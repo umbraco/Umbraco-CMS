@@ -79,15 +79,14 @@ test.describe('Stylesheet Folder tests', () => {
     const child = await umbracoApi.stylesheet.getChildren(stylesheetParentFolderPath);
     expect(child[0].name).toEqual(childFolderName);
     expect(child[0].isFolder).toBe(true);
-    console.log(stylesheetChildFolderPath);
-    expect(await umbracoApi.stylesheet.doesNameExist(childFolderName)).toBeTruthy();
 
+    expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetChildFolderPath)).toBeTruthy();
 
     // Act
     await umbracoApi.stylesheet.deleteFolder(stylesheetChildFolderPath);
 
     // Assert
     const noChild = await umbracoApi.stylesheet.getChildren(stylesheetParentFolderPath);
-    expect(noChild).toBe(undefined);
+    expect(noChild[0]).toBe(undefined);
   });
 });
