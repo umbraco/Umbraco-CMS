@@ -1,4 +1,4 @@
-import {ConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('Installed packages tests', () => {
   // We can't install any packages so we do not have any installed.

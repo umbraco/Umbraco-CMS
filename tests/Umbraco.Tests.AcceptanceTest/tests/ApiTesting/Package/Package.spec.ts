@@ -1,5 +1,5 @@
 import {test} from '@umbraco/playwright-testhelpers';
-import {expect} from "@playwright/test";
+import {expect} from '@playwright/test';
 
 test.describe('Package tests', () => {
   let packageId = '';
@@ -21,8 +21,7 @@ test.describe('Package tests', () => {
     expect(await umbracoApi.package.doesExist(packageId)).toBeTruthy();
   });
 
-
-  test('can update a package', async ({ umbracoApi}) => {
+  test('can update a package', async ({umbracoApi}) => {
     // Arrange
     const wrongPackageName = 'WrongName';
     await umbracoApi.package.ensureNameNotExists(wrongPackageName);
@@ -38,7 +37,6 @@ test.describe('Package tests', () => {
     expect(updatedPackageData.name).toEqual(packageName);
   });
 
-
   test('can delete a package', async ({umbracoApi}) => {
     // Arrange
     packageId = await umbracoApi.package.create(packageName);
@@ -49,5 +47,4 @@ test.describe('Package tests', () => {
     // Assert
     expect(await umbracoApi.package.doesExist(packageId)).toBeFalsy();
   });
-
 });

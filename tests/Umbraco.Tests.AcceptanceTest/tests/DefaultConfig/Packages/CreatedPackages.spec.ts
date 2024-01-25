@@ -1,5 +1,5 @@
-import {ConstantHelper, test} from "@umbraco/playwright-testhelpers";
-import {expect} from "@playwright/test";
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {expect} from '@playwright/test';
 import * as fs from 'fs';
 
 test.describe('Created packages tests', () => {
@@ -28,7 +28,7 @@ test.describe('Created packages tests', () => {
 
   test('can update package name', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const wrongPackageName = "WrongPackageName";
+    const wrongPackageName = 'WrongPackageName';
     await umbracoApi.package.ensureNameNotExists(wrongPackageName);
     await umbracoApi.package.createEmptyPackage(wrongPackageName);
     await umbracoUi.reloadPage();
@@ -86,7 +86,6 @@ test.describe('Created packages tests', () => {
 
     // Clean
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-    await umbracoApi.package.ensureNameNotExists(packageName);
   });
 
   // Currently unable to run this test. Because you are not able to save a mediaId
@@ -108,7 +107,6 @@ test.describe('Created packages tests', () => {
     await umbracoUi.package.clickSubmitButton();
     await umbracoUi.package.clickSaveChangesToPackageButton();
 
-
     // Assert
     await umbracoUi.package.clickExistingPackageName(packageName);
     expect(umbracoUi.package.isButtonWithNameVisible(mediaTypeName + ' ' + mediaId)).toBeTruthy();
@@ -117,7 +115,6 @@ test.describe('Created packages tests', () => {
 
     // Clean
     await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName);
-    await umbracoApi.package.ensureNameNotExists(packageName);
   });
 
   test.skip('can create a package with document types', async ({umbracoApi, umbracoUi}) => {
@@ -144,7 +141,6 @@ test.describe('Created packages tests', () => {
 
     // Clean
     await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-    await umbracoApi.package.ensureNameNotExists(packageName);
   });
 
   // TODO: Remove .skip when the test is able to run. Currently waiting for button
@@ -172,7 +168,6 @@ test.describe('Created packages tests', () => {
 
     // Clean
     await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName);
-    await umbracoApi.package.ensureNameNotExists(packageName);
   });
 
   // TODO: Remove .skip when the test is able to run. After adding a language to a package and saving. The language is not saved or anything.
@@ -199,7 +194,6 @@ test.describe('Created packages tests', () => {
     expect(packageData.languages[0] == languageId).toBeTruthy();
 
     // Clean
-    await umbracoApi.package.ensureNameNotExists(packageName);
     await umbracoApi.language.ensureNameNotExists(languageName);
   });
 
@@ -226,7 +220,6 @@ test.describe('Created packages tests', () => {
     expect(packageData.dictionaryItems[0] == dictionaryName).toBeTruthy();
 
     // Clean
-    await umbracoApi.package.ensureNameNotExists(packageName);
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   });
 
@@ -253,7 +246,6 @@ test.describe('Created packages tests', () => {
     expect(packageData.dataTypes[0] == dataTypeId).toBeTruthy();
 
     // Clean
-    await umbracoApi.package.ensureNameNotExists(packageName);
     await umbracoApi.dictionary.ensureNameNotExists(dataTypeName);
   });
 
@@ -280,7 +272,6 @@ test.describe('Created packages tests', () => {
     expect(packageData.templates[0] == templateId).toBeTruthy();
 
     // Clean
-    await umbracoApi.package.ensureNameNotExists(packageName);
     await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
@@ -307,7 +298,6 @@ test.describe('Created packages tests', () => {
     expect(packageData.stylesheets[0] == stylesheetId).toBeTruthy();
 
     // Clean
-    await umbracoApi.package.ensureNameNotExists(packageName);
     await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
   });
 
@@ -334,7 +324,6 @@ test.describe('Created packages tests', () => {
     expect(packageData.scripts[0] == scriptId).toBeTruthy();
 
     // Clean
-    await umbracoApi.package.ensureNameNotExists(packageName);
     await umbracoApi.script.ensureNameNotExists(scriptName);
   });
 
@@ -362,11 +351,10 @@ test.describe('Created packages tests', () => {
 
     // Clean
     await umbracoApi.package.ensureNameNotExists(packageName);
-    await umbracoApi.package.ensureNameNotExists(packageName);
   });
 
   // Currently you are not able to download a package
-  test('can download a package', async ({page, umbracoApi, umbracoUi}) => {
+  test('can download a package', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const packageId = await umbracoApi.package.createEmptyPackage(packageName);
     await umbracoUi.reloadPage();
