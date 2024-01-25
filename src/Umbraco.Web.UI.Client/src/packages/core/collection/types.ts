@@ -1,6 +1,6 @@
-import { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbCollectionConfiguration {
 	pageSize?: number;

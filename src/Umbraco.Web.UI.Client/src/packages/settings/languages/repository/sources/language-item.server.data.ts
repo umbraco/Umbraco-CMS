@@ -1,7 +1,8 @@
-import { LanguageResource, LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { LanguageResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Languages that fetches Language items from the server

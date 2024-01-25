@@ -1,8 +1,9 @@
-import { UmbStoreBase } from './store-base.js';
+import type { UmbStoreBase } from './store-base.js';
 import { UmbStoreAppendEvent, UmbStoreRemoveEvent, UmbStoreUpdateEvent } from './events/index.js';
-import { UmbStore } from './store.interface.js';
-import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbStore } from './store.interface.js';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // WIP: get back to this when we have decided on detail model sizes
 export class UmbStoreConnector<StoreType, ConnectedStoreType> {

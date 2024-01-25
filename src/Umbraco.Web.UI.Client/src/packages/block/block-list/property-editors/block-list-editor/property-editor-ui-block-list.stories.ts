@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIBlockListElement } from './property-editor-ui-block-list.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

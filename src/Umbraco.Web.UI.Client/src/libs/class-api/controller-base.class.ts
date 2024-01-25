@@ -1,4 +1,4 @@
-import { type UmbController } from '../controller-api/controller.interface.js';
+import type { UmbController } from '../controller-api/controller.interface.js';
 import { UmbClassMixin } from './index.js';
 
 /**

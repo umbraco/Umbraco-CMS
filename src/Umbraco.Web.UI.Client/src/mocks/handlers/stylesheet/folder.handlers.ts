@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbStylesheetMockDb } from '../../data/stylesheet/stylesheet.db.js';
 import { UMB_SLUG } from './slug.js';
-import { CreateStylesheetFolderRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateStylesheetFolderRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const folderHandlers = [

@@ -1,12 +1,13 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
-import { UmbDocumentTypeDetailModel } from '../types.js';
+import type { UmbDocumentTypeDetailModel } from '../types.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbEditableWorkspaceContextBase,
-	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase
 } from '@umbraco-cms/backoffice/workspace';
 import type { ContentTypeCompositionModel, ContentTypeSortModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = UmbDocumentTypeDetailModel;

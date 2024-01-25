@@ -1,6 +1,6 @@
 import { UmbUserActionConditionBase } from '../../../conditions/user-allow-action-base.condition.js';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
-import {
+import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,

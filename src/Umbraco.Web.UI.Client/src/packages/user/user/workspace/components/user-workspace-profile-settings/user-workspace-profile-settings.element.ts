@@ -2,9 +2,9 @@ import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
 import { html, customElement, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
+import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
 
 @customElement('umb-user-workspace-profile-settings')
 export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {

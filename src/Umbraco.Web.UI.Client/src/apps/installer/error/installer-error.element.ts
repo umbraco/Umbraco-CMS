@@ -1,6 +1,8 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT } from '../installer.context.js';
-import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbInstallerContext} from '../installer.context.js';
+import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-error')

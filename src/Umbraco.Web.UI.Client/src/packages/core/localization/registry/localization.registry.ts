@@ -1,12 +1,14 @@
-import {
+import type {
 	UmbLocalizationDictionary,
 	UmbLocalizationFlatDictionary,
-	LocalizationSet,
+	LocalizationSet} from '@umbraco-cms/backoffice/localization-api';
+import {
 	registerLocalization,
 	localizations,
 } from '@umbraco-cms/backoffice/localization-api';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBackofficeExtensionRegistry} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	BehaviorSubject,
 	Subject,

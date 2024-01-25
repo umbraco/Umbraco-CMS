@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './table.element.js';
 import type { UmbTableElement, UmbTableColumn, UmbTableConfig, UmbTableItem } from './table.element.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';

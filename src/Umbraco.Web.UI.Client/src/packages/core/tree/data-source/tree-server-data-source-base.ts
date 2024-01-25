@@ -2,8 +2,8 @@ import type { UmbTreeItemModelBase } from '../types.js';
 import type { UmbTreeDataSource } from './tree-data-source.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { CancelablePromise, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import type { CancelablePromise, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbPagedData } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeServerDataSourceBaseArgs<
 	ServerTreeItemType extends TreeItemPresentationModel,

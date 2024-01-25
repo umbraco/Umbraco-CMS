@@ -1,8 +1,9 @@
-import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
+import type { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
 import { UMB_DATA_TYPE_CREATE_OPTIONS_MODAL } from './modal/index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateDataTypeEntityAction extends UmbEntityActionBase<UmbDataTypeDetailRepository> {
 	#modalManagerContext?: UmbModalManagerContext;

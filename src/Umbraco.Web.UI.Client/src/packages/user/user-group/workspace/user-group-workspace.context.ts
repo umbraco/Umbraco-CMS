@@ -1,7 +1,8 @@
 import { UmbUserGroupRepository } from '../repository/user-group.repository.js';
 import { UmbUserRepository } from '../../user/repository/user.repository.js';
+import type {
+	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';

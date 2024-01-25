@@ -1,4 +1,4 @@
-import { UmbCultureDataSource } from './index.js';
+import type { UmbCultureDataSource } from './index.js';
 import { CultureResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

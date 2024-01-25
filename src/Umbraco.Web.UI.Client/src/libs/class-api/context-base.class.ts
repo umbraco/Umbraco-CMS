@@ -1,5 +1,5 @@
-import { type UmbContextToken } from '../context-api/index.js';
-import { type UmbControllerHost } from '../controller-api/index.js';
+import type { UmbContextToken } from '../context-api/index.js';
+import type { UmbControllerHost } from '../controller-api/index.js';
 import { UmbBaseController } from './controller-base.class.js';
 
 /**

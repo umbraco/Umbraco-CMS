@@ -1,8 +1,9 @@
-import { UmbMoveDataTypeRepository } from '../../repository/move/data-type-move.repository.js';
+import type { UmbMoveDataTypeRepository } from '../../repository/move/data-type-move.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
-	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_DATA_TYPE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';

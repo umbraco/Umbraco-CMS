@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './input-color.element.js';
 import type { UmbInputColorElement } from './input-color.element.js';
 

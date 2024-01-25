@@ -1,10 +1,11 @@
 const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import {
+import type {
 	PagedRedirectUrlResponseModel,
 	RedirectUrlResponseModel,
-	RedirectStatusModel,
-	RedirectUrlStatusResponseModel,
+	RedirectUrlStatusResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	RedirectStatusModel
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [

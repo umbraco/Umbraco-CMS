@@ -3,8 +3,9 @@ import { UmbMockFileSystemFolderManager } from '../file-system/file-system-folde
 import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.manager.js';
 import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
 import { UmbMockFileSystemDetailManager } from '../file-system/file-system-detail.manager.js';
-import { UmbMockPartialViewModel, data, snippets } from './partial-view.data.js';
-import {
+import type { UmbMockPartialViewModel} from './partial-view.data.js';
+import { data, snippets } from './partial-view.data.js';
+import type {
 	PagedPartialViewSnippetItemResponseModel,
 	PartialViewSnippetItemResponseModel,
 	PartialViewSnippetResponseModel,

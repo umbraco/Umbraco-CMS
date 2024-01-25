@@ -1,5 +1,6 @@
 import { type ManifestTypes, umbExtensionsRegistry } from '../../extension-registry/index.js';
-import { css, repeat, customElement, property, state, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import { css, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementInitializer,
 	UmbExtensionsElementInitializer,

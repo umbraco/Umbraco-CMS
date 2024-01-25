@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import type UmbTestSorterControllerElement from './test-sorter-controller.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import './test-sorter-controller.element.js';

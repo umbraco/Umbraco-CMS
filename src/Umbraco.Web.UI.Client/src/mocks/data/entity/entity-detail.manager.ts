@@ -1,4 +1,4 @@
-import { UmbEntityMockDbBase } from './entity-base.js';
+import type { UmbEntityMockDbBase } from './entity-base.js';
 
 export class UmbMockEntityDetailManager<MockType extends { id: string }> {
 	#db: UmbEntityMockDbBase<MockType>;

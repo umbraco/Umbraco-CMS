@@ -1,4 +1,4 @@
-import { UmbUserGroupInputElement } from '../../../../user-group/components/input-user-group/user-group-input.element.js';
+import type { UmbUserGroupInputElement } from '../../../../user-group/components/input-user-group/user-group-input.element.js';
 import { UmbInviteUserRepository } from '../../repository/invite-user.repository.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

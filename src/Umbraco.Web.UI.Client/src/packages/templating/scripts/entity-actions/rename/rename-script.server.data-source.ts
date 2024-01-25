@@ -1,10 +1,11 @@
+import { UmbScriptDetailServerDataSource } from '../../repository/script-detail.server.data-source.js';
 import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
-import { UmbScriptDetailServerDataSource } from '../../repository/script-detail.server.data-source.js';
-import { RenameStylesheetRequestModel, ScriptResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { RenameStylesheetRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import { ScriptResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbRenameScriptServerDataSource {

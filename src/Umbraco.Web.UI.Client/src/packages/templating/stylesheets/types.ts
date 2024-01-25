@@ -1,4 +1,4 @@
-import { UmbStylesheetEntityType, UmbStylesheetFolderEntityType } from './entity.js';
+import type { UmbStylesheetEntityType, UmbStylesheetFolderEntityType } from './entity.js';
 
 export interface UmbStylesheetDetailModel {
 	entityType: UmbStylesheetEntityType;

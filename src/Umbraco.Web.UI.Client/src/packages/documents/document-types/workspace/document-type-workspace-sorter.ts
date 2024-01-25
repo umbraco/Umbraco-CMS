@@ -1,8 +1,8 @@
-import {
+import type {
 	DocumentTypePropertyTypeContainerResponseModel,
 	PropertyTypeContainerModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG_HORIZONTAL: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeContainerResponseModel) => {

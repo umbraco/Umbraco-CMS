@@ -1,8 +1,9 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	// TODO: Refactor: use the split view context token:
@@ -67,8 +68,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			}
 
 			#splitViews {
-				display: grid;
-				grid-template-columns: 50% 50%;
+				display: flex;
 				width: 100%;
 				height: calc(100% - var(--umb-footer-layout-height));
 			}

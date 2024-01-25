@@ -1,11 +1,12 @@
-import { UmbUniqueTreeItemModel } from '../types.js';
+import type { UmbUniqueTreeItemModel } from '../types.js';
 import { UmbUniqueTreeItemContext } from './unique-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
+import type {
 	UmbBackofficeManifestKind,
-	UmbTreeItemElement,
+	UmbTreeItemElement} from '@umbraco-cms/backoffice/extension-registry';
+import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 

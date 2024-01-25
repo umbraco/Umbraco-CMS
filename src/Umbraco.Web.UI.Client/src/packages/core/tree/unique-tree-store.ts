@@ -1,8 +1,8 @@
-import { type UmbTreeStore } from './tree-store.interface.js';
-import { UmbUniqueTreeItemModel } from './types.js';
+import type { UmbTreeStore } from './tree-store.interface.js';
+import type { UmbUniqueTreeItemModel } from './types.js';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: remove Unique from name when we have switched to uniques
 /**

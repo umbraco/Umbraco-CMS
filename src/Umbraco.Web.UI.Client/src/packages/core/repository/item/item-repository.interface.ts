@@ -1,6 +1,6 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbItemRepository<ItemType = any> extends UmbApi {
 	requestItems: (uniques: string[]) => Promise<{

@@ -1,8 +1,8 @@
 import type { UmbTreeItemModelBase } from './types.js';
 import type { UmbPagedData } from '@umbraco-cms/backoffice/repository';
-import { type Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbTreeRepository<
 	TreeItemType extends UmbTreeItemModelBase = UmbTreeItemModelBase,

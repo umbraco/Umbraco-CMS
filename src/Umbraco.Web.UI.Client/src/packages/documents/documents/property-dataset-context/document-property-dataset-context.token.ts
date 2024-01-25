@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentPropertyDataContext } from './document-property-dataset-context.js';
-import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export const IsDocumentVariantContext = (

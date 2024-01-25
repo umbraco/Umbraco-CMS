@@ -1,8 +1,9 @@
-import {
-	HealthStatusModel,
+import type {
 	IndexResponseModel,
 	PagedIndexResponseModel,
-	SearchResultResponseModel,
+	SearchResultResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	HealthStatusModel
 } from '@umbraco-cms/backoffice/backend-api';
 
 export function getIndexByName(indexName: string) {

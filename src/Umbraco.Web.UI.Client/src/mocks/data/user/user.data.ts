@@ -1,4 +1,5 @@
-import { UserResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<UserResponseModel & { type: string }> = [
 	{

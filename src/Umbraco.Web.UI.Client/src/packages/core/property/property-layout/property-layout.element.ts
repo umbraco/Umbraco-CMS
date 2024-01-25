@@ -69,7 +69,7 @@ export class UmbPropertyLayoutElement extends LitElement {
 		css`
 			:host {
 				display: grid;
-				grid-template-columns: 200px auto;
+				grid-template-columns: 200px minmax(0,1fr);
 				column-gap: var(--uui-size-layout-2);
 				border-bottom: 1px solid var(--uui-color-divider);
 				padding: var(--uui-size-layout-1) 0;

@@ -1,5 +1,5 @@
-import { UmbFileSystemMockDbBase } from './file-system-base.js';
-import {
+import type { UmbFileSystemMockDbBase } from './file-system-base.js';
+import type {
 	FileSystemFileCreateRequestModelBaseModel,
 	FileSystemFileResponseModelBaseModel,
 	FileSystemFileUpdateRequestModelBaseModel,

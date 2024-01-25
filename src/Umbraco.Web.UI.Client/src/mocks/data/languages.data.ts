@@ -1,5 +1,5 @@
 import { UmbData } from './data.js';
-import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database
 class UmbLanguagesData extends UmbData<LanguageResponseModel> {

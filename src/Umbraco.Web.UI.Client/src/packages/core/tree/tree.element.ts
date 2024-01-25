@@ -1,8 +1,8 @@
 import { UmbTreeContextBase } from './tree.context.js';
-import { UmbTreeItemModelBase } from './types.js';
+import type { UmbTreeItemModelBase } from './types.js';
 import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 import './tree-item-default/tree-item.element.js';
 import './tree-item-base/tree-item-base.element.js';

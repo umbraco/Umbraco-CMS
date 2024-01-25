@@ -1,5 +1,5 @@
-import { UmbUserCollectionContext } from './user-collection.context.js';
-import {
+import type { UmbUserCollectionContext } from './user-collection.context.js';
+import type {
 	UUIBooleanInputEvent,
 	UUICheckboxElement,
 	UUIRadioGroupElement,
@@ -8,8 +8,9 @@ import {
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UserGroupResponseModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import type { UserGroupResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-collection-header')

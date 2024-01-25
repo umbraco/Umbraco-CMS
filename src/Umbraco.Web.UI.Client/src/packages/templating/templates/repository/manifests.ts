@@ -1,7 +1,7 @@
 import { UmbTemplateRepository } from '../repository/template.repository.js';
 import { UmbTemplateStore } from './template.store.js';
 import { UmbTemplateItemStore } from './template-item.store.js';
-import { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_TEMPLATE_REPOSITORY_ALIAS = 'Umb.Repository.Template';
 

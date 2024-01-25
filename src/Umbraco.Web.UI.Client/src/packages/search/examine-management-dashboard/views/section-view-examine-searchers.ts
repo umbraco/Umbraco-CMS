@@ -1,14 +1,16 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
-	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_EXAMINE_FIELDS_SETTINGS_MODAL,
 } from '@umbraco-cms/backoffice/modal';
-import {
+import type {
 	SearchResultResponseModel,
-	SearcherResource,
-	FieldPresentationModel,
+	FieldPresentationModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	SearcherResource
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

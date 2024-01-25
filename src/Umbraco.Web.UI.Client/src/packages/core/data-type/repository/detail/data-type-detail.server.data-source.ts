@@ -1,10 +1,11 @@
-import { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../types.js';
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../types.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import {
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
 	CreateDataTypeRequestModel,
-	DataTypeModelBaseModel,
+	DataTypeModelBaseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	DataTypeResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

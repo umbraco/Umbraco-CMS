@@ -1,8 +1,9 @@
-import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
+import type {
+	ModelsBuilderResponseModel} from '@umbraco-cms/backoffice/backend-api';
 import {
-	ModelsBuilderResponseModel,
 	ModelsBuilderResource,
 	ModelsModeModel,
 } from '@umbraco-cms/backoffice/backend-api';

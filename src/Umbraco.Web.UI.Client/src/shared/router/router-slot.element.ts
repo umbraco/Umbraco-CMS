@@ -1,9 +1,9 @@
 import '@umbraco-cms/backoffice/external/router-slot';
 import { UmbRouterSlotInitEvent } from './router-slot-init.event.js';
 import { UmbRouterSlotChangeEvent } from './router-slot-change.event.js';
-import { css, html, PropertyValueMap, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, type PropertyValueMap, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbRouteContext, UmbRoute, IRouterSlot } from '@umbraco-cms/backoffice/router';
+import { UmbRouteContext, type UmbRoute, type IRouterSlot } from '@umbraco-cms/backoffice/router';
 
 /**
  *  @element umb-router-slot
