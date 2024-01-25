@@ -1,6 +1,8 @@
 import type {
 	PropertyTypeContainerModelBaseModel,
 	PropertyTypeModelBaseModel,
+	ContentTypeSortModel,
+	ContentTypeCompositionModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbContentTypeModel {

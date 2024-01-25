@@ -9,7 +9,6 @@ import type {
 	TemplateItemResponseModel,
 	TemplateQuerySettingsResponseModel,
 	TemplateQueryResultResponseModel,
-	TemplateQueryResultResponseModel,
 	PagedNamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { TemplateQueryPropertyTypeModel, OperatorModel } from '@umbraco-cms/backoffice/backend-api';

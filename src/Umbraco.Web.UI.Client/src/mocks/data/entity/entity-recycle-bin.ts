@@ -1,6 +1,6 @@
 import { UmbEntityMockDbBase } from './entity-base.js';
 import { UmbMockEntityTreeManager } from './entity-tree.manager.js';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbEntityRecycleBin<
 	MockType extends Omit<EntityTreeItemResponseModel, 'type'>,

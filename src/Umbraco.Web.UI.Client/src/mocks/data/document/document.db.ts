@@ -4,9 +4,10 @@ import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
 import { umbDocumentTypeMockDb } from '../document-type/document-type.db.js';
 import { UmbEntityMockDbBase } from '../entity/entity-base.js';
 import { UmbEntityRecycleBin } from '../entity/entity-recycle-bin.js';
-import { UmbMockDocumentModel, data } from './document.data.js';
+import type { UmbMockDocumentModel } from './document.data.js';
+import { data } from './document.data.js';
 import { UmbMockDocumentPublishingManager } from './document-publishing.manager.js';
-import {
+import type {
 	CreateDocumentRequestModel,
 	DocumentItemResponseModel,
 	DocumentResponseModel,
