@@ -1,4 +1,4 @@
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;
@@ -185,25 +185,25 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				? this.#host.shadowRoot!.querySelector(this.#config.containerSelector)
 				: this.#host) ?? this.#host;
 
+		this.#containerElement = containerEl as HTMLElement;
 		this.#useContainerShadowRoot = this.#containerElement === this.#host;
 
 		if (!this.#currentContainerElement || this.#currentContainerElement === this.#containerElement) {
 			this.#currentContainerElement = containerEl;
 		}
-		this.#containerElement = containerEl as HTMLElement;
-		this.#containerElement.addEventListener('dragover', preventDragOver);
-
-		(this.#containerElement as any)['__umbBlockGridSorterController'] = () => {
-			return this;
-		};
-
-		// TODO: Clean up??
-		this.#observer.disconnect();
 
 		// Only look at the shadowRoot if the containerElement is host.
 		const containerElement = this.#useContainerShadowRoot
 			? this.#containerElement.shadowRoot ?? this.#containerElement
 			: this.#containerElement;
+		containerElement.addEventListener('dragover', preventDragOver);
+
+		(this.#containerElement as any)['__umbBlockGridSorterController'] = () => {
+			return this;
+		};
+
+		this.#observer.disconnect();
+
 		containerElement.querySelectorAll(this.#config.itemSelector).forEach((child) => {
 			if (child.matches && child.matches(this.#config.itemSelector)) {
 				this.setupItem(child as ElementType);

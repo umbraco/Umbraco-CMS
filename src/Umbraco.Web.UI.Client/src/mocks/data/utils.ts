@@ -6,7 +6,7 @@ import type {
 	MediaTreeItemResponseModel,
 	NamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
+import type { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
 
 export const createEntityTreeItem = (item: any): NamedEntityTreeItemResponseModel => {
 	return {

@@ -1,17 +1,19 @@
-import type { UmbBlockTypeBase } from '../types.js';
-import { UMB_PROPERTY_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import {
+import type { UmbBlockTypeBaseModel } from '../types.js';
+import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type {
 	UmbInvariantableWorkspaceContextInterface,
+	UmbWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
+import {
 	UmbEditableWorkspaceContextBase,
-	UmbWorkspaceContextInterface,
 	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase = UmbBlockTypeBase>
+export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel>
 	extends UmbEditableWorkspaceContextBase<BlockTypeData>
 	implements UmbInvariantableWorkspaceContextInterface
 {
@@ -43,7 +45,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.value, (value) => {
 				if (value) {
-					const blockTypeData = value.find((x: UmbBlockTypeBase) => x.contentElementTypeKey === unique);
+					const blockTypeData = value.find((x: UmbBlockTypeBaseModel) => x.contentElementTypeKey === unique);
 					if (blockTypeData) {
 						this.#data.setValue(blockTypeData);
 						return;

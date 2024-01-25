@@ -5,7 +5,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDictionaryWorkspaceContext
@@ -83,7 +83,10 @@ export class UmbDictionaryWorkspaceContext
 		if (!this.#data.value.id) return;
 
 		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
+			const { error } = await this.repository.create(this.#data.value);
+			if (error) {
+				return;
+			}
 			this.setIsNew(false);
 		} else {
 			await this.repository.save(this.#data.value.id, this.#data.value);

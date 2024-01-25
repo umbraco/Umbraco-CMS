@@ -1,5 +1,5 @@
-import { UmbRenameRepository } from '../types.js';
-import { UmbRenameModalData, UmbRenameModalValue } from './rename-modal.token.js';
+import type { UmbRenameRepository } from '../types.js';
+import type { UmbRenameModalData, UmbRenameModalValue } from './rename-modal.token.js';
 import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';

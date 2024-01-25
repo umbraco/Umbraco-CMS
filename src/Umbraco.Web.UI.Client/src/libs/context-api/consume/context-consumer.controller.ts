@@ -1,6 +1,6 @@
-import { UmbContextToken } from '../token/context-token.js';
+import type { UmbContextToken } from '../token/context-token.js';
 import { UmbContextConsumer } from './context-consumer.js';
-import { UmbContextCallback } from './context-request.event.js';
+import type { UmbContextCallback } from './context-request.event.js';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbContextConsumerController<BaseType = unknown, ResultType extends BaseType = BaseType>

@@ -2,11 +2,11 @@ import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
 import { html, customElement, state, css, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
-import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
-import { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
+import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
+import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-workspace-access-settings')
 export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {

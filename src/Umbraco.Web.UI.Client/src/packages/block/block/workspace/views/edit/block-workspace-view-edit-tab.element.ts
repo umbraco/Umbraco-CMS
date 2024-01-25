@@ -1,9 +1,10 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbContentTypeContainerStructureHelper, UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import './block-workspace-view-edit-properties.element.js';
 
@@ -42,6 +43,13 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		this._groupStructureHelper.setOwnerId(value);
 	}
 
+	/**
+	 * If true, the group box will be hidden, if we are to only represents one group.
+	 * This is used by Inline Editing Mode of Block List Editor.
+	 */
+	@property({ type: Boolean, reflect: false })
+	hideSingleGroup = false;
+
 	_groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
@@ -66,28 +74,27 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this._hasProperties
-				? html`
-						<uui-box>
-							<umb-block-workspace-view-edit-properties
-								class="properties"
-								container-type="Tab"
-								container-name=${this.tabName || ''}></umb-block-workspace-view-edit-properties>
-						</uui-box>
-				  `
-				: ''}
+			${this._hasProperties ? this.#renderPart(this._tabName) : ''}
 			${repeat(
 				this._groups,
 				(group) => group.name,
-				(group) =>
-					html`<uui-box .headline=${group.name || ''}>
-						<umb-block-workspace-view-edit-properties
-							class="properties"
-							container-type="Group"
-							container-name=${group.name || ''}></umb-block-workspace-view-edit-properties>
-					</uui-box>`,
+				(group) => this.#renderPart(group.name, group.name),
 			)}
 		`;
+	}
+
+	#renderPart(groupName: string | null | undefined, boxName?: string | null | undefined) {
+		return this.hideSingleGroup && this._groups.length === 1
+			? html` <umb-block-workspace-view-edit-properties
+					class="properties"
+					container-type="Group"
+					container-name=${groupName || ''}></umb-block-workspace-view-edit-properties>`
+			: html` <uui-box .headline=${boxName || ''}
+					><umb-block-workspace-view-edit-properties
+						class="properties"
+						container-type="Group"
+						container-name=${groupName || ''}></umb-block-workspace-view-edit-properties
+			  ></uui-box>`;
 	}
 
 	static styles = [

@@ -2,16 +2,18 @@ import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
 import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type {
 	ManifestSection,
 	ManifestSectionSidebarApp,
 	ManifestSectionSidebarAppMenuKind,
-	UmbSectionElement,
+	UmbSectionElement} from '@umbraco-cms/backoffice/extension-registry';
+import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbExtensionElementInitializer, UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionElementInitializer} from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @export

@@ -1,5 +1,5 @@
-import { UmbEntityMockDbBase } from './entity-base.js';
-import {
+import type { UmbEntityMockDbBase } from './entity-base.js';
+import type {
 	CreateFolderRequestModel,
 	FolderResponseModel,
 	FolderTreeItemResponseModel,

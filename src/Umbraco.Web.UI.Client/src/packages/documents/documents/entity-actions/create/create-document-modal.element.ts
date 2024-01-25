@@ -1,11 +1,12 @@
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
+import type {
 	UmbCreateDocumentModalData,
-	UmbCreateDocumentModalValue,
+	UmbCreateDocumentModalValue} from '@umbraco-cms/backoffice/modal';
+import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-create-document-modal')

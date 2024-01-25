@@ -1,6 +1,7 @@
 import { expect } from '@open-wc/testing';
 
-import { UmbNotificationHandler, UmbNotificationContext } from './index.js';
+import type { UmbNotificationHandler} from './index.js';
+import { UmbNotificationContext } from './index.js';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 

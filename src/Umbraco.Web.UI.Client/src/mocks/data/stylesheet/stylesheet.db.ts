@@ -3,7 +3,8 @@ import { UmbMockFileSystemDetailManager } from '../file-system/file-system-detai
 import { UmbMockFileSystemFolderManager } from '../file-system/file-system-folder.manager.js';
 import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.manager.js';
 import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
-import { UmbMockStylesheetModel, data } from './stylesheet.data.js';
+import type { UmbMockStylesheetModel} from './stylesheet.data.js';
+import { data } from './stylesheet.data.js';
 
 class UmbStylesheetMockDb extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockStylesheetModel>(this);

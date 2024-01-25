@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { extendDataSourceResponseData } from './extend-data-source-response-data.function.js';
-import { DataSourceResponse } from './data-source-response.interface.js';
+import type { DataSourceResponse } from './data-source-response.interface.js';
 
 describe('extendDataSourceResponseData', () => {
 	it('is a function', () => {

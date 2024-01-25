@@ -6,7 +6,7 @@ import {
 	UmbDeleteEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'document-type';
 

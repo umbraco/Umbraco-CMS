@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbDashboardSettingsWelcomeElement } from './dashboard-settings-welcome.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

@@ -1,18 +1,18 @@
 import { UmbEntityData } from './entity.data.js';
 import { createEntityTreeItem } from './utils.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import {
+import type {
 	EntityTreeItemResponseModel,
 	TemplateResponseModel,
 	TemplateScaffoldResponseModel,
 	CreateTemplateRequestModel,
 	TemplateItemResponseModel,
 	TemplateQuerySettingsResponseModel,
-	TemplateQueryPropertyTypeModel,
-	OperatorModel,
+	TemplateQueryResultResponseModel,
 	TemplateQueryResultResponseModel,
 	PagedNamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { TemplateQueryPropertyTypeModel, OperatorModel } from '@umbraco-cms/backoffice/backend-api';
 
 type UmbMockTemplateModel = TemplateResponseModel & EntityTreeItemResponseModel;
 

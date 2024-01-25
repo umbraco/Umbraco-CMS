@@ -1,12 +1,14 @@
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
+import type {
 	UmbPropertyEditorUIPickerModalData,
-	UmbPropertyEditorUIPickerModalValue,
+	UmbPropertyEditorUIPickerModalValue} from '@umbraco-cms/backoffice/modal';
+import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUi>;

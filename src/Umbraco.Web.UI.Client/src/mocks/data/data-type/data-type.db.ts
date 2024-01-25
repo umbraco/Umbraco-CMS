@@ -4,9 +4,10 @@ import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
 import { folderTreeItemMapper } from '../utils.js';
 import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
-import { UmbMockDataTypeModel, data } from './data-type.data.js';
+import type { UmbMockDataTypeModel} from './data-type.data.js';
+import { data } from './data-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import {
+import type {
 	CreateDataTypeRequestModel,
 	CreateFolderRequestModel,
 	DataTypeItemResponseModel,

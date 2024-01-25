@@ -1,4 +1,4 @@
-import { UmbDocumentTreeItemModel } from '../types.js';
+import type { UmbDocumentTreeItemModel } from '../types.js';
 import { UmbUniqueTreeItemContext } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

@@ -1,4 +1,4 @@
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,

@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
@@ -20,7 +20,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	constructor(host: UmbControllerHost) {
 		super(
 			host,
-			UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN.toString(),
+			UMB_CURRENT_USER_HISTORY_STORE_CONTEXT.toString(),
 			new UmbArrayState<UmbCurrentUserHistoryItem>([], (x) => x.unique),
 		);
 		if (!('navigation' in window)) return;
@@ -61,7 +61,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	}
 }
 
-export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbCurrentUserHistoryStore>(
+export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT = new UmbContextToken<UmbCurrentUserHistoryStore>(
 	'UmbCurrentUserHistoryStore',
 );
 

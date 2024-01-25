@@ -1,9 +1,10 @@
 import { UmbDocumentServerDataSource } from './sources/document.server.data.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbDocumentRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<unknown>;
@@ -19,7 +20,7 @@ export class UmbDocumentRepository extends UmbBaseController implements UmbApi {
 		this.#detailDataSource = new UmbDocumentServerDataSource(this);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);

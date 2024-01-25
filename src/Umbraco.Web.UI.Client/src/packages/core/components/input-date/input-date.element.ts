@@ -1,6 +1,7 @@
 import { UmbConfigRepository } from '../../repository/config/config.repository.js';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-date')

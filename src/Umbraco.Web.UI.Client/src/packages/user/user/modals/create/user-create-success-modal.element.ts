@@ -1,18 +1,20 @@
 import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
-import {
+import type { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
+import type {
 	UmbNotificationDefaultData,
-	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/backoffice/notification';
+	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
 import {
+	UMB_NOTIFICATION_CONTEXT,
+} from '@umbraco-cms/backoffice/notification';
+import type {
 	UmbCreateUserSuccessModalData,
-	UmbCreateUserSuccessModalValue,
+	UmbCreateUserSuccessModalValue} from '@umbraco-cms/backoffice/modal';
+import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-create-success-modal')
 export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
@@ -28,7 +30,7 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => (this.#notificationContext = instance));
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => (this.#notificationContext = instance));
 	}
 
 	protected async firstUpdated(): Promise<void> {

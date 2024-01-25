@@ -1,7 +1,7 @@
 import type { UmbMediaDetailModel } from '../../packages/media/media/index.js';
 import { UmbEntityData } from './entity.data.js';
 import { createMediaTreeItem } from './utils.js';
-import {
+import type {
 	ContentTreeItemResponseModel,
 	MediaItemResponseModel,
 	PagedMediaTreeItemResponseModel,

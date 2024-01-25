@@ -1,8 +1,8 @@
-import { UmbDocumentTreeItemModel } from '../../../tree/types.js';
+import type { UmbDocumentTreeItemModel } from '../../../tree/types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
-import {
+import type {
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,
@@ -11,9 +11,10 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 import './column-layouts/document-table-actions-column-layout.element.js';
 

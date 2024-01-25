@@ -1,10 +1,7 @@
 import { data as userData } from './user/user.data.js';
 import { data as documentData } from './document/document.data.js';
-import {
-	AuditLogResponseModel,
-	AuditLogWithUsernameResponseModel,
-	AuditTypeModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { AuditLogResponseModel, AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { AuditTypeModel } from '@umbraco-cms/backoffice/backend-api';
 
 const userId = userData[0].id;
 const userName = userData[0].name;

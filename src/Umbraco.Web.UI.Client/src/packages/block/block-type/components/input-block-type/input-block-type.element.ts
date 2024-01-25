@@ -1,7 +1,7 @@
-import { UmbBlockTypeBase } from '../../types.js';
+import type { UmbBlockTypeBaseModel } from '../../types.js';
 import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
@@ -11,7 +11,9 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-block-type')
-export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBlockTypeBase> extends UmbLitElement {
+export class UmbInputBlockTypeElement<
+	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
+> extends UmbLitElement {
 	//
 	@property({ type: Array, attribute: false })
 	public get value() {
@@ -61,7 +63,7 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 	}
 
 	create() {
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, async (modalManager) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
 			if (modalManager) {
 				// TODO: Make as mode for the Picker Modal, so the click to select immediately submits the modal(And in that mode we do not want to see a Submit button).
 				const modalContext = modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {

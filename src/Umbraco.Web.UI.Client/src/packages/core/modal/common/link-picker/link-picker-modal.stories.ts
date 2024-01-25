@@ -1,7 +1,7 @@
 import '../../../components/body-layout/body-layout.element.js';
 import './link-picker-modal.element.js';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbLinkPickerModalElement } from './link-picker-modal.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

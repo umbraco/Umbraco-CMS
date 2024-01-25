@@ -1,10 +1,10 @@
 // Needed to disable the import/no-duplicates rule, cause otherwise we do not get the custom element registered:
 // eslint-disable-next-line import/no-duplicates
-import { UmbInputStaticFileElement } from '@umbraco-cms/backoffice/static-file';
+import type { UmbInputStaticFileElement } from '@umbraco-cms/backoffice/static-file';
 // eslint-disable-next-line import/no-duplicates
 import '@umbraco-cms/backoffice/static-file';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

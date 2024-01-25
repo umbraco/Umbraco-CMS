@@ -1,4 +1,7 @@
-import { PropertyTypeContainerModelBaseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	PropertyTypeContainerModelBaseModel,
+	PropertyTypeModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbContentTypeModel {
 	unique: string;

@@ -1,13 +1,15 @@
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	UmbConfirmModalData} from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_PROPERTY_SETTINGS_MODAL,
 	UMB_WORKSPACE_MODAL,
-	UmbConfirmModalData,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -15,11 +17,11 @@ import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
- *  @element document-type-workspace-view-edit-property
+ *  @element umb-document-type-workspace-view-edit-property
  *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
  */
-@customElement('document-type-workspace-view-edit-property')
+@customElement('umb-document-type-workspace-view-edit-property')
 export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	private _property?: PropertyTypeModelBaseModel | undefined;
 	/**
@@ -56,7 +58,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
 	#modalRegistration;
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
+	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	@state()
 	protected _modalRoute?: string;
@@ -110,7 +112,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				this._editDocumentTypePath = routeBuilder({});
 			});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 			this._modalManagerContext = context;
 		});
 	}
@@ -478,6 +480,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'document-type-workspace-view-edit-property': UmbDocumentTypeWorkspacePropertyElement;
+		'umb-document-type-workspace-view-edit-property': UmbDocumentTypeWorkspacePropertyElement;
 	}
 }

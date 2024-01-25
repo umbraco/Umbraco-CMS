@@ -1,3 +1,5 @@
-import type { UmbBlockTypeBase } from '../block-type/index.js';
+import type { UmbBlockTypeBaseModel } from '../block-type/index.js';
+import type { UmbBlockLayoutBaseModel } from '../index.js';
 
-export interface UmbBlockListType extends UmbBlockTypeBase {}
+export interface UmbBlockListTypeModel extends UmbBlockTypeBaseModel {}
+export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}

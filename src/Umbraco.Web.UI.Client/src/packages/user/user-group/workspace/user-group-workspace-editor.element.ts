@@ -1,15 +1,16 @@
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context.js';
-import { UmbUserInputElement } from '@umbraco-cms/backoffice/user';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbUserInputElement } from '@umbraco-cms/backoffice/user';
+import type { UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
-import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
+import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 
 import './components/user-group-default-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';

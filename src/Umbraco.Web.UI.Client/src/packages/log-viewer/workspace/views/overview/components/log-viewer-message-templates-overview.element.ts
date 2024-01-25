@@ -1,8 +1,9 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
+import type { UmbLogViewerWorkspaceContext} from '../../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PagedLogTemplateResponseModel, SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PagedLogTemplateResponseModel, SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 //TODO: fix pagination bug when API is fixed
 @customElement('umb-log-viewer-message-templates-overview')
@@ -13,7 +14,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#logViewerContext?.getMessageTemplates(0, 10);
 			this.#observeStuff();

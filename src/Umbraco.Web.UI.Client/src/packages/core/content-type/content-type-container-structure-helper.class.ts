@@ -1,10 +1,10 @@
-import {
+import type {
 	PropertyContainerTypes,
 	UmbContentTypePropertyStructureManager,
 } from './content-type-structure-manager.class.js';
-import { UmbContentTypeModel } from './types.js';
-import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContentTypeModel } from './types.js';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeModel> {

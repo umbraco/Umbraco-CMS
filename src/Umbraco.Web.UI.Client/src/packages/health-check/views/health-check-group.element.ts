@@ -1,17 +1,19 @@
-import { UmbHealthCheckContext } from '../health-check.context.js';
+import type { UmbHealthCheckContext } from '../health-check.context.js';
+import type {
+	UmbHealthCheckDashboardContext} from '../health-check-dashboard.context.js';
 import {
-	UmbHealthCheckDashboardContext,
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
+	UMB_HEALTHCHECK_DASHBOARD_CONTEXT,
 } from '../health-check-dashboard.context.js';
-import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
-import {
+import type {
 	HealthCheckActionRequestModel,
 	HealthCheckGroupPresentationModel,
 	HealthCheckModel,
+	HealthCheckWithResultPresentationModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	HealthCheckResource,
-	HealthCheckWithResultPresentationModel,
 	StatusResultTypeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -42,7 +44,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT, (instance) => {
 			this._healthCheckContext = instance;
 
 			this._api = this._healthCheckContext?.apis.get(this.groupName);

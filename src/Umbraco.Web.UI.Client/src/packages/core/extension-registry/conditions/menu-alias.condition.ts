@@ -1,6 +1,6 @@
-import { UMB_MENU_CONTEXT_TOKEN } from '../../menu/menu.context.js';
+import { UMB_MENU_CONTEXT } from '../../menu/menu.context.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import {
+import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
@@ -20,7 +20,7 @@ export class UmbMenuAliasCondition extends UmbBaseController implements UmbExten
 		super(args.host);
 		this.config = args.config;
 		this.#onChange = args.onChange;
-		this.consumeContext(UMB_MENU_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_MENU_CONTEXT, (context) => {
 			this.observe(context.alias, (MenuAlias) => {
 				this.permitted = MenuAlias === this.config.match;
 				this.#onChange();

@@ -1,11 +1,8 @@
-import {
-	DocumentResource,
-	PublishDocumentRequestModel,
-	UnpublishDocumentRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { PublishDocumentRequestModel, UnpublishDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A data source for the Document that fetches data from the server
