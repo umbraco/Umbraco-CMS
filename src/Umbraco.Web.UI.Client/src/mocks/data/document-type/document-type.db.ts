@@ -3,7 +3,7 @@ import { UmbMockEntityFolderManager } from '../entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
-import type { UmbMockDocumentTypeModel} from './document-type.data.js';
+import type { UmbMockDocumentTypeModel } from './document-type.data.js';
 import { data } from './document-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
@@ -33,7 +33,7 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 	return {
 		name: request.name,
 		id: request.id ? request.id : UmbId.new(),
-		parentId: request.parentId,
+		parent: request.parentId ? { id: request.parentId } : null,
 		description: '',
 		alias: '',
 		icon: '',
@@ -43,12 +43,11 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		isFolder: true,
 		hasChildren: false,
-		isContainer: false,
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		cleanup: {
 			preventCleanup: false,
 			keepAllVersionsNewerThanDays: null,
@@ -97,9 +96,9 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,
-		allowedContentTypes: item.allowedContentTypes,
+		allowedDocumentTypes: item.allowedDocumentTypes,
 		compositions: item.compositions,
-		allowedTemplateIds: item.allowedTemplateIds,
+		allowedTemplates: item.allowedTemplates,
 		cleanup: item.cleanup,
 	};
 };
@@ -111,8 +110,7 @@ const documentTypeTreeItemMapper = (
 		name: item.name,
 		hasChildren: item.hasChildren,
 		id: item.id,
-		isContainer: item.isContainer,
-		parentId: item.parentId,
+		parent: item.parent,
 		isFolder: item.isFolder,
 		icon: item.icon,
 		isElement: item.isElement,

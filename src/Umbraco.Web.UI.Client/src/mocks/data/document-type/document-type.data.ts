@@ -1,9 +1,9 @@
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/backend-api';
 import type {
 	DocumentTypeItemResponseModel,
 	DocumentTypeResponseModel,
 	DocumentTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { ContentTypeCompositionTypeModel } from '@umbraco-cms/backoffice/backend-api';
 
 export type UmbMockDocumentTypeModelHack = DocumentTypeResponseModel &
 	DocumentTypeTreeItemResponseModel &
@@ -14,7 +14,7 @@ export interface UmbMockDocumentTypeModel extends Omit<UmbMockDocumentTypeModelH
 export const data: Array<UmbMockDocumentTypeModel> = [
 	{
 		allowedTemplates: [],
-		defaultTemplateId: null,
+		defaultTemplate: null,
 		id: 'all-property-editors-document-type-id',
 		alias: 'blogPost',
 		name: 'All property editors document type',
@@ -25,7 +25,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesBySegment: false,
 		isElement: false,
 		hasChildren: false,
-		isContainer: false,
 		parent: null,
 		isFolder: false,
 		properties: [
@@ -890,11 +889,11 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		compositions: [
 			{
 				documentType: { id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d' },
-				compositionType: ContentTypeCompositionTypeModel.INHERITANCE,
+				compositionType: CompositionTypeModel.INHERITANCE,
 			},
 			{
 				documentType: { id: '5035d7d9-0a63-415c-9e75-ee2cf931db92' },
-				compositionType: ContentTypeCompositionTypeModel.COMPOSITION,
+				compositionType: CompositionTypeModel.COMPOSITION,
 			},
 		],
 		cleanup: {

@@ -7,12 +7,12 @@ import { UmbEntityRecycleBin } from '../entity/entity-recycle-bin.js';
 import type { UmbMockDocumentModel } from './document.data.js';
 import { data } from './document.data.js';
 import { UmbMockDocumentPublishingManager } from './document-publishing.manager.js';
-import type {
-	CreateDocumentRequestModel,
-	DocumentItemResponseModel,
-	DocumentResponseModel,
-	DocumentTreeItemResponseModel,
-	PagedDocumentTypeResponseModel,
+import {
+	ContentStateModel,
+	type CreateDocumentRequestModel,
+	type DocumentItemResponseModel,
+	type DocumentResponseModel,
+	type DocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -25,26 +25,6 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 
 	constructor(data: Array<UmbMockDocumentModel>) {
 		super(data);
-	}
-
-	getAllowedDocumentTypes(id: string): PagedDocumentTypeResponseModel {
-		debugger;
-		const { contentTypeId } = this.detail.read(id);
-
-		if (contentTypeId) {
-			const docType = umbDocumentTypeMockDb.detail.read(contentTypeId);
-
-			if (docType) {
-				const allowedTypes = docType.allowedContentTypes;
-				const models = allowedTypes
-					.map((allowedType: any) => umbDocumentTypeMockDb.detail.read(allowedType.id))
-					.filter((item: any) => item !== undefined);
-				const total = models.length;
-				return { items: models, total };
-			}
-		}
-
-		return { items: [], total: 0 };
 	}
 
 	// permissions
@@ -84,11 +64,13 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 	const documentType = umbDocumentTypeMockDb.read(request.documentType.id);
 	if (!documentType) throw new Error(`Document type with id ${request.documentType.id} not found`);
 
+	const now = new Date().toString();
+
 	return {
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,
-			hasListView: documentType.hasListView,
+			hasListView: false, // TODO: get list from doc type when ready
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
@@ -97,7 +79,17 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 		noAccess: false,
 		parent: request.parent,
 		values: request.values,
-		variants: request.variants,
+		variants: request.variants.map((variantRequest) => {
+			return {
+				culture: variantRequest.culture,
+				segment: variantRequest.segment,
+				name: variantRequest.name,
+				createDate: now,
+				updateDate: now,
+				state: ContentStateModel.DRAFT,
+				publishDate: null,
+			};
+		}),
 		urls: [],
 	};
 };
