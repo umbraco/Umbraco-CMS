@@ -9,8 +9,8 @@ import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/back
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UMB_ACTION_EVENT_CONTEXT, UmbActionEventContext } from '@umbraco-cms/backoffice/action';
-import { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
@@ -232,6 +232,14 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
+	}
+
+	destroy(): void {
+		this.#actionEventContext?.removeEventListener(
+			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+			this.#onReloadRequest as EventListener,
+		);
+		super.destroy();
 	}
 }
 
