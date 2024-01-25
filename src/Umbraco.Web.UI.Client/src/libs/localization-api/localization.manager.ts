@@ -78,18 +78,30 @@ export class UmbLocalizationManager {
 
 	/** Updates all localized elements that are currently connected */
 	updateAll = () => {
-		this.documentDirection = document.documentElement.dir || 'ltr';
-		this.documentLanguage = document.documentElement.lang || navigator.language;
+		const newDir = document.documentElement.dir || 'ltr';
+		const newLang = document.documentElement.lang || navigator.language;
+
+		if (this.documentDirection === newDir && this.documentLanguage === newLang) return;
+
+		// The document direction or language did changed, so lets move on:
+		this.documentDirection = newDir;
+		this.documentLanguage = newLang;
 
 		// Check if there was any changed.
 		this.connectedControllers.forEach((ctrl) => {
 			ctrl.documentUpdate();
 		});
 
+		if (this.#requestUpdateChangedKeysId) {
+			cancelAnimationFrame(this.#requestUpdateChangedKeysId);
+			this.#requestUpdateChangedKeysId = undefined;
+		}
 		this.#changedKeys.clear();
 	};
 
 	updateChangedKeys = () => {
+		this.#requestUpdateChangedKeysId = undefined;
+
 		this.connectedControllers.forEach((ctrl) => {
 			ctrl.keysChanged(this.#changedKeys);
 		});
