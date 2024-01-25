@@ -45,7 +45,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
-				min-height: 0;
+				min-width: 0;
 			}
 
 			:host(:not(:last-child)) {
