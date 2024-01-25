@@ -9,6 +9,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 
+import '../../../../../../documents/document-types/components/input-document-type/input-document-type.element.js';
+
 /**
  * @element umb-property-editor-ui-tree-picker-source-type-picker
  */
