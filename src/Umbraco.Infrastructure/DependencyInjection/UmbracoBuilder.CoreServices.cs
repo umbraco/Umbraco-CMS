@@ -42,6 +42,7 @@ using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Webhooks;
+using Umbraco.Cms.Infrastructure.Configuration;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -367,10 +368,13 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddNotificationHandler<ContentSavingNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockListPropertyNotificationHandler>()
+            .AddNotificationHandler<ContentScaffoldedNotification, BlockListPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
+            .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentSavingNotification, NestedContentPropertyHandler>()
             .AddNotificationHandler<ContentCopyingNotification, NestedContentPropertyHandler>()
+            .AddNotificationHandler<ContentScaffoldedNotification, NestedContentPropertyHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, FileUploadPropertyEditor>()
