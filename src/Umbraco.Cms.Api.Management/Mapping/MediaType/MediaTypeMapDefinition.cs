@@ -14,6 +14,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         mapper.Define<IMediaType, MediaTypeResponseModel>((_, _) => new MediaTypeResponseModel(), Map);
         mapper.Define<IMediaType, MediaTypeReferenceResponseModel>((_, _) => new MediaTypeReferenceResponseModel(), Map);
         mapper.Define<ISimpleContentType, MediaTypeReferenceResponseModel>((_, _) => new MediaTypeReferenceResponseModel(), Map);
+        mapper.Define<IMediaType, AllowedMediaType>((_, _) => new AllowedMediaType(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -54,5 +55,14 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
         target.HasListView = source.IsContainer;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(IMediaType source, AllowedMediaType target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Name = source.Name ?? string.Empty;
+        target.Description = source.Description;
+        target.Icon = source.Icon ?? string.Empty;
     }
 }
