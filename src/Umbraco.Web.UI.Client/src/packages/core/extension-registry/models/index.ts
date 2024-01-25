@@ -2,6 +2,7 @@ import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
 import type { ManifestDashboardCollection } from './dashboard-collection.model.js';
+import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityAction } from './entity-action.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
@@ -45,6 +46,7 @@ export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
 export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
+export type * from './dynamic-root.model.js';
 export type * from './entity-action.model.js';
 export type * from './entity-bulk-action.model.js';
 export type * from './external-login-provider.model.js';
@@ -84,6 +86,8 @@ export type ManifestTypes =
 	| ManifestCollectionAction
 	| ManifestDashboard
 	| ManifestDashboardCollection
+	| ManifestDynamicRootOrigin
+	| ManifestDynamicRootQueryStep
 	| ManifestEntityAction
 	| ManifestEntityBulkAction
 	| ManifestEntryPoint
