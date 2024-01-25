@@ -11,7 +11,6 @@ import type { DomainsResponseModel } from '../models/DomainsResponseModel';
 import type { MoveDocumentRequestModel } from '../models/MoveDocumentRequestModel';
 import type { PagedDocumentRecycleBinItemResponseModel } from '../models/PagedDocumentRecycleBinItemResponseModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
-import type { PagedDocumentTypeResponseModel } from '../models/PagedDocumentTypeResponseModel';
 import type { PublicAccessRequestModel } from '../models/PublicAccessRequestModel';
 import type { PublishDocumentRequestModel } from '../models/PublishDocumentRequestModel';
 import type { PublishDocumentWithDescendantsRequestModel } from '../models/PublishDocumentWithDescendantsRequestModel';
@@ -66,6 +65,30 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteDocumentById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/document/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
@@ -461,34 +484,6 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentTypeResponseModel Success
-     * @throws ApiError
-     */
-    public static getDocumentAllowedDocumentTypes({
-        parentId,
-        skip,
-        take = 100,
-    }: {
-        parentId?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedDocumentTypeResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/document/allowed-document-types',
-            query: {
-                'parentId': parentId,
-                'skip': skip,
-                'take': take,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -544,6 +539,30 @@ export class DocumentResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteRecycleBinDocumentById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/recycle-bin/document/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
             },
         });
     }

@@ -12,6 +12,7 @@ import type { DocumentTypeItemResponseModel } from '../models/DocumentTypeItemRe
 import type { DocumentTypeResponseModel } from '../models/DocumentTypeResponseModel';
 import type { FolderResponseModel } from '../models/FolderResponseModel';
 import type { MoveDocumentTypeRequestModel } from '../models/MoveDocumentTypeRequestModel';
+import type { PagedAllowedDocumentTypeModel } from '../models/PagedAllowedDocumentTypeModel';
 import type { PagedDocumentTypeTreeItemResponseModel } from '../models/PagedDocumentTypeTreeItemResponseModel';
 import type { UpdateDocumentTypeRequestModel } from '../models/UpdateDocumentTypeRequestModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
@@ -117,6 +118,36 @@ export class DocumentTypeResource {
     }
 
     /**
+     * @returns PagedAllowedDocumentTypeModel Success
+     * @throws ApiError
+     */
+    public static getDocumentTypeByIdAllowedChildren({
+        id,
+        skip,
+        take = 100,
+    }: {
+        id: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedAllowedDocumentTypeModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document-type/{id}/allowed-children',
+            path: {
+                'id': id,
+            },
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -190,6 +221,30 @@ export class DocumentTypeResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedAllowedDocumentTypeModel Success
+     * @throws ApiError
+     */
+    public static getDocumentTypeAllowedAtRoot({
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedAllowedDocumentTypeModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document-type/allowed-at-root',
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
