@@ -177,19 +177,19 @@ export class UmbExtensionRegistry<
 		return true;
 	}
 
-	private _kindsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
+	#kindsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
 		return this.kinds.pipe(
 			map((kinds) => kinds.filter((kind) => kind.matchType === type)),
 			distinctUntilChanged(extensionArrayMemoization),
 		);
 	}
-	private _extensionsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
+	#extensionsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => ext.type === type)),
 			distinctUntilChanged(extensionArrayMemoization),
 		);
 	}
-	private _kindsOfTypes(types: string[]) {
+	#kindsOfTypes(types: string[]) {
 		return this.kinds.pipe(
 			map((kinds) => kinds.filter((kind) => types.indexOf(kind.matchType) !== -1)),
 			distinctUntilChanged(extensionArrayMemoization),
@@ -197,7 +197,7 @@ export class UmbExtensionRegistry<
 	}
 
 	// TODO: can we get rid of as unknown here
-	private _extensionsOfTypes<ExtensionType extends ManifestBase = ManifestBase>(
+	#extensionsOfTypes<ExtensionType extends ManifestBase = ManifestBase>(
 		types: Array<ExtensionType['type']>,
 	): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
@@ -213,7 +213,7 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionSingleMemoization),
 			switchMap((ext) => {
 				if (ext?.kind) {
-					return this._kindsOfType(ext.type).pipe(
+					return this.#kindsOfType(ext.type).pipe(
 						map((kinds) => {
 							// Specific Extension Meta merge (does not merge conditions)
 							if (ext) {
@@ -249,7 +249,7 @@ export class UmbExtensionRegistry<
 				map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias)),
 				distinctUntilChanged(extensionSingleMemoization),
 			),
-			this._kindsOfType(type),
+			this.#kindsOfType(type),
 		]).pipe(
 			map(([ext, kinds]) => {
 				// TODO: share one merge function between the different methods of this class:
@@ -280,7 +280,7 @@ export class UmbExtensionRegistry<
 				map((exts) => exts.filter((ext) => ext.type === type && aliases.indexOf(ext.alias) !== -1)),
 				distinctUntilChanged(extensionArrayMemoization),
 			),
-			this._kindsOfType(type),
+			this.#kindsOfType(type),
 		]).pipe(
 			map(([exts, kinds]) =>
 				exts
@@ -319,7 +319,7 @@ export class UmbExtensionRegistry<
 				map((exts) => exts.find((ext) => ext.type === type && filter(ext as unknown as T))),
 				distinctUntilChanged(extensionSingleMemoization),
 			),
-			this._kindsOfType(type),
+			this.#kindsOfType(type),
 		]).pipe(
 			map(([ext, kinds]) => {
 				// TODO: share one merge function between the different methods of this class:
@@ -349,7 +349,7 @@ export class UmbExtensionRegistry<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
 	>(type: Key) {
-		return combineLatest([this._extensionsOfType(type), this._kindsOfType(type)]).pipe(
+		return combineLatest([this.#extensionsOfType(type), this.#kindsOfType(type)]).pipe(
 			map(([exts, kinds]) =>
 				exts
 					.map((ext) => {
@@ -378,7 +378,7 @@ export class UmbExtensionRegistry<
 	extensionsOfTypes<ExtensionTypes extends ManifestBase = ManifestBase>(
 		types: string[],
 	): Observable<Array<ExtensionTypes>> {
-		return combineLatest([this._extensionsOfTypes(types), this._kindsOfTypes(types)]).pipe(
+		return combineLatest([this.#extensionsOfTypes(types), this.#kindsOfTypes(types)]).pipe(
 			map(([exts, kinds]) =>
 				exts
 					.map((ext) => {
