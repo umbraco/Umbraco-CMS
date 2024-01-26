@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Management.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
@@ -20,13 +21,15 @@ internal class ResponseHeaderOperationFilter : IOperationFilter
             switch (int.Parse(key))
             {
                 case StatusCodes.Status201Created:
-                    SetHeader(value, "Location", "Location of the newly created resource", "string", "uri");
+                    // NOTE: The header order matters to the back-office client. Do not change.
+                    SetHeader(value, Constants.Headers.GeneratedResource, "Identifier of the newly created resource", "string");
+                    SetHeader(value, Constants.Headers.Location, "Location of the newly created resource", "string", "uri");
                     break;
             }
         }
     }
 
-    private void SetHeader(OpenApiResponse value, string headerName, string description, string type, string format)
+    private void SetHeader(OpenApiResponse value, string headerName, string description, string type, string? format = null)
     {
 
         if (value.Headers is null)

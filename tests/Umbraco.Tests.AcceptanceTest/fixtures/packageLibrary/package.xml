@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<umbPackage>
+  <info>
+    <package>
+      <name>TestPackage</name>
+    </package>
+  </info>
+  <DocumentTypes />
+  <MediaTypes />
+  <Templates />
+  <Stylesheets />
+  <Scripts />
+  <PartialViews />
+  <Macros />
+  <MacroPartialViews />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes />
+  <MediaItems />
+</umbPackage>

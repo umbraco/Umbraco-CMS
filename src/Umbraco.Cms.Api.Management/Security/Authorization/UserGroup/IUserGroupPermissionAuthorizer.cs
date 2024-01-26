@@ -14,8 +14,8 @@ public interface IUserGroupPermissionAuthorizer
     /// <param name="currentUser">The current user's principal.</param>
     /// <param name="userGroupKey">The key of the user group to check against.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsAuthorizedAsync(IPrincipal currentUser, Guid userGroupKey)
-        => IsAuthorizedAsync(currentUser, userGroupKey.Yield());
+    Task<bool> IsDeniedAsync(IPrincipal currentUser, Guid userGroupKey)
+        => IsDeniedAsync(currentUser, userGroupKey.Yield());
 
     /// <summary>
     ///     Authorizes whether the current user has access to the specified user group(s).
@@ -23,5 +23,5 @@ public interface IUserGroupPermissionAuthorizer
     /// <param name="currentUser">The current user's principal.</param>
     /// <param name="userGroupKeys">The keys of the user groups to check against.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsAuthorizedAsync(IPrincipal currentUser, IEnumerable<Guid> userGroupKeys);
+    Task<bool> IsDeniedAsync(IPrincipal currentUser, IEnumerable<Guid> userGroupKeys);
 }

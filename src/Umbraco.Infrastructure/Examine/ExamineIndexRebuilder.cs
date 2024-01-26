@@ -10,6 +10,7 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
+[Obsolete("This will be removed in Umbraco 15. Use IIndexRebuilder instead.")] // Main reason for this is to remove it form the service container. Maybe even make this internal
 public class ExamineIndexRebuilder : IIndexRebuilder
 {
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;

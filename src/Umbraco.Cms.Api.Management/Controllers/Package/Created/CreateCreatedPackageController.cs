@@ -45,7 +45,7 @@ public class CreateCreatedPackageController : CreatedPackageControllerBase
         Attempt<PackageDefinition, PackageOperationStatus> result = await _packagingService.CreateCreatedPackageAsync(packageDefinition, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyCreatedPackageController>(controller => nameof(controller.ByKey), packageDefinition.PackageId)
+            ? CreatedAtId<ByKeyCreatedPackageController>(controller => nameof(controller.ByKey), packageDefinition.PackageId)
             : PackageOperationStatusResult(result.Status);
     }
 }

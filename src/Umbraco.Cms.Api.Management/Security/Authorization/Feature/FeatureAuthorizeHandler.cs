@@ -18,5 +18,5 @@ public class FeatureAuthorizeHandler : MustSatisfyRequirementAuthorizationHandle
 
     /// <inheritdoc />
     protected override async Task<bool> IsAuthorized(AuthorizationHandlerContext context, FeatureAuthorizeRequirement requirement)
-        => await _featureAuthorizer.IsAuthorizedAsync(context);
+        => await _featureAuthorizer.IsDeniedAsync(context) is false;
 }

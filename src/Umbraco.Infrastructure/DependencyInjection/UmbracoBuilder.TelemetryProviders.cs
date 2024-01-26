@@ -18,7 +18,7 @@ public static class UmbracoBuilder_TelemetryProviders
         builder.Services.AddTransient<IDetailedTelemetryProvider, NodeCountTelemetryProvider>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, PropertyEditorTelemetryProvider>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, UserTelemetryProvider>();
-        builder.Services.AddTransient<IDetailedTelemetryProvider, SystemInformationTelemetryProvider>();
+        builder.Services.AddTransient<IDetailedTelemetryProvider, SystemTroubleshootingInformationTelemetryProvider>();
         builder.Services.AddTransient<IDetailedTelemetryProvider, DeliveryApiTelemetryProvider>();
         return builder;
     }
