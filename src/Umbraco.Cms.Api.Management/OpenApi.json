@@ -996,6 +996,56 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/data-type/configuration": {
+      "get": {
+        "tags": [
+          "Data Type"
+        ],
+        "operationId": "GetDataTypeConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DatatypeConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DatatypeConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DatatypeConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/data-type/folder": {
       "post": {
         "tags": [
@@ -3451,6 +3501,56 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document-type/configuration": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetDocumentTypeConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentTypeConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentTypeConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentTypeConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document-type/folder": {
       "post": {
         "tags": [
@@ -5553,6 +5653,56 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/configuration": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "GetDocumentConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentConfigurationResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -10012,6 +10162,56 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/media/configuration": {
+      "get": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "GetMediaConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MediaConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MediaConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MediaConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/media/item": {
       "get": {
         "tags": [
@@ -11169,6 +11369,56 @@
           },
           "200": {
             "description": "Success"
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/package/configuration": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "operationId": "GetPackageConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PackageConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PackageConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PackageConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
@@ -17425,6 +17675,56 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/template/configuration": {
+      "get": {
+        "tags": [
+          "Template"
+        ],
+        "operationId": "GetTemplateConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemplateConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemplateConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TemplateConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/template/item": {
       "get": {
         "tags": [
@@ -22975,6 +23275,14 @@
         },
         "additionalProperties": false
       },
+      "DataTypeChangeModeModel": {
+        "enum": [
+          "True",
+          "False",
+          "FalseWithHelpText"
+        ],
+        "type": "string"
+      },
       "DataTypeItemResponseModel": {
         "type": "object",
         "allOf": [
@@ -23224,6 +23532,18 @@
         },
         "additionalProperties": false
       },
+      "DatatypeConfigurationResponseModel": {
+        "required": [
+          "canBeChanged"
+        ],
+        "type": "object",
+        "properties": {
+          "canBeChanged": {
+            "$ref": "#/components/schemas/DataTypeChangeModeModel"
+          }
+        },
+        "additionalProperties": false
+      },
       "DeleteUserGroupsRequestModel": {
         "required": [
           "userGroupIds"
@@ -23415,6 +23735,30 @@
         },
         "additionalProperties": false
       },
+      "DocumentConfigurationResponseModel": {
+        "required": [
+          "allowEditInvariantFromNonDefault",
+          "disableDeleteWhenReferenced",
+          "disableUnpublishWhenReferenced",
+          "sanitizeTinyMce"
+        ],
+        "type": "object",
+        "properties": {
+          "sanitizeTinyMce": {
+            "type": "boolean"
+          },
+          "disableDeleteWhenReferenced": {
+            "type": "boolean"
+          },
+          "disableUnpublishWhenReferenced": {
+            "type": "boolean"
+          },
+          "allowEditInvariantFromNonDefault": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentItemResponseModel": {
         "required": [
           "contentTypeId",
@@ -23559,6 +23903,22 @@
             "$ref": "#/components/schemas/ContentTypeCompositionResponseModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "DocumentTypeConfigurationResponseModel": {
+        "required": [
+          "dataTypesCanBeChanged",
+          "disableTemplates"
+        ],
+        "type": "object",
+        "properties": {
+          "dataTypesCanBeChanged": {
+            "$ref": "#/components/schemas/DataTypeChangeModeModel"
+          },
+          "disableTemplates": {
+            "type": "boolean"
+          }
+        },
         "additionalProperties": false
       },
       "DocumentTypeItemResponseModel": {
@@ -24817,6 +25177,26 @@
         },
         "additionalProperties": false
       },
+      "MediaConfigurationResponseModel": {
+        "required": [
+          "disableDeleteWhenReferenced",
+          "disableUnpublishWhenReferenced",
+          "sanitizeTinyMce"
+        ],
+        "type": "object",
+        "properties": {
+          "disableDeleteWhenReferenced": {
+            "type": "boolean"
+          },
+          "disableUnpublishWhenReferenced": {
+            "type": "boolean"
+          },
+          "sanitizeTinyMce": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaItemResponseModel": {
         "required": [
           "isTrashed"
@@ -25176,6 +25556,18 @@
           "Unknown"
         ],
         "type": "string"
+      },
+      "PackageConfigurationResponseModel": {
+        "required": [
+          "marketplaceUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "marketplaceUrl": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "PackageDefinitionResponseModel": {
         "required": [
@@ -27344,6 +27736,18 @@
             "$ref": "#/components/schemas/TelemetryRepresentationBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "TemplateConfigurationResponseModel": {
+        "required": [
+          "disabled"
+        ],
+        "type": "object",
+        "properties": {
+          "disabled": {
+            "type": "boolean"
+          }
+        },
         "additionalProperties": false
       },
       "TemplateItemResponseModel": {
