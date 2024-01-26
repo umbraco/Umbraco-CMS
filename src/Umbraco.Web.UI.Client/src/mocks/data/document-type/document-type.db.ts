@@ -27,6 +27,16 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 	constructor(data: Array<UmbMockDocumentTypeModel>) {
 		super(data);
 	}
+
+	getAllowedChildren(id: string | null): Array<{ id: string }> {
+		return [];
+	}
+
+	getAllowedAtRoot(): Array<{ id: string }> {
+		const mockItems = this.data.filter((item) => item.allowedAsRoot);
+		debugger;
+		return [];
+	}
 }
 
 const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): UmbMockDocumentTypeModel => {

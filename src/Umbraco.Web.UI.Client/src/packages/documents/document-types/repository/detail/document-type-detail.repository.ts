@@ -7,4 +7,8 @@ export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<Umb
 	constructor(host: UmbControllerHost) {
 		super(host, UmbDocumentTypeDetailServerDataSource, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT);
 	}
+
+	allowAtRoot(): Promise<Array<{ id: string }>> {}
+
+	allowedChildren(id: string): Promise<Array<{ id: string }>> {}
 }

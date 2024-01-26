@@ -3,14 +3,14 @@ import type { UmbTreeDataSource } from './tree-data-source.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { CancelablePromise, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeServerDataSourceBaseArgs<
 	ServerTreeItemType extends TreeItemPresentationModel,
 	ClientTreeItemType extends UmbTreeItemModelBase,
 > {
-	getRootItems: () => CancelablePromise<UmbPagedData<ServerTreeItemType>>;
-	getChildrenOf: (parentUnique: string | null) => CancelablePromise<UmbPagedData<ServerTreeItemType>>;
+	getRootItems: () => CancelablePromise<UmbPagedModel<ServerTreeItemType>>;
+	getChildrenOf: (parentUnique: string | null) => CancelablePromise<UmbPagedModel<ServerTreeItemType>>;
 	mapper: (item: ServerTreeItemType) => ClientTreeItemType;
 }
 
@@ -26,8 +26,8 @@ export abstract class UmbTreeServerDataSourceBase<
 > implements UmbTreeDataSource<ClientTreeItemType>
 {
 	#host: UmbControllerHost;
-	#getRootItems: () => CancelablePromise<UmbPagedData<ServerTreeItemType>>;
-	#getChildrenOf: (parentUnique: string | null) => CancelablePromise<UmbPagedData<ServerTreeItemType>>;
+	#getRootItems: () => CancelablePromise<UmbPagedModel<ServerTreeItemType>>;
+	#getChildrenOf: (parentUnique: string | null) => CancelablePromise<UmbPagedModel<ServerTreeItemType>>;
 	#mapper: (item: ServerTreeItemType) => ClientTreeItemType;
 
 	/**
