@@ -2,34 +2,36 @@ import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/bac
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbCreateDocumentModalData, UmbCreateDocumentModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDocumentDetailRepository } from '@umbraco-cms/backoffice/document';
+import {
+	UmbDocumentTypeStructureRepository,
+	type UmbAllowedDocumentTypeModel,
+} from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-create-document-modal')
 export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	UmbCreateDocumentModalData,
 	UmbCreateDocumentModalValue
 > {
-	#documentRepository = new UmbDocumentDetailRepository(this);
+	#documentTypeStructureRepository = new UmbDocumentTypeStructureRepository(this);
 
 	@state()
-	private _allowedDocumentTypes: DocumentTypeResponseModel[] = [];
+	private _allowedDocumentTypes: UmbAllowedDocumentTypeModel[] = [];
 
 	@state()
 	private _headline: string = 'Create';
 
 	async firstUpdated() {
-		const documentId = this.data?.id || null;
+		const documentUnique = this.data?.unique || null;
 
-		this.#retrieveAllowedDocumentTypesOf(documentId);
+		this.#retrieveAllowedDocumentTypesOf(documentUnique);
 
-		if (documentId) {
-			this.#retrieveHeadline(documentId);
+		if (documentUnique) {
+			this.#retrieveHeadline(documentUnique);
 		}
 	}
 
-	async #retrieveAllowedDocumentTypesOf(id: string | null) {
-		const { data } = await this.#documentRepository.requestAllowedDocumentTypesOf(id);
+	async #retrieveAllowedDocumentTypesOf(unique: string | null) {
+		const { data } = await this.#documentTypeStructureRepository.allowedDocumentTypesOf(unique);
 
 		if (data) {
 			// TODO: implement pagination, or get 1000?
@@ -37,26 +39,17 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	async #retrieveHeadline(id: string) {
-		if (!id) return;
-		const { data } = await this.#documentRepository.requestById(id);
+	async #retrieveHeadline(unique: string) {
+		if (!unique) return;
+		const { data } = await this.#documentItemRepository.requestItems(id);
 		if (data) {
 			// TODO: we need to get the correct variant context here
 			this._headline = `Create at ${data.variants?.[0].name}`;
 		}
 	}
 
-	private _handleCancel() {
-		this.modalContext?.reject();
-	}
-
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
-		const target = event.target as HTMLButtonElement;
-		const documentTypeId = target.dataset.id;
-		if (!documentTypeId) throw new Error('No document type id found');
-		this.value = { documentTypeId };
-		this.modalContext?.submit();
 	}
 
 	render() {
@@ -66,13 +59,13 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
 					${this._allowedDocumentTypes.map(
 						(item) => html`
-							<uui-menu-item data-id=${ifDefined(item.id)} @click=${this.#onClick} label="${ifDefined(item.name)}">
+							<uui-menu-item data-id=${ifDefined(item.unique)} href="" label="${item.name}">
 								${item.icon ? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>` : nothing}
 							</uui-menu-item>
 						`,
 					)}
 				</uui-box>
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
+				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}">Cancel</uui-button>
 			</umb-body-layout>
 		`;
 	}

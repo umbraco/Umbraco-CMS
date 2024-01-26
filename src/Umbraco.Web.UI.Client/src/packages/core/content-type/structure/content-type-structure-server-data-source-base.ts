@@ -1,10 +1,6 @@
 import type { UmbPagedModel } from '../../repository/data-source/types.js';
 import type { UmbContentTypeStructureDataSource } from './content-type-structure-data-source.interface.js';
-import type {
-	AllowedContentTypeModel,
-	CancelablePromise,
-	ItemResponseModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { AllowedContentTypeModel, ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -12,8 +8,8 @@ export interface UmbContentTypeStructureServerDataSourceBaseArgs<
 	ServerItemType extends ItemResponseModelBaseModel,
 	ClientItemType extends { unique: string },
 > {
-	getAllowedAtRoot: () => CancelablePromise<UmbPagedModel<ServerItemType>>;
-	getAllowedChildrenOf: (unique: string) => CancelablePromise<UmbPagedModel<ServerItemType>>;
+	getAllowedAtRoot: () => Promise<UmbPagedModel<ServerItemType>>;
+	getAllowedChildrenOf: (unique: string) => Promise<UmbPagedModel<ServerItemType>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
 
@@ -47,7 +43,7 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	 * @return {*}
 	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
-	async allowedAtRoot() {
+	async getAllowedAtRoot() {
 		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getAllowedAtRoot());
 
 		if (data) {
@@ -64,7 +60,7 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	 * @return {*}
 	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
-	async allowedChildrenOf(unique: string) {
+	async getAllowedChildrenOf(unique: string) {
 		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getAllowedChildrenOf(unique));
 
 		if (data) {

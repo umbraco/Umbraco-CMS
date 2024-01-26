@@ -1,5 +1,5 @@
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import { CancelablePromise, ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -7,7 +7,7 @@ export interface UmbItemServerDataSourceBaseArgs<
 	ServerItemType extends ItemResponseModelBaseModel,
 	ClientItemType extends { unique: string },
 > {
-	getItems: (uniques: Array<string>) => CancelablePromise<Array<ServerItemType>>;
+	getItems: (uniques: Array<string>) => Promise<Array<ServerItemType>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
 
@@ -23,7 +23,7 @@ export abstract class UmbItemServerDataSourceBase<
 > implements UmbItemDataSource<ClientItemType>
 {
 	#host: UmbControllerHost;
-	#getItems: (uniques: Array<string>) => CancelablePromise<Array<ServerItemType>>;
+	#getItems: (uniques: Array<string>) => Promise<Array<ServerItemType>>;
 	#mapper: (item: ServerItemType) => ClientItemType;
 
 	/**
