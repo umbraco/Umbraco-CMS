@@ -3,10 +3,9 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type {
 	ManifestMenuItemTreeKind,
 	UmbBackofficeManifestKind,
-	UmbMenuItemElement} from '@umbraco-cms/backoffice/extension-registry';
-import {
-	umbExtensionsRegistry,
+	UmbMenuItemElement,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 // TODO: Move to separate file:
 const manifest: UmbBackofficeManifestKind = {
