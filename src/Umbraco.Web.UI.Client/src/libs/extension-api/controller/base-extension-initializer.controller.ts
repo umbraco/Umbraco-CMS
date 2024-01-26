@@ -73,7 +73,7 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 	protected _init() {
 		this.#manifestObserver = this.observe(
-			this.#extensionRegistry.getByAlias<ManifestType>(this.#alias),
+			this.#extensionRegistry.byAlias<ManifestType>(this.#alias),
 			async (extensionManifest) => {
 				this.#clearPermittedState();
 				this.#manifest = extensionManifest;

@@ -199,8 +199,7 @@ export class UmbExtensionRegistry<
 		) as unknown as Observable<Array<ExtensionType>>;
 	}
 
-	// TODO: get rid of the name get
-	getByAlias<T extends ManifestBase = ManifestBase>(alias: string) {
+	byAlias<T extends ManifestBase = ManifestBase>(alias: string) {
 		return this.extensions.pipe(
 			map((exts) => exts.find((ext) => ext.alias === alias)),
 			distinctUntilChanged(extensionSingleMemoization),
@@ -231,8 +230,11 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
+	/**
+	 * @deprecated Use `byAlias` instead.
+	 */
+	getByAlias = this.byAlias.bind(this);
 
-	// TODO: get rid of the name get
 	byTypeAndAlias<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
