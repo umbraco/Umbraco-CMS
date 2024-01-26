@@ -3,7 +3,7 @@ import { css, html, customElement, query, state, property } from '@umbraco-cms/b
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { ManifestLocalization} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestLocalization } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 interface UmbCultureInputOption {
@@ -38,7 +38,7 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 
 	#observeTranslations() {
 		this.observe(
-			umbExtensionsRegistry.extensionsOfType('localization'),
+			umbExtensionsRegistry.byType('localization'),
 			(localizationManifests) => {
 				this.#mapToOptions(localizationManifests);
 			},
