@@ -1,12 +1,9 @@
-import { UmbDocumentDetailModel } from '../../types.js';
+import type { UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import {
-	CreateDocumentRequestModel,
-	DocumentResource,
-	UpdateDocumentRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { CreateDocumentRequestModel, UpdateDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -38,10 +35,11 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		const data: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique: parentUnique,
 			urls: [],
-			templateId: null,
-			contentTypeId: 'documentTypeId',
+			template: null,
+			documentType: {
+				unique: 'documentTypeId',
+			},
 			isTrashed: false,
 			values: [],
 			variants: [
@@ -82,8 +80,8 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			values: data.values,
 			variants: data.variants,
 			urls: data.urls,
-			template: data.template,
-			contentTypeId: data.contentTypeId,
+			template: data.template ? { id: data.template.id } : null,
+			documentType: { unique: data.documentType.id },
 			isTrashed: data.isTrashed,
 		};
 
@@ -103,9 +101,9 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDocumentRequestModel = {
 			id: model.unique,
-			parentId: model.parentUnique,
-			contentTypeId: model.contentTypeId,
-			templateId: model.templateId,
+			parent: model.parentUnique,
+			documentType: { id: model.documentType.unique },
+			template: model.template,
 			values: model.values,
 			variants: model.variants,
 		};
@@ -135,7 +133,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateDocumentRequestModel = {
-			templateId: model.templateId,
+			template: model.template,
 			values: model.values,
 			variants: model.variants,
 		};
