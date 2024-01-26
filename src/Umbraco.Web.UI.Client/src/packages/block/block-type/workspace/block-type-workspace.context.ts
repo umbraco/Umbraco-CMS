@@ -65,8 +65,6 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 			...(groupKey && { groupKey: groupKey }),
 		} as BlockTypeData;
 
-		console.log(data);
-
 		this.setIsNew(true);
 		this.#data.setValue(data);
 		return { data };
