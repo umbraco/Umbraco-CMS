@@ -199,30 +199,47 @@ export class UmbExtensionRegistry<
 		) as unknown as Observable<Array<ExtensionType>>;
 	}
 
+	#mergeExtensionWithKinds([ext, kinds]) {
+		// Specific Extension Meta merge (does not merge conditions)
+		if (ext) {
+			// Since we don't have the type up front in this request, we will just get all kinds here and find the matching one:
+			const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
+			// TODO: This check can go away when making a find kind based on type and kind.
+			if (baseManifest) {
+				const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+				if ((baseManifest as any).meta) {
+					merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+				}
+				return merged;
+			}
+		}
+		return ext;
+	}
+
+	#mergeExtensionsWithKinds([exts, kinds]) {
+		exts
+			.map((ext) => {
+				// Specific Extension Meta merge (does not merge conditions)
+				const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
+				if (baseManifest) {
+					const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+					if ((baseManifest as any).meta) {
+						merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+					}
+					return merged;
+				}
+				return ext;
+			})
+			.sort(sortExtensions);
+	}
+
 	byAlias<T extends ManifestBase = ManifestBase>(alias: string) {
 		return this.extensions.pipe(
 			map((exts) => exts.find((ext) => ext.alias === alias)),
 			distinctUntilChanged(extensionSingleMemoization),
 			switchMap((ext) => {
 				if (ext?.kind) {
-					return this.#kindsOfType(ext.type).pipe(
-						map((kinds) => {
-							// Specific Extension Meta merge (does not merge conditions)
-							if (ext) {
-								// Since we dont have the type up front in this request, we will just get all kinds here and find the matching one:
-								const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
-								// TODO: This check can go away when making a find kind based on type and kind.
-								if (baseManifest) {
-									const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
-									if ((baseManifest as any).meta) {
-										merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
-									}
-									return merged;
-								}
-							}
-							return ext;
-						}),
-					);
+					return this.#kindsOfType(ext.type).pipe(map((kinds) => this.#mergeExtensionWithKinds([ext, kinds])));
 				}
 				return of(ext);
 			}),
@@ -246,21 +263,7 @@ export class UmbExtensionRegistry<
 			),
 			this.#kindsOfType(type),
 		]).pipe(
-			map(([ext, kinds]) => {
-				// TODO: share one merge function between the different methods of this class:
-				// Specific Extension Meta merge (does not merge conditions)
-				if (ext) {
-					const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
-					if (baseManifest) {
-						const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
-						if ((baseManifest as any).meta) {
-							merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
-						}
-						return merged;
-					}
-				}
-				return ext;
-			}),
+			map(this.#mergeExtensionWithKinds),
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
@@ -280,22 +283,7 @@ export class UmbExtensionRegistry<
 			),
 			this.#kindsOfType(type),
 		]).pipe(
-			map(([exts, kinds]) =>
-				exts
-					.map((ext) => {
-						// Specific Extension Meta merge (does not merge conditions)
-						const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
-						if (baseManifest) {
-							const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
-							if ((baseManifest as any).meta) {
-								merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
-							}
-							return merged;
-						}
-						return ext;
-					})
-					.sort(sortExtensions),
-			),
+			map(this.#mergeExtensionsWithKinds),
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<T>>;
 	}
@@ -323,21 +311,7 @@ export class UmbExtensionRegistry<
 			),
 			this.#kindsOfType(type),
 		]).pipe(
-			map(([ext, kinds]) => {
-				// TODO: share one merge function between the different methods of this class:
-				// Specific Extension Meta merge (does not merge conditions)
-				if (ext) {
-					const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
-					if (baseManifest) {
-						const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
-						if ((baseManifest as any).meta) {
-							merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
-						}
-						return merged;
-					}
-				}
-				return ext;
-			}),
+			map(this.#mergeExtensionsWithKinds),
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
@@ -352,22 +326,7 @@ export class UmbExtensionRegistry<
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
 	>(type: Key) {
 		return combineLatest([this.#extensionsOfType(type), this.#kindsOfType(type)]).pipe(
-			map(([exts, kinds]) =>
-				exts
-					.map((ext) => {
-						// Specific Extension Meta merge (does not merge conditions)
-						const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
-						if (baseManifest) {
-							const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
-							if ((baseManifest as any).meta) {
-								merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
-							}
-							return merged;
-						}
-						return ext;
-					})
-					.sort(sortExtensions),
-			),
+			map(this.#mergeExtensionsWithKinds),
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<T>>;
 	}
@@ -383,24 +342,7 @@ export class UmbExtensionRegistry<
 	 */
 	byTypes<ExtensionTypes extends ManifestBase = ManifestBase>(types: string[]): Observable<Array<ExtensionTypes>> {
 		return combineLatest([this.#extensionsOfTypes(types), this.#kindsOfTypes(types)]).pipe(
-			map(([exts, kinds]) =>
-				exts
-					.map((ext) => {
-						// Specific Extension Meta merge (does not merge conditions)
-						if (ext) {
-							const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
-							if (baseManifest) {
-								const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
-								if ((baseManifest as any).meta) {
-									merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
-								}
-								return merged;
-							}
-						}
-						return ext;
-					})
-					.sort(sortExtensions),
-			),
+			map(this.#mergeExtensionsWithKinds),
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<ExtensionTypes>>;
 	}
