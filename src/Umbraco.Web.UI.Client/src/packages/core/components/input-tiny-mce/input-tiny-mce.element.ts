@@ -78,7 +78,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	 * the plugins are ready and so are not associated with the editor.
 	 */
 	async #loadPlugins() {
-		const observable = umbExtensionsRegistry?.extensionsOfType('tinyMcePlugin');
+		const observable = umbExtensionsRegistry?.byType('tinyMcePlugin');
 		const manifests = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
 
 		const promises = [];

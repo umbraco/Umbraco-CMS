@@ -94,7 +94,7 @@ describe('UmbExtensionRegistry', () => {
 
 		it('should get all extensions by type', (done) => {
 			extensionRegistry
-				.extensionsOfType(type)
+				.byType(type)
 				.subscribe((extensions) => {
 					expect(extensions).to.have.lengthOf(3);
 					expect(extensions?.[0]?.type).to.eq(type);
@@ -106,7 +106,7 @@ describe('UmbExtensionRegistry', () => {
 
 		it('should return extensions ordered by weight', (done) => {
 			extensionRegistry
-				.extensionsOfType(type)
+				.byType(type)
 				.subscribe((extensions) => {
 					expect(extensions?.[0]?.weight).to.eq(200);
 					expect(extensions?.[1]?.weight).to.eq(25);
@@ -121,7 +121,7 @@ describe('UmbExtensionRegistry', () => {
 			let lastAmount = 0;
 
 			extensionRegistry
-				.extensionsOfType('section')
+				.byType('section')
 				.subscribe((extensions) => {
 					amountOfTimesTriggered++;
 					const newAmount = extensions?.length ?? 0;
@@ -244,7 +244,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 
 	it('should merge with kinds', (done) => {
 		extensionRegistry
-			.extensionsOfType('section')
+			.byType('section')
 			.subscribe((extensions) => {
 				expect(extensions).to.have.lengthOf(3);
 				expect(extensions?.[0]?.elementName).to.not.eq('my-kind-element');
@@ -265,7 +265,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 		extensionRegistry.unregister('Umb.Test.Kind');
 
 		extensionRegistry
-			.extensionsOfType('section')
+			.byType('section')
 			.subscribe((extensions) => {
 				amountOfTimesTriggered++;
 				expect(extensions).to.have.lengthOf(3);
@@ -287,7 +287,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 		let amountOfTimesTriggered = -1;
 
 		extensionRegistry
-			.extensionsOfType('section')
+			.byType('section')
 			.subscribe((extensions) => {
 				amountOfTimesTriggered++;
 				expect(extensions).to.have.lengthOf(3);

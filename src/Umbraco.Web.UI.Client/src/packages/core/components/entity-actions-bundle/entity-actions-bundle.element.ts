@@ -1,7 +1,7 @@
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbSectionSidebarContext} from '@umbraco-cms/backoffice/section';
+import type { UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import { UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -44,7 +44,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#observeEntityActions() {
 		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfType('entityAction')
+				.byType('entityAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this._hasActions = actions.length > 0;

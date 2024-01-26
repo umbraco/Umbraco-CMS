@@ -5,13 +5,14 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalValue,
-	UmbModalRouteBuilder} from '@umbraco-cms/backoffice/modal';
+	UmbModalRouteBuilder,
+} from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
 	UmbModalBaseElement,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import type { ManifestPropertyEditorUi} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/data-type';
@@ -107,7 +108,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			'_repositoryItemsObserver',
 		);
 
-		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
+		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
 			this.#propertyEditorUIs = propertyEditorUIs.filter(
 				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,

@@ -338,8 +338,7 @@ export class UmbExtensionRegistry<
 	 * @param type {string} - The type of the extensions to get.
 	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the type.
 	 */
-	// TODO: get rid of the extensions name.
-	extensionsOfType<
+	byType<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
 	>(type: Key) {
@@ -363,16 +362,17 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<T>>;
 	}
+	/**
+	 * @deprecated Use `byType` instead.
+	 */
+	extensionsOfType = this.byType.bind(this);
 
 	/**
 	 * Get an observable that provides extensions matching given types.
 	 * @param type {Array<string>} - The types of the extensions to get.
 	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the types.
 	 */
-	// TODO: get rid of the extensions name.
-	extensionsOfTypes<ExtensionTypes extends ManifestBase = ManifestBase>(
-		types: string[],
-	): Observable<Array<ExtensionTypes>> {
+	byTypes<ExtensionTypes extends ManifestBase = ManifestBase>(types: string[]): Observable<Array<ExtensionTypes>> {
 		return combineLatest([this.#extensionsOfTypes(types), this.#kindsOfTypes(types)]).pipe(
 			map(([exts, kinds]) =>
 				exts
@@ -395,4 +395,9 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<ExtensionTypes>>;
 	}
+
+	/**
+	 * @deprecated Use `byTypes` instead.
+	 */
+	extensionsOfTypes = this.byTypes.bind(this);
 }

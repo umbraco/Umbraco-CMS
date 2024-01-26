@@ -1,9 +1,9 @@
-import type { UmbThemeContext} from '@umbraco-cms/backoffice/themes';
+import type { UmbThemeContext } from '@umbraco-cms/backoffice/themes';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { ManifestTheme} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-user-profile-app-themes')
@@ -29,7 +29,7 @@ export class UmbUserProfileAppThemesElement extends UmbLitElement {
 			);
 
 			this.observe(
-				umbExtensionsRegistry.extensionsOfType('theme'),
+				umbExtensionsRegistry.byType('theme'),
 				(themes) => {
 					this._themes = themes;
 				},
