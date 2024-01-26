@@ -112,6 +112,7 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="ids">Optional array of Ids</param>
     /// <returns>An enumerable list of <see cref="IDataType" /> objects</returns>
+    [Obsolete("Please use GetAllAsync. Will be removed in V15.")]
     IEnumerable<IDataType> GetAll(params int[] ids);
 
     /// <summary>
