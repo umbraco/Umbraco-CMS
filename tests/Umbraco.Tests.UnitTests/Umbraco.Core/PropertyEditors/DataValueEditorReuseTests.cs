@@ -26,7 +26,6 @@ public class DataValueEditorReuseTests
             .Setup(m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()))
             .Returns(() => new TextOnlyValueEditor(
                 new DataEditorAttribute("a", "b", "c"),
-                Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
                 Mock.Of<IJsonSerializer>(),
                 Mock.Of<IIOHelper>()));
