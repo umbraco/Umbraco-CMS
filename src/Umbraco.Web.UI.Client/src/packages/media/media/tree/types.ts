@@ -5,5 +5,4 @@ export interface UmbMediaTreeItemModel extends Omit<UmbEntityTreeItemModel, 'nam
 	isTrashed: boolean;
 }
 
-// TODO: TREE STORE TYPE PROBLEM:
 export interface UmbMediaTreeRootModel extends UmbEntityTreeRootModel {}

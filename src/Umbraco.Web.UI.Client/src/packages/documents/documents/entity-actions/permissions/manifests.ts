@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/manifests.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbDocumentPermissionsEntityAction } from './permissions.action.js';
 import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';

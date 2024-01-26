@@ -2,12 +2,8 @@ import type { UmbMediaTypeDetailModel } from '../../types.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type {
-	CreateMediaTypeRequestModel,
-	UpdateMediaTypeRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	MediaTypeResource
-} from '@umbraco-cms/backoffice/backend-api';
+import type { CreateMediaTypeRequestModel, UpdateMediaTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { MediaTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -87,7 +83,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			isElement: data.isElement,
 			properties: data.properties,
 			containers: data.containers,
-			allowedContentTypes: data.allowedContentTypes,
+			allowedContentTypes: data.allowedMediaTypes,
 			compositions: data.compositions,
 		};
 
@@ -116,7 +112,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			isElement: model.isElement,
 			properties: model.properties,
 			containers: model.containers,
-			allowedContentTypes: model.allowedContentTypes,
+			allowedMediaTypes: model.allowedContentTypes,
 			compositions: model.compositions,
 			id: model.unique,
 			containerId: model.parentUnique,

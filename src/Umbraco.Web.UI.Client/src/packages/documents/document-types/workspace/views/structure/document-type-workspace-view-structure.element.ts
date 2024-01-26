@@ -6,6 +6,7 @@ import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 
 @customElement('umb-document-type-workspace-view-structure')
 export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -63,12 +64,12 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 							element-types-only
 							.selectedIds=${this._allowedContentTypeIDs ?? []}
 							@change="${(e: CustomEvent) => {
-								const sortedContentTypesList = (e.target as UmbInputDocumentTypeElement).selectedIds.map(
-									(id, index) => ({
-										id: id,
-										sortOrder: index,
-									}),
-								);
+								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
+									e.target as UmbInputDocumentTypeElement
+								).selectedIds.map((id, index) => ({
+									contentType: { unique: id },
+									sortOrder: index,
+								}));
 								this.#workspaceContext?.setAllowedContentTypes(sortedContentTypesList);
 							}}">
 						</umb-input-document-type>
