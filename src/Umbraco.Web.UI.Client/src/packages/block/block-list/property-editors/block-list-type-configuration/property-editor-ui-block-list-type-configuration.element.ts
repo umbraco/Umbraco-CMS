@@ -48,7 +48,8 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 	#onCreate(e: CustomEvent) {
 		const selectedElementType = e.detail.contentElementTypeKey;
 		if (selectedElementType) {
-			this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/' + selectedElementType + '/null');
+			// We do not have any groups here, which is why we pass null as the groupKey.
+			this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/null/' + selectedElementType);
 		}
 	}
 
