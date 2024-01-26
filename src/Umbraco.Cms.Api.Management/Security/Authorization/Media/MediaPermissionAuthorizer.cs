@@ -18,7 +18,7 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
     }
 
     /// <inheritdoc />
-    public async Task<bool> IsAuthorizedAsync(IPrincipal currentUser, IEnumerable<Guid> mediaKeys)
+    public async Task<bool> IsDeniedAsync(IPrincipal currentUser, IEnumerable<Guid> mediaKeys)
     {
         if (!mediaKeys.Any())
         {
@@ -30,26 +30,29 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 
         var result = await _mediaPermissionService.AuthorizeAccessAsync(user, mediaKeys);
 
-        return result == MediaAuthorizationStatus.Success;
+        // If we can't find the media item(s) then we can't determine whether you are denied access.
+        return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsAuthorizedAtRootLevelAsync(IPrincipal currentUser)
+    public async Task<bool> IsDeniedAtRootLevelAsync(IPrincipal currentUser)
     {
         IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _mediaPermissionService.AuthorizeRootAccessAsync(user);
 
-        return result == MediaAuthorizationStatus.Success;
+        // If we can't find the media item(s) then we can't determine whether you are denied access.
+        return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsAuthorizedAtRecycleBinLevelAsync(IPrincipal currentUser)
+    public async Task<bool> IsDeniedAtRecycleBinLevelAsync(IPrincipal currentUser)
     {
         IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _mediaPermissionService.AuthorizeBinAccessAsync(user);
 
-        return result == MediaAuthorizationStatus.Success;
+        // If we can't find the media item(s) then we can't determine whether you are denied access.
+        return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
 }

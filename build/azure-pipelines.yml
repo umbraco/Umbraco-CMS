@@ -17,10 +17,6 @@ parameters:
     displayName: Deploy to Npm
     type: boolean
     default: false
-  - name: npmPublishTag
-    displayName: Npm publish tag
-    type: string
-    default: 'latest'
   - name: buildApiDocs
     displayName: Build API docs
     type: boolean
@@ -104,6 +100,12 @@ stages:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
+          - script: npm ci --no-fund --no-audit --prefer-offline
+            displayName: Run npm ci (Login)
+            workingDirectory: src/Umbraco.Web.UI.Login
+          - script: npm run build
+            displayName: Run npm build (Login)
+            workingDirectory: src/Umbraco.Web.UI.Login
           - script: npm ci --no-fund --no-audit --prefer-offline
             displayName: Run npm ci (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client
@@ -369,7 +371,7 @@ stages:
 
       # Integration Tests (SQL Server)
       - job:
-        timeoutInMinutes: 120
+        timeoutInMinutes: 180
         condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}})
         displayName: Integration Tests (SQL Server)
         strategy:
@@ -702,9 +704,10 @@ stages:
     pool:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
-      umbracoMajorVersion:  $[ dependencies.Build.outputs['A.build.NBGV_VersionMajor'] ]
+      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     displayName: Upload API Documentation
     dependsOn:
+      - Build
       - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
@@ -730,6 +733,7 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/csharp
+              CleanTargetBeforeCopy: true
       - job:
         displayName: Upload js Docs
         steps:
@@ -752,3 +756,4 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/ui
+              CleanTargetBeforeCopy: true

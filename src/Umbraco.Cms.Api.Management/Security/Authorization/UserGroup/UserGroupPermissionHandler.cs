@@ -21,5 +21,5 @@ public class UserGroupPermissionHandler : MustSatisfyRequirementAuthorizationHan
         AuthorizationHandlerContext context,
         UserGroupPermissionRequirement requirement,
         UserGroupPermissionResource resource) =>
-        await _userGroupPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.UserGroupKeys);
+        await _userGroupPermissionAuthorizer.IsDeniedAsync(context.User, resource.UserGroupKeys) is false;
 }

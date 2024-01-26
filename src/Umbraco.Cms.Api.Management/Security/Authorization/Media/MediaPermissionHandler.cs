@@ -26,17 +26,17 @@ public class MediaPermissionHandler : MustSatisfyRequirementAuthorizationHandler
 
         if (resource.CheckRoot)
         {
-            result &= await _mediaPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User);
+            result &= await _mediaPermissionAuthorizer.IsDeniedAtRootLevelAsync(context.User) is false;
         }
 
         if (resource.CheckRecycleBin)
         {
-            result &= await _mediaPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User);
+            result &= await _mediaPermissionAuthorizer.IsDeniedAtRecycleBinLevelAsync(context.User) is false;
         }
 
         if (resource.MediaKeys.Any())
         {
-            result &= await _mediaPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.MediaKeys);
+            result &= await _mediaPermissionAuthorizer.IsDeniedAsync(context.User, resource.MediaKeys) is false;
         }
 
         return result;
