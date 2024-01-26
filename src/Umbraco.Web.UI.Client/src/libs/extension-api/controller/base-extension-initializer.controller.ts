@@ -143,7 +143,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (conditionConfigs.length > 0) {
 			// Observes the conditions and initialize as they come in.
 			this.observe(
-				this.#extensionRegistry.getByTypeAndAliases('condition', conditionAliases),
+				this.#extensionRegistry.byTypeAndAliases('condition', conditionAliases),
 				this.#gotConditions,
 				'_observeConditions',
 			);

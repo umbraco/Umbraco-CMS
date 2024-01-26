@@ -80,7 +80,7 @@ describe('UmbExtensionRegistry', () => {
 	it('should get an extension by aliases', (done) => {
 		const aliases = ['Umb.Test.Section.1', 'Umb.Test.Section.2'];
 		extensionRegistry
-			.getByTypeAndAliases('section', aliases)
+			.byTypeAndAliases('section', aliases)
 			.subscribe((extensions) => {
 				expect(extensions[0]?.alias).to.eq(aliases[1]);
 				expect(extensions[1]?.alias).to.eq(aliases[0]);
