@@ -16,6 +16,9 @@ class UmbLocalizationRenderCountElement extends UmbElementMixin(LitElement) {
 	amountOfUpdates = 0;
 	amountOfRenders = 0;
 
+	@property({ type: Number })
+	test: number = 0;
+
 	requestUpdate() {
 		super.requestUpdate();
 		this.amountOfUpdates++;
@@ -23,7 +26,7 @@ class UmbLocalizationRenderCountElement extends UmbElementMixin(LitElement) {
 
 	render() {
 		this.amountOfRenders++;
-		return html`${this.localize.term('logout')}`;
+		return html`${this.localize.term('logout') + '#' + this.test}`;
 	}
 }
 
@@ -177,31 +180,44 @@ describe('UmbLocalizeController', () => {
 
 		it('only reacts to changes of its own localization-keys', async () => {
 			const element: UmbLocalizationRenderCountElement = await fixture(
-				html`<umb-localization-render-count></umb-localization-render-count>`,
+				html`<umb-localization-render-count test="10"></umb-localization-render-count>`,
 			);
+
+			// Something triggers multiple updates initially, and it varies how many it is. So we wait for a timeout to ensure that we have a clean slate and then reset the counter:
+			await aTimeout(20);
+			element.amountOfUpdates = 0;
+
 			expect(element.amountOfUpdates).to.equal(0);
 			expect(element.amountOfRenders).to.equal(1);
-
-			expect(element.shadowRoot!.textContent).to.equal('Log out');
-			expect(element.amountOfUpdates).to.equal(0);
+			expect(element.shadowRoot!.textContent).to.equal('Log out#10');
 
 			// Let the registry load the new extension
 			umbLocalizationManager.registerLocalization(englishOverride);
 
-			await aTimeout(12);
+			// Wait three frames is safe:
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			await new Promise((resolve) => requestAnimationFrame(resolve));
 
 			// This should still be the same (cause it should not be affected as the change did not change our localization key)
 			expect(element.amountOfUpdates).to.equal(0);
-			expect(element.shadowRoot!.textContent).to.equal('Log out');
+			expect(element.amountOfRenders).to.equal(1);
+			expect(element.shadowRoot!.textContent).to.equal('Log out#10');
 
 			// Let the registry load the new extension
 			umbLocalizationManager.registerLocalization(englishOverrideLogout);
 
-			await aTimeout(12);
+			// Wait three frames is safe:
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			await new Promise((resolve) => requestAnimationFrame(resolve));
 
 			// Now we should have gotten one update and the text should be different
 			expect(element.amountOfUpdates).to.equal(1);
-			expect(element.shadowRoot!.textContent).to.equal('Log out 2');
+			expect(element.amountOfRenders).to.equal(2);
+			expect(element.shadowRoot!.textContent).to.equal('Log out 2#10');
+
+			console.log('done');
 		});
 	});
 
