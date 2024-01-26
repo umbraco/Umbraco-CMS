@@ -176,9 +176,13 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionArrayMemoization),
 		);
 	}
-	#extensionsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
+
+	#extensionsOfType<
+		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
+	>(type: Key) {
 		return this.extensions.pipe(
-			map((exts) => exts.filter((ext) => ext.type === type)),
+			map((exts) => exts.filter((ext) => ext.type === type) as unknown as T[]),
 			distinctUntilChanged(extensionArrayMemoization),
 		);
 	}
@@ -194,30 +198,36 @@ export class UmbExtensionRegistry<
 		types: Array<ExtensionType['type']>,
 	): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
-			map((exts) => exts.filter((ext) => types.indexOf(ext.type) !== -1)),
+			map((exts) => exts.filter((ext) => types.indexOf(ext.type) !== -1) as unknown as Array<ExtensionType>),
 			distinctUntilChanged(extensionArrayMemoization),
-		) as unknown as Observable<Array<ExtensionType>>;
+		);
 	}
 
-	#mergeExtensionWithKinds([ext, kinds]) {
+	#mergeExtensionWithKinds<ExtensionType extends ManifestBase, KindType extends ManifestKind<ManifestTypes>>([
+		ext,
+		kinds,
+	]: [ExtensionType | undefined, Array<KindType>]): ExtensionType | undefined {
 		// Specific Extension Meta merge (does not merge conditions)
 		if (ext) {
 			// Since we don't have the type up front in this request, we will just get all kinds here and find the matching one:
 			const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
 			// TODO: This check can go away when making a find kind based on type and kind.
 			if (baseManifest) {
-				const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+				const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext };
 				if ((baseManifest as any).meta) {
-					merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+					(merged as any).meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
 				}
-				return merged;
+				return merged as ExtensionType;
 			}
 		}
 		return ext;
 	}
 
-	#mergeExtensionsWithKinds([exts, kinds]) {
-		exts
+	#mergeExtensionsWithKinds<ExtensionType extends ManifestBase, KindType extends ManifestKind<ManifestTypes>>([
+		exts,
+		kinds,
+	]: [Array<ExtensionType>, Array<KindType>]): ExtensionType[] {
+		return exts
 			.map((ext) => {
 				// Specific Extension Meta merge (does not merge conditions)
 				const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
@@ -289,7 +299,7 @@ export class UmbExtensionRegistry<
 	>(type: Key, aliases: Array<string>) {
 		return combineLatest([
 			this.extensions.pipe(
-				map((exts) => exts.filter((ext) => ext.type === type && aliases.indexOf(ext.alias) !== -1)),
+				map((exts) => exts.filter((ext) => ext.type === type && aliases.indexOf(ext.alias) !== -1) as unknown as T[]),
 				distinctUntilChanged(extensionArrayMemoization),
 			),
 			this.#kindsOfType(type),
@@ -309,7 +319,7 @@ export class UmbExtensionRegistry<
 	 * The filter method will be called for each extension manifest of the given type, and the first argument to it is the extension manifest.
 	 * @param type {string} - The type of the extension to get
 	 * @param filter {(ext: T): void} - The filter method to use to filter the extensions
-	 * @returns {Observable<Array<T | undefined>>} - An observable of the extensions that matches the type and filter method
+	 * @returns {Observable<Array<T>>} - An observable of the extensions that matches the type and filter method
 	 */
 	byTypeAndFilter<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
@@ -317,14 +327,14 @@ export class UmbExtensionRegistry<
 	>(type: Key, filter: (ext: T) => boolean) {
 		return combineLatest([
 			this.extensions.pipe(
-				map((exts) => exts.find((ext) => ext.type === type && filter(ext as unknown as T))),
+				map((exts) => exts.filter((ext) => ext.type === type && filter(ext as unknown as T)) as unknown as T[]),
 				distinctUntilChanged(extensionArrayMemoization),
 			),
 			this.#kindsOfType(type),
 		]).pipe(
 			map(this.#mergeExtensionsWithKinds),
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
-		) as Observable<Array<T | undefined>>;
+		) as Observable<Array<T>>;
 	}
 
 	/**
@@ -352,7 +362,7 @@ export class UmbExtensionRegistry<
 	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the types.
 	 */
 	byTypes<ExtensionTypes extends ManifestBase = ManifestBase>(types: string[]): Observable<Array<ExtensionTypes>> {
-		return combineLatest([this.#extensionsOfTypes(types), this.#kindsOfTypes(types)]).pipe(
+		return combineLatest([this.#extensionsOfTypes<ExtensionTypes>(types), this.#kindsOfTypes(types)]).pipe(
 			map(this.#mergeExtensionsWithKinds),
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<ExtensionTypes>>;

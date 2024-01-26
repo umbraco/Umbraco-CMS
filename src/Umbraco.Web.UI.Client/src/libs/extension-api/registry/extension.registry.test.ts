@@ -66,12 +66,33 @@ describe('UmbExtensionRegistry', () => {
 		expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.true;
 	});
 
+	it('should get several extensions by type', (done) => {
+		extensionRegistry
+			.byType('section')
+			.subscribe((extensions) => {
+				expect(extensions.length).to.eq(3);
+				done();
+			})
+			.unsubscribe();
+	});
+
 	it('should get an extension by alias', (done) => {
 		const alias = 'Umb.Test.Section.1';
 		extensionRegistry
-			.getByTypeAndAlias('section', alias)
+			.byTypeAndAlias('section', alias)
 			.subscribe((extension) => {
 				expect(extension?.alias).to.eq(alias);
+				done();
+			})
+			.unsubscribe();
+	});
+
+	it('should get an extension by type and filter', (done) => {
+		extensionRegistry
+			.byTypeAndFilter('section', (ext) => ext.weight === 25)
+			.subscribe((extensions) => {
+				expect(extensions.length).to.eq(1);
+				expect(extensions[0].alias).to.eq('Umb.Test.Section.3');
 				done();
 			})
 			.unsubscribe();
@@ -89,7 +110,7 @@ describe('UmbExtensionRegistry', () => {
 			.unsubscribe();
 	});
 
-	describe('getByType', () => {
+	describe('byType', () => {
 		const type = 'section';
 
 		it('should get all extensions by type', (done) => {
