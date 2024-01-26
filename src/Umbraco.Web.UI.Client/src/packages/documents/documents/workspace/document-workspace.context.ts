@@ -33,8 +33,8 @@ export class UmbDocumentWorkspaceContext
 		return this.#getDataPromise;
 	}
 
-	readonly unique = this.#currentData.asObservablePart((data) => data?.id);
-	readonly contentTypeId = this.#currentData.asObservablePart((data) => data?.documentType.id);
+	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
@@ -47,7 +47,7 @@ export class UmbDocumentWorkspaceContext
 		// TODO: Get Workspace Alias via Manifest.
 		super(host, 'Umb.Workspace.Document');
 
-		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
+		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 
 		/*
 		TODO: Make something to ensure all variants are present in data? Seems like a good idea?.
