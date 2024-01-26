@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Installer;
+using Umbraco.Cms.Core.Models.Installer;
 
 namespace Umbraco.Cms.Core.Services.Installer;
 
@@ -22,7 +21,7 @@ public class UpgradeService : IUpgradeService
     }
 
     /// <inheritdoc/>
-    public async Task Upgrade()
+    public async Task<Attempt<InstallationResult?>> UpgradeAsync()
     {
         if (_runtimeState.Level != RuntimeLevel.Upgrade)
         {
@@ -32,16 +31,17 @@ public class UpgradeService : IUpgradeService
 
         try
         {
-            await RunSteps();
+            Attempt<InstallationResult?> result = await RunStepsAsync();
+            return result;
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Encountered an error when running the upgrade steps");
+            _logger.LogError(exception, "Encountered an unexpected error when running the upgrade steps");
             throw;
         }
     }
 
-    private async Task RunSteps()
+    private async Task<Attempt<InstallationResult?>> RunStepsAsync()
     {
         foreach (IUpgradeStep step in _upgradeSteps)
         {
@@ -54,8 +54,25 @@ public class UpgradeService : IUpgradeService
             }
 
             _logger.LogInformation("Running {StepName}", stepName);
-            await step.ExecuteAsync();
+            Attempt<InstallationResult> result = await step.ExecuteAsync();
+
+            if (result.Success is false)
+            {
+                if (result.Result?.ErrorMessage is not null)
+                {
+                    _logger.LogError("Failed {StepName}, with the message: {Message}", stepName, result.Result?.ErrorMessage);
+                }
+                else
+                {
+                    _logger.LogError("Failed {StepName}", stepName);
+                }
+
+                return Attempt.Fail(result.Result);
+            }
+
             _logger.LogInformation("Finished {StepName}", stepName);
         }
+
+        return Attempt<InstallationResult?>.Succeed();
     }
 }

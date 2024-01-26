@@ -19,7 +19,7 @@ public class AuthorizeUpgradeController : UpgradeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Authorize()
     {
-        await _upgradeService.Upgrade();
+        await _upgradeService.UpgradeAsync();
         return Ok();
     }
 }

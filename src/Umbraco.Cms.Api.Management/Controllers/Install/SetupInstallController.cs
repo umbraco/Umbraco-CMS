@@ -32,7 +32,7 @@ public class SetupInstallController : InstallControllerBase
     public async Task<IActionResult> Setup(InstallRequestModel installData)
     {
         InstallData data = _mapper.Map<InstallData>(installData)!;
-        await _installService.Install(data);
+        await _installService.InstallAsync(data);
 
         return Ok();
     }

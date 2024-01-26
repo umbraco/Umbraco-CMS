@@ -10,5 +10,5 @@ public interface IInstallService
     /// </summary>
     /// <param name="model">InstallData containing the required data used to install</param>
     /// <returns></returns>
-    Task Install(InstallData model);
+    Task<Attempt<InstallationResult?>> InstallAsync(InstallData model);
 }
