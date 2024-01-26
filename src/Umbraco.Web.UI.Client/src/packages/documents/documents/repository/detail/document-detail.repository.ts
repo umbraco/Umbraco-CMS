@@ -1,7 +1,7 @@
-import { UmbDocumentDetailModel } from '../../types.js';
+import type { UmbDocumentDetailModel } from '../../types.js';
 import { UmbDocumentServerDataSource } from './document-detail.server.data-source.js';
 import { UMB_DOCUMENT_DETAIL_STORE_CONTEXT } from './document-detail.store.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDocumentDetailRepository extends UmbDetailRepositoryBase<UmbDocumentDetailModel> {

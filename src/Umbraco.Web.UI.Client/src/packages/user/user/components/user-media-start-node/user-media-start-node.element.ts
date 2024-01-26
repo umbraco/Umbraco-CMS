@@ -34,7 +34,8 @@ export class UmbUserMediaStartNodeElement extends UmbLitElement {
 			(item) => item.id,
 			(item) => {
 				return html`
-					<uui-ref-node name=${ifDefined(item.name)}>
+					<!-- TODO: get correct variant name -->
+					<uui-ref-node name=${ifDefined(item.variants[0].name)}>
 						<uui-icon slot="icon" name="folder"></uui-icon>
 					</uui-ref-node>
 				`;

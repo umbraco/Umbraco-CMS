@@ -32,7 +32,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 	// Document type specific:
 	readonly allowedTemplateIds;
-	readonly defaultTemplateId;
+	readonly defaultTemplate;
 	readonly cleanup;
 
 	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
@@ -58,7 +58,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 		// Document type specific:
 		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplates);
-		this.defaultTemplateId = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
+		this.defaultTemplate = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
 		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
 	}
 
@@ -117,10 +117,10 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	// Document type specific:
-	setAllowedTemplateIds(allowedTemplates: Array<string>) {
+	setAllowedTemplateIds(allowedTemplates: Array<{ id: string }>) {
 		this.structure.updateOwnerContentType({ allowedTemplates });
 	}
-	setDefaultTemplateId(defaultTemplate: string) {
+	setDefaultTemplate(defaultTemplate: { id: string }) {
 		this.structure.updateOwnerContentType({ defaultTemplate });
 	}
 

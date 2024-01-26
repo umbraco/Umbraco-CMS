@@ -1,9 +1,8 @@
-import { css, html, customElement, property, repeat, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
-import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDocumentItemModel } from 'src/packages/documents/documents/repository/item/types';
 
 @customElement('umb-user-document-start-node')
 export class UmbUserDocumentStartNodeElement extends UmbLitElement {
@@ -32,10 +31,11 @@ export class UmbUserDocumentStartNodeElement extends UmbLitElement {
 
 		return repeat(
 			this._displayValue,
-			(item) => item.id,
+			(item) => item.unique,
 			(item) => {
 				return html`
-					<uui-ref-node name=${ifDefined(item.name)}>
+					<!-- TODO: get correct variant name -->
+					<uui-ref-node name=${item.variants[0].name}>
 						<uui-icon slot="icon" name="folder"></uui-icon>
 					</uui-ref-node>
 				`;
