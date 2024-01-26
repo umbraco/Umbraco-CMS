@@ -106,7 +106,7 @@ export class UmbExtensionRegistry<
 	}
 
 	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
-		const isValid = this.checkExtension(manifest);
+		const isValid = this.#checkExtension(manifest);
 		if (!isValid) {
 			return;
 		}
@@ -143,14 +143,7 @@ export class UmbExtensionRegistry<
 		return false;
 	}
 
-	/*
-	getByAlias(alias: string) {
-		// TODO: make pipes prettier/simpler/reuseable
-		return this.extensions.pipe(map((extensions) => extensions.find((extension) => extension.alias === alias) || null));
-	}
-	*/
-
-	private checkExtension(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {
+	#checkExtension(manifest: ManifestTypes | ManifestKind<ManifestTypes>): boolean {
 		if (!manifest.type) {
 			console.error(`Extension is missing type`, manifest);
 			return false;
@@ -345,6 +338,7 @@ export class UmbExtensionRegistry<
 	 * @param type {string} - The type of the extensions to get.
 	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the type.
 	 */
+	// TODO: get rid of the extensions name.
 	extensionsOfType<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
@@ -375,6 +369,7 @@ export class UmbExtensionRegistry<
 	 * @param type {Array<string>} - The types of the extensions to get.
 	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the types.
 	 */
+	// TODO: get rid of the extensions name.
 	extensionsOfTypes<ExtensionTypes extends ManifestBase = ManifestBase>(
 		types: string[],
 	): Observable<Array<ExtensionTypes>> {
