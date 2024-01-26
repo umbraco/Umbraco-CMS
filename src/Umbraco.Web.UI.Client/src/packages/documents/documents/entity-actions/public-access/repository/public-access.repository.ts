@@ -25,6 +25,19 @@ export class UmbDocumentPublicAccessRepository extends UmbBaseController impleme
 		]);
 	}
 
+	async create(id: string, data: PublicAccessRequestModel) {
+		if (!id) throw new Error('Id is missing');
+		if (!data) throw new Error('Data is missing');
+		await this.#init;
+
+		const { error } = await this.#dataSource.update(id, data);
+		if (!error) {
+			const notification = { data: { message: `Public acccess setting created` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+		return { error };
+	}
+
 	async readPublicAccess(id: string) {
 		if (!id) throw new Error('Id is missing');
 		await this.#init;
@@ -43,7 +56,19 @@ export class UmbDocumentPublicAccessRepository extends UmbBaseController impleme
 
 		const { error } = await this.#dataSource.update(id, data);
 		if (!error) {
-			const notification = { data: { message: `Public acccess saved` } };
+			const notification = { data: { message: `Public acccess setting updated` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+		return { error };
+	}
+
+	async deletePublicAccess(id: string) {
+		if (!id) throw new Error('Id is missing');
+		await this.#init;
+
+		const { error } = await this.#dataSource.delete(id);
+		if (!error) {
+			const notification = { data: { message: `Public acccess setting deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 		return { error };
