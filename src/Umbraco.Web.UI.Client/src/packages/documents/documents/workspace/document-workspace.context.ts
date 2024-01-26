@@ -2,6 +2,8 @@ import { UmbDocumentTypeDetailRepository } from '../../document-types/repository
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
+import type { UmbDocumentDetailModel } from '../types.js';
+import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
@@ -10,17 +12,18 @@ import {
 	type UmbVariantableWorkspaceContextInterface,
 	type UmbPublishableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
-import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-type EntityType = DocumentResponseModel;
+type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
 {
 	//
-	public readonly repository: UmbDocumentDetailRepository = new UmbDocumentDetailRepository(this);
+	public readonly repository = new UmbDocumentDetailRepository(this);
+	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
+
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
@@ -76,14 +79,8 @@ export class UmbDocumentWorkspaceContext
 		return this.#currentData.getValue();
 	}
 
-	/*
-	getUnique() {
-		return this.#data.getKey();
-	}
-	*/
-
 	getEntityId() {
-		return this.getData()?.id;
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
@@ -91,7 +88,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getContentTypeId() {
-		return this.getData()?.documentType.id;
+		return this.getData()?.documentType.unique;
 	}
 
 	variantById(variantId: UmbVariantId) {
@@ -168,16 +165,16 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async #createOrSave() {
-		if (!this.#currentData.value?.id) throw new Error('Id is missing');
+		if (!this.#currentData.value?.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
-			// TODO: typescript hack until we get the create type
-			const value = this.#currentData.value as CreateDocumentRequestModel & { id: string };
+			const value = this.#currentData.value;
+
 			if ((await this.repository.create(value)).data !== undefined) {
 				this.setIsNew(false);
 			}
 		} else {
-			await this.repository.save(this.#currentData.value.id, this.#currentData.value);
+			await this.repository.save(this.#currentData.value);
 		}
 	}
 
@@ -201,9 +198,9 @@ export class UmbDocumentWorkspaceContext
 		const currentData = this.#currentData.value;
 		if (currentData) {
 			const variantIds = currentData.variants?.map((x) => UmbVariantId.Create(x));
-			const id = currentData.id;
-			if (variantIds && id) {
-				await this.repository.publish(id, variantIds);
+			const unique = currentData.unique;
+			if (variantIds && unique) {
+				await this.publishingRepository.publish(unique, variantIds);
 			}
 		}
 	}
@@ -213,9 +210,9 @@ export class UmbDocumentWorkspaceContext
 		const currentData = this.#currentData.value;
 		if (currentData) {
 			const variantIds = currentData.variants?.map((x) => UmbVariantId.Create(x));
-			const id = this.getEntityId();
-			if (variantIds && id) {
-				await this.repository.publish(id, variantIds);
+			const unique = this.getEntityId();
+			if (variantIds && unique) {
+				await this.publishingRepository.publish(unique, variantIds);
 			}
 		}
 	}
@@ -225,9 +222,9 @@ export class UmbDocumentWorkspaceContext
 		const currentData = this.#currentData.value;
 		if (currentData) {
 			const variantIds = currentData.variants?.map((x) => UmbVariantId.Create(x));
-			const id = this.getEntityId();
-			if (variantIds && id) {
-				await this.repository.unpublish(id, variantIds);
+			const unique = this.getEntityId();
+			if (variantIds && unique) {
+				await this.publishingRepository.unpublish(unique, variantIds);
 			}
 		}
 	}

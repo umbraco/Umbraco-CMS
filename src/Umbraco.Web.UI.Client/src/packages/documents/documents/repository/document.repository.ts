@@ -4,7 +4,6 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbDocumentRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<unknown>;
@@ -26,15 +25,6 @@ export class UmbDocumentRepository extends UmbBaseController implements UmbApi {
 		]);
 	}
 
-	// TODO: Move
-
-	// Structure permissions;
-	async requestAllowedDocumentTypesOf(id: string | null) {
-		if (id === undefined) throw new Error('Id is missing');
-		await this.#init;
-		return this.#detailDataSource.getAllowedDocumentTypesOf(id);
-	}
-
 	// General:
 
 	async trash(id: string) {
@@ -45,40 +35,6 @@ export class UmbDocumentRepository extends UmbBaseController implements UmbApi {
 
 		if (!error) {
 			const notification = { data: { message: `Document moved to recycle bin` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-
-		return { error };
-	}
-
-	async publish(id: string, variantIds: Array<UmbVariantId>) {
-		if (!id) throw new Error('id is missing');
-		if (!variantIds) throw new Error('variant IDs are missing');
-		await this.#init;
-
-		const { error } = await this.#detailDataSource.publish(id, variantIds);
-
-		if (!error) {
-			// TODO: Update other stores based on above effect.
-
-			const notification = { data: { message: `Document published` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-
-		return { error };
-	}
-
-	async unpublish(id: string, variantIds: Array<UmbVariantId>) {
-		if (!id) throw new Error('id is missing');
-		if (!variantIds) throw new Error('variant IDs are missing');
-		await this.#init;
-
-		const { error } = await this.#detailDataSource.unpublish(id, variantIds);
-
-		if (!error) {
-			// TODO: Update other stores based on above effect.
-
-			const notification = { data: { message: `Document unpublished` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 

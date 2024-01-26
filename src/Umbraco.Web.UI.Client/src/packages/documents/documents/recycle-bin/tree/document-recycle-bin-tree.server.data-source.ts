@@ -11,7 +11,7 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
  * @implements {UmbTreeDataSource}
  */
 export class UmbDocumentRecycleBinTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	RecycleBinItemResponseModel,
+	DocumentRecycleBinItemResponseModel,
 	UmbDocumentRecycleBinTreeItemModel
 > {
 	/**

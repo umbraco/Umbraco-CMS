@@ -79,11 +79,10 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		const document: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: data.parentId || null,
 			values: data.values,
 			variants: data.variants,
 			urls: data.urls,
-			templateId: data.templateId || null,
+			template: data.template,
 			contentTypeId: data.contentTypeId,
 			isTrashed: data.isTrashed,
 		};

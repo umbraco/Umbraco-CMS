@@ -14,16 +14,13 @@ import type {
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 import './column-layouts/document-table-actions-column-layout.element.js';
-
-type EntityType = UmbDocumentTreeItemModel;
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
-	private _items?: Array<UmbEntityTreeItemModel>;
+	private _items?: Array<UmbDocumentTreeItemModel>;
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -52,7 +49,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbDefaultCollectionContext<EntityType, any>;
+	private _collectionContext?: UmbDefaultCollectionContext<UmbDocumentTreeItemModel, any>;
 
 	constructor() {
 		super();
@@ -75,12 +72,11 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(items: Array<UmbEntityTreeItemModel>) {
+	private _createTableItems(items: Array<UmbDocumentTreeItemModel>) {
 		this._tableItems = items.map((item) => {
-			// TODO: use unique instead of id
-			if (!item.id) throw new Error('Item id is missing.');
+			if (!item.unique) throw new Error('Item id is missing.');
 			return {
-				id: item.id,
+				id: item.unique,
 				data: [
 					{
 						columnAlias: 'entityName',

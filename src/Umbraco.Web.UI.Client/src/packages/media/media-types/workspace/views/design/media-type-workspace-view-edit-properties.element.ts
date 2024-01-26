@@ -175,18 +175,18 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 		return html`<div id="property-list">
 				${repeat(
 					this._propertyStructure,
-					(property) => property.id ?? '' + property.container.id ?? '' + property.sortOrder ?? '',
+					(property) => property.id ?? '' + property.container?.id ?? '' + property.sortOrder ?? '',
 					(property) => {
 						// Note: This piece might be moved into the property component
 						const inheritedFromMedia = this._ownerMediaTypes?.find(
-							(types) => types.containers?.find((containers) => containers.id === property.container.id),
+							(types) => types.containers?.find((containers) => containers.id === property.container?.id),
 						);
 
 						return html`<umb-media-type-workspace-view-edit-property
 							data-umb-property-id=${ifDefined(property.id)}
 							owner-media-type-id=${ifDefined(inheritedFromMedia?.unique)}
 							owner-media-type-name=${ifDefined(inheritedFromMedia?.name)}
-							?inherited=${property.container.id !== this.containerId}
+							?inherited=${property.container?.id !== this.containerId}
 							?sort-mode-active=${this._sortModeActive}
 							.property=${property}
 							@partial-property-update=${(event: CustomEvent) => {

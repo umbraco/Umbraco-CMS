@@ -1,8 +1,9 @@
 import { css, html, customElement, property, repeat, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
+import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDocumentItemModel } from 'src/packages/documents/documents/repository/item/types';
 
 @customElement('umb-user-document-start-node')
 export class UmbUserDocumentStartNodeElement extends UmbLitElement {
@@ -10,9 +11,9 @@ export class UmbUserDocumentStartNodeElement extends UmbLitElement {
 	ids: Array<string> = [];
 
 	@state()
-	_displayValue: Array<DocumentItemResponseModel> = [];
+	_displayValue: Array<UmbDocumentItemModel> = [];
 
-	#itemRepository = new UmbDocumentRepository(this);
+	#itemRepository = new UmbDocumentItemRepository(this);
 
 	protected async firstUpdated(): Promise<void> {
 		if (this.ids.length === 0) return;
