@@ -233,7 +233,7 @@ export class UmbExtensionRegistry<
 	}
 
 	// TODO: get rid of the name get
-	getByTypeAndAlias<
+	byTypeAndAlias<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
 	>(type: Key, alias: string) {
@@ -262,6 +262,10 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
+	/**
+	 * @deprecated Use `byTypeAndAlias` instead.
+	 */
+	getByTypeAndAlias = this.byTypeAndAlias.bind(this);
 
 	byTypeAndAliases<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
