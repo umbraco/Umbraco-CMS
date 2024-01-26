@@ -9,6 +9,9 @@ import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/back
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
 	x: TreeItemType,
@@ -52,6 +55,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	treeContext?: UmbTreeContextBase<TreeItemType>;
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
+	#actionEventContext?: UmbActionEventContext;
 	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
 
 	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
@@ -128,6 +132,18 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeHasChildren();
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#actionEventContext = instance;
+			this.#actionEventContext.removeEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+			this.#actionEventContext.addEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
 		});
 	}
 
@@ -206,9 +222,25 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		});
 	}
 
+	#onReloadRequest = (event: UmbEntityActionEvent) => {
+		// Only handle children request here. Root request is handled by the tree context
+		if (!this.unique) return;
+		if (event.getUnique() !== this.unique) return;
+		if (event.getEntityType() !== this.entityType) return;
+		this.requestChildren();
+	};
+
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
+	}
+
+	destroy(): void {
+		this.#actionEventContext?.removeEventListener(
+			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+			this.#onReloadRequest as EventListener,
+		);
+		super.destroy();
 	}
 }
 

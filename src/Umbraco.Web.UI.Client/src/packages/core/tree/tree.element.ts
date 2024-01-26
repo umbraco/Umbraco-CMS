@@ -79,19 +79,21 @@ export class UmbTreeElement extends UmbLitElement {
 	private _treeRoot?: UmbTreeItemModelBase;
 
 	#treeContext = new UmbTreeContextBase<UmbTreeItemModelBase>(this);
-
 	#rootItemsObserver?: UmbObserverController<Array<UmbTreeItemModelBase>>;
 
 	constructor() {
 		super();
-		this.#requestTreeRoot();
+		this.#observeTreeRoot();
 	}
 
-	async #requestTreeRoot() {
-		if (!this.#treeContext?.requestTreeRoot) throw new Error('Tree does not support root');
-
-		const { data } = await this.#treeContext.requestTreeRoot();
-		this._treeRoot = data;
+	#observeTreeRoot() {
+		this.observe(
+			this.#treeContext.treeRoot,
+			(treeRoot) => {
+				this._treeRoot = treeRoot;
+			},
+			'umbTreeRootObserver',
+		);
 	}
 
 	async #observeRootItems() {
