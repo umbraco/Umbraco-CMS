@@ -75,7 +75,7 @@ export class UmbInputBlockTypeElement<
 	}
 
 	render() {
-		return html` <div>
+		return html`<div>
 			${repeat(this.value, (block) => block.contentElementTypeKey, this.#renderItem)} ${this.#renderButton()}
 		</div>`;
 	}
