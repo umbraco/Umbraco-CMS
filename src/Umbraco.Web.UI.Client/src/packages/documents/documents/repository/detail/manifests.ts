@@ -1,6 +1,6 @@
 import { UmbDocumentDetailRepository } from './document-detail.repository.js';
 import { UmbDocumentDetailStore } from './document-detail.store.js';
-import { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Document.Detail';
 

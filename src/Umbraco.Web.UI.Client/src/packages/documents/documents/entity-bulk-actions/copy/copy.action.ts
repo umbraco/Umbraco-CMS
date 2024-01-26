@@ -9,6 +9,6 @@ export class UmbDocumentCopyEntityBulkAction extends UmbEntityBulkActionBase<Umb
 
 	async execute() {
 		console.log(`execute copy for: ${this.selection}`);
-		await this.repository?.copy();
+		//await this.repository?.copy();
 	}
 }

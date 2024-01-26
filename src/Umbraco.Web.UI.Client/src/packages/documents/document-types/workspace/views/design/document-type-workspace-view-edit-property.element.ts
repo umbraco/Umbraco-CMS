@@ -295,7 +295,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	renderPropertyTags() {
 		return this.property
 			? html`<div class="types">
-					${this.property.dataTypeId ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
+					${this.property.dataType.id ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}

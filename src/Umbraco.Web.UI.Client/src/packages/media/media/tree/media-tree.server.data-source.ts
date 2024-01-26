@@ -44,11 +44,9 @@ const getChildrenOf = (parentUnique: string | null) => {
 const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 	return {
 		id: item.id,
-		parentId: item.parentId || null,
-		name: item.name,
+		parentId: item.parent ? item.parent.id : null,
 		entityType: 'media',
 		hasChildren: item.hasChildren,
-		isContainer: item.isContainer,
 		noAccess: item.noAccess,
 		isTrashed: item.isTrashed,
 		isFolder: false,

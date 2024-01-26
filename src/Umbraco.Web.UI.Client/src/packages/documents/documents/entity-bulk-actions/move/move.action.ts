@@ -9,6 +9,6 @@ export class UmbDocumentMoveEntityBulkAction extends UmbEntityBulkActionBase<Umb
 
 	async execute() {
 		console.log(`execute move for: ${this.selection}`);
-		await this.repository?.move();
+		//await this.repository?.move();
 	}
 }

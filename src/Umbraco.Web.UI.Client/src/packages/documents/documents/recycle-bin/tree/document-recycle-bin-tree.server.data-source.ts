@@ -1,5 +1,5 @@
 import type { UmbDocumentRecycleBinTreeItemModel } from './types.js';
-import type { RecycleBinItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
@@ -42,14 +42,12 @@ const getChildrenOf = (parentUnique: string | null) => {
 	}
 };
 
-const mapper = (item: RecycleBinItemResponseModel): UmbDocumentRecycleBinTreeItemModel => {
+const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBinTreeItemModel => {
 	return {
 		id: item.id,
-		parentId: item.parentId || null,
-		name: item.name,
+		parentId: item.parent ? item.parent.id : null,
 		entityType: 'document-recycle-bin',
 		hasChildren: item.hasChildren,
-		isContainer: item.isContainer,
 		isFolder: false,
 	};
 };

@@ -1,8 +1,5 @@
 import type { UmbRelationTypeTreeItemModel } from './types.js';
-import type {
-	EntityTreeItemResponseModel,
-	NamedEntityTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
@@ -14,7 +11,7 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
  * @implements {UmbTreeDataSource}
  */
 export class UmbRelationTypeTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	EntityTreeItemResponseModel,
+	NamedEntityTreeItemResponseModel,
 	UmbRelationTypeTreeItemModel
 > {
 	/**
