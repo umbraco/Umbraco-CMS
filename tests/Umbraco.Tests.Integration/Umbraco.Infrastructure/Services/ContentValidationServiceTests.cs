@@ -223,6 +223,73 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.JsonPath == string.Empty));
     }
 
+    [Test]
+    public async Task Uses_Localizaton_Keys_For_Validation_Error_Messages()
+    {
+        var contentType = SetupSimpleTest();
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                InvariantName = "Test Document",
+                InvariantProperties = new[]
+                {
+                    new PropertyValueModel
+                    {
+                        Alias = "author",
+                        Value = "Invalid value"
+                    }
+                }
+            },
+            contentType);
+
+        Assert.AreEqual(2, validationResult.ValidationErrors.Count());
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(
+            r => r.Alias == "title"
+                 && r.ErrorMessages.Length == 1
+                 && r.ErrorMessages.First() == Constants.Validation.ErrorMessages.Properties.Missing));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(
+            r => r.Alias == "author"
+                 && r.ErrorMessages.Length == 1
+                 && r.ErrorMessages.First() == Constants.Validation.ErrorMessages.Properties.PatternMismatch));
+    }
+
+    [Test]
+    public async Task Custom_Validation_Error_Messages_Replaces_Localizaton_Keys()
+    {
+        var contentType = SetupSimpleTest();
+        contentType.PropertyTypes.First(pt => pt.Alias == "title").MandatoryMessage = "Custom mandatory message";
+        contentType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExpMessage = "Custom regex message";
+        ContentTypeService.Save(contentType);
+
+        var validationResult = await ContentValidationService.ValidatePropertiesAsync(
+            new ContentCreateModel
+            {
+                ContentTypeKey = contentType.Key,
+                InvariantName = "Test Document",
+                InvariantProperties = new[]
+                {
+                    new PropertyValueModel
+                    {
+                        Alias = "author",
+                        Value = "Invalid value"
+                    }
+                }
+            },
+            contentType);
+
+        Assert.AreEqual(2, validationResult.ValidationErrors.Count());
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(
+            r => r.Alias == "title"
+                 && r.ErrorMessages.Length == 1
+                 && r.ErrorMessages.First() == "Custom mandatory message"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(
+            r => r.Alias == "author"
+                 && r.ErrorMessages.Length == 1
+                 && r.ErrorMessages.First() == "Custom regex message"));
+    }
+
     private async Task<(IContentType DocumentType, IContentType ElementType)> SetupBlockListTest()
     {
         var propertyEditorCollection = GetRequiredService<PropertyEditorCollection>();

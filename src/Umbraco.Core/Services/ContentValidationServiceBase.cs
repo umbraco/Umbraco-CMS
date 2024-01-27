@@ -1,9 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
 using Umbraco.Extensions;
 
@@ -12,18 +10,15 @@ namespace Umbraco.Cms.Core.Services;
 internal abstract class ContentValidationServiceBase<TContentType>
     where TContentType : IContentTypeComposition
 {
-    private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly ILanguageService _languageService;
-    private readonly ILogger<ContentValidationServiceBase<TContentType>> _logger;
+    private readonly IPropertyValidationService _propertyValidationService;
 
     protected ContentValidationServiceBase(
-        PropertyEditorCollection propertyEditorCollection,
-        ILanguageService languageService,
-        ILogger<ContentValidationServiceBase<TContentType>> logger)
+        IPropertyValidationService propertyValidationService,
+        ILanguageService languageService)
     {
-        _propertyEditorCollection = propertyEditorCollection;
+        _propertyValidationService = propertyValidationService;
         _languageService = languageService;
-        _logger = logger;
     }
 
     protected async Task<ContentValidationResult> HandlePropertiesValidationAsync(
@@ -68,12 +63,6 @@ internal abstract class ContentValidationServiceBase<TContentType>
 
     private IEnumerable<PropertyValidationError> ValidateProperty(ContentEditingModelBase contentEditingModelBase, IPropertyType propertyType, string? culture, string? segment)
     {
-        if (_propertyEditorCollection.TryGet(propertyType.PropertyEditorAlias, out IDataEditor? dataEditor) is false)
-        {
-            _logger.LogWarning("Unable to validate property - no data editor found for property editor: {PropertyEditorAlias}", propertyType.PropertyEditorAlias);
-            return Enumerable.Empty<PropertyValidationError>();
-        }
-
         IEnumerable<PropertyValueModel>? properties = culture is null && segment is null
             ? contentEditingModelBase.InvariantProperties
             : contentEditingModelBase
@@ -83,13 +72,9 @@ internal abstract class ContentValidationServiceBase<TContentType>
 
         PropertyValueModel? propertyValueModel = properties?.FirstOrDefault(p => p.Alias == propertyType.Alias);
 
-        ValidationResult[] validationResults = dataEditor
-            .GetValueEditor()
-            .Validate(
-                propertyValueModel?.Value,
-                propertyType.Mandatory,
-                propertyType.ValidationRegExp)
-            .ToArray();
+        ValidationResult[] validationResults = _propertyValidationService
+                .ValidatePropertyValue(propertyType, propertyValueModel?.Value)
+                .ToArray();
 
         if (validationResults.Any() is false)
         {
