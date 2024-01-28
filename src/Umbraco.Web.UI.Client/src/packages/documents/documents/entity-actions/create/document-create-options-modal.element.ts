@@ -1,17 +1,20 @@
 import { UmbDocumentItemRepository } from '../../repository/index.js';
+import type {
+	UmbDocumentCreateOptionsModalData,
+	UmbDocumentCreateOptionsModalValue,
+} from './document-create-options-modal.token.js';
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbCreateDocumentModalData, UmbCreateDocumentModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbDocumentTypeStructureRepository,
 	type UmbAllowedDocumentTypeModel,
 } from '@umbraco-cms/backoffice/document-type';
 
-@customElement('umb-create-document-modal')
-export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
-	UmbCreateDocumentModalData,
-	UmbCreateDocumentModalValue
+@customElement('umb-document-create-options-modal')
+export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
+	UmbDocumentCreateOptionsModalData,
+	UmbDocumentCreateOptionsModalValue
 > {
 	#documentTypeStructureRepository = new UmbDocumentTypeStructureRepository(this);
 	#documentItemRepository = new UmbDocumentItemRepository(this);
@@ -51,8 +54,9 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	#onClick(event: PointerEvent) {
-		event.stopPropagation();
+	// close the modal when navigating to data type
+	#onNavigate() {
+		this._submitModal();
 	}
 
 	render() {
@@ -67,8 +71,9 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 								href="${`section/content/workspace/document/create/${this.data?.document?.unique ?? 'null'}/${
 									documentType.unique
 								}`}"
-								label="${documentType.name}">
-								${documentType.icon ? html`<uui-icon slot="icon" name=${documentType.icon}></uui-icon>` : nothing}
+								label="${documentType.name}"
+								@click=${this.#onNavigate}>
+								> ${documentType.icon ? html`<uui-icon slot="icon" name=${documentType.icon}></uui-icon>` : nothing}
 							</uui-menu-item>
 						`,
 					)}
@@ -81,10 +86,10 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	static styles = [UmbTextStyles];
 }
 
-export default UmbCreateDocumentModalElement;
+export default UmbDocumentCreateOptionsModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-create-document-modal': UmbCreateDocumentModalElement;
+		'umb-document-create-options-modal': UmbDocumentCreateOptionsModalElement;
 	}
 }

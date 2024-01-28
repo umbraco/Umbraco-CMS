@@ -6,9 +6,9 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
-import type { UmbApi} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestWorkspace} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace')
@@ -35,6 +35,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 				path: 'create/:parentId/:documentTypeKey',
 				component: this.#editorElement,
 				setup: async (_component, info) => {
+					debugger;
 					// TODO: Remember the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
 					const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
 					const documentTypeKey = info.match.params.documentTypeKey;

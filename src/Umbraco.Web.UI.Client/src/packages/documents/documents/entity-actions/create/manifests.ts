@@ -33,9 +33,9 @@ const entityActions: Array<ManifestEntityAction> = [
 const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.CreateDocument',
-		name: 'Create Document Modal',
-		js: () => import('./create-document-modal.element.js'),
+		alias: 'Umb.Modal.Document.CreateOptions',
+		name: 'Document Create Options Modal',
+		js: () => import('./document-create-options-modal.element.js'),
 	},
 ];
 

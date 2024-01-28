@@ -1,7 +1,7 @@
 import type { UmbDocumentDetailRepository } from '../../repository/index.js';
 import { UmbDocumentItemRepository } from '../../repository/index.js';
-import type { UmbCreateDocumentModalData } from './create-document-modal.token.js';
-import { UMB_CREATE_DOCUMENT_MODAL } from './create-document-modal.token.js';
+import type { UmbDocumentCreateOptionsModalData } from './document-create-options-modal.token.js';
+import { UMB_DOCUMENT_CREATE_OPTIONS_MODAL } from './document-create-options-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -35,9 +35,9 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		});
 	}
 
-	private async _openModal(modalData: UmbCreateDocumentModalData) {
+	private async _openModal(modalData: UmbDocumentCreateOptionsModalData) {
 		if (!this.#modalContext) return;
-		this.#modalContext.open(UMB_CREATE_DOCUMENT_MODAL, {
+		this.#modalContext.open(UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
 			data: modalData,
 		});
 	}
