@@ -28,7 +28,6 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		if (error || !data) throw new Error(`Failed to load document item`);
 
 		const documentItem = data[0];
-		debugger;
 
 		this._openModal({
 			document: documentItem ? { unique: documentItem.unique } : null,
