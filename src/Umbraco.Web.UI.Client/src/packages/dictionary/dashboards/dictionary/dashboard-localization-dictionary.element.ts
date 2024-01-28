@@ -42,6 +42,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 		const { data } = await this.#repo.list(0, 1000);
 		this.#dictionaryItems = data?.items ?? [];
+
 		this.#setTableColumns();
 		this.#setTableItems();
 	}

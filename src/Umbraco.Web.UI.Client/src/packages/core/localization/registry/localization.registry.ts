@@ -34,7 +34,7 @@ export class UmbLocalizationRegistry {
 	}
 
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
-		combineLatest([this.currentLanguage, extensionRegistry.extensionsOfType('localization')]).subscribe(
+		combineLatest([this.currentLanguage, extensionRegistry.byType('localization')]).subscribe(
 			async ([currentLanguage, extensions]) => {
 				const locale = new Intl.Locale(currentLanguage);
 				const filteredExt = extensions.filter(

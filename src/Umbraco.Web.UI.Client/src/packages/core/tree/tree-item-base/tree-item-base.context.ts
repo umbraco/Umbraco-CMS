@@ -197,7 +197,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	#observeActions() {
 		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfType('entityAction')
+				.byType('entityAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this.#hasActions.setValue(actions.length > 0);

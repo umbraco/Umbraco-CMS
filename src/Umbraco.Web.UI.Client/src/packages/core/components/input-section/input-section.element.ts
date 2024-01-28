@@ -2,7 +2,7 @@ import { UmbInputListBaseElement } from '../input-list-base/input-list-base.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_SECTION_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
-import type { ManifestSection} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-input-section')
@@ -18,7 +18,7 @@ export class UmbInputSectionElement extends UmbInputListBaseElement {
 
 	private _observeSections() {
 		if (this.value.length > 0) {
-			this.observe(umbExtensionsRegistry.extensionsOfType('section'), (sections: Array<ManifestSection>) => {
+			this.observe(umbExtensionsRegistry.byType('section'), (sections: Array<ManifestSection>) => {
 				this._sections = sections.filter((section) => this.value.includes(section.alias));
 			});
 		} else {
