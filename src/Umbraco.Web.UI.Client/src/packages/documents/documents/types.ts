@@ -9,15 +9,5 @@ export interface UmbDocumentDetailModel {
 	unique: string;
 	urls: Array<ContentUrlInfoModel>;
 	values: Array<DocumentValueModel>;
-	variants: Array<UmbDocumentVariantModel>;
-}
-
-export interface UmbDocumentVariantModel {
-	createDate: string | null;
-	culture: string | null;
-	name: string;
-	publishDate: string | null;
-	segment: string | null;
-	state: ContentStateModel | null;
-	updateDate: string | null;
+	variants: Array<UmbVariantModel>;
 }
