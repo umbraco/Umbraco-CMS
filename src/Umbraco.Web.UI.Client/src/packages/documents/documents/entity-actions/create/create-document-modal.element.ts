@@ -64,7 +64,7 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 						(documentType) => html`
 							<uui-menu-item
 								data-id=${ifDefined(documentType.unique)}
-								href="${`section/content/workspace/document/create/${this.data?.unique ?? 'null'}/${
+								href="${`section/content/workspace/document/create/${this.data?.document?.unique ?? 'null'}/${
 									documentType.unique
 								}`}"
 								label="${documentType.name}">
