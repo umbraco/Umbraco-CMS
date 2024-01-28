@@ -1496,8 +1496,8 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [],
 	},
 	{
-		allowedTemplateIds: [],
-		defaultTemplateId: null,
+		allowedTemplates: [],
+		defaultTemplate: null,
 		id: 'test-block-id',
 		alias: 'testBlock',
 		name: 'Test broken group key',
@@ -1508,10 +1508,9 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesBySegment: false,
 		isElement: true,
 		hasChildren: false,
-		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: false,
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
