@@ -1,40 +1,37 @@
-import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import type { DocumentTypeItemResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDocumentTypeItemModel } from './types.js';
+import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
+import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for Document Type items that fetches data from the server
  * @export
  * @class UmbDocumentTypeItemServerDataSource
- * @implements {UmbItemDataSource}
+ * @extends {UmbItemServerDataSourceBase<DocumentTypeItemResponseModel, UmbDocumentTypeItemModel>}
  */
-export class UmbDocumentTypeItemServerDataSource implements UmbItemDataSource<DocumentTypeItemResponseModel> {
-	#host: UmbControllerHost;
-
+export class UmbDocumentTypeItemServerDataSource extends UmbItemServerDataSourceBase<
+	DocumentTypeItemResponseModel,
+	UmbDocumentTypeItemModel
+> {
 	/**
 	 * Creates an instance of UmbDocumentTypeItemServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbDocumentTypeItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the items for the given ids from the server
-	 * @param {Array<string>} ids
-	 * @return {*}
-	 * @memberof UmbDocumentTypeItemServerDataSource
-	 */
-	async getItems(ids: Array<string>) {
-		if (!ids) throw new Error('Ids are missing');
-		return tryExecuteAndNotify(
-			this.#host,
-			DocumentTypeResource.getDocumentTypeItem({
-				id: ids,
-			}),
-		);
+		super(host, { getItems, mapper });
 	}
 }
+
+/* eslint-disable local-rules/no-direct-api-import */
+const getItems = (uniques: Array<string>) => DocumentTypeResource.getDocumentTypeItem({ id: uniques });
+
+const mapper = (item: DocumentTypeItemResponseModel): UmbDocumentTypeItemModel => {
+	return {
+		isElement: item.isElement,
+		icon: item.icon,
+		unique: item.id,
+		name: item.name,
+	};
+};
