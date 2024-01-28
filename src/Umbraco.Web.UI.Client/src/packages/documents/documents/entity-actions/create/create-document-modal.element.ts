@@ -1,3 +1,4 @@
+import { UmbDocumentItemRepository } from '../../repository/index.js';
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbCreateDocumentModalData, UmbCreateDocumentModalValue } from '@umbraco-cms/backoffice/modal';
@@ -13,6 +14,7 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	UmbCreateDocumentModalValue
 > {
 	#documentTypeStructureRepository = new UmbDocumentTypeStructureRepository(this);
+	#documentItemRepository = new UmbDocumentItemRepository(this);
 
 	@state()
 	private _allowedDocumentTypes: UmbAllowedDocumentTypeModel[] = [];
@@ -21,9 +23,10 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	private _headline: string = 'Create';
 
 	async firstUpdated() {
-		const documentUnique = this.data?.unique || null;
+		const documentUnique = this.data?.document?.unique || null;
+		const documentTypeUnique = this.data?.documentType?.unique || null;
 
-		this.#retrieveAllowedDocumentTypesOf(documentUnique);
+		this.#retrieveAllowedDocumentTypesOf(documentTypeUnique);
 
 		if (documentUnique) {
 			this.#retrieveHeadline(documentUnique);
@@ -31,7 +34,7 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	}
 
 	async #retrieveAllowedDocumentTypesOf(unique: string | null) {
-		const { data } = await this.#documentTypeStructureRepository.allowedDocumentTypesOf(unique);
+		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique);
 
 		if (data) {
 			// TODO: implement pagination, or get 1000?
@@ -41,10 +44,10 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 
 	async #retrieveHeadline(unique: string) {
 		if (!unique) return;
-		const { data } = await this.#documentItemRepository.requestItems(id);
+		const { data } = await this.#documentItemRepository.requestItems([unique]);
 		if (data) {
 			// TODO: we need to get the correct variant context here
-			this._headline = `Create at ${data.variants?.[0].name}`;
+			this._headline = `Create at ${data[0].variants?.[0].name}`;
 		}
 	}
 
@@ -58,9 +61,14 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 				<uui-box>
 					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
 					${this._allowedDocumentTypes.map(
-						(item) => html`
-							<uui-menu-item data-id=${ifDefined(item.unique)} href="" label="${item.name}">
-								${item.icon ? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>` : nothing}
+						(documentType) => html`
+							<uui-menu-item
+								data-id=${ifDefined(documentType.unique)}
+								href="${`section/content/workspace/document/create/${this.data?.unique ?? 'null'}/${
+									documentType.unique
+								}`}"
+								label="${documentType.name}">
+								${documentType.icon ? html`<uui-icon slot="icon" name=${documentType.icon}></uui-icon>` : nothing}
 							</uui-menu-item>
 						`,
 					)}

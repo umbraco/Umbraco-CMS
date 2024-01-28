@@ -724,7 +724,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				sortOrder: 0,
 			},
 		],
-		allowedDocumentTypes: [],
+		allowedDocumentTypes: [{ documentType: { id: 'simple-document-type-id' }, sortOrder: 0 }],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,

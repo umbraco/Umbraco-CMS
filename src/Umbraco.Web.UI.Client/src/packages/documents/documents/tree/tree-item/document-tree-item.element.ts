@@ -40,8 +40,9 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 	}
 
 	// TODO: lower opacity if item is not published
+	// TODO: get correct variant name
 	#renderLabel() {
-		return html` <span id="label" slot="label">${this.item?.name}</span> `;
+		return html` <span id="label" slot="label">${this.item?.variants[0].name}</span> `;
 	}
 
 	static styles = [

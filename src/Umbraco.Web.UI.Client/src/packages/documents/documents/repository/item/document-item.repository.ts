@@ -1,4 +1,4 @@
-import { UmbDocumentItemServerDataSource } from './document-item.server.data.js';
+import { UmbDocumentItemServerDataSource } from './document-item.server.data-source.js';
 import { UMB_DOCUMENT_ITEM_STORE_CONTEXT } from './document-item.store.js';
 import type { UmbDocumentItemModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

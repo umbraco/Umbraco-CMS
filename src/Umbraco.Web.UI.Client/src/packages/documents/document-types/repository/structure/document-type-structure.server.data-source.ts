@@ -22,9 +22,15 @@ export class UmbDocumentTypeStructureServerDataSource extends UmbContentTypeStru
 // eslint-disable-next-line local-rules/no-direct-api-import
 const getAllowedAtRoot = () => DocumentTypeResource.getDocumentTypeAllowedAtRoot({});
 
-const getAllowedChildrenOf = (unique: string) =>
-	// eslint-disable-next-line local-rules/no-direct-api-import
-	DocumentTypeResource.getDocumentTypeByIdAllowedChildren({ id: unique });
+const getAllowedChildrenOf = (unique: string | null) => {
+	if (unique) {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		return DocumentTypeResource.getDocumentTypeByIdAllowedChildren({ id: unique });
+	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		return DocumentTypeResource.getDocumentTypeAllowedAtRoot({});
+	}
+};
 
 const mapper = (item: AllowedDocumentTypeModel): UmbAllowedDocumentTypeModel => {
 	return {

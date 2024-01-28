@@ -11,11 +11,11 @@ export class UmbItemRepositoryBase<ItemType extends { unique: string }>
 {
 	protected _init: Promise<unknown>;
 	protected _itemStore?: UmbItemStore<ItemType>;
-	#itemSource: UmbItemDataSource;
+	#itemSource: UmbItemDataSource<ItemType>;
 
 	constructor(
 		host: UmbControllerHost,
-		itemSource: UmbItemDataSourceConstructor,
+		itemSource: UmbItemDataSourceConstructor<ItemType>,
 		itemStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);

@@ -7,11 +7,14 @@ import type { UmbMockDocumentTypeModel } from './document-type.data.js';
 import { data } from './document-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
+	AllowedDocumentTypeModel,
 	CreateDocumentTypeRequestModel,
 	CreateFolderRequestModel,
 	DocumentTypeItemResponseModel,
 	DocumentTypeResponseModel,
+	DocumentTypeSortModel,
 	DocumentTypeTreeItemResponseModel,
+	PagedAllowedDocumentTypeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel> {
@@ -28,14 +31,19 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 		super(data);
 	}
 
-	getAllowedChildren(id: string | null): Array<{ id: string }> {
-		return [];
+	getAllowedChildren(id: string): PagedAllowedDocumentTypeModel {
+		const documentType = this.detail.read(id);
+		const allowedDocumentTypes = documentType.allowedDocumentTypes.map((sortModel: DocumentTypeSortModel) =>
+			this.detail.read(sortModel.documentType.id),
+		);
+		const mappedItems = allowedDocumentTypes.map((item: UmbMockDocumentTypeModel) => allowedDocumentTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
 	}
 
-	getAllowedAtRoot(): Array<{ id: string }> {
+	getAllowedAtRoot(): PagedAllowedDocumentTypeModel {
 		const mockItems = this.data.filter((item) => item.allowedAsRoot);
-		debugger;
-		return [];
+		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
 	}
 }
 
@@ -133,6 +141,15 @@ const documentTypeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeIte
 		name: item.name,
 		icon: item.icon,
 		isElement: item.isElement,
+	};
+};
+
+const allowedDocumentTypeMapper = (item: UmbMockDocumentTypeModel): AllowedDocumentTypeModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		description: item.description,
+		icon: item.icon,
 	};
 };
 
