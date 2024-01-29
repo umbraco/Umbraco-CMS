@@ -24,13 +24,14 @@ export class UmbDocumentPublicAccessEntityAction extends UmbEntityActionBase<Umb
 		const mock: PublicAccessResponseModel = {
 			loginPageId: '1234567890',
 			errorPageId: '0987654321',
-			members: [],
+			members: [{ id: '123', name: 'test' }],
 			groups: [],
 		};
 		this._openModal(mock);
 	}
 
-	private async _openModal(data: PublicAccessResponseModel) {
-		this.#modalContext?.open(UMB_PUBLIC_ACCESS_MODAL, { data: { data } });
+	private async _openModal(publicAccessModel: PublicAccessResponseModel) {
+		//this.#modalContext?.open(UMB_PUBLIC_ACCESS_MODAL, { data: { publicAccessModel } });
+		this.#modalContext?.open(UMB_PUBLIC_ACCESS_MODAL);
 	}
 }

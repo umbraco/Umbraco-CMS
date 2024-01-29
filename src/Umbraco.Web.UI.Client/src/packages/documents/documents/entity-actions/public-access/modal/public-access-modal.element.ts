@@ -1,19 +1,8 @@
-import { UmbDocumentPublicAccessRepository } from '../repository/public-access.repository.js';
-import { html, customElement, state, css, repeat, query } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, css, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbLanguageRepository } from '@umbraco-cms/backoffice/language';
-import type {
-	DomainPresentationModel,
-	LanguageResponseModel,
-	PublicAccessResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-/*import {
-	UmbDocumentPublicAccessRepository,
-	type UmbPublicAccessModalData,
-	type UmbPublicAccessModalValue,
-} from '@umbraco-cms/backoffice/document';*/
 import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from '@umbraco-cms/backoffice/document';
+import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-public-access-modal')
 export class UmbPublicAccessModalElement extends UmbModalBaseElement<
@@ -21,27 +10,48 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	UmbPublicAccessModalValue
 > {
 	@state()
-	private _userMember?: any;
+	private _specific?: boolean;
 
 	@state()
-	private _page?: string;
+	private _startPage = true;
 
 	@state()
-	private _responseModel?: PublicAccessResponseModel;
+	private _selectedIds: Array<string> = [];
 
 	// Init
 
 	firstUpdated() {
-		this._responseModel = this.data?.data;
+		const data = this.data?.publicAccessModel;
+		if (!data) return;
+		this._startPage = false;
+
+		// Specific or Group
+		this._specific = data.members.length > 0 ? true : false;
+
+		//SelectedIds members
+		if (data.members.length > 0) {
+			this._selectedIds = data.members.map((m) => m.id);
+		} else if (data.groups.length > 0) {
+			this._selectedIds = data.groups.map((g) => g.id);
+		}
 	}
 
 	// Modal
 
+	#handleNext() {
+		this._startPage = false;
+	}
+
 	async #handleSave() {
-		//this.value = { defaultIsoCode: this._defaultIsoCode, domains: this._domains };
-		//const { error } = await this.#documentRepository.updateCultureAndHostnames(this.#unique!, this.value);
-		//if (error) return;
-		this.modalContext?.submit();
+		if (this.data?.publicAccessModel) {
+			this.modalContext?.submit({ action: 'update', publicAccessModel: this.value });
+		} else {
+			this.modalContext?.submit({ action: 'save', publicAccessModel: this.value });
+		}
+	}
+
+	#handleDelete() {
+		this.modalContext?.submit({ action: 'delete', publicAccessModel: this.value });
 	}
 
 	#handleCancel() {
@@ -53,46 +63,114 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_protect')}>
-				Public Access
-				<uui-button
-					slot="actions"
-					id="cancel"
-					label=${this.localize.term('buttons_confirmActionCancel')}
-					@click="${this.#handleCancel}"></uui-button>
-				<uui-button
+				<uui-box>${this._startPage ? this.renderSelectGroup() : this.renderEditPage()}</uui-box> ${this.renderActions()}
+			</umb-body-layout>
+		`;
+	}
+
+	// First page when no Restricting Public Access is set.
+	renderSelectGroup() {
+		return html`<umb-localize key="publicAccess_paHowWould" .args=${['NameOfDocument']}>
+				Choose how you want to restrict public access to the page 'NameOfDocument'.
+			</umb-localize>
+			<uui-radio-group
+				@change=${(e: UUIRadioEvent) =>
+					e.target.value === 'members' ? (this._specific = true) : (this._specific = false)}>
+				<uui-radio label="Specific members protection" value="members">Test</uui-radio>
+				<uui-radio label="Group based protection" value="groups"></uui-radio>
+			</uui-radio-group>`;
+	}
+
+	// Second page when editing Restricting Public Access
+	renderEditPage() {
+		return html`${this.renderMemberType()}
+			<p>
+				<umb-localize key="publicAccess_paSelectPages">
+					Select the pages that contain login form and error messages
+				</umb-localize>
+			</p>
+			<div class="select-item">
+				<strong><umb-localize key="publicAccess_paLoginPage">Login Page</umb-localize></strong>
+				<small>
+					<umb-localize key="publicAccess_paLoginPageHelp"> Choose the page that contains the login form </umb-localize>
+				</small>
+				<umb-input-document max="1"></umb-input-document>
+			</div>
+			<br />
+			<div class="select-item">
+				<strong><umb-localize key="publicAccess_paErrorPage">Error Page</umb-localize></strong>
+				<small>
+					<umb-localize key="publicAccess_paErrorPageHelp">
+						Used when people are logged on, but do not have access
+					</umb-localize>
+				</small>
+				<umb-input-document max="1"></umb-input-document>
+			</div>`;
+	}
+
+	renderMemberType() {
+		return this._specific
+			? html`<umb-localize key="publicAccess_paSelectMembers" .args=${['NameOfDocument']}>
+						Select the members who have access to the page <strong>%0%</strong>
+					</umb-localize>
+					<umb-input-member .selectedIds=${this._selectedIds}></umb-input-member>`
+			: html`<umb-localize key="publicAccess_paSelectGroups" .args=${['NameOfDocument']}>
+						Select the groups who have access to the page <strong>%0%</strong>
+					</umb-localize>
+					<umb-input-member-type .selectedIds=${this._selectedIds}></umb-input-member-type>`;
+	}
+
+	// Action buttons
+	renderActions() {
+		// Check for Save or Next button
+		const confirm = this.data?.publicAccessModel
+			? html`<uui-button
 					slot="actions"
 					id="save"
 					look="primary"
 					color="positive"
 					label=${this.localize.term('buttons_save')}
-					@click="${this.#handleSave}"></uui-button>
-			</umb-body-layout>
-		`;
-	}
-
-	// First page when no Public Access Restricting is set.
-	renderSelectGroup() {
-		return html``;
+					@click="${this.#handleSave}"></uui-button>`
+			: html`<uui-button
+					slot="actions"
+					id="save"
+					look="primary"
+					label=${this.localize.term('general_next')}
+					?disabled=${this._specific === undefined}
+					@click="${this.#handleNext}"></uui-button>`;
+		// Check for Remove button
+		const remove = this.data?.publicAccessModel
+			? html`<uui-button
+					slot="actions"
+					id="save"
+					look="primary"
+					color="warning"
+					@click="${this.#handleDelete}"
+					label=${this.localize.term('publicAccess_paRemoveProtection')}></uui-button>`
+			: nothing;
+		//Render buttons
+		return html` <uui-button
+				slot="actions"
+				id="cancel"
+				label=${this.localize.term('buttons_confirmActionCancel')}
+				@click="${this.#handleCancel}"></uui-button
+			>${remove}${confirm}`;
 	}
 
 	static styles = [
 		UmbTextStyles,
 		css`
-			uui-button-group {
-				width: 100%;
+			uui-radio-group {
+				display: block;
 			}
-			uui-box:first-child {
-				margin-bottom: var(--uui-size-layout-1);
+
+			.select-item {
+				display: flex;
+				flex-direction: column;
 			}
-			#dropdown {
-				flex-grow: 0;
-			}
-			#domains {
-				margin-top: var(--uui-size-layout-1);
-				margin-bottom: var(--uui-size-2);
-				display: grid;
-				grid-template-columns: 1fr 1fr auto;
-				grid-gap: var(--uui-size-1);
+
+			p {
+				margin: var(--uui-size-6) 0 var(--uui-size-2);
 			}
 		`,
 	];

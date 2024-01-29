@@ -2,12 +2,12 @@ import type { PublicAccessResponseModel } from '@umbraco-cms/backoffice/backend-
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbPublicAccessModalData {
-	requestBody: PublicAccessResponseModel;
+	publicAccessModel: PublicAccessResponseModel;
 }
 
 export interface UmbPublicAccessModalValue {
 	action: 'create' | 'update' | 'delete';
-	requestBody: PublicAccessResponseModel;
+	publicAccessModel: PublicAccessResponseModel;
 }
 
 export const UMB_PUBLIC_ACCESS_MODAL = new UmbModalToken<UmbPublicAccessModalData, UmbPublicAccessModalValue>(
