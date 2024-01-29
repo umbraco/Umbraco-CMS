@@ -1,34 +1,38 @@
+import { UmbDocumentPublicAccessRepository } from '../repository/public-access.repository.js';
 import { html, customElement, state, css, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbLanguageRepository } from '@umbraco-cms/backoffice/language';
-import type { DomainPresentationModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	DomainPresentationModel,
+	LanguageResponseModel,
+	PublicAccessResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 /*import {
 	UmbDocumentPublicAccessRepository,
 	type UmbPublicAccessModalData,
 	type UmbPublicAccessModalValue,
 } from '@umbraco-cms/backoffice/document';*/
-import type { UUIInputEvent, UUIPopoverContainerElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-public-access-modal')
-export class UmbPublicAccessModalElement extends UmbModalBaseElement<any, any> {
-	#publicAccessRepository?: any; //new UmbDocumentPublicAccessRepository(this);
-	#unique?: string;
-	#model?: any;
+export class UmbPublicAccessModalElement extends UmbModalBaseElement<
+	UmbPublicAccessModalData,
+	UmbPublicAccessModalValue
+> {
+	@state()
+	private _userMember?: any;
+
+	@state()
+	private _page?: string;
+
+	@state()
+	private _responseModel?: PublicAccessResponseModel;
 
 	// Init
 
 	firstUpdated() {
-		this.#unique = this.data?.unique;
-		this.#requestPublicAccessModel();
-	}
-
-	async #requestPublicAccessModel() {
-		if (!this.#unique) return;
-		const { data } = await this.#publicAccessRepository.requestPublicAccessModel(this.#unique);
-
-		if (!data) return;
-		this.#model = data;
+		this._responseModel = this.data?.data;
 	}
 
 	// Modal
@@ -44,8 +48,31 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<any, any> {
 		this.modalContext?.reject();
 	}
 
+	// Renders
+
 	render() {
-		return html`Public Access`;
+		return html`
+			<umb-body-layout headline=${this.localize.term('actions_protect')}>
+				Public Access
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('buttons_confirmActionCancel')}
+					@click="${this.#handleCancel}"></uui-button>
+				<uui-button
+					slot="actions"
+					id="save"
+					look="primary"
+					color="positive"
+					label=${this.localize.term('buttons_save')}
+					@click="${this.#handleSave}"></uui-button>
+			</umb-body-layout>
+		`;
+	}
+
+	// First page when no Public Access Restricting is set.
+	renderSelectGroup() {
+		return html``;
 	}
 
 	static styles = [
