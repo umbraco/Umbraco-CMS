@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbDocumentMockDb } from '../../data/document/document.db.js';
 import { UMB_SLUG } from './slug.js';
-import { PublishDocumentRequestModel, UnpublishDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PublishDocumentRequestModel, UnpublishDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const publishingHandlers = [
