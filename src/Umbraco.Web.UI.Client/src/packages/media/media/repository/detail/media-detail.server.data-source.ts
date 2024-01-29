@@ -35,6 +35,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		const data: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: UmbId.new(),
+			parentUnique,
 			urls: [],
 			mediaType: {
 				unique: 'mediaTypeId',
@@ -73,17 +74,28 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		}
 
 		// TODO: make data mapper to prevent errors
-		const document: UmbMediaDetailModel = {
+		const media: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: data.id,
+			parentUnique: null, // TODO: this is not correct. It will be solved when we know where to get the parent from
 			values: data.values,
-			variants: data.variants,
+			variants: data.variants.map((variant) => {
+				return {
+					state: null,
+					culture: variant.culture || null,
+					segment: variant.segment || null,
+					name: variant.name,
+					publishDate: null,
+					createDate: variant.createDate,
+					updateDate: variant.updateDate,
+				};
+			}),
 			urls: data.urls,
 			mediaType: { unique: data.mediaType.id },
 			isTrashed: data.isTrashed,
 		};
 
-		return { data: document };
+		return { data: media };
 	}
 
 	/**
@@ -99,9 +111,8 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateMediaRequestModel = {
 			id: model.unique,
-			parent: model.parentUnique,
-			documentType: { id: model.documentType.unique },
-			template: model.template,
+			parent: model.parentUnique ? { id: model.parentUnique } : null,
+			mediaType: { id: model.mediaType.unique },
 			values: model.values,
 			variants: model.variants,
 		};

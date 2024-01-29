@@ -35,6 +35,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		const data: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
+			parentUnique: parentUnique,
 			urls: [],
 			template: null,
 			documentType: {
@@ -77,8 +78,19 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		const document: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: data.id,
+			parentUnique: null, // TODO: this is not correct. It will be solved when we know where to get the parent from
 			values: data.values,
-			variants: data.variants,
+			variants: data.variants.map((variant) => {
+				return {
+					state: variant.state,
+					culture: variant.culture || null,
+					segment: variant.segment || null,
+					name: variant.name,
+					publishDate: variant.publishDate || null,
+					createDate: variant.createDate,
+					updateDate: variant.updateDate,
+				};
+			}),
 			urls: data.urls,
 			template: data.template ? { id: data.template.id } : null,
 			documentType: { unique: data.documentType.id },
@@ -101,7 +113,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDocumentRequestModel = {
 			id: model.unique,
-			parent: model.parentUnique,
+			parent: model.parentUnique ? { id: model.parentUnique } : null,
 			documentType: { id: model.documentType.unique },
 			template: model.template,
 			values: model.values,
