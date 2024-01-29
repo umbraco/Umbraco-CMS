@@ -128,7 +128,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	async #getDocumentItem(ids: string[]) {
 		const { data, error } = await this.#documentItemRepository.requestItems(ids);
 		if (data) {
-			this._selectedRootContentName = data[0].name;
+			// TODO: get correct variant name
+			this._selectedRootContentName = data[0].variants[0].name;
 		}
 	}
 
