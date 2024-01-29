@@ -23,11 +23,16 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 
 	async execute() {
 		if (!this.repository) return;
-		// get document item to get the doc type id
-		const { data, error } = await this.#itemRepository.requestItems([this.unique]);
-		if (error || !data) throw new Error(`Failed to load document item`);
 
-		const documentItem = data[0];
+		// default to root
+		let documentItem = null;
+
+		if (this.unique) {
+			// get document item to get the doc type id
+			const { data, error } = await this.#itemRepository.requestItems([this.unique]);
+			if (error || !data) throw new Error(`Failed to load document item`);
+			documentItem = data[0];
+		}
 
 		this._openModal({
 			document: documentItem ? { unique: documentItem.unique } : null,
