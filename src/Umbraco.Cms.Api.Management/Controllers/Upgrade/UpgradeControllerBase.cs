@@ -22,7 +22,7 @@ public abstract class UpgradeControllerBase : ManagementApiControllerBase
         status switch
         {
             UpgradeOperationStatus.Success => Ok(),
-            UpgradeOperationStatus.UpgradeFailed => BadRequest(new ProblemDetailsBuilder()
+            UpgradeOperationStatus.UpgradeFailed => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Upgrade failed")
                 .WithDetail(result?.ErrorMessage ?? "An unknown error occurred.")
                 .Build()),

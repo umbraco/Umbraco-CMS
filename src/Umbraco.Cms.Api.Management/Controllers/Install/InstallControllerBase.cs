@@ -37,7 +37,7 @@ public abstract class InstallControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid database configuration")
                 .WithDetail("Could not connect to the database.")
                 .Build()),
-            InstallOperationStatus.InstallFailed => BadRequest(new ProblemDetailsBuilder()
+            InstallOperationStatus.InstallFailed => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Install failed")
                 .WithDetail(result?.ErrorMessage ?? "An unknown error occurred.")
                 .Build()),
