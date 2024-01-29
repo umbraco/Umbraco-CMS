@@ -13,10 +13,10 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	@state()
-	private _allowedAsRoot?: boolean;
+	private _allowedAtRoot?: boolean;
 
 	@state()
-	private _allowedContentTypeIDs?: Array<string>;
+	private _allowedContentTypeUniques?: Array<string>;
 
 	constructor() {
 		super();
@@ -30,13 +30,13 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 
 	private _observeDocumentType() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.allowedAsRoot, (allowedAsRoot) => (this._allowedAsRoot = allowedAsRoot));
+		this.observe(this.#workspaceContext.allowedAsRoot, (allowedAsRoot) => (this._allowedAtRoot = allowedAsRoot));
 		this.observe(this.#workspaceContext.allowedContentTypes, (allowedContentTypes) => {
-			const oldValue = this._allowedContentTypeIDs;
-			this._allowedContentTypeIDs = allowedContentTypes
+			const oldValue = this._allowedContentTypeUniques;
+			this._allowedContentTypeUniques = allowedContentTypes
 				?.map((x) => x.contentType.unique)
 				.filter((x) => x !== undefined) as Array<string>;
-			this.requestUpdate('_allowedContentTypeIDs', oldValue);
+			this.requestUpdate('_allowedContentTypeUniques', oldValue);
 		});
 	}
 
@@ -48,7 +48,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					<div slot="editor">
 						<uui-toggle
 							label=${this.localize.term('contentTypeEditor_allowAsRootHeading')}
-							?checked=${this._allowedAsRoot}
+							?checked=${this._allowedAtRoot}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setAllowedAsRoot((e.target as UUIToggleElement).checked);
 							}}></uui-toggle>
@@ -62,7 +62,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-document-type
 							element-types-only
-							.selectedIds=${this._allowedContentTypeIDs ?? []}
+							.selectedIds=${this._allowedContentTypeUniques ?? []}
 							@change="${(e: CustomEvent) => {
 								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
 									e.target as UmbInputDocumentTypeElement
