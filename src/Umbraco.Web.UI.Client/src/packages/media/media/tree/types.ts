@@ -7,7 +7,7 @@ export interface UmbMediaTreeItemModel extends UmbUniqueTreeItemModel {
 	noAccess: boolean;
 	isTrashed: boolean;
 	mediaType: {
-		id: string;
+		unique: string;
 		icon: string;
 		hasListView: boolean;
 	};

@@ -8,7 +8,7 @@ export interface UmbDocumentTreeItemModel extends UmbUniqueTreeItemModel {
 	isTrashed: boolean;
 	isProtected: boolean;
 	documentType: {
-		id: string;
+		unique: string;
 		icon: string;
 		hasListView: boolean;
 	};

@@ -1,8 +1,8 @@
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentPickerContext } from './input-document.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -139,9 +139,9 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		return undefined;
 	}
 
-	#pickableFilter: (item: DocumentTreeItemResponseModel) => boolean = (item) => {
+	#pickableFilter: (item: UmbDocumentTreeItemModel) => boolean = (item) => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-			return this.allowedContentTypeIds.includes(item.documentType.id);
+			return this.allowedContentTypeIds.includes(item.documentType.unique);
 		}
 		return true;
 	};
@@ -151,6 +151,8 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		console.log('_openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			pickableFilter: this.#pickableFilter,
 		});
 	}

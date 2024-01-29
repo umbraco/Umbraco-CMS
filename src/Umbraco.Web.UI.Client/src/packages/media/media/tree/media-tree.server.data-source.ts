@@ -51,7 +51,11 @@ const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 		noAccess: item.noAccess,
 		isTrashed: item.isTrashed,
 		isFolder: false,
-		mediaType: item.mediaType,
+		mediaType: {
+			unique: item.mediaType.id,
+			icon: item.mediaType.icon,
+			hasListView: item.mediaType.hasListView,
+		},
 		name: item.variants[0].name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 		variants: item.variants.map((variant) => {
 			return {
