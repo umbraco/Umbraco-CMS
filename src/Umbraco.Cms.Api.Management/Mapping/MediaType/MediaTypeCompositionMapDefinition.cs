@@ -1,4 +1,4 @@
-using Umbraco.Cms.Api.Management.ViewModels.MediaType.Composition;
+using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 

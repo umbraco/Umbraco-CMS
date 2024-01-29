@@ -12,5 +12,5 @@ public interface IFeatureAuthorizer
     /// </summary>
     /// <param name="context">The authorization context.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsAuthorizedAsync(AuthorizationHandlerContext context);
+    Task<bool> IsDeniedAsync(AuthorizationHandlerContext context);
 }

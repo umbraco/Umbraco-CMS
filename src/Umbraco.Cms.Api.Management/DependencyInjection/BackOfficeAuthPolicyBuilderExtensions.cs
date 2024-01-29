@@ -4,6 +4,7 @@ using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Api.Management.Security.Authorization;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
+using Umbraco.Cms.Api.Management.Security.Authorization.Dictionary;
 using Umbraco.Cms.Api.Management.Security.Authorization.Feature;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Api.Management.Security.Authorization.User;
@@ -28,6 +29,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, DictionaryPermissionHandler>();
 
         builder.Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
         builder.Services.AddSingleton<IContentPermissionAuthorizer, ContentPermissionAuthorizer>();
@@ -35,6 +37,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
         builder.Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();
         builder.Services.AddSingleton<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
+        builder.Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
 
         builder.Services.AddAuthorization(CreatePolicies);
         return builder;
@@ -130,6 +133,12 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new UserGroupPermissionRequirement());
+        });
+
+        options.AddPolicy($"New{AuthorizationPolicies.DictionaryPermissionByResource}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new DictionaryPermissionRequirement());
         });
     }
 }

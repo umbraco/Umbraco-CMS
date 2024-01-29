@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
-using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Composition;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
