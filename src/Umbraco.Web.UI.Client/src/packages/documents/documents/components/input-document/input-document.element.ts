@@ -184,7 +184,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	#renderItem(item: UmbDocumentItemModel) {
 		if (!item.unique) return;
 		// TODO: get correct variant name
-		const name = item.variants[0].name;
+		const name = item.variants[0]?.name;
 
 		return html`
 			<uui-ref-node name=${name} detail=${ifDefined(item.unique)}>
@@ -213,7 +213,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		if (!this.showOpenButton) return;
 
 		// TODO: get correct variant name
-		const name = item.variants[0].name;
+		const name = item.variants[0]?.name;
 
 		return html`
 			<uui-button

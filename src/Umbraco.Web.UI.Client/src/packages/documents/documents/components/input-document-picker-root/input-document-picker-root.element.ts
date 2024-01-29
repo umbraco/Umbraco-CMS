@@ -79,7 +79,7 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 	private _renderItem(item: UmbDocumentItemModel) {
 		if (!item.unique) return;
 		// TODO: get correct variant name
-		const name = item.variants[0].name;
+		const name = item.variants[0]?.name;
 		return html`
 			<uui-ref-node name=${name} detail=${ifDefined(item.unique)}>
 				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->

@@ -33,7 +33,7 @@ export const data: Array<UmbMockMediaModel> = [
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
-				name: 'Article in english',
+				name: 'Flipped Car',
 				createDate: '2023-02-06T15:31:46.876902',
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
@@ -57,7 +57,17 @@ export const data: Array<UmbMockMediaModel> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
-		variants: [],
+		variants: [
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-us',
+				segment: null,
+				name: 'Umbracoffee',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 		urls: [],
 	},
 	{
@@ -72,7 +82,17 @@ export const data: Array<UmbMockMediaModel> = [
 			hasListView: false,
 		},
 		values: [],
-		variants: [],
+		variants: [
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-us',
+				segment: null,
+				name: 'People',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 		urls: [],
 	},
 	{
@@ -87,7 +107,17 @@ export const data: Array<UmbMockMediaModel> = [
 			hasListView: false,
 		},
 		values: [],
-		variants: [],
+		variants: [
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-us',
+				segment: null,
+				name: 'John Smith',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 		urls: [],
 	},
 	{
@@ -107,7 +137,17 @@ export const data: Array<UmbMockMediaModel> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
-		variants: [],
+		variants: [
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-us',
+				segment: null,
+				name: 'Jane Doe',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 		urls: [],
 	},
 	{
@@ -147,7 +187,17 @@ export const data: Array<UmbMockMediaModel> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
-		variants: [],
+		variants: [
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-us',
+				segment: null,
+				name: 'A very nice hat',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 		urls: [],
 	},
 	{
@@ -167,16 +217,17 @@ export const data: Array<UmbMockMediaModel> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
-		variants: [],
+		variants: [
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-us',
+				segment: null,
+				name: 'Fancy old chair',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 		urls: [],
 	},
 ];
-
-const createMediaItem = (item: UmbMockMediaModel): MediaItemResponseModel => {
-	return {
-		id: item.id,
-		mediaType: item.mediaType,
-		isTrashed: false,
-		variants: item.variants,
-	};
-};
