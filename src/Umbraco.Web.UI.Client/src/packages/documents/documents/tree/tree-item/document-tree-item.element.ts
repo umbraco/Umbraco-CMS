@@ -30,9 +30,10 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 	#renderIconWithStatusSymbol() {
 		return html`
 			<span id="icon-container" slot="icon">
-				${this.item?.icon
+				${this.item?.documentType.icon
 					? html`
-							<uui-icon id="icon" slot="icon" name="${this.item.icon}"></uui-icon> <span id="status-symbol"></span>
+							<uui-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></uui-icon>
+							<span id="status-symbol"></span>
 					  `
 					: nothing}
 			</span>
