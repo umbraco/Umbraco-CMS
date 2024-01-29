@@ -1,6 +1,6 @@
-import type { UmbChangeEvent} from '@umbraco-cms/backoffice/event';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { ManifestUserPermission} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -36,7 +36,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		this.#manifestObserver?.destroy();
 
 		this.#manifestObserver = this.observe(
-			umbExtensionsRegistry.extensionsOfType('userPermission'),
+			umbExtensionsRegistry.byType('userPermission'),
 			(userPermissionManifests) => {
 				this._manifests = userPermissionManifests.filter((manifest) => manifest.meta.entityType === this.entityType);
 			},

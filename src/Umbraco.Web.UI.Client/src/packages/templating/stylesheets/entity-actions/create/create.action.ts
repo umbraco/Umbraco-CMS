@@ -7,8 +7,8 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 export class UmbStylesheetCreateOptionsEntityAction extends UmbEntityActionBase<never> {
 	#modalManagerContext?: UmbModalManagerContext;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+		super(host, repositoryAlias, unique, entityType);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
@@ -22,6 +22,7 @@ export class UmbStylesheetCreateOptionsEntityAction extends UmbEntityActionBase<
 		this.#modalManagerContext?.open(UMB_STYLESHEET_CREATE_OPTIONS_MODAL, {
 			data: {
 				parentUnique: this.unique,
+				entityType: this.entityType,
 			},
 		});
 	}

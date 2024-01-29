@@ -6,7 +6,7 @@ import {
 import { UmbMediaTypeTreeRepository } from './media-type-tree.repository.js';
 import { UmbMediaTypeTreeStore } from './media-type-tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
-
+import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -51,4 +51,11 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests];
+export const manifests = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	...folderManifests,
+	...reloadTreeItemChildrenManifest,
+];

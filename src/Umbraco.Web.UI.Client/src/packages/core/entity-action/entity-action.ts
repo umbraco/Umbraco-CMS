@@ -7,11 +7,13 @@ export interface UmbEntityAction<RepositoryType> extends UmbAction<RepositoryTyp
 }
 
 export class UmbEntityActionBase<RepositoryType> extends UmbActionBase<RepositoryType> {
+	entityType: string;
 	unique: string;
 	repositoryAlias: string;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias);
+		this.entityType = entityType;
 		this.unique = unique;
 		this.repositoryAlias = repositoryAlias;
 	}

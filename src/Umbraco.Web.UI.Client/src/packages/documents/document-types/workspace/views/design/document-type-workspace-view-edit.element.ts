@@ -11,12 +11,12 @@ import type {
 	PropertyTypeContainerModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbRoute , UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbSorterConfig} from '@umbraco-cms/backoffice/sorter';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
@@ -216,7 +216,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		if (!tabId) return;
 		this._workspaceContext?.structure.removeContainer(null, tabId);
 		this._tabsStructureHelper?.isOwnerContainer(tabId)
-			? window.history.replaceState(null, '', this._routerPath + this._routes[0]?.path ?? '/root')
+			? window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'))
 			: '';
 	}
 	async #addTab() {
