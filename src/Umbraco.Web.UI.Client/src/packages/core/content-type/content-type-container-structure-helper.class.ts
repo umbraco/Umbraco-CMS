@@ -17,6 +17,10 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	private _ownerType?: PropertyContainerTypes = 'Tab';
 	private _childType?: PropertyContainerTypes = 'Group';
 	private _isRoot = false;
+	/**
+	 * The owner id is the owning container (The container that is begin presented, the container is the parent of the child containers)
+	 * If set to null, this helper class will provide containers of the root.
+	 */
 	private _ownerId?: string | null;
 	private _ownerName?: string;
 
