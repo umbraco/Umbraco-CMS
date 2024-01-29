@@ -39,9 +39,9 @@ const treeItemMapper = (model: UmbMockDocumentModel): Omit<DocumentTreeItemRespo
 
 	return {
 		documentType: {
-			hasListView: model.documentType.hasListView,
-			icon: model.documentType.icon,
-			id: model.documentType.id,
+			hasListView: false,
+			icon: documentType.icon,
+			id: documentType.id,
 		},
 		hasChildren: model.hasChildren,
 		id: model.id,
