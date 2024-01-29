@@ -1,11 +1,7 @@
-import { UmbEntityData } from './entity.data.js';
-import { createMediaTreeItem } from './utils.js';
 import type {
-	ContentTreeItemResponseModel,
 	MediaItemResponseModel,
 	MediaResponseModel,
 	MediaTreeItemResponseModel,
-	PagedMediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export type UmbMockMediaModelHack = MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel;
@@ -173,35 +169,3 @@ const createMediaItem = (item: UmbMockMediaModel): MediaItemResponseModel => {
 		variants: item.variants,
 	};
 };
-
-class UmbMediaData extends UmbEntityData<UmbMockMediaModel> {
-	constructor() {
-		super(data);
-	}
-
-	getItems(ids: Array<string>): Array<MediaItemResponseModel> {
-		const items = this.data.filter((item) => ids.includes(item.id));
-		return items.map((item) => createMediaItem(item));
-	}
-
-	getTreeRoot(): PagedMediaTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parent === null);
-		const treeItems = items.map((item) => createMediaTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
-	}
-
-	getTreeItemChildren(id: string): PagedMediaTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parent?.id === id);
-		const treeItems = items.map((item) => createMediaTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
-	}
-
-	getTreeItem(ids: Array<string>): Array<ContentTreeItemResponseModel> {
-		const items = this.data.filter((item) => ids.includes(item.id));
-		return items.map((item) => createMediaTreeItem(item));
-	}
-}
-
-export const umbMediaData = new UmbMediaData();

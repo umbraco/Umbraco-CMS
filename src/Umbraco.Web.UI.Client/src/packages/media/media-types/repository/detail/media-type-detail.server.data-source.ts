@@ -83,8 +83,18 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			isElement: data.isElement,
 			properties: data.properties,
 			containers: data.containers,
-			allowedContentTypes: data.allowedMediaTypes,
-			compositions: data.compositions,
+			allowedContentTypes: data.allowedMediaTypes.map((allowedMediaType) => {
+				return {
+					contentType: { unique: allowedMediaType.mediaType.id },
+					sortOrder: allowedMediaType.sortOrder,
+				};
+			}),
+			compositions: data.compositions.map((composition) => {
+				return {
+					contentType: { unique: composition.mediaType.id },
+					compositionType: composition.compositionType,
+				};
+			}),
 		};
 
 		return { data: mediaType };

@@ -17,7 +17,8 @@ export class UmbMediaWorkspaceContext
 
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
+	// TODO: get correct variant name
+	name = this.#data.asObservablePart((data) => data?.variants[0].name);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Media');
@@ -29,15 +30,11 @@ export class UmbMediaWorkspaceContext
 
 	// TODO: this should be async because it can only return the id if the data is loaded.
 	getEntityId() {
-		return this.getData()?.id || '';
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
 		return 'media';
-	}
-
-	setName(name: string) {
-		this.#data.update({ name });
 	}
 
 	setPropertyValue(alias: string, value: unknown) {
@@ -51,16 +48,16 @@ export class UmbMediaWorkspaceContext
 		}
 	}
 
-	async load(entityId: string) {
-		const { data } = await this.repository.requestById(entityId);
+	async load(unique: string) {
+		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.setValue(data);
 		}
 	}
 
-	async create(parentId: string | null) {
-		const { data } = await this.repository.createScaffold(parentId);
+	async create(parentUnique: string | null) {
+		const { data } = await this.repository.createScaffold(parentUnique);
 		if (!data) return;
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.

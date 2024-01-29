@@ -7,6 +7,7 @@ export interface UmbMediaDetailModel {
 	entityType: UmbMediaEntityType;
 	isTrashed: boolean;
 	unique: string;
+	parentUnique: string | null;
 	urls: Array<ContentUrlInfoModel>;
 	values: Array<MediaValueModel>;
 	variants: Array<UmbVariantModel>;

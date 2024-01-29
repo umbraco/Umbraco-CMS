@@ -7,7 +7,7 @@ import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
 @customElement('umb-user-document-start-node')
 export class UmbUserDocumentStartNodeElement extends UmbLitElement {
 	@property({ type: Array, attribute: false })
-	ids: Array<string> = [];
+	uniques: Array<string> = [];
 
 	@state()
 	_displayValue: Array<UmbDocumentItemModel> = [];
@@ -15,13 +15,13 @@ export class UmbUserDocumentStartNodeElement extends UmbLitElement {
 	#itemRepository = new UmbDocumentItemRepository(this);
 
 	protected async firstUpdated(): Promise<void> {
-		if (this.ids.length === 0) return;
-		const { data } = await this.#itemRepository.requestItems(this.ids);
+		if (this.uniques.length === 0) return;
+		const { data } = await this.#itemRepository.requestItems(this.uniques);
 		this._displayValue = data || [];
 	}
 
 	render() {
-		if (this.ids.length < 1) {
+		if (this.uniques.length < 1) {
 			return html`
 				<uui-ref-node name="Content Root">
 					<uui-icon slot="icon" name="folder"></uui-icon>

@@ -1,5 +1,6 @@
 import type { UmbDocumentEntityType } from './entity.js';
-import type { ContentStateModel, ContentUrlInfoModel, DocumentValueModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { ContentUrlInfoModel, DocumentValueModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbDocumentDetailModel {
 	documentType: { unique: string };
@@ -7,6 +8,7 @@ export interface UmbDocumentDetailModel {
 	isTrashed: boolean;
 	template: { id: string } | null; // TODO: change to unique when template is updated
 	unique: string;
+	parentUnique: string | null;
 	urls: Array<ContentUrlInfoModel>;
 	values: Array<DocumentValueModel>;
 	variants: Array<UmbVariantModel>;

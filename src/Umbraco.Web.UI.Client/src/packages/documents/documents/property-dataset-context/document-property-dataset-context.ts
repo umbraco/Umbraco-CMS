@@ -1,15 +1,12 @@
 import type { UmbDocumentWorkspaceContext } from '../workspace/index.js';
-import type {
-	UmbNameablePropertyDatasetContext,
-	UmbPropertyDatasetContext} from '@umbraco-cms/backoffice/property';
-import {
-	UMB_PROPERTY_DATASET_CONTEXT
-} from '@umbraco-cms/backoffice/property';
-import type { DocumentVariantResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbNameablePropertyDatasetContext, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 // TODO: This code can be split into a UmbContentTypePropertyDatasetContext, leaving just the publishing state and methods to this class.
@@ -23,7 +20,7 @@ export class UmbDocumentPropertyDataContext
 		return this.#variantId;
 	}
 
-	#currentVariant = new UmbObjectState<DocumentVariantResponseModel | undefined>(undefined);
+	#currentVariant = new UmbObjectState<UmbVariantModel | undefined>(undefined);
 	currentVariant = this.#currentVariant.asObservable();
 
 	name = this.#currentVariant.asObservablePart((x) => x?.name);
