@@ -1,3 +1,4 @@
-export * from './media.repository.js';
-export { UMB_MEDIA_REPOSITORY_ALIAS } from './manifests.js';
-export { UMB_MEDIA_STORE_CONTEXT } from './media.store.js';
+export { UmbMediaDetailRepository, UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from './detail/index.js';
+export { UmbMediaItemRepository, UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from './item/index.js';
+
+export type { UmbMediaItemModel } from './item/types.js';

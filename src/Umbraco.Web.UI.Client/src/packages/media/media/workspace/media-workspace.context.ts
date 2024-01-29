@@ -1,10 +1,7 @@
-import { UmbMediaRepository } from '../repository/media.repository.js';
+import { UmbMediaDetailRepository } from '../repository/detail/index.js';
 import type { UmbMediaDetailModel } from '../index.js';
-import type {
-	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbEditableWorkspaceContextBase,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -16,7 +13,7 @@ export class UmbMediaWorkspaceContext
 	implements UmbSaveableWorkspaceContextInterface, UmbApi
 {
 	//
-	public readonly repository: UmbMediaRepository = new UmbMediaRepository(this);
+	public readonly repository = new UmbMediaDetailRepository(this);
 
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
