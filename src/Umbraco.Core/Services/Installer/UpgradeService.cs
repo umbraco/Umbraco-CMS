@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.Installer;
 
@@ -21,7 +22,7 @@ public class UpgradeService : IUpgradeService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<InstallationResult?>> UpgradeAsync()
+    public async Task<Attempt<InstallationResult?, UpgradeOperationStatus>> UpgradeAsync()
     {
         if (_runtimeState.Level != RuntimeLevel.Upgrade)
         {
@@ -32,7 +33,9 @@ public class UpgradeService : IUpgradeService
         try
         {
             Attempt<InstallationResult?> result = await RunStepsAsync();
-            return result;
+            return result.Success
+                ? Attempt.SucceedWithStatus(UpgradeOperationStatus.Success, result.Result)
+                : Attempt.FailWithStatus(UpgradeOperationStatus.UpgradeFailed, result.Result);
         }
         catch (Exception exception)
         {
