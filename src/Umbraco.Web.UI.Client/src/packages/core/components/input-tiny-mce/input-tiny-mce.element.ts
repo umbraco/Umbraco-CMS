@@ -53,7 +53,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 	
 	get value(): FormDataEntryValue | FormData {
-		return this._value;
+		return super.value;
 	}
 
 	@query('#editor', true)
