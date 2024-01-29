@@ -10,7 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export class UmbRefListBlockElement extends UmbLitElement {
 	//
 	@property({ type: String })
-	name?: string;
+	label?: string;
 
 	@state()
 	_workspaceEditPath?: string;
@@ -31,7 +31,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 
 	render() {
 		// href=${this._workspaceEditPath ?? '#'}
-		return html`<uui-ref-node border .name=${this.name ?? ''}></uui-ref-node>`;
+		return html`<uui-ref-node border .name=${this.label ?? ''}></uui-ref-node>`;
 	}
 
 	static styles = [
