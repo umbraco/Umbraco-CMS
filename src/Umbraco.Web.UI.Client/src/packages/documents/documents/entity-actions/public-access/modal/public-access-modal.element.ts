@@ -58,6 +58,28 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
+	// Events
+
+	#onChangeLoginPage(e: CustomEvent) {
+		console.log('e', e);
+		this.value = { ...this.value, loginPageId: e.detail.value[0] };
+	}
+
+	#onChangeErrorPage(e: CustomEvent) {
+		console.log('e', e);
+		this.value = { ...this.value, errorPageId: e.detail.value[0] };
+	}
+
+	#onChangeGroup() {
+		// TODO: Finish when umb-input-member-type is done
+		console.log('onChangeGroup');
+	}
+
+	#onChangeMember() {
+		// TODO: Finish when umb-input-member is done
+		console.log('onChangeMember');
+	}
+
 	// Renders
 
 	render() {
@@ -94,7 +116,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 				<small>
 					<umb-localize key="publicAccess_paLoginPageHelp"> Choose the page that contains the login form </umb-localize>
 				</small>
-				<umb-input-document max="1"></umb-input-document>
+				<umb-input-document max="1" @change=${this.#onChangeLoginPage}></umb-input-document>
 			</div>
 			<br />
 			<div class="select-item">
@@ -104,26 +126,28 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 						Used when people are logged on, but do not have access
 					</umb-localize>
 				</small>
-				<umb-input-document max="1"></umb-input-document>
+				<umb-input-document max="1" @change=${this.#onChangeErrorPage}></umb-input-document>
 			</div>`;
 	}
 
 	renderMemberType() {
 		return this._specific
 			? html`<umb-localize key="publicAccess_paSelectMembers" .args=${['NameOfDocument']}>
-						Select the members who have access to the page <strong>%0%</strong>
+						Select the members who have access to the page <strong>NameOfDocument</strong>
 					</umb-localize>
-					<umb-input-member .selectedIds=${this._selectedIds}></umb-input-member>`
+					<umb-input-member .selectedIds=${this._selectedIds} @change=${this.#onChangeMember}></umb-input-member>`
 			: html`<umb-localize key="publicAccess_paSelectGroups" .args=${['NameOfDocument']}>
-						Select the groups who have access to the page <strong>%0%</strong>
+						Select the groups who have access to the page <strong>NameOfDocument</strong>
 					</umb-localize>
-					<umb-input-member-type .selectedIds=${this._selectedIds}></umb-input-member-type>`;
+					<umb-input-member-type
+						.selectedIds=${this._selectedIds}
+						@change=${this.#onChangeGroup}></umb-input-member-type>`;
 	}
 
 	// Action buttons
 	renderActions() {
 		// Check for Save or Next button
-		const confirm = this.data?.publicAccessModel
+		const confirm = !this._startPage
 			? html`<uui-button
 					slot="actions"
 					id="save"

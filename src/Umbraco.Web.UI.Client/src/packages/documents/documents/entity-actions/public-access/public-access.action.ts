@@ -32,6 +32,24 @@ export class UmbDocumentPublicAccessEntityAction extends UmbEntityActionBase<Umb
 
 	private async _openModal(publicAccessModel: PublicAccessResponseModel) {
 		//this.#modalContext?.open(UMB_PUBLIC_ACCESS_MODAL, { data: { publicAccessModel } });
-		this.#modalContext?.open(UMB_PUBLIC_ACCESS_MODAL);
+		const modalContext = this.#modalContext?.open(UMB_PUBLIC_ACCESS_MODAL);
+
+		const result = await modalContext.onSubmit();
+		console.log('result', result);
+
+		switch (result.action) {
+			case 'save':
+				console.log('save', result.publicAccessModel);
+				break;
+			case 'update':
+				console.log('update', result.publicAccessModel);
+				break;
+			case 'delete':
+				console.log('delete', result.publicAccessModel);
+				break;
+			default:
+				console.log('cancel');
+				break;
+		}
 	}
 }
