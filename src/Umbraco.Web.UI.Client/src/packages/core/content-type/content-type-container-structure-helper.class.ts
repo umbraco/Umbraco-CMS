@@ -195,7 +195,10 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		if (!this.#structure || !containerId) return;
 
 		return (
-			this.#containers.getValue().find((x) => x.id === containerId && x.parent?.id === this._ownerId) !== undefined
+			this.#containers
+				.getValue()
+				.find((x) => (x.id === containerId && this._ownerId ? x.parent?.id === this._ownerId : x.parent === null)) !==
+			undefined
 		);
 	}
 
