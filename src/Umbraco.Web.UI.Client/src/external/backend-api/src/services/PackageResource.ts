@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreatePackageRequestModel } from '../models/CreatePackageRequestModel';
+import type { PackageConfigurationResponseModel } from '../models/PackageConfigurationResponseModel';
 import type { PackageDefinitionResponseModel } from '../models/PackageDefinitionResponseModel';
 import type { PackageManifestResponseModel } from '../models/PackageManifestResponseModel';
 import type { PagedPackageDefinitionResponseModel } from '../models/PagedPackageDefinitionResponseModel';
@@ -34,6 +35,20 @@ export class PackageResource {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
                 409: `Conflict`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getPackageConfiguration(): CancelablePromise<PackageConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/package/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

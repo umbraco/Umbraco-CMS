@@ -61,7 +61,6 @@ const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 			return {
 				name: variant.name,
 				culture: variant.culture || null,
-				state: variant.state,
 			};
 		}),
 	};

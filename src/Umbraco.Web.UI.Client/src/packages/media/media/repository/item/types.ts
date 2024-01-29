@@ -1,5 +1,3 @@
-import type { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
-
 export interface UmbMediaItemModel {
 	unique: string;
 	isTrashed: boolean;
@@ -15,5 +13,4 @@ export interface UmbMediaItemModel {
 export interface UmbMediaItemVariantModel {
 	name: string;
 	culture: string | null;
-	state: ContentStateModel | null;
 }

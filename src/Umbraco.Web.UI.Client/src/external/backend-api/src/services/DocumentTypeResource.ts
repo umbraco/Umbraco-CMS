@@ -8,6 +8,7 @@ import type { CreateDocumentTypeRequestModel } from '../models/CreateDocumentTyp
 import type { CreateFolderRequestModel } from '../models/CreateFolderRequestModel';
 import type { DocumentTypeCompositionRequestModel } from '../models/DocumentTypeCompositionRequestModel';
 import type { DocumentTypeCompositionResponseModel } from '../models/DocumentTypeCompositionResponseModel';
+import type { DocumentTypeConfigurationResponseModel } from '../models/DocumentTypeConfigurationResponseModel';
 import type { DocumentTypeItemResponseModel } from '../models/DocumentTypeItemResponseModel';
 import type { DocumentTypeResponseModel } from '../models/DocumentTypeResponseModel';
 import type { FolderResponseModel } from '../models/FolderResponseModel';
@@ -263,6 +264,20 @@ export class DocumentTypeResource {
             url: '/umbraco/management/api/v1/document-type/available-compositions',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDocumentTypeConfiguration(): CancelablePromise<DocumentTypeConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document-type/configuration',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },

@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateMediaRequestModel } from '../models/CreateMediaRequestModel';
+import type { MediaConfigurationResponseModel } from '../models/MediaConfigurationResponseModel';
 import type { MediaItemResponseModel } from '../models/MediaItemResponseModel';
 import type { MediaResponseModel } from '../models/MediaResponseModel';
 import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
@@ -137,6 +138,20 @@ export class MediaResource {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getMediaConfiguration(): CancelablePromise<MediaConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

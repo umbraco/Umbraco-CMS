@@ -21,5 +21,4 @@ export interface UmbMediaTreeRootModel extends UmbUniqueTreeRootModel {
 export interface UmbMediaTreeItemVariantModel {
 	name: string;
 	culture: string | null;
-	state: ContentStateModel; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
 }

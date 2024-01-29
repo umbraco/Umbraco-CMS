@@ -4,11 +4,11 @@
 /* eslint-disable */
 
 import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
+import type { DocumentVariantItemResponseModel } from './DocumentVariantItemResponseModel';
 import type { RecycleBinItemResponseModelBaseModel } from './RecycleBinItemResponseModelBaseModel';
-import type { VariantItemResponseModel } from './VariantItemResponseModel';
 
 export type DocumentRecycleBinItemResponseModel = (RecycleBinItemResponseModelBaseModel & {
     documentType: DocumentTypeReferenceResponseModel;
-    variants: Array<VariantItemResponseModel>;
+    variants: Array<DocumentVariantItemResponseModel>;
 });
 

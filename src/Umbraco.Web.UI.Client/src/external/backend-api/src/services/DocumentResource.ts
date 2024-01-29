@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { CopyDocumentRequestModel } from '../models/CopyDocumentRequestModel';
 import type { CreateDocumentRequestModel } from '../models/CreateDocumentRequestModel';
+import type { DocumentConfigurationResponseModel } from '../models/DocumentConfigurationResponseModel';
 import type { DocumentItemResponseModel } from '../models/DocumentItemResponseModel';
 import type { DocumentNotificationResponseModel } from '../models/DocumentNotificationResponseModel';
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
@@ -479,6 +480,20 @@ export class DocumentResource {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDocumentConfiguration(): CancelablePromise<DocumentConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

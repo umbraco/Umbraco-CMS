@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ContentStateModel } from './ContentStateModel';
 import type { VariantItemResponseModelBaseModel } from './VariantItemResponseModelBaseModel';
 
-export type VariantItemResponseModel = VariantItemResponseModelBaseModel;
+export type DocumentVariantItemResponseModel = (VariantItemResponseModelBaseModel & {
+    state: ContentStateModel;
+});
 

@@ -43,7 +43,6 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 			return {
 				culture: variant.culture || null,
 				name: variant.name,
-				state: variant.state,
 			};
 		}),
 		name: item.variants[0]?.name, // TODO: get correct variant name

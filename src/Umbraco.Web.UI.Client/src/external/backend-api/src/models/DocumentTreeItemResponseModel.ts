@@ -5,11 +5,11 @@
 
 import type { ContentTreeItemResponseModel } from './ContentTreeItemResponseModel';
 import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
-import type { VariantItemResponseModel } from './VariantItemResponseModel';
+import type { DocumentVariantItemResponseModel } from './DocumentVariantItemResponseModel';
 
 export type DocumentTreeItemResponseModel = (ContentTreeItemResponseModel & {
     isProtected: boolean;
     documentType: DocumentTypeReferenceResponseModel;
-    variants: Array<VariantItemResponseModel>;
+    variants: Array<DocumentVariantItemResponseModel>;
 });
 
