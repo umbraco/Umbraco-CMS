@@ -7,7 +7,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 
-public class DatabaseInstallStep : InstallStepBase, IUpgradeStep
+public class DatabaseInstallStep : StepBase, IInstallStep, IUpgradeStep
 {
     private readonly IRuntimeState _runtime;
     private readonly DatabaseBuilder _databaseBuilder;
@@ -18,7 +18,7 @@ public class DatabaseInstallStep : InstallStepBase, IUpgradeStep
         _databaseBuilder = databaseBuilder;
     }
 
-    public override Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _) => Execute();
+    public Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _) => Execute();
 
     public Task<Attempt<InstallationResult>> ExecuteAsync() => Execute();
 
@@ -40,7 +40,7 @@ public class DatabaseInstallStep : InstallStepBase, IUpgradeStep
         return Task.FromResult(Success());
     }
 
-    public override Task<bool> RequiresExecutionAsync(InstallData _) => ShouldExecute();
+    public Task<bool> RequiresExecutionAsync(InstallData _) => ShouldExecute();
 
     public Task<bool> RequiresExecutionAsync() => ShouldExecute();
 

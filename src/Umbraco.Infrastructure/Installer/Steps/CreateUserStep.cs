@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -19,7 +20,7 @@ using HttpResponseMessage = System.Net.Http.HttpResponseMessage;
 
 namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 
-public class CreateUserStep : InstallStepBase
+public class CreateUserStep : StepBase, IInstallStep
 {
     private readonly IUserService _userService;
     private readonly DatabaseBuilder _databaseBuilder;
@@ -53,7 +54,7 @@ public class CreateUserStep : InstallStepBase
         _metricsConsentService = metricsConsentService;
     }
 
-    public override async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
+    public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
     {
             IUser? admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin is null)
@@ -108,7 +109,7 @@ public class CreateUserStep : InstallStepBase
     }
 
     /// <inheritdoc/>
-    public override Task<bool> RequiresExecutionAsync(InstallData model)
+    public Task<bool> RequiresExecutionAsync(InstallData model)
     {
         InstallState installState = GetInstallState();
         if (installState.HasFlag(InstallState.Unknown))
