@@ -1,11 +1,7 @@
-import type { UmbContentTypeModel } from './types.js';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from './types.js';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type {
-	DocumentTypePropertyTypeResponseModel,
-	PropertyTypeContainerModelBaseModel,
-	PropertyTypeModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 import type { MappingFunction } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -277,7 +273,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	}
 
 	createPropertyScaffold(containerId: string | null = null, sortOrder?: number) {
-		const property: PropertyTypeModelBaseModel = {
+		const property: UmbPropertyTypeModel = {
 			id: UmbId.new(),
 			containerId: containerId,
 			alias: '',
@@ -305,7 +301,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
-		const property: PropertyTypeModelBaseModel = this.createPropertyScaffold(containerId, sortOrder);
+		const property: UmbPropertyTypeModel = this.createPropertyScaffold(containerId, sortOrder);
 
 		const properties = [
 			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? []),
@@ -320,7 +316,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		return property;
 	}
 
-	async insertProperty(contentTypeUnique: string | null, property: PropertyTypeModelBaseModel) {
+	async insertProperty(contentTypeUnique: string | null, property: UmbPropertyTypeModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
@@ -353,7 +349,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	async updateProperty(
 		contentTypeUnique: string | null,
 		propertyId: string,
-		partialUpdate: Partial<PropertyTypeModelBaseModel>,
+		partialUpdate: Partial<UmbPropertyTypeModel>,
 	) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
@@ -440,7 +436,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	propertyStructuresOf(containerId: string | null) {
 		return this.#contentTypes.asObservablePart((docTypes) => {
-			const props: DocumentTypePropertyTypeResponseModel[] = [];
+			const props: UmbPropertyTypeModel[] = [];
 			docTypes.forEach((docType) => {
 				docType.properties?.forEach((property) => {
 					if (property.container?.id === containerId) {

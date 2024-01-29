@@ -3,23 +3,19 @@ import './document-type-workspace-view-edit-property.element.js';
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
+import type { PropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type {
-	DocumentTypePropertyTypeResponseModel,
-	PropertyTypeModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
-const SORTER_CONFIG: UmbSorterConfig<DocumentTypePropertyTypeResponseModel> = {
-	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeResponseModel) => {
+const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel> = {
+	compareElementToModel: (element: HTMLElement, model: UmbPropertyTypeModel) => {
 		return element.getAttribute('data-umb-property-id') === model.id;
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: DocumentTypePropertyTypeResponseModel) => {
+	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbPropertyTypeModel) => {
 		return container.querySelector('[data-umb-property-id=' + modelEntry.id + ']');
 	},
 	identifier: 'content-type-property-sorter',
@@ -94,7 +90,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbDocumentTypeDetailModel>(this);
 
 	@state()
-	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
+	_propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	@state()
 	_ownerDocumentTypes?: UmbDocumentTypeDetailModel[];
@@ -167,7 +163,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		);
 	}
 
-	async #addProperty(propertyData: PropertyTypeModelBaseModel) {
+	async #addProperty(propertyData: UmbPropertyTypeModel) {
 		const propertyPlaceholder = await this._propertyStructureHelper.addProperty(this._containerId);
 		if (!propertyPlaceholder) return;
 

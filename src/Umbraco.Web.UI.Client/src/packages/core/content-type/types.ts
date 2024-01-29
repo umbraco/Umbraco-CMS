@@ -1,7 +1,7 @@
 import type {
 	PropertyTypeContainerModelBaseModel,
-	PropertyTypeModelBaseModel,
 	CompositionTypeModel,
+	PropertyTypeModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbContentTypeModel {
@@ -16,10 +16,14 @@ export interface UmbContentTypeModel {
 	variesBySegment: boolean;
 	isElement: boolean;
 	// TODO: investigate if we need our own model for these
-	properties: Array<PropertyTypeModelBaseModel>;
+	properties: Array<UmbPropertyTypeModel>;
 	containers: Array<PropertyTypeContainerModelBaseModel>;
 	allowedContentTypes: Array<UmbContentTypeSortModel>;
 	compositions: Array<UmbContentTypeCompositionModel>;
+}
+
+export interface UmbPropertyTypeModel extends Omit<PropertyTypeModelBaseModel, 'dataType'> {
+	dataType: { unique: string };
 }
 
 export interface UmbContentTypeSortModel {

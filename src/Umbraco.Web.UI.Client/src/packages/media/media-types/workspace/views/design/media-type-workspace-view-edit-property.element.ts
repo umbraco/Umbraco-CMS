@@ -2,7 +2,6 @@ import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_CONFIRM_MODAL,
@@ -14,6 +13,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
  *  @element umb-media-type-workspace-view-edit-property
@@ -22,22 +22,22 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  */
 @customElement('umb-media-type-workspace-view-edit-property')
 export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
-	private _property?: PropertyTypeModelBaseModel | undefined;
+	private _property?: UmbPropertyTypeModel | undefined;
 	/**
 	 * Property, the data object for the property.
-	 * @type {PropertyTypeModelBaseModel}
+	 * @type {UmbPropertyTypeModel}
 	 * @attr
 	 * @default undefined
 	 */
 	@property({ type: Object })
-	public get property(): PropertyTypeModelBaseModel | undefined {
+	public get property(): UmbPropertyTypeModel | undefined {
 		return this._property;
 	}
-	public set property(value: PropertyTypeModelBaseModel | undefined) {
+	public set property(value: UmbPropertyTypeModel | undefined) {
 		const oldValue = this._property;
 		this._property = value;
 		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
-		this.setDataType(this._property?.dataType.id);
+		this.setDataType(this._property?.dataType.unique);
 		this.requestUpdate('property', oldValue);
 	}
 
@@ -116,7 +116,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 		});
 	}
 
-	_partialUpdate(partialObject: PropertyTypeModelBaseModel) {
+	_partialUpdate(partialObject: UmbPropertyTypeModel) {
 		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
 	}
 
@@ -295,7 +295,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 	renderPropertyTags() {
 		return this.property
 			? html`<div class="types">
-					${this.property.dataType.id ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
+					${this.property.dataType.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}

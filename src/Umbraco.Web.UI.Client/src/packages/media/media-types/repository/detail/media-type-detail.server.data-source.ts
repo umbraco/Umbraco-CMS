@@ -81,7 +81,21 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
-			properties: data.properties,
+			properties: data.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { unique: property.dataType.id },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: data.containers,
 			allowedContentTypes: data.allowedMediaTypes.map((allowedMediaType) => {
 				return {
@@ -120,7 +134,21 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			properties: model.properties,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: model.containers,
 			allowedMediaTypes: model.allowedContentTypes.map((allowedContentType) => {
 				return {
@@ -171,7 +199,21 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			properties: model.properties,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: model.containers,
 			allowedMediaTypes: model.allowedContentTypes.map((allowedContentType) => {
 				return {

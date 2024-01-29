@@ -1,7 +1,8 @@
-import type {
-	MediaItemResponseModel,
-	MediaResponseModel,
-	MediaTreeItemResponseModel,
+import {
+	ContentStateModel,
+	type MediaItemResponseModel,
+	type MediaResponseModel,
+	type MediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export type UmbMockMediaModelHack = MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel;
@@ -26,7 +27,17 @@ export const data: Array<UmbMockMediaModel> = [
 				value: 'The daily life at Umbraco HQ',
 			},
 		],
-		variants: [],
+		variants: [
+			{
+				state: ContentStateModel.PUBLISHED,
+				publishDate: '2023-02-06T15:31:51.354764',
+				culture: 'en-us',
+				segment: null,
+				name: 'Article in english',
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 		urls: [],
 	},
 	{
