@@ -11,11 +11,9 @@ import type {
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
-	PublishDocumentRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	ContentStateModel,
-	PublishedStateModel,
+	PublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { ContentStateModel, PublishedStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 
 export const data: Array<DocumentResponseModel> = [
@@ -177,6 +175,7 @@ export const data: Array<DocumentResponseModel> = [
 						'Umbraco.BlockList': [
 							{
 								contentUdi: '1234',
+								settingsUdi: '5678',
 							},
 						],
 					},
@@ -187,7 +186,13 @@ export const data: Array<DocumentResponseModel> = [
 							elementProperty: 'Hello world',
 						},
 					],
-					settingsData: [],
+					settingsData: [
+						{
+							udi: '5678',
+							contentTypeKey: 'all-property-editors-document-type-id',
+							elementProperty: 'Hello world',
+						},
+					],
 				},
 			},
 			{

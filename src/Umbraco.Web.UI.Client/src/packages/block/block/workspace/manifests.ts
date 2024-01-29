@@ -41,6 +41,7 @@ export const manifests: Array<ManifestTypes> = [
 			label: 'Content',
 			pathname: 'content',
 			icon: 'icon-document',
+			blockElementManagerName: 'content',
 		},
 		conditions: [
 			{
@@ -48,5 +49,24 @@ export const manifests: Array<ManifestTypes> = [
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
 		],
-	},
+	} as any,
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Block.Settings',
+		name: 'Block Workspace Settings View',
+		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
+		weight: 1000,
+		meta: {
+			label: 'Settings',
+			pathname: 'settings',
+			icon: 'icon-settings',
+			blockElementManagerName: 'settings',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: UMB_BLOCK_WORKSPACE_ALIAS,
+			},
+		],
+	} as any,
 ];
