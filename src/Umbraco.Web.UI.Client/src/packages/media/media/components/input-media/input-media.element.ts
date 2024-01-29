@@ -2,8 +2,9 @@ import { UmbMediaPickerContext } from './input-media.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { MediaItemResponseModel, MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG: UmbSorterConfig<string> = {
@@ -95,12 +96,24 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
+	private _editMediaPath = '';
+
+	@state()
 	private _items?: Array<MediaItemResponseModel>;
 
 	#pickerContext = new UmbMediaPickerContext(this);
 
 	constructor() {
 		super();
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('media')
+			.onSetup(() => {
+				return { data: { entityType: 'media', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editMediaPath = routeBuilder({});
+			});
 
 		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
@@ -175,7 +188,6 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 
 	#renderItem(item: MediaItemResponseModel) {
 		// TODO: `file-ext` value has been hardcoded here. Find out if API model has value for it. [LK]
-		// TODO: How to handle the `showOpenButton` option? [LK]
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
@@ -183,6 +195,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 				file-ext="jpg">
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
+					${this.#renderOpenButton(item)}
 					<uui-button label="Copy media">
 						<uui-icon name="icon-documents"></uui-icon>
 					</uui-button>
@@ -197,6 +210,18 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	#renderIsTrashed(item: MediaItemResponseModel) {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
+	}
+
+	#renderOpenButton(item: MediaItemResponseModel) {
+		if (!this.showOpenButton) return;
+		return html`
+			<uui-button
+				compact
+				href="${this._editMediaPath}edit/${item.id}"
+				label=${this.localize.term('general_edit') + ` ${item.name}`}>
+				<uui-icon name="icon-edit"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	static styles = [

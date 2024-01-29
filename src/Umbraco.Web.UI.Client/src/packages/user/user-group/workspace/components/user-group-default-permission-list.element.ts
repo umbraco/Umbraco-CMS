@@ -2,7 +2,7 @@ import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.contex
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-user-group-default-permission-list')
@@ -32,7 +32,7 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 
 	#observeUserPermissions() {
 		this.observe(
-			umbExtensionsRegistry.extensionsOfType('userPermission'),
+			umbExtensionsRegistry.byType('userPermission'),
 			(userPermissionManifests) => {
 				this._entityTypes = [...new Set(userPermissionManifests.map((manifest) => manifest.meta.entityType))];
 			},

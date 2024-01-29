@@ -1,15 +1,11 @@
-import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UmbContextToken,
-	UmbContextCallback,
-	UmbContextConsumerController,
-	UmbContextProviderController,
-} from '@umbraco-cms/backoffice/context-api';
-import { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContextToken, UmbContextCallback } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import type { ObserverCallback } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export declare class UmbElement extends UmbControllerHostElement {
 	/**
@@ -38,14 +34,14 @@ export declare class UmbElement extends UmbControllerHostElement {
 	): UmbContextConsumerController<BaseType, ResultType>;
 	/**
 	 * Use the UmbLocalizeController to localize your element.
-	 * @see UmbLocalizeController
+	 * @see UmbLocalizationController
 	 */
-	localize: UmbLocalizeController;
+	localize: UmbLocalizationController;
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElement {
-		localize: UmbLocalizeController = new UmbLocalizeController(this);
+		localize: UmbLocalizationController = new UmbLocalizationController(this);
 
 		/**
 		 * @description Observe a RxJS source of choice.

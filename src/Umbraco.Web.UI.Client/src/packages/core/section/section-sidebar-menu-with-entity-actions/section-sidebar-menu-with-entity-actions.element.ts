@@ -1,8 +1,9 @@
 import { UmbSectionSidebarMenuElement } from '../section-sidebar-menu/section-sidebar-menu.element.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type {
 	ManifestSectionSidebarAppMenuWithEntityActionsKind,
-	UmbBackofficeManifestKind,
+	UmbBackofficeManifestKind} from '@umbraco-cms/backoffice/extension-registry';
+import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 

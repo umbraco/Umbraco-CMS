@@ -1,8 +1,9 @@
 import { html, css, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
+import type {
 	UmbExamineFieldsSettingsModalValue,
-	UmbExamineFieldsSettingsModalData,
+	UmbExamineFieldsSettingsModalData} from '@umbraco-cms/backoffice/modal';
+import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 

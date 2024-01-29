@@ -1,12 +1,13 @@
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
+import type {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalValue,
-	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUi>;
@@ -36,7 +37,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	#usePropertyEditorUIs() {
 		if (!this.data) return;
 
-		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
+		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
 			this._propertyEditorUIs = propertyEditorUIs.filter(
 				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,

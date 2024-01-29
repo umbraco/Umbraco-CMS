@@ -4,7 +4,7 @@ import {
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -53,7 +53,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	}
 
 	#onRequestDelete() {
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, async (modalManager) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
 			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
 				data: {
 					color: 'danger',

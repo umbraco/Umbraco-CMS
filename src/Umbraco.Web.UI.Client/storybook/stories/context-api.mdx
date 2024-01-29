@@ -32,9 +32,9 @@ new UmbContextConsumerController(host, 'requestThisContextAlias', (context) => {
 Using a Context Token gives you a typed context:
 
 ```ts
-import { UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
-this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (context) => {
+this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
 	// Notice this is a subscription, as context might change or a new one appears, but the value is strongly typed
 	console.log("I've got the context of the right type", context);
 });
@@ -52,7 +52,7 @@ type MyContext = {
 	bar: number;
 };
 
-const MY_CONTEXT_TOKEN = new ContextToken<MyContext>('My.Context.Token');
+const MY_CONTEXT = new ContextToken<MyContext>('My.Context.Token');
 ```
 
 #### Context Token with discriminator.
@@ -79,38 +79,37 @@ import { ContextToken } from '@umbraco-cms/backoffice/context';
 interface MyBaseContext {
 	foo: string;
 	bar: number;
-};
+}
 
 interface MyPublishableContext extends MyBaseContext {
-	publish()
-};
+	publish();
+}
 
-const MY_PUBLISHABLE_CONTEXT_TOKEN = new ContextToken<MyContext, MyPublishableContext>('My.Context.Token', (context): context is MyPublishableContext => {
-	return 'publish' in context;
-});
+const MY_PUBLISHABLE_CONTEXT = new ContextToken<MyContext, MyPublishableContext>(
+	'My.Context.Token',
+	(context): context is MyPublishableContext => {
+		return 'publish' in context;
+	},
+);
 ```
 
 Implementation of context token example:
 
 ```ts
-
 const contextElement = new UmbLitElement();
-contextElement.provideContext(MY_PUBLISHABLE_CONTEXT_TOKEN, new MyPublishableContext());
-
+contextElement.provideContext(MY_PUBLISHABLE_CONTEXT, new MyPublishableContext());
 
 const consumerElement = new UmbLitElement();
 contextElement.appendChild(contextElement);
-consumerElement.consumeContext(MY_PUBLISHABLE_CONTEXT_TOKEN, (context) => {
+consumerElement.consumeContext(MY_PUBLISHABLE_CONTEXT, (context) => {
 	// context is of type 'MyPublishableContext'
 	console.log("I've got the context of the right type", context);
 });
-
 ```
 
 This enables implementors to request a publishable context, without the knowledge about how do identify such, neither they need to know about the Type.
 
 In details, the Context API will find the first API matching alias 'My.Context.Token', and never look furhter. If that API does live up to the type discriminator, it will be returned. If not the consumer will never reply.
-
 
 ### Provide a Context API.
 

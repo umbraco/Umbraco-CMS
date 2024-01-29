@@ -3,14 +3,15 @@ import { UmbDocumentRepository } from '../../repository/index.js';
 import { UmbUserGroupRepository } from '@umbraco-cms/backoffice/user-group';
 import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UMB_ENTITY_USER_PERMISSION_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_USER_GROUP_PICKER_MODAL,
+import type {
 	UmbEntityUserPermissionSettingsModalData,
 	UmbEntityUserPermissionSettingsModalValue,
 	UmbModalContext,
-	UmbModalManagerContext,
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_ENTITY_USER_PERMISSION_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT,
+	UMB_USER_GROUP_PICKER_MODAL
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
@@ -54,7 +55,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 		});
 	}

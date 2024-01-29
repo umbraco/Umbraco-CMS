@@ -1,8 +1,9 @@
-import {
-	ContentTypeCompositionTypeModel,
+import type {
 	DocumentTypeItemResponseModel,
 	DocumentTypeResponseModel,
-	DocumentTypeTreeItemResponseModel,
+	DocumentTypeTreeItemResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	ContentTypeCompositionTypeModel
 } from '@umbraco-cms/backoffice/backend-api';
 
 export type UmbMockDocumentTypeModelHack = DocumentTypeResponseModel &
@@ -1476,6 +1477,32 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: 'folder-umbraco-demo-blocks-id',
+		isFolder: false,
+		allowedContentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		properties: [],
+		containers: [],
+	},
+	{
+		allowedTemplateIds: [],
+		defaultTemplateId: null,
+		id: 'test-block-id',
+		alias: 'testBlock',
+		name: 'Test broken group key',
+		description: null,
+		icon: 'icon-war',
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: true,
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
 		isFolder: false,
 		allowedContentTypes: [],
 		compositions: [],

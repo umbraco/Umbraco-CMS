@@ -1,14 +1,17 @@
-import { UmbTreeItemContext } from '../tree-item-default/tree-item.context.interface.js';
-import { UmbTreeContextBase } from '../tree.context.js';
-import { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemContext } from '../tree-item-default/tree-item.context.interface.js';
+import type { UmbTreeContextBase } from '../tree.context.js';
+import type { UmbTreeItemModelBase } from '../types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
+import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
 	x: TreeItemType,
@@ -52,13 +55,14 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	treeContext?: UmbTreeContextBase<TreeItemType>;
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
+	#actionEventContext?: UmbActionEventContext;
 	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
 
 	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
 		super(host);
 		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();
-		this.provideContext(UMB_TREE_ITEM_CONTEXT_TOKEN, this);
+		this.provideContext(UMB_TREE_ITEM_CONTEXT, this);
 	}
 
 	public setTreeItem(treeItem: TreeItemType | undefined) {
@@ -114,12 +118,12 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	}
 
 	#consumeContexts() {
-		this.consumeContext(UMB_SECTION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
 			this.#sectionContext = instance;
 			this.#observeSectionPath();
 		});
 
-		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT, (instance) => {
 			this.#sectionSidebarContext = instance;
 		});
 
@@ -128,6 +132,18 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeHasChildren();
+		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#actionEventContext = instance;
+			this.#actionEventContext.removeEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+			this.#actionEventContext.addEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
 		});
 	}
 
@@ -181,7 +197,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	#observeActions() {
 		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfType('entityAction')
+				.byType('entityAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this.#hasActions.setValue(actions.length > 0);
@@ -206,10 +222,26 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		});
 	}
 
+	#onReloadRequest = (event: UmbEntityActionEvent) => {
+		// Only handle children request here. Root request is handled by the tree context
+		if (!this.unique) return;
+		if (event.getUnique() !== this.unique) return;
+		if (event.getEntityType() !== this.entityType) return;
+		this.requestChildren();
+	};
+
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
 		return `section/${pathname}/workspace/${entityType}/edit/${unique}`;
 	}
+
+	destroy(): void {
+		this.#actionEventContext?.removeEventListener(
+			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+			this.#onReloadRequest as EventListener,
+		);
+		super.destroy();
+	}
 }
 
-export const UMB_TREE_ITEM_CONTEXT_TOKEN = new UmbContextToken<UmbTreeItemContext<any>>('UmbTreeItemContext');
+export const UMB_TREE_ITEM_CONTEXT = new UmbContextToken<UmbTreeItemContext<any>>('UmbTreeItemContext');

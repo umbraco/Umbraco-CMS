@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './code-block.element.js';
 import type { UmbCodeBlockElement } from './code-block.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';

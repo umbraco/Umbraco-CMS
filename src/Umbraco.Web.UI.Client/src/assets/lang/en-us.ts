@@ -1522,6 +1522,7 @@ export default {
 		addGroup: 'Add group',
 		inheritedFrom: 'Inherited from',
 		addProperty: 'Add property',
+		editProperty : 'Edit property',
 		requiredLabel: 'Required label',
 		enableListViewHeading: 'Enable list view',
 		enableListViewDescription:

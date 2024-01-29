@@ -1,7 +1,8 @@
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestUserPermission } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
@@ -24,7 +25,7 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 	async #observeUserPermissions(value: Array<string>) {
 		if (value) {
 			this.observe(
-				umbExtensionsRegistry.extensionsOfType('userPermission').pipe(
+				umbExtensionsRegistry.byType('userPermission').pipe(
 					map((manifests) => {
 						return manifests.filter((manifest) => manifest.alias && value.includes(manifest.alias));
 					}),

@@ -1,9 +1,11 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, property, map, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, property, map, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbPropertyEditorUiElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
 const tinyIconSet = tinymce.IconManager.get('default');
@@ -76,7 +78,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 
 	private async getToolbarPlugins(): Promise<void> {
 		// Get all the toolbar plugins
-		const plugin$ = umbExtensionsRegistry.extensionsOfType('tinyMcePlugin');
+		const plugin$ = umbExtensionsRegistry.byType('tinyMcePlugin');
 
 		const plugins = await firstValueFrom(plugin$);
 

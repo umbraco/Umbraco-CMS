@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbPropertyEditorUIBlockGridGroupConfigurationElement } from './property-editor-ui-block-type-group-configuration.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

@@ -1,8 +1,8 @@
-import { UmbUserDetailModel } from '../types.js';
-import { UmbUserWorkspaceContext } from '../workspace/user-workspace.context.js';
+import type { UmbUserDetailModel } from '../types.js';
+import type { UmbUserWorkspaceContext } from '../workspace/user-workspace.context.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { isCurrentUser } from '@umbraco-cms/backoffice/current-user';
-import {
+import type {
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,

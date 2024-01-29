@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
-import { UmbDocumentTypeCreateOptionsModalData } from './index.js';
+import type { UmbDocumentTypeCreateOptionsModalData } from './index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -21,6 +21,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			// @ts-ignore
 			// TODO: allow null for entity actions. Some actions can be executed on the root item
 			this.data.parentUnique,
+			this.data.entityType,
 		);
 	}
 

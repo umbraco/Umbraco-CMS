@@ -1,4 +1,4 @@
-import {
+import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
@@ -705,6 +705,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 						editorSize: 'medium',
 						icon: 'icon-book-alt',
 						groupKey: 'demo-block-group-id',
+					},
+					{
+						label: 'Test broken group key',
+						contentElementTypeKey: 'test-block-id',
+						editorSize: 'medium',
+						icon: 'icon-war',
+						groupKey: 'group-id-that-does-not-exist',
 					},
 				],
 			},

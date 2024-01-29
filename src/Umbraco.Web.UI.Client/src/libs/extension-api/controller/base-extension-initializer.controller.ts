@@ -1,14 +1,14 @@
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import {
-	type ManifestCondition,
-	type ManifestWithDynamicConditions,
-	type UmbExtensionRegistry,
-	createExtensionApi,
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import type {
 	UmbConditionConfigBase,
+	ManifestCondition,
+	ManifestWithDynamicConditions,
+	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * This abstract Controller holds the core to manage a single Extension.
@@ -73,7 +73,7 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 	protected _init() {
 		this.#manifestObserver = this.observe(
-			this.#extensionRegistry.getByAlias<ManifestType>(this.#alias),
+			this.#extensionRegistry.byAlias<ManifestType>(this.#alias),
 			async (extensionManifest) => {
 				this.#clearPermittedState();
 				this.#manifest = extensionManifest;
@@ -143,7 +143,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (conditionConfigs.length > 0) {
 			// Observes the conditions and initialize as they come in.
 			this.observe(
-				this.#extensionRegistry.getByTypeAndAliases('condition', conditionAliases),
+				this.#extensionRegistry.byTypeAndAliases('condition', conditionAliases),
 				this.#gotConditions,
 				'_observeConditions',
 			);

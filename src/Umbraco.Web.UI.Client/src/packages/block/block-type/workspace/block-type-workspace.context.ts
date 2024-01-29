@@ -1,17 +1,20 @@
-import type { UmbBlockTypeBaseModel } from '../types.js';
-import { UMB_PROPERTY_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import {
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
+import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type {
 	UmbInvariantableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
+} from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEditableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel>
+export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
 	extends UmbEditableWorkspaceContextBase<BlockTypeData>
 	implements UmbInvariantableWorkspaceContextInterface
 {
@@ -55,9 +58,11 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 		});
 	}
 
-	async create(contentElementTypeId: string) {
+	async create(contentElementTypeId: string, groupKey?: string | null) {
+		//Only set groupKey property if it exists
 		const data: BlockTypeData = {
 			contentElementTypeKey: contentElementTypeId,
+			...(groupKey && { groupKey: groupKey }),
 		} as BlockTypeData;
 
 		this.setIsNew(true);

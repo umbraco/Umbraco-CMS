@@ -2,7 +2,7 @@ const { rest } = window.MockServiceWorker;
 import { searchResultMockData, getIndexByName, PagedIndexers } from '../data/examine.data.js';
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import {
+import type {
 	IndexResponseModel,
 	PagedIndexResponseModel,
 	PagedSearcherResponseModel,

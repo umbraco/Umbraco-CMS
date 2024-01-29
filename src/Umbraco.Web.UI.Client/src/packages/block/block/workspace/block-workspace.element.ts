@@ -6,8 +6,10 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
-import { UmbApi, UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestWorkspace, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbApi} from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestWorkspace} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-block-workspace')

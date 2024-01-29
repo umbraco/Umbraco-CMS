@@ -1,7 +1,7 @@
-import { UmbCurrentUser } from './types.js';
+import type { UmbCurrentUser } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
@@ -25,17 +25,8 @@ export class UmbCurrentUserContext extends UmbBaseController {
 			this.#observeIsAuthorized();
 		});
 
-		// TODO: revisit this. It can probably be simplified
-		this.observe(umbLocalizationRegistry.isDefaultLoaded, (isDefaultLoaded) => {
-			if (!isDefaultLoaded) return;
-
-			this.observe(
-				this.languageIsoCode,
-				(currentLanguageIsoCode) => {
-					umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
-				},
-				'umbCurrentUserLanguageIsoCode',
-			);
+		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
+			umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
 		});
 
 		this.provideContext(UMB_CURRENT_USER_CONTEXT, this);

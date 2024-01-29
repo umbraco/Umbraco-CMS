@@ -1,19 +1,19 @@
-import { UmbTreeElement, type UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeElement, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 import { css, html, nothing, customElement, query, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
-import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import {
+import type { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import type {
 	UmbLinkPickerConfig,
 	UmbLinkPickerLink,
 	UmbLinkPickerModalData,
 	UmbLinkPickerModalValue,
-	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 import { UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
-		@state()
+	@state()
 	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
 		multiple: false,
 		selectable: true,

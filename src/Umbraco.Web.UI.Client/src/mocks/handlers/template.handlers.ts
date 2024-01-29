@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbTemplateData } from '../data/template.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { CreateTemplateRequestModel, UpdateTemplateRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateTemplateRequestModel, UpdateTemplateRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
 	//#region TREE

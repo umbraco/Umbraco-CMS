@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUINumberRangeElement } from './property-editor-ui-number-range.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

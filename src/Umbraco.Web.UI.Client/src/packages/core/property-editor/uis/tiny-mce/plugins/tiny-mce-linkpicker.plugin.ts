@@ -1,10 +1,12 @@
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
-import {
+import type { TinyMcePluginArguments} from '@umbraco-cms/backoffice/components';
+import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import type {
 	UmbLinkPickerModalValue,
-	UMB_LINK_PICKER_MODAL,
 	UmbLinkPickerLink,
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_LINK_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 
 type AnchorElementAttributes = {
@@ -26,7 +28,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 

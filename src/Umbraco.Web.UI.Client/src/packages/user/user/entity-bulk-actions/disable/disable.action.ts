@@ -1,5 +1,5 @@
-import { UmbDisableUserRepository } from '../../repository/disable/disable-user.repository.js';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbDisableUserRepository } from '../../repository/disable/disable-user.repository.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 
 export class UmbDisableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbDisableUserRepository> {

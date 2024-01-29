@@ -17,10 +17,8 @@ export class UmbUserGroupItemStore extends UmbEntityItemStore<UserGroupItemRespo
 	 * @memberof UmbUserGroupItemStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_USER_GROUP_ITEM_STORE_CONTEXT.toString());
 	}
 }
 
-export const UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGroupItemStore>(
-	'UmbUserGroupItemStore',
-);
+export const UMB_USER_GROUP_ITEM_STORE_CONTEXT = new UmbContextToken<UmbUserGroupItemStore>('UmbUserGroupItemStore');

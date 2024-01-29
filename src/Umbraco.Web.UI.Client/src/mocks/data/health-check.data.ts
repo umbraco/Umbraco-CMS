@@ -1,6 +1,7 @@
-import {
+import type {
 	HealthCheckGroupPresentationModel,
-	HealthCheckGroupWithResultResponseModel,
+	HealthCheckGroupWithResultResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	StatusResultTypeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 

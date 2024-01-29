@@ -1,4 +1,4 @@
-import { UmbStylesheetRule } from '../../types.js';
+import type { UmbStylesheetRule } from '../../types.js';
 import { UMB_STYLESHEET_RULE_SETTINGS_MODAL_ALIAS } from './manifests.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 

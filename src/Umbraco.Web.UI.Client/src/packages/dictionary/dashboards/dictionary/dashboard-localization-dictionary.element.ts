@@ -1,9 +1,9 @@
 import { UmbDictionaryRepository } from '../../dictionary/repository/dictionary.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
+import type { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DictionaryOverviewResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
@@ -42,6 +42,7 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 		const { data } = await this.#repo.list(0, 1000);
 		this.#dictionaryItems = data?.items ?? [];
+
 		this.#setTableColumns();
 		this.#setTableItems();
 	}

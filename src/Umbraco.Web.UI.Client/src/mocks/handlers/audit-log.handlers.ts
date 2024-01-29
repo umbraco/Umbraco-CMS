@@ -1,7 +1,7 @@
 import { logs, logsWithUser } from '../data/audit-log.data.js';
 const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import {
+import type {
 	PagedAuditLogResponseModel,
 	PagedAuditLogWithUsernameResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';

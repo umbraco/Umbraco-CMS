@@ -1,8 +1,8 @@
 import type { ManifestBase, ManifestBundle } from '../types/index.js';
-import { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { loadManifestPlainJs } from '../functions/load-manifest-plain-js.function.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbBundleExtensionInitializer extends UmbBaseController {
 	#extensionRegistry;
@@ -11,7 +11,7 @@ export class UmbBundleExtensionInitializer extends UmbBaseController {
 	constructor(host: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry<ManifestBundle>) {
 		super(host);
 		this.#extensionRegistry = extensionRegistry;
-		this.observe(extensionRegistry.extensionsOfType('bundle'), (bundles) => {
+		this.observe(extensionRegistry.byType('bundle'), (bundles) => {
 			// Unregister removed bundles:
 			this.#bundleMap.forEach((existingBundle) => {
 				if (!bundles.find((b) => b.alias === existingBundle.alias)) {

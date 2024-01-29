@@ -2,16 +2,19 @@ import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.
 import { css, html, repeat, customElement, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
+import type {
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalValue,
-	UmbModalBaseElement,
 	UmbModalRouteBuilder,
+} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
+	UmbModalBaseElement,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/data-type';
 
 interface GroupedItems<T> {
@@ -105,7 +108,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			'_repositoryItemsObserver',
 		);
 
-		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
+		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
 			this.#propertyEditorUIs = propertyEditorUIs.filter(
 				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,

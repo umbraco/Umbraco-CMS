@@ -1,9 +1,11 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, CSSResultGroup, html, customElement, state, repeat, query } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, query } from '@umbraco-cms/backoffice/external/lit';
+import type {
 	UmbNotificationHandler,
-	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
+	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import {
+	UMB_NOTIFICATION_CONTEXT,
 } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -20,7 +22,7 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 			this._notificationContext = instance;
 			this._observeNotifications();
 		});

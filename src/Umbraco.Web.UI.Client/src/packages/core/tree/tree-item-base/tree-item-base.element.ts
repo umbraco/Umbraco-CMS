@@ -1,15 +1,12 @@
 import type { UmbTreeItemContext } from '../tree-item-default/index.js';
-import { UmbTreeItemModelBase } from '../types.js';
-import { UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context.js';
+import type { UmbTreeItemModelBase } from '../types.js';
+import { UMB_TREE_ITEM_CONTEXT } from './tree-item-base.context.js';
 import { css, html, nothing, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-tree-item-base')
 export class UmbTreeItemBaseElement extends UmbLitElement {
-	@state()
-	private _iconAlias?: string;
-
 	@state()
 	private _item?: UmbTreeItemModelBase;
 
@@ -42,7 +39,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_TREE_ITEM_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;
 			// TODO: investigate if we can make an observe decorator

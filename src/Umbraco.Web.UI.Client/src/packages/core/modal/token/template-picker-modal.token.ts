@@ -1,5 +1,6 @@
-import { UmbModalToken, UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
-import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 export type UmbTemplatePickerModalData = UmbTreePickerModalData<UmbEntityTreeItemModel>;
 export type UmbTemplatePickerModalValue = UmbPickerModalValue;

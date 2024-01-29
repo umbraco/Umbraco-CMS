@@ -1,10 +1,10 @@
-import {
+import type {
 	CreateUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
 	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 export interface UserGroupEntity extends UmbEntityBase {
 	type: 'user-group';
