@@ -9,6 +9,7 @@ export interface UmbMediaItemModel {
 		hasListView: boolean;
 	};
 	variants: Array<UmbMediaItemVariantModel>;
+	name: string; // TODO: get correct variant name
 }
 
 export interface UmbMediaItemVariantModel {

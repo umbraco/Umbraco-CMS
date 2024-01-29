@@ -1,9 +1,9 @@
+import type { UmbMediaItemModel } from '../../repository/item/types.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
-import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbMediaPickerContext extends UmbPickerInputContext<MediaItemResponseModel> {
+export class UmbMediaPickerContext extends UmbPickerInputContext<UmbMediaItemModel> {
 	constructor(host: UmbControllerHostElement) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore

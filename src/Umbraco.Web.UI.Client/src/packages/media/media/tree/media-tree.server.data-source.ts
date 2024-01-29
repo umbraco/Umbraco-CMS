@@ -1,3 +1,4 @@
+import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import type { UmbMediaTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { MediaResource, type MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -43,12 +44,21 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 	return {
-		id: item.id,
-		parentId: item.parent ? item.parent.id : null,
-		entityType: 'media',
+		unique: item.id,
+		parentUnique: item.parent ? item.parent.id : null,
+		entityType: UMB_MEDIA_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		noAccess: item.noAccess,
 		isTrashed: item.isTrashed,
 		isFolder: false,
+		mediaType: item.mediaType,
+		name: item.variants[0].name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
+		variants: item.variants.map((variant) => {
+			return {
+				name: variant.name,
+				culture: variant.culture || null,
+				state: variant.state,
+			};
+		}),
 	};
 };

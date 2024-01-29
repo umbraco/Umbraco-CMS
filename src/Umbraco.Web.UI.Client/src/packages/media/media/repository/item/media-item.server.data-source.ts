@@ -46,5 +46,6 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 				state: variant.state,
 			};
 		}),
+		name: item.variants[0].name, // TODO: get correct variant name
 	};
 };

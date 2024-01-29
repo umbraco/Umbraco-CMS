@@ -49,5 +49,6 @@ const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBi
 		entityType: 'document-recycle-bin',
 		hasChildren: item.hasChildren,
 		isFolder: false,
+		name: item.variants[0].name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 	};
 };

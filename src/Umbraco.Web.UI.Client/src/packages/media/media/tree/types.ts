@@ -6,7 +6,6 @@ export interface UmbMediaTreeItemModel extends UmbUniqueTreeItemModel {
 	entityType: UmbMediaEntityType;
 	noAccess: boolean;
 	isTrashed: boolean;
-	isProtected: boolean;
 	mediaType: {
 		id: string;
 		icon: string;

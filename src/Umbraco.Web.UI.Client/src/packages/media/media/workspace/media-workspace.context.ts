@@ -42,9 +42,9 @@ export class UmbMediaWorkspaceContext
 
 		const currentData = this.#data.value;
 		if (currentData) {
-			const newDataSet = appendToFrozenArray(currentData.data, entry, (x) => x.alias);
+			const newDataSet = appendToFrozenArray(currentData.values, entry, (x) => x.alias);
 
-			this.#data.update({ data: newDataSet });
+			this.#data.update({ values: newDataSet });
 		}
 	}
 

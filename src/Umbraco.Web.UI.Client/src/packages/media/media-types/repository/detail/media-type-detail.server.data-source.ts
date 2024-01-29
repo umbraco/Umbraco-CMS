@@ -122,10 +122,20 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			isElement: model.isElement,
 			properties: model.properties,
 			containers: model.containers,
-			allowedMediaTypes: model.allowedContentTypes,
-			compositions: model.compositions,
+			allowedMediaTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					mediaType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					mediaType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
 			id: model.unique,
-			containerId: model.parentUnique,
+			folder: model.parentUnique ? { id: model.parentUnique } : null,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -163,8 +173,18 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			isElement: model.isElement,
 			properties: model.properties,
 			containers: model.containers,
-			allowedContentTypes: model.allowedContentTypes,
-			compositions: model.compositions,
+			allowedMediaTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					mediaType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					mediaType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
