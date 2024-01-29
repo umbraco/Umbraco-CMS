@@ -31,7 +31,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 * @return { UmbDocumentDetailModel }
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(parentUnique: string | null, preset: Partial<UmbDocumentDetailModel> = {}) {
 		const data: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
@@ -39,7 +39,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			urls: [],
 			template: null,
 			documentType: {
-				unique: 'documentTypeId',
+				unique: '',
 			},
 			isTrashed: false,
 			values: [],
@@ -54,6 +54,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					updateDate: null,
 				},
 			],
+			...preset,
 		};
 
 		return { data };

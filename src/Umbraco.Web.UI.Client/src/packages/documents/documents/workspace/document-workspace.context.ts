@@ -65,8 +65,10 @@ export class UmbDocumentWorkspaceContext
 		return data || undefined;
 	}
 
-	async create(unique: string, parentUnique: string | null) {
-		this.#getDataPromise = this.repository.createScaffold(unique, { parentUnique });
+	async create(parentUnique: string | null, documentTypeUnique: string) {
+		this.#getDataPromise = this.repository.createScaffold(parentUnique, {
+			documentType: { unique: documentTypeUnique },
+		});
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
