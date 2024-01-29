@@ -9,17 +9,7 @@ import type { UmbTreePickerDynamicRoot, UmbTreePickerDynamicRootQueryStep } from
 import type { UmbModalContext, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-
-const SORTER_CONFIG: UmbSorterConfig<string> = {
-	compareElementToModel: (element, model) => {
-		return element.getAttribute('data-idx') === model;
-	},
-	querySelectModelToElement: () => null,
-	identifier: 'Umb.SorterIdentifier.InputDocumentPickerRoot',
-	itemSelector: 'uui-ref-node',
-	containerSelector: '#query-steps',
-};
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-input-document-picker-root')
 export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitElement) {
@@ -30,7 +20,9 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 	@property({ attribute: false })
 	data?: UmbTreePickerDynamicRoot | undefined;
 
-	private _modalContext?: UmbModalManagerContext;
+	#dynamicRootOrigin?: { label: string; icon: string; description?: string };
+
+	#modalContext?: UmbModalManagerContext;
 
 	#openModal?: UmbModalContext;
 
@@ -38,48 +30,56 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 		super();
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
+			this.#modalContext = instance;
 		});
 	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.#updateQuerySteps(this.data?.querySteps);
+		this.#updateDynamicRootQuerySteps(this.data?.querySteps);
 	}
 
 	#sorter = new UmbSorterController(this, {
-		...SORTER_CONFIG,
+		compareElementToModel: (element: HTMLElement, model: string) => {
+			return element.getAttribute('data-idx') === model;
+		},
+		querySelectModelToElement: () => null,
+		identifier: 'Umb.SorterIdentifier.InputDocumentPickerRoot',
+		itemSelector: 'uui-ref-node',
+		containerSelector: '#query-steps',
 		onChange: ({ model }) => {
 			if (this.data && this.data.querySteps) {
 				const steps = [...this.data.querySteps];
 				const querySteps = model.map((index) => steps[parseInt(index)]);
-				this.#updateQuerySteps(querySteps);
+				this.#updateDynamicRootQuerySteps(querySteps);
 				this.dispatchEvent(new UmbChangeEvent());
 			}
 		},
 	});
 
 	#openDynamicRootOriginPicker() {
-		this.#openModal = this._modalContext?.open(UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, {});
-		this.#openModal?.onSubmit().then((data) => {
-			this.data = { ...this.data, ...data };
+		this.#openModal = this.#modalContext?.open(UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, {});
+		this.#openModal?.onSubmit().then((data: UmbTreePickerDynamicRoot) => {
+			const existingData = { ...this.data };
+			existingData.originKey = undefined;
+			this.data = { ...existingData, ...data };
 			this.dispatchEvent(new UmbChangeEvent());
 		});
 	}
 
 	#openDynamicRootQueryStepPicker() {
-		this.#openModal = this._modalContext?.open(UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL, {});
+		this.#openModal = this.#modalContext?.open(UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL, {});
 		this.#openModal?.onSubmit().then((step) => {
 			if (this.data) {
 				const querySteps = [...(this.data.querySteps ?? []), step];
-				this.#updateQuerySteps(querySteps);
+				this.#updateDynamicRootQuerySteps(querySteps);
 				this.dispatchEvent(new UmbChangeEvent());
 			}
 		});
 	}
 
-	#updateQuerySteps(querySteps?: Array<UmbTreePickerDynamicRootQueryStep>) {
+	#updateDynamicRootQuerySteps(querySteps?: Array<UmbTreePickerDynamicRootQueryStep>) {
 		if (!this.data) return;
 		this.#sorter.setModel(querySteps?.map((_, index) => index.toString()) ?? []);
 		this.data = { ...this.data, ...{ querySteps } };
@@ -141,7 +141,7 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 			if (index !== -1) {
 				const querySteps = [...this.data.querySteps];
 				querySteps.splice(index, 1);
-				this.#updateQuerySteps(querySteps);
+				this.#updateDynamicRootQuerySteps(querySteps);
 				this.dispatchEvent(new UmbChangeEvent());
 			}
 		}

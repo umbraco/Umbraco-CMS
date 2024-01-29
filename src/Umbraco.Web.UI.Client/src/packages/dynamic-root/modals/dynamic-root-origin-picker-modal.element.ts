@@ -17,7 +17,7 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 		this.#documentPickerContext.max = 1;
 
 		this.observe(
-			umbExtensionsRegistry.extensionsOfType('dynamicRootOrigin'),
+			umbExtensionsRegistry.byType('dynamicRootOrigin'),
 			(origins: Array<ManifestDynamicRootOrigin>) => {
 				this._origins = origins;
 			},

@@ -16,7 +16,7 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 		super();
 
 		this.observe(
-			umbExtensionsRegistry.extensionsOfType('dynamicRootQueryStep'),
+			umbExtensionsRegistry.byType('dynamicRootQueryStep'),
 			(querySteps: Array<ManifestDynamicRootQueryStep>) => {
 				this._querySteps = querySteps;
 			},
