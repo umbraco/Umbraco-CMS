@@ -4,7 +4,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">Umbraco.Cms.Web.UI</RootNamespace>
-    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>

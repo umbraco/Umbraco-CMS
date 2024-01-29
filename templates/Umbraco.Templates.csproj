@@ -10,7 +10,6 @@
     <IncludeContentInPack>true</IncludeContentInPack>
     <ContentTargetFolders>.</ContentTargetFolders>
     <NoWarn>NU5128</NoWarn>
-    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,9 +42,10 @@
     </Content>
   </ItemGroup>
 
+
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
-    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="**\.template.config\template.json" Pack="false" />

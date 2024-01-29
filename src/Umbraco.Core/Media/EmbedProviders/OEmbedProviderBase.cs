@@ -55,7 +55,7 @@ public abstract class OEmbedProviderBase : IEmbedProvider
         if (_httpClient == null)
         {
             _httpClient = new HttpClient();
-            _httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("Umbraco-CMS");
+            _httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd(Constants.HttpClients.Headers.UserAgentProductName);
         }
 
         using (var request = new HttpRequestMessage(HttpMethod.Get, url))

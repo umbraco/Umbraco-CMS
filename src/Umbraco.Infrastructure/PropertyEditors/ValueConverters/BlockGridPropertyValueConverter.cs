@@ -21,8 +21,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly BlockEditorConverter _blockConverter;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IApiElementBuilder _apiElementBuilder;
+        private readonly BlockGridPropertyValueConstructorCache _constructorCache;
 
-        [Obsolete("Please use non-obsolete cconstrutor. This will be removed in Umbraco 14.")]
+        [Obsolete("Please use non-obsolete construtor. This will be removed in Umbraco 14.")]
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog,
             BlockEditorConverter blockConverter,
@@ -32,16 +33,28 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         }
 
+        [Obsolete("Please use non-obsolete construtor. This will be removed in Umbraco 15.")]
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog,
             BlockEditorConverter blockConverter,
             IJsonSerializer jsonSerializer,
             IApiElementBuilder apiElementBuilder)
+            : this(proflog, blockConverter, jsonSerializer, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<BlockGridPropertyValueConstructorCache>())
+        {
+        }
+
+        public BlockGridPropertyValueConverter(
+            IProfilingLogger proflog,
+            BlockEditorConverter blockConverter,
+            IJsonSerializer jsonSerializer,
+            IApiElementBuilder apiElementBuilder,
+            BlockGridPropertyValueConstructorCache constructorCache)
         {
             _proflog = proflog;
             _blockConverter = blockConverter;
             _jsonSerializer = jsonSerializer;
             _apiElementBuilder = apiElementBuilder;
+            _constructorCache = constructorCache;
         }
 
         /// <inheritdoc />
@@ -129,7 +142,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     return null;
                 }
 
-                var creator = new BlockGridPropertyValueCreator(_blockConverter, _jsonSerializer);
+                var creator = new BlockGridPropertyValueCreator(_blockConverter, _jsonSerializer, _constructorCache);
                 return creator.CreateBlockModel(referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns);
             }
         }

@@ -37,4 +37,7 @@ public class WebhookLogViewModel
 
     [DataMember(Name = "responseBody")]
     public string ResponseBody { get; set; } = string.Empty;
+
+    [DataMember(Name = "exceptionOccured")]
+    public bool ExceptionOccured { get; set; }
 }

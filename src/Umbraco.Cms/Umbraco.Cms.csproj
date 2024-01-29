@@ -4,7 +4,6 @@
     <Description>Installs Umbraco CMS with all default dependencies in your ASP.NET Core project.</Description>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
-    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>

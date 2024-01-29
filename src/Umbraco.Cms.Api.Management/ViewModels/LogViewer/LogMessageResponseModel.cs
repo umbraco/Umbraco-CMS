@@ -27,7 +27,7 @@ public class LogMessageResponseModel
     /// <summary>
     ///     Gets or sets the properties associated with the log event, including those presented in MessageTemplate.
     /// </summary>
-    public IEnumerable<LogMessagePropertyPresentationModel> Properties { get; set; } = null!;
+    public IEnumerable<LogMessagePropertyPresentationModel> Properties { get; set; } = Enumerable.Empty<LogMessagePropertyPresentationModel>();
 
     /// <summary>
     ///     Gets or sets an exception associated with the log event (can be null).

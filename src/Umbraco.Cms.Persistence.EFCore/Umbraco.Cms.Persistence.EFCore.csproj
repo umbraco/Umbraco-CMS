@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Take top-level depedendency on Azure.Identity, because Microsoft.EntityFrameworkCore.SqlServer depends on a vulnerable version -->
+    <PackageReference Include="Azure.Identity" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" />

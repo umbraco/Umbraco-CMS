@@ -146,6 +146,11 @@ public class RichTextEditorSettings
     [DefaultValue(StaticInvalidElements)]
     public string InvalidElements { get; set; } = StaticInvalidElements;
 
+    /// <summary>
+    ///     Cloud API Key for TinyMCE. This is required to use TinyMCE premium plugins.
+    /// </summary>
+    public string? CloudApiKey { get; set; }
+
     public class RichTextEditorCommand
     {
         [Required]

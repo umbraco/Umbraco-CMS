@@ -7,5 +7,6 @@ public enum ContentAuthorizationStatus
     UnauthorizedMissingBinAccess,
     UnauthorizedMissingDescendantAccess,
     UnauthorizedMissingPathAccess,
-    UnauthorizedMissingRootAccess
+    UnauthorizedMissingRootAccess,
+    UnauthorizedMissingCulture
 }

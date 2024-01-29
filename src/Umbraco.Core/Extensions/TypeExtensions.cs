@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Umbraco.Cms.Core;
@@ -132,9 +133,7 @@ public static class TypeExtensions
     ///     <c>true</c> if [is of generic type] [the specified type]; otherwise, <c>false</c>.
     /// </returns>
     public static bool IsOfGenericType(this Type type, Type genericType)
-    {
-        return type.TryGetGenericArguments(genericType, out Type[]? args);
-    }
+        => type.TryGetGenericArguments(genericType, out _);
 
     /// <summary>
     ///     Will find the generic type of the 'type' parameter passed in that is equal to the 'genericType' parameter passed in
@@ -143,17 +142,10 @@ public static class TypeExtensions
     /// <param name="genericType"></param>
     /// <param name="genericArgType"></param>
     /// <returns></returns>
-    public static bool TryGetGenericArguments(this Type type, Type genericType, out Type[]? genericArgType)
+    public static bool TryGetGenericArguments(this Type type, Type genericType, [NotNullWhen(true)] out Type[]? genericArgType)
     {
-        if (type == null)
-        {
-            throw new ArgumentNullException("type");
-        }
-
-        if (genericType == null)
-        {
-            throw new ArgumentNullException("genericType");
-        }
+        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(genericType);
 
         if (genericType.IsGenericType == false)
         {

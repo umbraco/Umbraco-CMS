@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Script;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -22,15 +23,17 @@ public class ByPathScriptController : ScriptControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet]
+    [HttpGet("{path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ScriptResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByPath(string path)
     {
+        path = DecodePath(path).VirtualPathToSystemPath();
         IScript? script = await _scriptService.GetAsync(path);
 
-        return script is null
-            ? ScriptNotFound()
-            : Ok(_mapper.Map<ScriptResponseModel>(script));
+        return script is not null
+            ? Ok(_mapper.Map<ScriptResponseModel>(script))
+            : ScriptNotFound();
     }
 }

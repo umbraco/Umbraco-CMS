@@ -50,12 +50,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="item in vm.filtered = (vm.items | filter: { 'name': vm.filter.searchTerm })" class="cursor-pointer">
+              <tr ng-repeat="item in vm.filtered = (vm.items | filter: { 'name': vm.filter.searchTerm })" ng-click="vm.clickItem(item.id)" class="cursor-pointer">
                 <th>
-                  <button type="button" ng-style="item.style" class="btn-reset bold" ng-click="vm.clickItem(item.id)">{{item.name}}</button>
+                  <span ng-style="item.style" class="bold">{{item.name}}</span>
                 </th>
                 <td ng-repeat="column in item.translations | orderBy:'displayName'">
-                  <button type="button" class="btn-reset" ng-click="vm.clickItem(item.id)">
+                  <div>
                     <umb-icon icon="{{ column.hasTranslation ? 'icon-check' : 'icon-alert' }}"
                               class="{{ column.hasTranslation ? 'color-green' : 'color-red' }}">
                     </umb-icon>
@@ -63,7 +63,7 @@
                       <localize ng-if="column.hasTranslation" key="visuallyHiddenTexts_hasTranslation">Has translation</localize>
                       <localize ng-if="!column.hasTranslation" key="visuallyHiddenTexts_noTranslation">Missing translation</localize>
                     </span>
-                  </button>
+                  </div>
                 </td>
               </tr>
             </tbody>

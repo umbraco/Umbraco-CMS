@@ -2,7 +2,6 @@
 <Project>
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>11.0</LangVersion>
     <Company>Umbraco HQ</Company>
     <Authors>Umbraco</Authors>
     <Copyright>Copyright © Umbraco $([System.DateTime]::Today.ToString('yyyy'))</Copyright>
@@ -17,6 +16,7 @@
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
   </PropertyGroup>
 
   <!-- SourceLink -->
@@ -35,18 +35,22 @@
     <EnableStrictModeForCompatibleTfms>true</EnableStrictModeForCompatibleTfms>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" PrivateAssets="all" IsImplicitlyDefined="true" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507" PrivateAssets="all" IsImplicitlyDefined="true" />
-    <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" IsImplicitlyDefined="true" />
-    <PackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" PrivateAssets="all" IsImplicitlyDefined="true" />
-  </ItemGroup>
+  <!-- Calculate version only once for the whole repository -->
+  <PropertyGroup>
+    <GitVersionBaseDirectory>$(MSBuildThisFileDirectory)</GitVersionBaseDirectory>
+  </PropertyGroup>
 
+  <!-- Include icon in generated NuGet packages -->
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <GitVersionBaseDirectory>$(MSBuildThisFileDirectory)</GitVersionBaseDirectory>
-  </PropertyGroup>
+  <!-- Use version range on project references (to limit on major version in generated packages) -->
+  <Target Name="_GetProjectReferenceVersionRanges" AfterTargets="_GetProjectReferenceVersions">
+    <ItemGroup>
+      <_ProjectReferencesWithVersions Condition="'%(ProjectVersion)' != ''">
+        <ProjectVersion>[%(ProjectVersion), $([MSBuild]::Add($([System.Text.RegularExpressions.Regex]::Match('%(ProjectVersion)', '^\d+').Value), 1)))</ProjectVersion>
+      </_ProjectReferencesWithVersions>
+    </ItemGroup>
+  </Target>
 </Project>

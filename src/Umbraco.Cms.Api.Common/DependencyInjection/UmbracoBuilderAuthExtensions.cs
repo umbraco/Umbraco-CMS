@@ -4,7 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
@@ -12,7 +14,7 @@ public static class UmbracoBuilderAuthExtensions
 {
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
-        if (builder.Services.Any(x=>x.ImplementationType == typeof(OpenIddictCleanup)) is false)
+        if (builder.Services.Any(x=>x.ImplementationType == typeof(OpenIddictCleanupJob)) is false)
         {
             ConfigureOpenIddict(builder);
         }
@@ -40,8 +42,8 @@ public static class UmbracoBuilderAuthExtensions
                         Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
                         Paths.BackOfficeApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetRevocationEndpointUris(
-                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
+                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
 
                 // Enable authorization code flow with PKCE
                 options
@@ -102,6 +104,6 @@ public static class UmbracoBuilderAuthExtensions
                 options.UseDataProtection();
             });
 
-        builder.Services.AddHostedService<OpenIddictCleanup>();
+        builder.Services.AddRecurringBackgroundJob<OpenIddictCleanupJob>();
     }
 }

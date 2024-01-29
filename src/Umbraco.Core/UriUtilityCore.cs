@@ -1,4 +1,4 @@
-﻿using Umbraco.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core;
 
@@ -6,7 +6,7 @@ public static class UriUtilityCore
 {
     #region Uri string utilities
 
-    public static bool HasScheme(string uri) => uri.IndexOf("://") > 0;
+    public static bool HasScheme(string uri) => uri.IndexOf("://", StringComparison.InvariantCulture) > 0;
 
     public static string StartWithScheme(string uri) => StartWithScheme(uri, null);
 
