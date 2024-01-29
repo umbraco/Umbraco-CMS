@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Install;
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Install;
 [RequireRuntimeLevel(RuntimeLevel.Install)]
 public abstract class InstallControllerBase : ManagementApiControllerBase
 {
-    protected IActionResult InstallOperationResult(InstallOperationStatus status) =>
+    protected IActionResult InstallOperationResult(InstallOperationStatus status, InstallationResult? result = null) =>
         status switch
         {
             InstallOperationStatus.Success => Ok(),
@@ -35,6 +36,10 @@ public abstract class InstallControllerBase : ManagementApiControllerBase
             InstallOperationStatus.DatabaseConnectionFailed => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid database configuration")
                 .WithDetail("Could not connect to the database.")
+                .Build()),
+            InstallOperationStatus.InstallFailed => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Install failed")
+                .WithDetail(result?.ErrorMessage ?? "An unknown error occurred.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown install operation status.")

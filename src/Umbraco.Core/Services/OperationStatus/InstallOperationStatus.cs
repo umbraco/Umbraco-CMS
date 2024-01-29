@@ -7,4 +7,5 @@ public enum InstallOperationStatus
     MissingConnectionString,
     MissingProviderName,
     DatabaseConnectionFailed,
+    InstallFailed,
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.Installer;
 
@@ -21,7 +22,7 @@ public class InstallService : IInstallService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<InstallationResult?>> InstallAsync(InstallData model)
+    public async Task<Attempt<InstallationResult?, InstallOperationStatus>> InstallAsync(InstallData model)
     {
         if (_runtimeState.Level != RuntimeLevel.Install)
         {
@@ -31,7 +32,9 @@ public class InstallService : IInstallService
         try
         {
             Attempt<InstallationResult?> result = await RunStepsAsync(model);
-            return result;
+            return result.Success
+                ? Attempt.SucceedWithStatus(InstallOperationStatus.Success, result.Result)
+                : Attempt.FailWithStatus(InstallOperationStatus.InstallFailed, result.Result);
         }
         catch (Exception exception)
         {

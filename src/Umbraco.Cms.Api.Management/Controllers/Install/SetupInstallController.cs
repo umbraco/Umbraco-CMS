@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Services.Installer;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Install;
 
@@ -29,8 +31,8 @@ public class SetupInstallController : InstallControllerBase
     public async Task<IActionResult> Setup(InstallRequestModel installData)
     {
         InstallData data = _mapper.Map<InstallData>(installData)!;
-        await _installService.InstallAsync(data);
+        Attempt<InstallationResult?, InstallOperationStatus> result = await _installService.InstallAsync(data);
 
-        return Ok();
+        return InstallOperationResult(result.Status, result.Result);
     }
 }
