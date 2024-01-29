@@ -19,7 +19,6 @@ export class UmbPartialViewTreeRepository
 			unique: null,
 			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			name: 'Partial Views',
-			icon: 'icon-folder',
 			hasChildren: true,
 			isFolder: true,
 		};

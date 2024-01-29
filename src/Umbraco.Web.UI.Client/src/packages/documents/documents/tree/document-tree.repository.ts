@@ -19,7 +19,6 @@ export class UmbDocumentTreeRepository
 			unique: null,
 			entityType: UMB_DOCUMENT_ROOT_ENTITY_TYPE,
 			name: 'Documents',
-			icon: 'icon-folder',
 			hasChildren: true,
 			isFolder: true,
 		};

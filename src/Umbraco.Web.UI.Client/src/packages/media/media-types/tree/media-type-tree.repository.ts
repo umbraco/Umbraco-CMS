@@ -19,7 +19,6 @@ export class UmbMediaTypeTreeRepository
 			unique: null,
 			entityType: UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Media Types',
-			icon: 'icon-folder',
 			hasChildren: true,
 			isFolder: true,
 		};
