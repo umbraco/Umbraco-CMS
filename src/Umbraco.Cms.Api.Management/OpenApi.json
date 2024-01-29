@@ -24127,7 +24127,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
                 }
               ]
             }
@@ -24175,7 +24175,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
                 }
               ]
             }
@@ -24255,7 +24255,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
                 }
               ]
             }
@@ -24484,6 +24484,23 @@
             "$ref": "#/components/schemas/ValueModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "DocumentVariantItemResponseModel": {
+        "required": [
+          "state"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/ContentStateModel"
+          }
+        },
         "additionalProperties": false
       },
       "DocumentVariantRequestModel": {
@@ -29852,9 +29869,17 @@
         "additionalProperties": false
       },
       "VariantItemResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantItemResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "VariantItemResponseModelBaseModel": {
         "required": [
-          "name",
-          "state"
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -29864,9 +29889,6 @@
           "culture": {
             "type": "string",
             "nullable": true
-          },
-          "state": {
-            "$ref": "#/components/schemas/ContentStateModel"
           }
         },
         "additionalProperties": false

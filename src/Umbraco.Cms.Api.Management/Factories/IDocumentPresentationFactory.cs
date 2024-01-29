@@ -16,7 +16,7 @@ public interface IDocumentPresentationFactory
 
     DocumentBlueprintResponseModel CreateBlueprintItemResponseModel(IDocumentEntitySlim entity);
 
-    IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity);
+    IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity);
 
     DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity);
 }

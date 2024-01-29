@@ -12,5 +12,5 @@ public class DocumentItemResponseModel : ItemResponseModelBase
 
     public DocumentTypeReferenceResponseModel DocumentType { get; set; } = new();
 
-    public IEnumerable<VariantItemResponseModel> Variants { get; set; } = Enumerable.Empty<VariantItemResponseModel>();
+    public IEnumerable<DocumentVariantItemResponseModel> Variants { get; set; } = Enumerable.Empty<DocumentVariantItemResponseModel>();
 }

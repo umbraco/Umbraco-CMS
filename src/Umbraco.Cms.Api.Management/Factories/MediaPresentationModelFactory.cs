@@ -80,7 +80,6 @@ internal sealed class MediaPresentationModelFactory
             new VariantItemResponseModel
             {
                 Name = entity.Name ?? string.Empty,
-                State = ContentState.Published,
                 Culture = null
             }
         };

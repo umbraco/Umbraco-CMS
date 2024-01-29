@@ -87,7 +87,7 @@ internal sealed class DocumentPresentationFactory
         return responseModel;
     }
 
-    public IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity)
+    public IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity)
     {
         if (entity.Variations.VariesByCulture() is false)
         {
