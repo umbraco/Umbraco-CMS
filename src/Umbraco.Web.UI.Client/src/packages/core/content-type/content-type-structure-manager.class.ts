@@ -454,17 +454,17 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	rootContainers(containerType: PropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
-			return data.filter((x) => x.parent?.id === null && x.type === containerType);
+			return data.filter((x) => x.parent === null && x.type === containerType);
 		});
 	}
 
 	getRootContainers(containerType: PropertyContainerTypes) {
-		return this.#containers.getValue().filter((x) => x.parent?.id === null && x.type === containerType);
+		return this.#containers.getValue().filter((x) => x.parent === null && x.type === containerType);
 	}
 
 	hasRootContainers(containerType: PropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
-			return data.filter((x) => x.parent?.id === null && x.type === containerType).length > 0;
+			return data.filter((x) => x.parent === null && x.type === containerType).length > 0;
 		});
 	}
 
@@ -473,7 +473,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	}
 
 	getOwnerContainers(containerType: PropertyContainerTypes, parentId: string | null = null) {
-		return this.getOwnerContentType()?.containers?.filter((x) => x.parent?.id === parentId && x.type === containerType);
+		return this.getOwnerContentType()?.containers?.filter((x) =>
+			parentId ? x.parent?.id === parentId : x.parent === null && x.type === containerType,
+		);
 	}
 
 	isOwnerContainer(containerId: string) {
