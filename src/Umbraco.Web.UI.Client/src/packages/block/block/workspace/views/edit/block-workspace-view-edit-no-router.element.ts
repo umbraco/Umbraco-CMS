@@ -39,7 +39,6 @@ export class UmbBlockWorkspaceViewEditNoRouterElement extends UmbLitElement impl
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._workspaceContext = workspaceContext;
-			console.log('workspaceContext.content.structure', workspaceContext.content.structure);
 			this._tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
 			this._observeRootGroups();
 		});

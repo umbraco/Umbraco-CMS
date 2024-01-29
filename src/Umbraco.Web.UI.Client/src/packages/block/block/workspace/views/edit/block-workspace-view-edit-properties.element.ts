@@ -1,35 +1,45 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
+import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	PropertyContainerTypes,
 	// UmbPropertyTypeBasedPropertyElement,
-	UmbContentTypeModel} from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbContentTypePropertyStructureHelper
+	UmbContentTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
+	@property({ attribute: false })
+	public get managerName(): UmbBlockWorkspaceElementManagerNames | undefined {
+		return this.#managerName;
+	}
+	public set managerName(value: UmbBlockWorkspaceElementManagerNames | undefined) {
+		this.#managerName = value;
+		this.#setStructureManager();
+	}
+	#managerName?: UmbBlockWorkspaceElementManagerNames;
+	#blockWorkspace?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
+
 	@property({ type: String, attribute: 'container-name', reflect: false })
 	public get containerName(): string | undefined {
-		return this._propertyStructureHelper.getContainerName();
+		return this.#propertyStructureHelper.getContainerName();
 	}
 	public set containerName(value: string | undefined) {
-		this._propertyStructureHelper.setContainerName(value);
+		this.#propertyStructureHelper.setContainerName(value);
 	}
 
 	@property({ type: String, attribute: 'container-type', reflect: false })
 	public get containerType(): PropertyContainerTypes | undefined {
-		return this._propertyStructureHelper.getContainerType();
+		return this.#propertyStructureHelper.getContainerType();
 	}
 	public set containerType(value: PropertyContainerTypes | undefined) {
-		this._propertyStructureHelper.setContainerType(value);
+		this.#propertyStructureHelper.setContainerType(value);
 	}
-
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
 	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
@@ -38,11 +48,21 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._propertyStructureHelper.setStructureManager(workspaceContext.content.structure);
+			this.#blockWorkspace = workspaceContext;
+			this.#setStructureManager();
 		});
-		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
-			this._propertyStructure = propertyStructure;
-		});
+	}
+
+	#setStructureManager() {
+		if (!this.#blockWorkspace || !this.#managerName) return;
+		this.#propertyStructureHelper.setStructureManager(this.#blockWorkspace[this.#managerName].structure);
+		this.observe(
+			this.#propertyStructureHelper.propertyStructure,
+			(propertyStructure) => {
+				this._propertyStructure = propertyStructure;
+			},
+			'observePropertyStructure',
+		);
 	}
 
 	render() {
