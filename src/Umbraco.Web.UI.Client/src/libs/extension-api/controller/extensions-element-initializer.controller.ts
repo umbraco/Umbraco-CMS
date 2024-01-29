@@ -27,7 +27,7 @@ export class UmbExtensionsElementInitializer<
 > {
 	//
 	#extensionRegistry;
-	private _defaultElement?: string;
+	#defaultElement?: string;
 	#props?: Record<string, unknown>;
 
 	public get properties() {
@@ -50,7 +50,7 @@ export class UmbExtensionsElementInitializer<
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
 		this.#extensionRegistry = extensionRegistry;
-		this._defaultElement = defaultElement;
+		this.#defaultElement = defaultElement;
 		this._init();
 	}
 
@@ -60,7 +60,7 @@ export class UmbExtensionsElementInitializer<
 			this.#extensionRegistry,
 			manifest.alias,
 			this._extensionChanged,
-			this._defaultElement,
+			this.#defaultElement,
 		) as ControllerType;
 
 		extController.properties = this.#props;
