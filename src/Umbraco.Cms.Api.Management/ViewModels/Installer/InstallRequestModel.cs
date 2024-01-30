@@ -4,13 +4,13 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Installer;
 
-public class InstallVResponseModel
+public class InstallRequestModel
 {
     [Required]
-    public UserInstallResponseModel User { get; set; } = null!;
+    public UserInstallPresentationModel User { get; set; } = null!;
 
     [Required]
-    public DatabaseInstallResponseModel Database { get; set; } = null!;
+    public DatabaseInstallPresentationModel Database { get; set; } = null!;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TelemetryLevel TelemetryLevel { get; set; } = TelemetryLevel.Basic;

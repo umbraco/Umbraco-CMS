@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Installer;
 
-public class UserSettingsViewModel
+public class UserSettingsPresentationModel
 {
     public int MinCharLength { get; set; }
 

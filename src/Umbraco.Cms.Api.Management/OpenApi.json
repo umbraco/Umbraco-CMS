@@ -7207,26 +7207,6 @@
         ],
         "operationId": "GetInstallSettings",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "428": {
             "description": "Client Error",
             "content": {
@@ -7294,7 +7274,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/InstallVResponseModel"
+                    "$ref": "#/components/schemas/InstallRequestModel"
                   }
                 ]
               }
@@ -7303,7 +7283,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/InstallVResponseModel"
+                    "$ref": "#/components/schemas/InstallRequestModel"
                   }
                 ]
               }
@@ -7312,7 +7292,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/InstallVResponseModel"
+                    "$ref": "#/components/schemas/InstallRequestModel"
                   }
                 ]
               }
@@ -7320,26 +7300,6 @@
           }
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "428": {
             "description": "Client Error",
             "content": {
@@ -7378,7 +7338,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DatabaseInstallResponseModel"
+                    "$ref": "#/components/schemas/DatabaseInstallRequestModel"
                   }
                 ]
               }
@@ -7387,7 +7347,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DatabaseInstallResponseModel"
+                    "$ref": "#/components/schemas/DatabaseInstallRequestModel"
                   }
                 ]
               }
@@ -7396,7 +7356,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DatabaseInstallResponseModel"
+                    "$ref": "#/components/schemas/DatabaseInstallRequestModel"
                   }
                 ]
               }
@@ -23764,7 +23724,7 @@
         },
         "additionalProperties": false
       },
-      "DatabaseInstallResponseModel": {
+      "DatabaseInstallPresentationModel": {
         "required": [
           "id",
           "providerName",
@@ -23808,6 +23768,15 @@
             "type": "boolean"
           }
         },
+        "additionalProperties": false
+      },
+      "DatabaseInstallRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DatabaseInstallPresentationModel"
+          }
+        ],
         "additionalProperties": false
       },
       "DatabaseSettingsPresentationModel": {
@@ -25325,6 +25294,37 @@
         },
         "additionalProperties": false
       },
+      "InstallRequestModel": {
+        "required": [
+          "database",
+          "telemetryLevel",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UserInstallPresentationModel"
+              }
+            ]
+          },
+          "database": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DatabaseInstallPresentationModel"
+              },
+              {
+                "$ref": "#/components/schemas/DatabaseInstallRequestModel"
+              }
+            ]
+          },
+          "telemetryLevel": {
+            "$ref": "#/components/schemas/TelemetryLevelModel"
+          }
+        },
+        "additionalProperties": false
+      },
       "InstallSettingsResponseModel": {
         "required": [
           "databases",
@@ -25335,7 +25335,7 @@
           "user": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/UserSettingsModel"
+                "$ref": "#/components/schemas/UserSettingsPresentationModel"
               }
             ]
           },
@@ -25348,34 +25348,6 @@
                 }
               ]
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "InstallVResponseModel": {
-        "required": [
-          "database",
-          "telemetryLevel",
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "user": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/UserInstallResponseModel"
-              }
-            ]
-          },
-          "database": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/DatabaseInstallResponseModel"
-              }
-            ]
-          },
-          "telemetryLevel": {
-            "$ref": "#/components/schemas/TelemetryLevelModel"
           }
         },
         "additionalProperties": false
@@ -29563,7 +29535,7 @@
         },
         "additionalProperties": false
       },
-      "UserInstallResponseModel": {
+      "UserInstallPresentationModel": {
         "required": [
           "email",
           "name",
@@ -29766,7 +29738,7 @@
         },
         "additionalProperties": false
       },
-      "UserSettingsModel": {
+      "UserSettingsPresentationModel": {
         "required": [
           "consentLevels",
           "minCharLength",

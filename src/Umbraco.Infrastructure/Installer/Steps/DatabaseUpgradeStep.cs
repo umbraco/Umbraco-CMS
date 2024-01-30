@@ -1,17 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
 namespace Umbraco.Cms.Infrastructure.Installer.Steps;
 
-public class DatabaseUpgradeStep : IInstallStep, IUpgradeStep
+public class DatabaseUpgradeStep : StepBase, IInstallStep, IUpgradeStep
 {
     private readonly DatabaseBuilder _databaseBuilder;
     private readonly IRuntimeState _runtime;
@@ -33,11 +31,11 @@ public class DatabaseUpgradeStep : IInstallStep, IUpgradeStep
         _keyValueService = keyValueService;
     }
 
-    public Task ExecuteAsync(InstallData _) => Execute();
+    public Task<Attempt<InstallationResult>> ExecuteAsync(InstallData _) => ExecuteInternalAsync();
 
-    public Task ExecuteAsync() => Execute();
+    public Task<Attempt<InstallationResult>> ExecuteAsync() => ExecuteInternalAsync();
 
-    private Task Execute()
+    private Task<Attempt<InstallationResult>> ExecuteInternalAsync()
     {
         _logger.LogInformation("Running 'Upgrade' service");
 
@@ -48,10 +46,10 @@ public class DatabaseUpgradeStep : IInstallStep, IUpgradeStep
 
         if (result?.Success == false)
         {
-            throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
+            return Task.FromResult(FailWithMessage("The database failed to upgrade. ERROR: " + result.Message));
         }
 
-        return Task.CompletedTask;
+        return Task.FromResult(Success());
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData model) => ShouldExecute();
