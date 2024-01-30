@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 
@@ -14,12 +14,12 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IRuntimeState _runtimeState;
     private readonly Uri? _backOfficeHost;
-    private readonly string? _authorizeCallbackPathName;
+    private readonly string _authorizeCallbackPathName;
 
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
-        IOptions<NewBackOfficeSettings> securitySettings,
+        IOptions<SecuritySettings> securitySettings,
         IRuntimeState runtimeState)
         : base(applicationManager)
     {
@@ -42,24 +42,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
 
         await CreateOrUpdate(
-            new OpenIddictApplicationDescriptor
-            {
-                DisplayName = "Umbraco back-office access",
-                ClientId = Constants.OAuthClientIds.BackOffice,
-                RedirectUris =
-                {
-                    CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco")
-                },
-                Type = OpenIddictConstants.ClientTypes.Public,
-                Permissions =
-                {
-                    OpenIddictConstants.Permissions.Endpoints.Authorization,
-                    OpenIddictConstants.Permissions.Endpoints.Token,
-                    OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                    OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                    OpenIddictConstants.Permissions.ResponseTypes.Code
-                }
-            },
+            BackofficeOpenIddictApplicationDescriptor(backOfficeUrl),
             cancellationToken);
 
         if (_webHostEnvironment.IsProduction())
@@ -111,5 +94,33 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
     }
 
-    private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri( $"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
+    public OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl) =>
+        new()
+        {
+            DisplayName = "Umbraco back-office access",
+            ClientId = Constants.OAuthClientIds.BackOffice,
+            RedirectUris =
+            {
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
+            },
+            Type = OpenIddictConstants.ClientTypes.Public,
+            PostLogoutRedirectUris =
+            {
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName + "/login"),
+                // FIXME: remove when we no longer use Umbraco.Web.UI project
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
+            },
+            Permissions =
+            {
+                OpenIddictConstants.Permissions.Endpoints.Authorization,
+                OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.Endpoints.Logout,
+                OpenIddictConstants.Permissions.Endpoints.Revocation,
+                OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                OpenIddictConstants.Permissions.ResponseTypes.Code
+            }
+        };
+
+    private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri($"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
 }

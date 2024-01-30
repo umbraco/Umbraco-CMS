@@ -1,7 +1,10 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Language;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Language;
 
 public class LanguageModelBase
 {
+    [Required]
     public string Name { get; set; } = string.Empty;
 
     public bool IsDefault { get; set; }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -22,6 +23,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security;
 public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUser>, IBackOfficeSignInManager
 {
     private readonly IEventAggregator _eventAggregator;
+    private readonly IOptions<BackOfficeAuthenticationTypeSettings> _backOfficeAuthenticationTypeSettings;
     private readonly IBackOfficeExternalLoginProviders _externalLogins;
     private readonly GlobalSettings _globalSettings;
     private readonly BackOfficeUserManager _userManager;
@@ -37,16 +39,19 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<BackOfficeIdentityUser> confirmation,
         IEventAggregator eventAggregator,
-        IOptions<SecuritySettings> securitySettings)
-        : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, securitySettings)
+        IOptions<SecuritySettings> securitySettings,
+        IOptions<BackOfficeAuthenticationTypeSettings> backOfficeAuthenticationTypeSettings,
+        IRequestCache requestCache)
+        : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, securitySettings, requestCache)
     {
         _userManager = userManager;
         _externalLogins = externalLogins;
         _eventAggregator = eventAggregator;
+        _backOfficeAuthenticationTypeSettings = backOfficeAuthenticationTypeSettings;
         _globalSettings = globalSettings.Value;
     }
 
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
+    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V15.")]
     public BackOfficeSignInManager(
         BackOfficeUserManager userManager,
         IHttpContextAccessor contextAccessor,
@@ -57,7 +62,8 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         ILogger<SignInManager<BackOfficeIdentityUser>> logger,
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<BackOfficeIdentityUser> confirmation,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IOptions<SecuritySettings> securitySettings)
         : this(
             userManager,
             contextAccessor,
@@ -69,44 +75,20 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
             schemes,
             confirmation,
             eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+            securitySettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<BackOfficeAuthenticationTypeSettings>>(),
+            StaticServiceProvider.Instance.GetRequiredService<IRequestCache>()
+        )
     {
     }
 
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
-    public BackOfficeSignInManager(
-        BackOfficeUserManager userManager,
-        IHttpContextAccessor contextAccessor,
-        IBackOfficeExternalLoginProviders externalLogins,
-        IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        IOptions<GlobalSettings> globalSettings,
-        ILogger<SignInManager<BackOfficeIdentityUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<BackOfficeIdentityUser> confirmation)
-        : this(
-            userManager,
-            contextAccessor,
-            externalLogins,
-            claimsFactory,
-            optionsAccessor,
-            globalSettings,
-            logger,
-            schemes,
-            confirmation,
-            StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
-    {
-    }
+    protected override string AuthenticationType => _backOfficeAuthenticationTypeSettings.Value.AuthenticationType;
 
-    protected override string AuthenticationType => Constants.Security.BackOfficeAuthenticationType;
+    protected override string ExternalAuthenticationType => _backOfficeAuthenticationTypeSettings.Value.ExternalAuthenticationType;
 
-    protected override string ExternalAuthenticationType => Constants.Security.BackOfficeExternalAuthenticationType;
+    protected override string TwoFactorAuthenticationType => _backOfficeAuthenticationTypeSettings.Value.TwoFactorAuthenticationType;
 
-    protected override string TwoFactorAuthenticationType => Constants.Security.BackOfficeTwoFactorAuthenticationType;
-
-    protected override string TwoFactorRememberMeAuthenticationType =>
-        Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType;
+    protected override string TwoFactorRememberMeAuthenticationType =>_backOfficeAuthenticationTypeSettings.Value.TwoFactorRememberMeAuthenticationType;
 
     /// <summary>
     ///     Custom ExternalLoginSignInAsync overload for handling external sign in with auto-linking

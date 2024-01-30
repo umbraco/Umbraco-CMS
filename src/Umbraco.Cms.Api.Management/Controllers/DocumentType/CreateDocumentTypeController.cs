@@ -40,7 +40,7 @@ public class CreateDocumentTypeController : DocumentTypeControllerBase
         Attempt<IContentType?, ContentTypeOperationStatus> result = await _contentTypeEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDocumentTypeController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            ? CreatedAtId<ByKeyDocumentTypeController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : OperationStatusResult(result.Status);
     }
 }

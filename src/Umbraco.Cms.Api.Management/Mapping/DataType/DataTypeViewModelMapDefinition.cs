@@ -30,8 +30,8 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
         target.Id = source.Key;
         target.ParentId = _dataTypeService.GetContainer(source.ParentId)?.Key;
         target.Name = source.Name ?? string.Empty;
-        target.PropertyEditorAlias = source.EditorAlias;
-        target.PropertyEditorUiAlias = source.EditorUiAlias;
+        target.EditorAlias = source.EditorAlias;
+        target.EditorUiAlias = source.EditorUiAlias;
 
         IConfigurationEditor? configurationEditor = source.Editor?.GetConfigurationEditor();
         IDictionary<string, object> configuration = configurationEditor?.ToConfigurationEditor(source.ConfigurationData)

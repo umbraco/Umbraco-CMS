@@ -1,15 +1,18 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiController]
 [VersionedApiBackOfficeRoute("security")]
 [ApiExplorerSettings(GroupName = "Security")]
+[Authorize(Policy = "New" + AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public abstract class SecurityControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserOperationStatusResult(UserOperationStatus status, ErrorMessageResult? errorMessageResult = null) =>

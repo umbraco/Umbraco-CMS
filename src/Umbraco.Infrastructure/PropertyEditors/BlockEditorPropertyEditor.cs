@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -14,14 +15,12 @@ public abstract class BlockEditorPropertyEditor : BlockListPropertyEditorBase
     public const string ContentTypeKeyPropertyKey = "contentTypeKey";
     public const string UdiPropertyKey = "udi";
 
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 15.")]
     protected BlockEditorPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        PropertyEditorCollection propertyEditors)
-        : this(
-            dataValueEditorFactory,
-            propertyEditors,
-            StaticServiceProvider.Instance.GetRequiredService<IBlockValuePropertyIndexValueFactory>())
+        PropertyEditorCollection propertyEditors,
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+        : this(dataValueEditorFactory, propertyEditors, blockValuePropertyIndexValueFactory, DependencyInjection.StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
     {
 
     }
@@ -29,8 +28,9 @@ public abstract class BlockEditorPropertyEditor : BlockListPropertyEditorBase
     protected BlockEditorPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         PropertyEditorCollection propertyEditors,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
-        : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory)
+        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
+        IJsonSerializer jsonSerializer)
+        : base(dataValueEditorFactory, blockValuePropertyIndexValueFactory, jsonSerializer)
     {
         PropertyEditors = propertyEditors;
     }

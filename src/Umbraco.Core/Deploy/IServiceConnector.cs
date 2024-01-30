@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Core.Deploy;
 /// <summary>
 /// Connects to an Umbraco service.
 /// </summary>
-/// <seealso cref="Umbraco.Cms.Core.Composing.IDiscoverable" />
 public interface IServiceConnector : IDiscoverable
 {
     /// <summary>

@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Services.Paging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Content;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 
-public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerBase
+public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
     where TItem : RecycleBinItemResponseModel, new()
 {
     private readonly IEntityService _entityService;
@@ -76,6 +79,18 @@ public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerB
 
         return viewModel;
     }
+
+    protected IActionResult OperationStatusResult(OperationResult result) =>
+        result.Result switch
+        {
+            OperationResultType.FailedCancelledByEvent => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cancelled by notification")
+                .WithDetail("A notification handler prevented the operation.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown operation status.")
+                .Build()),
+        };
 
     private IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {

@@ -10,9 +10,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Handles nested Udi keys when
+/// - saving: Empty keys get generated
+/// - copy: keys get replaced by new ones while keeping references intact
+/// - scaffolding: keys get replaced by new ones while keeping references intact
+/// </summary>
 public abstract class ComplexPropertyEditorContentNotificationHandler :
     INotificationHandler<ContentSavingNotification>,
-    INotificationHandler<ContentCopyingNotification>
+    INotificationHandler<ContentCopyingNotification>,
+    INotificationHandler<ContentScaffoldedNotification>
 {
     protected abstract string EditorAlias { get; }
 
@@ -29,6 +36,12 @@ public abstract class ComplexPropertyEditorContentNotificationHandler :
             IEnumerable<IProperty> props = entity.GetPropertiesByEditor(EditorAlias);
             UpdatePropertyValues(props, true);
         }
+    }
+
+    public void Handle(ContentScaffoldedNotification notification)
+    {
+        IEnumerable<IProperty> props = notification.Scaffold.GetPropertiesByEditor(EditorAlias);
+        UpdatePropertyValues(props, false);
     }
 
     protected abstract string FormatPropertyValue(string rawJson, bool onlyMissingKeys);

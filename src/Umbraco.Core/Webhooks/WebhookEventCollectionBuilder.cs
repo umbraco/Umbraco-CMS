@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Webhooks.Events;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;
 
-public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<WebhookEventCollectionBuilder, WebhookEventCollection, IWebhookEvent>
+public class WebhookEventCollectionBuilder : SetCollectionBuilderBase<WebhookEventCollectionBuilder, WebhookEventCollection, IWebhookEvent>
 {
     protected override WebhookEventCollectionBuilder This => this;
 
@@ -21,30 +21,20 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         base.RegisterWith(services);
     }
 
-    public WebhookEventCollectionBuilder AddCoreWebhooks()
-    {
-        Append<ContentDeleteWebhookEvent>();
-        Append<ContentPublishWebhookEvent>();
-        Append<ContentUnpublishWebhookEvent>();
-        Append<MediaDeleteWebhookEvent>();
-        Append<MediaSaveWebhookEvent>();
-        return this;
-    }
-
     private void RegisterTypes(IServiceCollection services)
     {
         Type[] types = GetRegisteringTypes(GetTypes()).ToArray();
 
-        // ensure they are safe
+        // Ensure they are safe
         foreach (Type type in types)
         {
             EnsureType(type, "register");
         }
 
+        // Register all webhooks as notification handlers
         foreach (Type type in types)
         {
             Type? notificationType = GetNotificationType(type);
-
             if (notificationType is null)
             {
                 continue;
@@ -55,27 +45,12 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
                 type,
                 ServiceLifetime.Transient);
 
-            if (!services.Contains(descriptor))
-            {
-                services.Add(descriptor);
-            }
+            services.TryAddEnumerable(descriptor);
         }
     }
 
     private Type? GetNotificationType(Type handlerType)
-    {
-        if (handlerType.IsOfGenericType(typeof(INotificationAsyncHandler<>)))
-        {
-            Type[] genericArguments = handlerType.BaseType!.GetGenericArguments();
-
-            Type? notificationType = genericArguments.FirstOrDefault(arg => typeof(INotification).IsAssignableFrom(arg));
-
-            if (notificationType is not null)
-            {
-                return notificationType;
-            }
-        }
-
-        return null;
-    }
+        => handlerType.TryGetGenericArguments(typeof(INotificationAsyncHandler<>), out Type[]? genericArguments)
+        ? genericArguments.FirstOrDefault(arg => typeof(INotification).IsAssignableFrom(arg))
+        : null;
 }

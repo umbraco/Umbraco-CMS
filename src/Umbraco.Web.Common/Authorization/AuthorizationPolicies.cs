@@ -23,6 +23,7 @@ public static class AuthorizationPolicies
     public const string ContentPermissionProtectById = nameof(ContentPermissionProtectById);
     public const string ContentPermissionBrowseById = nameof(ContentPermissionBrowseById);
     public const string ContentPermissionDeleteById = nameof(ContentPermissionDeleteById);
+    public const string ContentPermissionCreateBlueprintFromId = nameof(ContentPermissionCreateBlueprintFromId);
 
     public const string MediaPermissionByResource = nameof(MediaPermissionByResource);
     public const string MediaPermissionPathById = nameof(MediaPermissionPathById);
@@ -70,6 +71,9 @@ public static class AuthorizationPolicies
     public const string TreeAccessMembersOrMemberTypes = nameof(TreeAccessMembersOrMemberTypes);
     public const string TreeAccessAnySchemaTypes = nameof(TreeAccessAnySchemaTypes);
     public const string TreeAccessDictionaryOrTemplates = nameof(TreeAccessDictionaryOrTemplates);
+
+    // other
+    public const string DictionaryPermissionByResource = nameof(DictionaryPermissionByResource);
 
     /// <summary>
     ///     Defines access based on if the user has access to any tree's exposing any types of content (documents, media,

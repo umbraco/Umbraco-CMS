@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -15,7 +16,7 @@ public interface IUserGroupPermissionService
     /// <param name="userGroupKey">The identifier of the user group to check for access.</param>
     /// <returns>A task resolving into a <see cref="UserGroupAuthorizationStatus"/>.</returns>
     Task<UserGroupAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid userGroupKey)
-        => AuthorizeAccessAsync(user, new[] { userGroupKey });
+        => AuthorizeAccessAsync(user, userGroupKey.Yield());
 
     /// <summary>
     ///     Authorize that a user belongs to user groups.

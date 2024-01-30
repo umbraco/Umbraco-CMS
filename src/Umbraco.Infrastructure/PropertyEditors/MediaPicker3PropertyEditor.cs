@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.MediaPicker3,
-    EditorType.PropertyValue | EditorType.MacroParameter,
+    EditorType.PropertyValue,
     "Media Picker",
     "mediapicker3",
     ValueType = ValueTypes.Json,

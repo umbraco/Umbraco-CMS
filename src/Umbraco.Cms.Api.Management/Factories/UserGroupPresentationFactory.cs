@@ -31,7 +31,10 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     public async Task<UserGroupResponseModel> CreateAsync(IUserGroup userGroup)
     {
         Guid? contentStartNodeKey = GetKeyFromId(userGroup.StartContentId, UmbracoObjectTypes.Document);
+        var contentRootAccess = contentStartNodeKey is null && userGroup.StartContentId == Constants.System.Root;
         Guid? mediaStartNodeKey = GetKeyFromId(userGroup.StartMediaId, UmbracoObjectTypes.Media);
+        var mediaRootAccess = mediaStartNodeKey is null && userGroup.StartMediaId == Constants.System.Root;
+
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
         // We've gotten this data from the database, so the mapping should not fail
@@ -45,7 +48,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Name = userGroup.Name ?? string.Empty,
             Id = userGroup.Key,
             DocumentStartNodeId = contentStartNodeKey,
+            DocumentRootAccess = contentRootAccess,
             MediaStartNodeId = mediaStartNodeKey,
+            MediaRootAccess = mediaRootAccess,
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
@@ -219,6 +224,10 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
             target.StartContentId = contentId;
         }
+        else if (source.DocumentRootAccess)
+        {
+            target.StartContentId = Constants.System.Root;
+        }
         else
         {
             target.StartContentId = null;
@@ -234,6 +243,10 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             }
 
             target.StartMediaId = mediaId;
+        }
+        else if (source.MediaRootAccess)
+        {
+            target.StartMediaId = Constants.System.Root;
         }
         else
         {

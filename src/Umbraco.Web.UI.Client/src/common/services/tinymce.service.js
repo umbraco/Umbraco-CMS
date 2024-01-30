@@ -387,8 +387,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         //create a baseline Config to extend upon
         var config = {
+          cloudApiKey: tinyMceConfig.cloudApiKey,
+          promotion: false,
           inline: modeInline,
-          plugins: plugins,
+          plugins: [...new Set(plugins)],
           custom_elements: 'umb-rte-block,~umb-rte-block-inline',
           valid_elements: tinyMceConfig.validElements,
           invalid_elements: tinyMceConfig.inValidElements,
@@ -541,10 +543,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      * @param {Object} editor the TinyMCE editor instance
      */
     createInsertEmbeddedMedia: function (editor, callback) {
-      editor.ui.registry.addButton('umbembeddialog', {
+      editor.ui.registry.addToggleButton('umbembeddialog', {
         icon: 'embed',
         tooltip: 'Embed',
-        stateSelector: 'div[data-embed-url]',
+        onSetup: function (api) {
+          const changed = editor.selection.selectorChangedWithUnbind('div[data-embed-url]', (state) =>
+            api.setActive(state)
+          );
+          return () => changed.unbind();
+        },
         onAction: function () {
 
           // Get the selected element
@@ -552,6 +559,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           var selectedElm = editor.selection.getNode();
           var nodeName = selectedElm.nodeName;
           var modify = null;
+
+          // If we have an iframe, we need to get the parent element
+          if (nodeName.toUpperCase() === "IFRAME") {
+            selectedElm = selectedElm.parentElement;
+            nodeName = selectedElm.nodeName;
+          }
 
           if (nodeName.toUpperCase() === "DIV" && selectedElm.classList.contains("embeditem")) {
             // See if we can go and get the attributes
@@ -628,10 +641,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
      * @param {Object} editor the TinyMCE editor instance
      */
     createMediaPicker: function (editor, callback) {
-      editor.ui.registry.addButton('umbmediapicker', {
+      editor.ui.registry.addToggleButton('umbmediapicker', {
         icon: 'image',
         tooltip: 'Image Picker',
-        stateSelector: 'img[data-udi]',
+        onSetup: function (api) {
+          const changed = editor.selection.selectorChangedWithUnbind('img[data-udi]', (state) =>
+            api.setActive(state)
+          );
+          return () => changed.unbind();
+        },
         onAction: function () {
 
           var selectedElm = editor.selection.getNode(),
@@ -779,10 +797,20 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         });
       });
 
-      editor.ui.registry.addButton('umbblockpicker', {
+      // Do not add any further controls if the block editor is not available
+      if (!blockEditorApi) {
+        return;
+      }
+
+      editor.ui.registry.addToggleButton('umbblockpicker', {
         icon: 'visualblocks',
         tooltip: 'Insert Block',
-        stateSelector: 'umb-rte-block[data-content-udi], umb-rte-block-inline[data-content-udi]',
+        onSetup: function (api) {
+          const changed = editor.selection.selectorChangedWithUnbind('umb-rte-block[data-content-udi], umb-rte-block-inline[data-content-udi]', (state) =>
+            api.setActive(state)
+          );
+          return () => changed.unbind();
+        },
         onAction: function () {
 
           var blockEl = editor.selection.getNode();
@@ -898,9 +926,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       }
 
       /** Adds the button instance */
-      editor.ui.registry.addButton('umbmacro', {
+      editor.ui.registry.addToggleButton('umbmacro', {
         icon: 'preferences',
         tooltip: 'Insert macro',
+        onSetup: function (api) {
+          const changed = editor.selection.selectorChangedWithUnbind('div.umb-macro-holder', (state) =>
+            api.setActive(state)
+          );
+          return () => changed.unbind();
+        },
 
         /** The insert macro button click event handler */
         onAction: function () {
@@ -1184,7 +1218,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           if (currentTarget.url.indexOf("localLink:") > 0) {
             // if the current link has an anchor, it needs to be considered when getting the udi/id
             // if an anchor exists, reduce the substring max by its length plus two to offset the removed prefix and trailing curly brace
-            var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, currentTarget.url.lastIndexOf("}"));
+            var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, currentTarget.url.indexOf("}"));
 
             //we need to check if this is an INT or a UDI
             var parsedIntId = parseInt(linkId, 10);
@@ -1205,32 +1239,47 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           });
       }
 
-      editor.ui.registry.addButton('link', {
+      editor.ui.registry.addToggleButton('link', {
         icon: 'link',
         tooltip: 'Insert/edit link',
         shortcut: 'Ctrl+K',
         onAction: createLinkList(showDialog),
-        stateSelector: 'a[href]'
+        onSetup: function (api) {
+          const changed = editor.selection.selectorChangedWithUnbind('a[href]', (state) =>
+            api.setActive(state)
+          );
+          return () => changed.unbind();
+        }
       });
 
-      editor.ui.registry.addButton('unlink', {
+      editor.ui.registry.addToggleButton('unlink', {
         icon: 'unlink',
         tooltip: 'Remove link',
         onAction: () => {
           editor.execCommand('unlink');
         },
-        stateSelector: 'a[href]'
+        onSetup: function (api) {
+          const changed = editor.selection.selectorChangedWithUnbind('a[href]', (state) =>
+            api.setActive(state)
+          );
+          return () => changed.unbind();
+        }
       });
 
       editor.addShortcut('Ctrl+K', '', createLinkList(showDialog));
       this.showDialog = showDialog;
 
-      editor.ui.registry.addMenuItem('link', {
+      editor.ui.registry.addToggleMenuItem('link', {
         icon: 'link',
         text: 'Insert link',
         shortcut: 'Ctrl+K',
         onAction: createLinkList(showDialog),
-        stateSelector: 'a[href]',
+        onSetup: function (api) {
+          const changed = editor.selection.selectorChangedWithUnbind('a[href]', (state) =>
+            api.setActive(state)
+          );
+          return () => changed.unbind();
+        },
         context: 'insert',
         prependToContext: true
       });
@@ -1436,6 +1485,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       }
 
       function initBlocks() {
+
+        if(!args.blockEditorApi) {
+          return;
+        }
 
         const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block, umb-rte-block-inline');
         for (var blockEl of blockEls) {
@@ -1706,7 +1759,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       });
 
       //Create the insert media plugin
-      self.createMediaPicker(args.editor, function (currentTarget, userData, imgDomElement) {
+      self.createMediaPicker(args.editor, function (currentTarget, userData) {
 
         var startNodeId, startNodeIsVirtual;
         if (!args.model.config.startNodeId) {
@@ -1730,7 +1783,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           startNodeIsVirtual: startNodeIsVirtual,
           dataTypeKey: args.model.dataTypeKey,
           submit: function (model) {
-            self.insertMediaInEditor(args.editor, model.selection[0], imgDomElement);
+            self.insertMediaInEditor(args.editor, model.selection[0]);
             editorService.close();
           },
           close: function () {
@@ -1741,19 +1794,21 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       });
 
 
-      //Create the insert block plugin
-      self.createBlockPicker(args.editor, args.blockEditorApi, function (currentTarget, userData, imgDomElement) {
-        args.blockEditorApi.showCreateDialog(0, false, (newBlock) => {
-          // TODO: Handle if its an array:
-          if(Utilities.isArray(newBlock)) {
-            newBlock.forEach(block => {
-              self.insertBlockInEditor(args.editor, block.layout.contentUdi, block.config.displayInline);
-            });
-          } else {
-            self.insertBlockInEditor(args.editor, newBlock.layout.contentUdi, newBlock.config.displayInline);
-          }
+      if(args.blockEditorApi) {
+        //Create the insert block plugin
+        self.createBlockPicker(args.editor, args.blockEditorApi, function (currentTarget, userData, imgDomElement) {
+          args.blockEditorApi.showCreateDialog(0, false, (newBlock) => {
+            // TODO: Handle if its an array:
+            if(Utilities.isArray(newBlock)) {
+              newBlock.forEach(block => {
+                self.insertBlockInEditor(args.editor, block.layout.contentUdi, block.config.displayInline);
+              });
+            } else {
+              self.insertBlockInEditor(args.editor, newBlock.layout.contentUdi, newBlock.config.displayInline);
+            }
+          });
         });
-      });
+      }
 
       //Create the embedded plugin
       self.createInsertEmbeddedMedia(args.editor, function (activeElement, modify) {

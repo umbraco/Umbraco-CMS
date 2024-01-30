@@ -32,6 +32,7 @@ public class ContentService : RepositoryService, IContentService
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ICultureImpactFactory _cultureImpactFactory;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -48,7 +49,8 @@ public class ContentService : RepositoryService, IContentService
     ILanguageRepository languageRepository,
     Lazy<IPropertyValidationService> propertyValidationService,
     IShortStringHelper shortStringHelper,
-    ICultureImpactFactory cultureImpactFactory)
+    ICultureImpactFactory cultureImpactFactory,
+    IUserIdKeyResolver userIdKeyResolver)
     : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -60,10 +62,11 @@ public class ContentService : RepositoryService, IContentService
         _propertyValidationService = propertyValidationService;
         _shortStringHelper = shortStringHelper;
         _cultureImpactFactory = cultureImpactFactory;
+        _userIdKeyResolver = userIdKeyResolver;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
-    [Obsolete("Use constructor that takes ICultureImpactService as a parameter, scheduled for removal in V12")]
+    [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -75,7 +78,8 @@ public class ContentService : RepositoryService, IContentService
         IDocumentBlueprintRepository documentBlueprintRepository,
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper)
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory)
         : this(
             provider,
             loggerFactory,
@@ -88,7 +92,8 @@ public class ContentService : RepositoryService, IContentService
             languageRepository,
             propertyValidationService,
             shortStringHelper,
-            StaticServiceProvider.Instance.GetRequiredService<ICultureImpactFactory>())
+            cultureImpactFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
     {
     }
 
@@ -2519,6 +2524,9 @@ public class ContentService : RepositoryService, IContentService
         content.WriterId = userId;
         _documentRepository.Save(content);
     }
+
+    public async Task<OperationResult> EmptyRecycleBinAsync(Guid userId)
+        => EmptyRecycleBin(await _userIdKeyResolver.GetAsync(userId));
 
     /// <summary>
     ///     Empties the Recycle Bin by deleting all <see cref="IContent" /> that resides in the bin

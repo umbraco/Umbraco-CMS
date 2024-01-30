@@ -1,9 +1,11 @@
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DynamicRoot.Origin;
+using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
@@ -15,8 +17,6 @@ using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Snippets;
-using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
-using Umbraco.Cms.Core.DynamicRoot.Origin;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Tour;
 using Umbraco.Cms.Core.Trees;
@@ -110,7 +110,6 @@ public static partial class UmbracoBuilderExtensions
             .Add<SettingsDashboard>()
             .Add(builder.TypeLoader.GetTypes<IDashboard>());
         builder.PartialViewSnippets();
-        builder.PartialViewMacroSnippets();
         builder.DataValueReferenceFactories();
         builder.PropertyValueConverters().Append(builder.TypeLoader.GetTypes<IPropertyValueConverter>());
         builder.UrlSegmentProviders().Append<DefaultUrlSegmentProvider>();
@@ -145,7 +144,7 @@ public static partial class UmbracoBuilderExtensions
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
         builder.ContentIndexHandlers().Add(() => builder.TypeLoader.GetTypes<IContentIndexHandler>());
-        builder.WebhookEvents().AddCoreWebhooks();
+        builder.WebhookEvents().AddCms(true);
     }
 
     /// <summary>
@@ -244,13 +243,6 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static PartialViewSnippetCollectionBuilder PartialViewSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewSnippetCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the partial view macro snippets collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    public static PartialViewMacroSnippetCollectionBuilder PartialViewMacroSnippets(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<PartialViewMacroSnippetCollectionBuilder>();
 
     /// <summary>
     /// Gets the cache refreshers collection builder.

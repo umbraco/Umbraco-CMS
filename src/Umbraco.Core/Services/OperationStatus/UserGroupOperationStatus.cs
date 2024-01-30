@@ -1,9 +1,11 @@
 ﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
 
+// FIXME: Move all authorization statuses to <see cref="UserGroupAuthorizationStatus"/>
 public enum UserGroupOperationStatus
 {
     Success,
     NotFound,
+    UserNotFound,
     AlreadyExists,
     DuplicateAlias,
     MissingUser,

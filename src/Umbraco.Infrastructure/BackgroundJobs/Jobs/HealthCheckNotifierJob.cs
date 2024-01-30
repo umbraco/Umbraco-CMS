@@ -1,14 +1,18 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -22,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// </summary>
 public class HealthCheckNotifierJob : IRecurringBackgroundJob
 {
-    
+
 
     public TimeSpan Period { get; private set; }
     public TimeSpan Delay { get; private set; }
@@ -38,8 +42,29 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
     private readonly ILogger<HealthCheckNotifierJob> _logger;
     private readonly HealthCheckNotificationMethodCollection _notifications;
     private readonly IProfilingLogger _profilingLogger;
+    private readonly IEventAggregator _eventAggregator;
     private readonly ICoreScopeProvider _scopeProvider;
     private HealthChecksSettings _healthChecksSettings;
+
+    [Obsolete("Use constructor that accepts IEventAggregator as a parameter, scheduled for removal in V14")]
+    public HealthCheckNotifierJob(
+        IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
+        HealthCheckCollection healthChecks,
+        HealthCheckNotificationMethodCollection notifications,
+        ICoreScopeProvider scopeProvider,
+        ILogger<HealthCheckNotifierJob> logger,
+        IProfilingLogger profilingLogger,
+        ICronTabParser cronTabParser)
+        : this(
+            healthChecksSettings,
+            healthChecks,
+            notifications,
+            scopeProvider,
+            logger,
+            profilingLogger,
+            cronTabParser,
+            StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+    { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HealthCheckNotifierJob" /> class.
@@ -58,7 +83,8 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
         ICoreScopeProvider scopeProvider,
         ILogger<HealthCheckNotifierJob> logger,
         IProfilingLogger profilingLogger,
-        ICronTabParser cronTabParser)
+        ICronTabParser cronTabParser,
+        IEventAggregator eventAggregator)
     {
         _healthChecksSettings = healthChecksSettings.CurrentValue;
         _healthChecks = healthChecks;
@@ -66,6 +92,7 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
         _scopeProvider = scopeProvider;
         _logger = logger;
         _profilingLogger = profilingLogger;
+        _eventAggregator = eventAggregator;
 
         Period = healthChecksSettings.CurrentValue.Notification.Period;
         Delay = DelayCalculator.GetDelay(healthChecksSettings.CurrentValue.Notification.FirstRunTime, cronTabParser, logger, TimeSpan.FromMinutes(3));
@@ -105,6 +132,8 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
 
             HealthCheckResults results = await HealthCheckResults.Create(checks);
             results.LogResults();
+
+            _eventAggregator.Publish(new HealthCheckCompletedNotification(results));
 
             // Send using registered notification methods that are enabled.
             foreach (IHealthCheckNotificationMethod notificationMethod in _notifications.Where(x => x.Enabled))
