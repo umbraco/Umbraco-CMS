@@ -117,7 +117,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			}
 
 			#toggle {
-				width: var(--umb-section-sidebar-width);
+				width: 100%;
 				text-align: left;
 				background: none;
 				border: none;
