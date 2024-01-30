@@ -1,3 +1,4 @@
+import type { ManifestBlockEditorCustomView } from './block-editor-custom-view.model.js';
 import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
@@ -41,6 +42,7 @@ import type {
 	ManifestEntryPoint,
 } from '@umbraco-cms/backoffice/extension-api';
 
+export type * from './block-editor-custom-view.model.js';
 export type * from './collection.models.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
@@ -81,6 +83,7 @@ export type * from './workspace.model.js';
 export type ManifestTypes =
 	| ManifestBundle<ManifestTypes>
 	| ManifestCondition
+	| ManifestBlockEditorCustomView
 	| ManifestCollection
 	| ManifestCollectionView
 	| ManifestCollectionAction

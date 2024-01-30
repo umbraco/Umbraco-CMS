@@ -4,13 +4,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
-import type {
-	UmbBlockTypeBaseModel,
-	UmbBlockWorkspaceData} from '@umbraco-cms/backoffice/block';
-import {
-	UMB_BLOCK_MANAGER_CONTEXT,
-	UMB_BLOCK_WORKSPACE_MODAL
-} from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_MANAGER_CONTEXT, UMB_BLOCK_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/block';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -72,6 +67,7 @@ export abstract class UmbBlockManagerContext<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
 
+		// TODO: This might will need the property alias as part of the URL, to avoid collision if multiple of these Editor on same Node.
 		// IDEA: Make a Workspace registration controller that can be used to register a workspace, which does both edit and create?.
 		new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
 			.addAdditionalPath('block')
