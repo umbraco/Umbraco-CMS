@@ -2,7 +2,7 @@ import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
-	PropertyContainerTypes,
+	UmbPropertyContainerTypes,
 	UmbContentTypeModel,
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
@@ -20,10 +20,10 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	}
 
 	@property({ type: String, attribute: 'container-type', reflect: false })
-	public get containerType(): PropertyContainerTypes | undefined {
+	public get containerType(): UmbPropertyContainerTypes | undefined {
 		return this._propertyStructureHelper.getContainerType();
 	}
-	public set containerType(value: PropertyContainerTypes | undefined) {
+	public set containerType(value: UmbPropertyContainerTypes | undefined) {
 		this._propertyStructureHelper.setContainerType(value);
 	}
 

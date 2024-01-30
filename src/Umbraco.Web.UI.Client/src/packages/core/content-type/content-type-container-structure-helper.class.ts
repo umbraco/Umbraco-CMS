@@ -1,8 +1,5 @@
-import type {
-	PropertyContainerTypes,
-	UmbContentTypePropertyStructureManager,
-} from './content-type-structure-manager.class.js';
-import type { UmbContentTypeModel } from './types.js';
+import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
+import type { UmbContentTypeModel, UmbPropertyContainerTypes } from './types.js';
 import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -14,8 +11,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 	#structure?: UmbContentTypePropertyStructureManager<T>;
 
-	private _ownerType?: PropertyContainerTypes = 'Tab';
-	private _childType?: PropertyContainerTypes = 'Group';
+	private _ownerType?: UmbPropertyContainerTypes = 'Tab';
+	private _childType?: UmbPropertyContainerTypes = 'Group';
 	private _isRoot = false;
 	/**
 	 * The owner id is the owning container (The container that is begin presented, the container is the parent of the child containers)
@@ -53,7 +50,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this._observeOwnerAlikeContainers();
 	}
 
-	public setType(value?: PropertyContainerTypes) {
+	public setType(value?: UmbPropertyContainerTypes) {
 		if (this._ownerType === value) return;
 		this._ownerType = value;
 		this._observeOwnerAlikeContainers();
@@ -62,7 +59,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		return this._ownerType;
 	}
 
-	public setContainerChildType(value?: PropertyContainerTypes) {
+	public setContainerChildType(value?: UmbPropertyContainerTypes) {
 		if (this._childType === value) return;
 		this._childType = value;
 		this._observeOwnerAlikeContainers();
