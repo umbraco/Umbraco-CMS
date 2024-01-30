@@ -1,11 +1,13 @@
-import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
 	UMB_USER_PERMISSION_DOCUMENT_READ,
 } from '@umbraco-cms/backoffice/document';
 
-export const data: Array<UserGroupResponseModel> = [
+export type UmbMockUserGroupModel = UserGroupResponseModel & UserGroupItemResponseModel;
+
+export const data: Array<UmbMockUserGroupModel> = [
 	{
 		id: 'user-group-administrators-id',
 		name: 'Administrators',

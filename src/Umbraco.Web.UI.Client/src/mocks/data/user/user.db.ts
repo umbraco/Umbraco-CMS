@@ -1,5 +1,5 @@
 import { UmbEntityData } from '../entity.data.js';
-import { umbUserGroupData } from '../user-group/user-group.db.js';
+import { umbUserGroupMockDb } from '../user-group/user-group.db.js';
 import { arrayFilter, stringFilter, queryFilter } from '../utils.js';
 import { data } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -11,10 +11,9 @@ import type {
 	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
-	UserResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	UserStateModel,
+	UserResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
 	return {
@@ -95,7 +94,7 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	 */
 	getCurrentUser(): UmbCurrentUser {
 		const firstUser = this.data[0];
-		const permissions = firstUser.userGroupIds?.length ? umbUserGroupData.getPermissions(firstUser.userGroupIds) : [];
+		const permissions = firstUser.userGroupIds?.length ? umbUserGroupMockDb.getPermissions(firstUser.userGroupIds) : [];
 
 		return {
 			id: firstUser.id,
