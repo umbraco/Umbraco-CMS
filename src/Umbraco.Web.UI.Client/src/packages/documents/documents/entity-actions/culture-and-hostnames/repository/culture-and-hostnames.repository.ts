@@ -25,23 +25,23 @@ export class UmbDocumentCultureAndHostnamesRepository extends UmbBaseController 
 		]);
 	}
 
-	async readCultureAndHostnames(id: string) {
-		if (!id) throw new Error('Id is missing');
+	async readCultureAndHostnames(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
-		const { data, error } = await this.#dataSource.read(id);
+		const { data, error } = await this.#dataSource.read(unique);
 		if (!error) {
 			return { data };
 		}
 		return { error };
 	}
 
-	async updateCultureAndHostnames(id: string, data: DomainsPresentationModelBaseModel) {
-		if (!id) throw new Error('Id is missing');
+	async updateCultureAndHostnames(unique: string, data: DomainsPresentationModelBaseModel) {
+		if (!unique) throw new Error('Unique is missing');
 		if (!data) throw new Error('Data is missing');
 		await this.#init;
 
-		const { error } = await this.#dataSource.update(id, data);
+		const { error } = await this.#dataSource.update(unique, data);
 		if (!error) {
 			const notification = { data: { message: `Cultures and hostnames saved` } };
 			this.#notificationContext?.peek('positive', notification);

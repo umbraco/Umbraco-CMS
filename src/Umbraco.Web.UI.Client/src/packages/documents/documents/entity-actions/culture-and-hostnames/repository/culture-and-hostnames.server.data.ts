@@ -22,23 +22,23 @@ export class UmbDocumentCultureAndHostnamesServerDataSource {
 	}
 
 	/**
-	 * Fetches the Culture and Hostnames for the given Document id
-	 * @param {string} id
+	 * Fetches the Culture and Hostnames for the given Document unique
+	 * @param {string} unique
 	 * @memberof UmbDocumentCultureAndHostnamesServerDataSource
 	 */
-	async read(id: string) {
-		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdDomains({ id }));
+	async read(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdDomains({ id: unique }));
 	}
 
 	/**
-	 * Updates Culture and Hostnames for the given Document id
-	 * @param {string} id
+	 * Updates Culture and Hostnames for the given Document unique
+	 * @param {string} unique
 	 * @param {DomainsPresentationModelBaseModel} data
 	 * @memberof UmbDocumentCultureAndHostnamesServerDataSource
 	 */
-	async update(id: string, data: DomainsPresentationModelBaseModel) {
-		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdDomains({ id, requestBody: data }));
+	async update(unique: string, data: DomainsPresentationModelBaseModel) {
+		if (!unique) throw new Error('Unique is missing');
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdDomains({ id: unique, requestBody: data }));
 	}
 }
