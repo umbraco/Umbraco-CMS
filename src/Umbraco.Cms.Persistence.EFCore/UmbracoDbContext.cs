@@ -36,14 +36,14 @@ public class UmbracoDbContext : DbContext
     /// </summary>
     /// <param name="options"></param>
     public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options)
-        : base(ConfigureOptions(options, out IOptionsMonitor<ConnectionStrings>? connectionStringsOptionsMonitor))
+        : base(ConfigureOptions(options))
     {
 
     }
 
-    private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options, out IOptionsMonitor<ConnectionStrings> connectionStringsOptionsMonitor)
+    private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
-        connectionStringsOptionsMonitor = StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+        IOptionsMonitor<ConnectionStrings> connectionStringsOptionsMonitor = StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
 
         ConnectionStrings connectionStrings = connectionStringsOptionsMonitor.CurrentValue;
 
