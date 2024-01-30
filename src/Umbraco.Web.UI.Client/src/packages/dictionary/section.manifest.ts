@@ -39,7 +39,7 @@ const dashboards: Array<ManifestDashboard> = [
 		alias: 'Umb.Dashboard.LocalizationDictionary',
 		name: 'Dictionary localization Dashboard',
 		elementName: 'umb-dashboard-translation-dictionary',
-		js: () => import('./dashboards/dictionary/dashboard-localization-dictionary.element.js'),
+		js: () => import('./dashboards/dashboard-localization-dictionary.element.js'),
 		meta: {
 			label: 'Dictionary overview',
 			pathname: '',
