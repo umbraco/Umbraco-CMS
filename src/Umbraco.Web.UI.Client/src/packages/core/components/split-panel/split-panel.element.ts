@@ -232,6 +232,7 @@ export class UmbSplitPanelElement extends LitElement {
 			transform: translateX(-50%);
 			cursor: col-resize;
 		}
+		/* Do we want a line that shows the divider? */
 		/* #divider::after {
 			content: '';
 			position: absolute;
