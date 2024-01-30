@@ -16,6 +16,7 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import rteContentUrl from './css/rte_content.css?url';
 
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
@@ -179,6 +180,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				(stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`,
 			) ?? [];
 
+		stylesheets.push('/umbraco/backoffice/css/rte-content.css');
+
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: RawEditorOptions = {
 			...defaultFallbackConfig,
@@ -218,7 +221,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			autoresize_bottom_margin: 10,
 			body_class: 'umb-rte',
 			contextMenu: false,
-			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder',
+			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder,.umb-macro-holder',
 			menubar: false,
 			paste_remove_styles_if_webkit: true,
 			paste_preprocess: pastePreProcessHandler,
