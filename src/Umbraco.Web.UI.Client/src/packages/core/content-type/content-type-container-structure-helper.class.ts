@@ -17,6 +17,10 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	private _ownerType?: PropertyContainerTypes = 'Tab';
 	private _childType?: PropertyContainerTypes = 'Group';
 	private _isRoot = false;
+	/**
+	 * The owner id is the owning container (The container that is begin presented, the container is the parent of the child containers)
+	 * If set to null, this helper class will provide containers of the root.
+	 */
 	private _ownerId?: string | null;
 	private _ownerName?: string;
 
@@ -194,7 +198,12 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;
 
-		return this.#containers.getValue().find((x) => x.id === containerId && x.parentId === this._ownerId) !== undefined;
+		return (
+			this.#containers
+				.getValue()
+				.find((x) => (x.id === containerId && this._ownerId ? x.parent?.id === this._ownerId : x.parent === null)) !==
+			undefined
+		);
 	}
 
 	/** Manipulate methods: */

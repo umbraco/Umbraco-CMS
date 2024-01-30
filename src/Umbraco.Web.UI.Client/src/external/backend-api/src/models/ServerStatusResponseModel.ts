@@ -8,3 +8,4 @@ import type { RuntimeLevelModel } from './RuntimeLevelModel';
 export type ServerStatusResponseModel = {
     serverStatus: RuntimeLevelModel;
 };
+

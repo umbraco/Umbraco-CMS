@@ -5,9 +5,13 @@
 
 import type { ContentForDocumentResponseModel } from './ContentForDocumentResponseModel';
 import type { ContentUrlInfoModel } from './ContentUrlInfoModel';
+import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type DocumentResponseModel = (ContentForDocumentResponseModel & {
-urls: Array<ContentUrlInfoModel>;
-templateId?: string | null;
-isTrashed: boolean;
+    urls: Array<ContentUrlInfoModel>;
+    template?: ReferenceByIdModel | null;
+    isTrashed: boolean;
+    documentType: DocumentTypeReferenceResponseModel;
 });
+

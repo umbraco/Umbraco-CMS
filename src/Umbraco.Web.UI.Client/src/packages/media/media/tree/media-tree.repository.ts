@@ -15,13 +15,11 @@ export class UmbMediaTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
-			id: null,
+		const data: UmbMediaTreeRootModel = {
+			unique: null,
 			entityType: UMB_MEDIA_ROOT_ENTITY_TYPE,
-			name: 'Medias',
-			icon: 'icon-folder',
+			name: 'Media',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 

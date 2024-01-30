@@ -1,5 +1,5 @@
 import { UmbDocumentPermissionRepository } from '../../user-permissions/index.js';
-import { UmbDocumentRepository } from '../../repository/index.js';
+import { UmbDocumentItemRepository } from '../../repository/index.js';
 import { UmbUserGroupRepository } from '@umbraco-cms/backoffice/user-group';
 import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -7,11 +7,12 @@ import type {
 	UmbEntityUserPermissionSettingsModalData,
 	UmbEntityUserPermissionSettingsModalValue,
 	UmbModalContext,
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_ENTITY_USER_PERMISSION_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_USER_GROUP_PICKER_MODAL
+	UMB_USER_GROUP_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
@@ -40,7 +41,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 	#userPermissions: Array<any> = [];
 	#userGroupRepository = new UmbUserGroupRepository(this);
 	#documentPermissionRepository = new UmbDocumentPermissionRepository(this);
-	#documentRepository = new UmbDocumentRepository(this);
+	#documentItemRepository = new UmbDocumentItemRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
 	#userGroupPickerModal?: UmbModalContext;
 
@@ -67,7 +68,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 	}
 
 	async #getEntityItem(unique: string) {
-		const { data } = await this.#documentRepository.requestItems([unique]);
+		const { data } = await this.#documentItemRepository.requestItems([unique]);
 		if (!data) throw new Error('Could not load item');
 		this._entityItem = data[0];
 	}

@@ -2,8 +2,7 @@ import type {
 	PropertyContainerTypes,
 	UmbContentTypePropertyStructureManager,
 } from './content-type-structure-manager.class.js';
-import type { UmbContentTypeModel } from './types.js';
-import type { DocumentTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from './types.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -18,7 +17,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	private _isRoot?: boolean;
 	private _containerName?: string;
 
-	#propertyStructure = new UmbArrayState<DocumentTypePropertyTypeResponseModel>([], (x) => x.id);
+	#propertyStructure = new UmbArrayState<UmbPropertyTypeModel>([], (x) => x.id);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -93,7 +92,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 			this.#structure.propertyStructuresOf(groupId),
 			(properties) => {
 				// If this need to be able to remove properties, we need to clean out the ones of this group.id before inserting them:
-				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.containerId !== groupId);
+				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.container?.id !== groupId);
 
 				properties?.forEach((property) => {
 					if (!_propertyStructure.find((x) => x.alias === property.alias)) {
@@ -125,7 +124,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return await this.#structure.createProperty(null, ownerId, sortOrder);
 	}
 
-	async insertProperty(property: PropertyTypeModelBaseModel, sortOrder = 0) {
+	async insertProperty(property: UmbPropertyTypeModel, sortOrder = 0) {
 		await this.#init;
 		if (!this.#structure) return false;
 
@@ -145,7 +144,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	}
 
 	// Takes optional arguments as this is easier for the implementation in the view:
-	async partialUpdateProperty(propertyKey?: string, partialUpdate?: Partial<DocumentTypePropertyTypeResponseModel>) {
+	async partialUpdateProperty(propertyKey?: string, partialUpdate?: Partial<UmbPropertyTypeModel>) {
 		await this.#init;
 		if (!this.#structure || !propertyKey || !partialUpdate) return;
 		return await this.#structure.updateProperty(null, propertyKey, partialUpdate);

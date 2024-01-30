@@ -4,10 +4,9 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentTypeRequestModel,
-	UpdateDocumentTypeRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	DocumentTypeResource
+	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -52,8 +51,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			containers: [],
 			allowedContentTypes: [],
 			compositions: [],
-			allowedTemplateIds: [],
-			defaultTemplateId: null,
+			allowedTemplates: [],
+			defaultTemplate: null,
 			cleanup: {
 				preventCleanup: false,
 				keepAllVersionsNewerThanDays: null,
@@ -95,12 +94,36 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
-			properties: data.properties,
+			properties: data.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { unique: property.dataType.id },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: data.containers,
-			allowedContentTypes: data.allowedContentTypes,
-			compositions: data.compositions,
-			allowedTemplateIds: data.allowedTemplateIds,
-			defaultTemplateId: data.defaultTemplateId || null,
+			allowedContentTypes: data.allowedDocumentTypes.map((allowedDocumentType) => {
+				return {
+					contentType: { unique: allowedDocumentType.documentType.id },
+					sortOrder: allowedDocumentType.sortOrder,
+				};
+			}),
+			compositions: data.compositions.map((composition) => {
+				return {
+					contentType: { unique: composition.documentType.id },
+					compositionType: composition.compositionType,
+				};
+			}),
+			allowedTemplates: data.allowedTemplates,
+			defaultTemplate: data.defaultTemplate ? { id: data.defaultTemplate.id } : null,
 			cleanup: data.cleanup,
 		};
 
@@ -127,14 +150,37 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			properties: model.properties,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: model.containers,
-			allowedContentTypes: model.allowedContentTypes,
-			compositions: model.compositions,
+			allowedDocumentTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					documentType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					documentType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
 			id: model.unique,
-			containerId: model.parentUnique,
-			allowedTemplateIds: model.allowedTemplateIds,
-			defaultTemplateId: model.defaultTemplateId || null,
+			allowedTemplates: model.allowedTemplates,
+			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
 		};
 
@@ -171,12 +217,36 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			properties: model.properties,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: model.containers,
-			allowedContentTypes: model.allowedContentTypes,
-			compositions: model.compositions,
-			allowedTemplateIds: model.allowedTemplateIds,
-			defaultTemplateId: model.defaultTemplateId || null,
+			allowedDocumentTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					documentType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					documentType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
+			allowedTemplates: model.allowedTemplates,
+			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
 		};
 

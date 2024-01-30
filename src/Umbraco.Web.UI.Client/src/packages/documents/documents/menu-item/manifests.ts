@@ -10,7 +10,6 @@ const menuItem: ManifestTypes = {
 	weight: 200,
 	meta: {
 		label: 'Documents',
-		icon: 'icon-folder',
 		menus: [UMB_CONTENT_MENU_ALIAS],
 		treeAlias: UMB_DOCUMENT_TREE_ALIAS,
 		hideTreeRoot: true,

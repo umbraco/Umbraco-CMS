@@ -1,7 +1,7 @@
-import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDataTypeItemModel } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityItemStore } from '@umbraco-cms/backoffice/store';
+import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export
@@ -10,7 +10,7 @@ import { UmbEntityItemStore } from '@umbraco-cms/backoffice/store';
  * @description - Data Store for Data Type items
  */
 
-export class UmbDataTypeItemStore extends UmbEntityItemStore<DataTypeItemResponseModel> {
+export class UmbDataTypeItemStore extends UmbItemStoreBase<UmbDataTypeItemModel> {
 	/**
 	 * Creates an instance of UmbDataTypeItemStore.
 	 * @param {UmbControllerHost} host

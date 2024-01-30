@@ -6,3 +6,4 @@
 import type { TemplateModelBaseModel } from './TemplateModelBaseModel';
 
 export type UpdateTemplateRequestModel = TemplateModelBaseModel;
+

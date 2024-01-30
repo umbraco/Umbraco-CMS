@@ -1,8 +1,11 @@
 import { UmbEntityData } from '../entity.data.js';
 import { createEntityTreeItem } from '../utils.js';
-import type { EntityTreeItemResponseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	EntityTreeItemResponseModel,
+	NamedEntityTreeItemResponseModel,
+	RelationTypeResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
-// TODO: investigate why we don't get an entity type as part of the RelationTypeResponseModel
 export const data: Array<RelationTypeResponseModel> = [
 	{
 		id: 'e0d39ff5-71d8-453f-b682-9d8d31ee5e06',
@@ -71,43 +74,39 @@ export const data: Array<RelationTypeResponseModel> = [
 	},
 ];
 
-export const treeData: Array<EntityTreeItemResponseModel> = [
+export const treeData: Array<NamedEntityTreeItemResponseModel> = [
 	{
 		id: 'e0d39ff5-71d8-453f-b682-9d8d31ee5e06',
-		isContainer: false,
-		parentId: null,
+		parent: null,
 		name: 'Relate Document On Copy',
 		type: 'relation-type',
 		hasChildren: false,
 	},
 	{
 		id: 'ac68cde6-763f-4231-a751-1101b57defd2',
-		isContainer: false,
-		parentId: null,
+
+		parent: null,
 		name: 'Relate Parent Document On Delete',
 		type: 'relation-type',
 		hasChildren: false,
 	},
 	{
 		id: '6f9b800c-762c-42d4-85d9-bf40a77d689e',
-		isContainer: false,
-		parentId: null,
+		parent: null,
 		name: 'Relate Parent Media Folder On Delete',
 		type: 'relation-type',
 		hasChildren: false,
 	},
 	{
 		id: 'd421727d-43de-4205-b4c6-037404f309ad',
-		isContainer: false,
-		parentId: null,
+		parent: null,
 		name: 'Related Media',
 		type: 'relation-type',
 		hasChildren: false,
 	},
 	{
 		id: 'e9a0a28e-2d5b-4229-ac00-66f2df230513',
-		isContainer: false,
-		parentId: null,
+		parent: null,
 		name: 'Related Document',
 		type: 'relation-type',
 		hasChildren: false,
@@ -132,7 +131,7 @@ class UmbRelationTypeData extends UmbEntityData<RelationTypeResponseModel> {
 
 	//TODO Can relation types have children?
 	getTreeItemChildren(id: string): Array<EntityTreeItemResponseModel> {
-		const childItems = this.treeData.filter((item) => item.parentId === id);
+		const childItems = this.treeData.filter((item) => item.parent?.id === id);
 		return childItems.map((item) => createEntityTreeItem(item));
 	}
 

@@ -8,3 +8,4 @@ export type TourStatusModel = {
     completed: boolean;
     disabled: boolean;
 };
+

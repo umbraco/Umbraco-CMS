@@ -3,7 +3,7 @@ import { UmbMockEntityFolderManager } from '../entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
-import type { UmbMockMediaTypeModel} from './media-type.data.js';
+import type { UmbMockMediaTypeModel } from './media-type.data.js';
 import { data } from './media-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
@@ -33,7 +33,7 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 	return {
 		name: request.name,
 		id: request.id ? request.id : UmbId.new(),
-		parentId: request.parentId,
+		parent: request.parentId ? { id: request.parentId } : null,
 		description: '',
 		alias: '',
 		icon: '',
@@ -43,11 +43,10 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		allowedContentTypes: [],
+		allowedMediaTypes: [],
 		compositions: [],
 		isFolder: true,
 		hasChildren: false,
-		isContainer: false,
 	};
 };
 
@@ -64,12 +63,11 @@ const createMockMediaTypeMapper = (request: CreateMediaTypeRequestModel): UmbMoc
 		variesByCulture: request.variesByCulture,
 		variesBySegment: request.variesBySegment,
 		isElement: request.isElement,
-		allowedContentTypes: request.allowedContentTypes,
+		allowedMediaTypes: request.allowedMediaTypes,
 		compositions: request.compositions,
-		parentId: request.containerId,
+		parent: request.folder ? { id: request.folder.id } : null,
 		isFolder: false,
 		hasChildren: false,
-		isContainer: false,
 	};
 };
 
@@ -86,7 +84,7 @@ const mediaTypeDetailMapper = (item: UmbMockMediaTypeModel): MediaTypeResponseMo
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,
-		allowedContentTypes: item.allowedContentTypes,
+		allowedMediaTypes: item.allowedMediaTypes,
 		compositions: item.compositions,
 	};
 };
@@ -96,8 +94,7 @@ const mediaTypeTreeItemMapper = (item: UmbMockMediaTypeModel): Omit<MediaTypeTre
 		name: item.name,
 		hasChildren: item.hasChildren,
 		id: item.id,
-		isContainer: item.isContainer,
-		parentId: item.parentId,
+		parent: item.parent,
 		isFolder: item.isFolder,
 		icon: item.icon,
 	};

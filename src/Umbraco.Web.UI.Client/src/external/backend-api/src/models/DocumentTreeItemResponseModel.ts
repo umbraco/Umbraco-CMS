@@ -4,13 +4,12 @@
 /* eslint-disable */
 
 import type { ContentTreeItemResponseModel } from './ContentTreeItemResponseModel';
-import type { VariantTreeItemModel } from './VariantTreeItemModel';
+import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
+import type { DocumentVariantItemResponseModel } from './DocumentVariantItemResponseModel';
 
 export type DocumentTreeItemResponseModel = (ContentTreeItemResponseModel & {
-isProtected: boolean;
-isPublished: boolean;
-isEdited: boolean;
-contentTypeId: string;
-variants: Array<VariantTreeItemModel>;
-icon: string;
+    isProtected: boolean;
+    documentType: DocumentTypeReferenceResponseModel;
+    variants: Array<DocumentVariantItemResponseModel>;
 });
+

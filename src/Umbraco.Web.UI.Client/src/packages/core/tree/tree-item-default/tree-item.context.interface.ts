@@ -1,7 +1,7 @@
 import type { UmbTreeItemModelBase } from '../types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModelBase> {
 	unique?: string | null;
@@ -18,7 +18,7 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModelBase> {
 
 	setTreeItem(treeItem: TreeItemType | undefined): void;
 	requestChildren(): Promise<{
-		data?: UmbPagedData<TreeItemType> | undefined;
+		data?: UmbPagedModel<TreeItemType> | undefined;
 		error?: ProblemDetails | undefined;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
