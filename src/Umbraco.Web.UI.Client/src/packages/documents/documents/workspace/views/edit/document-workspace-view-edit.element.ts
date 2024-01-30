@@ -21,7 +21,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
+	private _tabs?: Array<PropertyTypeContainerModelBaseModel>;
 
 	@state()
 	private _routerPath?: string;
