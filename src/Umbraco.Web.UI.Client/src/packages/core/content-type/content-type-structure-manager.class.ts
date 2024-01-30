@@ -1,7 +1,12 @@
-import type { UmbContentTypeModel, UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from './types.js';
+import type {
+	UmbContentTypeModel,
+	UmbPropertyContainerTypes,
+	UmbPropertyTypeContainerModel,
+	UmbPropertyTypeModel,
+	UmbPropertyTypeScaffoldModel,
+} from './types.js';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 import type { MappingFunction } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -13,10 +18,6 @@ import {
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
-export type PropertyContainerTypes = 'Group' | 'Tab';
-
-// TODO: get this type from the repository, or use some generic type.
-// TODO: Make this a controller on its own:
 export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeModel> extends UmbBaseController {
 	#init!: Promise<unknown>;
 
@@ -30,8 +31,10 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		x.flatMap((x) => x.containers ?? []),
 	);
 
-	#containers: UmbArrayState<PropertyTypeContainerModelBaseModel> =
-		new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
+	#containers: UmbArrayState<UmbPropertyTypeContainerModel> = new UmbArrayState<UmbPropertyTypeContainerModel>(
+		[],
+		(x) => x.id,
+	);
 
 	constructor(host: UmbControllerHost, typeRepository: UmbDetailRepository<T>) {
 		super(host);
@@ -178,13 +181,13 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	async createContainer(
 		contentTypeUnique: string | null,
 		parentId: string | null = null,
-		type: PropertyContainerTypes = 'Group',
+		type: UmbPropertyContainerTypes = 'Group',
 		sortOrder?: number,
 	) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
-		const container: PropertyTypeContainerModelBaseModel = {
+		const container: UmbPropertyTypeContainerModel = {
 			id: UmbId.new(),
 			parent: parentId ? { id: parentId } : null,
 			name: '',
@@ -205,7 +208,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		return container;
 	}
 
-	async insertContainer(contentTypeUnique: string | null, container: PropertyTypeContainerModelBaseModel) {
+	async insertContainer(contentTypeUnique: string | null, container: UmbPropertyTypeContainerModel) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
@@ -223,7 +226,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	makeContainerNameUniqueForOwnerContentType(
 		newName: string,
-		containerType: PropertyContainerTypes = 'Tab',
+		containerType: UmbPropertyContainerTypes = 'Tab',
 		parentId: string | null = null,
 	) {
 		const ownerRootContainers = this.getOwnerContainers(containerType); //getRootContainers() can't differentiates between compositions and locals
@@ -242,7 +245,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	async updateContainer(
 		contentTypeUnique: string | null,
 		containerId: string,
-		partialUpdate: Partial<PropertyTypeContainerModelBaseModel>,
+		partialUpdate: Partial<UmbPropertyTypeContainerModel>,
 	) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
@@ -448,27 +451,27 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		});
 	}
 
-	rootContainers(containerType: PropertyContainerTypes) {
+	rootContainers(containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType);
 		});
 	}
 
-	getRootContainers(containerType: PropertyContainerTypes) {
+	getRootContainers(containerType: UmbPropertyContainerTypes) {
 		return this.#containers.getValue().filter((x) => x.parent === null && x.type === containerType);
 	}
 
-	hasRootContainers(containerType: PropertyContainerTypes) {
+	hasRootContainers(containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parent === null && x.type === containerType).length > 0;
 		});
 	}
 
-	ownerContainersOf(containerType: PropertyContainerTypes) {
+	ownerContainersOf(containerType: UmbPropertyContainerTypes) {
 		return this.ownerContentTypeObservablePart((x) => x.containers?.filter((x) => x.type === containerType) ?? []);
 	}
 
-	getOwnerContainers(containerType: PropertyContainerTypes, parentId: string | null = null) {
+	getOwnerContainers(containerType: UmbPropertyContainerTypes, parentId: string | null = null) {
 		return this.getOwnerContentType()?.containers?.filter((x) =>
 			parentId ? x.parent?.id === parentId : x.parent === null && x.type === containerType,
 		);
@@ -478,14 +481,14 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		return this.getOwnerContentType()?.containers?.filter((x) => x.id === containerId);
 	}
 
-	containersOfParentKey(parentId: string, containerType: PropertyContainerTypes) {
+	containersOfParentKey(parentId: string, containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parent?.id === parentId && x.type === containerType);
 		});
 	}
 
 	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should not be merged.
-	containersByNameAndType(name: string, containerType: PropertyContainerTypes) {
+	containersByNameAndType(name: string, containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);
 		});

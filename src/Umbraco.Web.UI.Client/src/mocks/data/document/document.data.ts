@@ -188,6 +188,7 @@ export const data: Array<UmbMockDocumentModel> = [
 						'Umbraco.BlockList': [
 							{
 								contentUdi: '1234',
+								settingsUdi: '5678',
 							},
 						],
 					},
@@ -198,7 +199,13 @@ export const data: Array<UmbMockDocumentModel> = [
 							elementProperty: 'Hello world',
 						},
 					],
-					settingsData: [],
+					settingsData: [
+						{
+							udi: '5678',
+							contentTypeKey: 'all-property-editors-document-type-id',
+							elementProperty: 'Hello world',
+						},
+					],
 				},
 			},
 			{

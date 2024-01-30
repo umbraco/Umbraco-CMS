@@ -1,8 +1,5 @@
-import type {
-	PropertyContainerTypes,
-	UmbContentTypePropertyStructureManager,
-} from './content-type-structure-manager.class.js';
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from './types.js';
+import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
+import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeModel } from './types.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -13,7 +10,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 	#structure?: UmbContentTypePropertyStructureManager<T>;
 
-	private _containerType?: PropertyContainerTypes;
+	private _containerType?: UmbPropertyContainerTypes;
 	private _isRoot?: boolean;
 	private _containerName?: string;
 
@@ -42,7 +39,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this._observeGroupContainers();
 	}
 
-	public setContainerType(value?: PropertyContainerTypes) {
+	public setContainerType(value?: UmbPropertyContainerTypes) {
 		if (this._containerType === value) return;
 		this._containerType = value;
 		this._observeGroupContainers();
