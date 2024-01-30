@@ -104,7 +104,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this._propertyStructureHelper.setStructureManager((workspaceContext as UmbMediaTypeWorkspaceContext).structure);
 			this.observe(
 				(workspaceContext as UmbMediaTypeWorkspaceContext).isSorting,
@@ -113,6 +113,16 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 					this.#setModel(isSorting);
 				},
 				'_observeIsSorting',
+			);
+
+			const mediaTypesObservable = await this._propertyStructureHelper.ownerDocumentTypes();
+			if (!mediaTypesObservable) return;
+			this.observe(
+				mediaTypesObservable,
+				(medias) => {
+					this._ownerMediaTypes = medias;
+				},
+				'observeOwnerMediaTypes',
 			);
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
@@ -145,19 +155,6 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 		} else {
 			this.#propertySorter.setModel([]);
 		}
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		const mediaTypes = this._propertyStructureHelper.ownerDocumentTypes; //TODO: Should we have a separate propertyStructureHelper for mediaTypes?
-		if (!mediaTypes) return;
-		this.observe(
-			mediaTypes,
-			(medias) => {
-				this._ownerMediaTypes = medias;
-			},
-			'observeOwnerMediaTypes',
-		);
 	}
 
 	async #addProperty(propertyData: UmbPropertyTypeModel) {
