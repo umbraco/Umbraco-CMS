@@ -9,3 +9,4 @@ export type PagedDataTypeTreeItemResponseModel = {
     total: number;
     items: Array<DataTypeTreeItemResponseModel>;
 };
+

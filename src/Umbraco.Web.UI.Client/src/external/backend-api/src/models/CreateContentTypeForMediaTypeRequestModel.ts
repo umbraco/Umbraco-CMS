@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCompositionModel } from './ContentTypeCompositionModel';
-import type { ContentTypeSortModel } from './ContentTypeSortModel';
 import type { CreateMediaTypePropertyTypeContainerRequestModel } from './CreateMediaTypePropertyTypeContainerRequestModel';
 import type { CreateMediaTypePropertyTypeRequestModel } from './CreateMediaTypePropertyTypeRequestModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type CreateContentTypeForMediaTypeRequestModel = {
     alias: string;
@@ -19,8 +18,7 @@ export type CreateContentTypeForMediaTypeRequestModel = {
     isElement: boolean;
     properties: Array<CreateMediaTypePropertyTypeRequestModel>;
     containers: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
-    allowedContentTypes: Array<ContentTypeSortModel>;
-    compositions: Array<ContentTypeCompositionModel>;
     id?: string | null;
-    containerId?: string | null;
+    folder?: ReferenceByIdModel | null;
 };
+

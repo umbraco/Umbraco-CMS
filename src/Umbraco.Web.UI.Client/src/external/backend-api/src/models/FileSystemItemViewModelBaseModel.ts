@@ -6,3 +6,4 @@
 export type FileSystemItemViewModelBaseModel = {
     path: string;
 };
+

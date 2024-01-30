@@ -1,5 +1,4 @@
 import type { UmbData } from '../data.js';
-import { createFileItemResponseModelBaseModel } from '../utils.js';
 import type { FileSystemItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbMockFileSystemItemManager<T extends FileSystemItemResponseModelBaseModel> {
@@ -14,3 +13,10 @@ export class UmbMockFileSystemItemManager<T extends FileSystemItemResponseModelB
 		return items.map((item) => createFileItemResponseModelBaseModel(item));
 	}
 }
+
+const createFileItemResponseModelBaseModel = (item: any): FileSystemItemResponseModelBaseModel => ({
+	path: item.path,
+	name: item.name,
+	parent: item.parent,
+	isFolder: item.isFolder,
+});

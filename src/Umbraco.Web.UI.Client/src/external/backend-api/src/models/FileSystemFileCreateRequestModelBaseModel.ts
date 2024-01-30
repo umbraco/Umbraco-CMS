@@ -10,3 +10,4 @@ export type FileSystemFileCreateRequestModelBaseModel = {
     parent?: FileSystemFolderModel | null;
     content: string;
 };
+

@@ -9,3 +9,4 @@ export type DomainsPresentationModelBaseModel = {
     defaultIsoCode?: string | null;
     domains: Array<DomainPresentationModel>;
 };
+

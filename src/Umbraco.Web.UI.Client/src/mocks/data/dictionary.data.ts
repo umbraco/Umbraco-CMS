@@ -1,6 +1,9 @@
 import { UmbEntityData } from './entity.data.js';
 import { createEntityTreeItem } from './utils.js';
-import type { DictionaryItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	DictionaryItemResponseModel,
+	NamedEntityTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DictionaryItemResponseModel> = [
 	{
@@ -33,22 +36,20 @@ export const data: Array<DictionaryItemResponseModel> = [
 	},
 ];
 
-const dictionaryTree: Array<EntityTreeItemResponseModel> = [
+const dictionaryTree: Array<NamedEntityTreeItemResponseModel> = [
 	{
-		parentId: null,
+		parent: null,
 		name: 'Hello',
 		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		hasChildren: true,
 		type: 'dictionary-item',
-		isContainer: false,
 	},
 	{
-		parentId: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
+		parent: null,
 		name: 'Hello again',
 		id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		hasChildren: false,
 		type: 'dictionary-item',
-		isContainer: false,
 	},
 ];
 
@@ -61,18 +62,18 @@ class UmbDictionaryData extends UmbEntityData<DictionaryItemResponseModel> {
 		super(data);
 	}
 
-	getTreeRoot(): Array<EntityTreeItemResponseModel> {
-		const rootItems = dictionaryTree.filter((item) => item.parentId === null);
+	getTreeRoot(): Array<NamedEntityTreeItemResponseModel> {
+		const rootItems = dictionaryTree.filter((item) => item.parent === null);
 		return rootItems.map((item) => createEntityTreeItem(item));
 	}
 
-	getTreeItemChildren(id: string): Array<EntityTreeItemResponseModel> {
-		const childItems = dictionaryTree.filter((item) => item.parentId === id);
+	getTreeItemChildren(id: string): Array<NamedEntityTreeItemResponseModel> {
+		const childItems = dictionaryTree.filter((item) => item.parent?.id === id);
 		return childItems.map((item) => createEntityTreeItem(item));
 	}
 
-	getTreeItem(ids: Array<string>): Array<EntityTreeItemResponseModel> {
-		const items = dictionaryTree.filter((item) => ids.includes(item.id ?? ''));
+	getTreeItem(ids: Array<string>): Array<NamedEntityTreeItemResponseModel> {
+		const items = dictionaryTree.filter((item) => ids.includes(item.id));
 		return items.map((item) => createEntityTreeItem(item));
 	}
 }

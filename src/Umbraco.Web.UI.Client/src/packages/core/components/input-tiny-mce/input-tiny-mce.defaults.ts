@@ -1,6 +1,5 @@
 import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 
-//These are absolutely required in order for the macros to render inline
 //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
 //so we don't have to specify all the normal elements again
 export const defaultFallbackConfig: RawEditorOptions = {
@@ -23,7 +22,6 @@ export const defaultFallbackConfig: RawEditorOptions = {
 		'indent',
 		'link',
 		'umbmediapicker',
-		'umbmacro',
 		'umbembeddialog',
 	],
 	style_formats: [

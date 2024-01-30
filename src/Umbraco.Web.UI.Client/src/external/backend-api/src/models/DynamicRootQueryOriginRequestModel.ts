@@ -7,3 +7,4 @@ export type DynamicRootQueryOriginRequestModel = {
     alias: string;
     key?: string | null;
 };
+

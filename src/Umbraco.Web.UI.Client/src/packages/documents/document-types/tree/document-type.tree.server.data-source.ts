@@ -46,10 +46,9 @@ const getChildrenOf = (parentUnique: string | null) => {
 const mapper = (item: DocumentTypeTreeItemResponseModel): UmbDocumentTypeTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parentId || null,
+		parentUnique: item.parent ? item.parent.id : null,
 		name: item.name,
 		entityType: item.isFolder ? UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE : UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 		isFolder: item.isFolder,
 		icon: item.icon,

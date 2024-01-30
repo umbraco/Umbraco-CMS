@@ -42,11 +42,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		super.value = newValue;
 		const newContent = newValue?.toString() ?? '';
 
-		if(this.#editorRef && this.#editorRef.getContent() != newContent) {
+		if (this.#editorRef && this.#editorRef.getContent() != newContent) {
 			this.#editorRef.setContent(newContent);
 		}
 	}
-	
+
 	get value(): FormDataEntryValue | FormData {
 		return super.value;
 	}
@@ -178,6 +178,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			stylesheetPaths?.map(
 				(stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`,
 			) ?? [];
+
+		stylesheets.push('/umbraco/backoffice/css/rte-content.css');
 
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: RawEditorOptions = {

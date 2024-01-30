@@ -3,8 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 import type { UpdateContentForDocumentRequestModel } from './UpdateContentForDocumentRequestModel';
 
 export type UpdateDocumentRequestModel = (UpdateContentForDocumentRequestModel & {
-templateId?: string | null;
+    template?: ReferenceByIdModel | null;
 });
+

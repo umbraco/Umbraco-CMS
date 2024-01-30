@@ -6,5 +6,6 @@
 import type { PublishDocumentRequestModel } from './PublishDocumentRequestModel';
 
 export type PublishDocumentWithDescendantsRequestModel = (PublishDocumentRequestModel & {
-includeUnpublishedDescendants: boolean;
+    includeUnpublishedDescendants: boolean;
 });
+

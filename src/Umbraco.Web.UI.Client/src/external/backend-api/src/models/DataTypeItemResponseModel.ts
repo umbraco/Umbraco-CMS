@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
+import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
 
-export type DataTypeItemResponseModel = (ItemResponseModelBaseModel & {
-editorUiAlias?: string | null;
+export type DataTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
+    editorUiAlias?: string | null;
 });
+

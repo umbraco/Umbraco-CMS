@@ -9,3 +9,4 @@ export type PagedCultureReponseModel = {
     total: number;
     items: Array<CultureReponseModel>;
 };
+

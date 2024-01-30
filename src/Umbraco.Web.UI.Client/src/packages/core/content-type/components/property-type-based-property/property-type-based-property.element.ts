@@ -1,26 +1,26 @@
 import type { UmbPropertyEditorConfig } from '../../../property-editor/index.js';
-import type { UmbDataTypeDetailModel} from '@umbraco-cms/backoffice/data-type';
+import type { UmbPropertyTypeModel } from '../../types.js';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 @customElement('umb-property-type-based-property')
 export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
-	public get property(): PropertyTypeModelBaseModel | undefined {
+	public get property(): UmbPropertyTypeModel | undefined {
 		return this._property;
 	}
-	public set property(value: PropertyTypeModelBaseModel | undefined) {
+	public set property(value: UmbPropertyTypeModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
-		if (this._property?.dataTypeId !== oldProperty?.dataTypeId) {
-			this._observeDataType(this._property?.dataTypeId);
+		if (this._property?.dataType.unique !== oldProperty?.dataType.unique) {
+			this._observeDataType(this._property?.dataType.unique);
 		}
 	}
-	private _property?: PropertyTypeModelBaseModel;
+	private _property?: UmbPropertyTypeModel;
 
 	@state()
 	private _propertyEditorUiAlias?: string;

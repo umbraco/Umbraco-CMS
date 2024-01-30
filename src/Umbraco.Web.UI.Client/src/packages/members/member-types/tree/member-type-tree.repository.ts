@@ -19,7 +19,6 @@ export class UmbMemberTypeTreeRepository
 			id: null,
 			entityType: UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Member Types',
-			icon: 'icon-folder',
 			hasChildren: true,
 			isContainer: false,
 			isFolder: true,
