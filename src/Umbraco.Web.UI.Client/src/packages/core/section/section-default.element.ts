@@ -124,12 +124,6 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 					--umb-split-panel-initial-position: 300px;
 				}
 			}
-
-			@media only screen and (min-width: 1200px) {
-				umb-split-panel {
-					--umb-split-panel-initial-position: 350px;
-				}
-			}
 		`,
 	];
 }
