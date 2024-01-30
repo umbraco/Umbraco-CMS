@@ -2,7 +2,7 @@ import type { CollectionAliasConditionConfig } from '../../collection/collection
 import type { SectionAliasConditionConfig } from './section-alias.condition.js';
 import type { SwitchConditionConfig } from './switch.condition.js';
 import type { UserPermissionConditionConfig } from '@umbraco-cms/backoffice/user-permission';
-import type { BlockHasSettingsConditionConfig } from '@umbraco-cms/backoffice/block';
+import type { BlockWorkspaceHasSettingsConditionConfig } from '@umbraco-cms/backoffice/block';
 import type {
 	WorkspaceAliasConditionConfig,
 	WorkspaceEntityTypeConditionConfig,
@@ -17,7 +17,7 @@ export type ConditionTypes =
 	| CollectionAliasConditionConfig
 	| SectionAliasConditionConfig
 	| WorkspaceAliasConditionConfig
-	| BlockHasSettingsConditionConfig
+	| BlockWorkspaceHasSettingsConditionConfig
 	| WorkspaceEntityTypeConditionConfig
 	| SwitchConditionConfig
 	| UserPermissionConditionConfig
