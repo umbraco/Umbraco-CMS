@@ -208,9 +208,13 @@ export class UmbSplitPanelElement extends LitElement {
 	static styles = css`
 		:host {
 			display: contents;
+			--umb-split-panel-initial-position: 50%;
+			--umb-split-panel-start-min-width: 0;
+			--umb-split-panel-end-min-width: 0;
 		}
 		slot {
 			overflow: hidden;
+			display: block;
 		}
 		#main {
 			width: 100%;
