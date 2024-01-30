@@ -67,6 +67,9 @@ export const manifests: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
+			{
+				alias: 'Umb.Condition.BlockHasSettings',
+			},
 		],
 	} as any,
 ];
