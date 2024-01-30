@@ -16,6 +16,9 @@ import {
  * @cssprop --umb-split-panel-initial-position - Initial position of the divider.
  * @cssprop --umb-split-panel-start-min-width - Minimum width of the start panel.
  * @cssprop --umb-split-panel-end-min-width - Minimum width of the end panel.
+ * @cssprop --umb-split-panel-divider-touch-area-width - Width of the divider touch area.
+ * @cssprop --umb-split-panel-divider-width - Width of the divider.
+ * @cssprop --umb-split-panel-divider-color - Color of the divider.
  */
 @customElement('umb-split-panel')
 export class UmbSplitPanelElement extends LitElement {
