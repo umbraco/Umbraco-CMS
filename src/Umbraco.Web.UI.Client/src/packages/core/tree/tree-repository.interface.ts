@@ -1,5 +1,5 @@
 import type { UmbTreeItemModelBase } from './types.js';
-import type { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -14,7 +14,7 @@ export interface UmbTreeRepository<
 	}>;
 
 	requestTreeItemsOf: (parentUnique: string | null) => Promise<{
-		data?: UmbPagedData<TreeItemType>;
+		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
@@ -26,7 +26,7 @@ export interface UmbTreeRepository<
 	because it is a server decision to split them
 	*/
 	requestRootTreeItems: () => Promise<{
-		data?: UmbPagedData<TreeItemType>;
+		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;

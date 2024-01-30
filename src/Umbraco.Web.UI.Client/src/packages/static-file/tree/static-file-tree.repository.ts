@@ -19,9 +19,7 @@ export class UmbStaticFileTreeRepository
 			unique: null,
 			entityType: UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
 			name: 'Static Files',
-			icon: 'icon-folder',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 

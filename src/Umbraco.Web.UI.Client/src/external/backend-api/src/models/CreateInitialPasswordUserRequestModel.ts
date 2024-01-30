@@ -6,5 +6,6 @@
 import type { VerifyInviteUserRequestModel } from './VerifyInviteUserRequestModel';
 
 export type CreateInitialPasswordUserRequestModel = (VerifyInviteUserRequestModel & {
-password: string;
+    password: string;
 });
+

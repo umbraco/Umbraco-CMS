@@ -12,7 +12,7 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.id,
+		(x) => x.unique,
 	);
 
 	#workspaceContext?: typeof UMB_BLOCK_TYPE_WORKSPACE_CONTEXT.TYPE;

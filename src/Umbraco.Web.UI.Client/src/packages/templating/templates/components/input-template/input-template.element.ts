@@ -4,16 +4,14 @@ import '../template-card/template-card.element.js';
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_TEMPLATE_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { ItemResponseModelBaseModel} from '@umbraco-cms/backoffice/backend-api';
-import { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { TemplateItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-input-template')
 export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
@@ -78,7 +76,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	private _templateRepository: UmbTemplateRepository = new UmbTemplateRepository(this);
 
 	@state()
-	_pickedTemplates: ItemResponseModelBaseModel[] = [];
+	_pickedTemplates: TemplateItemResponseModel[] = [];
 
 	constructor() {
 		super();

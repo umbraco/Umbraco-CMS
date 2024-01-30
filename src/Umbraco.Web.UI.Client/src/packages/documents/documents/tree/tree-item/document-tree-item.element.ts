@@ -30,9 +30,10 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 	#renderIconWithStatusSymbol() {
 		return html`
 			<span id="icon-container" slot="icon">
-				${this.item?.icon
+				${this.item?.documentType.icon
 					? html`
-							<uui-icon id="icon" slot="icon" name="${this.item.icon}"></uui-icon> <span id="status-symbol"></span>
+							<uui-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></uui-icon>
+							<span id="status-symbol"></span>
 					  `
 					: nothing}
 			</span>
@@ -40,8 +41,9 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 	}
 
 	// TODO: lower opacity if item is not published
+	// TODO: get correct variant name
 	#renderLabel() {
-		return html` <span id="label" slot="label">${this.item?.name}</span> `;
+		return html` <span id="label" slot="label">${this.item?.variants[0].name}</span> `;
 	}
 
 	static styles = [

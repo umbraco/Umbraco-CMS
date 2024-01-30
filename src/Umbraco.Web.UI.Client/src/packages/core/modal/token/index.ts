@@ -2,7 +2,6 @@ export * from './change-password-modal.token.js';
 export * from './code-editor-modal.token.js';
 export * from './confirm-modal.token.js';
 export * from './create-dictionary-modal.token.js';
-export * from './create-document-modal.token.js';
 export * from './create-user-modal.token.js';
 export * from './create-user-success-modal.token.js';
 export * from './current-user-modal.token.js';

@@ -6,7 +6,7 @@ import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbSorterConfig} from '@umbraco-cms/backoffice/sorter';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 import './media-type-workspace-view-edit-properties.element.js';
@@ -172,7 +172,11 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 													value=${group.name ?? ''}
 													@change=${(e: InputEvent) => {
 														const newName = (e.target as HTMLInputElement).value;
-														this._groupStructureHelper.updateContainerName(group.id!, group.parentId ?? null, newName);
+														this._groupStructureHelper.updateContainerName(
+															group.id!,
+															group.parent?.id ?? null,
+															newName,
+														);
 													}}>
 												</uui-input>
 											</div>

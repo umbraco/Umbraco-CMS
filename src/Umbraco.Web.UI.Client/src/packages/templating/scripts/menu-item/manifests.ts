@@ -11,7 +11,6 @@ const menuItem: ManifestTypes = {
 	weight: 10,
 	meta: {
 		label: 'Scripts',
-		icon: 'icon-folder',
 		treeAlias: UMB_SCRIPT_TREE_ALIAS,
 		menus: ['Umb.Menu.Templating'],
 	},

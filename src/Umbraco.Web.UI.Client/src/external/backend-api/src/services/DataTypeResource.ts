@@ -5,6 +5,7 @@
 import type { CopyDataTypeRequestModel } from '../models/CopyDataTypeRequestModel';
 import type { CreateDataTypeRequestModel } from '../models/CreateDataTypeRequestModel';
 import type { CreateFolderRequestModel } from '../models/CreateFolderRequestModel';
+import type { DatatypeConfigurationResponseModel } from '../models/DatatypeConfigurationResponseModel';
 import type { DataTypeItemResponseModel } from '../models/DataTypeItemResponseModel';
 import type { DataTypeReferenceResponseModel } from '../models/DataTypeReferenceResponseModel';
 import type { DataTypeResponseModel } from '../models/DataTypeResponseModel';
@@ -208,6 +209,20 @@ export class DataTypeResource {
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDataTypeConfiguration(): CancelablePromise<DatatypeConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/data-type/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

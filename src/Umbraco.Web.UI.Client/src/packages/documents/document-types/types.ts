@@ -4,7 +4,7 @@ import type { ContentTypeCleanupModel } from '@umbraco-cms/backoffice/backend-ap
 
 export interface UmbDocumentTypeDetailModel extends UmbContentTypeModel {
 	entityType: UmbDocumentTypeEntityType;
-	allowedTemplateIds: Array<string>;
-	defaultTemplateId: string | null;
+	allowedTemplates: Array<{ id: string }>;
+	defaultTemplate: { id: string } | null;
 	cleanup: ContentTypeCleanupModel;
 }

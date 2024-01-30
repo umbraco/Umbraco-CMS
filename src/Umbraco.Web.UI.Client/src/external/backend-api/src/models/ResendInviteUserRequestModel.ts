@@ -7,3 +7,4 @@ export type ResendInviteUserRequestModel = {
     userId: string;
     message?: string | null;
 };
+

@@ -1,8 +1,7 @@
 export interface UmbTreeItemModelBase {
-	entityType: string;
 	name: string;
+	entityType: string;
 	hasChildren: boolean;
-	isContainer: boolean;
 	isFolder: boolean;
 	icon?: string | null;
 }
@@ -11,6 +10,13 @@ export interface UmbUniqueTreeItemModel extends UmbTreeItemModelBase {
 	unique: string;
 	parentUnique: string | null;
 }
+
+// Root
+export interface UmbUniqueTreeRootModel extends UmbTreeItemModelBase {
+	unique: null;
+}
+
+// ------------------------------------
 
 // TODO: remove this when we have unique for everything
 export interface UmbEntityTreeItemModel extends UmbTreeItemModelBase {
@@ -22,11 +28,6 @@ export interface UmbEntityTreeItemModel extends UmbTreeItemModelBase {
 export interface UmbFileSystemTreeItemModel extends UmbTreeItemModelBase {
 	path: string;
 	isFolder: boolean;
-}
-
-// Root
-export interface UmbUniqueTreeRootModel extends UmbTreeItemModelBase {
-	unique: null;
 }
 
 // TODO: remove this when we have unique for everything

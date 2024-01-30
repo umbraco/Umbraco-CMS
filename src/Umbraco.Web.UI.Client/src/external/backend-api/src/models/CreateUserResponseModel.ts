@@ -7,3 +7,4 @@ export type CreateUserResponseModel = {
     userId: string;
     initialPassword?: string | null;
 };
+

@@ -10,3 +10,4 @@ export type DataTypeReferenceResponseModel = {
     type: string;
     properties: Array<DataTypePropertyReferenceModel>;
 };
+

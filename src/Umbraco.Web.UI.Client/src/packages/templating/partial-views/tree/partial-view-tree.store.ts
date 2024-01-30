@@ -39,7 +39,6 @@ export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
 			name: item.name,
 			hasChildren: false,
-			isContainer: false,
 			isFolder: false,
 		};
 

@@ -13,3 +13,4 @@ export type TemplateQueryExecuteModel = {
     sort?: TemplateQueryExecuteSortModel | null;
     take: number;
 };
+
