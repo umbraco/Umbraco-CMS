@@ -29,6 +29,9 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	_contentUdi?: string;
 
 	@state()
+	_hasSettings = false;
+
+	@state()
 	_label = '';
 
 	@state()
@@ -51,6 +54,10 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		});
 		this.observe(this.#context.contentUdi, (contentUdi) => {
 			this._contentUdi = contentUdi;
+		});
+		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
+			console.log(blockTypeSettingsElementTypeKey, !!blockTypeSettingsElementTypeKey);
+			this._hasSettings = blockTypeSettingsElementTypeKey !== undefined;
 		});
 		this.observe(this.#context.label, (label) => {
 			this._blockViewProps.label = label;
@@ -96,6 +103,11 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 				${this._workspaceEditPath
 					? html`<uui-button label="edit" compact href=${this._workspaceEditPath}>
 							<uui-icon name="icon-edit"></uui-icon>
+					  </uui-button>`
+					: ''}
+				${this._workspaceEditPath && this._hasSettings
+					? html`<uui-button label="Edit settings" compact href=${this._workspaceEditPath + '/view/settings'}>
+							<uui-icon name="icon-settings"></uui-icon>
 					  </uui-button>`
 					: ''}
 				<uui-button label="delete" compact @click=${this.#requestDelete}>
