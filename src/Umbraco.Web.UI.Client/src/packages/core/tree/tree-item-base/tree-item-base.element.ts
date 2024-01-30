@@ -8,9 +8,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-tree-item-base')
 export class UmbTreeItemBaseElement extends UmbLitElement {
 	@state()
-	private _iconAlias?: string;
-
-	@state()
 	private _item?: UmbTreeItemModelBase;
 
 	@state()

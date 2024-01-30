@@ -2,6 +2,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbPartialViewCreateOptionsModalData {
 	parentUnique: string | null;
+	entityType: string;
 }
 
 export const UMB_PARTIAL_VIEW_CREATE_OPTIONS_MODAL = new UmbModalToken<UmbPartialViewCreateOptionsModalData>(

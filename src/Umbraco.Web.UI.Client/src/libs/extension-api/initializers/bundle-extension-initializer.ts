@@ -11,7 +11,7 @@ export class UmbBundleExtensionInitializer extends UmbBaseController {
 	constructor(host: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry<ManifestBundle>) {
 		super(host);
 		this.#extensionRegistry = extensionRegistry;
-		this.observe(extensionRegistry.extensionsOfType('bundle'), (bundles) => {
+		this.observe(extensionRegistry.byType('bundle'), (bundles) => {
 			// Unregister removed bundles:
 			this.#bundleMap.forEach((existingBundle) => {
 				if (!bundles.find((b) => b.alias === existingBundle.alias)) {

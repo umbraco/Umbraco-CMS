@@ -1,7 +1,7 @@
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
-import type { DefaultLocalizationSet, LocalizationSet} from './manager.js';
-import { registerLocalization, localizations } from './manager.js';
-import { UmbLocalizeController } from './localize.controller.js';
+import type { UmbLocalizationSet, UmbLocalizationSetBase } from './localization.manager.js';
+import { umbLocalizationManager } from './localization.manager.js';
+import { UmbLocalizationController } from './localization.controller.js';
 import { LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,7 +11,21 @@ class UmbLocalizeControllerHostElement extends UmbElementMixin(LitElement) {
 	@property() lang = 'en-us';
 }
 
-interface TestLocalization extends LocalizationSet {
+@customElement('umb-localization-render-count')
+class UmbLocalizationRenderCountElement extends UmbElementMixin(LitElement) {
+	amountOfUpdates = 0;
+
+	requestUpdate() {
+		super.requestUpdate();
+		this.amountOfUpdates++;
+	}
+
+	render() {
+		return html`${this.localize.term('logout')}`;
+	}
+}
+
+interface TestLocalization extends UmbLocalizationSetBase {
 	close: string;
 	logout: string;
 	withInlineToken: any;
@@ -36,20 +50,26 @@ const english: TestLocalization = {
 	},
 };
 
-const englishOverride: DefaultLocalizationSet = {
+const englishOverride: UmbLocalizationSet = {
 	$code: 'en-us',
 	$dir: 'ltr',
 	close: 'Close 2',
 };
 
-const danish: DefaultLocalizationSet = {
+const englishOverrideLogout: UmbLocalizationSet = {
+	$code: 'en-us',
+	$dir: 'ltr',
+	logout: 'Log out 2',
+};
+
+const danish: UmbLocalizationSet = {
 	$code: 'da',
 	$dir: 'ltr',
 	close: 'Luk',
 	notOnRegional: 'Not on regional',
 };
 
-const danishRegional: DefaultLocalizationSet = {
+const danishRegional: UmbLocalizationSet = {
 	$code: 'da-dk',
 	$dir: 'ltr',
 	close: 'Luk',
@@ -57,10 +77,10 @@ const danishRegional: DefaultLocalizationSet = {
 //#endregion
 
 describe('UmbLocalizeController', () => {
-	let controller: UmbLocalizeController<TestLocalization>;
+	let controller: UmbLocalizationController;
 
 	beforeEach(async () => {
-		registerLocalization(english, danish, danishRegional);
+		umbLocalizationManager.registerManyLocalizations([english, danish, danishRegional]);
 		document.documentElement.lang = english.$code;
 		document.documentElement.dir = english.$dir;
 		await aTimeout(0);
@@ -72,12 +92,12 @@ describe('UmbLocalizeController', () => {
 			getControllers: () => [],
 			removeControllerByAlias: () => {},
 		} satisfies UmbControllerHost;
-		controller = new UmbLocalizeController(host);
+		controller = new UmbLocalizationController(host);
 	});
 
 	afterEach(() => {
 		controller.destroy();
-		localizations.clear();
+		umbLocalizationManager.localizations.clear();
 	});
 
 	it('should have a default language', () => {
@@ -130,9 +150,9 @@ describe('UmbLocalizeController', () => {
 			expect(controller.term('logout')).to.equal('Log out'); // Fallback
 		});
 
-		it('should override a term if new translation is registered', () => {
+		it('should override a term if new localization is registered', () => {
 			// Let the registry load the new extension
-			registerLocalization(englishOverride);
+			umbLocalizationManager.registerLocalization(englishOverride);
 
 			expect(controller.term('close')).to.equal('Close 2');
 		});
@@ -151,6 +171,42 @@ describe('UmbLocalizeController', () => {
 		it('should return a term with no tokens even though they are provided', async () => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			expect((controller.term as any)('logout', 'Hello', 'World')).to.equal('Log out');
+		});
+
+		it('only reacts to changes of its own localization-keys', async () => {
+			const element: UmbLocalizationRenderCountElement = await fixture(
+				html`<umb-localization-render-count></umb-localization-render-count>`,
+			);
+
+			// Something triggers multiple updates initially, and it varies how many it is. So we wait for a timeout to ensure that we have a clean slate and then reset the counter:
+			await aTimeout(20);
+			element.amountOfUpdates = 0;
+
+			expect(element.shadowRoot!.textContent).to.equal('Log out');
+
+			// Let the registry load the new extension
+			umbLocalizationManager.registerLocalization(englishOverride);
+
+			// Wait three frames is safe:
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+
+			// This should still be the same (cause it should not be affected as the change did not change our localization key)
+			expect(element.amountOfUpdates).to.equal(0);
+			expect(element.shadowRoot!.textContent).to.equal('Log out');
+
+			// Let the registry load the new extension
+			umbLocalizationManager.registerLocalization(englishOverrideLogout);
+
+			// Wait three frames is safe:
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+
+			// Now we should have gotten one update and the text should be different
+			expect(element.amountOfUpdates).to.equal(1);
+			expect(element.shadowRoot!.textContent).to.equal('Log out 2');
 		});
 	});
 
@@ -226,7 +282,7 @@ describe('UmbLocalizeController', () => {
 		});
 
 		it('should have a localize controller', () => {
-			expect(element.localize).to.be.instanceOf(UmbLocalizeController);
+			expect(element.localize).to.be.instanceOf(UmbLocalizationController);
 		});
 
 		it('should update the term when the language changes', async () => {

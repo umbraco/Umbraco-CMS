@@ -13,7 +13,7 @@ export class UmbEntryPointExtensionInitializer extends UmbBaseController {
 		super(host);
 		this.#host = host;
 		this.#extensionRegistry = extensionRegistry;
-		this.observe(extensionRegistry.extensionsOfType('entryPoint'), (entryPoints) => {
+		this.observe(extensionRegistry.byType('entryPoint'), (entryPoints) => {
 			entryPoints.forEach((entryPoint) => {
 				if (this.#entryPointMap.has(entryPoint.alias)) return;
 				this.#entryPointMap.set(entryPoint.alias, entryPoint);

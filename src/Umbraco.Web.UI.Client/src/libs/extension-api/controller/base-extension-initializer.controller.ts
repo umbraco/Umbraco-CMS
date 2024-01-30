@@ -73,7 +73,7 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 	protected _init() {
 		this.#manifestObserver = this.observe(
-			this.#extensionRegistry.getByAlias<ManifestType>(this.#alias),
+			this.#extensionRegistry.byAlias<ManifestType>(this.#alias),
 			async (extensionManifest) => {
 				this.#clearPermittedState();
 				this.#manifest = extensionManifest;
@@ -143,7 +143,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (conditionConfigs.length > 0) {
 			// Observes the conditions and initialize as they come in.
 			this.observe(
-				this.#extensionRegistry.getByTypeAndAliases('condition', conditionAliases),
+				this.#extensionRegistry.byTypeAndAliases('condition', conditionAliases),
 				this.#gotConditions,
 				'_observeConditions',
 			);
