@@ -32,10 +32,10 @@ export class SecurityResource {
      * @throws ApiError
      */
     public static postSecurityForgotPassword({
-requestBody,
-}: {
-requestBody?: ResetPasswordRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: ResetPasswordRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/forgot-password',
@@ -48,14 +48,14 @@ requestBody?: ResetPasswordRequestModel,
     }
 
     /**
-     * @returns void 
+     * @returns void
      * @throws ApiError
      */
     public static postSecurityForgotPasswordReset({
-requestBody,
-}: {
-requestBody?: ResetPasswordTokenRequestModel,
-}): CancelablePromise<void> {
+        requestBody,
+    }: {
+        requestBody?: ResetPasswordTokenRequestModel,
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/forgot-password/reset',
@@ -70,14 +70,14 @@ requestBody?: ResetPasswordTokenRequestModel,
     }
 
     /**
-     * @returns void 
+     * @returns void
      * @throws ApiError
      */
     public static postSecurityForgotPasswordVerify({
-requestBody,
-}: {
-requestBody?: (VerifyResetPasswordTokenRequestModel | ResetPasswordTokenRequestModel),
-}): CancelablePromise<void> {
+        requestBody,
+    }: {
+        requestBody?: (VerifyResetPasswordTokenRequestModel | ResetPasswordTokenRequestModel),
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/forgot-password/verify',

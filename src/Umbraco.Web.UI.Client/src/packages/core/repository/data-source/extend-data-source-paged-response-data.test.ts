@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import type { UmbPagedData } from './types.js';
+import type { UmbPagedModel } from './types.js';
 import type { DataSourceResponse } from './data-source-response.interface.js';
 import { extendDataSourcePagedResponseData } from './extend-data-source-paged-response-data.function.js';
 
@@ -10,7 +10,7 @@ describe('extendDataSourcePagedResponseData', () => {
 
 	describe('Extending data set', () => {
 		it('has an controllerAlias property', () => {
-			const response: DataSourceResponse<UmbPagedData<object>> = {
+			const response: DataSourceResponse<UmbPagedModel<object>> = {
 				data: {
 					items: [
 						{

@@ -11,3 +11,4 @@ export type SearchResultResponseModel = {
     readonly fieldCount: number;
     fields: Array<FieldPresentationModel>;
 };
+

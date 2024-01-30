@@ -6,3 +6,4 @@
 import type { DomainsPresentationModelBaseModel } from './DomainsPresentationModelBaseModel';
 
 export type DomainsResponseModel = DomainsPresentationModelBaseModel;
+

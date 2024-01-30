@@ -1,6 +1,9 @@
 import { UmbEntityData } from './entity.data.js';
 import { createEntityTreeItem } from './utils.js';
-import type { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	EntityTreeItemResponseModel,
+	PagedNamedEntityTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbMemberGroupDetailModel } from '@umbraco-cms/backoffice/member-group';
 
 export const data: Array<any> = [
@@ -23,14 +26,14 @@ class UmbMemberGroupData extends UmbEntityData<UmbMemberGroupDetailModel> {
 		super(data);
 	}
 
-	getTreeRoot(): PagedEntityTreeItemResponseModel {
+	getTreeRoot(): PagedNamedEntityTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(id: string): PagedEntityTreeItemResponseModel {
+	getTreeItemChildren(id: string): PagedNamedEntityTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;

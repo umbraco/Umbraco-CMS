@@ -12,3 +12,4 @@ export type InstallVResponseModel = {
     database: DatabaseInstallResponseModel;
     telemetryLevel: TelemetryLevelModel;
 };
+

@@ -19,7 +19,6 @@ export class UmbRelationTypeTreeRepository
 			id: null,
 			entityType: UMB_RELATION_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Relation Types',
-			icon: 'icon-folder',
 			hasChildren: true,
 			isContainer: false,
 			isFolder: true,

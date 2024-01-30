@@ -15,3 +15,4 @@ export type UserGroupBaseModel = {
     mediaRootAccess: boolean;
     permissions: Array<string>;
 };
+

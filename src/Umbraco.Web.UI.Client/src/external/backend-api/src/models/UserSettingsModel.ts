@@ -10,3 +10,4 @@ export type UserSettingsModel = {
     minNonAlphaNumericLength: number;
     consentLevels: Array<ConsentLevelPresentationModel>;
 };
+

@@ -9,3 +9,4 @@ export type PagedSearcherResponseModel = {
     total: number;
     items: Array<SearcherResponseModel>;
 };
+

@@ -10,3 +10,4 @@ export type UpdateContentForDocumentRequestModel = {
     values: Array<DocumentValueModel>;
     variants: Array<DocumentVariantRequestModel>;
 };
+

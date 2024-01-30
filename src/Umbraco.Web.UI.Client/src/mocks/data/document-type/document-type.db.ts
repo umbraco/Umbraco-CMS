@@ -3,15 +3,18 @@ import { UmbMockEntityFolderManager } from '../entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
-import type { UmbMockDocumentTypeModel} from './document-type.data.js';
+import type { UmbMockDocumentTypeModel } from './document-type.data.js';
 import { data } from './document-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
+	AllowedDocumentTypeModel,
 	CreateDocumentTypeRequestModel,
 	CreateFolderRequestModel,
 	DocumentTypeItemResponseModel,
 	DocumentTypeResponseModel,
+	DocumentTypeSortModel,
 	DocumentTypeTreeItemResponseModel,
+	PagedAllowedDocumentTypeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel> {
@@ -27,13 +30,28 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 	constructor(data: Array<UmbMockDocumentTypeModel>) {
 		super(data);
 	}
+
+	getAllowedChildren(id: string): PagedAllowedDocumentTypeModel {
+		const documentType = this.detail.read(id);
+		const allowedDocumentTypes = documentType.allowedDocumentTypes.map((sortModel: DocumentTypeSortModel) =>
+			this.detail.read(sortModel.documentType.id),
+		);
+		const mappedItems = allowedDocumentTypes.map((item: UmbMockDocumentTypeModel) => allowedDocumentTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
+	}
+
+	getAllowedAtRoot(): PagedAllowedDocumentTypeModel {
+		const mockItems = this.data.filter((item) => item.allowedAsRoot);
+		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
+	}
 }
 
 const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): UmbMockDocumentTypeModel => {
 	return {
 		name: request.name,
 		id: request.id ? request.id : UmbId.new(),
-		parentId: request.parentId,
+		parent: request.parentId ? { id: request.parentId } : null,
 		description: '',
 		alias: '',
 		icon: '',
@@ -43,12 +61,11 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		isFolder: true,
 		hasChildren: false,
-		isContainer: false,
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		cleanup: {
 			preventCleanup: false,
 			keepAllVersionsNewerThanDays: null,
@@ -70,13 +87,12 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 		variesByCulture: request.variesByCulture,
 		variesBySegment: request.variesBySegment,
 		isElement: request.isElement,
-		allowedContentTypes: request.allowedContentTypes,
+		allowedDocumentTypes: request.allowedDocumentTypes,
 		compositions: request.compositions,
-		parentId: request.containerId,
+		parent: request.folder,
 		isFolder: false,
 		hasChildren: false,
-		isContainer: false,
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		cleanup: {
 			preventCleanup: false,
 			keepAllVersionsNewerThanDays: null,
@@ -98,9 +114,9 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,
-		allowedContentTypes: item.allowedContentTypes,
+		allowedDocumentTypes: item.allowedDocumentTypes,
 		compositions: item.compositions,
-		allowedTemplateIds: item.allowedTemplateIds,
+		allowedTemplates: item.allowedTemplates,
 		cleanup: item.cleanup,
 	};
 };
@@ -112,8 +128,7 @@ const documentTypeTreeItemMapper = (
 		name: item.name,
 		hasChildren: item.hasChildren,
 		id: item.id,
-		isContainer: item.isContainer,
-		parentId: item.parentId,
+		parent: item.parent,
 		isFolder: item.isFolder,
 		icon: item.icon,
 		isElement: item.isElement,
@@ -126,6 +141,15 @@ const documentTypeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeIte
 		name: item.name,
 		icon: item.icon,
 		isElement: item.isElement,
+	};
+};
+
+const allowedDocumentTypeMapper = (item: UmbMockDocumentTypeModel): AllowedDocumentTypeModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		description: item.description,
+		icon: item.icon,
 	};
 };
 

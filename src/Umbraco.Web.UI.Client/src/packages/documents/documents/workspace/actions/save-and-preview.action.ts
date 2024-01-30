@@ -13,6 +13,6 @@ export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceAction
 		const document = this.workspaceContext.getData();
 		// TODO: handle errors
 		if (!document) return;
-		this.workspaceContext.repository?.saveAndPreview();
+		//this.workspaceContext.repository?.saveAndPreview();
 	}
 }

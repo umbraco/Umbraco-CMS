@@ -6,3 +6,4 @@
 export type OkResult = {
     statusCode: number;
 };
+
