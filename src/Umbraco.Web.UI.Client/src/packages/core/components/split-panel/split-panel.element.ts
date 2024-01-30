@@ -119,23 +119,23 @@ export class UmbSplitPanelElement extends LitElement {
 
 	#updateSplit() {
 		// If lock is none
-		let maxStartWidth = `clamp(var(--umb-split-panel-start-min-width, 0px), ${this.position}, var(--umb-split-panel-start-max-width, 100%))`;
+		let maxStartWidth = this.position;
 		let maxEndWidth = '1fr';
 
 		if (this.lock === 'start') {
-			maxStartWidth = `clamp(var(--umb-split-panel-start-min-width, 0px), ${
-				this.#lockedPanelWidth
-			}px, var(--umb-split-panel-start-max-width, 100%))`;
+			maxStartWidth = this.#lockedPanelWidth + 'px';
 			maxEndWidth = `1fr`;
 		}
 		if (this.lock === 'end') {
 			maxStartWidth = `1fr`;
-			maxEndWidth = `clamp(var(--umb-split-panel-end-min-width, 0px), ${
-				this.#lockedPanelWidth
-			}px, var(--umb-split-panel-end-max-width, 100%))`;
+			maxEndWidth = this.#lockedPanelWidth + 'px';
 		}
 
-		this.mainElement.style.gridTemplateColumns = `${maxStartWidth} 0px ${maxEndWidth}`;
+		this.mainElement.style.gridTemplateColumns = `
+      minmax(var(--umb-split-panel-start-min-width, 0), ${maxStartWidth})
+      0px
+      minmax(var(--umb-split-panel-end-min-width, 0), ${maxEndWidth})
+    `;
 	}
 
 	#onDragStart(event: PointerEvent) {
