@@ -47,7 +47,7 @@ public class CreateDocumentController : DocumentControllerBase
             User,
             ContentPermissionResource.WithKeys(
                 ActionNew.ActionLetter,
-                requestModel.ParentId,
+                requestModel.Parent?.Id,
                 requestModel.Variants
                     .Where(v => v.Culture is not null)
                     .Select(v => v.Culture!)),

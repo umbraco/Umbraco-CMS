@@ -1856,6 +1856,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -2108,6 +2111,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -2522,17 +2528,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -2580,17 +2586,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -3078,6 +3084,93 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document-type/{id}/allowed-children": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetDocumentTypeByIdAllowedChildren",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document-type/{id}/composition-references": {
       "get": {
         "tags": [
@@ -3396,6 +3489,64 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document-type/allowed-at-root": {
+      "get": {
+        "tags": [
+          "Document Type"
+        ],
+        "operationId": "GetDocumentTypeAllowedAtRoot",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedDocumentTypeModel"
                 }
               }
             }
@@ -4263,6 +4414,79 @@
                       "$ref": "#/components/schemas/DocumentResponseModel"
                     }
                   ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "DeleteDocumentById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -5582,92 +5806,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/document/allowed-document-types": {
-      "get": {
-        "tags": [
-          "Document"
-        ],
-        "operationId": "GetDocumentAllowedDocumentTypes",
-        "parameters": [
-          {
-            "name": "parentId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTypeResponseModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTypeResponseModel"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedDocumentTypeResponseModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/document/configuration": {
       "get": {
         "tags": [
@@ -5735,21 +5873,6 @@
                 "type": "string",
                 "format": "uuid"
               }
-            }
-          },
-          {
-            "name": "dataTypeId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "culture",
-            "in": "query",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -5945,6 +6068,81 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/recycle-bin/document/{id}": {
+      "delete": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "DeleteRecycleBinDocumentById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/recycle-bin/document/children": {
       "get": {
         "tags": [
@@ -5985,17 +6183,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               }
             }
@@ -6043,17 +6241,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               }
             }
@@ -6108,13 +6306,6 @@
             "schema": {
               "type": "string",
               "format": "uuid"
-            }
-          },
-          {
-            "name": "culture",
-            "in": "query",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -6181,13 +6372,6 @@
             "schema": {
               "type": "string",
               "format": "uuid"
-            }
-          },
-          {
-            "name": "culture",
-            "in": "query",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -8744,6 +8928,93 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/media-type/{id}/allowed-children": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetMediaTypeByIdAllowedChildren",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedMediaTypeModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedMediaTypeModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedMediaTypeModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/media-type/{id}/composition-references": {
       "get": {
         "tags": [
@@ -9062,6 +9333,64 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media-type/allowed-at-root": {
+      "get": {
+        "tags": [
+          "Media Type"
+        ],
+        "operationId": "GetMediaTypeAllowedAtRoot",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedMediaTypeModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedMediaTypeModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAllowedMediaTypeModel"
                 }
               }
             }
@@ -9858,7 +10187,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DocumentResponseModel"
+                      "$ref": "#/components/schemas/MediaResponseModel"
                     }
                   ]
                 }
@@ -9867,7 +10196,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DocumentResponseModel"
+                      "$ref": "#/components/schemas/MediaResponseModel"
                     }
                   ]
                 }
@@ -9876,7 +10205,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DocumentResponseModel"
+                      "$ref": "#/components/schemas/MediaResponseModel"
                     }
                   ]
                 }
@@ -10230,14 +10559,6 @@
                 "format": "uuid"
               }
             }
-          },
-          {
-            "name": "dataTypeId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
           }
         ],
         "responses": {
@@ -10472,17 +10793,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               }
             }
@@ -10530,17 +10851,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               }
             }
@@ -10615,86 +10936,6 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedMediaTreeItemResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/tree/media/item": {
-      "get": {
-        "tags": [
-          "Media"
-        ],
-        "operationId": "GetTreeMediaItem",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          },
-          {
-            "name": "dataTypeId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/MediaTreeItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/MediaTreeItemResponseModel"
-                      }
-                    ]
-                  }
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/MediaTreeItemResponseModel"
-                      }
-                    ]
-                  }
                 }
               }
             }
@@ -10881,17 +11122,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -11012,17 +11253,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -14096,17 +14337,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -18049,17 +18290,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -18107,17 +18348,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
                 }
               }
             }
@@ -20024,6 +20265,26 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -20466,6 +20727,82 @@
       }
     },
     "/umbraco/management/api/v1/user/current/2fa/{providerName}": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "DeleteUserCurrent2faByProviderName",
+        "parameters": [
+          {
+            "name": "providerName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
       "post": {
         "tags": [
           "User"
@@ -20565,6 +20902,26 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           }
@@ -20622,82 +20979,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "DeleteUserCurrent2faByProviderName",
-        "parameters": [
-          {
-            "name": "providerName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "code",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
           },
           "404": {
             "description": "Not Found",
@@ -21912,6 +22193,49 @@
   },
   "components": {
     "schemas": {
+      "AllowedContentTypeModel": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AllowedDocumentTypeModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AllowedContentTypeModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "AllowedMediaTypeModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AllowedContentTypeModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "AuditLogBaseModel": {
         "required": [
           "logType",
@@ -22079,6 +22403,13 @@
         },
         "additionalProperties": false
       },
+      "CompositionTypeModel": {
+        "enum": [
+          "Composition",
+          "Inheritance"
+        ],
+        "type": "string"
+      },
       "ConsentLevelPresentationModel": {
         "required": [
           "description",
@@ -22098,7 +22429,6 @@
       },
       "ContentForDocumentResponseModel": {
         "required": [
-          "contentTypeId",
           "id",
           "values",
           "variants"
@@ -22128,8 +22458,39 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentForMediaResponseModel": {
+        "required": [
+          "id",
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaValueModel"
+                }
+              ]
+            }
           },
-          "contentTypeId": {
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaVariantResponseModel"
+                }
+              ]
+            }
+          },
+          "id": {
             "type": "string",
             "format": "uuid"
           }
@@ -22193,23 +22554,6 @@
         },
         "additionalProperties": false
       },
-      "ContentTypeCompositionModel": {
-        "required": [
-          "compositionType",
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "compositionType": {
-            "$ref": "#/components/schemas/ContentTypeCompositionTypeModel"
-          }
-        },
-        "additionalProperties": false
-      },
       "ContentTypeCompositionRequestModelBaseModel": {
         "required": [
           "currentCompositeIds",
@@ -22259,19 +22603,10 @@
         },
         "additionalProperties": false
       },
-      "ContentTypeCompositionTypeModel": {
-        "enum": [
-          "Composition",
-          "Inheritance"
-        ],
-        "type": "string"
-      },
       "ContentTypeForDocumentTypeResponseModel": {
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "id",
@@ -22331,26 +22666,6 @@
               ]
             }
           },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
-          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -22362,8 +22677,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "id",
@@ -22423,26 +22736,6 @@
               ]
             }
           },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
-          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -22450,10 +22743,11 @@
         },
         "additionalProperties": false
       },
-      "ContentTypeSortModel": {
+      "ContentTypeReferenceResponseModelBaseModel": {
         "required": [
-          "id",
-          "sortOrder"
+          "hasListView",
+          "icon",
+          "id"
         ],
         "type": "object",
         "properties": {
@@ -22461,9 +22755,11 @@
             "type": "string",
             "format": "uuid"
           },
-          "sortOrder": {
-            "type": "integer",
-            "format": "int32"
+          "icon": {
+            "type": "string"
+          },
+          "hasListView": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -22502,9 +22798,12 @@
         ],
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "relateToOriginal": {
@@ -22519,9 +22818,12 @@
       "CopyDocumentTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -22530,9 +22832,12 @@
       "CopyMediaTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -22570,9 +22875,12 @@
             "format": "uuid",
             "nullable": true
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -22610,9 +22918,12 @@
             "format": "uuid",
             "nullable": true
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -22622,8 +22933,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "isElement",
@@ -22682,34 +22991,17 @@
               ]
             }
           },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
-          },
           "id": {
             "type": "string",
             "format": "uuid",
             "nullable": true
           },
-          "containerId": {
-            "type": "string",
-            "format": "uuid",
+          "folder": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -22719,8 +23011,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "isElement",
@@ -22779,34 +23069,17 @@
               ]
             }
           },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
-          },
           "id": {
             "type": "string",
             "format": "uuid",
             "nullable": true
           },
-          "containerId": {
-            "type": "string",
-            "format": "uuid",
+          "folder": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -22856,7 +23129,7 @@
       },
       "CreateDocumentRequestModel": {
         "required": [
-          "contentTypeId"
+          "documentType"
         ],
         "type": "object",
         "allOf": [
@@ -22865,13 +23138,19 @@
           }
         ],
         "properties": {
-          "contentTypeId": {
-            "type": "string",
-            "format": "uuid"
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
-          "templateId": {
-            "type": "string",
-            "format": "uuid",
+          "template": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -22897,8 +23176,10 @@
       },
       "CreateDocumentTypeRequestModel": {
         "required": [
-          "allowedTemplateIds",
-          "cleanup"
+          "allowedDocumentTypes",
+          "allowedTemplates",
+          "cleanup",
+          "compositions"
         ],
         "type": "object",
         "allOf": [
@@ -22907,16 +23188,22 @@
           }
         ],
         "properties": {
-          "allowedTemplateIds": {
+          "allowedTemplates": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
-          "defaultTemplateId": {
-            "type": "string",
-            "format": "uuid",
+          "defaultTemplate": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "cleanup": {
@@ -22925,6 +23212,26 @@
                 "$ref": "#/components/schemas/ContentTypeCleanupModel"
               }
             ]
+          },
+          "allowedDocumentTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeCompositionModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -22987,7 +23294,7 @@
       },
       "CreateMediaRequestModel": {
         "required": [
-          "contentTypeId"
+          "mediaType"
         ],
         "type": "object",
         "allOf": [
@@ -22996,9 +23303,12 @@
           }
         ],
         "properties": {
-          "contentTypeId": {
-            "type": "string",
-            "format": "uuid"
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -23022,12 +23332,38 @@
         "additionalProperties": false
       },
       "CreateMediaTypeRequestModel": {
+        "required": [
+          "allowedMediaTypes",
+          "compositions"
+        ],
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/CreateContentTypeForMediaTypeRequestModel"
           }
         ],
+        "properties": {
+          "allowedMediaTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeCompositionModel"
+                }
+              ]
+            }
+          }
+        },
         "additionalProperties": false
       },
       "CreatePackageRequestModel": {
@@ -23287,7 +23623,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "properties": {
@@ -23582,7 +23918,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -23704,7 +24040,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -23717,7 +24053,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/EntityTreeItemResponseModel"
+            "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
           }
         ],
         "properties": {
@@ -23761,8 +24097,10 @@
       },
       "DocumentItemResponseModel": {
         "required": [
-          "contentTypeId",
-          "isTrashed"
+          "documentType",
+          "isProtected",
+          "isTrashed",
+          "variants"
         ],
         "type": "object",
         "allOf": [
@@ -23771,16 +24109,28 @@
           }
         ],
         "properties": {
-          "icon": {
-            "type": "string",
-            "nullable": true
-          },
-          "contentTypeId": {
-            "type": "string",
-            "format": "uuid"
-          },
           "isTrashed": {
             "type": "boolean"
+          },
+          "isProtected": {
+            "type": "boolean"
+          },
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -23801,8 +24151,41 @@
         },
         "additionalProperties": false
       },
+      "DocumentRecycleBinItemResponseModel": {
+        "required": [
+          "documentType",
+          "variants"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RecycleBinItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentResponseModel": {
         "required": [
+          "documentType",
           "isTrashed",
           "urls"
         ],
@@ -23823,24 +24206,31 @@
               ]
             }
           },
-          "templateId": {
-            "type": "string",
-            "format": "uuid",
+          "template": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "isTrashed": {
             "type": "boolean"
+          },
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
       },
       "DocumentTreeItemResponseModel": {
         "required": [
-          "contentTypeId",
-          "icon",
-          "isEdited",
+          "documentType",
           "isProtected",
-          "isPublished",
           "variants"
         ],
         "type": "object",
@@ -23853,28 +24243,42 @@
           "isProtected": {
             "type": "boolean"
           },
-          "isPublished": {
-            "type": "boolean"
-          },
-          "isEdited": {
-            "type": "boolean"
-          },
-          "contentTypeId": {
-            "type": "string",
-            "format": "uuid"
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+              }
+            ]
           },
           "variants": {
             "type": "array",
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/VariantTreeItemModel"
+                  "$ref": "#/components/schemas/DocumentVariantItemResponseModel"
                 }
               ]
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentTypeCompositionModel": {
+        "required": [
+          "compositionType",
+          "documentType"
+        ],
+        "type": "object",
+        "properties": {
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
-          "icon": {
-            "type": "string"
+          "compositionType": {
+            "$ref": "#/components/schemas/CompositionTypeModel"
           }
         },
         "additionalProperties": false
@@ -23928,7 +24332,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "properties": {
@@ -23960,10 +24364,21 @@
         ],
         "additionalProperties": false
       },
+      "DocumentTypeReferenceResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTypeReferenceResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "DocumentTypeResponseModel": {
         "required": [
-          "allowedTemplateIds",
-          "cleanup"
+          "allowedDocumentTypes",
+          "allowedTemplates",
+          "cleanup",
+          "compositions"
         ],
         "type": "object",
         "allOf": [
@@ -23972,16 +24387,22 @@
           }
         ],
         "properties": {
-          "allowedTemplateIds": {
+          "allowedTemplates": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
-          "defaultTemplateId": {
-            "type": "string",
-            "format": "uuid",
+          "defaultTemplate": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "cleanup": {
@@ -23990,6 +24411,47 @@
                 "$ref": "#/components/schemas/ContentTypeCleanupModel"
               }
             ]
+          },
+          "allowedDocumentTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeCompositionModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentTypeSortModel": {
+        "required": [
+          "documentType",
+          "sortOrder"
+        ],
+        "type": "object",
+        "properties": {
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -24022,6 +24484,23 @@
             "$ref": "#/components/schemas/ValueModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "DocumentVariantItemResponseModel": {
+        "required": [
+          "state"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/ContentStateModel"
+          }
+        },
         "additionalProperties": false
       },
       "DocumentVariantRequestModel": {
@@ -24268,8 +24747,7 @@
       },
       "EntityTreeItemResponseModel": {
         "required": [
-          "id",
-          "isContainer"
+          "id"
         ],
         "type": "object",
         "allOf": [
@@ -24282,12 +24760,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -24484,6 +24962,7 @@
       "FileSystemTreeItemPresentationModel": {
         "required": [
           "isFolder",
+          "name",
           "path"
         ],
         "type": "object",
@@ -24493,6 +24972,9 @@
           }
         ],
         "properties": {
+          "name": {
+            "type": "string"
+          },
           "path": {
             "type": "string"
           },
@@ -24553,7 +25035,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/EntityTreeItemResponseModel"
+            "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
           }
         ],
         "properties": {
@@ -24913,16 +25395,25 @@
         },
         "additionalProperties": false
       },
-      "ItemResponseModelBaseModel": {
+      "ItemReferenceByIdResponseModel": {
         "required": [
-          "id",
-          "name"
+          "id"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string"
-          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ItemResponseModelBaseModel": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
@@ -25199,7 +25690,9 @@
       },
       "MediaItemResponseModel": {
         "required": [
-          "isTrashed"
+          "isTrashed",
+          "mediaType",
+          "variants"
         ],
         "type": "object",
         "allOf": [
@@ -25208,19 +25701,101 @@
           }
         ],
         "properties": {
-          "icon": {
-            "type": "string",
-            "nullable": true
+          "isTrashed": {
+            "type": "boolean"
+          },
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaRecycleBinItemResponseModel": {
+        "required": [
+          "mediaType",
+          "variants"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RecycleBinItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaResponseModel": {
+        "required": [
+          "isTrashed",
+          "mediaType",
+          "urls"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentForMediaResponseModel"
+          }
+        ],
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContentUrlInfoModel"
+                }
+              ]
+            }
           },
           "isTrashed": {
             "type": "boolean"
+          },
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
       },
       "MediaTreeItemResponseModel": {
         "required": [
-          "icon"
+          "mediaType",
+          "variants"
         ],
         "type": "object",
         "allOf": [
@@ -25229,9 +25804,42 @@
           }
         ],
         "properties": {
-          "icon": {
-            "minLength": 1,
-            "type": "string"
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaTypeCompositionModel": {
+        "required": [
+          "compositionType",
+          "mediaType"
+        ],
+        "type": "object",
+        "properties": {
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "compositionType": {
+            "$ref": "#/components/schemas/CompositionTypeModel"
           }
         },
         "additionalProperties": false
@@ -25258,7 +25866,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "properties": {
@@ -25287,13 +25895,69 @@
         ],
         "additionalProperties": false
       },
+      "MediaTypeReferenceResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTypeReferenceResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "MediaTypeResponseModel": {
+        "required": [
+          "allowedMediaTypes",
+          "compositions"
+        ],
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/ContentTypeForMediaTypeResponseModel"
           }
         ],
+        "properties": {
+          "allowedMediaTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeCompositionModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaTypeSortModel": {
+        "required": [
+          "mediaType",
+          "sortOrder"
+        ],
+        "type": "object",
+        "properties": {
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
         "additionalProperties": false
       },
       "MediaTypeTreeItemResponseModel": {
@@ -25344,7 +26008,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -25353,7 +26017,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "properties": {
@@ -25368,7 +26032,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "properties": {
@@ -25449,9 +26113,12 @@
       "MoveDocumentRequestModel": {
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -25460,9 +26127,12 @@
       "MoveDocumentTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -25471,9 +26141,12 @@
       "MoveMediaRequestModel": {
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -25482,10 +26155,47 @@
       "MoveMediaTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NamedEntityTreeItemResponseModel": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EntityTreeItemResponseModel"
+          }
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NamedItemResponseModelBaseModel": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -25724,6 +26434,54 @@
         },
         "additionalProperties": false
       },
+      "PagedAllowedDocumentTypeModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AllowedDocumentTypeModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedAllowedMediaTypeModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/AllowedMediaTypeModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedAuditLogResponseModel": {
         "required": [
           "items",
@@ -25868,6 +26626,30 @@
         },
         "additionalProperties": false
       },
+      "PagedDocumentRecycleBinItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentRecycleBinItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedDocumentTreeItemResponseModel": {
         "required": [
           "items",
@@ -25892,30 +26674,6 @@
         },
         "additionalProperties": false
       },
-      "PagedDocumentTypeResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/DocumentTypeResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedDocumentTypeTreeItemResponseModel": {
         "required": [
           "items",
@@ -25933,54 +26691,6 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedEntityTreeItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/EntityTreeItemResponseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/ContentTreeItemResponseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/DocumentTreeItemResponseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/FolderTreeItemResponseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/MediaTreeItemResponseModel"
-                },
-                {
-                  "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
                 }
               ]
             }
@@ -26180,6 +26890,30 @@
         },
         "additionalProperties": false
       },
+      "PagedMediaRecycleBinItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaRecycleBinItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedMediaTreeItemResponseModel": {
         "required": [
           "items",
@@ -26219,6 +26953,45 @@
             "type": "array",
             "items": {
               "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedNamedEntityTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DataTypeTreeItemResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentBlueprintTreeItemResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/DocumentTypeTreeItemResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/FolderTreeItemResponseModel"
+                },
                 {
                   "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
                 }
@@ -26342,30 +27115,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ProblemDetails"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedRecycleBinItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/RecycleBinItemResponseModel"
-                }
-              ]
             }
           }
         },
@@ -26779,9 +27528,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "name": {
@@ -26803,7 +27555,7 @@
         "required": [
           "alias",
           "appearance",
-          "dataTypeId",
+          "dataType",
           "id",
           "name",
           "sortOrder",
@@ -26817,9 +27569,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "containerId": {
-            "type": "string",
-            "format": "uuid",
+          "container": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "sortOrder": {
@@ -26838,9 +27593,12 @@
             "type": "string",
             "nullable": true
           },
-          "dataTypeId": {
-            "type": "string",
-            "format": "uuid"
+          "dataType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "variesByCulture": {
             "type": "boolean"
@@ -27001,22 +27759,10 @@
         },
         "additionalProperties": false
       },
-      "PublishedStateModel": {
-        "enum": [
-          "Published",
-          "Unpublished",
-          "Publishing",
-          "Unpublishing"
-        ],
-        "type": "string"
-      },
-      "RecycleBinItemResponseModel": {
+      "RecycleBinItemResponseModelBaseModel": {
         "required": [
           "hasChildren",
-          "icon",
           "id",
-          "isContainer",
-          "name",
           "type"
         ],
         "type": "object",
@@ -27025,27 +27771,19 @@
             "type": "string",
             "format": "uuid"
           },
-          "name": {
-            "minLength": 1,
-            "type": "string"
-          },
           "type": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "icon": {
             "minLength": 1,
             "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
           },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemReferenceByIdResponseModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -27105,6 +27843,19 @@
           },
           "userIsAdmin": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReferenceByIdModel": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -27228,7 +27979,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -27757,7 +28508,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "properties": {
@@ -28079,14 +28830,10 @@
       "TreeItemPresentationModel": {
         "required": [
           "hasChildren",
-          "name",
           "type"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string"
-          },
           "type": {
             "type": "string"
           },
@@ -28187,8 +28934,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "isElement",
@@ -28246,26 +28991,6 @@
                 }
               ]
             }
-          },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
@@ -28274,8 +28999,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "isElement",
@@ -28333,26 +29056,6 @@
                 }
               ]
             }
-          },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
@@ -28398,9 +29101,12 @@
           }
         ],
         "properties": {
-          "templateId": {
-            "type": "string",
-            "format": "uuid",
+          "template": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -28426,8 +29132,10 @@
       },
       "UpdateDocumentTypeRequestModel": {
         "required": [
-          "allowedTemplateIds",
-          "cleanup"
+          "allowedDocumentTypes",
+          "allowedTemplates",
+          "cleanup",
+          "compositions"
         ],
         "type": "object",
         "allOf": [
@@ -28436,16 +29144,22 @@
           }
         ],
         "properties": {
-          "allowedTemplateIds": {
+          "allowedTemplates": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
-          "defaultTemplateId": {
-            "type": "string",
-            "format": "uuid",
+          "defaultTemplate": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "cleanup": {
@@ -28454,6 +29168,26 @@
                 "$ref": "#/components/schemas/ContentTypeCleanupModel"
               }
             ]
+          },
+          "allowedDocumentTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeCompositionModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -28513,12 +29247,38 @@
         "additionalProperties": false
       },
       "UpdateMediaTypeRequestModel": {
+        "required": [
+          "allowedMediaTypes",
+          "compositions"
+        ],
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/UpdateContentTypeForMediaTypeRequestModel"
           }
         ],
+        "properties": {
+          "allowedMediaTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeCompositionModel"
+                }
+              ]
+            }
+          }
+        },
         "additionalProperties": false
       },
       "UpdatePackageRequestModel": {
@@ -28770,7 +29530,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "properties": {
@@ -28837,7 +29597,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -29108,6 +29868,31 @@
         },
         "additionalProperties": false
       },
+      "VariantItemResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VariantItemResponseModelBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
+      "VariantItemResponseModelBaseModel": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "culture": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "VariantModelBaseModel": {
         "required": [
           "name"
@@ -29156,26 +29941,6 @@
           "updateDate": {
             "type": "string",
             "format": "date-time"
-          }
-        },
-        "additionalProperties": false
-      },
-      "VariantTreeItemModel": {
-        "required": [
-          "name",
-          "state"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "culture": {
-            "type": "string",
-            "nullable": true
-          },
-          "state": {
-            "$ref": "#/components/schemas/PublishedStateModel"
           }
         },
         "additionalProperties": false

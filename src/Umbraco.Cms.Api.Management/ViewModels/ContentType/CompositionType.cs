@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
-public enum ContentTypeCompositionType
+public enum CompositionType
 {
     Composition,
     Inheritance
