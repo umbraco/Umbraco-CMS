@@ -15,12 +15,11 @@ export class UmbDictionaryTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
-			id: null,
+		const data: UmbDictionaryTreeRootModel = {
+			unique: null,
 			entityType: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
 			name: 'Dictionary',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 

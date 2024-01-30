@@ -1,3 +1,4 @@
+import { UMB_DICTIONARY_ENTITY_TYPE } from '../entity.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -11,7 +12,7 @@ const workspace: ManifestWorkspace = {
 	name: 'Dictionary Workspace',
 	js: () => import('./dictionary-workspace.element.js'),
 	meta: {
-		entityType: 'dictionary-item',
+		entityType: UMB_DICTIONARY_ENTITY_TYPE,
 	},
 };
 

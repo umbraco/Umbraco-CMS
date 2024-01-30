@@ -34,7 +34,7 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	getEntityType() {
-		return 'dictionary-item';
+		return 'dictionary';
 	}
 
 	setName(name: string) {
@@ -107,5 +107,5 @@ export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<
 >(
 	'UmbWorkspaceContext',
 	undefined,
-	(context): context is UmbDictionaryWorkspaceContext => context.getEntityType?.() === 'dictionary-item',
+	(context): context is UmbDictionaryWorkspaceContext => context.getEntityType?.() === 'dictionary',
 );

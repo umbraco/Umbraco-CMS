@@ -1,5 +1,6 @@
 import { UMB_DICTIONARY_TREE_ALIAS } from '../../tree/manifests.js';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
+import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbImportDictionaryModalData, UmbImportDictionaryModalValue } from '@umbraco-cms/backoffice/modal';
@@ -62,7 +63,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				data.push({
 					id: item.id,
 					name: item.name,
-					entityType: 'dictionary-item',
+					entityType: UMB_DICTIONARY_ENTITY_TYPE,
 					hasChildren: item.children.length ? true : false,
 					parentId: parentId || null,
 					isFolder: false,
