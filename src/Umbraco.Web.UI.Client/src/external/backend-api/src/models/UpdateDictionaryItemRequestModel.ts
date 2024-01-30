@@ -6,3 +6,4 @@
 import type { DictionaryItemModelBaseModel } from './DictionaryItemModelBaseModel';
 
 export type UpdateDictionaryItemRequestModel = DictionaryItemModelBaseModel;
+

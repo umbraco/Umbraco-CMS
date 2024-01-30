@@ -1,6 +1,6 @@
 import type { UmbMemberGroupTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import type { EntityTreeItemResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { MemberGroupResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -11,7 +11,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @implements {UmbTreeDataSource}
  */
 export class UmbMemberGroupTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	EntityTreeItemResponseModel,
+	NamedEntityTreeItemResponseModel,
 	UmbMemberGroupTreeItemModel
 > {
 	/**
@@ -39,13 +39,12 @@ const getChildrenOf = (parentUnique: string | null) => {
 	}
 };
 
-const mapper = (item: EntityTreeItemResponseModel): UmbMemberGroupTreeItemModel => {
+const mapper = (item: NamedEntityTreeItemResponseModel): UmbMemberGroupTreeItemModel => {
 	return {
 		id: item.id,
-		parentId: item.parentId || null,
+		parentId: item.parent ? item.parent.id : null,
 		name: item.name,
 		entityType: 'member-group',
-		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 		isFolder: false,
 	};

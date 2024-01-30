@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
+import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
 
-export type UserGroupItemResponseModel = (ItemResponseModelBaseModel & {
-icon?: string | null;
+export type UserGroupItemResponseModel = (NamedItemResponseModelBaseModel & {
+    icon?: string | null;
 });
+

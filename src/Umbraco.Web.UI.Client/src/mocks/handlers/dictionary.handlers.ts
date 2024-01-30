@@ -15,12 +15,11 @@ const uploadResponse: ImportDictionaryRequestModel = {
 
 /// TODO: get correct type
 const importResponse: DictionaryItemResponseModel & EntityTreeItemResponseModel = {
-	parentId: null,
+	parent: null,
 	name: 'Uploaded dictionary',
 	id: 'b7e7d0ab-53ba-485d-dddd-12537f9925cb',
 	hasChildren: false,
 	type: 'dictionary-item',
-	isContainer: false,
 	translations: [
 		{
 			isoCode: 'en',
@@ -185,12 +184,15 @@ export const handlers = [
 
 		if (!file || !importResponse.id) return;
 
-		importResponse.parentId = req.url.searchParams.get('parentId') ?? null;
+		const parentId = req.url.searchParams.get('parentId') ?? null;
+		importResponse.parent = parentId ? { id: parentId } : null;
 		umbDictionaryData.save(importResponse.id, importResponse);
 
 		// build the path to the new item => reflects the expected server response
 		const path = ['-1'];
-		if (importResponse.parentId) path.push(importResponse.parentId);
+		if (importResponse.parent?.id) {
+			path.push(importResponse.parent.id);
+		}
 
 		path.push(importResponse.id);
 

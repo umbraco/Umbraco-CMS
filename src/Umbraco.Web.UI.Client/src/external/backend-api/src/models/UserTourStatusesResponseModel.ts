@@ -9,3 +9,4 @@ import type { TourStatusModel } from './TourStatusModel';
 export type UserTourStatusesResponseModel = {
     tourStatuses: Array<(TourStatusModel | SetTourStatusRequestModel)>;
 };
+

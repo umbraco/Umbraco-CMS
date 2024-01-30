@@ -39,7 +39,6 @@ export class UmbDocumentTypeTreeStore extends UmbUniqueTreeStore {
 			entityType: item.entityType,
 			isElement: item.isElement,
 			isFolder: false,
-			isContainer: false,
 			hasChildren: false,
 		};
 

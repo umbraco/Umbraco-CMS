@@ -38,7 +38,6 @@ export class UmbMediaTypeTreeStore extends UmbUniqueTreeStore {
 			name: item.name,
 			entityType: item.entityType,
 			isFolder: false,
-			isContainer: false,
 			hasChildren: false,
 		};
 

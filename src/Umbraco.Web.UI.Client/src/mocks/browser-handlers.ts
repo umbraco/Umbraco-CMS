@@ -16,7 +16,7 @@ import { handlers as objectTypeHandlers } from './handlers/object-type/index.js'
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
 import { handlers as documentHandlers } from './handlers/document/index.js';
-import { handlers as mediaHandlers } from './handlers/media.handlers.js';
+import { handlers as mediaHandlers } from './handlers/media/index.js';
 import { handlers as dictionaryHandlers } from './handlers/dictionary.handlers.js';
 import { handlers as mediaTypeHandlers } from './handlers/media-type/index.js';
 import { handlers as memberGroupHandlers } from './handlers/member-group.handlers.js';

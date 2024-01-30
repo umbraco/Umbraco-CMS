@@ -19,7 +19,6 @@ export class UmbDictionaryTreeRepository
 			id: null,
 			entityType: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
 			name: 'Dictionary',
-			icon: 'icon-folder',
 			hasChildren: true,
 			isContainer: false,
 			isFolder: true,

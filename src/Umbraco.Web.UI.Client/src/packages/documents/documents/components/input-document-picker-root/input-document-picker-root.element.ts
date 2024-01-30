@@ -1,4 +1,5 @@
 import { UmbDocumentPickerContext } from '../input-document/input-document.context.js';
+import type { UmbDocumentItemModel } from '../../repository/index.js';
 import { html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -6,21 +7,21 @@ import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-
 
 @customElement('umb-input-document-picker-root')
 export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitElement) {
-	public get nodeId(): string | null | undefined {
+	public get unique(): string | null | undefined {
 		return this.#documentPickerContext.getSelection()[0];
 	}
-	public set nodeId(id: string | null | undefined) {
-		const selection = id ? [id] : [];
+	public set unique(unique: string | null | undefined) {
+		const selection = unique ? [unique] : [];
 		this.#documentPickerContext.setSelection(selection);
 	}
 
 	@property()
-	public set value(id: string) {
-		this.nodeId = id;
+	public set value(unique: string) {
+		this.unique = unique;
 	}
 
 	@state()
-	private _items?: Array<DocumentItemResponseModel>;
+	private _items?: Array<UmbDocumentItemModel>;
 
 	#documentPickerContext = new UmbDocumentPickerContext(this);
 
@@ -50,7 +51,7 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 				? html` <uui-ref-list
 						>${repeat(
 							this._items,
-							(item) => item.id,
+							(item) => item.unique,
 							(item) => this._renderItem(item),
 						)}
 				  </uui-ref-list>`
@@ -60,7 +61,7 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 	}
 
 	#renderButtons() {
-		if (this.nodeId) return;
+		if (this.unique) return;
 
 		//TODO: Dynamic paths
 		return html` <uui-button-group>
@@ -75,18 +76,20 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 		</uui-button-group>`;
 	}
 
-	private _renderItem(item: DocumentItemResponseModel) {
-		if (!item.id) return;
+	private _renderItem(item: UmbDocumentItemModel) {
+		if (!item.unique) return;
+		// TODO: get correct variant name
+		const name = item.variants[0]?.name;
 		return html`
-			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
+			<uui-ref-node name=${name} detail=${ifDefined(item.unique)}>
 				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#documentPickerContext.openPicker()} label="Edit document ${item.name}"
+					<uui-button @click=${() => this.#documentPickerContext.openPicker()} label="Edit document ${name}"
 						>Edit</uui-button
 					>
 					<uui-button
-						@click=${() => this.#documentPickerContext.requestRemoveItem(item.id!)}
-						label="Remove document ${item.name}"
+						@click=${() => this.#documentPickerContext.requestRemoveItem(item.unique)}
+						label="Remove document ${name}"
 						>Remove</uui-button
 					>
 				</uui-action-bar>
