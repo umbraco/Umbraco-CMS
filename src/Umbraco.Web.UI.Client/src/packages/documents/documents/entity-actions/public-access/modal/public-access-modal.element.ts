@@ -1,14 +1,30 @@
-import { html, customElement, state, css, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentPublicAccessRepository } from '../repository/public-access.repository.js';
+import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbPublicAccessModalData, UmbPublicAccessModalValue } from '@umbraco-cms/backoffice/document';
+import {
+	UmbDocumentRepository,
+	type UmbInputDocumentElement,
+	type UmbPublicAccessModalData,
+	type UmbPublicAccessModalValue,
+} from '@umbraco-cms/backoffice/document';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
+import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 
 @customElement('umb-public-access-modal')
 export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	UmbPublicAccessModalData,
 	UmbPublicAccessModalValue
 > {
+	#publicAccessRepository = new UmbDocumentPublicAccessRepository(this);
+	#unique?: string;
+	#isNew: boolean = true;
+
+	@state()
+	private _documentName = '';
+
 	@state()
 	private _specific?: boolean;
 
@@ -18,66 +34,113 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	@state()
 	private _selectedIds: Array<string> = [];
 
+	@state()
+	private _loginPageId?: string;
+
+	@state()
+	private _errorPageId?: string;
+
 	// Init
 
 	firstUpdated() {
-		const data = this.data?.publicAccessModel;
-		if (!data) return;
-		this._startPage = false;
-
-		// Specific or Group
-		this._specific = data.members.length > 0 ? true : false;
-
-		//SelectedIds members
-		if (data.members.length > 0) {
-			this._selectedIds = data.members.map((m) => m.id);
-		} else if (data.groups.length > 0) {
-			this._selectedIds = data.groups.map((g) => g.id);
-		}
+		this.#unique = this.data?.unique;
+		this.#getDocumentName();
+		this.#getPublicAccessModel();
 	}
 
-	// Modal
+	async #getDocumentName() {
+		if (!this.#unique) return;
+		// Should this be done here or in the action file?
+		const { data } = await new UmbDocumentRepository(this).requestById(this.#unique);
+		if (!data) return;
+		//TODO How do we ensure we get the correct variant?
+		this._documentName = data.variants[0]?.name;
+	}
+
+	async #getPublicAccessModel() {
+		if (!this.#unique) return;
+		//const { data } = (await this.#publicAccessRepository.read(this.#unique));
+		// TODO Currently returning "void". Remove mock data when API is ready. Will it be Response or Request model?
+		const data: any = undefined;
+		/*const data: PublicAccessResponseModel = {
+			members: [{ name: 'Agent', id: '007' }],
+			groups: [],
+			loginPageId: '123',
+			errorPageId: '456',
+		};*/
+
+		if (!data) return;
+		this.#isNew = false;
+		this._startPage = false;
+
+		// Specific or Groups
+		this._specific = data.members.length > 0 ? true : false;
+
+		//SelectedIds
+		if (data.members.length > 0) {
+			this._selectedIds = data.members.map((m: any) => m.id);
+		} else if (data.groups.length > 0) {
+			this._selectedIds = data.groups.map((g: any) => g.id);
+		}
+
+		this._loginPageId = data.loginPageId;
+		this._errorPageId = data.errorPageId;
+	}
+
+	// Modal events
 
 	#handleNext() {
 		this._startPage = false;
 	}
 
 	async #handleSave() {
-		if (this.data?.publicAccessModel) {
-			this.modalContext?.submit({ action: 'update', publicAccessModel: this.value });
+		if (!this._loginPageId || !this._errorPageId || !this.#unique) return;
+
+		const groups = this._specific ? [] : this._selectedIds;
+		const members = this._specific ? this._selectedIds : [];
+
+		const requestBody: PublicAccessRequestModel = {
+			memberGroupNames: groups,
+			memberUserNames: members,
+			loginPageId: this._loginPageId,
+			errorPageId: this._errorPageId,
+		};
+
+		if (this.#isNew) {
+			this.#publicAccessRepository.create(this.#unique, requestBody);
 		} else {
-			this.modalContext?.submit({ action: 'save', publicAccessModel: this.value });
+			this.#publicAccessRepository.update(this.#unique, requestBody);
 		}
+
+		this.modalContext?.submit();
 	}
 
 	#handleDelete() {
-		this.modalContext?.submit({ action: 'delete', publicAccessModel: this.value });
+		if (!this.#unique) return;
+		this.#publicAccessRepository.delete(this.#unique);
+		this.modalContext?.submit();
 	}
 
 	#handleCancel() {
 		this.modalContext?.reject();
 	}
 
-	// Events
+	// Change Events
 
 	#onChangeLoginPage(e: CustomEvent) {
-		console.log('e', e);
-		this.value = { ...this.value, loginPageId: e.detail.value[0] };
+		this._loginPageId = (e.target as UmbInputDocumentElement).selectedIds[0];
 	}
 
 	#onChangeErrorPage(e: CustomEvent) {
-		console.log('e', e);
-		this.value = { ...this.value, errorPageId: e.detail.value[0] };
+		this._errorPageId = (e.target as UmbInputDocumentElement).selectedIds[0];
 	}
 
-	#onChangeGroup() {
-		// TODO: Finish when umb-input-member-type is done
-		console.log('onChangeGroup');
+	#onChangeGroup(e: CustomEvent) {
+		this._selectedIds = (e.target as UmbInputMemberTypeElement).selectedIds;
 	}
 
-	#onChangeMember() {
-		// TODO: Finish when umb-input-member is done
-		console.log('onChangeMember');
+	#onChangeMember(e: CustomEvent) {
+		this._selectedIds = (e.target as UmbInputMemberElement).selectedIds;
 	}
 
 	// Renders
@@ -92,14 +155,20 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	// First page when no Restricting Public Access is set.
 	renderSelectGroup() {
-		return html`<umb-localize key="publicAccess_paHowWould" .args=${['NameOfDocument']}>
-				Choose how you want to restrict public access to the page 'NameOfDocument'.
+		return html`<umb-localize key="publicAccess_paHowWould" .args=${[this._documentName]}>
+				Choose how you want to restrict public access to the page '${this._documentName}'.
 			</umb-localize>
 			<uui-radio-group
 				@change=${(e: UUIRadioEvent) =>
 					e.target.value === 'members' ? (this._specific = true) : (this._specific = false)}>
-				<uui-radio label="Specific members protection" value="members">Test</uui-radio>
-				<uui-radio label="Group based protection" value="groups"></uui-radio>
+				<uui-radio label=${this.localize.term('publicAccess_paMembers')} value="members">
+					<strong>${this.localize.term('publicAccess_paMembers')}</strong><br />
+					${this.localize.term('publicAccess_paMembersHelp')}
+				</uui-radio>
+				<uui-radio label=${this.localize.term('publicAccess_paGroups')} value="groups">
+					<strong>${this.localize.term('publicAccess_paGroups')}</strong><br />
+					${this.localize.term('publicAccess_paGroupsHelp')}
+				</uui-radio>
 			</uui-radio-group>`;
 	}
 
@@ -132,12 +201,12 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 
 	renderMemberType() {
 		return this._specific
-			? html`<umb-localize key="publicAccess_paSelectMembers" .args=${['NameOfDocument']}>
-						Select the members who have access to the page <strong>NameOfDocument</strong>
+			? html`<umb-localize key="publicAccess_paSelectMembers" .args=${[this._documentName]}>
+						Select the members who have access to the page <strong>${this._documentName}</strong>
 					</umb-localize>
 					<umb-input-member .selectedIds=${this._selectedIds} @change=${this.#onChangeMember}></umb-input-member>`
-			: html`<umb-localize key="publicAccess_paSelectGroups" .args=${['NameOfDocument']}>
-						Select the groups who have access to the page <strong>NameOfDocument</strong>
+			: html`<umb-localize key="publicAccess_paSelectGroups" .args=${[this._documentName]}>
+						Select the groups who have access to the page <strong>${this._documentName}</strong>
 					</umb-localize>
 					<umb-input-member-type
 						.selectedIds=${this._selectedIds}
@@ -154,6 +223,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					look="primary"
 					color="positive"
 					label=${this.localize.term('buttons_save')}
+					?disabled=${!this._loginPageId || !this._errorPageId || this._selectedIds.length === 0}
 					@click="${this.#handleSave}"></uui-button>`
 			: html`<uui-button
 					slot="actions"
@@ -163,7 +233,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					?disabled=${this._specific === undefined}
 					@click="${this.#handleNext}"></uui-button>`;
 		// Check for Remove button
-		const remove = this.data?.publicAccessModel
+		const remove = !this.#isNew
 			? html`<uui-button
 					slot="actions"
 					id="save"
@@ -172,7 +242,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 					@click="${this.#handleDelete}"
 					label=${this.localize.term('publicAccess_paRemoveProtection')}></uui-button>`
 			: nothing;
-		//Render buttons
+		//Render the buttons
 		return html` <uui-button
 				slot="actions"
 				id="cancel"
@@ -184,17 +254,21 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	static styles = [
 		UmbTextStyles,
 		css`
+			uui-box,
 			uui-radio-group {
-				display: block;
-			}
-
-			.select-item {
 				display: flex;
 				flex-direction: column;
+				gap: var(--uui-size-4);
+			}
+			uui-radio-group {
+				margin-top: var(--uui-size-4);
 			}
 
 			p {
 				margin: var(--uui-size-6) 0 var(--uui-size-2);
+			}
+			small {
+				display: block;
 			}
 		`,
 	];

@@ -38,18 +38,15 @@ export class UmbDocumentPublicAccessRepository extends UmbBaseController impleme
 		return { error };
 	}
 
-	async readPublicAccess(id: string) {
+	async read(id: string) {
 		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
 		const { data, error } = await this.#dataSource.read(id);
-		if (!error) {
-			return { data };
-		}
-		return { error };
+		return { data, error };
 	}
 
-	async updatePublicAccess(id: string, data: PublicAccessRequestModel) {
+	async update(id: string, data: PublicAccessRequestModel) {
 		if (!id) throw new Error('Id is missing');
 		if (!data) throw new Error('Data is missing');
 		await this.#init;
@@ -62,7 +59,7 @@ export class UmbDocumentPublicAccessRepository extends UmbBaseController impleme
 		return { error };
 	}
 
-	async deletePublicAccess(id: string) {
+	async delete(id: string) {
 		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
