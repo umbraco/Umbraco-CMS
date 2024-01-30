@@ -15,7 +15,7 @@ public abstract class NamedEntityTreeControllerBase<TItem> : EntityTreeControlle
     protected override TItem MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
     {
         TItem item = base.MapTreeItemViewModel(parentKey, entity);
-        item.Name = entity.Name!;
+        item.Name = entity.Name ?? string.Empty;
         return item;
     }
 }
