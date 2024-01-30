@@ -56,8 +56,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 			this._contentUdi = contentUdi;
 		});
 		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
-			console.log(blockTypeSettingsElementTypeKey, !!blockTypeSettingsElementTypeKey);
-			this._hasSettings = blockTypeSettingsElementTypeKey !== undefined;
+			this._hasSettings = !!blockTypeSettingsElementTypeKey;
 		});
 		this.observe(this.#context.label, (label) => {
 			this._blockViewProps.label = label;
