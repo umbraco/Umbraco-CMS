@@ -6,13 +6,12 @@ import type {
 	ManifestSection,
 	ManifestSectionSidebarApp,
 	ManifestSectionSidebarAppMenuKind,
-	UmbSectionElement} from '@umbraco-cms/backoffice/extension-registry';
-import {
-	umbExtensionsRegistry,
+	UmbSectionElement,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbExtensionElementInitializer} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 /**
@@ -77,24 +76,26 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 
 	render() {
 		return html`
-			${this._sidebarApps && this._sidebarApps.length > 0
-				? html`
-						<!-- TODO: these extensions should be combined into one type: sectionSidebarApp with a "subtype" -->
-						<umb-section-sidebar>
-							${repeat(
-								this._sidebarApps,
-								(app) => app.alias,
-								(app) => app.component,
-							)}
-						</umb-section-sidebar>
-				  `
-				: nothing}
-			<umb-section-main>
-				${this._routes && this._routes.length > 0
-					? html`<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>`
+			<umb-split-panel lock="start" snap="300px 50%" position="50%">
+				${this._sidebarApps && this._sidebarApps.length > 0
+					? html`
+							<!-- TODO: these extensions should be combined into one type: sectionSidebarApp with a "subtype" -->
+							<umb-section-sidebar slot="start">
+								${repeat(
+									this._sidebarApps,
+									(app) => app.alias,
+									(app) => app.component,
+								)}
+							</umb-section-sidebar>
+					  `
 					: nothing}
-				<slot></slot>
-			</umb-section-main>
+				<umb-section-main slot="end">
+					${this._routes && this._routes.length > 0
+						? html`<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>`
+						: nothing}
+					<slot></slot>
+				</umb-section-main>
+			</umb-split-panel>
 		`;
 	}
 
@@ -109,6 +110,24 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 
 			h3 {
 				padding: var(--uui-size-4) var(--uui-size-8);
+			}
+
+			umb-split-panel {
+				--umb-split-panel-start-position: 200px;
+				--umb-split-panel-start-min-width: 200px;
+				--umb-split-panel-end-min-width: 200px;
+			}
+
+			@media only screen and (min-width: 800px) {
+				umb-split-panel {
+					--umb-split-panel-start-position: 300px;
+				}
+			}
+
+			@media only screen and (min-width: 1200px) {
+				umb-split-panel {
+					--umb-split-panel-start-position: 350px;
+				}
 			}
 		`,
 	];
