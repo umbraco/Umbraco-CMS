@@ -13,7 +13,7 @@ import {
  * @element umb-split-panel
  * @slot start - Content for the start panel.
  * @slot end - Content for the end panel.
- * @cssprop --umb-split-panel-start-position - Initial position of the divider.
+ * @cssprop --umb-split-panel-initial-position - Initial position of the divider.
  * @cssprop --umb-split-panel-start-min-width - Minimum width of the start panel.
  * @cssprop --umb-split-panel-end-min-width - Minimum width of the end panel.
  */
@@ -26,7 +26,7 @@ export class UmbSplitPanelElement extends LitElement {
 	 * Pixel or percent space-separated values: e.g., "100px 50% -75% -200px".
 	 * Negative values are relative to the end of the container.
 	 */
-	@property({ type: String }) snap?: string;
+	@property({ type: String }) snap?: string; //TODO: Consider using css variables for snap points.
 
 	/**
 	 * Locking mode for the split panel.
@@ -37,9 +37,9 @@ export class UmbSplitPanelElement extends LitElement {
 	/**
 	 * Initial position of the divider.
 	 * Pixel or percent value: e.g., "100px" or "25%".
-	 * Defaults to a CSS variable if not set: "var(--umb-split-panel-start-position, 50%)".
+	 * Defaults to a CSS variable if not set: "var(--umb-split-panel-initial-position, 50%)".
 	 */
-	@property({ type: String, reflect: true }) position = 'var(--umb-split-panel-start-position, 50%)';
+	@property({ type: String, reflect: true }) position = 'var(--umb-split-panel-initial-position, 50%)';
 	//TODO: Add support for negative values (relative to end of container) similar to snap points.
 
 	/** Width of the locked panel when in "start" or "end" lock mode */
@@ -119,23 +119,23 @@ export class UmbSplitPanelElement extends LitElement {
 
 	#updateSplit() {
 		// If lock is none
-		let maxStartWidth = this.position;
+		let maxStartWidth = `clamp(var(--umb-split-panel-start-min-width, 0), ${this.position}, var(--umb-split-panel-start-max-width, 100%))`;
 		let maxEndWidth = '1fr';
 
 		if (this.lock === 'start') {
-			maxStartWidth = this.#lockedPanelWidth + 'px';
+			maxStartWidth = `clamp(var(--umb-split-panel-start-min-width, 0), ${
+				this.#lockedPanelWidth
+			}px, var(--umb-split-panel-start-max-width, 100%))`;
 			maxEndWidth = `1fr`;
 		}
 		if (this.lock === 'end') {
 			maxStartWidth = `1fr`;
-			maxEndWidth = this.#lockedPanelWidth + 'px';
+			maxEndWidth = `clamp(var(--umb-split-panel-end-min-width, 0), ${
+				this.#lockedPanelWidth
+			}px, var(--umb-split-panel-end-max-width, 100%))`;
 		}
 
-		this.mainElement.style.gridTemplateColumns = `
-      minmax(var(--umb-split-panel-start-min-width, 0), ${maxStartWidth})
-      0px
-      minmax(var(--umb-split-panel-end-min-width, 0), ${maxEndWidth})
-    `;
+		this.mainElement.style.gridTemplateColumns = `${maxStartWidth} 0px ${maxEndWidth}`;
 	}
 
 	#onDragStart(event: PointerEvent) {

@@ -113,20 +113,21 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 			}
 
 			umb-split-panel {
-				--umb-split-panel-start-position: 200px;
+				--umb-split-panel-initial-position: 200px;
 				--umb-split-panel-start-min-width: 200px;
+				--umb-split-panel-start-max-width: 400px;
 				--umb-split-panel-end-min-width: 400px;
 			}
 
 			@media only screen and (min-width: 800px) {
 				umb-split-panel {
-					--umb-split-panel-start-position: 300px;
+					--umb-split-panel-initial-position: 300px;
 				}
 			}
 
 			@media only screen and (min-width: 1200px) {
 				umb-split-panel {
-					--umb-split-panel-start-position: 350px;
+					--umb-split-panel-initial-position: 350px;
 				}
 			}
 		`,
