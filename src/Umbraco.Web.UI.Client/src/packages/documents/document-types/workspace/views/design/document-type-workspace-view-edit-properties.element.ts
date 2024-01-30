@@ -182,7 +182,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 						);
 
 						return html`<umb-document-type-workspace-view-edit-property
-							data-umb-property-id=${ifDefined(property.id)}
+							data-umb-property-id=${property.id}
 							owner-document-type-id=${ifDefined(inheritedFromDocument?.unique)}
 							owner-document-type-name=${ifDefined(inheritedFromDocument?.name)}
 							?inherited=${property.container?.id !== this.containerId}

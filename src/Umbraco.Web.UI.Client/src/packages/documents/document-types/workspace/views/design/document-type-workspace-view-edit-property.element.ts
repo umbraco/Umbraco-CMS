@@ -13,7 +13,7 @@ import {
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
  *  @element umb-document-type-workspace-view-edit-property
@@ -22,22 +22,22 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
  */
 @customElement('umb-document-type-workspace-view-edit-property')
 export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
-	private _property?: UmbPropertyTypeModel | undefined;
+	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
 	/**
 	 * Property, the data object for the property.
-	 * @type {UmbPropertyTypeModel}
+	 * @type {UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined}
 	 * @attr
 	 * @default undefined
 	 */
 	@property({ type: Object })
-	public get property(): UmbPropertyTypeModel | undefined {
+	public get property(): UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined {
 		return this._property;
 	}
-	public set property(value: UmbPropertyTypeModel | undefined) {
+	public set property(value: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined) {
 		const oldValue = this._property;
 		this._property = value;
 		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
-		this.setDataType(this._property?.dataType.unique);
+		this.setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
 
@@ -295,7 +295,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	renderPropertyTags() {
 		return this.property
 			? html`<div class="types">
-					${this.property.dataType.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
+					${this.property.dataType?.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
