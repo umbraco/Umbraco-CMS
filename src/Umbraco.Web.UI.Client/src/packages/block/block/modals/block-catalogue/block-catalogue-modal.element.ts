@@ -2,6 +2,7 @@ import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
 import type {
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue,
+	UmbBlockTypeGroup,
 	UmbBlockTypeWithGroupKey,
 } from '@umbraco-cms/backoffice/block';
 import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -21,7 +22,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	private _blocks: Array<UmbBlockTypeWithGroupKey> = [];
 
 	@state()
-	private _blockGroups: Array<{ key: string; name: string }> = [];
+	private _blockGroups: Array<UmbBlockTypeGroup> = [];
 
 	@state()
 	_openClipboard?: boolean;
