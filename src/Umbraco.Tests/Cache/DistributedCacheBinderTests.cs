@@ -5,10 +5,10 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -16,6 +16,7 @@ using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 
@@ -234,6 +235,38 @@ namespace Umbraco.Tests.Cache
                     if (eventDefinition.Args is ContentTypeChange<IMemberType>.EventArgs changeMemberEventArgs)
                     {
                         Assert.AreEqual(num, changeMemberEventArgs.Changes.Count());
+                    }
+                }
+            });
+        }
+
+        [Test]
+        public void GroupsDataTypeEvents()
+        {
+            IDataType[] dataTypes = new[]
+            {
+                new DataType(new LabelPropertyEditor(Logger)) { Name = "Label (string)", DatabaseType = ValueStorageType.Ntext },
+                new DataType(new LabelPropertyEditor(Logger)) { Name = "Label (integer)", DatabaseType = ValueStorageType.Integer },
+                new DataType(new RadioButtonsPropertyEditor(Logger, Current.Services.TextService)) { Name = "Radiobox" },
+            };
+
+            var definitions = dataTypes.SelectMany(x => new IEventDefinition[]
+            {
+                new EventDefinition<IDataTypeService, SaveEventArgs<IDataType>>(null, Current.Services.DataTypeService, new SaveEventArgs<IDataType>(x), "Saved"),
+            });
+
+            var result = DistributedCacheBinder.GetGroupedEventList(definitions);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(dataTypes.Length, definitions.Count(), "Precondition is we have many definitions");
+                Assert.AreEqual(1, result.Count(), "Unexpected number of reduced definitions");
+
+                foreach (var eventDefinition in result)
+                {
+                    if (eventDefinition.Args is SaveEventArgs<IDataType> eventArgs)
+                    {
+                        Assert.AreEqual(dataTypes.Length, eventArgs.SavedEntities.Count());
                     }
                 }
             });

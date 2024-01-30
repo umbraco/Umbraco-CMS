@@ -245,16 +245,10 @@ namespace Umbraco.Web.Cache
         #region DataTypeService
 
         private void DataTypeService_Saved(IDataTypeService sender, SaveEventArgs<IDataType> e)
-        {
-            foreach (var entity in e.SavedEntities)
-                _distributedCache.RefreshDataTypeCache(entity);
-        }
+            => _distributedCache.RefreshDataTypeCache(e.SavedEntities);
 
         private void DataTypeService_Deleted(IDataTypeService sender, DeleteEventArgs<IDataType> e)
-        {
-            foreach (var entity in e.DeletedEntities)
-                _distributedCache.RemoveDataTypeCache(entity);
-        }
+            => _distributedCache.RemoveDataTypeCache(e.DeletedEntities);
 
         #endregion
 
