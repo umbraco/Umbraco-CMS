@@ -22,7 +22,6 @@ export class UmbBlockWorkspaceHasSettingsCondition extends UmbBaseController imp
 			this.observe(
 				context.settings.contentTypeId,
 				(settingsContentTypeId) => {
-					console.log('settingsContentTypeId', settingsContentTypeId);
 					this.permitted = !!settingsContentTypeId;
 					this.#onChange();
 				},
