@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup;
 
-[VersionedApiBackOfficeRoute("membergroup")]
+[ApiController]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberGroup}")]
+[ApiExplorerSettings(GroupName = "Member Group")]
 [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMembers)]
 public class MemberGroupControllerBase : ManagementApiControllerBase
 {
