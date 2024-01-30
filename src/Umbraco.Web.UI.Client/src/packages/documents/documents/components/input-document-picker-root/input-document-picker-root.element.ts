@@ -145,6 +145,7 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 
 	#clearDynamicRootQuery() {
 		this.data = undefined;
+		this.#dynamicRootOrigin = undefined;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
