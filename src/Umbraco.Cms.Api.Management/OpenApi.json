@@ -1856,6 +1856,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -2108,6 +2111,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -4300,6 +4306,79 @@
           }
         ]
       },
+      "delete": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "DeleteDocumentById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
       "put": {
         "tags": [
           "Document"
@@ -5945,6 +6024,81 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/recycle-bin/document/{id}": {
+      "delete": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "DeleteRecycleBinDocumentById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/recycle-bin/document/children": {
       "get": {
         "tags": [
@@ -7023,26 +7177,6 @@
         ],
         "operationId": "GetInstallSettings",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "428": {
             "description": "Client Error",
             "content": {
@@ -7110,7 +7244,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/InstallVResponseModel"
+                    "$ref": "#/components/schemas/InstallRequestModel"
                   }
                 ]
               }
@@ -7119,7 +7253,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/InstallVResponseModel"
+                    "$ref": "#/components/schemas/InstallRequestModel"
                   }
                 ]
               }
@@ -7128,7 +7262,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/InstallVResponseModel"
+                    "$ref": "#/components/schemas/InstallRequestModel"
                   }
                 ]
               }
@@ -7136,26 +7270,6 @@
           }
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "428": {
             "description": "Client Error",
             "content": {
@@ -7194,7 +7308,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DatabaseInstallResponseModel"
+                    "$ref": "#/components/schemas/DatabaseInstallRequestModel"
                   }
                 ]
               }
@@ -7203,7 +7317,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DatabaseInstallResponseModel"
+                    "$ref": "#/components/schemas/DatabaseInstallRequestModel"
                   }
                 ]
               }
@@ -7212,7 +7326,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/DatabaseInstallResponseModel"
+                    "$ref": "#/components/schemas/DatabaseInstallRequestModel"
                   }
                 ]
               }
@@ -20024,6 +20138,26 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           },
@@ -20466,6 +20600,82 @@
       }
     },
     "/umbraco/management/api/v1/user/current/2fa/{providerName}": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "DeleteUserCurrent2faByProviderName",
+        "parameters": [
+          {
+            "name": "providerName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
       "post": {
         "tags": [
           "User"
@@ -20565,6 +20775,26 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           }
@@ -20622,82 +20852,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "DeleteUserCurrent2faByProviderName",
-        "parameters": [
-          {
-            "name": "providerName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "code",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
           },
           "404": {
             "description": "Not Found",
@@ -23428,7 +23582,7 @@
         },
         "additionalProperties": false
       },
-      "DatabaseInstallResponseModel": {
+      "DatabaseInstallPresentationModel": {
         "required": [
           "id",
           "providerName",
@@ -23472,6 +23626,15 @@
             "type": "boolean"
           }
         },
+        "additionalProperties": false
+      },
+      "DatabaseInstallRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DatabaseInstallPresentationModel"
+          }
+        ],
         "additionalProperties": false
       },
       "DatabaseSettingsPresentationModel": {
@@ -24843,6 +25006,37 @@
         },
         "additionalProperties": false
       },
+      "InstallRequestModel": {
+        "required": [
+          "database",
+          "telemetryLevel",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UserInstallPresentationModel"
+              }
+            ]
+          },
+          "database": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DatabaseInstallPresentationModel"
+              },
+              {
+                "$ref": "#/components/schemas/DatabaseInstallRequestModel"
+              }
+            ]
+          },
+          "telemetryLevel": {
+            "$ref": "#/components/schemas/TelemetryLevelModel"
+          }
+        },
+        "additionalProperties": false
+      },
       "InstallSettingsResponseModel": {
         "required": [
           "databases",
@@ -24853,7 +25047,7 @@
           "user": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/UserSettingsModel"
+                "$ref": "#/components/schemas/UserSettingsPresentationModel"
               }
             ]
           },
@@ -24866,34 +25060,6 @@
                 }
               ]
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "InstallVResponseModel": {
-        "required": [
-          "database",
-          "telemetryLevel",
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "user": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/UserInstallResponseModel"
-              }
-            ]
-          },
-          "database": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/DatabaseInstallResponseModel"
-              }
-            ]
-          },
-          "telemetryLevel": {
-            "$ref": "#/components/schemas/TelemetryLevelModel"
           }
         },
         "additionalProperties": false
@@ -28803,7 +28969,7 @@
         },
         "additionalProperties": false
       },
-      "UserInstallResponseModel": {
+      "UserInstallPresentationModel": {
         "required": [
           "email",
           "name",
@@ -29006,7 +29172,7 @@
         },
         "additionalProperties": false
       },
-      "UserSettingsModel": {
+      "UserSettingsPresentationModel": {
         "required": [
           "consentLevels",
           "minCharLength",
