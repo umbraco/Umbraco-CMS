@@ -42,11 +42,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		super.value = newValue;
 		const newContent = newValue?.toString() ?? '';
 
-		if(this.#editorRef && this.#editorRef.getContent() != newContent) {
+		if (this.#editorRef && this.#editorRef.getContent() != newContent) {
 			this.#editorRef.setContent(newContent);
 		}
 	}
-	
+
 	get value(): FormDataEntryValue | FormData {
 		return super.value;
 	}
@@ -218,7 +218,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			autoresize_bottom_margin: 10,
 			body_class: 'umb-rte',
 			contextMenu: false,
-			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder,.umb-macro-holder',
+			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder',
 			menubar: false,
 			paste_remove_styles_if_webkit: true,
 			paste_preprocess: pastePreProcessHandler,

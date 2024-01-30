@@ -1,16 +1,3 @@
-.umb-macro-holder {
-    border: 3px dotted var(--uui-palette-spanish-pink-light);
-    padding: 7px;
-    display: block;
-    margin: 3px;
-}
-
-.umb-macro-holder.loading {
-    background: url(assets/img/loader.gif) right no-repeat;
-    background-size: 18px;
-    background-position-x: 99%;
-}
-
 .umb-embed-holder {
     position: relative;
 }

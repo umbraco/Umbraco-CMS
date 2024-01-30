@@ -784,7 +784,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'anchor',
 					'table',
 					'umbmediapicker',
-					'umbmacro',
 					'umbembeddialog',
 				],
 			},

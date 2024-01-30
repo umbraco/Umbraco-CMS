@@ -11,11 +11,9 @@ import type {
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
-	PublishDocumentRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	ContentStateModel,
-	PublishedStateModel,
+	PublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { ContentStateModel, PublishedStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 
 export const data: Array<DocumentResponseModel> = [
@@ -35,8 +33,11 @@ export const data: Array<DocumentResponseModel> = [
 				alias: 'richTextEditor',
 				culture: null,
 				segment: null,
-				value:
-					'Some value for the RTE with an <a href="http://foo.com">external link</a> and an <a href="/{localLink:umb://document/c05da24d7740447b9cdcbd8ce2172e38}">internal link</a> foo foo <div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>',
+				value: {
+					blocks: {},
+					markup: `
+					Some value for the RTE with an <a href="https://google.com">external link</a> and an <a href="/{localLink:umb://document/c05da24d7740447b9cdcbd8ce2172e38}">internal link</a> foo foo <div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>`,
+				},
 			},
 			{
 				alias: 'email',
