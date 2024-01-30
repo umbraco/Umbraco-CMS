@@ -1,8 +1,9 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from './dictionary-workspace.context.js';
-import type { UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+
 @customElement('umb-dictionary-workspace-editor')
 export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 	@state()

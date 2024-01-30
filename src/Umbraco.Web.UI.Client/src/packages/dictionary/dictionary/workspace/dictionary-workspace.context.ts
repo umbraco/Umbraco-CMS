@@ -1,21 +1,21 @@
-import { UmbDictionaryRepository } from '../repository/dictionary.repository.js';
+import { UmbDictionaryDetailRepository } from '../repository/index.js';
+import type { UmbDictionaryDetailModel } from '../types.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<DictionaryItemResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbDictionaryDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	//
-	public readonly repository = new UmbDictionaryRepository(this);
+	public readonly detailRepository = new UmbDictionaryDetailRepository(this);
 
-	#data = new UmbObjectState<DictionaryItemResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbDictionaryDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -30,7 +30,7 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.id || '';
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
@@ -62,34 +62,33 @@ export class UmbDictionaryWorkspaceContext
 		this.#data.setValue({ ...this.#data.value, translations: updatedValue });
 	}
 
-	async load(entityId: string) {
-		const { data } = await this.repository.requestById(entityId);
+	async load(unique: string) {
+		const { data } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.setValue(data);
 		}
 	}
 
-	async create(parentId: string | null) {
-		const { data } = await this.repository.createScaffold(parentId);
+	async create(parentUnique: string | null) {
+		const { data } = await this.detailRepository.createScaffold(parentUnique);
 		if (!data) return;
 		this.setIsNew(true);
-
-		this.#data.setValue(data as DictionaryItemResponseModel);
+		this.#data.setValue(data);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
-		if (!this.#data.value.id) return;
+		if (!this.#data.value.unique) return;
 
 		if (this.getIsNew()) {
-			const { error } = await this.repository.create(this.#data.value);
+			const { error } = await this.detailRepository.create(this.#data.value);
 			if (error) {
 				return;
 			}
 			this.setIsNew(false);
 		} else {
-			await this.repository.save(this.#data.value.id, this.#data.value);
+			await this.detailRepository.save(this.#data.value);
 		}
 
 		const data = this.getData();

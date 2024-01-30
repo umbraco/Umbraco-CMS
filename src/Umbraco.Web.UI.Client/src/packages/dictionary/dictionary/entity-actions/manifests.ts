@@ -1,5 +1,9 @@
-import { UMB_DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
+	UMB_DICTIONARY_EXPORT_REPOSITORY_ALIAS,
+	UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS,
+} from '../repository/index.js';
 import UmbImportDictionaryEntityAction from './import/import.action.js';
 import UmbExportDictionaryEntityAction from './export/export.action.js';
 import UmbCreateDictionaryEntityAction from './create/create.action.js';
@@ -16,7 +20,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		},
 	},
@@ -29,7 +33,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move',
-			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
@@ -42,7 +46,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-download-alt',
 			label: 'Export',
-			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DICTIONARY_EXPORT_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
@@ -55,7 +59,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-page-up',
 			label: 'Import',
-			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		},
 	},
@@ -68,7 +72,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
@@ -77,19 +81,19 @@ const entityActions: Array<ManifestEntityAction> = [
 const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.CreateDictionary',
+		alias: 'Umb.Modal.Dictionary.Create',
 		name: 'Create Dictionary Modal',
 		js: () => import('./create/create-dictionary-modal.element.js'),
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.ExportDictionary',
+		alias: 'Umb.Modal.Dictionary.Export',
 		name: 'Export Dictionary Modal',
 		js: () => import('./export/export-dictionary-modal.element.js'),
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.ImportDictionary',
+		alias: 'Umb.Modal.Dictionary.Import',
 		name: 'Import Dictionary Modal',
 		js: () => import('./import/import-dictionary-modal.element.js'),
 	},

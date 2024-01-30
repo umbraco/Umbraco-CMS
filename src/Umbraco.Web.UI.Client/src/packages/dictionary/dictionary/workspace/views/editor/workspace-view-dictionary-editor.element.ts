@@ -1,16 +1,18 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../../dictionary-workspace.context.js';
 import { UmbDictionaryRepository } from '../../../repository/dictionary.repository.js';
-import type { UUITextareaElement} from '@umbraco-cms/backoffice/external/uui';
+import { UmbDictionaryDetailRepository, UmbDictionaryItemModel } from '../../../repository/index.js';
+import type { UmbDictionaryDetailModel } from '../../../types.js';
+import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DictionaryItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 @customElement('umb-workspace-view-dictionary-editor')
 export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	@state()
-	private _dictionary?: DictionaryItemResponseModel;
+	private _dictionary?: UmbDictionaryDetailModel;
 
-	#repo!: UmbDictionaryRepository;
+	#repo!: UmbDictionaryDetailRepository;
 
 	@state()
 	private _languages: Array<LanguageResponseModel> = [];
@@ -20,7 +22,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	async connectedCallback() {
 		super.connectedCallback();
 
-		this.#repo = new UmbDictionaryRepository(this);
+		this.#repo = new UmbDictionaryDetailRepository(this);
 		this._languages = await this.#repo.getLanguages();
 
 		this.consumeContext(UMB_DICTIONARY_WORKSPACE_CONTEXT, (_instance) => {

@@ -13,7 +13,7 @@ export interface UmbImportDictionaryModalValue {
 export const UMB_IMPORT_DICTIONARY_MODAL = new UmbModalToken<
 	UmbImportDictionaryModalData,
 	UmbImportDictionaryModalValue
->('Umb.Modal.ImportDictionary', {
+>('Umb.Modal.Dictionary.Import', {
 	modal: {
 		type: 'sidebar',
 		size: 'small',

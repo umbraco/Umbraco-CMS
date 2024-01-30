@@ -5,11 +5,9 @@ import type {
 	CreateDictionaryItemRequestModel,
 	DictionaryItemResponseModel,
 	ImportDictionaryRequestModel,
-	UpdateDictionaryItemRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	DictionaryResource,
-	LanguageResource
+	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { DictionaryResource, LanguageResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
@@ -110,21 +108,6 @@ export class UmbDictionaryDetailServerDataSource
 	}
 
 	/**
-	 * @description - Import a dictionary
-	 * @param {string} temporaryFileId
-	 * @param {string?} parentId
-	 * @returns {*}
-	 * @memberof UmbDictionaryDetailServerDataSource
-	 */
-	async import(temporaryFileId: string, parentId?: string) {
-		// TODO => parentId will be a guid param once #13786 is merged and API regenerated
-		return await tryExecuteAndNotify(
-			this.#host,
-			DictionaryResource.postDictionaryImport({ requestBody: { temporaryFileId, parentId } }),
-		);
-	}
-
-	/**
 	 * @description - Upload a Dictionary
 	 * @param {ImportDictionaryRequestModel} formData
 	 * @return {*}
@@ -137,17 +120,6 @@ export class UmbDictionaryDetailServerDataSource
 				requestBody: formData,
 			}),
 		);
-	}
-
-	/**
-	 * @description - Export a Dictionary, optionally including child items.
-	 * @param {string} id
-	 * @param {boolean} includeChildren
-	 * @return {*}
-	 * @memberof UmbDictionaryDetailServerDataSource
-	 */
-	async export(id: string, includeChildren: boolean) {
-		return await tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryByIdExport({ id, includeChildren }));
 	}
 
 	async getLanguages() {

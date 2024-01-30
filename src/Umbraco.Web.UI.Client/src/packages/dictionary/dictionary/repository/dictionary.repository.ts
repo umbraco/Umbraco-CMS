@@ -1,5 +1,4 @@
-import { type UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT } from '../tree/index.js';
-import { UmbDictionaryDetailServerDataSource } from './sources/dictionary-detail.server.data-source.js';
+import { UMB_DICTIONARY_TREE_STORE_CONTEXT } from '../tree/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -7,10 +6,6 @@ import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-fi
 
 export class UmbDictionaryRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<unknown>;
-
-	#treeStore?: UmbDictionaryTreeStore;
-
-	#detailSource: UmbDictionaryDetailServerDataSource = new UmbDictionaryDetailServerDataSource(this);
 
 	#temporaryFileRepository: UmbTemporaryFileRepository = new UmbTemporaryFileRepository(this);
 
@@ -24,34 +19,9 @@ export class UmbDictionaryRepository extends UmbBaseController implements UmbApi
 		]);
 	}
 
-	async itemsLegacy(ids: Array<string>) {
-		await this.#init;
-		return this.#treeStore!.items(ids);
-	}
-
 	async list(skip = 0, take = 1000) {
 		await this.#init;
 		return this.#detailSource.list(skip, take);
-	}
-
-	async export(id: string, includeChildren = false) {
-		await this.#init;
-
-		if (!id) {
-			throw new Error('Id is missing');
-		}
-
-		return this.#detailSource.export(id, includeChildren);
-	}
-
-	async import(temporaryFileId: string, parentId?: string) {
-		await this.#init;
-
-		if (!temporaryFileId) {
-			throw new Error('Temporary file id is missing');
-		}
-
-		return this.#detailSource.import(temporaryFileId, parentId);
 	}
 
 	async upload(UmbId: string, file: File) {
@@ -82,9 +52,5 @@ export class UmbDictionaryRepository extends UmbBaseController implements UmbApi
 		languages.unshift(...languages.splice(defaultIndex, 1));
 
 		return languages;
-	}
-
-	async move() {
-		alert('move me!');
 	}
 }
