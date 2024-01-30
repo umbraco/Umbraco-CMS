@@ -40,6 +40,7 @@ export const Overview: Story = {
 			}
 			#start {
 				border-right: 2px solid #e5e5e5;
+				min-height: 300px;
 			}
 			#end {
 				border-left: 2px solid #e5e5e5;
