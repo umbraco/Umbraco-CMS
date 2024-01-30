@@ -3,7 +3,7 @@ import './document-type-workspace-view-edit-property.element.js';
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -80,10 +80,10 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	}
 
 	@property({ type: String, attribute: 'container-type', reflect: false })
-	public get containerType(): PropertyContainerTypes | undefined {
+	public get containerType(): UmbPropertyContainerTypes | undefined {
 		return this._propertyStructureHelper.getContainerType();
 	}
-	public set containerType(value: PropertyContainerTypes | undefined) {
+	public set containerType(value: UmbPropertyContainerTypes | undefined) {
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
