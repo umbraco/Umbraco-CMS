@@ -46,28 +46,4 @@ public class ConnectionStrings // TODO: Rename to [Umbraco]ConnectionString (sin
     /// The name of the provider.
     /// </value>
     public string? ProviderName { get; set; }
-
-    protected bool Equals(ConnectionStrings other) => ConnectionString == other.ConnectionString && ProviderName == other.ProviderName;
-
-    public override bool Equals(object? obj)
-    {
-        if (ReferenceEquals(null, obj))
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-
-        if (obj.GetType() != this.GetType())
-        {
-            return false;
-        }
-
-        return Equals((ConnectionStrings)obj);
-    }
-
-    public override int GetHashCode() => HashCode.Combine(ConnectionString, ProviderName);
 }
