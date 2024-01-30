@@ -1,9 +1,9 @@
-import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
-import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
+import { UmbMockEntityTreeManager } from '../utils/entity/entity-tree.manager.js';
+import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
+import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import { umbMediaTypeMockDb } from '../media-type/media-type.db.js';
-import { UmbEntityMockDbBase } from '../entity/entity-base.js';
-import { UmbEntityRecycleBin } from '../entity/entity-recycle-bin.js';
+import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
+import { UmbEntityRecycleBin } from '../utils/entity/entity-recycle-bin.js';
 import type { UmbMockMediaModel } from './media.data.js';
 import { data } from './media.data.js';
 import {

@@ -1,10 +1,7 @@
-import type { UmbData } from '../data.js';
-import { createFileSystemTreeItem } from '../utils.js';
-import type {
-	FileSystemTreeItemPresentationModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	PagedFileSystemTreeItemPresentationModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { UmbData } from '../../data.js';
+import { createFileSystemTreeItem } from '../../utils.js';
+import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { PagedFileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbMockFileSystemTreeManager<T extends Omit<FileSystemTreeItemPresentationModel, 'type'>> {
 	#db: UmbData<T>;

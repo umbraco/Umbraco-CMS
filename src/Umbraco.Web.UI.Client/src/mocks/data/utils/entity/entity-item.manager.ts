@@ -1,4 +1,4 @@
-import type { UmbData } from '../data.js';
+import type { UmbData } from '../../data.js';
 
 export class UmbMockEntityItemManager<T extends { id: string }> {
 	#db: UmbData<T>;

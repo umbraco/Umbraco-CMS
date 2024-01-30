@@ -1,4 +1,4 @@
-import { UmbData } from '../data.js';
+import { UmbData } from '../../data.js';
 
 export abstract class UmbEntityMockDbBase<MockItemType extends { id: string }> extends UmbData<MockItemType> {
 	constructor(data: Array<MockItemType>) {

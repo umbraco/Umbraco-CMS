@@ -1,4 +1,4 @@
-import { UmbData } from '../data.js';
+import { UmbData } from '../../data.js';
 import type { FileSystemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export abstract class UmbFileSystemMockDbBase<

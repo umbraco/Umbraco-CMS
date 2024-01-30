@@ -1,6 +1,6 @@
-import { UmbEntityMockDbBase } from '../entity/entity-base.js';
-import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
-import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
+import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
+import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
+import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import type { UmbMockUserGroupModel } from './user-group.data.js';
 import { data } from './user-group.data.js';
 import type {
