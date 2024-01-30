@@ -6,6 +6,7 @@ import {
 	html,
 	property,
 	query,
+	state,
 } from '@umbraco-cms/backoffice/external/lit';
 
 /**
@@ -23,6 +24,8 @@ import {
 @customElement('umb-split-panel')
 export class UmbSplitPanelElement extends LitElement {
 	@query('#main') mainElement!: HTMLElement;
+	@query('#divider-touch-area') dividerTouchAreaElement!: HTMLElement;
+	@query('#divider') dividerElement!: HTMLElement;
 
 	/**
 	 * Snap points for the divider position.
@@ -52,31 +55,23 @@ export class UmbSplitPanelElement extends LitElement {
 	/** Pixel value for the snap threshold. Determines how close the divider needs to be to a snap point to snap to it. */
 	readonly #SNAP_THRESHOLD = 25 as const;
 
-	connectedCallback() {
-		super.connectedCallback();
-		this.#resizeObserver = new ResizeObserver(this.#onResize.bind(this));
-		this.updateComplete.then(async () => {
-			this.mainElement.style.gridTemplateColumns = `${this.position} 0px 1fr`;
-
-			// Wait for the next frame to get the correct position of the divider.
-			await new Promise((resolve) => requestAnimationFrame(resolve));
-
-			const { left: dividerLeft } = this.shadowRoot!.querySelector('#divider')!.getBoundingClientRect();
-			const { left: mainLeft, width: mainWidth } = this.mainElement.getBoundingClientRect();
-			const percentagePos = ((dividerLeft - mainLeft) / mainWidth) * 100;
-			this.position = `${percentagePos}%`;
-
-			this.#resizeObserver?.observe(this);
-		});
+	@state() _hasStartPanel = false;
+	@state() _hasEndPanel = false;
+	get #hasBothPanels() {
+		return this._hasStartPanel && this._hasEndPanel;
 	}
+
+	#hasInitialized = false;
 
 	disconnectedCallback() {
 		super.disconnectedCallback();
-		this.#resizeObserver?.unobserve(this);
+		this.#disconnect();
 	}
 
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
+
+		if (!this.#hasInitialized) return;
 
 		if (_changedProperties.has('position')) {
 			if (this.lock !== 'none') {
@@ -139,7 +134,7 @@ export class UmbSplitPanelElement extends LitElement {
     `;
 	}
 
-	#onDragStart(event: PointerEvent) {
+	#onDragStart = (event: PointerEvent | TouchEvent) => {
 		event.preventDefault();
 
 		const move = (event: PointerEvent) => {
@@ -188,20 +183,72 @@ export class UmbSplitPanelElement extends LitElement {
 
 		document.addEventListener('pointermove', move, { passive: true });
 		document.addEventListener('pointerup', stop);
+	};
+
+	#disconnect() {
+		this.#resizeObserver?.unobserve(this);
+		this.dividerTouchAreaElement.removeEventListener('pointerdown', this.#onDragStart);
+		this.dividerTouchAreaElement.removeEventListener('touchstart', this.#onDragStart);
+		this.dividerElement.style.display = 'none';
+		this.mainElement.style.display = 'flex';
+		this.#hasInitialized = false;
+	}
+
+	async #connect() {
+		this.#hasInitialized = true;
+
+		this.#resizeObserver = new ResizeObserver(this.#onResize.bind(this));
+		this.mainElement.style.display = 'grid';
+		this.mainElement.style.gridTemplateColumns = `${this.position} 0px 1fr`;
+		this.dividerElement.style.display = 'unset';
+
+		this.dividerTouchAreaElement.addEventListener('pointerdown', this.#onDragStart);
+		this.dividerTouchAreaElement.addEventListener('touchstart', this.#onDragStart, { passive: false });
+
+		// Wait for the next frame to get the correct position of the divider.
+		await new Promise((resolve) => requestAnimationFrame(resolve));
+
+		const { left: dividerLeft } = this.shadowRoot!.querySelector('#divider')!.getBoundingClientRect();
+		const { left: mainLeft, width: mainWidth } = this.mainElement.getBoundingClientRect();
+		const percentagePos = ((dividerLeft - mainLeft) / mainWidth) * 100;
+		this.position = `${percentagePos}%`;
+
+		this.#resizeObserver?.observe(this);
+	}
+
+	#onSlotChanged(event: Event) {
+		const slot = event.target as HTMLSlotElement;
+		const name = slot.name;
+
+		if (name === 'start') {
+			this._hasStartPanel = slot.assignedElements().length > 0;
+		}
+		if (name === 'end') {
+			this._hasEndPanel = slot.assignedElements().length > 0;
+		}
+
+		if (!this.#hasBothPanels) {
+			if (this.#hasInitialized) {
+				this.#disconnect();
+			}
+			return;
+		}
+
+		this.#connect();
 	}
 
 	render() {
+		console.log('render', this._hasStartPanel, this._hasEndPanel);
 		return html`
 			<div id="main">
-				<slot name="start"></slot>
+				<slot
+					name="start"
+					@slotchange=${this.#onSlotChanged}
+					style="width: ${this._hasStartPanel ? '100%' : '0'}"></slot>
 				<div id="divider">
-					<div
-						id="divider-touch-area"
-						tabindex="0"
-						@mousedown=${this.#onDragStart}
-						@touchstart=${this.#onDragStart}></div>
+					<div id="divider-touch-area" tabindex="0"></div>
 				</div>
-				<slot name="end"></slot>
+				<slot name="end" @slotchange=${this.#onSlotChanged} style="width: ${this._hasEndPanel ? '100%' : '0'}"></slot>
 			</div>
 		`;
 	}
@@ -223,7 +270,7 @@ export class UmbSplitPanelElement extends LitElement {
 		#main {
 			width: 100%;
 			height: 100%;
-			display: grid;
+			display: flex;
 			position: relative;
 			z-index: 0;
 			overflow: hidden;
@@ -232,6 +279,7 @@ export class UmbSplitPanelElement extends LitElement {
 			height: 100%;
 			position: relative;
 			z-index: 999999;
+			display: none;
 		}
 		#divider-touch-area {
 			position: absolute;

@@ -36,28 +36,6 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	render() {
 		if (!this._variants) return nothing;
 
-		//TODO: This can probably be cleaned up.
-		if (this._variants.length === 1)
-			return html`
-				<div id="splitViews">
-					${repeat(
-						this._variants,
-						(view) =>
-							view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
-						(view) => html`
-							<umb-workspace-split-view
-								alias="Umb.Workspace.Document"
-								.splitViewIndex=${view.index}
-								.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
-						`,
-					)}
-				</div>
-
-				<umb-workspace-footer alias="Umb.Workspace.Document">
-					<div id="breadcrumbs">Breadcrumbs</div>
-				</umb-workspace-footer>
-			`;
-
 		return html`<div id="splitViews">
 				<umb-split-panel snap="50%">
 					${repeat(
