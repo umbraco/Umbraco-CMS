@@ -5,9 +5,7 @@ import type {
 } from '@umbraco-cms/backoffice/backend-api';
 import { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockDocumentTypeModelHack = DocumentResponseModel &
-	DocumentTreeItemResponseModel &
-	DocumentItemResponseModel;
+type UmbMockDocumentTypeModelHack = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
 
 export interface UmbMockDocumentModel extends Omit<UmbMockDocumentTypeModelHack, 'type'> {}
 

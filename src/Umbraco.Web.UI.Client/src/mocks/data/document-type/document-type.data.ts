@@ -5,7 +5,7 @@ import type {
 	DocumentTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockDocumentTypeModelHack = DocumentTypeResponseModel &
+type UmbMockDocumentTypeModelHack = DocumentTypeResponseModel &
 	DocumentTypeTreeItemResponseModel &
 	DocumentTypeItemResponseModel;
 
