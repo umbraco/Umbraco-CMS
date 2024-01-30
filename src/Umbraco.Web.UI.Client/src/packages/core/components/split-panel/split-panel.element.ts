@@ -37,9 +37,9 @@ export class UmbSplitPanelElement extends LitElement {
 	/**
 	 * Initial position of the divider.
 	 * Pixel or percent value: e.g., "100px" or "25%".
-	 * Defaults to a CSS variable if not set: "var(--umb-split-panel-initial-position, 50%)".
+	 * Defaults to a CSS variable if not set: "var(--umb-split-panel-initial-position) which defaults to 50%".
 	 */
-	@property({ type: String, reflect: true }) position = 'var(--umb-split-panel-initial-position, 50%)';
+	@property({ type: String, reflect: true }) position = 'var(--umb-split-panel-initial-position)';
 	//TODO: Add support for negative values (relative to end of container) similar to snap points.
 
 	/** Width of the locked panel when in "start" or "end" lock mode */
@@ -48,8 +48,6 @@ export class UmbSplitPanelElement extends LitElement {
 	#resizeObserver?: ResizeObserver;
 	/** Pixel value for the snap threshold. Determines how close the divider needs to be to a snap point to snap to it. */
 	readonly #SNAP_THRESHOLD = 25 as const;
-	/** Pixel value for the divider width. */
-	readonly #DIVIDER_WIDTH = 20 as const;
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -132,9 +130,9 @@ export class UmbSplitPanelElement extends LitElement {
 		}
 
 		this.mainElement.style.gridTemplateColumns = `
-      minmax(var(--umb-split-panel-start-min-width, 0), ${maxStartWidth})
+      minmax(var(--umb-split-panel-start-min-width), ${maxStartWidth})
       0px
-      minmax(var(--umb-split-panel-end-min-width, 0), ${maxEndWidth})
+      minmax(var(--umb-split-panel-end-min-width), ${maxEndWidth})
     `;
 	}
 
@@ -197,7 +195,6 @@ export class UmbSplitPanelElement extends LitElement {
 					<div
 						id="divider-touch-area"
 						tabindex="0"
-						style="width: ${this.#DIVIDER_WIDTH}px; transform: translateX(-${this.#DIVIDER_WIDTH / 2}px)"
 						@mousedown=${this.#onDragStart}
 						@touchstart=${this.#onDragStart}></div>
 				</div>
@@ -211,6 +208,10 @@ export class UmbSplitPanelElement extends LitElement {
 			--umb-split-panel-initial-position: 50%;
 			--umb-split-panel-start-min-width: 0;
 			--umb-split-panel-end-min-width: 0;
+
+			--umb-split-panel-divider-touch-area-width: 20px;
+			--umb-split-panel-divider-width: 1px;
+			--umb-split-panel-divider-color: transparent;
 		}
 		slot {
 			overflow: hidden;
@@ -234,21 +235,22 @@ export class UmbSplitPanelElement extends LitElement {
 			top: 0;
 			left: 0;
 			height: 100%;
+			width: var(--umb-split-panel-divider-touch-area-width);
 			transform: translateX(-50%);
 			cursor: col-resize;
 		}
 		/* Do we want a line that shows the divider? */
-		/* #divider::after {
+		#divider::after {
 			content: '';
 			position: absolute;
 			top: 0;
 			left: 50%;
-			width: 2px;
+			width: var(--umb-split-panel-divider-width);
 			height: 100%;
-			transform: translateX(-50%);
-			background-color: black;
+			transform: round(translateX(-50%));
+			background-color: var(--umb-split-panel-divider-color);
 			z-index: -1;
-		} */
+		}
 	`;
 }
 
