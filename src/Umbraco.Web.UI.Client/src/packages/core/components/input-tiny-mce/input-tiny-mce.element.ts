@@ -16,7 +16,6 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import rteContentUrl from './css/rte_content.css?url';
 
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
