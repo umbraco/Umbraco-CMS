@@ -76,7 +76,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 
 	render() {
 		return html`
-			<umb-split-panel lock="start" snap="300px 50%">
+			<umb-split-panel lock="start" snap="300px">
 				${this._sidebarApps && this._sidebarApps.length > 0
 					? html`
 							<!-- TODO: these extensions should be combined into one type: sectionSidebarApp with a "subtype" -->
