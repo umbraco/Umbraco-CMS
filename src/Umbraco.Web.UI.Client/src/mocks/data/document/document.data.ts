@@ -36,8 +36,18 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'richTextEditor',
 				culture: null,
 				segment: null,
-				value:
-					'Some value for the RTE with an <a href="http://foo.com">external link</a> and an <a href="/{localLink:umb://document/c05da24d7740447b9cdcbd8ce2172e38}">internal link</a> foo foo <div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>',
+				value: {
+					blocks: {},
+					markup: `
+						<p>
+							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a href="/{localLink:umb://document/c05da24d7740447b9cdcbd8ce2172e38}">internal link</a> foo foo
+						</p>
+						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
+						<p>The following tests the embed plugin:</p>
+						<div class="mceNonEditable umb-embed-holder" data-embed-height="240" data-embed-width="360" data-embed-constrain="false"><iframe width="360" height="240" src="https://www.youtube.com/embed/QRIWz9SotY4?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" title="Sleep Token - The Summoning"></iframe></div>
+						<p>End of test content</p>
+					`,
+				},
 			},
 			{
 				alias: 'email',
