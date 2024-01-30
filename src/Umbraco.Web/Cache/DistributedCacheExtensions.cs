@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services.Changes;
 
@@ -86,19 +89,33 @@ namespace Umbraco.Web.Cache
 
         #region DataTypeCache
 
+        [Obsolete("Use the overload accepting IEnumerable instead.")]
         public static void RefreshDataTypeCache(this DistributedCache dc, IDataType dataType)
         {
-            if (dataType == null) return;
-            var payloads = new[] { new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, false) };
-            dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
+            if (dataType == null)
+            {
+                return;
+            }
+
+            dc.RefreshDataTypeCache(dataType.Yield());
         }
 
+        public static void RefreshDataTypeCache(this DistributedCache dc, IEnumerable<IDataType> dataTypes)
+            => dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, dataTypes?.Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, false)));
+
+        [Obsolete("Use the overload accepting IEnumerable instead.")]
         public static void RemoveDataTypeCache(this DistributedCache dc, IDataType dataType)
         {
-            if (dataType == null) return;
-            var payloads = new[] { new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, true) };
-            dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
+            if (dataType == null)
+            {
+                return;
+            }
+
+            dc.RemoveDataTypeCache(dataType.Yield());
         }
+
+        public static void RemoveDataTypeCache(this DistributedCache dc, IEnumerable<IDataType> dataTypes)
+            => dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, dataTypes?.Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, true)));
 
         #endregion
 
