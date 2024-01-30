@@ -3,8 +3,8 @@ import {expect} from "@playwright/test";
 
 test.describe('Relation type tests', () => {
   const relationTypeName = 'Test Relation Type';
-  const relationTypeId = crypto.randomUUID();
   const objectTypeName = 'Document';
+  let relationTypeId = '';
   let objectTypeId = '';
 
   test.beforeEach(async ({umbracoApi}) => {
@@ -18,7 +18,7 @@ test.describe('Relation type tests', () => {
 
   test('can create a relation type', async ({umbracoApi}) => {
     // Act
-    await umbracoApi.relationType.create(relationTypeName, relationTypeId, false, false, objectTypeId, objectTypeId);
+    relationTypeId = await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
 
     // Assert
     expect(await umbracoApi.relationType.doesExist(relationTypeId)).toBeTruthy();
@@ -27,7 +27,7 @@ test.describe('Relation type tests', () => {
   test('can update a relation type', async ({umbracoApi}) => {
     // Arrange
     const wrongRelationTypeName = 'Updated Relation Type';
-    await umbracoApi.relationType.create(wrongRelationTypeName, relationTypeId, false, false, objectTypeId, objectTypeId);
+    relationTypeId = await umbracoApi.relationType.create(wrongRelationTypeName, false, false, objectTypeId, objectTypeId);
     const relationTypeData = await umbracoApi.relationType.get(relationTypeId);
 
     // Act
@@ -43,7 +43,7 @@ test.describe('Relation type tests', () => {
 
   test('can delete a relation type', async ({umbracoApi}) => {
     // Arrange
-    await umbracoApi.relationType.create(relationTypeName, relationTypeId, false, false, objectTypeId, objectTypeId);
+    relationTypeId = await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
     expect(await umbracoApi.relationType.doesExist(relationTypeId)).toBeTruthy();
 
     //Act
