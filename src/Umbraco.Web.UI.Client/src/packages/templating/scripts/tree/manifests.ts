@@ -2,6 +2,7 @@ import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_
 import { UmbScriptTreeRepository } from './script-tree.repository.js';
 import { UmbScriptTreeStore } from './script-tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
+import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -46,4 +47,11 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests];
+export const manifests = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	...folderManifests,
+	...reloadTreeItemChildrenManifest,
+];

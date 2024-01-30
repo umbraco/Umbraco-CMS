@@ -56,8 +56,8 @@ export abstract class UmbBaseExtensionsInitializer<
 	}
 	protected _init() {
 		let source = Array.isArray(this.#type)
-			? this.#extensionRegistry.extensionsOfTypes<ManifestType>(this.#type as string[])
-			: this.#extensionRegistry.extensionsOfType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
+			? this.#extensionRegistry.byTypes<ManifestType>(this.#type as string[])
+			: this.#extensionRegistry.byType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
 		if (this.#filter) {
 			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(this.#filter!)));
 		}

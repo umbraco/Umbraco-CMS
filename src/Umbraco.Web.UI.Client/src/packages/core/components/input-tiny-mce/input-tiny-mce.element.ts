@@ -38,6 +38,19 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		return this._editorElement?.querySelector('iframe') ?? undefined;
 	}
 
+	set value(newValue: FormDataEntryValue | FormData) {
+		super.value = newValue;
+		const newContent = newValue?.toString() ?? '';
+
+		if(this.#editorRef && this.#editorRef.getContent() != newContent) {
+			this.#editorRef.setContent(newContent);
+		}
+	}
+	
+	get value(): FormDataEntryValue | FormData {
+		return super.value;
+	}
+
 	@query('#editor', true)
 	private _editorElement?: HTMLElement;
 
@@ -78,7 +91,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	 * the plugins are ready and so are not associated with the editor.
 	 */
 	async #loadPlugins() {
-		const observable = umbExtensionsRegistry?.extensionsOfType('tinyMcePlugin');
+		const observable = umbExtensionsRegistry?.byType('tinyMcePlugin');
 		const manifests = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
 
 		const promises = [];

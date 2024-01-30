@@ -1,15 +1,15 @@
 import { html, css, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestPackageView} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPackageView } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-installed-packages-section-view-item')
@@ -58,7 +58,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 
 	#observePackageView() {
 		this.observe(
-			umbExtensionsRegistry.extensionsOfType('packageView').pipe(
+			umbExtensionsRegistry.byType('packageView').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.packageName === this.#name);
 				}),

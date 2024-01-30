@@ -4,7 +4,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import type { ManifestTheme} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { loadManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
 
@@ -37,7 +37,7 @@ export class UmbThemeContext extends UmbBaseController {
 			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
 			this.#themeObserver = this.observe(
 				umbExtensionsRegistry
-					.extensionsOfType('theme')
+					.byType('theme')
 					.pipe(map((extensions) => extensions.filter((extension) => extension.alias === themeAlias))),
 				async (themes) => {
 					this.#styleElement?.remove();

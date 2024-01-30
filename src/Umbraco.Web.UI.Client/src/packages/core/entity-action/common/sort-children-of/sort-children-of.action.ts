@@ -4,8 +4,8 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 export class UmbSortChildrenOfEntityAction<
 	T extends { sortChildrenOf(): Promise<void> },
 > extends UmbEntityActionBase<T> {
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+		super(host, repositoryAlias, unique, entityType);
 	}
 
 	async execute() {
