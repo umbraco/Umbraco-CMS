@@ -1,16 +1,16 @@
-import type { UmbData } from '../../data.js';
+import type { UmbMockDBBase } from '../mock-db-base.js';
 
 export class UmbMockEntityItemManager<T extends { id: string }> {
-	#db: UmbData<T>;
+	#db: UmbMockDBBase<T>;
 	#itemReadMapper: (item: T) => any;
 
-	constructor(db: UmbData<T>, itemReadMapper: (item: T) => any) {
+	constructor(db: UmbMockDBBase<T>, itemReadMapper: (item: T) => any) {
 		this.#db = db;
 		this.#itemReadMapper = itemReadMapper;
 	}
 
 	getItems(ids: Array<string>) {
-		const items = this.#db.getData().filter((item) => ids.includes(item.id));
+		const items = this.#db.getAll().filter((item) => ids.includes(item.id));
 		return items.map((item) => this.#itemReadMapper(item));
 	}
 }

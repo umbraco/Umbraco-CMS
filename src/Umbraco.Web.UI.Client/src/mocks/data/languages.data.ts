@@ -1,8 +1,8 @@
-import { UmbData } from './data.js';
+import { UmbMockDBBase } from './utils/mock-db-base.js';
 import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Temp mocked database
-class UmbLanguagesData extends UmbData<LanguageResponseModel> {
+class UmbLanguagesData extends UmbMockDBBase<LanguageResponseModel> {
 	constructor(data: LanguageResponseModel[]) {
 		super(data);
 	}

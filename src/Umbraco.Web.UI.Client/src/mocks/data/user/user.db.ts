@@ -165,7 +165,7 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	}
 
 	filter(options: any): PagedUserResponseModel {
-		const { items: allItems } = this.getAll();
+		const allItems = this.getAll();
 
 		const filterOptions = {
 			skip: options.skip || 0,

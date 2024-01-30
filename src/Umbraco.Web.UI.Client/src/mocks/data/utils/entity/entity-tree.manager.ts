@@ -12,14 +12,14 @@ export class UmbMockEntityTreeManager<T extends Omit<EntityTreeItemResponseModel
 	}
 
 	getRoot() {
-		const items = this.#db.getData().filter((item) => item.parent === null);
+		const items = this.#db.getAll().filter((item) => item.parent === null);
 		const treeItems = items.map((item) => this.#treeItemMapper(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getChildrenOf(parentId: string) {
-		const items = this.#db.getData().filter((item) => item.parent?.id === parentId);
+		const items = this.#db.getAll().filter((item) => item.parent?.id === parentId);
 		const treeItems = items.map((item) => this.#treeItemMapper(item));
 		const total = items.length;
 		return { items: treeItems, total };

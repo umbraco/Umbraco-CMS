@@ -1,6 +1,6 @@
-import { UmbData } from '../../data.js';
+import { UmbMockDBBase } from '../mock-db-base.js';
 
-export abstract class UmbEntityMockDbBase<MockItemType extends { id: string }> extends UmbData<MockItemType> {
+export abstract class UmbEntityMockDbBase<MockItemType extends { id: string }> extends UmbMockDBBase<MockItemType> {
 	constructor(data: Array<MockItemType>) {
 		super(data);
 	}
@@ -20,15 +20,5 @@ export abstract class UmbEntityMockDbBase<MockItemType extends { id: string }> e
 
 	delete(id: string) {
 		this.data = this.data.filter((item) => item.id !== id);
-	}
-
-	get(options: { skip: number | undefined; take: number | undefined }) {
-		const skip = options.skip ? options.skip : 0;
-		const take = options.take ? options.take : 100;
-
-		const mockItems = this.data;
-		const paginatedItems = mockItems.slice(skip, skip + take);
-
-		return { items: paginatedItems, total: mockItems.length };
 	}
 }

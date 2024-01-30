@@ -1,15 +1,15 @@
-import type { UmbData } from '../../data.js';
+import type { UmbMockDBBase } from '../mock-db-base.js';
 import type { FileSystemItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbMockFileSystemItemManager<T extends FileSystemItemResponseModelBaseModel> {
-	#db: UmbData<T>;
+	#db: UmbMockDBBase<T>;
 
-	constructor(db: UmbData<T>) {
+	constructor(db: UmbMockDBBase<T>) {
 		this.#db = db;
 	}
 
 	getItems(paths: Array<string>) {
-		const items = this.#db.getData().filter((item) => paths.includes(item.path));
+		const items = this.#db.getAll().filter((item) => paths.includes(item.path));
 		return items.map((item) => createFileItemResponseModelBaseModel(item));
 	}
 }
