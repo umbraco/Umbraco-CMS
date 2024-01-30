@@ -276,4 +276,21 @@ public class TemplateServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(result.Success);
         Assert.AreEqual(TemplateOperationStatus.InvalidAlias, result.Status);
     }
+
+    [Test]
+    public async Task Can_Create_Template_With_Key()
+    {
+        var key = Guid.NewGuid();
+        var result = await TemplateService.CreateAsync("Template", "template", "test", Constants.Security.SuperUserKey, key);
+        Assert.IsTrue(result.Success);
+
+        var template = await TemplateService.GetAsync(key);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNotNull(template);
+            Assert.AreEqual(key, template.Key);
+        });
+
+    }
 }

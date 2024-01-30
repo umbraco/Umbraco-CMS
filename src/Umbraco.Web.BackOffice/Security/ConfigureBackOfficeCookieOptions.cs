@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.BackOffice.Controllers;
@@ -24,6 +25,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security;
 public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAuthenticationOptions>
 {
     private readonly IBasicAuthService _basicAuthService;
+    private readonly IOptions<BackOfficeAuthenticationTypeSettings> _backOfficeAuthenticationTypeSettings;
     private readonly IDataProtectionProvider _dataProtection;
     private readonly GlobalSettings _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -63,7 +65,9 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         IIpResolver ipResolver,
         TimeProvider timeProvider,
         UmbracoRequestPaths umbracoRequestPaths,
-        IBasicAuthService basicAuthService)
+        IBasicAuthService basicAuthService,
+        IOptions<BackOfficeAuthenticationTypeSettings> backOfficeAuthenticationTypeSettings
+        )
     {
         _serviceProvider = serviceProvider;
         _umbracoContextAccessor = umbracoContextAccessor;
@@ -77,12 +81,14 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         _timeProvider = timeProvider;
         _umbracoRequestPaths = umbracoRequestPaths;
         _basicAuthService = basicAuthService;
+        _backOfficeAuthenticationTypeSettings = backOfficeAuthenticationTypeSettings;
     }
 
+    private string AuthenticationType => _backOfficeAuthenticationTypeSettings.Value.AuthenticationType;
     /// <inheritdoc />
     public void Configure(string? name, CookieAuthenticationOptions options)
     {
-        if (name != Constants.Security.BackOfficeAuthenticationType)
+        if (name != AuthenticationType)
         {
             return;
         }
@@ -115,7 +121,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         // Note: the purpose for the data protector must remain fixed for interop to work.
         IDataProtector dataProtector = options.DataProtectionProvider.CreateProtector(
             "Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware",
-            Constants.Security.BackOfficeAuthenticationType,
+            AuthenticationType,
             "v2");
         var ticketDataFormat = new TicketDataFormat(dataProtector);
 
@@ -164,8 +170,8 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                     Constants.Security.TicketExpiresClaimType,
                     ctx.Properties.ExpiresUtc!.Value.ToString("o"),
                     ClaimValueTypes.DateTime,
-                    Constants.Security.BackOfficeAuthenticationType,
-                    Constants.Security.BackOfficeAuthenticationType,
+                    AuthenticationType,
+                    AuthenticationType,
                     backOfficeIdentity));
 
                 await securityStampValidator.ValidateAsync(ctx);
@@ -210,8 +216,8 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                         Constants.Security.SessionIdClaimType,
                         session.ToString(),
                         ClaimValueTypes.String,
-                        Constants.Security.BackOfficeAuthenticationType,
-                        Constants.Security.BackOfficeAuthenticationType,
+                        AuthenticationType,
+                        AuthenticationType,
                         backOfficeIdentity));
 
                     // since it is a cookie-based authentication add that claim
@@ -219,8 +225,8 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                         ClaimTypes.CookiePath,
                         "/",
                         ClaimValueTypes.String,
-                        Constants.Security.BackOfficeAuthenticationType,
-                        Constants.Security.BackOfficeAuthenticationType,
+                        AuthenticationType,
+                        AuthenticationType,
                         backOfficeIdentity));
                 }
 

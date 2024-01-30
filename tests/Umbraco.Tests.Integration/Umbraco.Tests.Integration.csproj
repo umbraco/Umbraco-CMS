@@ -58,7 +58,7 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Copy.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Delete.cs">
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.DeleteFromRecycleBin.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Get.cs">
@@ -106,14 +106,23 @@
     <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.Create.cs">
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.GetAvailableCompositions.cs">
+      <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Services\ContentTypeEditingServiceTests.Update.cs">
       <DependentUpon>ContentTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.Create.cs">
       <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
     </Compile>
+    <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.GetAvailableCompositions.cs">
+      <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
     <Compile Update="Umbraco.Core\Services\MediaTypeEditingServiceTests.Update.cs">
       <DependentUpon>MediaTypeEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.MoveToRecyleBin.cs">
+      <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 

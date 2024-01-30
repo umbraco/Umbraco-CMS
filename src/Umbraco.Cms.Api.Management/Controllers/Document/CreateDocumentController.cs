@@ -45,7 +45,12 @@ public class CreateDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, requestModel.ParentId),
+            ContentPermissionResource.WithKeys(
+                ActionNew.ActionLetter,
+                requestModel.ParentId,
+                requestModel.Variants
+                    .Where(v => v.Culture is not null)
+                    .Select(v => v.Culture!)),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -57,7 +62,7 @@ public class CreateDocumentController : DocumentControllerBase
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            ? CreatedAtId<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : ContentEditingOperationStatusResult(result.Status);
     }
 }

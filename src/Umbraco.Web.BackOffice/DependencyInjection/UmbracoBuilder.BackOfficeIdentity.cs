@@ -73,7 +73,8 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    private static BackOfficeIdentityBuilder BuildUmbracoBackOfficeIdentity(this IUmbracoBuilder builder)
+    //TODO change this to private when the legacy backoffice is removed
+    public static BackOfficeIdentityBuilder BuildUmbracoBackOfficeIdentity(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
 

@@ -21,7 +21,7 @@ test.describe('Log Viewer tests', () => {
     // Assert
     // Checks if there is a log with the telemetry level to minimal
     await umbracoUi.waitForTimeout(1000);
-    await umbracoUi.logViewer.doesFirstLogHasMessage('Telemetry level set to "' + telemetryLevel + '"');
+    await umbracoUi.logViewer.doesFirstLogHaveMessage('Telemetry level set to "' + telemetryLevel + '"');
 
     // Clean
     await umbracoApi.telemetry.setLevel(startTelemetryLevel);
@@ -57,7 +57,7 @@ test.describe('Log Viewer tests', () => {
     // Assert
     // Checks if the saved search is visible in the UI
     await umbracoUi.logViewer.clickOverviewButton();
-    await umbracoUi.logViewer.doesSavedSearchDisplay(searchName);
+    await expect(umbracoUi.logViewer.checkSavedSearch(searchName)).toBeVisible();
     expect(umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
 
     // Clean
@@ -86,7 +86,7 @@ test.describe('Log Viewer tests', () => {
     // Assert
     // Checks if the saved search is visible in the UI
     await umbracoUi.logViewer.clickOverviewButton();
-    await umbracoUi.logViewer.doesSavedSearchDisplay(searchName);
+    await expect(umbracoUi.logViewer.checkSavedSearch(searchName)).toBeVisible();
     expect(umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeTruthy();
 
     // Clean
@@ -108,7 +108,7 @@ test.describe('Log Viewer tests', () => {
     // Assert
     // Checks if the saved search is visible in the UI
     await umbracoUi.logViewer.clickOverviewButton();
-    await umbracoUi.logViewer.doesSavedSearchNotDisplay(searchName);
+    await expect(umbracoUi.logViewer.checkSavedSearch(searchName)).not.toBeVisible();
     expect(await umbracoApi.logViewer.doesSavedSearchExist(searchName)).toBeFalsy();
   });
 
@@ -122,7 +122,7 @@ test.describe('Log Viewer tests', () => {
     await umbracoUi.logViewer.clickFirstLogSearchResult();
 
     // Assert
-    await umbracoUi.logViewer.doesDetailedLogHasText('The token');
+    await umbracoUi.logViewer.doesDetailedLogHaveText('The token');
   });
 
   // Currently only works if the user is using the locale 'en-US' otherwise it will fail
@@ -149,7 +149,7 @@ test.describe('Log Viewer tests', () => {
     const lastLogTimestamp = new Intl.DateTimeFormat(locale, options).format(dateToFormat);
 
     // Assert
-    await umbracoUi.logViewer.doesFirstLogHasTimestamp(lastLogTimestamp);
+    await umbracoUi.logViewer.doesFirstLogHaveTimestamp(lastLogTimestamp);
   });
 
   // Will fail if there is not enough logs.
@@ -160,10 +160,10 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await umbracoUi.logViewer.clickSearchButton();
-    await umbracoUi.logViewer.clickPageTwo();
+    await umbracoUi.logViewer.clickPageNumber(2);
 
     // Assert
-    await umbracoUi.logViewer.doesFirstLogHasMessage(firstLogOnSecondPage);
+    await umbracoUi.logViewer.doesFirstLogHaveMessage(firstLogOnSecondPage);
     // TODO: Remove the comment below when the issue is resolved.
     // At the time this test was created, the UI only highlights page 1. Uncomment the line below when the issue is resolved.
     // await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
@@ -183,9 +183,9 @@ test.describe('Log Viewer tests', () => {
 
     // Assert
     // Checks if the search has the correct search value
-    await umbracoUi.logViewer.doesSearchBoxHasValue(search);
+    await umbracoUi.logViewer.doesSearchBoxHaveValue(search);
     // Checks if the saved search found the correct logs
-    await umbracoUi.logViewer.doesFirstLogHasMessage('The token');
+    await umbracoUi.logViewer.doesFirstLogHaveMessage('The token');
 
     // Clean
     await umbracoApi.logViewer.deleteSavedSearch(searchName);

@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
@@ -635,17 +636,33 @@ public class ContentController : ContentControllerBase
     [OutgoingEditorModelEvent]
     public ActionResult<ContentItemDisplay?> GetEmptyBlueprint(int blueprintId, int parentId)
     {
-        IContent? blueprint = _contentService.GetBlueprintById(blueprintId);
-        if (blueprint == null)
+        IContent? scaffold;
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
-            return NotFound();
+            IContent? blueprint = _contentService.GetBlueprintById(blueprintId);
+            if (blueprint is null)
+            {
+                return NotFound();
+            }
+            scaffold = (IContent)blueprint.DeepClone();
+
+            scaffold.Id = 0;
+            scaffold.Name = string.Empty;
+            scaffold.ParentId = parentId;
+
+            var scaffoldedNotification = new ContentScaffoldedNotification(blueprint, scaffold, parentId, new EventMessages());
+            if (scope.Notifications.PublishCancelable(scaffoldedNotification))
+            {
+                scope.Complete();
+                return Problem("Scaffolding was cancelled");
+            }
+
+            scope.Complete();
         }
 
-        blueprint.Id = 0;
-        blueprint.Name = string.Empty;
-        blueprint.ParentId = parentId;
 
-        ContentItemDisplay? mapped = _umbracoMapper.Map<ContentItemDisplay>(blueprint);
+
+        ContentItemDisplay? mapped = _umbracoMapper.Map<ContentItemDisplay>(scaffold);
 
         if (mapped is not null)
         {
@@ -778,6 +795,7 @@ public class ContentController : ContentControllerBase
     /// <param name="contentId">The content id to copy</param>
     /// <param name="name">The name of the blueprint</param>
     /// <returns></returns>
+    [Authorize(Policy = AuthorizationPolicies.ContentPermissionCreateBlueprintFromId)]
     [HttpPost]
     public ActionResult<SimpleNotificationModel> CreateBlueprintFromContent(
         [FromQuery] int contentId,
@@ -833,7 +851,8 @@ public class ContentController : ContentControllerBase
     /// <summary>
     ///     Saves content
     /// </summary>
-    [ContentSaveValidation]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+    [ContentSaveValidation(skipUserAccessValidation:true)] // skip user access validation because we "only" require Settings access to create new blueprints from scratch
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
     {
@@ -1993,6 +2012,7 @@ public class ContentController : ContentControllerBase
         return Ok();
     }
 
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     [HttpDelete]
     [HttpPost]
     public IActionResult DeleteBlueprint(int id)

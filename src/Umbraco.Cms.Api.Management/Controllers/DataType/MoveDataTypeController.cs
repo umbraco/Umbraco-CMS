@@ -22,7 +22,7 @@ public class MoveDataTypeController : DataTypeControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost("{id:guid}/move")]
+    [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

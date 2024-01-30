@@ -537,6 +537,19 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    public int CountChildren(
+        int id,
+        UmbracoObjectTypes objectType,
+        IQuery<IUmbracoEntity>? filter = null)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == false);
+
+            return _entityRepository.CountByQuery(query, objectType.GetGuid(), filter);
+        }
+    }
+
     // gets the object type, throws if not supported
     private UmbracoObjectTypes GetObjectType(Type? type)
     {
@@ -561,6 +574,12 @@ public class EntityService : RepositoryService, IEntityService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == trashed);
+
+            if (pageSize == 0)
+            {
+                totalRecords = _entityRepository.CountByQuery(query, objectType.GetGuid(), filter);
+                return Enumerable.Empty<IEntitySlim>();
+            }
 
             return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize, out totalRecords, filter, ordering);
         }

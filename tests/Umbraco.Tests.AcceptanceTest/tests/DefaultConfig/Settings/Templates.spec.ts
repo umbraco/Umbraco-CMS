@@ -80,11 +80,15 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(childTemplateName);
+<<<<<<< HEAD
     await page.getByLabel('Change Master template').click();
+=======
+    await umbracoUi.template.clickChangeMasterTemplateButton();
+>>>>>>> v14/dev
     await page.locator('umb-tree-picker-modal').locator('#caret-button').click();
     await page.getByRole('button', {name: templateName}).click();
-    await page.getByLabel('Submit').click();
-    await page.getByLabel('Save').click();
+    await umbracoUi.template.clickSubmitButton();
+    await umbracoUi.template.clickSaveButton();
 
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();
@@ -163,7 +167,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
-  test('can insert dictionaryItem into a template', async ({page, umbracoApi, umbracoUi}) => {
+  test('can insert dictionaryItem into a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const templateAlias = AliasHelper.toAlias(templateName);
     await umbracoApi.template.create(templateName, templateAlias, '');
@@ -179,7 +183,7 @@ test.describe('Template tests', () => {
     // Act
     await umbracoUi.template.goToTemplate(templateName);
     await umbracoUi.template.insertDictionaryByName(dictionaryName);
-    await page.getByLabel('Save').click();
+    await umbracoUi.template.clickSaveButton();
 
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();

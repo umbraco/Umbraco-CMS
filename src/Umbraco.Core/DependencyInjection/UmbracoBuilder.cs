@@ -37,6 +37,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -301,6 +302,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDomainService, DomainService>();
             Services.AddUnique<ITagService, TagService>();
             Services.AddUnique<IContentPermissionService, ContentPermissionService>();
+            Services.AddUnique<IDictionaryPermissionService, DictionaryPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();
@@ -320,7 +322,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IScriptService, ScriptService>();
             Services.AddUnique<IStylesheetService, StylesheetService>();
             Services.AddUnique<IStylesheetFolderService, StylesheetFolderService>();
-            Services.AddUnique<IRichTextStylesheetService, RichTextStylesheetService>();
             Services.AddUnique<IPartialViewService, PartialViewService>();
             Services.AddUnique<IScriptFolderService, ScriptFolderService>();
             Services.AddUnique<IPartialViewFolderService, PartialViewFolderService>();
@@ -348,6 +349,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<ConflictingPackageData>();
             Services.AddSingleton<CompiledPackageXmlParser>();
+            Services.AddUnique<IPreviewService, PreviewService>();
 
             // Register a noop IHtmlSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
@@ -369,6 +371,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
+
+            //Two factor providers
+            Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
+            Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
+
         }
     }
 }

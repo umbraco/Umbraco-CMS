@@ -7,23 +7,23 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-[Obsolete($"Use {nameof(ISystemInformationService)} instead. Will be removed in V16.")]
+[Obsolete($"Use {nameof(ISystemTroubleshootingInformationService)} instead. Will be removed in V16.")]
 public class UserDataService : IUserDataService
 {
-    private readonly ISystemInformationService _systemInformationService;
+    private readonly ISystemTroubleshootingInformationService _systemTroubleshootingInformationService;
 
-    [Obsolete($"Use the constructor that accepts {nameof(ISystemInformationService)}")]
+    [Obsolete($"Use the constructor that accepts {nameof(ISystemTroubleshootingInformationService)}")]
     public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
-        : this(version, localizationService, StaticServiceProvider.Instance.GetRequiredService<ISystemInformationService>())
+        : this(version, localizationService, StaticServiceProvider.Instance.GetRequiredService<ISystemTroubleshootingInformationService>())
     {
     }
 
-    public UserDataService(IUmbracoVersion version, ILocalizationService localizationService, ISystemInformationService systemInformationService)
-        => _systemInformationService = systemInformationService;
+    public UserDataService(IUmbracoVersion version, ILocalizationService localizationService, ISystemTroubleshootingInformationService systemTroubleshootingInformationService)
+        => _systemTroubleshootingInformationService = systemTroubleshootingInformationService;
 
-    [Obsolete($"Use {nameof(ISystemInformationService)} instead. Will be removed in V16.")]
+    [Obsolete($"Use {nameof(ISystemTroubleshootingInformationService)} instead. Will be removed in V16.")]
     public IEnumerable<UserData> GetUserData() =>
-        _systemInformationService.GetSystemInformation().Select(kvp => new UserData(kvp.Key, kvp.Value)).ToArray();
+        _systemTroubleshootingInformationService.GetTroubleshootingInformation().Select(kvp => new UserData(kvp.Key, kvp.Value)).ToArray();
 
     public bool IsRunningInProcessIIS()
     {

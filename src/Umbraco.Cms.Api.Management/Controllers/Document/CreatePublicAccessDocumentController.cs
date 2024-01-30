@@ -53,7 +53,7 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
         Attempt<PublicAccessEntry?, PublicAccessOperationStatus> saveAttempt = await _publicAccessService.CreateAsync(publicAccessEntrySlim);
 
         return saveAttempt.Success
-            ? CreatedAtAction<GetPublicAccessDocumentController>(controller => nameof(controller.GetPublicAccess), saveAttempt.Result!.Key)
+            ? CreatedAtId<GetPublicAccessDocumentController>(controller => nameof(controller.GetPublicAccess), saveAttempt.Result!.Key)
             : PublicAccessOperationStatusResult(saveAttempt.Status);
     }
 }
