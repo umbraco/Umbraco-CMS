@@ -56,12 +56,7 @@ export class UmbEntityActionElement extends UmbLitElement {
 		if (this._unique === undefined) return;
 		if (!this._entityType) return;
 
-		this.#api = await createExtensionApi(this._manifest, [
-			this,
-			this._manifest.meta.repositoryAlias,
-			this.unique,
-			this.entityType,
-		]);
+		this.#api = await createExtensionApi(this._manifest, [this, this._manifest.meta]);
 
 		// TODO: Fix so when we use a HREF it does not refresh the page?
 		this._href = await this.#api.getHref?.();

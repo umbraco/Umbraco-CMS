@@ -30,34 +30,20 @@ export interface MetaEntityAction {
 	 * ]
 	 */
 	label: string;
+}
 
-	/**
-	 * The alias for the repository of the entity type this action is for
-	 * such as 'Umb.Repository.Documents'
-	 * @examples [
-	 *   "Umb.Repository.Documents"
-	 * ]
-	 */
-	repositoryAlias: string;
+// TODO: Warren these don't seem to be used anywhere
 
-	/**
-	 * The entity types that this action can be performed on
-	 * @examples [
-	 * "data-type",
-	 * "data-type-folder",
-	 * "document",
-	 * "document-root",
-	 * "document-type",
-	 * "dictionary-item",
-	 * "language",
-	 * "language-root",
-	 * "member",
-	 * "member-group",
-	 * "member-type",
-	 * "template",
-	 * "template-root",
-	 * "partial-view"
-	 * ]
-	 */
+export interface ManifestEntityActionDeleteKind extends ManifestEntityAction {
+	type: 'entityAction';
+	kind: 'delete';
+	meta: MetaEntityActionDeleteKind;
+}
+
+export interface MetaEntityActionDeleteKind {
+	icon: string;
+	label: string;
+	detailRepositoryAlias: string;
+	itemRepositoryAlias: string;
 	entityTypes: Array<string>;
 }

@@ -1,7 +1,7 @@
 import { UmbEntityActionBase } from '../../entity-action.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
@@ -10,7 +10,8 @@ export class UmbDeleteEntityAction<
 > extends UmbEntityActionBase<T> {
 	#modalManager?: UmbModalManagerContext;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+	constructor(host: UmbControllerHostElement, args: any) {
+		console.log('ARGS', args);
 		super(host, repositoryAlias, unique, entityType);
 
 		new UmbContextConsumerController(this._host, UMB_MODAL_MANAGER_CONTEXT, (instance) => {
