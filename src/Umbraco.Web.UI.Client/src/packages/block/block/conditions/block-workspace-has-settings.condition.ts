@@ -17,7 +17,6 @@ export class UmbBlockWorkspaceHasSettingsCondition extends UmbBaseController imp
 		this.config = args.config;
 		this.#onChange = args.onChange;
 
-		// TODO: Rename the Block Context, so it gets a name.. like Block Entry Context or something.
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
 				context.settings.contentTypeId,
