@@ -142,7 +142,10 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 				return { data: { documentTypeId: mediaTypeId }, value: propertyData }; //TODO: Should we have a separate modal for mediaTypes?
 			})
 			.onSubmit((value) => {
-				this.#addProperty(value);
+				if (!value.dataType) {
+					throw new Error('No data type selected');
+				}
+				this.#addProperty(value as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteNewProperty = routeBuilder(null);
