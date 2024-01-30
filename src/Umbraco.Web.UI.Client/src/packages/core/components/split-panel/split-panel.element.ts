@@ -218,6 +218,7 @@ export class UmbSplitPanelElement extends LitElement {
 			display: grid;
 			position: relative;
 			z-index: 0;
+			overflow: hidden;
 		}
 		#divider {
 			height: 100%;
