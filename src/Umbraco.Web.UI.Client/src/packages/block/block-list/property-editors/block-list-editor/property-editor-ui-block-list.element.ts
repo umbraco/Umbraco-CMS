@@ -67,9 +67,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.#context.setSettings(buildUpValue.settingsData);
 	}
 
+	@state()
+	private _createButtonLabel = this.localize.term('content_createEmpty');
+
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
+
 		const validationLimit = config.getValueByAlias<NumberRangeValueType>('validationLimit');
 
 		this._limitMin = validationLimit?.min;
@@ -77,6 +81,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
 		this.#context.setBlockTypes(blocks);
+
+		const customCreateButtonLabel = config.getValueByAlias<string>('createLabel');
+		if (customCreateButtonLabel) {
+			this._createButtonLabel = customCreateButtonLabel;
+		} else if (blocks.length === 1) {
+			this._createButtonLabel = `${this.localize.term('general_add')} ${blocks[0].label}`;
+		}
 
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
 		this.#context.setInlineEditingMode(useInlineEditingAsDefault);
@@ -97,10 +108,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	private _blocks?: Array<UmbBlockTypeBaseModel>;
 
 	@state()
-	_layouts: Array<UmbBlockLayoutBaseModel> = [];
+	private _layouts: Array<UmbBlockLayoutBaseModel> = [];
 
 	@state()
-	_catalogueRouteBuilder?: UmbModalRouteBuilder;
+	private _catalogueRouteBuilder?: UmbModalRouteBuilder;
+
+	@state()
+	private _directRoute?: string;
 
 	#context = new UmbBlockListManagerContext(this);
 
@@ -151,6 +165,11 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	}
 
 	render() {
+		if (this._blocks?.length === 1) {
+			const elementKey = this._blocks[0].contentElementTypeKey;
+			this._directRoute =
+				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
+		}
 		return html` ${repeat(
 				this._layouts,
 				(x) => x.contentUdi,
@@ -164,10 +183,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				<uui-button
 					id="add-button"
 					look="placeholder"
-					label=${this.localize.term('content_createEmpty')}
-					href=${this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) ?? ''}>
-					${this.localize.term('content_createEmpty')}
-				</uui-button>
+					label=${this._createButtonLabel}
+					href=${this._directRoute ?? this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) ?? ''}></uui-button>
 				<uui-button
 					label=${this.localize.term('content_createFromClipboard')}
 					look="placeholder"
