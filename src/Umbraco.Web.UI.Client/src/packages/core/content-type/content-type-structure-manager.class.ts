@@ -1,4 +1,4 @@
-import type { UmbContentTypeModel, UmbPropertyTypeModel } from './types.js';
+import type { UmbContentTypeModel, UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from './types.js';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -273,13 +273,12 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	}
 
 	createPropertyScaffold(containerId: string | null = null, sortOrder?: number) {
-		const property: UmbPropertyTypeModel = {
+		const property: UmbPropertyTypeScaffoldModel = {
 			id: UmbId.new(),
-			containerId: containerId,
+			container: containerId ? { id: containerId } : null,
 			alias: '',
 			name: '',
 			description: '',
-			dataTypeId: '',
 			variesByCulture: false,
 			variesBySegment: false,
 			validation: {
@@ -292,7 +291,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 				labelOnTop: false,
 			},
 			sortOrder: sortOrder ?? 0,
-		} as any; // Sort order was not allowed when this was written.
+		};
 
 		return property;
 	}
@@ -301,11 +300,12 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
-		const property: UmbPropertyTypeModel = this.createPropertyScaffold(containerId, sortOrder);
+		const property = this.createPropertyScaffold(containerId, sortOrder);
 
-		const properties = [
+		const properties: Array<UmbPropertyTypeScaffoldModel | UmbPropertyTypeModel> = [
 			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? []),
 		];
+
 		properties.push(property);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
