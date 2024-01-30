@@ -2,8 +2,7 @@ import type { UmbWorkspaceSplitViewManager } from '../workspace-split-view-manag
 import type { UmbPropertyDatasetContext } from '../../property/property-dataset/property-dataset-context.interface.js';
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { ContentStateModel, VariantResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbVariantId, UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbVariantableWorkspaceContextInterface extends UmbSaveableWorkspaceContextInterface {
@@ -12,9 +11,9 @@ export interface UmbVariantableWorkspaceContextInterface extends UmbSaveableWork
 	setName(name: string, variantId?: UmbVariantId): void;
 
 	// Variant:
-	variants: Observable<Array<VariantResponseModelBaseModel & { state: ContentStateModel }>>;
+	variants: Observable<Array<UmbVariantModel>>;
 	splitView: UmbWorkspaceSplitViewManager;
-	getVariant(variantId: UmbVariantId): VariantResponseModelBaseModel | undefined;
+	getVariant(variantId: UmbVariantId): UmbVariantModel | undefined;
 
 	// Property:
 	// This one is async cause it needs to structure to provide this data:

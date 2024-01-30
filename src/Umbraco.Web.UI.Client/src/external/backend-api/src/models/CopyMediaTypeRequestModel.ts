@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type CopyMediaTypeRequestModel = {
-    targetId?: string | null;
+    target?: ReferenceByIdModel | null;
 };
 

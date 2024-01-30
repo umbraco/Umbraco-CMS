@@ -39,7 +39,6 @@ export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
 			name: item.name,
 			hasChildren: false,
-			isContainer: false,
 			isFolder: false,
 		};
 

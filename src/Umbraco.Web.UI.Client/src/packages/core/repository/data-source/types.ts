@@ -1,4 +1,4 @@
-export interface UmbPagedData<T> {
+export interface UmbPagedModel<T> {
 	total: number;
 	items: Array<T>;
 }

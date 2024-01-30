@@ -6,7 +6,6 @@ import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-// TODO: TREE STORE TYPE PROBLEM:
 export class UmbPartialViewTreeRepository
 	extends UmbTreeRepositoryBase<UmbPartialViewTreeItemModel, UmbPartialViewTreeRootModel>
 	implements UmbApi
@@ -20,9 +19,7 @@ export class UmbPartialViewTreeRepository
 			unique: null,
 			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			name: 'Partial Views',
-			icon: 'icon-folder',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 

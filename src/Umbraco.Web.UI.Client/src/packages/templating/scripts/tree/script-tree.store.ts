@@ -39,7 +39,6 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			name: item.name,
 			hasChildren: false,
-			isContainer: false,
 			isFolder: false,
 		};
 

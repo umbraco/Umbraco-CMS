@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbPublishDocumentEntityAction } from './publish.action.js';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action.js';
@@ -28,7 +28,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-blueprint',
 			label: 'Create Document Blueprint (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -41,7 +41,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -54,7 +54,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-documents',
 			label: 'Copy (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -67,7 +67,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-navigation-vertical',
 			label: 'Sort (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -79,7 +79,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-lock',
 			label: 'Public Access (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -91,7 +91,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-globe',
 			label: 'Publish (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -103,7 +103,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-globe',
 			label: 'Unpublish (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -115,7 +115,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-undo',
 			label: 'Rollback (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},

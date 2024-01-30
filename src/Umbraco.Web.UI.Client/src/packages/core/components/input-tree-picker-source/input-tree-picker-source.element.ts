@@ -77,7 +77,7 @@ export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElem
 	#onIdChange(event: CustomEvent) {
 		switch (this.type) {
 			case 'content':
-				this.nodeId = (<UmbInputDocumentPickerRootElement>event.target).nodeId;
+				this.nodeId = (<UmbInputDocumentPickerRootElement>event.target).unique;
 				break;
 			case 'media':
 			case 'member':

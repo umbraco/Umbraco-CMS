@@ -17,7 +17,8 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { type DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -25,7 +26,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	private _popoverElement?: UUIPopoverContainerElement;
 
 	@state()
-	_variants: Array<DocumentVariantResponseModel> = [];
+	_variants: Array<UmbVariantModel> = [];
 
 	// TODO: Stop using document context specific ActiveVariant type.
 	@state()
@@ -146,11 +147,11 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private _switchVariant(variant: DocumentVariantResponseModel) {
+	private _switchVariant(variant: UmbVariantModel) {
 		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
 	}
 
-	private _openSplitView(variant: DocumentVariantResponseModel) {
+	private _openSplitView(variant: UmbVariantModel) {
 		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
 	}
 

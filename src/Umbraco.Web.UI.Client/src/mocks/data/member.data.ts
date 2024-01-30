@@ -3,7 +3,7 @@ import { UmbEntityData } from './entity.data.js';
 import { createEntityTreeItem } from './utils.js';
 import type {
 	EntityTreeItemResponseModel,
-	PagedEntityTreeItemResponseModel,
+	PagedNamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<UmbMemberDetailModel> = [
@@ -12,29 +12,24 @@ export const data: Array<UmbMemberDetailModel> = [
 		entityType: 'member',
 		hasChildren: false,
 		id: 'aaa08ccd-4179-464c-b634-6969149dd9f9',
-		isContainer: false,
 		parentId: null,
 		isFolder: false,
 	},
 ];
 
-// Temp mocked database
-// TODO: all properties are optional in the server schema. I don't think this is correct.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 class UmbMemberData extends UmbEntityData<UmbMemberDetailModel> {
 	constructor() {
 		super(data);
 	}
 
-	getTreeRoot(): PagedEntityTreeItemResponseModel {
+	getTreeRoot(): PagedNamedEntityTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(id: string): PagedEntityTreeItemResponseModel {
+	getTreeItemChildren(id: string): PagedNamedEntityTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === id);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;

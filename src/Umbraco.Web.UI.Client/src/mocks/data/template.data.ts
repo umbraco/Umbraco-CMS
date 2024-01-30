@@ -3,17 +3,15 @@ import { createEntityTreeItem } from './utils.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	EntityTreeItemResponseModel,
-	PagedEntityTreeItemResponseModel,
 	TemplateResponseModel,
 	TemplateScaffoldResponseModel,
 	CreateTemplateRequestModel,
 	TemplateItemResponseModel,
 	TemplateQuerySettingsResponseModel,
-	TemplateQueryResultResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	TemplateQueryPropertyTypeModel,
-	OperatorModel
+	TemplateQueryResultResponseModel,
+	PagedNamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { TemplateQueryPropertyTypeModel, OperatorModel } from '@umbraco-cms/backoffice/backend-api';
 
 type UmbMockTemplateModel = TemplateResponseModel & EntityTreeItemResponseModel;
 
@@ -36,10 +34,9 @@ const createTemplateItem = (dbItem: UmbMockTemplateModel): TemplateItemResponseM
 export const data: Array<UmbMockTemplateModel> = [
 	{
 		id: '2bf464b6-3aca-4388-b043-4eb439cc2643',
-		isContainer: false,
-		parentId: null,
+		parent: null,
 		name: 'Doc 1',
-		type: 'template',
+		type: 'templa }te',
 		hasChildren: false,
 		alias: 'Doc1',
 		content: `@using Umbraco.Extensions
@@ -58,10 +55,9 @@ export const data: Array<UmbMockTemplateModel> = [
 	},
 	{
 		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
-		isContainer: false,
-		parentId: null,
+		parent: null,
 		name: 'Test',
-		type: 'template',
+		type: 'templat }e',
 		hasChildren: true,
 		alias: 'Test',
 		content:
@@ -69,8 +65,7 @@ export const data: Array<UmbMockTemplateModel> = [
 	},
 	{
 		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
-		isContainer: false,
-		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Child',
 		type: 'template',
@@ -81,8 +76,7 @@ export const data: Array<UmbMockTemplateModel> = [
 	},
 	{
 		id: '9a84c0b3-03b4-4dd4-84ac-706740acwerer0f72',
-		isContainer: false,
-		parentId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		name: 'Has Master Template',
 		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		type: 'template',
@@ -233,15 +227,15 @@ class UmbTemplateData extends UmbEntityData<UmbMockTemplateModel> {
 		return template;
 	}
 
-	getTreeRoot(): PagedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentId === null);
+	getTreeRoot(): PagedNamedEntityTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parent?.id === null);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
-	getTreeItemChildren(id: string): PagedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentId === id);
+	getTreeItemChildren(id: string): PagedNamedEntityTreeItemResponseModel {
+		const items = this.data.filter((item) => item.parent?.id === id);
 		const treeItems = items.map((item) => createEntityTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };

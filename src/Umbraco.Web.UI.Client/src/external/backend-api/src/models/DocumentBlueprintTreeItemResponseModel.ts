@@ -3,10 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { EntityTreeItemResponseModel } from './EntityTreeItemResponseModel';
+import type { NamedEntityTreeItemResponseModel } from './NamedEntityTreeItemResponseModel';
 
-export type DocumentBlueprintTreeItemResponseModel = (EntityTreeItemResponseModel & {
-documentTypeId: string;
-documentTypeAlias: string;
-documentTypeName?: string | null;
+export type DocumentBlueprintTreeItemResponseModel = (NamedEntityTreeItemResponseModel & {
+    documentTypeId: string;
+    documentTypeAlias: string;
+    documentTypeName?: string | null;
 });
+

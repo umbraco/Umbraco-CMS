@@ -1,8 +1,8 @@
+import type { UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaPickerContext } from './input-media.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -99,7 +99,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	private _editMediaPath = '';
 
 	@state()
-	private _items?: Array<MediaItemResponseModel>;
+	private _items?: Array<UmbMediaItemModel>;
 
 	#pickerContext = new UmbMediaPickerContext(this);
 
@@ -135,7 +135,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		return undefined;
 	}
 
-	#pickableFilter: (item: MediaItemResponseModel) => boolean = (item) => {
+	#pickableFilter: (item: UmbMediaItemModel) => boolean = (item) => {
 		/* TODO: Media item doesn't have the content/media-type ID available to query.
 			 Commenting out until the Management API model is updated. [LK]
 		*/
@@ -154,7 +154,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		});
 	}
 
-	#openItem(item: MediaItemResponseModel) {
+	#openItem(item: UmbMediaItemModel) {
 		// TODO: Implement the Media editing infinity editor. [LK]
 		console.log('TODO: _openItem', item);
 	}
@@ -167,7 +167,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		if (!this._items) return;
 		return html`${repeat(
 			this._items,
-			(item) => item.id,
+			(item) => item.unique,
 			(item) => this.#renderItem(item),
 		)}`;
 	}
@@ -186,12 +186,12 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	#renderItem(item: MediaItemResponseModel) {
+	#renderItem(item: UmbMediaItemModel) {
 		// TODO: `file-ext` value has been hardcoded here. Find out if API model has value for it. [LK]
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
-				detail=${ifDefined(item.id)}
+				detail=${ifDefined(item.unique)}
 				file-ext="jpg">
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
@@ -199,7 +199,9 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 					<uui-button label="Copy media">
 						<uui-icon name="icon-documents"></uui-icon>
 					</uui-button>
-					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.id!)} label="Remove media ${item.name}">
+					<uui-button
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
+						label="Remove media ${item.name}">
 						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
@@ -207,17 +209,17 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	#renderIsTrashed(item: MediaItemResponseModel) {
+	#renderIsTrashed(item: UmbMediaItemModel) {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
-	#renderOpenButton(item: MediaItemResponseModel) {
+	#renderOpenButton(item: UmbMediaItemModel) {
 		if (!this.showOpenButton) return;
 		return html`
 			<uui-button
 				compact
-				href="${this._editMediaPath}edit/${item.id}"
+				href="${this._editMediaPath}edit/${item.unique}"
 				label=${this.localize.term('general_edit') + ` ${item.name}`}>
 				<uui-icon name="icon-edit"></uui-icon>
 			</uui-button>

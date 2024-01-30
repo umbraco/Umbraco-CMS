@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-media-workspace-editor')
 export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	@state()
-	_id?: string;
+	_unique?: string;
 
 	#umbWorkspaceContext?: typeof UMB_MEDIA_WORKSPACE_CONTEXT.TYPE;
 
@@ -14,23 +14,23 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
 			this.#umbWorkspaceContext = instance;
-			this.#observeId();
+			this.#observeUnique();
 		});
 	}
 
-	#observeId() {
+	#observeUnique() {
 		if (!this.#umbWorkspaceContext) return;
-		this.observe(this.#umbWorkspaceContext.data, (data) => (this._id = data?.id));
+		this.observe(this.#umbWorkspaceContext.data, (data) => (this._unique = data?.unique));
 	}
 
 	render() {
-		if (!this._id) return nothing;
+		if (!this._unique) return nothing;
 		return html` <umb-workspace-editor alias="Umb.Workspace.Media">
 			<div id="header" slot="header">TODO: MISSING INPUT COMPONENT</div>
 			<umb-workspace-action-menu
 				slot="action-menu"
 				entity-type="media"
-				unique="${this._id}"></umb-workspace-action-menu>
+				unique="${this._unique}"></umb-workspace-action-menu>
 		</umb-workspace-editor>`;
 	}
 

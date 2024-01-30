@@ -1,5 +1,5 @@
 import type { UmbDocumentTypeItemModel } from './types.js';
-import { UmbDocumentTypeItemServerDataSource } from './document-type-item.server.data.js';
+import { UmbDocumentTypeItemServerDataSource } from './document-type-item.server.data-source.js';
 import { UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT } from './document-type-item.store.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemRepositoryBase } from '@umbraco-cms/backoffice/repository';

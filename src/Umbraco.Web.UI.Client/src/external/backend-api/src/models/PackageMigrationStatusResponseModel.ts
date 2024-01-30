@@ -7,3 +7,4 @@ export type PackageMigrationStatusResponseModel = {
     packageName: string;
     hasPendingMigrations: boolean;
 };
+

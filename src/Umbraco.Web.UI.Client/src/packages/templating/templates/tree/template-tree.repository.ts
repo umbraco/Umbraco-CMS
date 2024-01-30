@@ -19,9 +19,7 @@ export class UmbTemplateTreeRepository
 			id: null,
 			entityType: UMB_TEMPLATE_ROOT_ENTITY_TYPE,
 			name: 'Templates',
-			icon: 'icon-folder',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 

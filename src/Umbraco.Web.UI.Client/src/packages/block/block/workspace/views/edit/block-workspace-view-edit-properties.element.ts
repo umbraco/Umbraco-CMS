@@ -3,13 +3,11 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	PropertyContainerTypes,
-	// UmbPropertyTypeBasedPropertyElement,
-	UmbContentTypeModel} from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbContentTypePropertyStructureHelper
+	UmbContentTypeModel,
+	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
@@ -32,7 +30,7 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
-	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
+	_propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	constructor() {
 		super();

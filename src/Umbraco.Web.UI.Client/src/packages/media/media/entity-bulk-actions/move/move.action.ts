@@ -1,15 +1,11 @@
-import type { UmbMediaRepository } from '../../repository/media.repository.js';
+import type { UmbMediaDetailRepository } from '../../repository/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_MEDIA_TREE_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
-export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaRepository> {
+export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaDetailRepository> {
 	#modalContext?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
@@ -33,7 +29,7 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMed
 		if (modalContext) {
 			const { selection } = await modalContext.onSubmit();
 			const destination = selection[0];
-			await this.repository?.move(this.selection, destination);
+			//await this.repository?.move(this.selection, destination);
 		}
 	}
 }

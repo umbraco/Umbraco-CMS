@@ -1,11 +1,12 @@
+import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentPickerContext } from './input-document.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DocumentItemResponseModel, DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 
 const SORTER_CONFIG: UmbSorterConfig<string> = {
 	compareElementToModel: (element, model) => {
@@ -102,7 +103,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	private _editDocumentPath = '';
 
 	@state()
-	private _items?: Array<DocumentItemResponseModel>;
+	private _items?: Array<UmbDocumentItemModel>;
 
 	#pickerContext = new UmbDocumentPickerContext(this);
 
@@ -138,9 +139,9 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		return undefined;
 	}
 
-	#pickableFilter: (item: DocumentTreeItemResponseModel) => boolean = (item) => {
+	#pickableFilter: (item: UmbDocumentTreeItemModel) => boolean = (item) => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-			return this.allowedContentTypeIds.includes(item.contentTypeId);
+			return this.allowedContentTypeIds.includes(item.documentType.unique);
 		}
 		return true;
 	};
@@ -150,6 +151,8 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		console.log('_openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			pickableFilter: this.#pickableFilter,
 		});
 	}
@@ -163,7 +166,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		return html`<uui-ref-list>
 			${repeat(
 				this._items,
-				(item) => item.id,
+				(item) => item.unique,
 				(item) => this.#renderItem(item),
 			)}
 		</uui-ref-list>`;
@@ -178,16 +181,17 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
-	#renderItem(item: DocumentItemResponseModel) {
-		if (!item.id) return;
+	#renderItem(item: UmbDocumentItemModel) {
+		if (!item.unique) return;
+		// TODO: get correct variant name
+		const name = item.variants[0]?.name;
+
 		return html`
-			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
+			<uui-ref-node name=${name} detail=${ifDefined(item.unique)}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
-					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
-						label="Remove document ${item.name}"
+					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique)} label="Remove document ${name}"
 						>${this.localize.term('general_remove')}</uui-button
 					>
 				</uui-action-bar>
@@ -195,22 +199,26 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	#renderIcon(item: DocumentItemResponseModel) {
-		if (!item.icon) return;
-		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
+	#renderIcon(item: UmbDocumentItemModel) {
+		if (!item.documentType.icon) return;
+		return html`<uui-icon slot="icon" name=${item.documentType.icon}></uui-icon>`;
 	}
 
-	#renderIsTrashed(item: DocumentItemResponseModel) {
+	#renderIsTrashed(item: UmbDocumentItemModel) {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
-	#renderOpenButton(item: DocumentItemResponseModel) {
+	#renderOpenButton(item: UmbDocumentItemModel) {
 		if (!this.showOpenButton) return;
+
+		// TODO: get correct variant name
+		const name = item.variants[0]?.name;
+
 		return html`
 			<uui-button
-				href="${this._editDocumentPath}edit/${item.id}"
-				label="${this.localize.term('general_open')} ${item.name}">
+				href="${this._editDocumentPath}edit/${item.unique}"
+				label="${this.localize.term('general_open')} ${name}">
 				${this.localize.term('general_open')}
 			</uui-button>
 		`;

@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type MoveDocumentTypeRequestModel = {
-    targetId?: string | null;
+    target?: ReferenceByIdModel | null;
 };
 
