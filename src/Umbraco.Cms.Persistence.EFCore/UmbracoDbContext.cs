@@ -38,12 +38,7 @@ public class UmbracoDbContext : DbContext
     public UmbracoDbContext(DbContextOptions<UmbracoDbContext> options)
         : base(ConfigureOptions(options, out IOptionsMonitor<ConnectionStrings>? connectionStringsOptionsMonitor))
     {
-        connectionStringsOptionsMonitor.OnChange(c =>
-        {
-            ILogger<UmbracoDbContext> logger = StaticServiceProvider.Instance.GetRequiredService<ILogger<UmbracoDbContext>>();
-            logger.LogWarning("Connection string changed, disposing context");
-            Dispose();
-        });
+
     }
 
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options, out IOptionsMonitor<ConnectionStrings> connectionStringsOptionsMonitor)
