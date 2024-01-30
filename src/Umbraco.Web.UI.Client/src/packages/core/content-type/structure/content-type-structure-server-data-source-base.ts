@@ -8,8 +8,7 @@ export interface UmbContentTypeStructureServerDataSourceBaseArgs<
 	ServerItemType extends ItemResponseModelBaseModel,
 	ClientItemType extends { unique: string },
 > {
-	getAllowedAtRoot: () => Promise<UmbPagedModel<ServerItemType>>;
-	getAllowedChildrenOf: (unique: string) => Promise<UmbPagedModel<ServerItemType>>;
+	getAllowedChildrenOf: (unique: string | null) => Promise<UmbPagedModel<ServerItemType>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
 
@@ -19,7 +18,6 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 > implements UmbContentTypeStructureDataSource<ClientItemType>
 {
 	#host;
-	#getAllowedAtRoot;
 	#getAllowedChildrenOf;
 	#mapper;
 
@@ -33,25 +31,8 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 		args: UmbContentTypeStructureServerDataSourceBaseArgs<ServerItemType, ClientItemType>,
 	) {
 		this.#host = host;
-		this.#getAllowedAtRoot = args.getAllowedAtRoot;
 		this.#getAllowedChildrenOf = args.getAllowedChildrenOf;
 		this.#mapper = args.mapper;
-	}
-
-	/**
-	 * Returns a promise with the allowed content types at root
-	 * @return {*}
-	 * @memberof UmbContentTypeStructureServerDataSourceBase
-	 */
-	async getAllowedAtRoot() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getAllowedAtRoot());
-
-		if (data) {
-			const items = data.items.map((item) => this.#mapper(item));
-			return { data: { items, total: data.total } };
-		}
-
-		return { error };
 	}
 
 	/**
@@ -60,7 +41,7 @@ export abstract class UmbContentTypeStructureServerDataSourceBase<
 	 * @return {*}
 	 * @memberof UmbContentTypeStructureServerDataSourceBase
 	 */
-	async getAllowedChildrenOf(unique: string) {
+	async getAllowedChildrenOf(unique: string | null) {
 		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getAllowedChildrenOf(unique));
 
 		if (data) {

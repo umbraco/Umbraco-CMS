@@ -15,12 +15,9 @@ export class UmbDocumentTypeStructureServerDataSource extends UmbContentTypeStru
 	UmbAllowedDocumentTypeModel
 > {
 	constructor(host: UmbControllerHost) {
-		super(host, { getAllowedAtRoot, getAllowedChildrenOf, mapper });
+		super(host, { getAllowedChildrenOf, mapper });
 	}
 }
-
-// eslint-disable-next-line local-rules/no-direct-api-import
-const getAllowedAtRoot = () => DocumentTypeResource.getDocumentTypeAllowedAtRoot({});
 
 const getAllowedChildrenOf = (unique: string | null) => {
 	if (unique) {

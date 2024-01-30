@@ -18,15 +18,6 @@ export abstract class UmbContentTypeStructureRepositoryBase<ItemType>
 	}
 
 	/**
-	 * Returns a promise with the allowed content types at root
-	 * @return {*}
-	 * @memberof UmbContentTypeStructureRepositoryBase
-	 */
-	requestAllowedAtRoot() {
-		return this.#structureSource.getAllowedAtRoot();
-	}
-
-	/**
 	 * Returns a promise with the allowed children of a content type
 	 * @param {string} unique
 	 * @return {*}
