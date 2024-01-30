@@ -39,9 +39,7 @@ export const data: Array<DocumentResponseModel> = [
 					<p>
 						Some value for the RTE with an <a href="https://google.com">external link</a> and an <a href="/{localLink:umb://document/c05da24d7740447b9cdcbd8ce2172e38}">internal link</a> foo foo
 					</p>
-					<p>
-						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
-					</p>`,
+					<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>`,
 				},
 			},
 			{
