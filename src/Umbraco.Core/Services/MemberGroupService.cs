@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -105,5 +106,29 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
             scope.Notifications.Publish(
                 new MemberGroupDeletedNotification(memberGroup, evtMsgs).WithStateFrom(deletingNotification));
         }
+    }
+
+    public async Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> CreateAsync(IMemberGroup memberGroup)
+    {
+        if (string.IsNullOrWhiteSpace(memberGroup.Name))
+        {
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CannotHaveEmptyName, null);
+        }
+
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        var savingNotification = new MemberGroupSavingNotification(memberGroup, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CancelledByNotification, null);
+        }
+
+        _memberGroupRepository.Save(memberGroup);
+        scope.Complete();
+
+        scope.Notifications.Publish(new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
+        return Attempt.SucceedWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.Success, memberGroup);
     }
 }

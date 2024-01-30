@@ -16,7 +16,7 @@ public class MemberGroupControllerBase : ManagementApiControllerBase
         status switch
         {
             MemberGroupOperationStatus.Success => Ok(),
-            MemberGroupOperationStatus.DuplicateName => NotFound(new ProblemDetailsBuilder()
+            MemberGroupOperationStatus.CannotHaveEmptyName => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Duplicate name")
                 .WithDetail("Another group with the same name already exists.")
                 .Build()),
