@@ -61,7 +61,7 @@ export class UmbPickerInputContext<ItemType extends { name: string }> extends Um
 		this.modalAlias = modalAlias;
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		//@ts-ignore
-		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
+		this.#getUnique = getUniqueMethod || ((entry) => entry.unique || entry.id || '');
 
 		this.#itemManager = new UmbRepositoryItemsManager<ItemType>(this, repositoryAlias, this.#getUnique);
 
