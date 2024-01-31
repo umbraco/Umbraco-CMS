@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -23,10 +24,11 @@ public class DeleteDocumentRecycleBinController : DocumentRecycleBinControllerBa
 
     public DeleteDocumentRecycleBinController(
         IEntityService entityService,
+        IDocumentPresentationFactory documentPresentationFactory,
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IContentEditingService contentEditingService)
-        : base(entityService)
+        : base(entityService, documentPresentationFactory)
     {
         _authorizationService = authorizationService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
