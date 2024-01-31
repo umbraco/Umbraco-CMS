@@ -1,18 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Content;
+using Umbraco.Cms.Api.Management.Services.Paging;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
+using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.Services.Paging;
-using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Content;
-using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 
 public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
-    where TItem : RecycleBinItemResponseModel, new()
+    where TItem : RecycleBinItemResponseModelBase, new()
 {
     private readonly IEntityService _entityService;
     private readonly string _itemUdiType;
@@ -68,13 +69,15 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
 
         var viewModel = new TItem
         {
-            Icon = _itemUdiType,
-            Name = entity.Name!,
             Id = entity.Key,
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
-            IsContainer = entity.IsContainer,
-            ParentId = parentKey
+            Parent = parentKey.HasValue
+                ? new ItemReferenceByIdResponseModel
+                {
+                    Id = parentKey.Value
+                }
+                : null
         };
 
         return viewModel;

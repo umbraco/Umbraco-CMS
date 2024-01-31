@@ -10,18 +10,25 @@ public class PropertyValidationService : IPropertyValidationService
 {
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyEditorCollection _propertyEditors;
-    private readonly ILocalizedTextService _textService;
     private readonly IValueEditorCache _valueEditorCache;
 
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
         ILocalizedTextService textService,
         IValueEditorCache valueEditorCache)
+        : this(propertyEditors, dataTypeService, valueEditorCache)
+    {
+    }
+
+    public PropertyValidationService(
+        PropertyEditorCollection propertyEditors,
+        IDataTypeService dataTypeService,
+        IValueEditorCache valueEditorCache)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
-        _textService = textService;
         _valueEditorCache = valueEditorCache;
     }
 
@@ -63,11 +70,8 @@ public class PropertyValidationService : IPropertyValidationService
     {
         // Retrieve default messages used for required and regex validatation.  We'll replace these
         // if set with custom ones if they've been provided for a given property.
-        var requiredDefaultMessages = new[]
-        {
-            _textService.Localize("validation", "invalidNull"), _textService.Localize("validation", "invalidEmpty"),
-        };
-        var formatDefaultMessages = new[] { _textService.Localize("validation", "invalidPattern") };
+        var requiredDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.Missing };
+        var formatDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.PatternMismatch };
 
         IDataValueEditor valueEditor = _valueEditorCache.GetValueEditor(editor, dataType);
         foreach (ValidationResult validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp))

@@ -1250,8 +1250,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.HasIdentity);
 
         // content cannot publish values because they are invalid
-        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService,
-            TextService, ValueEditorCache);
+        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, ValueEditorCache);
         var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties,
             CultureImpact.Invariant);
         Assert.IsFalse(isValid);

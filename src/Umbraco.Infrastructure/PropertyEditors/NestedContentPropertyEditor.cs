@@ -421,7 +421,7 @@ public class NestedContentPropertyEditor : DataEditor
                          row.PropertyValues)
                 {
                     elementValidation.AddPropertyTypeValidation(
-                        new PropertyTypeValidationModel(prop.Value.PropertyType, prop.Value.Value));
+                        new PropertyTypeValidationModel(prop.Value.PropertyType, prop.Value.Value, string.Empty));
                 }
 
                 yield return elementValidation;
