@@ -108,6 +108,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         }
     }
 
+    /// <inheritdoc/>
     public async Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> CreateAsync(IMemberGroup memberGroup)
     {
         if (string.IsNullOrWhiteSpace(memberGroup.Name))
@@ -129,6 +130,34 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         scope.Complete();
 
         scope.Notifications.Publish(new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
+        return Attempt.SucceedWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.Success, memberGroup);
+    }
+
+    /// <inheritdoc/>
+    public async Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> DeleteAsync(Guid key)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IMemberGroup? memberGroup = _memberGroupRepository.Get(key);
+
+        if (memberGroup is null)
+        {
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CancelledByNotification, null);
+        }
+
+        var deletingNotification = new MemberGroupDeletingNotification(memberGroup, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CancelledByNotification, null);
+        }
+
+        _memberGroupRepository.Delete(memberGroup);
+        scope.Complete();
+
+        scope.Notifications.Publish(new MemberGroupDeletedNotification(memberGroup, evtMsgs).WithStateFrom(deletingNotification));
+
         return Attempt.SucceedWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.Success, memberGroup);
     }
 }

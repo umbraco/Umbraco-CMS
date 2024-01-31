@@ -26,4 +26,10 @@ public interface IMemberGroupService : IService
     /// <param name="memberGroup"><see cref="IMemberGroup" /> to create</param>
     /// <returns>An attempt with a status of whether the operation was successful or not, and the created object if it succeeded.</returns>
     Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> CreateAsync(IMemberGroup memberGroup);
+
+    /// <summary>
+    ///     Deletes a <see cref="IMemberGroup" /> by removing it and its usages from the db
+    /// </summary>
+    /// <param name="key">The key of the <see cref="IMemberGroup" /> to delete</param>
+    Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> DeleteAsync(Guid key);
 }
