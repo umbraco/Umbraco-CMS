@@ -16,26 +16,9 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         : base(provider, loggerFactory, eventMessagesFactory) =>
         _memberGroupRepository = memberGroupRepository;
 
-    public IEnumerable<IMemberGroup> GetAll()
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _memberGroupRepository.GetMany();
-        }
-    }
+    public IEnumerable<IMemberGroup> GetAll() => GetAllAsync().GetAwaiter().GetResult();
 
-    public IEnumerable<IMemberGroup> GetByIds(IEnumerable<int> ids)
-    {
-        if (ids == null || ids.Any() == false)
-        {
-            return new IMemberGroup[0];
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _memberGroupRepository.GetMany(ids.ToArray());
-        }
-    }
+    public IEnumerable<IMemberGroup> GetByIds(IEnumerable<int> ids) => GetByIdsAsync(ids).GetAwaiter().GetResult();
 
     public IMemberGroup? GetById(int id)
     {
@@ -45,21 +28,9 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         }
     }
 
-    public IMemberGroup? GetById(Guid id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _memberGroupRepository.Get(id);
-        }
-    }
+    public IMemberGroup? GetById(Guid id) => GetAsync(id).GetAwaiter().GetResult();
 
-    public IMemberGroup? GetByName(string? name)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _memberGroupRepository.GetByName(name);
-        }
-    }
+    public IMemberGroup? GetByName(string? name) => name is null ? null : GetByNameAsync(name).GetAwaiter().GetResult();
 
     public void Save(IMemberGroup memberGroup)
     {
@@ -87,25 +58,13 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         }
     }
 
-    public void Delete(IMemberGroup memberGroup)
+    public void Delete(IMemberGroup memberGroup) => DeleteAsync(memberGroup.Key).GetAwaiter().GetResult();
+
+    /// <inheritdoc/>
+    public Task<IMemberGroup?> GetByNameAsync(string name)
     {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var deletingNotification = new MemberGroupDeletingNotification(memberGroup, evtMsgs);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _memberGroupRepository.Delete(memberGroup);
-            scope.Complete();
-
-            scope.Notifications.Publish(
-                new MemberGroupDeletedNotification(memberGroup, evtMsgs).WithStateFrom(deletingNotification));
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(_memberGroupRepository.GetByName(name));
     }
 
     /// <inheritdoc/>
@@ -120,6 +79,17 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
         return Task.FromResult(_memberGroupRepository.GetMany());
+    }
+
+    public Task<IEnumerable<IMemberGroup>> GetByIdsAsync(IEnumerable<int> ids)
+    {
+        if (ids.Any() == false)
+        {
+            return Task.FromResult<IEnumerable<IMemberGroup>>(Array.Empty<IMemberGroup>());
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(_memberGroupRepository.GetMany(ids.ToArray()));
     }
 
     /// <inheritdoc/>
@@ -140,7 +110,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         }
 
 
-        if (NameAlreadyExists(memberGroup))
+        if (await NameAlreadyExistsAsync(memberGroup))
         {
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.DuplicateName, null);
         }
@@ -198,7 +168,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        if (NameAlreadyExists(memberGroup))
+        if (await NameAlreadyExistsAsync(memberGroup))
         {
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.DuplicateName, null);
         }
@@ -217,9 +187,9 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         return Attempt.SucceedWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.Success, memberGroup);
     }
 
-    private bool NameAlreadyExists(IMemberGroup memberGroup)
+    private async Task<bool> NameAlreadyExistsAsync(IMemberGroup memberGroup)
     {
-        IMemberGroup? existingMemberGroup = GetByName(memberGroup.Name);
+        IMemberGroup? existingMemberGroup = await GetByNameAsync(memberGroup.Name!);
         return existingMemberGroup is not null;
     }
 }
