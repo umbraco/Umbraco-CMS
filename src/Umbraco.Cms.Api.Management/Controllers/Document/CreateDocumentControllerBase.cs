@@ -22,7 +22,7 @@ public abstract class CreateDocumentControllerBase : DocumentControllerBase
             .Select(v => v.Culture!);
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, requestModel.ParentId, cultures),
+            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, requestModel.Parent?.Id, cultures),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)

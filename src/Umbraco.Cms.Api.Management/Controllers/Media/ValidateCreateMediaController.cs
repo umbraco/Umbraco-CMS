@@ -33,7 +33,7 @@ public class ValidateCreateMediaController : CreateMediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Validate(CreateMediaRequestModel requestModel)
-        => await HandleRequest(requestModel.ParentId, async () =>
+        => await HandleRequest(requestModel.Parent?.Id, async () =>
         {
             MediaCreateModel model = _mediaEditingPresentationFactory.MapCreateModel(requestModel);
             Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _mediaEditingService.ValidateCreateAsync(model);
