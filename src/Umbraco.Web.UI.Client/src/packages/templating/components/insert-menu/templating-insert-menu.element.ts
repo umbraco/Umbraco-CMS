@@ -1,6 +1,6 @@
 import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests.js';
 import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils/index.js';
-import type { UmbChooseInsertTypeModalValue} from '../../modals/insert-choose-type-sidebar.element.js';
+import type { UmbChooseInsertTypeModalValue } from '../../modals/insert-choose-type-sidebar.element.js';
 import { CodeSnippetType } from '../../modals/insert-choose-type-sidebar.element.js';
 import { UmbDictionaryRepository } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
@@ -9,12 +9,13 @@ import type {
 	UmbDictionaryItemPickerModalValue,
 	UmbModalManagerContext,
 	UmbModalContext,
-	UmbPartialViewPickerModalValue} from '@umbraco-cms/backoffice/modal';
+	UmbPartialViewPickerModalValue,
+} from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
-	UmbModalToken
+	UmbModalToken,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -59,9 +60,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 				this.#dispatchInsertEvent();
 
 				break;
-			}
-			case CodeSnippetType.macro: {
-				throw new Error('Not implemented');
 			}
 		}
 	}
@@ -130,10 +128,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 						title="Dictionary item"
 						@click=${this.#openInsertDictionaryItemModal}>
 					</uui-menu-item>
-
-					<!-- <li>
-							<uui-menu-item class="insert-menu-item" label="Macro" title="Macro"> </uui-menu-item>
-						</li> -->
 				</umb-dropdown>
 			</uui-button-group>
 		`;

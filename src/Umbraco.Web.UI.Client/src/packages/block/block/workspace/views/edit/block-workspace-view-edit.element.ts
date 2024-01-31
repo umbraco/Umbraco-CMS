@@ -1,23 +1,34 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
+import type { UmbBlockWorkspaceElementManagerNames } from '../../block-workspace.context.js';
 import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import type {
-	UmbRoute,
-	UmbRouterSlotChangeEvent,
-	UmbRouterSlotInitEvent} from '@umbraco-cms/backoffice/router';
-import {
-	encodeFolderName
-} from '@umbraco-cms/backoffice/router';
+import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspaceView, UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-block-workspace-view-edit')
 export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	@property({ attribute: false })
+	public get manifest(): ManifestWorkspaceView | undefined {
+		return;
+	}
+	public set manifest(value: ManifestWorkspaceView | undefined) {
+		this.#managerName = (value?.meta as any).blockElementManagerName ?? 'content';
+		this.#setStructureManager();
+	}
+	#managerName?: UmbBlockWorkspaceElementManagerNames;
+	#blockWorkspace?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
+
+	//@state()
 	//private _hasRootProperties = false;
+
+	@state()
 	private _hasRootGroups = false;
 
 	@state()
@@ -32,44 +43,44 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 	@state()
 	private _activePath = '';
 
-	private _workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
-
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
-
 	constructor() {
 		super();
 
-		this._tabsStructureHelper.setIsRoot(true);
-		this._tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this._tabsStructureHelper.containers, (tabs) => {
-			this._tabs = tabs;
-			this._createRoutes();
-		});
+		this.#tabsStructureHelper.setIsRoot(true);
+		this.#tabsStructureHelper.setContainerChildType('Tab');
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._workspaceContext = workspaceContext;
-			this._tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
-			this._observeRootGroups();
+			this.#blockWorkspace = workspaceContext;
+			this.#setStructureManager();
 		});
 	}
 
-	private _observeRootGroups() {
-		if (!this._workspaceContext) return;
+	#setStructureManager() {
+		if (!this.#blockWorkspace || !this.#managerName) return;
+		this.#tabsStructureHelper.setStructureManager(this.#blockWorkspace[this.#managerName].structure);
 
 		this.observe(
-			this._workspaceContext.content.structure.hasRootContainers('Group'),
+			this.#blockWorkspace![this.#managerName!].structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
 			},
-			'_observeGroups',
+			'observeGroups',
+		);
+		this.observe(
+			this.#tabsStructureHelper.containers,
+			(tabs) => {
+				this._tabs = tabs;
+				this._createRoutes();
+			},
+			'observeTabs',
 		);
 	}
 
 	private _createRoutes() {
-		if (!this._tabs || !this._workspaceContext) return;
+		if (!this._tabs || !this.#blockWorkspace) return;
 		const routes: UmbRoute[] = [];
 
 		if (this._tabs.length > 0) {
@@ -79,10 +90,11 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./block-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
+						(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
 						(component as UmbBlockWorkspaceViewEditTabElement).tabName = tabName;
 						// TODO: Consider if we can link these more simple, and not parse this on.
 						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
-						(component as UmbBlockWorkspaceViewEditTabElement).ownerTabId = this._tabsStructureHelper.isOwnerContainer(
+						(component as UmbBlockWorkspaceViewEditTabElement).ownerTabId = this.#tabsStructureHelper.isOwnerContainer(
 							tab.id!,
 						)
 							? tab.id
@@ -97,6 +109,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 				path: '',
 				component: () => import('./block-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
+					(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
 					(component as UmbBlockWorkspaceViewEditTabElement).noTabName = true;
 					(component as UmbBlockWorkspaceViewEditTabElement).ownerTabId = null;
 				},
