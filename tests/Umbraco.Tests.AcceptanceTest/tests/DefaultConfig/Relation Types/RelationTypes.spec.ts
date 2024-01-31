@@ -57,7 +57,7 @@ test.describe('Relation types tests', () => {
 
     // Act
     await umbracoUi.relationType.openRelationTypeByNameAtRoot(relationTypeName);
-    await umbracoUi.relationType.clickBidirectionalRadio();
+    await umbracoUi.relationType.clickBidirectionalRadioButton();
     await umbracoUi.relationType.clickSaveButton();
 
     // Assert
