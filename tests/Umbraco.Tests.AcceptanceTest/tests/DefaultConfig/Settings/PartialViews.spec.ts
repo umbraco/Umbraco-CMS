@@ -22,7 +22,7 @@ test.describe('Partial Views tests', () => {
   test('can create an empty partial view', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.partialView.clickActionsMenuAtRoot();
-    await umbracoUi.partialView.clickCreateButton();
+    await umbracoUi.partialView.clickCreateThreeDotsButton();
     await umbracoUi.partialView.clickNewEmptyPartialViewButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
     await umbracoUi.partialView.clickSaveButton();
@@ -41,7 +41,7 @@ test.describe('Partial Views tests', () => {
 
     // Act
     await umbracoUi.partialView.clickActionsMenuAtRoot();
-    await umbracoUi.partialView.clickCreateButton();
+    await umbracoUi.partialView.clickCreateThreeDotsButton();
     await umbracoUi.partialView.clickNewPartialViewFromSnippetButton();
     await umbracoUi.partialView.clickBreadcrumbButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
@@ -226,7 +226,6 @@ test.describe('Partial Views tests', () => {
 
     // Act
     await umbracoUi.partialView.clickActionsMenuAtRoot();
-    await umbracoUi.partialView.clickCreateButton();
     await umbracoUi.partialView.createFolder(folderName);
 
     // Assert
@@ -265,7 +264,7 @@ test.describe('Partial Views tests', () => {
     // Act
     await umbracoUi.partialView.clickRootFolderCaretButton();
     await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
-    await umbracoUi.partialView.clickCreateButton();
+    await umbracoUi.partialView.clickCreateThreeDotsButton();
     await umbracoUi.partialView.clickNewEmptyPartialViewButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
     await umbracoUi.partialView.clickSaveButton();
