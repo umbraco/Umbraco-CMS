@@ -102,12 +102,12 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     {
         queryExpression.Append(_indent);
 
-        if (model.ContentTypeAlias.IsNullOrWhiteSpace() == false)
+        if (model.DocumentTypeAlias.IsNullOrWhiteSpace() == false)
         {
-            queryExpression.Append($".ChildrenOfType(\"{model.ContentTypeAlias}\")");
+            queryExpression.Append($".ChildrenOfType(\"{model.DocumentTypeAlias}\")");
             return rootContent == null
                 ? Enumerable.Empty<IPublishedContent>()
-                : rootContent.ChildrenOfType(_variationContextAccessor, model.ContentTypeAlias);
+                : rootContent.ChildrenOfType(_variationContextAccessor, model.DocumentTypeAlias);
         }
 
         queryExpression.Append(".Children()");

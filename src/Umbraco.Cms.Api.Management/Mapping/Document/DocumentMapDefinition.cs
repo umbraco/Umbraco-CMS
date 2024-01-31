@@ -27,7 +27,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = ContentStateHelper.GetContentState(source, culture);
+                documentVariantViewModel.State = DocumentVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);

@@ -45,7 +45,7 @@ internal sealed class MediaPresentationModelFactory
         responseModel.Urls = media
             .GetUrls(_contentSettings, _mediaUrlGenerators)
             .WhereNotNull()
-            .Select(mediaUrl => new ContentUrlInfo
+            .Select(mediaUrl => new MediaUrlInfo
             {
                 Culture = null,
                 Url = _absoluteUrlBuilder.ToAbsoluteUrl(mediaUrl).ToString(),

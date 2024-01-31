@@ -1,6 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -50,7 +49,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
 
         if (source.HistoryCleanup != null)
         {
-            target.Cleanup = new ContentTypeCleanup
+            target.Cleanup = new DocumentTypeCleanup
             {
                 PreventCleanup = source.HistoryCleanup.PreventCleanup,
                 KeepAllVersionsNewerThanDays = source.HistoryCleanup.KeepAllVersionsNewerThanDays,

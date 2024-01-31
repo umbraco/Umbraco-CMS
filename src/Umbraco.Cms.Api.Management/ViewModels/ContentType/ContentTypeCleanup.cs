@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
-public class ContentTypeCleanup
+public abstract class ContentTypeCleanupBase
 {
     public bool PreventCleanup { get; init; }
 

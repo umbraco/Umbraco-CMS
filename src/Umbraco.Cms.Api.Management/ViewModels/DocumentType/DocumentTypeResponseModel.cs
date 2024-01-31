@@ -10,7 +10,7 @@ public class DocumentTypeResponseModel : ContentTypeResponseModelBase<DocumentTy
 
     public ReferenceByIdModel? DefaultTemplate { get; set; }
 
-    public ContentTypeCleanup Cleanup { get; set; } = new();
+    public DocumentTypeCleanup Cleanup { get; set; } = new();
 
     public IEnumerable<DocumentTypeSort> AllowedDocumentTypes { get; set; } = Enumerable.Empty<DocumentTypeSort>();
 

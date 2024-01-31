@@ -22956,28 +22956,30 @@
         },
         "additionalProperties": false
       },
-      "ContentStateModel": {
-        "enum": [
-          "NotCreated",
-          "Draft",
-          "Published",
-          "PublishedPendingChanges"
-        ],
-        "type": "string"
-      },
       "ContentTreeItemResponseModel": {
         "required": [
+          "hasChildren",
           "id",
           "isTrashed",
-          "noAccess"
+          "noAccess",
+          "type"
         ],
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/EntityTreeItemResponseModel"
-          }
-        ],
         "properties": {
+          "type": {
+            "type": "string"
+          },
+          "hasChildren": {
+            "type": "boolean"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
+          },
           "noAccess": {
             "type": "boolean"
           },
@@ -22991,7 +22993,7 @@
         },
         "additionalProperties": false
       },
-      "ContentTypeCleanupModel": {
+      "ContentTypeCleanupBaseModel": {
         "required": [
           "preventCleanup"
         ],
@@ -23223,7 +23225,7 @@
         },
         "additionalProperties": false
       },
-      "ContentUrlInfoModel": {
+      "ContentUrlInfoBaseModel": {
         "required": [
           "url"
         ],
@@ -23677,7 +23679,7 @@
           "cleanup": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ContentTypeCleanupModel"
+                "$ref": "#/components/schemas/DocumentTypeCleanupModel"
               }
             ]
           },
@@ -24015,7 +24017,7 @@
       "CurrentUserResponseModel": {
         "required": [
           "avatarUrls",
-          "contentStartNodeIds",
+          "documentStartNodeIds",
           "email",
           "hasAccessToAllLanguages",
           "id",
@@ -24044,7 +24046,7 @@
             "type": "string",
             "nullable": true
           },
-          "contentStartNodeIds": {
+          "documentStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -24685,7 +24687,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/ContentUrlInfoModel"
+                  "$ref": "#/components/schemas/DocumentUrlInfoModel"
                 }
               ]
             }
@@ -24745,6 +24747,15 @@
             }
           }
         },
+        "additionalProperties": false
+      },
+      "DocumentTypeCleanupModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTypeCleanupBaseModel"
+          }
+        ],
         "additionalProperties": false
       },
       "DocumentTypeCompositionModel": {
@@ -24892,7 +24903,7 @@
           "cleanup": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ContentTypeCleanupModel"
+                "$ref": "#/components/schemas/DocumentTypeCleanupModel"
               }
             ]
           },
@@ -24961,6 +24972,15 @@
         },
         "additionalProperties": false
       },
+      "DocumentUrlInfoModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentUrlInfoBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "DocumentValueModel": {
         "type": "object",
         "allOf": [
@@ -24982,7 +25002,7 @@
         ],
         "properties": {
           "state": {
-            "$ref": "#/components/schemas/ContentStateModel"
+            "$ref": "#/components/schemas/DocumentVariantStateModel"
           }
         },
         "additionalProperties": false
@@ -25008,7 +25028,7 @@
         ],
         "properties": {
           "state": {
-            "$ref": "#/components/schemas/ContentStateModel"
+            "$ref": "#/components/schemas/DocumentVariantStateModel"
           },
           "publishDate": {
             "type": "string",
@@ -25017,6 +25037,15 @@
           }
         },
         "additionalProperties": false
+      },
+      "DocumentVariantStateModel": {
+        "enum": [
+          "NotCreated",
+          "Draft",
+          "Published",
+          "PublishedPendingChanges"
+        ],
+        "type": "string"
       },
       "DomainPresentationModel": {
         "required": [
@@ -26276,7 +26305,7 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/ContentUrlInfoModel"
+                  "$ref": "#/components/schemas/MediaUrlInfoModel"
                 }
               ]
             }
@@ -26477,6 +26506,15 @@
             "type": "string"
           }
         },
+        "additionalProperties": false
+      },
+      "MediaUrlInfoModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentUrlInfoBaseModel"
+          }
+        ],
         "additionalProperties": false
       },
       "MediaValueModel": {
@@ -29102,7 +29140,7 @@
             ],
             "nullable": true
           },
-          "contentTypeAlias": {
+          "documentTypeAlias": {
             "type": "string",
             "nullable": true
           },
@@ -29242,13 +29280,13 @@
       },
       "TemplateQuerySettingsResponseModel": {
         "required": [
-          "contentTypeAliases",
+          "documentTypeAliases",
           "operators",
           "properties"
         ],
         "type": "object",
         "properties": {
-          "contentTypeAliases": {
+          "documentTypeAliases": {
             "type": "array",
             "items": {
               "type": "string"
@@ -29697,7 +29735,7 @@
           "cleanup": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ContentTypeCleanupModel"
+                "$ref": "#/components/schemas/DocumentTypeCleanupModel"
               }
             ]
           },
@@ -29912,7 +29950,7 @@
       },
       "UpdateUserRequestModel": {
         "required": [
-          "contentStartNodeIds",
+          "documentStartNodeIds",
           "languageIsoCode",
           "mediaStartNodeIds"
         ],
@@ -29926,7 +29964,7 @@
           "languageIsoCode": {
             "type": "string"
           },
-          "contentStartNodeIds": {
+          "documentStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {

@@ -140,7 +140,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Name = updateModel.Name,
             UserName = updateModel.UserName,
             LanguageIsoCode = updateModel.LanguageIsoCode,
-            ContentStartNodeKeys = updateModel.ContentStartNodeIds,
+            ContentStartNodeKeys = updateModel.DocumentStartNodeIds,
             MediaStartNodeKeys = updateModel.MediaStartNodeIds,
         };
 
@@ -170,7 +170,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             AvatarUrls = presentationUser.AvatarUrls,
             LanguageIsoCode = presentationUser.LanguageIsoCode,
             MediaStartNodeIds = mediaStartNodeKeys,
-            ContentStartNodeIds = documentStartNodeKeys,
+            DocumentStartNodeIds = documentStartNodeKeys,
             Permissions = permissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages
         });
