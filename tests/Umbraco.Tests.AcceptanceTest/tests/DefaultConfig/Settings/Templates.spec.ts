@@ -40,7 +40,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.create(templateName, templateAlias, '');
 
     // Act
-    await umbracoUi.template.goToTemplate(templateName)
+    await umbracoUi.template.goToTemplate(templateName);
     await umbracoUi.template.enterTemplateContent(updatedTemplateContent);
     await umbracoUi.template.clickSaveButton();
 
@@ -69,7 +69,7 @@ test.describe('Template tests', () => {
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
   });
 
-  test.skip('can set a template as master template', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can set a template as master template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const templateAlias = AliasHelper.toAlias(templateName);
     const childTemplateName = 'ChildTemplate';
@@ -81,14 +81,14 @@ test.describe('Template tests', () => {
     // Act
     await umbracoUi.template.goToTemplate(childTemplateName);
     await umbracoUi.template.clickChangeMasterTemplateButton();
-    await page.locator('umb-tree-picker-modal').locator('#caret-button').click();
-    await page.getByRole('button', {name: templateName}).click();
+    await umbracoUi.template.clickCaretDictionaryButton();
+    await umbracoUi.template.clickButtonWithName(templateName);
     await umbracoUi.template.clickSubmitButton();
     await umbracoUi.template.clickSaveButton();
 
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();
-    await expect(page.locator('[label="Change Master template"]', {hasText: 'Master template: ' + templateName})).toBeVisible();
+    expect(await umbracoUi.template.isMasterTemplateNameVisible(templateName)).toBeTruthy();
     // Checks if the childTemplate has the masterTemplate set
     const childTemplate = await umbracoApi.template.getByName(childTemplateName);
     const masterTemplate = await umbracoApi.template.getByName(templateName);
@@ -108,6 +108,7 @@ test.describe('Template tests', () => {
     // Act
     await umbracoUi.template.goToTemplate(templateName);
     await umbracoUi.template.addQueryBuilderWithOrderByStatement('CreateDateCreated Date', true);
+    await umbracoUi.template.clickSubmitButton();
     await umbracoUi.template.clickSaveButton();
 
     // Assert
@@ -131,7 +132,6 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-
     await umbracoUi.template.clickSectionsButton();
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.clickSubmitButton();

@@ -17,7 +17,7 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
-    await umbracoUi.script.clickCreateButton();
+    await umbracoUi.script.clickCreateThreeDotsButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -41,7 +41,7 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
-    await umbracoUi.script.clickCreateButton();
+    await umbracoUi.script.clickCreateThreeDotsButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -142,7 +142,7 @@ test.describe('Script tests', () => {
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
     await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-    await umbracoUi.script.clickCreateButton();
+    await umbracoUi.script.clickCreateThreeDotsButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -223,7 +223,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.clickRootFolderCaretButton();
     await umbracoUi.script.clickCaretButtonForName(scriptFolderName);
     await umbracoUi.script.clickActionsMenuForScript(childFolderName);
-    await umbracoUi.script.clickCreateButton();
+    await umbracoUi.script.clickCreateThreeDotsButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
