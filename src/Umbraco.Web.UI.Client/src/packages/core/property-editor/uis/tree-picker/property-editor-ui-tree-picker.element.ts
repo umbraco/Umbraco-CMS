@@ -19,7 +19,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	value = '';
 
 	@state()
-	type?: UmbTreePickerSource['type'];
+	type: UmbTreePickerSource['type'] = 'content';
 
 	@state()
 	startNodeId?: string | null;
@@ -39,9 +39,9 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	@state()
 	ignoreUserStartNodes?: boolean;
 
-	#dynamicRoot?: UmbTreePickerSource['dynamicRoot'] | undefined;
+	#dynamicRoot?: UmbTreePickerSource['dynamicRoot'];
 
-	#dynamicRootRepository: UmbDynamicRootRepository;
+	#dynamicRootRepository = new UmbDynamicRootRepository(this);
 
 	#workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
@@ -65,9 +65,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	constructor() {
 		super();
 
-		this.#dynamicRootRepository = new UmbDynamicRootRepository(this);
-
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext: typeof UMB_WORKSPACE_CONTEXT.TYPE) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
 		});
 	}
@@ -101,7 +99,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	render() {
 		return html`<umb-input-tree
 			.value=${this.value}
-			.type=${this.type ?? 'content'}
+			.type=${this.type}
 			.startNodeId=${this.startNodeId ?? ''}
 			.min=${this.min}
 			.max=${this.max}
