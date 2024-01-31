@@ -13,7 +13,7 @@ public class ContentSerializationTests
     [Test]
     public void GivenACacheModel_WhenItsSerializedAndDeserializedWithAnySerializer_TheResultsAreTheSame()
     {
-        var jsonSerializer = new JsonContentNestedDataSerializer();
+        var jsonSerializer = new SystemTextJsonNestedDataSerializer();
         var msgPackSerializer = new MsgPackContentNestedDataSerializer(Mock.Of<IPropertyCacheCompression>());
 
         var now = DateTime.Now;
