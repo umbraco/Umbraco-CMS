@@ -302,7 +302,7 @@ public partial class ContentPublishingServiceTests
     }
 
     [Test]
-    public async Task Cannot_Publish_Variant_Content_With_Mandatory_Culture()
+    public async Task Can_Publish_Variant_Content_With_Mandatory_Culture()
     {
         var (langEn, langDa, contentType) = await SetupVariantTest(true);
 
