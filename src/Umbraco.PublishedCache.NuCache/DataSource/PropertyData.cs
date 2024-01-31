@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Umbraco.Cms.Infrastructure.Serialization;
 
@@ -12,9 +13,10 @@ public class PropertyData
     private string? _segment;
 
     [DataMember(Order = 0)]
-    [JsonConverter(typeof(AutoInterningStringConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(AutoInterningStringConverter))]
     [DefaultValue("")]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, PropertyName = "c")]
+    [JsonPropertyName("c")]
     public string? Culture
     {
         get => _culture;
@@ -24,9 +26,10 @@ public class PropertyData
     }
 
     [DataMember(Order = 1)]
-    [JsonConverter(typeof(AutoInterningStringConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(AutoInterningStringConverter))]
     [DefaultValue("")]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, PropertyName = "s")]
+    [JsonPropertyName("s")]
     public string? Segment
     {
         get => _segment;
@@ -37,6 +40,7 @@ public class PropertyData
 
     [DataMember(Order = 2)]
     [JsonProperty("v")]
+    [JsonPropertyName("v")]
     public object? Value { get; set; }
 
     // Legacy properties used to deserialize existing nucache db entries
@@ -49,6 +53,7 @@ public class PropertyData
 
     [IgnoreDataMember]
     [JsonProperty("seg")]
+    [JsonPropertyName("seg")]
     private string LegacySegment
     {
         set => Segment = value;
@@ -56,6 +61,7 @@ public class PropertyData
 
     [IgnoreDataMember]
     [JsonProperty("val")]
+    [JsonPropertyName("val")]
     private object LegacyValue
     {
         set => Value = value;
