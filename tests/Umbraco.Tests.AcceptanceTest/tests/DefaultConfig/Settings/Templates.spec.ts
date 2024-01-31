@@ -80,11 +80,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(childTemplateName);
-<<<<<<< HEAD
-    await page.getByLabel('Change Master template').click();
-=======
     await umbracoUi.template.clickChangeMasterTemplateButton();
->>>>>>> v14/dev
     await page.locator('umb-tree-picker-modal').locator('#caret-button').click();
     await page.getByRole('button', {name: templateName}).click();
     await umbracoUi.template.clickSubmitButton();
