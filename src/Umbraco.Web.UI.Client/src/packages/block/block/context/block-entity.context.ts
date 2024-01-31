@@ -60,7 +60,7 @@ export abstract class UmbBlockContext<
 	}
 
 	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
-		super(host, UMB_BLOCK_CONTEXT.toString());
+		super(host, UMB_BLOCK_ENTITY_CONTEXT.toString());
 
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
@@ -198,6 +198,6 @@ export abstract class UmbBlockContext<
 	}
 }
 
-export const UMB_BLOCK_CONTEXT = new UmbContextToken<
+export const UMB_BLOCK_ENTITY_CONTEXT = new UmbContextToken<
 	UmbBlockContext<typeof UMB_BLOCK_MANAGER_CONTEXT, typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE>
 >('UmbBlockContext');

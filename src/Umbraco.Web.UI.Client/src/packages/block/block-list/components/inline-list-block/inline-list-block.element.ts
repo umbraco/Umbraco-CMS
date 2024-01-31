@@ -3,7 +3,7 @@ import type { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../../block/index.js';
 import { UMB_BLOCK_WORKSPACE_ALIAS } from '../../../block/index.js';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../../../block/workspace/views/edit/block-workspace-view-edit-no-router.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -17,8 +17,8 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentUdi?: string;
 
-	@state()
-	_label = '';
+	@property({ type: String })
+	label?: string;
 
 	@state()
 	_isOpen = false;
@@ -36,9 +36,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				},
 				'observeContentUdi',
 			);
-			this.observe(blockContext.label, (label) => {
-				this._label = label;
-			});
 		});
 		this.observe(umbExtensionsRegistry.getByTypeAndAlias('workspace', UMB_BLOCK_WORKSPACE_ALIAS), (manifest) => {
 			if (manifest) {
@@ -73,7 +70,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				}}>
 				<uui-icon name="icon-document"></uui-icon>
 				<uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
-				<span>${this._label}</span>
+				<span>${this.label}</span>
 			</button>
 			${this._isOpen === true
 				? html`<umb-block-workspace-view-edit-no-router></umb-block-workspace-view-edit-no-router>`
@@ -82,6 +79,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	}
 
 	static styles = [
+		UmbTextStyles,
 		css`
 			#accordion-button {
 				display: flex;

@@ -3,7 +3,8 @@ import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbModalManagerContext,
 	UmbModalContext,
-	UmbDictionaryItemPickerModalValue} from '@umbraco-cms/backoffice/modal';
+	UmbDictionaryItemPickerModalValue,
+} from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
@@ -18,7 +19,6 @@ export interface ChooseInsertTypeModalData {
 export enum CodeSnippetType {
 	partialView = 'partialView',
 	dictionaryItem = 'dictionaryItem',
-	macro = 'macro',
 }
 export interface UmbChooseInsertTypeModalValue {
 	value: string | UmbDictionaryItemPickerModalValue;

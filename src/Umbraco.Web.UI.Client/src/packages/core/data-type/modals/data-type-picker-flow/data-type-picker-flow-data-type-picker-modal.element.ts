@@ -5,10 +5,9 @@ import { css, html, customElement, state, repeat, when } from '@umbraco-cms/back
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbDataTypePickerFlowDataTypePickerModalData,
-	UmbDataTypePickerFlowDataTypePickerModalValue} from '@umbraco-cms/backoffice/modal';
-import {
-	UmbModalBaseElement,
+	UmbDataTypePickerFlowDataTypePickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
 export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBaseElement<

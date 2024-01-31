@@ -29,6 +29,9 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	_contentUdi?: string;
 
 	@state()
+	_hasSettings = false;
+
+	@state()
 	_label = '';
 
 	@state()
@@ -36,6 +39,12 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 
 	@state()
 	_inlineEditingMode?: boolean;
+
+	// TODO: Move type for the Block Properties, and use it on the Element Interface for the Manifest.
+	@state()
+	_blockViewProps: {
+		label?: string;
+	} = {};
 
 	constructor() {
 		super();
@@ -46,7 +55,11 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		this.observe(this.#context.contentUdi, (contentUdi) => {
 			this._contentUdi = contentUdi;
 		});
+		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
+			this._hasSettings = !!blockTypeSettingsElementTypeKey;
+		});
 		this.observe(this.#context.label, (label) => {
+			this._blockViewProps.label = label;
 			this._label = label;
 		});
 		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
@@ -70,20 +83,30 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	}
 
 	#renderRefBlock() {
-		return html`<umb-ref-list-block .name=${this._label}></umb-ref-list-block>`;
+		return html`<umb-ref-list-block .label=${this._label}></umb-ref-list-block>`;
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-list-block .name=${this._label}></umb-inline-list-block>`;
+		return html`<umb-inline-list-block .label=${this._label}></umb-inline-list-block>`;
 	}
 
 	#renderBlock() {
 		return html`
-			${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}
+			<umb-extension-slot
+				type="blockEditorCustomView"
+				default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
+				.props=${this._blockViewProps}
+				>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
+			>
 			<uui-action-bar>
 				${this._workspaceEditPath
 					? html`<uui-button label="edit" compact href=${this._workspaceEditPath}>
 							<uui-icon name="icon-edit"></uui-icon>
+					  </uui-button>`
+					: ''}
+				${this._workspaceEditPath && this._hasSettings
+					? html`<uui-button label="Edit settings" compact href=${this._workspaceEditPath + '/view/settings'}>
+							<uui-icon name="icon-settings"></uui-icon>
 					  </uui-button>`
 					: ''}
 				<uui-button label="delete" compact @click=${this.#requestDelete}>
