@@ -32,7 +32,7 @@ public abstract class UpdateMediaControllerBase : MediaControllerBase
         }
 
         IMedia? media = await _mediaEditingService.GetAsync(id);
-        if (media == null)
+        if (media is null)
         {
             return MediaNotFound();
         }

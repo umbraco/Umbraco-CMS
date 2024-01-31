@@ -23,7 +23,7 @@ internal static class JsonPathValidator
         {
             current.Children.Add(new JsonPathValidationTreeItem
             {
-                JsonPath = $"{current.JsonPath}.{jsonPathValidationResult.JsonPath}"
+                JsonPath = $"{current.JsonPath}.{jsonPathValidationResult.JsonPath}",
             });
             current = current.Children.Last();
         }

@@ -31,7 +31,7 @@ internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEdito
         {
             var allElementTypes = _contentTypeService.GetAll(group.Items.Select(x => x.ContentTypeKey).ToArray()).ToDictionary(x => x.Key);
 
-            for (var i=0; i<group.Items.Count; i++)
+            for (var i = 0; i < group.Items.Count; i++)
             {
                 BlockItemData item = group.Items[i];
                 if (!allElementTypes.TryGetValue(item.ContentTypeKey, out IContentType? elementType))

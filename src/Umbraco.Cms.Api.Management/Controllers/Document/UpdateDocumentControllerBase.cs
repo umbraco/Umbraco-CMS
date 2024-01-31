@@ -37,7 +37,7 @@ public abstract class UpdateDocumentControllerBase : DocumentControllerBase
         }
 
         IContent? content = await _contentEditingService.GetAsync(id);
-        if (content == null)
+        if (content is null)
         {
             return DocumentNotFound();
         }
