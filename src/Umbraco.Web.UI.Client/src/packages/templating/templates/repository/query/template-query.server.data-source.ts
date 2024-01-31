@@ -1,4 +1,4 @@
-import type { TemplateQueryExecuteModel} from '@umbraco-cms/backoffice/backend-api';
+import type { TemplateQueryExecuteModel } from '@umbraco-cms/backoffice/backend-api';
 import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -6,18 +6,18 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 /**
  * A data source for the Template Query Builder that fetches data from the server
  * @export
- * @class UmbTemplateQueryBuilderServerDataSource
+ * @class UmbTemplateQueryServerDataSource
  */
-export class UmbTemplateQueryBuilderServerDataSource {
+export class UmbTemplateQueryServerDataSource {
 	#host: UmbControllerHost;
 
 	// TODO: When we map the server models to our own models, we need to have a localization property.
 	// For example, the OperatorModel.NOT_EQUALS need to use the localization key "template_doesNotEqual"
 
 	/**
-	 * Creates an instance of UmbTemplateQueryBuilderServerDataSource.
+	 * Creates an instance of UmbTemplateQueryServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof UmbTemplateQueryBuilderServerDataSource
+	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -26,19 +26,34 @@ export class UmbTemplateQueryBuilderServerDataSource {
 	 * Fetches the query builder settings from the server
 	 *
 	 * @return {*}
-	 * @memberof UmbTemplateQueryBuilderServerDataSource
+	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	async getTemplateQuerySettings() {
-		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateQuerySettings());
+		const { data, error } = await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateQuerySettings());
+
+		if (data) {
+			const model = {};
+
+			return { data: model };
+		}
+
+		return { error };
 	}
 	/**
 	 * Executes a query builder query on the server
 	 *
-	 * @param {{ requestBody?: TemplateQueryExecuteModel }} { requestBody }
 	 * @return {*}
-	 * @memberof UmbTemplateQueryBuilderServerDataSource
+	 * @memberof UmbTemplateQueryServerDataSource
 	 */
-	async postTemplateQueryExecute({ requestBody }: { requestBody?: TemplateQueryExecuteModel }) {
+	async executeTemplateQuery(args: any) {
+		const requestBody: TemplateQueryExecuteModel = {
+			rootContentId: args.rootContentUnique,
+			contentTypeAlias: args.contentTypeAlias,
+			filters: args.filters,
+			sort: args.sort,
+			take: args.take,
+		};
+
 		return tryExecuteAndNotify(this.#host, TemplateResource.postTemplateQueryExecute({ requestBody }));
 	}
 }

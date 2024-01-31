@@ -1,4 +1,4 @@
-import { UMB_TEMPLATE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbCreateEntityAction } from './create/create.action.js';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
@@ -13,7 +13,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: UMB_TEMPLATE_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE],
 		},
 	},
@@ -25,7 +25,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias: UMB_TEMPLATE_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_TEMPLATE_ENTITY_TYPE],
 		},
 	},
