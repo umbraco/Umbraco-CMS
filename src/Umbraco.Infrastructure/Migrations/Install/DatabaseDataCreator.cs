@@ -19,8 +19,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 internal class DatabaseDataCreator
 {
 
-    internal static readonly IEnumerable<LogViewerQueryDto> _defaultLogQueries = new LogViewerQueryDto[]
-    {
+    internal static readonly LogViewerQueryDto[] _defaultLogQueries =
+    [
         new()
         {
             Name = "Find all logs where the Level is NOT Verbose and NOT Debug",
@@ -70,8 +70,8 @@ internal class DatabaseDataCreator
         {
             Name = "Find all logs that the message that starts with 'end' in it with SQL like",
             Query = "@Message like 'end%'",
-        },
-    };
+        }
+    ];
 
     private readonly IDatabase _database;
 
@@ -2353,11 +2353,9 @@ internal class DatabaseDataCreator
 
     private void CreateLogViewerQueryData()
     {
-        LogViewerQueryDto[] defaultData = _defaultLogQueries.ToArray();
-
-        for (var i = 0; i < defaultData.Length; i++)
+        for (var i = 0; i < _defaultLogQueries.Length; i++)
         {
-            LogViewerQueryDto dto = defaultData[i];
+            LogViewerQueryDto dto = _defaultLogQueries[i];
             dto.Id = i + 1;
             _database.Insert(Constants.DatabaseSchema.Tables.LogViewerQuery, "id", false, dto);
         }
