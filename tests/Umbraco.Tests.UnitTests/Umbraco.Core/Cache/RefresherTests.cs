@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -38,6 +37,7 @@ public class RefresherTests
         Assert.AreEqual(source[0].Id, payload[0].Id);
         Assert.AreEqual(source[0].Key, payload[0].Key);
         Assert.AreEqual(source[0].ChangeTypes, payload[0].ChangeTypes);
+        Assert.AreEqual(source[0].Blueprint, payload[0].Blueprint);
     }
 
     [Test]

@@ -145,8 +145,13 @@ public static class DistributedCacheExtensions
             return;
         }
 
-        IEnumerable<ContentCacheRefresher.JsonPayload> payloads = changes
-            .Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes, x.Item.Blueprint));
+        IEnumerable<ContentCacheRefresher.JsonPayload> payloads = changes.Select(x => new ContentCacheRefresher.JsonPayload()
+        {
+            Id = x.Item.Id,
+            Key = x.Item.Key,
+            ChangeTypes = x.ChangeTypes,
+            Blueprint = x.Item.Blueprint
+        });
 
         dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
     }

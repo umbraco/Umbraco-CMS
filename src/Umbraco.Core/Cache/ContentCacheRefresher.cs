@@ -163,25 +163,23 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     public class JsonPayload
     {
-        public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
-            : this(id, key, changeTypes, false)
+        public JsonPayload()
         { }
 
-        public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes, bool blueprint = false)
+        public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
         {
             Id = id;
             Key = key;
             ChangeTypes = changeTypes;
-            Blueprint = blueprint;
         }
 
-        public int Id { get; }
+        public int Id { get; init; }
 
-        public Guid? Key { get; }
+        public Guid? Key { get; init; }
 
-        public TreeChangeTypes ChangeTypes { get; }
+        public TreeChangeTypes ChangeTypes { get; init; }
 
-        public bool Blueprint { get; }
+        public bool Blueprint { get; init; }
     }
 
     #endregion
