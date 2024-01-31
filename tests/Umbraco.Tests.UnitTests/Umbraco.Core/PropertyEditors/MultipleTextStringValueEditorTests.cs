@@ -130,7 +130,6 @@ public class MultipleTextStringValueEditorTests
     private static MultipleTextStringPropertyEditor.MultipleTextStringPropertyValueEditor CreateValueEditor()
     {
         var valueEditor = new MultipleTextStringPropertyEditor.MultipleTextStringPropertyValueEditor(
-            Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),

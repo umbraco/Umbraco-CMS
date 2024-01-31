@@ -553,7 +553,6 @@ public class MemberControllerUnitTests
                  && x.Alias == Constants.PropertyEditors.Aliases.Label);
         Mock.Get(dataEditor).Setup(x => x.GetValueEditor()).Returns(new TextOnlyValueEditor(
             new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),
-            textService.Object,
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>()));
