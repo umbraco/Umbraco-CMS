@@ -21,6 +21,19 @@ public interface IMemberGroupService : IService
     void Delete(IMemberGroup memberGroup);
 
     /// <summary>
+    ///     Get a member group by key.
+    /// </summary>
+    ///  /// <param name="key"><see cref="Guid" /> of the member group to get.</param>
+    /// <returns>An enumerable list of <see cref="IMemberGroup" /> objects.</returns>
+    Task<IMemberGroup?> GetAsync(Guid key);
+
+    /// <summary>
+    ///     Gets all member groups
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="IMemberGroup" /> objects.</returns>
+    Task<IEnumerable<IMemberGroup>> GetAllAsync();
+
+    /// <summary>
     ///     Creates a new <see cref="IMemberGroup" /> object
     /// </summary>
     /// <param name="memberGroup"><see cref="IMemberGroup" /> to create</param>

@@ -109,6 +109,20 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
     }
 
     /// <inheritdoc/>
+    public Task<IMemberGroup?> GetAsync(Guid key)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(_memberGroupRepository.Get(key));
+    }
+
+    /// <inheritdoc/>
+    public Task<IEnumerable<IMemberGroup>> GetAllAsync()
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(_memberGroupRepository.GetMany());
+    }
+
+    /// <inheritdoc/>
     public async Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> CreateAsync(IMemberGroup memberGroup)
     {
         if (string.IsNullOrWhiteSpace(memberGroup.Name))
@@ -119,6 +133,12 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        IMemberGroup? existingMemberGroup = await GetAsync(memberGroup.Key);
+        if (existingMemberGroup is not null)
+        {
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.DuplicateKey, null);
+        }
+
 
         if (NameAlreadyExists(memberGroup))
         {

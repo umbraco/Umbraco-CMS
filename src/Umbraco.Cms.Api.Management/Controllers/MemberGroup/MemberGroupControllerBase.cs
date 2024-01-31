@@ -10,7 +10,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup;
 
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberGroup}")]
+[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberGroup}")]
 [ApiExplorerSettings(GroupName = "Member Group")]
 [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMembers)]
 public class MemberGroupControllerBase : ManagementApiControllerBase
@@ -19,16 +19,25 @@ public class MemberGroupControllerBase : ManagementApiControllerBase
         status switch
         {
             MemberGroupOperationStatus.Success => Ok(),
-            MemberGroupOperationStatus.CannotHaveEmptyName => NotFound(new ProblemDetailsBuilder()
+            MemberGroupOperationStatus.CannotHaveEmptyName => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Name was empty or null")
                 .WithDetail("The provided member group name cannot be null or empty.")
                 .Build()),
-            MemberGroupOperationStatus.DuplicateName => NotFound(new ProblemDetailsBuilder()
+            MemberGroupOperationStatus.DuplicateName => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Duplicate name")
                 .WithDetail("Another group with the same name already exists.")
+                .Build()),
+            MemberGroupOperationStatus.DuplicateKey => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Duplicate key")
+                .WithDetail("Another group with the same key already exists.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown member group operation status.")
                 .Build()),
         };
+
+    protected IActionResult MemberGroupNotFound() => OperationStatusResult(MemberGroupOperationStatus.NotFound, problemDetailsBuilder
+            => NotFound(problemDetailsBuilder
+                .WithTitle("The requested member group could not be found")
+                .Build()));
 }

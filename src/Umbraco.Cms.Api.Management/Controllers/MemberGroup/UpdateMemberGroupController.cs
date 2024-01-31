@@ -22,14 +22,21 @@ public class UpdateMemberGroupController : MemberGroupControllerBase
         _memberGroupService = memberGroupService;
     }
 
-    [HttpPut]
+    [HttpPut($"{{{nameof(id)}:guid}}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MemberGroupResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create(CreateMemberGroupRequestModel model)
+    public async Task<IActionResult> Create(Guid id, UpdateMemberGroupRequestModel model)
     {
-        IMemberGroup? memberGroup = _mapper.Map<IMemberGroup>(model);
-        Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await _memberGroupService.UpdateAsync(memberGroup!);
+        IMemberGroup? current = await _memberGroupService.GetAsync(id);
+        if (current is null)
+        {
+            return MemberGroupNotFound();
+        }
+
+        IMemberGroup updated = _mapper.Map(model, current);
+
+        Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await _memberGroupService.UpdateAsync(updated);
         return result.Success
             ? Ok(_mapper.Map<MemberGroupResponseModel>(result.Result))
             : MemberGroupOperationStatusResult(result.Status);

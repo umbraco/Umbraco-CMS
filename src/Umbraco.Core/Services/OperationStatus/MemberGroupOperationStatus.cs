@@ -3,7 +3,9 @@
 public enum MemberGroupOperationStatus
 {
     Success,
+    NotFound,
     CannotHaveEmptyName,
     CancelledByNotification,
-    DuplicateName
+    DuplicateName,
+    DuplicateKey,
 }
