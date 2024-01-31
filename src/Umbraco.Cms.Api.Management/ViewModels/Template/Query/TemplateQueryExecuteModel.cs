@@ -2,7 +2,7 @@
 
 public class TemplateQueryExecuteModel
 {
-    public Guid? RootContentId { get; set; }
+    public ReferenceByIdModel? RootDocument { get; set; }
 
     public string? ContentTypeAlias { get; set; }
 

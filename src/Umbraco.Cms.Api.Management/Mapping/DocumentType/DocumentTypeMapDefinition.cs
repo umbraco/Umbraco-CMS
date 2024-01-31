@@ -46,9 +46,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
             target.AllowedTemplates = source.AllowedTemplates.Select(template => new ReferenceByIdModel(template.Key));
         }
 
-        target.DefaultTemplate = source.DefaultTemplate is not null
-            ? new ReferenceByIdModel(source.DefaultTemplate.Key)
-            : null;
+        target.DefaultTemplate = ReferenceByIdModel.ReferenceOrNull(source.DefaultTemplate?.Key);
 
         if (source.HistoryCleanup != null)
         {

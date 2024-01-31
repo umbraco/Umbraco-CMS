@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.DataType;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -8,27 +9,20 @@ namespace Umbraco.Cms.Api.Management.Mapping.DataType;
 
 public class DataTypeViewModelMapDefinition : IMapDefinition
 {
-    private readonly PropertyEditorCollection _propertyEditors;
     private readonly IDataTypeService _dataTypeService;
 
-    public DataTypeViewModelMapDefinition(
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService)
-    {
-        _propertyEditors = propertyEditors;
-        _dataTypeService = dataTypeService;
-    }
+    public DataTypeViewModelMapDefinition(IDataTypeService dataTypeService)
+        => _dataTypeService = dataTypeService;
 
     public void DefineMaps(IUmbracoMapper mapper)
-    {
-        mapper.Define<IDataType, DataTypeResponseModel>((_, _) => new DataTypeResponseModel(), Map);
-    }
+        => mapper.Define<IDataType, DataTypeResponseModel>((_, _) => new DataTypeResponseModel(), Map);
 
     // Umbraco.Code.MapAll
     private void Map(IDataType source, DataTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
-        target.ParentId = _dataTypeService.GetContainer(source.ParentId)?.Key;
+        Guid? parentId = _dataTypeService.GetContainer(source.ParentId)?.Key;
+        target.Parent = ReferenceByIdModel.ReferenceOrNull(parentId);
         target.Name = source.Name ?? string.Empty;
         target.EditorAlias = source.EditorAlias;
         target.EditorUiAlias = source.EditorUiAlias;

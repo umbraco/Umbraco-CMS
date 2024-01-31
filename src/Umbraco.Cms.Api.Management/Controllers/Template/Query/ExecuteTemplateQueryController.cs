@@ -84,10 +84,10 @@ public class ExecuteTemplateQueryController : TemplateQueryControllerBase
     {
         IPublishedContent? rootContent;
 
-        if (model.RootContentId != null && model.RootContentId != Guid.Empty)
+        if (model.RootDocument?.Id is not null)
         {
-            rootContent = _publishedContentQuery.Content(model.RootContentId);
-            queryExpression.Append($"Umbraco.Content(Guid.Parse(\"{model.RootContentId}\"))");
+            rootContent = _publishedContentQuery.Content(model.RootDocument.Id);
+            queryExpression.Append($"Umbraco.Content(Guid.Parse(\"{model.RootDocument.Id}\"))");
         }
         else
         {

@@ -105,7 +105,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     {
         var inviteModel = new UserResendInviteModel
         {
-            InvitedUserKey = requestModel.UserId,
+            InvitedUserKey = requestModel.User.Id,
             Message = requestModel.Message,
         };
 

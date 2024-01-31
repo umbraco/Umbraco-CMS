@@ -4334,6 +4334,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -4574,6 +4594,26 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -5806,6 +5846,112 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/document/{id}/validate": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PutDocumentByIdValidate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDocumentRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDocumentRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateDocumentRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/document/configuration": {
       "get": {
         "tags": [
@@ -5960,6 +6106,101 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/SortingRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/document/validate": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "PostDocumentValidate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateDocumentRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateDocumentRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateDocumentRequestModel"
                   }
                 ]
               }
@@ -10088,6 +10329,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -10256,6 +10517,26 @@
           "200": {
             "description": "Success"
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -10393,6 +10674,112 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media/{id}/validate": {
+      "put": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "PutMediaByIdValidate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateMediaRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateMediaRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateMediaRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success"
@@ -10605,6 +10992,101 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/SortingRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/media/validate": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "PostMediaValidate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateMediaRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateMediaRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateMediaRequestModel"
                   }
                 ]
               }
@@ -22200,17 +22682,23 @@
         "required": [
           "logType",
           "timestamp",
-          "userId"
+          "user"
         ],
         "type": "object",
         "properties": {
-          "userId": {
-            "type": "string",
-            "format": "uuid"
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
-          "entityId": {
-            "type": "string",
-            "format": "uuid",
+          "entity": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AuditLogEntityModel"
+              }
+            ],
             "nullable": true
           },
           "timestamp": {
@@ -22220,15 +22708,26 @@
           "logType": {
             "$ref": "#/components/schemas/AuditTypeModel"
           },
-          "entityType": {
-            "type": "string",
-            "nullable": true
-          },
           "comment": {
             "type": "string",
             "nullable": true
           },
           "parameters": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuditLogEntityModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "type": {
             "type": "string",
             "nullable": true
           }
@@ -22743,9 +23242,12 @@
       "CopyDataTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -23058,9 +23560,12 @@
             "format": "uuid",
             "nullable": true
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -23079,9 +23584,12 @@
             "format": "uuid",
             "nullable": true
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -23209,9 +23717,12 @@
             "format": "uuid",
             "nullable": true
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -23441,13 +23952,16 @@
       },
       "CreateUserResponseModel": {
         "required": [
-          "userId"
+          "user"
         ],
         "type": "object",
         "properties": {
-          "userId": {
-            "type": "string",
-            "format": "uuid"
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "initialPassword": {
             "type": "string",
@@ -23701,9 +24215,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -23967,9 +24484,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "translatedIsoCodes": {
@@ -24016,8 +24536,7 @@
       },
       "DocumentBlueprintTreeItemResponseModel": {
         "required": [
-          "documentTypeAlias",
-          "documentTypeId"
+          "documentType"
         ],
         "type": "object",
         "allOf": [
@@ -24026,16 +24545,12 @@
           }
         ],
         "properties": {
-          "documentTypeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "documentTypeAlias": {
-            "type": "string"
-          },
-          "documentTypeName": {
-            "type": "string",
-            "nullable": true
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -24553,7 +25068,7 @@
       },
       "DynamicRootContextRequestModel": {
         "required": [
-          "parentId"
+          "parent"
         ],
         "type": "object",
         "properties": {
@@ -24562,9 +25077,12 @@
             "format": "uuid",
             "nullable": true
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid"
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "culture": {
             "type": "string",
@@ -24989,9 +25507,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -25016,14 +25537,17 @@
       },
       "HealthCheckActionRequestModel": {
         "required": [
-          "healthCheckId",
+          "healthCheck",
           "valueRequired"
         ],
         "type": "object",
         "properties": {
-          "healthCheckId": {
-            "type": "string",
-            "format": "uuid"
+          "healthCheck": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "alias": {
             "type": "string",
@@ -25238,17 +25762,23 @@
       },
       "ImportDictionaryRequestModel": {
         "required": [
-          "temporaryFileId"
+          "temporaryFile"
         ],
         "type": "object",
         "properties": {
-          "temporaryFileId": {
-            "type": "string",
-            "format": "uuid"
+          "temporaryFile": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -26063,9 +26593,12 @@
       "MoveDataTypeRequestModel": {
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -26074,9 +26607,12 @@
       "MoveDictionaryRequestModel": {
         "type": "object",
         "properties": {
-          "targetId": {
-            "type": "string",
-            "format": "uuid",
+          "target": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -27621,18 +28157,24 @@
       },
       "PublicAccessBaseModel": {
         "required": [
-          "errorPageId",
-          "loginPageId"
+          "errorDocument",
+          "loginDocument"
         ],
         "type": "object",
         "properties": {
-          "loginPageId": {
-            "type": "string",
-            "format": "uuid"
+          "loginDocument": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
-          "errorPageId": {
-            "type": "string",
-            "format": "uuid"
+          "errorDocument": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -27770,9 +28312,9 @@
       },
       "RedirectUrlResponseModel": {
         "required": [
-          "contentId",
           "created",
           "destinationUrl",
+          "document",
           "id",
           "originalUrl"
         ],
@@ -27792,9 +28334,12 @@
             "type": "string",
             "format": "date-time"
           },
-          "contentId": {
-            "type": "string",
-            "format": "uuid"
+          "document": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "culture": {
             "type": "string",
@@ -28024,13 +28569,16 @@
       },
       "ResendInviteUserRequestModel": {
         "required": [
-          "userId"
+          "user"
         ],
         "type": "object",
         "properties": {
-          "userId": {
-            "type": "string",
-            "format": "uuid"
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "message": {
             "type": "string",
@@ -28308,13 +28856,16 @@
       },
       "SetAvatarRequestModel": {
         "required": [
-          "fileId"
+          "file"
         ],
         "type": "object",
         "properties": {
-          "fileId": {
-            "type": "string",
-            "format": "uuid"
+          "file": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -28334,9 +28885,12 @@
         ],
         "type": "object",
         "properties": {
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "sorting": {
@@ -28540,9 +29094,12 @@
         ],
         "type": "object",
         "properties": {
-          "rootContentId": {
-            "type": "string",
-            "format": "uuid",
+          "rootDocument": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "contentTypeAlias": {
@@ -28735,9 +29292,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "masterTemplateId": {
-            "type": "string",
-            "format": "uuid",
+          "masterTemplate": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -29472,17 +30032,23 @@
           "hasAccessToAllLanguages": {
             "type": "boolean"
           },
-          "documentStartNodeId": {
-            "type": "string",
-            "format": "uuid",
+          "documentStartNode": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "documentRootAccess": {
             "type": "boolean"
           },
-          "mediaStartNodeId": {
-            "type": "string",
-            "format": "uuid",
+          "mediaStartNode": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "mediaRootAccess": {
@@ -29920,13 +30486,16 @@
       "VerifyInviteUserRequestModel": {
         "required": [
           "token",
-          "userId"
+          "user"
         ],
         "type": "object",
         "properties": {
-          "userId": {
-            "type": "string",
-            "format": "uuid"
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "token": {
             "minLength": 1,
@@ -29938,16 +30507,18 @@
       "VerifyResetPasswordTokenRequestModel": {
         "required": [
           "resetCode",
-          "userId"
+          "user"
         ],
         "type": "object",
         "properties": {
-          "userId": {
-            "type": "string",
-            "format": "uuid"
+          "user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "resetCode": {
-            "minLength": 1,
             "type": "string"
           }
         },
