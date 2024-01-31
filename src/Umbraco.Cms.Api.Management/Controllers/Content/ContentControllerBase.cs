@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -9,7 +8,7 @@ using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Content;
+namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
 public class ContentControllerBase : ManagementApiControllerBase
 {
