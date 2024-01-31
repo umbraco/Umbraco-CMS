@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.DependencyInjection;
+using Umbraco.Cms.Api.Management.Handlers;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -18,6 +20,12 @@ public static class BackOfficeAuthBuilderExtensions
             .AddAuthentication()
             .AddUmbracoOpenIddict()
             .AddBackOfficeLogin();
+
+        builder.AddNotificationAsyncHandler<UserSavingNotification, RevokeUserAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UserSavedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UserDeletedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UserGroupDeletingNotification, RevokeUserAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UserGroupDeletedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
 
         return builder;
     }
