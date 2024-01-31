@@ -5,4 +5,5 @@ public enum MemberGroupOperationStatus
     Success,
     CannotHaveEmptyName,
     CancelledByNotification,
+    DuplicateName
 }

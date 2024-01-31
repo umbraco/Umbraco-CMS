@@ -32,4 +32,11 @@ public interface IMemberGroupService : IService
     /// </summary>
     /// <param name="key">The key of the <see cref="IMemberGroup" /> to delete</param>
     Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> DeleteAsync(Guid key);
+
+    /// <summary>
+    ///     Updates <see cref="IMemberGroup" /> object
+    /// </summary>
+    /// <param name="memberGroup"><see cref="IMemberGroup" /> to create</param>
+    /// <returns>An attempt with a status of whether the operation was successful or not, and the object.</returns>
+    Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> UpdateAsync(IMemberGroup memberGroup);
 }

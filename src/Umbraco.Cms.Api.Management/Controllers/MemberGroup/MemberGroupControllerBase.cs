@@ -20,6 +20,10 @@ public class MemberGroupControllerBase : ManagementApiControllerBase
         {
             MemberGroupOperationStatus.Success => Ok(),
             MemberGroupOperationStatus.CannotHaveEmptyName => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Name was empty or null")
+                .WithDetail("The provided member group name cannot be null or empty.")
+                .Build()),
+            MemberGroupOperationStatus.DuplicateName => NotFound(new ProblemDetailsBuilder()
                 .WithTitle("Duplicate name")
                 .WithDetail("Another group with the same name already exists.")
                 .Build()),

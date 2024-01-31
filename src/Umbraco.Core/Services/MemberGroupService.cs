@@ -116,10 +116,16 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CannotHaveEmptyName, null);
         }
 
-        EventMessages evtMsgs = EventMessagesFactory.Get();
+        EventMessages eventMessages = EventMessagesFactory.Get();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        var savingNotification = new MemberGroupSavingNotification(memberGroup, evtMsgs);
+
+        if (NameAlreadyExists(memberGroup))
+        {
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.DuplicateName, null);
+        }
+
+        var savingNotification = new MemberGroupSavingNotification(memberGroup, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
@@ -129,14 +135,14 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         _memberGroupRepository.Save(memberGroup);
         scope.Complete();
 
-        scope.Notifications.Publish(new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
+        scope.Notifications.Publish(new MemberGroupSavedNotification(memberGroup, eventMessages).WithStateFrom(savingNotification));
         return Attempt.SucceedWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.Success, memberGroup);
     }
 
     /// <inheritdoc/>
     public async Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> DeleteAsync(Guid key)
     {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
+        EventMessages eventMessages = EventMessagesFactory.Get();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IMemberGroup? memberGroup = _memberGroupRepository.Get(key);
@@ -146,7 +152,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CancelledByNotification, null);
         }
 
-        var deletingNotification = new MemberGroupDeletingNotification(memberGroup, evtMsgs);
+        var deletingNotification = new MemberGroupDeletingNotification(memberGroup, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
             scope.Complete();
@@ -156,8 +162,44 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
         _memberGroupRepository.Delete(memberGroup);
         scope.Complete();
 
-        scope.Notifications.Publish(new MemberGroupDeletedNotification(memberGroup, evtMsgs).WithStateFrom(deletingNotification));
+        scope.Notifications.Publish(new MemberGroupDeletedNotification(memberGroup, eventMessages).WithStateFrom(deletingNotification));
 
         return Attempt.SucceedWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.Success, memberGroup);
+    }
+
+    public async Task<Attempt<IMemberGroup?, MemberGroupOperationStatus>> UpdateAsync(IMemberGroup memberGroup)
+    {
+        if (string.IsNullOrWhiteSpace(memberGroup.Name))
+        {
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CannotHaveEmptyName, null);
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        if (NameAlreadyExists(memberGroup))
+        {
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.DuplicateName, null);
+        }
+
+        var savingNotification = new MemberGroupSavingNotification(memberGroup, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CancelledByNotification, null);
+        }
+
+        _memberGroupRepository.Save(memberGroup);
+        scope.Complete();
+
+        scope.Notifications.Publish(new MemberGroupSavedNotification(memberGroup, eventMessages).WithStateFrom(savingNotification));
+        return Attempt.SucceedWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.Success, memberGroup);
+    }
+
+    private bool NameAlreadyExists(IMemberGroup memberGroup)
+    {
+        IMemberGroup? existingMemberGroup = GetByName(memberGroup.Name);
+        return existingMemberGroup is not null;
     }
 }
