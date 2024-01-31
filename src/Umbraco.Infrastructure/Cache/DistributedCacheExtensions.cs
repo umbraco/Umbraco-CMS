@@ -132,7 +132,13 @@ public static class DistributedCacheExtensions
 
     public static void RefreshAllContentCache(this DistributedCache dc)
     {
-        ContentCacheRefresher.JsonPayload[] payloads = new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
+        ContentCacheRefresher.JsonPayload[] payloads = new[]
+        {
+            new ContentCacheRefresher.JsonPayload()
+            {
+                ChangeTypes = TreeChangeTypes.RefreshAll
+            }
+        };
 
         // note: refresh all content cache does refresh content types too
         dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);

@@ -210,7 +210,16 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             // they require.
             using (_contentStore.GetScopedWriteLock(_scopeProvider))
             {
-                NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                NotifyLocked(
+                    new[]
+                    {
+                        new ContentCacheRefresher.JsonPayload()
+                        {
+                            ChangeTypes = TreeChangeTypes.RefreshAll
+                        }
+                    },
+                    out _,
+                    out _);
             }
 
             using (_mediaStore.GetScopedWriteLock(_scopeProvider))
