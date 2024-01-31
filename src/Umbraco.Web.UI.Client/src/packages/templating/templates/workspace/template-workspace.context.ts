@@ -1,5 +1,6 @@
 import type { UmbTemplateDetailModel } from '../types.js';
-import { UmbTemplateDetailRepository } from '../repository/index.js';
+import { UmbTemplateDetailRepository, UmbTemplateItemRepository } from '../repository/index.js';
+import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
@@ -12,7 +13,8 @@ export class UmbTemplateWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbTemplateDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	public readonly repository = new UmbTemplateDetailRepository(this);
+	public readonly detailRepository = new UmbTemplateDetailRepository(this);
+	public readonly itemRepository = new UmbTemplateItemRepository(this);
 
 	#data = new UmbObjectState<UmbTemplateDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -28,7 +30,7 @@ export class UmbTemplateWorkspaceContext
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.Template');
+		super(host, UMB_TEMPLATE_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
 	}
 
@@ -74,7 +76,7 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	async load(unique: string) {
-		const { data } = await this.repository.requestByUnique(unique);
+		const { data } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
 			//this.setMasterTemplate(data.masterTemplateId ?? null);
@@ -89,7 +91,7 @@ export class UmbTemplateWorkspaceContext
 			return null;
 		}
 
-		const { data } = await this.repository.requestItems([id]);
+		const { data } = await this.itemRepository.requestItems([id]);
 		if (data) {
 			this.#masterTemplate.setValue(data[0]);
 			this.#updateMasterTemplateLayoutBlock();
@@ -128,7 +130,7 @@ ${currentContent}`;
 	};
 
 	async create(parentUnique: string | null) {
-		const { data } = await this.repository.createScaffold(parentUnique);
+		const { data } = await this.detailRepository.createScaffold(parentUnique);
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.setValue(data);
@@ -144,10 +146,10 @@ ${currentContent}`;
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(this.#data.value);
+			const { data } = await this.detailRepository.create(this.#data.value);
 			newData = data;
 		} else {
-			const { data } = await this.repository.save(this.#data.value);
+			const { data } = await this.detailRepository.save(this.#data.value);
 			newData = data;
 		}
 

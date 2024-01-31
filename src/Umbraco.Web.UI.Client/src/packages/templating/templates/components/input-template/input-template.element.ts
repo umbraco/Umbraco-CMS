@@ -1,7 +1,7 @@
 import type { UmbTemplateCardElement } from '../template-card/template-card.element.js';
 import '../template-card/template-card.element.js';
-
-import { UmbTemplateRepository } from '../../repository/template.repository.js';
+import type { UmbTemplateItemModel } from '../../repository/item/index.js';
+import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -11,7 +11,6 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { TemplateItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-input-template')
 export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
@@ -61,22 +60,22 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		this.#observePickedTemplates();
 	}
 
-	_defaultId = '';
+	_defaultUnique = '';
 	@property({ type: String })
-	public get defaultId(): string {
-		return this._defaultId;
+	public get defaultUnique(): string {
+		return this._defaultUnique;
 	}
-	public set defaultId(newId: string) {
-		this._defaultId = newId;
+	public set defaultUnique(newId: string) {
+		this._defaultUnique = newId;
 		super.value = newId;
 		this.#observePickedTemplates();
 	}
 
 	private _modalContext?: UmbModalManagerContext;
-	private _templateRepository: UmbTemplateRepository = new UmbTemplateRepository(this);
+	private _templateItemRepository = new UmbTemplateItemRepository(this);
 
 	@state()
-	_pickedTemplates: TemplateItemResponseModel[] = [];
+	_pickedTemplates: UmbTemplateItemModel[] = [];
 
 	constructor() {
 		super();
@@ -88,7 +87,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 	async #observePickedTemplates() {
 		this.observe(
-			(await this._templateRepository.requestItems(this._selectedIds)).asObservable(),
+			(await this._templateItemRepository.requestItems(this._selectedIds)).asObservable(),
 			(data) => {
 				const oldValue = this._pickedTemplates;
 				this._pickedTemplates = data;
@@ -104,8 +103,8 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 	#onCardChange(e: CustomEvent) {
 		e.stopPropagation();
-		const newKey = (e.target as UmbTemplateCardElement).value as string;
-		this.defaultId = newKey;
+		const unique = (e.target as UmbTemplateCardElement).value as string;
+		this.defaultUnique = unique;
 		this.dispatchEvent(new CustomEvent('change'));
 	}
 
@@ -114,7 +113,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				multiple: true,
-				pickableFilter: (template) => template.id !== null,
+				pickableFilter: (template) => template.unique !== null,
 			},
 			value: {
 				selection: [...this._selectedIds],
@@ -128,7 +127,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		});
 	}
 
-	#removeTemplate(id: string) {
+	#removeTemplate(unique: string) {
 		/*
 		TODO: We need to follow up on this experience.
 		Could we test if this document type is in use, if so we should have a dialog notifying the user(Dialog, are you sure...) about that we might will break something?
@@ -138,15 +137,15 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		In current backoffice we just prevent deleting a default when there are other templates. But if its the only one its okay. This is a weird experience, so we should make something that makes more sense.
 		BTW. its weird cause the damage of removing the default template is equally bad when there is one or more templates.
 		*/
-		this.selectedIds = this._selectedIds.filter((x) => x !== id);
+		this.selectedIds = this._selectedIds.filter((x) => x !== unique);
 	}
 
 	#openTemplate(e: CustomEvent) {
-		const id = (e.target as UmbTemplateCardElement).value;
+		const unique = (e.target as UmbTemplateCardElement).value as string;
 
 		this._modalContext?.open(UMB_TEMPLATE_MODAL, {
 			data: {
-				id: id as string,
+				unique,
 				language: 'razor',
 			},
 		});
@@ -158,14 +157,14 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 				(template) => html`
 					<umb-template-card
 						.name="${template.name ?? ''}"
-						.id="${template.id ?? ''}"
+						.id="${template.unique ?? ''}"
 						@change=${this.#onCardChange}
 						@open="${this.#openTemplate}"
-						?default="${template.id === this.defaultId}">
+						?default="${template.unique === this.defaultUnique}">
 						<uui-button
 							slot="actions"
-							label="Remove document ${template.name}"
-							@click="${() => this.#removeTemplate(template.id ?? '')}"
+							label="Remove Template ${template.name}"
+							@click="${() => this.#removeTemplate(template.unique ?? '')}"
 							compact>
 							<uui-icon name="icon-trash"></uui-icon>
 						</uui-button>

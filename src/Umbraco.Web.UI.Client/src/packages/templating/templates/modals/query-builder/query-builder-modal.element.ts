@@ -1,6 +1,10 @@
-import { UmbTemplateRepository } from '../../repository/template.repository.js';
+import { UmbTemplateQueryRepository } from '../../repository/query/index.js';
 import { localizePropertyType, localizeSort } from './utils.js';
-import type { UmbQueryBuilderFilterElement } from './query-builder-filter.element.js';
+import type { UmbTemplateQueryBuilderFilterElement } from './query-builder-filter.element.js';
+import type {
+	UmbTemplateQueryBuilderModalData,
+	UmbTemplateQueryBuilderModalValue,
+} from './query-builder-modal.token.js';
 import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -17,29 +21,21 @@ import type {
 import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
 import './query-builder-filter.element.js';
 
-export interface TemplateQueryBuilderModalData {
-	hidePartialViews?: boolean;
-}
-
-export interface UmbTemplateQueryBuilderModalValue {
-	value: string;
-}
-
 enum SortOrder {
 	Ascending = 'ascending',
 	Descending = 'descending',
 }
 
-@customElement('umb-templating-query-builder-modal')
-export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement<
-	TemplateQueryBuilderModalData,
+@customElement('umb-template-query-builder-modal')
+export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseElement<
+	UmbTemplateQueryBuilderModalData,
 	UmbTemplateQueryBuilderModalValue
 > {
 	@query('#filter-container')
 	private _filterContainer?: HTMLElement;
 
-	@queryAll('umb-query-builder-filter')
-	private _filterElements!: UmbQueryBuilderFilterElement[];
+	@queryAll('umb-template-query-builder-filter')
+	private _filterElements!: UmbTemplateQueryBuilderFilterElement[];
 
 	@state()
 	private _templateQuery?: TemplateQueryResultResponseModel;
@@ -58,11 +54,11 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#documentItemRepository: UmbDocumentItemRepository;
 	#modalManagerContext?: UmbModalManagerContext;
-	#templateRepository: UmbTemplateRepository;
+	#templateQueryRepository: UmbTemplateQueryRepository;
 
 	constructor() {
 		super();
-		this.#templateRepository = new UmbTemplateRepository(this);
+		this.#templateQueryRepository = new UmbTemplateQueryRepository(this);
 		this.#documentItemRepository = new UmbDocumentItemRepository(this);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
@@ -73,7 +69,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#init() {
 		this.#getTemplateQuerySettings();
-		this.#postTemplateQuery();
+		this.#executeTemplateQuery();
 	}
 
 	#close() {
@@ -86,18 +82,18 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#updateQueryRequest(update: TemplateQueryExecuteModel) {
 		this._queryRequest = { ...this._queryRequest, ...update };
-		this.#postTemplateQuery();
+		this.#executeTemplateQuery();
 	}
 
 	async #getTemplateQuerySettings() {
-		const { data, error } = await this.#templateRepository.getTemplateQuerySettings();
+		debugger;
+		const { data, error } = await this.#templateQueryRepository.getTemplateQuerySettings();
 		if (data) this._queryBuilderSettings = data;
 	}
 
-	#postTemplateQuery = async () => {
-		const { data, error } = await this.#templateRepository.postTemplateQueryExecute({
-			requestBody: this._queryRequest,
-		});
+	#executeTemplateQuery = async () => {
+		debugger;
+		const { data, error } = await this.#templateQueryRepository.executeTemplateQuery();
 		if (data) {
 			this._templateQuery = { ...data };
 			this.value = { value: this._templateQuery?.queryExpression ?? '' };
@@ -134,7 +130,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	}
 
 	#createFilterElement() {
-		const filterElement = document.createElement('umb-query-builder-filter');
+		const filterElement = document.createElement('umb-template-query-builder-filter');
 		filterElement.settings = this._queryBuilderSettings;
 		filterElement.classList.add('row');
 		filterElement.addEventListener('add-filter', this.#addFilterElement);
@@ -194,7 +190,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	};
 
 	#removeFilter = (event: Event) => {
-		const target = event.target as UmbQueryBuilderFilterElement;
+		const target = event.target as UmbTemplateQueryBuilderFilterElement;
 		this._filterContainer?.removeChild(target);
 		this.#updateFilters();
 	};
@@ -230,13 +226,13 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 							</uui-button>
 						</div>
 						<div id="filter-container">
-							<umb-query-builder-filter
+							<umb-template-query-builder-filter
 								unremovable
 								class="row"
 								.settings=${this._queryBuilderSettings}
 								@add-filter=${this.#addFilterElement}
 								@update-query=${this.#updateFilters}
-								@remove-filter=${this.#removeFilter}></umb-query-builder-filter>
+								@remove-filter=${this.#removeFilter}></umb-template-query-builder-filter>
 						</div>
 						<div class="row">
 							<umb-localize key="template_orderBy">order by</umb-localize>
@@ -328,6 +324,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-templating-query-builder-modal': UmbChooseInsertTypeModalElement;
+		'umb-template-query-builder-modal': UmbTemplateQueryBuilderModalElement;
 	}
 }

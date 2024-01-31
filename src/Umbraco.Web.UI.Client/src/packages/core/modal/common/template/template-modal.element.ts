@@ -2,21 +2,21 @@ import type { UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, ifDefined, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbTemplateModalData, UmbTemplateModalValue} from '@umbraco-cms/backoffice/modal';
+import type { UmbTemplateModalData, UmbTemplateModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbTemplateDetailModel } from '@umbraco-cms/backoffice/template';
 
 //TODO: make a default tree-picker that can be used across multiple pickers
 // TODO: make use of UmbPickerLayoutBase
 @customElement('umb-template-modal')
 export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModalData, UmbTemplateModalValue> {
 	@state()
-	_id = '';
+	_unique = '';
 
 	@state()
-	_template?: TemplateResponseModel;
+	_template?: UmbTemplateDetailModel;
 
 	@query('umb-code-editor')
 	_codeEditor?: UmbCodeEditorElement;
@@ -24,16 +24,16 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 	connectedCallback() {
 		super.connectedCallback();
 
-		if (!this.data?.id) return;
+		if (!this.data?.unique) return;
 
 		// TODO: use the template workspace instead of a custom modal. This is still to be made available as infinite editors(Modals).
 		alert('This should be using the Template Workspace instead of a custom build modal.');
-		this._id = this.data.id;
+		this._unique = this.data.unique;
 		this.#getTemplate();
 	}
 
 	async #getTemplate() {
-		const { data } = await tryExecuteAndNotify(this, TemplateResource.getTemplateById({ id: this._id }));
+		const { data } = await tryExecuteAndNotify(this, TemplateResource.getTemplateById({ id: this._unique }));
 		if (!data) return;
 
 		this._template = data;
@@ -42,10 +42,10 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 	async #saveTemplate() {
 		const { error } = await tryExecuteAndNotify(
 			this,
-			TemplateResource.putTemplateById({ id: this._id, requestBody: this._template }),
+			TemplateResource.putTemplateById({ id: this._unique, requestBody: this._template }),
 		);
 		if (!error) {
-			console.log(`template (${this._id}) saved successfully`);
+			console.log(`template (${this._unique}) saved successfully`);
 		}
 	}
 
@@ -54,7 +54,7 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 
 		this.#saveTemplate();
 
-		this.value = { id: this._template.id };
+		this.value = { unique: this._template.unique };
 		this.modalContext?.submit();
 	}
 
