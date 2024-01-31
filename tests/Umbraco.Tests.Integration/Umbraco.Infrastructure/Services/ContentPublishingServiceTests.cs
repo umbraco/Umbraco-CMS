@@ -42,6 +42,8 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
         ContentTypeService.Save(ContentType);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Invalid Content", parent?.Id ?? Constants.System.Root);
+        content.SetValue("title", string.Empty);
+        content.SetValue("bodyText", string.Empty);
         content.SetValue("author", string.Empty);
         ContentService.Save(content);
 

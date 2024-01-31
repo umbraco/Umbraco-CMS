@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -15,18 +13,17 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class TagConfigurationEditor : ConfigurationEditor<TagConfiguration>
 {
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public TagConfigurationEditor(ManifestValueValidatorCollection validators, IIOHelper ioHelper, ILocalizedTextService localizedTextService)
-        : this(validators, ioHelper, localizedTextService, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
+    public TagConfigurationEditor(ManifestValueValidatorCollection validators, IIOHelper ioHelper, ILocalizedTextService localizedTextService, IEditorConfigurationParser editorConfigurationParser)
+        : this(ioHelper, editorConfigurationParser)
     {
     }
 
-    public TagConfigurationEditor(ManifestValueValidatorCollection validators, IIOHelper ioHelper, ILocalizedTextService localizedTextService, IEditorConfigurationParser editorConfigurationParser)
+    public TagConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
         : base(ioHelper, editorConfigurationParser)
     {
-        Field(nameof(TagConfiguration.Group)).Validators.Add(new RequiredValidator(localizedTextService));
-        Field(nameof(TagConfiguration.StorageType)).Validators.Add(new RequiredValidator(localizedTextService));
+        Field(nameof(TagConfiguration.Group)).Validators.Add(new RequiredValidator());
+        Field(nameof(TagConfiguration.StorageType)).Validators.Add(new RequiredValidator());
     }
 
     public override IDictionary<string, object> ToConfigurationEditor(IDictionary<string, object> configuration)
