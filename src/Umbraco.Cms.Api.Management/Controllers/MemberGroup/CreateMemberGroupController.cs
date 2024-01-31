@@ -24,14 +24,14 @@ public class CreateMemberGroupController : MemberGroupControllerBase
 
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(CreateMemberGroupResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MemberGroupResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CreateMemberGroupRequestModel model)
     {
         IMemberGroup? memberGroup = _mapper.Map<IMemberGroup>(model);
         Attempt<IMemberGroup?, MemberGroupOperationStatus> result = await _memberGroupService.CreateAsync(memberGroup!);
         return result.Success
-            ? Ok(_mapper.Map<CreateMemberGroupResponseModel>(result.Result))
+            ? Ok(_mapper.Map<MemberGroupResponseModel>(result.Result))
             : MemberGroupOperationStatusResult(result.Status);
     }
 }

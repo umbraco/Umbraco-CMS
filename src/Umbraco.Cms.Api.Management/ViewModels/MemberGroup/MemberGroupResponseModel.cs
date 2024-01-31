@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.MemberGroup;
 
-public class CreateMemberGroupResponseModel : MemberGroupPresentationBase
+public class MemberGroupResponseModel : MemberGroupPresentationBase
 {
     public Guid Id { get; set; }
 }
