@@ -36,10 +36,10 @@ public class CreateMemberController : MemberControllerBase
     public async Task<IActionResult> Create(CreateMemberRequestModel createRequestModel)
     {
         MemberCreateModel model = _memberEditingPresentationFactory.MapCreateModel(createRequestModel);
-        Attempt<IMember?, MemberEditingStatus> result = await _memberEditingService.CreateAsync(model, CurrentUser(_backOfficeSecurityAccessor));
+        Attempt<MemberCreateResult, MemberEditingStatus> result = await _memberEditingService.CreateAsync(model, CurrentUser(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtId<ByKeyMemberController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            ? CreatedAtId<ByKeyMemberController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
             : MemberEditingStatusResult(result.Status);
     }
 }

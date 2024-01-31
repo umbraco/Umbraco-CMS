@@ -46,7 +46,7 @@ internal sealed class MemberEditingService : IMemberEditingService
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMember member, MemberUpdateModel updateModel)
         => await _memberContentEditingService.ValidateAsync(updateModel, member.ContentType.Key);
 
-    public async Task<Attempt<IMember?, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user)
+    public async Task<Attempt<MemberCreateResult, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user)
     {
         var status = new MemberEditingStatus();
 
@@ -54,14 +54,14 @@ internal sealed class MemberEditingService : IMemberEditingService
         if (validationStatus is not MemberEditingOperationStatus.Success)
         {
             status.MemberEditingOperationStatus = validationStatus;
-            return Attempt.FailWithStatus<IMember?, MemberEditingStatus>(status, null);
+            return Attempt.FailWithStatus(status, new MemberCreateResult());
         }
 
         IMemberType? memberType = await _memberTypeService.GetAsync(createModel.ContentTypeKey);
         if (memberType is null)
         {
             status.MemberEditingOperationStatus = MemberEditingOperationStatus.MemberTypeNotFound;
-            return Attempt.FailWithStatus<IMember?, MemberEditingStatus>(status, null);
+            return Attempt.FailWithStatus(status, new MemberCreateResult());
         }
 
         var identityMember = MemberIdentityUser.CreateNew(
@@ -84,7 +84,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         if (updateRolesResult is false)
         {
             status.MemberEditingOperationStatus = MemberEditingOperationStatus.RoleAssignmentFailed;
-            return Attempt.FailWithStatus<IMember?, MemberEditingStatus>(status, member);
+            return Attempt.FailWithStatus(status, new MemberCreateResult { Content = member });
         }
 
         Attempt<MemberUpdateResult, ContentEditingOperationStatus> contentUpdateResult = await _memberContentEditingService.UpdateAsync(member, createModel, user.Key);
@@ -93,11 +93,11 @@ internal sealed class MemberEditingService : IMemberEditingService
         status.ContentEditingOperationStatus = contentUpdateResult.Status;
 
         return contentUpdateResult.Success
-            ? Attempt.SucceedWithStatus<IMember?, MemberEditingStatus>(status, member)
-            : Attempt.FailWithStatus<IMember?, MemberEditingStatus>(status, member);
+            ? Attempt.SucceedWithStatus(status, new MemberCreateResult { Content = member, ValidationResult = contentUpdateResult.Result.ValidationResult })
+            : Attempt.FailWithStatus(status, new MemberCreateResult { Content = member });
     }
 
-    public async Task<Attempt<IMember, MemberEditingStatus>> UpdateAsync(IMember member, MemberUpdateModel updateModel, IUser user)
+    public async Task<Attempt<MemberUpdateResult, MemberEditingStatus>> UpdateAsync(IMember member, MemberUpdateModel updateModel, IUser user)
     {
         var status = new MemberEditingStatus();
 
@@ -105,14 +105,14 @@ internal sealed class MemberEditingService : IMemberEditingService
         if (identityMember is null)
         {
             status.MemberEditingOperationStatus = MemberEditingOperationStatus.MemberNotFound;
-            return Attempt.FailWithStatus(status, member);
+            return Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
         }
 
         MemberEditingOperationStatus validationStatus = await ValidateMemberDataAsync(updateModel, member.Key, updateModel.NewPassword);
         if (validationStatus is not MemberEditingOperationStatus.Success)
         {
             status.MemberEditingOperationStatus = validationStatus;
-            return Attempt.FailWithStatus(status, member);
+            return Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
         }
 
         if (identityMember.IsLockedOut && updateModel.IsLockedOut is false)
@@ -121,7 +121,7 @@ internal sealed class MemberEditingService : IMemberEditingService
             if (unlockResult is false)
             {
                 status.MemberEditingOperationStatus = MemberEditingOperationStatus.UnlockFailed;
-                return Attempt.FailWithStatus(status, member);
+                return Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
             }
         }
 
@@ -131,7 +131,7 @@ internal sealed class MemberEditingService : IMemberEditingService
             if (disableTwoFactorResult is false)
             {
                 status.MemberEditingOperationStatus = MemberEditingOperationStatus.DisableTwoFactorFailed;
-                return Attempt.FailWithStatus(status, member);
+                return Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
             }
         }
 
@@ -141,7 +141,7 @@ internal sealed class MemberEditingService : IMemberEditingService
             if (changePasswordResult is false)
             {
                 status.MemberEditingOperationStatus = MemberEditingOperationStatus.PasswordChangeFailed;
-                return Attempt.FailWithStatus(status, member);
+                return Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
             }
         }
 
@@ -149,7 +149,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         if (updateRolesResult is false)
         {
             status.MemberEditingOperationStatus = MemberEditingOperationStatus.RoleAssignmentFailed;
-            return Attempt.FailWithStatus(status, member);
+            return Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
         }
 
         // FIXME: handle sensitive data. certain properties (IsApproved, IsLockedOut, ...) are subject to "sensitive data" rules.
@@ -165,8 +165,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         status.ContentEditingOperationStatus = contentUpdateResult.Status;
 
         return contentUpdateResult.Success
-            ? Attempt.SucceedWithStatus(status, member)
-            : Attempt.FailWithStatus(status, member);
+            ? Attempt.SucceedWithStatus(status, new MemberUpdateResult { Content = member, ValidationResult = contentUpdateResult.Result.ValidationResult })
+            : Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
     }
 
     public async Task<Attempt<IMember?, MemberEditingStatus>> DeleteAsync(Guid key, Guid userKey)
@@ -264,7 +264,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         return true;
     }
 
-    private static Attempt<IMember?, MemberEditingStatus> IdentityMemberCreationFailed(IdentityResult created, MemberEditingStatus status)
+    private static Attempt<MemberCreateResult, MemberEditingStatus> IdentityMemberCreationFailed(IdentityResult created, MemberEditingStatus status)
     {
         MemberEditingOperationStatus createStatus = MemberEditingOperationStatus.Unknown;
         foreach (IdentityError error in created.Errors)
@@ -301,7 +301,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         }
 
         status.MemberEditingOperationStatus = createStatus;
-        return Attempt.FailWithStatus<IMember?, MemberEditingStatus>(status, null);
+        return Attempt.FailWithStatus(status, new MemberCreateResult());
     }
 
     private async Task<bool> UnlockMember(MemberIdentityUser identityMember)

@@ -13,9 +13,9 @@ public interface IMemberEditingService
 
     Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMember member, MemberUpdateModel updateModel);
 
-    Task<Attempt<IMember?, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user);
+    Task<Attempt<MemberCreateResult, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user);
 
-    Task<Attempt<IMember, MemberEditingStatus>> UpdateAsync(IMember member, MemberUpdateModel updateModel, IUser user);
+    Task<Attempt<MemberUpdateResult, MemberEditingStatus>> UpdateAsync(IMember member, MemberUpdateModel updateModel, IUser user);
 
     Task<Attempt<IMember?, MemberEditingStatus>> DeleteAsync(Guid key, Guid userKey);
 }

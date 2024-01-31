@@ -42,7 +42,7 @@ public class UpdateMemberController : MemberControllerBase
         }
 
         MemberUpdateModel model = _memberEditingPresentationFactory.MapUpdateModel(updateRequestModel);
-        Attempt<IMember, MemberEditingStatus> result = await _memberEditingService.UpdateAsync(member, model, CurrentUser(_backOfficeSecurityAccessor));
+        Attempt<MemberUpdateResult, MemberEditingStatus> result = await _memberEditingService.UpdateAsync(member, model, CurrentUser(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

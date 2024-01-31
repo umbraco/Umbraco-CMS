@@ -21,6 +21,8 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
 
     private IMemberService MemberService => GetRequiredService<IMemberService>();
 
+    private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
+
     [Test]
     public async Task Can_Create_Member()
     {
@@ -71,7 +73,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
         Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
 
-        member = result.Result;
+        member = result.Result.Content;
         Assert.IsNotNull(member);
         Assert.AreEqual("test-updated@test.com", member.Email);
         Assert.AreEqual("test-updated", member.Username);
@@ -154,12 +156,106 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
         Assert.IsNull(member);
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Create_With_Property_Validation(bool addValidProperties)
+    {
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        memberType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
+        memberType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^\\d*$";
+        MemberTypeService.Save(memberType);
+
+        var titleValue = addValidProperties ? "The title value" : null;
+        var authorValue = addValidProperties ? "12345" : "This is not a number";
+
+        var createModel = new MemberCreateModel
+        {
+            Email = "test@test.com",
+            Username = "test",
+            Password = "SuperSecret123",
+            IsApproved = true,
+            ContentTypeKey = memberType.Key,
+            InvariantName = "T. Est",
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "title", Value = titleValue },
+                new PropertyValueModel { Alias = "author", Value = authorValue }
+            }
+        };
+
+        var result = await MemberEditingService.CreateAsync(createModel, SuperUser());
+
+        // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        Assert.AreEqual(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError, result.Status.ContentEditingOperationStatus);
+        Assert.IsNotNull(result.Result);
+
+        if (addValidProperties is false)
+        {
+            Assert.AreEqual(2, result.Result.ValidationResult.ValidationErrors.Count());
+            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1));
+            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "author" && v.ErrorMessages.Length == 1));
+        }
+
+        // NOTE: member creation must be successful, even if the mandatory property is missing
+        Assert.IsTrue(result.Result.Content!.HasIdentity);
+        Assert.AreEqual(titleValue, result.Result.Content!.GetValue<string>("title"));
+        Assert.AreEqual(authorValue, result.Result.Content!.GetValue<string>("author"));
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Update_With_Property_Validation(bool addValidProperties)
+    {
+        var member = await CreateMemberAsync();
+        var memberType = await MemberTypeService.GetAsync(member.ContentType.Key)!;
+        memberType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
+        memberType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^\\d*$";
+        await MemberTypeService.SaveAsync(memberType, Constants.Security.SuperUserKey);
+
+        var titleValue = addValidProperties ? "The title value" : null;
+        var authorValue = addValidProperties ? "12345" : "This is not a number";
+
+        var updateModel = new MemberUpdateModel
+        {
+            Email = member.Email,
+            Username = member.Username,
+            IsApproved = true,
+            InvariantName = member.Name,
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "title", Value = titleValue },
+                new PropertyValueModel { Alias = "author", Value = authorValue }
+            }
+        };
+
+        var result = await MemberEditingService.UpdateAsync(member, updateModel, SuperUser());
+
+        // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
+        Assert.AreEqual(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError, result.Status.ContentEditingOperationStatus);
+        Assert.IsNotNull(result.Result);
+
+        if (addValidProperties is false)
+        {
+            Assert.AreEqual(2, result.Result.ValidationResult.ValidationErrors.Count());
+            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1));
+            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "author" && v.ErrorMessages.Length == 1));
+        }
+
+        // NOTE: member update must be successful, even if the mandatory property is missing
+        Assert.AreEqual(titleValue, result.Result.Content!.GetValue<string>("title"));
+        Assert.AreEqual(authorValue, result.Result.Content!.GetValue<string>("author"));
+    }
+
     private IUser SuperUser() => GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
     private async Task<IMember> CreateMemberAsync()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        GetRequiredService<IMemberTypeService>().Save(memberType);
+        MemberTypeService.Save(memberType);
         MemberService.AddRole("RoleOne");
 
         var createModel = new MemberCreateModel
@@ -183,11 +279,11 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
         Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
 
-        var member = result.Result;
+        var member = result.Result.Content;
         Assert.IsNotNull(member);
         Assert.IsTrue(member.HasIdentity);
         Assert.Greater(member.Id, 0);
 
-        return await MemberEditingService.GetAsync(result.Result!.Key) ?? throw new ApplicationException("Created member could not be retrieved");
+        return await MemberEditingService.GetAsync(member.Key) ?? throw new ApplicationException("Created member could not be retrieved");
     }
 }
