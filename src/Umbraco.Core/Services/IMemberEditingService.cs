@@ -9,9 +9,13 @@ public interface IMemberEditingService
 {
     Task<IMember?> GetAsync(Guid key);
 
-    Task<Attempt<IMember, MemberEditingStatus>> UpdateAsync(IMember member, MemberUpdateModel updateModel, IUser user);
+    Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel);
+
+    Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMember member, MemberUpdateModel updateModel);
 
     Task<Attempt<IMember?, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user);
+
+    Task<Attempt<IMember, MemberEditingStatus>> UpdateAsync(IMember member, MemberUpdateModel updateModel, IUser user);
 
     Task<Attempt<IMember?, MemberEditingStatus>> DeleteAsync(Guid key, Guid userKey);
 }

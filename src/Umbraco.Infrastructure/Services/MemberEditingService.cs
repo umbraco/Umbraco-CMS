@@ -40,6 +40,12 @@ internal sealed class MemberEditingService : IMemberEditingService
     public async Task<IMember?> GetAsync(Guid key)
         => await Task.FromResult(_memberService.GetByKey(key));
 
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel)
+        => await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);
+
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMember member, MemberUpdateModel updateModel)
+        => await _memberContentEditingService.ValidateAsync(updateModel, member.ContentType.Key);
+
     public async Task<Attempt<IMember?, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user)
     {
         var status = new MemberEditingStatus();

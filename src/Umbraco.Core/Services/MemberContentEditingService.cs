@@ -24,6 +24,9 @@ internal sealed class MemberContentEditingService
         : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService)
         => _logger = logger;
 
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateAsync(MemberEditingModelBase editingModel, Guid memberTypeKey)
+        => await ValidatePropertiesAsync(editingModel, memberTypeKey);
+
     public async Task<Attempt<MemberUpdateResult, ContentEditingOperationStatus>> UpdateAsync(IMember member, MemberEditingModelBase updateModel, Guid userKey)
     {
         // FIXME: handle sensitive property data

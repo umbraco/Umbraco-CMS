@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
@@ -11,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member;
 [ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Member)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Member))]
-// TODO: implement authorization
+// FIXME: implement authorization
 // [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMembers)]
 public class MemberControllerBase : ContentControllerBase
 {
@@ -82,4 +85,11 @@ public class MemberControllerBase : ContentControllerBase
                 .WithTitle("Unknown member operation status.")
                 .Build())
         });
+
+    protected IActionResult MemberEditingOperationStatusResult<TContentModelBase>(
+        ContentEditingOperationStatus status,
+        TContentModelBase requestModel,
+        ContentValidationResult validationResult)
+        where TContentModelBase : ContentModelBase<MemberValueModel, MemberVariantRequestModel>
+        => ContentEditingOperationStatusResult<TContentModelBase, MemberValueModel, MemberVariantRequestModel>(status, requestModel, validationResult);
 }
