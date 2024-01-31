@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Cms.Web.Common.Security;
+namespace Umbraco.Cms.Core.Security;
 
 public interface IPasswordChanger<TUser> where TUser : UmbracoIdentityUser
 {
