@@ -2,7 +2,7 @@ import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Script tests', () => {
-  let scriptPath = "";
+  let scriptPath = '';
   const scriptName = 'scriptName.js';
 
   test.beforeEach(async ({umbracoApi}) => {
@@ -16,7 +16,6 @@ test.describe('Script tests', () => {
   test('can create a script', async ({umbracoApi}) => {
     // Act
     scriptPath = await umbracoApi.script.create(scriptName, 'test');
-
     await umbracoApi.script.get(scriptPath);
 
     // Assert

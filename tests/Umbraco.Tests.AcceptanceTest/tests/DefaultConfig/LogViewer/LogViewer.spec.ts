@@ -11,7 +11,7 @@ test.describe('Log Viewer tests', () => {
   test('can search', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const startTelemetryLevel = await umbracoApi.telemetry.getLevel();
-    const telemetryLevel = "Minimal";
+    const telemetryLevel = 'Minimal';
     await umbracoApi.telemetry.setLevel(telemetryLevel);
 
     // Act
@@ -30,17 +30,18 @@ test.describe('Log Viewer tests', () => {
   test('can change the search log level', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const logInformation = await umbracoApi.logViewer.getLevelCount();
-    const expectedLogCount = Math.min(logInformation.information, 100);
+    const expectedLogCount = Math.min(logInformation.information, 100)
+    const logLevel = 'Information';
 
     // Act
     await umbracoUi.logViewer.clickSearchButton();
-    await umbracoUi.logViewer.selectLogLevel('Information');
+    await umbracoUi.logViewer.selectLogLevel(logLevel);
 
     // Assert
     // Check if the search log level indicator is visible
-    await umbracoUi.logViewer.doesLogLevelIndicatorDisplay('Information');
+    await umbracoUi.logViewer.doesLogLevelIndicatorDisplay(logLevel);
     // Check if the log count matches the expected count
-    await umbracoUi.logViewer.doesLogLevelCountMatch('Information', expectedLogCount);
+    await umbracoUi.logViewer.doesLogLevelCountMatch(logLevel, expectedLogCount);
   });
 
   test('can create a saved search', async ({umbracoApi, umbracoUi}) => {
@@ -145,7 +146,7 @@ test.describe('Log Viewer tests', () => {
     // Sorts logs by timestamp
     await umbracoUi.logViewer.clickSortLogByTimestampButton();
     // Gets the last log from the log viewer
-    const lastLog = await umbracoApi.logViewer.getLog(0, 1, "Descending");
+    const lastLog = await umbracoApi.logViewer.getLog(0, 1, 'Descending');
     const dateToFormat = new Date(lastLog.items[0].timestamp);
     const lastLogTimestamp = new Intl.DateTimeFormat(locale, options).format(dateToFormat);
 

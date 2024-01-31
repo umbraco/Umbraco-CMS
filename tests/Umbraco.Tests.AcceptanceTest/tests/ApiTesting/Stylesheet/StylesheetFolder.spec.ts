@@ -13,7 +13,7 @@ test.describe('Stylesheet Folder tests', () => {
   });
 
   test('can create a stylesheet folder', async ({umbracoApi}) => {
-    // Arrange
+    // Act
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
 
     // Assert
@@ -50,10 +50,8 @@ test.describe('Stylesheet Folder tests', () => {
     const childFolderName = 'childFolder';
     const childOfChildFolderName = 'childOfChildFolder';
     const childFolderPath = stylesheetFolderName + '/' + childFolderName;
-
     // Creates parent folder
     await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
-
     // Creates child folder in parent folder
     await umbracoApi.stylesheet.createFolder(childFolderName, stylesheetFolderName);
 
@@ -74,12 +72,10 @@ test.describe('Stylesheet Folder tests', () => {
     const childFolderName = 'childFolder';
     const stylesheetParentFolderPath = await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
     const stylesheetChildFolderPath = await umbracoApi.stylesheet.createFolder(childFolderName, stylesheetFolderName);
-
     // Checks if a child exists in the parent folder with the name
     const child = await umbracoApi.stylesheet.getChildren(stylesheetParentFolderPath);
     expect(child[0].name).toEqual(childFolderName);
     expect(child[0].isFolder).toBe(true);
-
     expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetChildFolderPath)).toBeTruthy();
 
     // Act

@@ -270,7 +270,7 @@ test.describe('Stylesheets tests', () => {
     // TODO: when frontend is ready, verify the new stylesheet is displayed under the Stylesheets section
     expect(await umbracoApi.stylesheet.doesNameExist(stylesheetName)).toBeTruthy();
     const stylesheetChildren = await umbracoApi.stylesheet.getChildren('/' + stylesheetFolderName + '/' + childFolderName);
-    expect(stylesheetChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName  + '/' + stylesheetName);
+    expect(stylesheetChildren[0].path).toBe('/' + stylesheetFolderName + '/' + childFolderName + '/' + stylesheetName);
     const stylesheetData = await umbracoApi.stylesheet.get(stylesheetChildren[0].path);
     expect(stylesheetData.content).toBe(stylesheetContent);
 

@@ -11,7 +11,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
   });
 
-  test('can create a empty script', async ({ umbracoApi, umbracoUi}) => {
+  test('can create a empty script', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptName);
 
@@ -34,7 +34,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptName);
   });
 
-  test('can create a script with content', async ({ umbracoApi, umbracoUi}) => {
+  test('can create a script with content', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptName);
     const scriptContent = 'TestContent';
@@ -77,7 +77,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.clickSaveButton();
 
     // Assert
-    // TODO: Uncomment when the notification is visible
+    // TODO: Uncomment when the notification is visible. Currently there is no notification after you update a script
     // await umbracoUi.script.isSuccessNotificationVisible();
     const updatedScript = await umbracoApi.script.get(scriptPath);
     expect(updatedScript.content).toBe(updatedScriptContent);
