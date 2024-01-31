@@ -45,7 +45,7 @@ public class CreateMediaController : MediaControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            MediaPermissionResource.WithKeys(requestModel.ParentId),
+            MediaPermissionResource.WithKeys(requestModel.Parent?.Id),
             AuthorizationPolicies.MediaPermissionByResource);
 
         if (!authorizationResult.Succeeded)

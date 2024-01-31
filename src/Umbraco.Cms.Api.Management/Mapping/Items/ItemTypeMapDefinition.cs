@@ -31,7 +31,6 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<ITemplate, TemplateItemResponseModel>((_, _) => new TemplateItemResponseModel { Alias = string.Empty }, Map);
         mapper.Define<IMemberType, MemberTypeItemResponseModel>((_, _) => new MemberTypeItemResponseModel(), Map);
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
-        mapper.Define<IMediaEntitySlim, MediaItemResponseModel>((_, _) => new MediaItemResponseModel(), Map);
         mapper.Define<IMember, MemberItemResponseModel>((_, _) => new MemberItemResponseModel(), Map);
         mapper.Define<IUser, UserItemResponseModel>((_, _) => new UserItemResponseModel(), Map);
         mapper.Define<IUserGroup, UserGroupItemResponseModel>((_, _) => new UserGroupItemResponseModel(), Map);
@@ -104,15 +103,6 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
-    }
-
-    // Umbraco.Code.MapAll
-    private static void Map(IMediaEntitySlim source, MediaItemResponseModel target, MapperContext context)
-    {
-        target.Icon = source.ContentTypeIcon;
-        target.Id = source.Key;
-        target.Name = source.Name ?? string.Empty;
-        target.IsTrashed = source.Trashed;
     }
 
     // Umbraco.Code.MapAll

@@ -32,7 +32,7 @@ public class ByKeyMediaController : MediaControllerBase
 
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DocumentResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MediaResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {

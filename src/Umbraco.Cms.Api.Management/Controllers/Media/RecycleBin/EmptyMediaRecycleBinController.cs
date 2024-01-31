@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -22,8 +23,9 @@ public class EmptyMediaRecycleBinController : MediaRecycleBinControllerBase
         IEntityService entityService,
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IMediaService mediaService)
-        : base(entityService)
+        IMediaService mediaService,
+        IMediaPresentationModelFactory mediaPresentationModelFactory)
+        : base(entityService, mediaPresentationModelFactory)
     {
         _authorizationService = authorizationService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;

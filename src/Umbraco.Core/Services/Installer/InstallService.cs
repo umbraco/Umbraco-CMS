@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services.Installer;
 
@@ -23,7 +22,7 @@ public class InstallService : IInstallService
     }
 
     /// <inheritdoc/>
-    public async Task Install(InstallData model)
+    public async Task<Attempt<InstallationResult?, InstallOperationStatus>> InstallAsync(InstallData model)
     {
         if (_runtimeState.Level != RuntimeLevel.Install)
         {
@@ -32,16 +31,19 @@ public class InstallService : IInstallService
 
         try
         {
-            await RunSteps(model);
+            Attempt<InstallationResult?> result = await RunStepsAsync(model);
+            return result.Success
+                ? Attempt.SucceedWithStatus(InstallOperationStatus.Success, result.Result)
+                : Attempt.FailWithStatus(InstallOperationStatus.InstallFailed, result.Result);
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Encountered an error when running the install steps");
+            _logger.LogError(exception, "Encountered an unexpected error when running the install steps");
             throw;
         }
     }
 
-    private async Task RunSteps(InstallData model)
+    private async Task<Attempt<InstallationResult?>> RunStepsAsync(InstallData model)
     {
         foreach (IInstallStep step in _installSteps)
         {
@@ -54,8 +56,25 @@ public class InstallService : IInstallService
             }
 
             _logger.LogInformation("Running {StepName}", stepName);
-            await step.ExecuteAsync(model);
+            Attempt<InstallationResult> result = await step.ExecuteAsync(model);
+
+            if (result.Success is false)
+            {
+                if (result.Result?.ErrorMessage is not null)
+                {
+                    _logger.LogError("Failed {StepName}, with the message: {Message}", stepName, result.Result?.ErrorMessage);
+                }
+                else
+                {
+                    _logger.LogError("Failed {StepName}", stepName);
+                }
+
+                return Attempt.Fail(result.Result);
+            }
+
             _logger.LogInformation("Finished {StepName}", stepName);
         }
+
+        return Attempt<InstallationResult?>.Succeed();
     }
 }
