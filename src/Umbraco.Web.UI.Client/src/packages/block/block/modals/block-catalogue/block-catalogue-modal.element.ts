@@ -1,4 +1,8 @@
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
+import {
+	DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+	type UmbDocumentTypeItemModel,
+} from '@umbraco-cms/backoffice/document-type';
 import type {
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue,
@@ -12,12 +16,19 @@ import {
 	UmbModalBaseElement,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
+import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue
 > {
+	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
+		this,
+		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+		(x) => x.unique,
+	);
+
 	@state()
 	private _blocks: Array<UmbBlockTypeWithGroupKey> = [];
 
@@ -49,6 +60,19 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					this._workspacePath = routeBuilder({});
 				});
 		});
+
+		this.observe(this.#itemManager.items, (items) => {
+			this._blocks = items.map((item) => {
+				const blockGroup = this._blocks.find((block) => block.contentElementTypeKey === item.unique)?.groupKey;
+				const block: UmbBlockTypeWithGroupKey = {
+					contentElementTypeKey: item.unique,
+					label: item.name,
+					icon: item.icon ?? undefined,
+					groupKey: blockGroup,
+				};
+				return block;
+			});
+		});
 	}
 
 	connectedCallback() {
@@ -58,14 +82,9 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this._openClipboard = this.data.openClipboard ?? false;
 		this._blocks = this.data.blocks ?? [];
 		this._blockGroups = this.data.blockGroups ?? [];
-	}
 
-	/*
-	#onClickBlock(contentElementTypeKey: string) {
-		this.modalContext?.updateValue({ key: contentElementTypeKey });
-		this.modalContext?.submit();
+		this.#itemManager.setUniques(this._blocks.map((x) => x.contentElementTypeKey));
 	}
-	*/
 
 	render() {
 		return html`
