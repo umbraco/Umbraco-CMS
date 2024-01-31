@@ -5,6 +5,7 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 
+[Obsolete("This is no longer used and will be removed in V14.")]
 public class ResetCache : MigrationBase
 {
     private readonly IHostingEnvironment _hostingEnvironment;
