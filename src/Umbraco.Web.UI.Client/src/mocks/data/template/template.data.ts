@@ -1,42 +1,21 @@
-import { UmbEntityData } from './entity.data.js';
-import { createEntityTreeItem } from './utils.js';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
-	EntityTreeItemResponseModel,
 	TemplateResponseModel,
-	TemplateScaffoldResponseModel,
-	CreateTemplateRequestModel,
 	TemplateItemResponseModel,
 	TemplateQuerySettingsResponseModel,
 	TemplateQueryResultResponseModel,
-	PagedNamedEntityTreeItemResponseModel,
+	NamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { TemplateQueryPropertyTypeModel, OperatorModel } from '@umbraco-cms/backoffice/backend-api';
 
-type UmbMockTemplateModel = TemplateResponseModel & EntityTreeItemResponseModel;
+type UmbMockTemplateModelHack = TemplateResponseModel & NamedEntityTreeItemResponseModel & TemplateItemResponseModel;
 
-const createTemplate = (dbItem: UmbMockTemplateModel): TemplateResponseModel => {
-	return {
-		id: dbItem.id,
-		name: dbItem.name,
-		alias: dbItem.alias,
-		content: dbItem.content,
-		masterTemplateId: dbItem.masterTemplateId,
-	};
-};
-
-const createTemplateItem = (dbItem: UmbMockTemplateModel): TemplateItemResponseModel => ({
-	name: dbItem.name,
-	id: dbItem.id,
-	alias: dbItem.alias,
-});
+export interface UmbMockTemplateModel extends Omit<UmbMockTemplateModelHack, 'type'> {}
 
 export const data: Array<UmbMockTemplateModel> = [
 	{
 		id: '2bf464b6-3aca-4388-b043-4eb439cc2643',
 		parent: null,
 		name: 'Doc 1',
-		type: 'templa }te',
 		hasChildren: false,
 		alias: 'Doc1',
 		content: `@using Umbraco.Extensions
@@ -57,7 +36,6 @@ export const data: Array<UmbMockTemplateModel> = [
 		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		parent: null,
 		name: 'Test',
-		type: 'templat }e',
 		hasChildren: true,
 		alias: 'Test',
 		content:
@@ -68,7 +46,6 @@ export const data: Array<UmbMockTemplateModel> = [
 		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 		name: 'Child',
-		type: 'template',
 		hasChildren: false,
 		alias: 'Test',
 		content:
@@ -79,7 +56,6 @@ export const data: Array<UmbMockTemplateModel> = [
 		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		name: 'Has Master Template',
 		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
-		type: 'template',
 		hasChildren: false,
 		alias: 'hasMasterTemplate',
 		content:
@@ -174,77 +150,3 @@ export const templateQuerySettings: TemplateQuerySettingsResponseModel = {
 		},
 	],
 };
-
-// Temp mocked database
-class UmbTemplateData extends UmbEntityData<UmbMockTemplateModel> {
-	constructor() {
-		super(data);
-	}
-
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	getById(id: string): TemplateResponseModel | undefined {
-		const item = this.data.find((item) => item.id === id);
-		return item ? createTemplate(item) : undefined;
-	}
-
-	getItemById(id: string): TemplateItemResponseModel | null {
-		const item = this.data.find((item) => item.id === id);
-		return item ? createTemplateItem(item) : null;
-	}
-
-	getScaffold(masterTemplateId: string | null = null): TemplateScaffoldResponseModel {
-		const masterTemplate = this.data.find((item) => item.id === masterTemplateId);
-
-		return {
-			content: createTemplateScaffold(masterTemplate?.alias ?? 'null'),
-		};
-	}
-
-	getItems(ids: string[]): TemplateItemResponseModel[] {
-		const items = ids.map((id) => this.getItemById(id)).filter((item) => item !== null) as TemplateItemResponseModel[];
-		return items;
-	}
-
-	getTemplateQuerySettings = () => templateQuerySettings;
-
-	getTemplateQueryResult = () => templateQueryResult;
-
-	create(templateData: CreateTemplateRequestModel) {
-		const template = {
-			id: UmbId.new(),
-			type: 'template',
-			hasChildren: false,
-			isContainer: false,
-			...templateData,
-		};
-		this.data.push(template);
-		return template;
-	}
-
-	update(template: TemplateResponseModel) {
-		this.updateData(template);
-		return template;
-	}
-
-	getTreeRoot(): PagedNamedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parent?.id === null);
-		const treeItems = items.map((item) => createEntityTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
-	}
-
-	getTreeItemChildren(id: string): PagedNamedEntityTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parent?.id === id);
-		const treeItems = items.map((item) => createEntityTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
-	}
-
-	getTreeItem(ids: Array<string>): Array<EntityTreeItemResponseModel> {
-		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createEntityTreeItem(item));
-	}
-}
-
-export const umbTemplateData = new UmbTemplateData();

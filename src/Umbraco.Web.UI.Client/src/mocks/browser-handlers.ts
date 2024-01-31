@@ -28,7 +28,7 @@ import { handlers as staticFileHandlers } from './handlers/static-file/index.js'
 import { handlers as stylesheetHandlers } from './handlers/stylesheet/index.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js';
-import { handlers as templateHandlers } from './handlers/template.handlers.js';
+import { handlers as templateHandlers } from './handlers/template/index.js';
 import { handlers as trackedReferenceHandlers } from './handlers/tracked-reference.handlers.js';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
