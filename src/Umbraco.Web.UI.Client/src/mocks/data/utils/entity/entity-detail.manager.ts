@@ -40,7 +40,7 @@ export class UmbMockEntityDetailManager<MockType extends { id: string }> {
 		this.#db.update(id, updatedMockItem);
 	}
 
-	delete(path: string) {
-		this.#db.delete(path);
+	delete(id: string) {
+		this.#db.delete(id);
 	}
 }
