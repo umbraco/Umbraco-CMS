@@ -16,6 +16,7 @@ public enum ContentPublishingOperationStatus
     PathNotPublished,
     ConcurrencyViolation,
     UnsavedChanges,
+    FailedBranch,
     Failed, // unspecified failure (can happen on unpublish at the time of writing)
     Unknown
 }

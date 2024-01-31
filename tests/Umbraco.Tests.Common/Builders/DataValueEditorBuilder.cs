@@ -55,7 +55,6 @@ public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataVa
         var valueType = _valueType ?? Guid.NewGuid().ToString();
 
         return new DataValueEditor(
-            Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>())
         {

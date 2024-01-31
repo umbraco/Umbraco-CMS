@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.Content;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -17,42 +17,21 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IContent, DocumentResponseModel>((_, _) => new DocumentResponseModel(), Map);
 
-    // Umbraco.Code.MapAll -Urls -TemplateId
+    // Umbraco.Code.MapAll -Urls -Template
     private void Map(IContent source, DocumentResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
-        target.ContentTypeId = source.ContentType.Key;
+        target.DocumentType = context.Map<DocumentTypeReferenceResponseModel>(source.ContentType)!;
         target.Values = MapValueViewModels(source);
         target.Variants = MapVariantViewModels(
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = GetSavedState(source, culture);
+                documentVariantViewModel.State = ContentStateHelper.GetContentState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);
             });
         target.IsTrashed = source.Trashed;
-    }
-
-    private ContentState GetSavedState(IContent content, string? culture)
-    {
-        if (content.Id <= 0 || (culture != null && content.IsCultureAvailable(culture) == false))
-        {
-            return ContentState.NotCreated;
-        }
-
-        var isDraft = content.PublishedState == PublishedState.Unpublished ||
-                      (culture != null && content.IsCulturePublished(culture) == false);
-        if (isDraft)
-        {
-            return ContentState.Draft;
-        }
-
-        var isEdited = culture != null
-            ? content.IsCultureEdited(culture)
-            : content.Edited;
-
-        return isEdited ? ContentState.PublishedPendingChanges : ContentState.Published;
     }
 }

@@ -6,5 +6,5 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 [ShortGenericSchemaName<DocumentValueModel, DocumentVariantRequestModel>("UpdateContentForDocumentRequestModel")]
 public class UpdateDocumentRequestModel : UpdateContentRequestModelBase<DocumentValueModel, DocumentVariantRequestModel>
 {
-    public Guid? TemplateId { get; set; }
+    public ReferenceByIdModel? Template { get; set; }
 }
