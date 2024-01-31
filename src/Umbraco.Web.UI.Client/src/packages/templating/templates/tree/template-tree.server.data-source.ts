@@ -1,3 +1,4 @@
+import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
 import type { UmbTemplateTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -44,10 +45,10 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemModel => {
 	return {
-		id: item.id,
-		parentId: item.parent ? item.parent.id : null,
+		unique: item.id,
+		parentUnique: item.parent ? item.parent.id : null,
 		name: item.name,
-		entityType: 'template',
+		entityType: UMB_TEMPLATE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		isFolder: false,
 	};
