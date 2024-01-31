@@ -19,7 +19,9 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#languageRepository = new UmbLanguageRepository(this);
 
 	#unique?: string | null;
-	#languageModel: Array<LanguageResponseModel> = [];
+
+	@state()
+	private _languageModel: Array<LanguageResponseModel> = [];
 
 	@state()
 	private _defaultIsoCode?: string | null;
@@ -34,8 +36,8 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	firstUpdated() {
 		this.#unique = this.data?.unique;
-		this.#readDomains();
 		this.#requestLanguages();
+		this.#readDomains();
 	}
 
 	async #readDomains() {
@@ -50,20 +52,18 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	async #requestLanguages() {
 		const { data } = await this.#languageRepository.requestLanguages();
 		if (!data) return;
-		this.#languageModel = data.items;
+		this._languageModel = data.items;
 	}
 
 	// Modal
 
 	async #handleSave() {
 		this.value = { defaultIsoCode: this._defaultIsoCode, domains: this._domains };
-		const { error } = await this.#documentRepository.updateCultureAndHostnames(this.#unique!, this.value);
-		if (error) return;
-		this.modalContext?.submit();
+		await this.#documentRepository.updateCultureAndHostnames(this.#unique!, this.value);
 	}
 
-	#handleCancel() {
-		this.modalContext?.reject();
+	#handleClose() {
+		this.modalContext?.submit();
 	}
 
 	// Events
@@ -92,7 +92,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	}
 
 	#onAddDomain(useCurrentDomain?: boolean) {
-		const defaultModel = this.#languageModel.find((model) => model.isDefault);
+		const defaultModel = this._languageModel.find((model) => model.isDefault);
 		if (useCurrentDomain) {
 			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -112,9 +112,9 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 				${this.#renderCultureSection()} ${this.#renderDomainSection()}
 				<uui-button
 					slot="actions"
-					id="cancel"
-					label=${this.localize.term('buttons_confirmActionCancel')}
-					@click="${this.#handleCancel}"></uui-button>
+					id="close"
+					label=${this.localize.term('general_close')}
+					@click="${this.#handleClose}"></uui-button>
 				<uui-button
 					slot="actions"
 					id="save"
@@ -185,7 +185,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	#renderLanguageModelOptions() {
 		return html`${repeat(
-			this.#languageModel,
+			this._languageModel,
 			(model) => model.isoCode,
 			(model) => html`<uui-combobox-list-option .value=${model.isoCode}>${model.name}</uui-combobox-list-option>`,
 		)}`;
