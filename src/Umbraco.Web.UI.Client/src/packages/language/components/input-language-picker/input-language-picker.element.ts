@@ -1,8 +1,8 @@
+import type { UmbLanguageItemModel } from '../../repository/index.js';
 import { UmbLanguagePickerContext } from './input-language-picker.context.js';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-language-picker')
@@ -54,7 +54,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Object, attribute: false })
-	public filter: (language: LanguageItemResponseModel) => boolean = () => true;
+	public filter: (language: UmbLanguageItemModel) => boolean = () => true;
 
 	public get selectedUniques(): Array<string> {
 		return this.#pickerContext.getSelection();
