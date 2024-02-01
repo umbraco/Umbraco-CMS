@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './column-layouts/boolean/language-table-boolean-column-layout.element.js';
 import './column-layouts/name/language-table-name-column-layout.element.js';
+import './column-layouts/entity-actions/language-table-entity-actions-column-layout.element.js';
 
 @customElement('umb-language-table-collection-view')
 export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
@@ -40,6 +41,11 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 		{
 			name: 'Fallback',
 			alias: 'fallbackLanguage',
+		},
+		{
+			name: '',
+			alias: 'entityActions',
+			elementName: 'umb-language-table-entity-actions-column-layout',
 		},
 	];
 
@@ -91,6 +97,10 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 					{
 						columnAlias: 'fallbackLanguage',
 						value: languages.find((x) => x.unique === language.fallbackIsoCode)?.name,
+					},
+					{
+						columnAlias: 'entityActions',
+						value: language,
 					},
 				],
 			};
