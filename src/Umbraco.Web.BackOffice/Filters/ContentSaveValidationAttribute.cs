@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters;
 ///     Validates the incoming <see cref="ContentItemSave" /> model along with if the user is allowed to perform the
 ///     operation
 /// </summary>
-internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
+public sealed class ContentSaveValidationAttribute : TypeFilterAttribute
 {
     public ContentSaveValidationAttribute(bool skipUserAccessValidation = false)
         : base(typeof(ContentSaveValidationFilter))
