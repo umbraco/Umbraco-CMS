@@ -66,7 +66,7 @@ test.describe('Relation types tests', () => {
     expect(relationTypeData.isBidirectional).toEqual(true);
   });
 
-  test('can update Is dependency value of a relation type', async ({umbracoApi, umbracoUi}) => {
+  test('can update isDependency value of a relation type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const updatedObjectTypeName = 'Media';
     relationTypeId = await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
