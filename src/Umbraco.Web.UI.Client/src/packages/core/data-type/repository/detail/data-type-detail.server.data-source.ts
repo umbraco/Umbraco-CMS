@@ -2,12 +2,8 @@ import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../typ
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type {
-	CreateDataTypeRequestModel,
-	DataTypeModelBaseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	DataTypeResource,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { CreateDataTypeRequestModel, DataTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -68,7 +64,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		const dataType: UmbDataTypeDetailModel = {
 			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: data.parentId || null,
+			parentUnique: data.parent ? data.parent.id : null,
 			name: data.name,
 			editorAlias: data.editorAlias,
 			editorUiAlias: data.editorUiAlias || null,
