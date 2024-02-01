@@ -14,11 +14,11 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'edit/:isoCode',
+			path: 'edit/:unique',
 			component: this.#createElement,
 			setup: (_component, info) => {
 				this.removeControllerByAlias('_observeIsNew');
-				this.#languageWorkspaceContext.load(info.match.params.isoCode);
+				this.#languageWorkspaceContext.load(info.match.params.unique);
 			},
 		},
 		{

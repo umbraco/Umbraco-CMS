@@ -1,17 +1,13 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbLanguageDetailModel } from '../../../types.js';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-/*
-import './components/language-root-table-delete-column-layout.element.js';
-import './components/language-root-table-name-column-layout.element.js';
-import './components/language-root-table-boolean-column-layout.element.js';
-*/
-
-@customElement('umb-language-root-workspace')
-export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
+@customElement('umb-language-table-collection-view')
+export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _tableConfig: UmbTableConfig = {
 		allowSelection: false,
@@ -53,7 +49,23 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 	private _cultureNames = new Intl.DisplayNames('en', { type: 'language' });
 
-	#createTableItems(languages: Array<LanguageResponseModel>) {
+	#collectionContext?: UmbDefaultCollectionContext<UmbLanguageDetailModel>;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
+			this.#observeCollectionItems();
+		});
+	}
+
+	#observeCollectionItems() {
+		if (!this.#collectionContext) return;
+		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
+	}
+
+	#createTableItems(languages: Array<UmbLanguageDetailModel>) {
 		this._tableItems = languages.map((language) => {
 			return {
 				id: language.isoCode ?? '',
@@ -91,33 +103,27 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		});
 	}
 
-	// TODO: Generate the href or retrieve it from something?
 	render() {
-		return html`<umb-collection alias="Umb.Collection.Language"></umb-collection>`;
 		return html`
-			<umb-body-layout main-no-padding headline="Languages">
-				<umb-body-layout header-transparent>
-					<uui-button
-						slot="header"
-						label="Add language"
-						look="outline"
-						color="default"
-						href="section/settings/workspace/language/create"></uui-button>
-
-					<!--- TODO: investigate if it's possible to use a collection component here --->
-					<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
-				</umb-body-layout>
-			</umb-body-layout>
+			<umb-table .config=${this._tableConfig} .columns=${this._tableColumns} .items=${this._tableItems}></umb-table>
 		`;
 	}
 
-	static styles = [UmbTextStyles];
+	static styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+			}
+		`,
+	];
 }
 
-export default UmbLanguageRootWorkspaceElement;
+export default UmbLanguageTableCollectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-language-root-workspace': UmbLanguageRootWorkspaceElement;
+		'umb-language-table-collection-view': UmbLanguageTableCollectionViewElement;
 	}
 }

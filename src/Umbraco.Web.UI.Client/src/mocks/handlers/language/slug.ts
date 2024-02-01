@@ -1,1 +1,1 @@
-export const UMB_SLUG = '/data-type';
+export const UMB_SLUG = '/language';

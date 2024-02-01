@@ -1,16 +1,16 @@
+import type { UmbLanguageDetailModel } from '../../types.js';
 import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from './language-workspace.context.js';
-import type { UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 @customElement('umb-language-workspace-editor')
 export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_LANGUAGE_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_language?: LanguageResponseModel;
+	_language?: UmbLanguageDetailModel;
 
 	@state()
 	_isNew?: boolean;

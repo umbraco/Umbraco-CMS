@@ -20,6 +20,17 @@ export const detailHandlers = [
 		);
 	}),
 
+	rest.get(umbracoPath(`${UMB_SLUG}`), (req, res, ctx) => {
+		const skipParam = req.url.searchParams.get('skip');
+		const skip = skipParam ? Number.parseInt(skipParam) : undefined;
+		const takeParam = req.url.searchParams.get('take');
+		const take = takeParam ? Number.parseInt(takeParam) : undefined;
+
+		const response = umbLanguageMockDb.get({ skip, take });
+
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));
