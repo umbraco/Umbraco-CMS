@@ -1,12 +1,10 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../../dictionary-workspace.context.js';
-import { UmbDictionaryRepository } from '../../../repository/dictionary.repository.js';
-import { UmbDictionaryDetailRepository, UmbDictionaryItemModel } from '../../../repository/index.js';
+import { UmbDictionaryDetailRepository } from '../../../repository/index.js';
 import type { UmbDictionaryDetailModel } from '../../../types.js';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 @customElement('umb-workspace-view-dictionary-editor')
 export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	@state()
@@ -15,7 +13,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	#repo!: UmbDictionaryDetailRepository;
 
 	@state()
-	private _languages: Array<LanguageResponseModel> = [];
+	private _languages: Array<UmbLanguageDetailModel> = [];
 
 	#workspaceContext!: typeof UMB_DICTIONARY_WORKSPACE_CONTEXT.TYPE;
 
@@ -37,7 +35,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 		});
 	}
 
-	#renderTranslation(language: LanguageResponseModel) {
+	#renderTranslation(language: UmbLanguageDetailModel) {
 		if (!language.isoCode) return;
 
 		const translation = this._dictionary?.translations?.find((x) => x.isoCode === language.isoCode);
@@ -68,7 +66,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 				${unsafeHTML(this.localize.term('dictionaryItem_description', this._dictionary?.name || 'unnamed'))}
 				${repeat(
 					this._languages,
-					(item) => item.isoCode,
+					(item) => item.unique,
 					(item) => this.#renderTranslation(item),
 				)}
 			</uui-box>

@@ -1,7 +1,6 @@
 import { UmbLanguageDetailRepository } from '../../repository/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbLanguagePickerModalValue, UmbLanguagePickerModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -12,7 +11,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	UmbLanguagePickerModalValue
 > {
 	@state()
-	private _languages: Array<LanguageResponseModel> = [];
+	private _languages: Array<UmbLanguageItemModel> = [];
 
 	#languageRepository = new UmbLanguageDetailRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
@@ -50,14 +49,14 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 			<uui-box>
 				${repeat(
 					this.#filteredLanguages,
-					(item) => item.isoCode,
+					(item) => item.unique,
 					(item) => html`
 						<uui-menu-item
 							label=${item.name ?? ''}
 							selectable
-							@selected=${() => this.#selectionManager.select(item.isoCode!)}
-							@deselected=${() => this.#selectionManager.deselect(item.isoCode!)}
-							?selected=${this.#selectionManager.isSelected(item.isoCode!)}>
+							@selected=${() => this.#selectionManager.select(item.unique)}
+							@deselected=${() => this.#selectionManager.deselect(item.unique)}
+							?selected=${this.#selectionManager.isSelected(item.unique)}>
 							<uui-icon slot="icon" name="icon-globe"></uui-icon>
 						</uui-menu-item>
 					`,

@@ -1,10 +1,9 @@
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_LANGUAGE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
-import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbLanguagePickerContext extends UmbPickerInputContext<LanguageItemResponseModel> {
+export class UmbLanguagePickerContext extends UmbPickerInputContext<UmbLanguageItemModel> {
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Repository.Language', UMB_LANGUAGE_PICKER_MODAL, (item) => item.isoCode);
+		super(host, UMB_LANGUAGE_ITEM_REPOSITORY, UMB_LANGUAGE_PICKER_MODAL);
 	}
 }

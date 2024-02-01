@@ -6,14 +6,13 @@ import { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-language-details-workspace-view')
 export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
-	_language?: LanguageResponseModel;
+	_language?: UmbLanguageDetailModel;
 
 	@state()
 	_isDefaultLanguage = false;
@@ -62,7 +61,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 	#handleCultureChange(event: Event) {
 		if (event instanceof UmbChangeEvent) {
 			const target = event.target as UmbInputCultureSelectElement;
-			const isoCode = target.value.toString();
+			const unique = target.value.toString();
 			const cultureName = target.selectedCultureName;
 
 			// If there is no cultureName, it was probably an unknown event that triggered the change event, so ignore it.
@@ -70,12 +69,12 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 				return;
 			}
 
-			if (!isoCode) {
-				// If the isoCode is empty, we reset the value to the original value.
+			if (!unique) {
+				// If the unique is empty, we reset the value to the original value.
 				// Provides a way better UX
 				//TODO: Maybe the combobox should implement something similar?
 				const resetFunction = () => {
-					target.value = this._language?.isoCode ?? '';
+					target.value = this._language?.unique;
 				};
 
 				target.addEventListener('close', resetFunction, { once: true });
@@ -83,7 +82,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 				return;
 			}
 
-			this.#languageWorkspaceContext?.setCulture(isoCode);
+			this.#languageWorkspaceContext?.setCulture(unique);
 
 			// to improve UX, we set the name to the culture name if it's a new language
 			if (this._isNew && cultureName) {
@@ -109,8 +108,8 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 	#handleFallbackChange(event: UmbChangeEvent) {
 		if (event instanceof UmbChangeEvent) {
 			const target = event.target as UmbInputLanguagePickerElement;
-			const selectedLanguageIsoCode = target.selectedIsoCodes?.[0];
-			this.#languageWorkspaceContext?.setFallbackCulture(selectedLanguageIsoCode);
+			const selectedLanguageUnique = target.selectedUniques?.[0];
+			this.#languageWorkspaceContext?.setFallbackCulture(selectedLanguageUnique);
 		}
 	}
 
@@ -121,19 +120,17 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 					<div slot="editor">
 						<!-- TODO: disable already created cultures in the select -->
 						<umb-input-culture-select
-							value=${ifDefined(this._language?.isoCode)}
+							value=${ifDefined(this._language?.unique)}
 							@change=${this.#handleCultureChange}
 							?readonly=${this._isNew === false}></umb-input-culture-select>
 
 						<!-- TEMP VALIDATION ERROR -->
-						${this._validationErrors?.isoCode.map(
-							(isoCodeError) => html`<div class="validation-message">${isoCodeError}</div>`,
-						)}
+						${this._validationErrors?.isoCode.map((error) => html`<div class="validation-message">${error}</div>`)}
 					</div>
 				</umb-property-layout>
 
 				<umb-property-layout label="ISO Code">
-					<div slot="editor">${this._language?.isoCode}</div>
+					<div slot="editor">${this._language?.unique}</div>
 				</umb-property-layout>
 
 				<umb-property-layout label="Settings">
@@ -176,8 +173,8 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 						slot="editor"
 						max="1"
 						@change=${this.#handleFallbackChange}
-						.filter=${(language: LanguageResponseModel) =>
-							language.isoCode !== this._language?.isoCode}></umb-input-language-picker>
+						.filter=${(language: UmbLanguageDetailModel) =>
+							language.unique !== this._language?.unique}></umb-input-language-picker>
 				</umb-property-layout>
 			</uui-box>
 		`;

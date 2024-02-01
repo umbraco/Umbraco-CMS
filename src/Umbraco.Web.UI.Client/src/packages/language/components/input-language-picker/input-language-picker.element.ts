@@ -56,21 +56,21 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	@property({ type: Object, attribute: false })
 	public filter: (language: LanguageItemResponseModel) => boolean = () => true;
 
-	public get selectedIsoCodes(): Array<string> {
+	public get selectedUniques(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
-	public set selectedIsoCodes(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+	public set selectedUniques(uniques: Array<string>) {
+		this.#pickerContext.setSelection(uniques);
 	}
 
 	@property()
-	public set value(isoCodesString: string) {
+	public set value(uniques: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIsoCodes = splitStringToArray(isoCodesString);
+		this.selectedUniques = splitStringToArray(uniques);
 	}
 
 	@state()
-	private _items: Array<LanguageItemResponseModel> = [];
+	private _items: Array<UmbLanguageItemModel> = [];
 
 	#pickerContext = new UmbLanguagePickerContext(this);
 
@@ -110,13 +110,13 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		`;
 	}
 
-	#renderItem(item: LanguageItemResponseModel) {
-		if (!item.isoCode) return;
+	#renderItem(item: UmbLanguageItemModel) {
+		if (!item.unique) return;
 		return html`
 			<!-- TODO: add language ref element -->
-			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.isoCode)}>
+			<uui-ref-node name=${ifDefined(item.name === null ? undefined : item.name)} detail=${ifDefined(item.unique)}>
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.isoCode!)} label="Remove ${item.name}"
+					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique!)} label="Remove ${item.name}"
 						>Remove</uui-button
 					>
 				</uui-action-bar>

@@ -26,8 +26,8 @@ export class UmbLanguageWorkspaceContext
 		super(host, 'Umb.Workspace.Language');
 	}
 
-	async load(isoCode: string) {
-		const { data } = await this.repository.requestByUnique(isoCode);
+	async load(unique: string) {
+		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);

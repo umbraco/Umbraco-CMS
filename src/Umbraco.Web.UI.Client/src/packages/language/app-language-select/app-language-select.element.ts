@@ -1,10 +1,10 @@
 import { UmbLanguageDetailRepository } from '../repository/index.js';
+import type { UmbLanguageDetailModel } from '../types.js';
 import type { UmbAppLanguageContext } from './app-language.context.js';
 import { UMB_APP_LANGUAGE_CONTEXT } from './app-language.context.js';
 import type { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-app-language-select')
 export class UmbAppLanguageSelectElement extends UmbLitElement {
@@ -12,10 +12,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	private _popoverElement?: UUIPopoverContainerElement;
 
 	@state()
-	private _languages: Array<LanguageResponseModel> = [];
+	private _languages: Array<UmbLanguageDetailModel> = [];
 
 	@state()
-	private _appLanguage?: LanguageResponseModel;
+	private _appLanguage?: UmbLanguageDetailModel;
 
 	@state()
 	private _isOpen = false;
@@ -36,8 +36,8 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	async #observeAppLanguage() {
 		if (!this.#appLanguageContext) return;
 
-		this.observe(this.#appLanguageContext.appLanguage, (isoCode) => {
-			this._appLanguage = isoCode;
+		this.observe(this.#appLanguageContext.appLanguage, (language) => {
+			this._appLanguage = language;
 		});
 	}
 
@@ -66,17 +66,12 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 	#onLabelClick(event: UUIMenuItemEvent) {
 		const menuItem = event.target;
-		const isoCode = menuItem.dataset.isoCode;
+		const unique = menuItem.dataset.unique;
+		if (!unique) throw new Error('Missing unique on menu item');
 
-		// TODO: handle error
-		if (!isoCode) return;
-
-		this.#appLanguageContext?.setLanguage(isoCode);
+		this.#appLanguageContext?.setLanguage(unique);
 		this._isOpen = false;
 
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		this._popoverElement?.hidePopover();
 	}
 
@@ -95,13 +90,13 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			<umb-popover-layout>
 				${repeat(
 					this._languages,
-					(language) => language.isoCode,
+					(language) => language.unique,
 					(language) => html`
 						<uui-menu-item
 							label=${ifDefined(language.name)}
 							@click-label=${this.#onLabelClick}
-							data-iso-code=${ifDefined(language.isoCode)}
-							?active=${language.isoCode === this._appLanguage?.isoCode}></uui-menu-item>
+							data-iso-code=${ifDefined(language.unique)}
+							?active=${language.unique === this._appLanguage?.unique}></uui-menu-item>
 					`,
 				)}
 			</umb-popover-layout>

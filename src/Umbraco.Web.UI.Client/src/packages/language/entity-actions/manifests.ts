@@ -1,5 +1,5 @@
 import { UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UMB_LANGUAGE_ENTITY_TYPE, UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../index.js';
+import { UMB_LANGUAGE_ENTITY_TYPE, UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbLanguageCreateEntityAction } from './language-create-entity-action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
