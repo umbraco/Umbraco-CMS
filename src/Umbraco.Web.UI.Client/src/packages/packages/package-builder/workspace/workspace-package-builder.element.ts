@@ -1,6 +1,6 @@
 import type { UmbInputDocumentElement } from '../../../documents/documents/components/input-document/input-document.element.js';
 import type { UmbInputMediaElement } from '../../../media/media/components/input-media/input-media.element.js';
-import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element.js';
+import type { UmbInputLanguagePickerElement } from '../../../languages/components/input-language-picker/input-language-picker.element.js';
 import type { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
@@ -14,10 +14,10 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 // TODO: update to module imports when ready
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { PackageDefinitionResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import type { PackageDefinitionResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
