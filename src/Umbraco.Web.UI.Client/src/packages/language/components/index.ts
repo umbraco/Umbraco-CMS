@@ -1,1 +1,1 @@
-import './input-language-picker/input-language-picker.element.js';
+import './input-language/input-language.element.js';

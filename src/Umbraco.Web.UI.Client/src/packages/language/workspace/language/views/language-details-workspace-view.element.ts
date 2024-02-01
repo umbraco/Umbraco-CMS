@@ -1,6 +1,7 @@
 import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../language-workspace.context.js';
-import type { UmbInputLanguagePickerElement } from '../../../components/input-language-picker/input-language-picker.element.js';
+import type { UmbInputLanguageElement } from '../../../components/input-language/input-language.element.js';
 import type { UmbLanguageDetailModel } from '../../../types.js';
+import type { UmbLanguageItemModel } from '../../../repository/index.js';
 import type { UmbInputCultureSelectElement } from '@umbraco-cms/backoffice/culture';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -74,9 +75,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 				// If the unique is empty, we reset the value to the original value.
 				// Provides a way better UX
 				//TODO: Maybe the combobox should implement something similar?
-				const resetFunction = () => {
-					target.value = this._language?.unique;
-				};
+				const resetFunction = () => (target.value = this._language?.unique as string);
 
 				target.addEventListener('close', resetFunction, { once: true });
 				target.addEventListener('blur', resetFunction, { once: true });
@@ -108,7 +107,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 
 	#handleFallbackChange(event: UmbChangeEvent) {
 		if (event instanceof UmbChangeEvent) {
-			const target = event.target as UmbInputLanguagePickerElement;
+			const target = event.target as UmbInputLanguageElement;
 			const selectedLanguageUnique = target.selectedUniques?.[0];
 			this.#languageWorkspaceContext?.setFallbackCulture(selectedLanguageUnique);
 		}
@@ -169,13 +168,13 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 				<umb-property-layout
 					label="Fallback language"
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
-					<umb-input-language-picker
+					<umb-input-language
 						value=${ifDefined(this._language?.fallbackIsoCode === null ? undefined : this._language?.fallbackIsoCode)}
 						slot="editor"
 						max="1"
 						@change=${this.#handleFallbackChange}
-						.filter=${(language: UmbLanguageDetailModel) =>
-							language.unique !== this._language?.unique}></umb-input-language-picker>
+						.filter=${(language: UmbLanguageItemModel) =>
+							language.unique !== this._language?.unique}></umb-input-language>
 				</umb-property-layout>
 			</uui-box>
 		`;

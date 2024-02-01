@@ -1,6 +1,6 @@
 import type { UmbInputDocumentElement } from '../../../documents/documents/components/input-document/input-document.element.js';
 import type { UmbInputMediaElement } from '../../../media/media/components/input-media/input-media.element.js';
-import type { UmbInputLanguagePickerElement } from '../../../language/components/input-language-picker/input-language-picker.element.js';
+import type { UmbInputLanguageElement } from '../../../language/components/input-language/input-language.element.js';
 import type { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
@@ -219,11 +219,11 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	#renderLanguageSection() {
 		return html`<div slot="editor">
-			<umb-input-language-picker
+			<umb-input-language
 				.value="${this._package.languages?.join(',') ?? ''}"
 				@change="${(e: CustomEvent) => {
-					this._package.languages = (e.target as UmbInputLanguagePickerElement).selectedUniques;
-				}}"></umb-input-language-picker>
+					this._package.languages = (e.target as UmbInputLanguageElement).selectedUniques;
+				}}"></umb-input-language>
 		</div>`;
 	}
 
