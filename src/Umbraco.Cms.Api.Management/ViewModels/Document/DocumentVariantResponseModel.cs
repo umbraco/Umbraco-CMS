@@ -6,5 +6,5 @@ public class DocumentVariantResponseModel : VariantResponseModelBase
 {
     public ContentState State { get; set; }
 
-    public DateTime? PublishDate { get; set; }
+    public DateTimeOffset? PublishDate { get; set; }
 }
