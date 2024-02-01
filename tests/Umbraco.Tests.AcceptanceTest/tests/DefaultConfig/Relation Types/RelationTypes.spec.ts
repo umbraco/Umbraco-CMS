@@ -51,7 +51,7 @@ test.describe('Relation types tests', () => {
     expect(await umbracoApi.relationType.doesNameExist(wrongRelationTypeName)).toBeFalsy();
   });
 
-  test('can update Direction value of a relation type', async ({umbracoApi, umbracoUi}) => {
+  test('can update direction value of a relation type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     relationTypeId = await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
 
