@@ -1019,6 +1019,64 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #endregion
 
+    #region Allowed types
+
+    /// <inheritdoc />
+    public Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+
+        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
+        IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
+
+        var pagedModel = new PagedModel<TItem>
+        {
+            Total = contentTypes.Count(),
+            Items = contentTypes.Skip(skip).Take(take)
+        };
+
+        return Task.FromResult(pagedModel);
+    }
+
+    /// <inheritdoc />
+    public Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        TItem? parent = Get(key);
+
+        if (parent?.AllowedContentTypes is null)
+        {
+            return Task.FromResult(Attempt.FailWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null));
+        }
+
+        PagedModel<TItem> result;
+        if (parent.AllowedContentTypes.Any() is false)
+        {
+            // no content types allowed under parent
+            result = new PagedModel<TItem>
+            {
+                Items = Array.Empty<TItem>(),
+                Total = 0,
+            };
+        }
+        else
+        {
+            TItem[] allowedChildren = GetAll(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
+            result = new PagedModel<TItem>
+            {
+                Items = allowedChildren.Take(take).Skip(skip),
+                Total = allowedChildren.Length,
+            };
+        }
+
+        return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<TItem>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result));
+    }
+
+    #endregion
+
     #region Containers
 
     protected abstract Guid ContainedObjectType { get; }
@@ -1248,6 +1306,4 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     #endregion
-
-
 }

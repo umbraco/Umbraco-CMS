@@ -367,7 +367,6 @@
              * @name load
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Load the scaffolding models for the given configuration, these are needed to provide useful models for each block.
-             * @param {Object} blockObject BlockObject to receive data values from.
              * @returns {Promise} A Promise object which resolves when all scaffold models are loaded.
              */
             load: function () {
@@ -398,9 +397,15 @@
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
                 if(scaffoldKeys.length > 0) {
-                  var currentPage = editorState.getCurrent();
-                  var currentPageId = currentPage ? (currentPage.id > 0 ? currentPage.id : currentPage.parentId) : null || -20;
+                  // We need to know if we are in the document type editor or content editor.
+                  // If we are in the document type editor, we need to use -20 as the current page id.
+                  // If we are in the content editor, we need to use the current page id or parent id if the current page is new.
+                  // We can recognize a content editor context by checking if the current editor state has a contentTypeKey.
+                  const currentEditorState = editorState.getCurrent();
+                  const currentPageId = currentEditorState.contentTypeKey ? currentEditorState.id || currentEditorState.parentId || -20 : -20;
 
+                  // Load all scaffolds for the block types.
+                  // The currentPageId is used to determine the access level for the current user.
                   tasks.push(contentResource.getScaffoldByKeys(currentPageId, scaffoldKeys).then(scaffolds => {
                       Object.values(scaffolds).forEach(scaffold => {
                           // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.

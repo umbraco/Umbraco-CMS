@@ -1,16 +1,20 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class ContentPublishingService : IContentPublishingService
+internal sealed class ContentPublishingService : IContentPublishingService
 {
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IContentService _contentService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
-    public ContentPublishingService(ICoreScopeProvider coreScopeProvider, IContentService contentService, IUserIdKeyResolver userIdKeyResolver)
+    public ContentPublishingService(
+        ICoreScopeProvider coreScopeProvider,
+        IContentService contentService,
+        IUserIdKeyResolver userIdKeyResolver)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
@@ -18,13 +22,13 @@ public class ContentPublishingService : IContentPublishingService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentPublishingOperationStatus>> PublishAsync(Guid key, IEnumerable<string> cultures, Guid userKey)
+    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(Guid key, IEnumerable<string> cultures, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {
-            return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
+            return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
         }
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
@@ -33,33 +37,59 @@ public class ContentPublishingService : IContentPublishingService
 
         ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
         return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
-            ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
-            : Attempt.Fail(ToContentPublishingOperationStatus(result));
+            ? Attempt.SucceedWithStatus(
+                ToContentPublishingOperationStatus(result),
+                new ContentPublishingResult { Content = content })
+            : Attempt.FailWithStatus(ToContentPublishingOperationStatus(result), new ContentPublishingResult
+            {
+                Content = content,
+                InvalidPropertyAliases = result.InvalidProperties?.Select(property => property.Alias).ToArray()
+                                         ?? Enumerable.Empty<string>()
+            });
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IDictionary<Guid, ContentPublishingOperationStatus>>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey)
+    public async Task<Attempt<ContentPublishingBranchResult, ContentPublishingOperationStatus>> PublishBranchAsync(Guid key, IEnumerable<string> cultures, bool force, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {
-            var payload = new Dictionary<Guid, ContentPublishingOperationStatus>
-            {
-                { key, ContentPublishingOperationStatus.ContentNotFound },
-            };
-
-            return Attempt<IDictionary<Guid, ContentPublishingOperationStatus>>.Fail(payload);
+            return Attempt.FailWithStatus(
+                ContentPublishingOperationStatus.ContentNotFound,
+                new ContentPublishingBranchResult
+                {
+                    FailedItems = new[]
+                    {
+                        new ContentPublishingBranchItemResult
+                        {
+                            Key = key, OperationStatus = ContentPublishingOperationStatus.ContentNotFound
+                        }
+                    }
+                });
         }
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
         IEnumerable<PublishResult> result = _contentService.PublishBranch(content, force, cultures.ToArray(), userId);
         scope.Complete();
 
-        var payloads = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);
-        return payloads.All(p => p.Value is ContentPublishingOperationStatus.Success)
-            ? Attempt<IDictionary<Guid, ContentPublishingOperationStatus>>.Succeed(payloads)
-            : Attempt<IDictionary<Guid, ContentPublishingOperationStatus>>.Fail(payloads);
+        var itemResults = result.ToDictionary(r => r.Content.Key, ToContentPublishingOperationStatus);
+        var branchResult = new ContentPublishingBranchResult
+        {
+            Content = content,
+            SucceededItems = itemResults
+                .Where(i => i.Value is ContentPublishingOperationStatus.Success)
+                .Select(i => new ContentPublishingBranchItemResult { Key = i.Key, OperationStatus = i.Value })
+                .ToArray(),
+            FailedItems = itemResults
+                .Where(i => i.Value is not ContentPublishingOperationStatus.Success)
+                .Select(i => new ContentPublishingBranchItemResult { Key = i.Key, OperationStatus = i.Value })
+                .ToArray()
+        };
+
+        return branchResult.FailedItems.Any() is false
+            ? Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, branchResult)
+            : Attempt.FailWithStatus(ContentPublishingOperationStatus.FailedBranch, branchResult);
     }
 
     /// <inheritdoc />
