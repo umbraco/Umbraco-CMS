@@ -51,13 +51,15 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
 
         foreach (ContentCacheRefresher.JsonPayload payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
         {
+            if (payload.Blueprint)
+            {
+                // Skip blueprints
+                continue;
+            }
+
             if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
             {
-                if (deleteBatch == null)
-                {
-                    deleteBatch = new HashSet<int>();
-                }
-
+                deleteBatch ??= new HashSet<int>();
                 deleteBatch.Add(payload.Id);
             }
             else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
