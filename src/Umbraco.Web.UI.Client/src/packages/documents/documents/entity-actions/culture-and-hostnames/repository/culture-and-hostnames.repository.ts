@@ -11,7 +11,7 @@ export class UmbDocumentCultureAndHostnamesRepository extends UmbBaseController 
 
 	#dataSource: UmbDocumentCultureAndHostnamesServerDataSource;
 
-	#notificationContext?: UmbNotificationContext;
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
