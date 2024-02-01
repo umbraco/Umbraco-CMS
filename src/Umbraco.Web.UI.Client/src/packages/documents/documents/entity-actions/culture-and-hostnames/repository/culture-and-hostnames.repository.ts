@@ -9,7 +9,7 @@ import type { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/
 export class UmbDocumentCultureAndHostnamesRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<unknown>;
 
-	#dataSource: UmbDocumentCultureAndHostnamesServerDataSource;
+	#dataSource = new UmbDocumentCultureAndHostnamesServerDataSource(this);
 
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
