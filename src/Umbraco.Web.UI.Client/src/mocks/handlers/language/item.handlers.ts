@@ -4,7 +4,7 @@ import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const itemHandlers = [
-	rest.get(umbracoPath(`${UMB_SLUG}/item`), (req, res, ctx) => {
+	rest.get(umbracoPath(`/item${UMB_SLUG}`), (req, res, ctx) => {
 		const isoCodes = req.url.searchParams.getAll('id');
 		if (!isoCodes) return;
 		const items = umbLanguageMockDb.item.getItems(isoCodes);
