@@ -1,1 +1,2 @@
-export * from './language.repository.js';
+export * from './detail/index.js';
+export * from './item/index.js';
