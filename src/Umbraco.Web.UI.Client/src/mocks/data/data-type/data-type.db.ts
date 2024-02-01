@@ -29,7 +29,7 @@ const createFolderMockMapper = (request: CreateFolderRequestModel): UmbMockDataT
 	return {
 		name: request.name,
 		id: request.id ? request.id : UmbId.new(),
-		parentId: request.parentId,
+		parent: request.parent,
 		isFolder: true,
 		hasChildren: false,
 		editorAlias: '',
@@ -40,7 +40,7 @@ const createFolderMockMapper = (request: CreateFolderRequestModel): UmbMockDataT
 const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDataTypeModel => {
 	return {
 		id: request.id ? request.id : UmbId.new(),
-		parentId: request.parentId,
+		parent: request.parent,
 		name: request.name,
 		editorAlias: request.editorAlias,
 		editorUiAlias: request.editorUiAlias,
@@ -53,7 +53,7 @@ const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDat
 const detailResponseMapper = (item: UmbMockDataTypeModel): DataTypeResponseModel => {
 	return {
 		id: item.id,
-		parentId: item.parentId,
+		parent: item.parent,
 		name: item.name,
 		editorAlias: item.editorAlias,
 		editorUiAlias: item.editorUiAlias,

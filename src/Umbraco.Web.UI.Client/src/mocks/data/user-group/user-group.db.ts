@@ -46,14 +46,14 @@ const itemMapper = (item: UmbMockUserGroupModel): UserGroupItemResponseModel => 
 const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupModel => {
 	return {
 		documentRootAccess: item.documentRootAccess,
-		documentStartNodeId: item.documentStartNodeId,
+		documentStartNode: item.documentStartNode,
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
 		icon: item.icon,
 		id: UmbId.new(),
 		isSystemGroup: false,
 		languages: item.languages,
 		mediaRootAccess: item.mediaRootAccess,
-		mediaStartNodeId: item.mediaStartNodeId,
+		mediaStartNode: item.mediaStartNode,
 		name: item.name,
 		permissions: item.permissions,
 		sections: item.sections,
@@ -63,14 +63,14 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseModel => {
 	return {
 		documentRootAccess: item.documentRootAccess,
-		documentStartNodeId: item.documentStartNodeId,
+		documentStartNode: item.documentStartNode,
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
 		icon: item.icon,
 		id: item.id,
 		isSystemGroup: item.isSystemGroup,
 		languages: item.languages,
 		mediaRootAccess: item.mediaRootAccess,
-		mediaStartNodeId: item.mediaStartNodeId,
+		mediaStartNode: item.mediaStartNode,
 		name: item.name,
 		permissions: item.permissions,
 		sections: item.sections,

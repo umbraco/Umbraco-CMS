@@ -44,7 +44,7 @@ export const data: Array<UmbMockTemplateModel> = [
 	{
 		id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
 		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
-		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		masterTemplate: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		name: 'Child',
 		hasChildren: false,
 		alias: 'Test',
@@ -55,7 +55,7 @@ export const data: Array<UmbMockTemplateModel> = [
 		id: '9a84c0b3-03b4-4dd4-84ac-706740acwerer0f72',
 		parent: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		name: 'Has Master Template',
-		masterTemplateId: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
+		masterTemplate: { id: '9a84c0b3-03b4-4dd4-84ac-706740ac0f71' },
 		hasChildren: false,
 		alias: 'hasMasterTemplate',
 		content:
@@ -96,7 +96,7 @@ export const templateQueryResult: TemplateQueryResultResponseModel = {
 };
 
 export const templateQuerySettings: TemplateQuerySettingsResponseModel = {
-	contentTypeAliases: ['docTypeWithTemplate', 'propertyTypeWithTemplate', 'somethingElse'],
+	documentTypeAliases: ['docTypeWithTemplate', 'propertyTypeWithTemplate', 'somethingElse'],
 	properties: [
 		{
 			alias: 'Id',

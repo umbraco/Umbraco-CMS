@@ -35,7 +35,7 @@ const createMockMapper = (request: CreateDictionaryItemRequestModel): UmbMockDic
 	return {
 		name: request.name,
 		id: request.id ? request.id : UmbId.new(),
-		parent: request.parentId ? { id: request.parentId } : null,
+		parent: request.parent,
 		translations: request.translations,
 		hasChildren: false,
 	};

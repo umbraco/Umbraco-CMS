@@ -1,5 +1,4 @@
 import type { UmbMediaEntityType, UmbMediaRootEntityType } from '../entity.js';
-import type { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbMediaTreeItemModel extends UmbUniqueTreeItemModel {
