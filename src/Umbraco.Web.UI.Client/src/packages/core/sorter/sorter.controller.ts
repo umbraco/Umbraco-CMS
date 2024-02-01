@@ -58,11 +58,8 @@ function destroyPreventEvent(element: Element) {
 }
 
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
-	// TODO: Clean up:
-	//compareElementToModel: (el: ElementType, modelEntry: T) => boolean;
-	//querySelectModelToElement: (container: HTMLElement, modelEntry: T) => ElementType | null;
-	getUniqueOfElement: (element: ElementType) => string;
-	getUniqueOfModel: (modeEntry: T) => string;
+	getUniqueOfElement: (element: ElementType) => string | null | symbol | number;
+	getUniqueOfModel: (modeEntry: T) => string | null | symbol | number;
 	identifier: string;
 	itemSelector: string;
 	disabledItemSelector?: string;

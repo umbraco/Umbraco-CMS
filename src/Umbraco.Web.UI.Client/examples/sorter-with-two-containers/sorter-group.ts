@@ -11,18 +11,12 @@ export type ModelEntryType = {
 };
 
 const SORTER_CONFIG: UmbSorterConfig<ModelEntryType, ExampleSorterItem> = {
-	/*compareElementToModel: (element, model) => {
-		return element.name === model.name;
-	},*/
 	getUniqueOfElement: (element) => {
 		return element.name;
 	},
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.name;
 	},
-	/*querySelectModelToElement: (container, modelEntry) => {
-		return container.querySelector("example-sorter-item[name='" + modelEntry.name + "']");
-	},*/
 	identifier: 'string-that-identifies-all-example-sorters',
 	itemSelector: 'example-sorter-item',
 	containerSelector: '.sorter-container',
