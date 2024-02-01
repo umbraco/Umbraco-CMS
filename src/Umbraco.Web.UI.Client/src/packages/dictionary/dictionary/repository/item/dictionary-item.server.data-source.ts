@@ -29,7 +29,7 @@ export class UmbDictionaryItemServerDataSource extends UmbItemServerDataSourceBa
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DictionaryResource.getDictionaryItem({ id: uniques });
+const getItems = (uniques: Array<string>) => DictionaryResource.getItemDictionary({ id: uniques });
 
 const mapper = (item: DictionaryItemResponseModel): UmbDictionaryItemModel => {
 	return {

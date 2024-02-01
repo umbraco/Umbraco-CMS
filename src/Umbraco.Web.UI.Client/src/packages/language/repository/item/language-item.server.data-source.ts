@@ -28,7 +28,7 @@ export class UmbLanguageItemServerDataSource extends UmbItemServerDataSourceBase
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => LanguageResource.getLanguageItem({ isoCode: uniques });
+const getItems = (uniques: Array<string>) => LanguageResource.getItemLanguage({ isoCode: uniques });
 
 const mapper = (item: LanguageItemResponseModel): UmbLanguageItemModel => {
 	return {
