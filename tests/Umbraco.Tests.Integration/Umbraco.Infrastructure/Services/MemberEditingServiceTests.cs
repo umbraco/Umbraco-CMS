@@ -51,6 +51,19 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Create_Member_With_Explicit_Key()
+    {
+        var key = Guid.NewGuid();
+        var member = await CreateMemberAsync(key);
+        Assert.IsTrue(member.HasIdentity);
+        Assert.Greater(member.Id, 0);
+        Assert.AreEqual(key, member.Key);
+
+        member = await MemberEditingService.GetAsync(member.Key);
+        Assert.IsNotNull(member);
+    }
+
+    [Test]
     public async Task Can_Update_Member()
     {
         var member = await CreateMemberAsync();
@@ -252,7 +265,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
 
     private IUser SuperUser() => GetRequiredService<IUserService>().GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
 
-    private async Task<IMember> CreateMemberAsync()
+    private async Task<IMember> CreateMemberAsync(Guid? key = null)
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         MemberTypeService.Save(memberType);
@@ -260,6 +273,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
 
         var createModel = new MemberCreateModel
         {
+            Key = key,
             Email = "test@test.com",
             Username = "test",
             Password = "SuperSecret123",

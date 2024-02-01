@@ -69,7 +69,8 @@ internal sealed class MemberEditingService : IMemberEditingService
             createModel.Email,
             memberType.Alias,
             createModel.IsApproved,
-            createModel.InvariantName);
+            createModel.InvariantName,
+            createModel.Key);
 
         IdentityResult createResult = await _memberManager.CreateAsync(identityMember, createModel.Password);
         if (createResult.Succeeded is false)
