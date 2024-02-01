@@ -1,7 +1,4 @@
-import type {
-	DocumentTypePropertyTypeContainerResponseModel,
-	PropertyTypeContainerModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG_HORIZONTAL: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
