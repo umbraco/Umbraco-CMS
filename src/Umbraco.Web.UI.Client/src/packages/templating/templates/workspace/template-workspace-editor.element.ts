@@ -124,7 +124,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				pickableFilter: (item) => {
-					return item.id !== null && item.id !== this.#templateWorkspaceContext?.getEntityId();
+					return item.unique !== null && item.unique !== this.#templateWorkspaceContext?.getEntityId();
 				},
 			},
 			value: {
