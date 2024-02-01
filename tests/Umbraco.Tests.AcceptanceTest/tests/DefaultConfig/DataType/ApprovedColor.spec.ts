@@ -39,7 +39,6 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
@@ -68,11 +67,11 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
 
+  // TODO: remove .skip when the frontend is able to display the added color. Currently the added colors are not displayed after reloading page
   test('can remove color', async ({umbracoApi, umbracoUi}) => {  
     // Arrange
     const removedDataTypeValues = [
@@ -97,7 +96,6 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toEqual([]);
   });

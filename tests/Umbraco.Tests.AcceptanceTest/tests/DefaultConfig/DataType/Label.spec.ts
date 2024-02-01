@@ -34,7 +34,6 @@ for (const labelType of labelTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(labelType);
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });

@@ -44,7 +44,6 @@ for (const uploadType of uploadTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(uploadType);
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });
@@ -73,7 +72,6 @@ for (const uploadType of uploadTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(uploadType);
       expect(dataTypeData.values).toEqual([]);
     });

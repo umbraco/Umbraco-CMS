@@ -33,7 +33,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
@@ -52,7 +51,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
@@ -71,7 +69,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       const includePropertiesData = dataTypeData.values.find(value => value.alias === "includeProperties");
       expect(includePropertiesData.value).toContainEqual(expectedIncludePropertiesValues);
@@ -91,7 +88,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       const includePropertiesData = dataTypeData.values.find(value => value.alias === "includeProperties");
       expect(includePropertiesData.value).not.toContainEqual(expectedIncludePropertiesValues);
@@ -110,7 +106,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
@@ -134,7 +129,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
@@ -153,7 +147,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
@@ -187,7 +180,6 @@ for (const listViewType of listViewTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(listViewType);
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
