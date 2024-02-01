@@ -33,6 +33,7 @@ public class CreateMemberController : MemberControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CreateMemberRequestModel createRequestModel)
     {
         MemberCreateModel model = _memberEditingPresentationFactory.MapCreateModel(createRequestModel);
