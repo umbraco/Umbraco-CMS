@@ -14,8 +14,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class MediaPresentationModelFactory
-    : ContentPresentationFactoryBase<IMediaType, IMediaTypeService>, IMediaPresentationModelFactory
+internal sealed class MediaPresentationFactory
+    : ContentPresentationFactoryBase<IMediaType, IMediaTypeService>, IMediaPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly ContentSettings _contentSettings;
@@ -23,7 +23,7 @@ internal sealed class MediaPresentationModelFactory
     private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
     private readonly IMediaTypeService _mediaTypeService;
 
-    public MediaPresentationModelFactory(
+    public MediaPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IOptions<ContentSettings> contentSettings,
         MediaUrlGeneratorCollection mediaUrlGenerators,

@@ -22,11 +22,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMedia)]
 public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecycleBinItemResponseModel>
 {
-    private readonly IMediaPresentationModelFactory _mediaPresentationModelFactory;
+    private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
-    public MediaRecycleBinControllerBase(IEntityService entityService, IMediaPresentationModelFactory mediaPresentationModelFactory)
+    public MediaRecycleBinControllerBase(IEntityService entityService, IMediaPresentationFactory mediaPresentationFactory)
         : base(entityService)
-        => _mediaPresentationModelFactory = mediaPresentationModelFactory;
+        => _mediaPresentationFactory = mediaPresentationFactory;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
 
@@ -38,8 +38,8 @@ public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecyc
 
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {
-            responseModel.Variants = _mediaPresentationModelFactory.CreateVariantsItemResponseModels(mediaEntitySlim);
-            responseModel.MediaType = _mediaPresentationModelFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);
+            responseModel.Variants = _mediaPresentationFactory.CreateVariantsItemResponseModels(mediaEntitySlim);
+            responseModel.MediaType = _mediaPresentationFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);
         }
 
         return responseModel;

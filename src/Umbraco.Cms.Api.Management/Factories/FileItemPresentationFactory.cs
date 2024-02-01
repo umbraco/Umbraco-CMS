@@ -9,12 +9,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class FileItemPresentationModelFactory : IFileItemPresentationModelFactory
+public class FileItemPresentationFactory : IFileItemPresentationFactory
 {
     private readonly FileSystems _fileSystems;
     private readonly IPhysicalFileSystem _physicalFileSystem;
 
-    public FileItemPresentationModelFactory(FileSystems fileSystems, IPhysicalFileSystem physicalFileSystem)
+    public FileItemPresentationFactory(FileSystems fileSystems, IPhysicalFileSystem physicalFileSystem)
     {
         _fileSystems = fileSystems;
         _physicalFileSystem = physicalFileSystem;

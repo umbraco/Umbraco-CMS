@@ -18,16 +18,16 @@ public class ByKeyMediaController : MediaControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IMediaEditingService _mediaEditingService;
-    private readonly IMediaPresentationModelFactory _mediaPresentationModelFactory;
+    private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
     public ByKeyMediaController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,
-        IMediaPresentationModelFactory mediaPresentationModelFactory)
+        IMediaPresentationFactory mediaPresentationFactory)
     {
         _authorizationService = authorizationService;
         _mediaEditingService = mediaEditingService;
-        _mediaPresentationModelFactory = mediaPresentationModelFactory;
+        _mediaPresentationFactory = mediaPresentationFactory;
     }
 
     [HttpGet("{id:guid}")]
@@ -52,7 +52,7 @@ public class ByKeyMediaController : MediaControllerBase
             return MediaNotFound();
         }
 
-        MediaResponseModel model = await _mediaPresentationModelFactory.CreateResponseModelAsync(media);
+        MediaResponseModel model = await _mediaPresentationFactory.CreateResponseModelAsync(media);
         return Ok(model);
     }
 }

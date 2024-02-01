@@ -10,10 +10,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Item;
 [ApiVersion("1.0")]
 public class ItemStaticFileItemController : StaticFileItemControllerBase
 {
-    private readonly IFileItemPresentationModelFactory _fileItemPresentationModelFactory;
+    private readonly IFileItemPresentationFactory _fileItemPresentationFactory;
 
-    public ItemStaticFileItemController(IFileItemPresentationModelFactory fileItemPresentationModelFactory)
-        => _fileItemPresentationModelFactory = fileItemPresentationModelFactory;
+    public ItemStaticFileItemController(IFileItemPresentationFactory fileItemPresentationFactory)
+        => _fileItemPresentationFactory = fileItemPresentationFactory;
 
     [HttpGet]
     [MapToApiVersion("1.0")]
@@ -21,7 +21,7 @@ public class ItemStaticFileItemController : StaticFileItemControllerBase
     public async Task<IActionResult> Item([FromQuery(Name = "path")] HashSet<string> paths)
     {
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
-        IEnumerable<StaticFileItemResponseModel> responseModels = _fileItemPresentationModelFactory.CreateStaticFileItemResponseModels(paths);
+        IEnumerable<StaticFileItemResponseModel> responseModels = _fileItemPresentationFactory.CreateStaticFileItemResponseModels(paths);
         return await Task.FromResult(Ok(responseModels));
     }
 }
