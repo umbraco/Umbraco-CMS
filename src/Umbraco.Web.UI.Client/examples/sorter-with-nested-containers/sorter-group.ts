@@ -8,18 +8,29 @@ import ExampleSorterItem from './sorter-item.js';
 
 export type ModelEntryType = {
 	name: string;
+	children?: ModelEntryType[];
+};
+
+const SORTER_CONFIG: UmbSorterConfig<ModelEntryType, ExampleSorterItem> = {
+	getUniqueOfElement: (element) => {
+		return element.name;
+	},
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.name;
+	},
+	identifier: 'string-that-identifies-all-example-sorters',
+	itemSelector: 'example-sorter-item',
+	containerSelector: '.sorter-container',
 };
 
 @customElement('example-sorter-group')
 export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
-	//
-	// Property that is used to set the model of the sorter.
 	@property({ type: Array, attribute: false })
 	public get items(): ModelEntryType[] {
 		return this._items ?? [];
 	}
 	public set items(value: ModelEntryType[]) {
-		// Only want to set the model initially via this one, as this is the initial model, cause any re-render should not set this data again.
+		// Only want to set the model initially, cause any re-render should not set this again.
 		if (this._items !== undefined) return;
 		this._items = value;
 		this.#sorter.setModel(this._items);
@@ -27,15 +38,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 	private _items?: ModelEntryType[];
 
 	#sorter = new UmbSorterController<ModelEntryType, ExampleSorterItem>(this, {
-		getUniqueOfElement: (element) => {
-			return element.name;
-		},
-		getUniqueOfModel: (modelEntry) => {
-			return modelEntry.name;
-		},
-		identifier: 'string-that-identifies-all-example-sorters',
-		itemSelector: 'example-sorter-item',
-		containerSelector: '.sorter-container',
+		...SORTER_CONFIG,
 		onChange: ({ model }) => {
 			const oldValue = this._items;
 			this._items = model;
@@ -56,6 +59,9 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 					(item) =>
 						html`<example-sorter-item name=${item.name}>
 							<button slot="action" @click=${() => this.removeItem(item)}>Delete</button>
+							${item.children && item.children.length > 0
+								? html`<example-sorter-group .items=${item.children}></example-sorter-group>`
+								: ''}
 						</example-sorter-item>`,
 				)}
 			</div>
@@ -90,6 +96,6 @@ export default ExampleSorterGroup;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'example-sorter-group': ExampleSorterGroup;
+		'example-sorter-group-nested': ExampleSorterGroup;
 	}
 }

@@ -9,6 +9,14 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 	groupOneItems: ModelEntryType[] = [
 		{
 			name: 'Apple',
+			children: [
+				{
+					name: 'Juice',
+				},
+				{
+					name: 'Milk',
+				},
+			],
 		},
 		{
 			name: 'Banana',
@@ -21,6 +29,14 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 		},
 		{
 			name: 'Lemon',
+			children: [
+				{
+					name: 'Cola',
+				},
+				{
+					name: 'Pepsi',
+				},
+			],
 		},
 	];
 
@@ -40,6 +56,7 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 		return html`
 			<uui-box class="uui-text">
 				<div class="outer-wrapper">
+					<h5>Notice this example still only support single group of Sorter.</h5>
 					<example-sorter-group .items=${this.groupOneItems}></example-sorter-group>
 					<example-sorter-group .items=${this.groupTwoItems}></example-sorter-group>
 				</div>
@@ -66,6 +83,6 @@ export default ExampleSorterDashboard;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'example-sorter-dashboard': ExampleSorterDashboard;
+		'example-sorter-dashboard-nested': ExampleSorterDashboard;
 	}
 }
