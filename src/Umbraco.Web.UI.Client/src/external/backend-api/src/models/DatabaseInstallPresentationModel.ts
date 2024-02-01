@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type DatabaseInstallResponseModel = {
+export type DatabaseInstallPresentationModel = {
     id: string;
     providerName: string;
     server?: string | null;

@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type DynamicRootQueryOriginRequestModel = {
-    alias: string;
-    id?: string | null;
+export type ContentUrlInfoBaseModel = {
+    culture?: string | null;
+    url: string;
 };
 

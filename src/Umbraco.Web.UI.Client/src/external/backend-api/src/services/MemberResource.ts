@@ -14,14 +14,14 @@ export class MemberResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getMemberItem({
+    public static getItemMember({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<MemberItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/member/item',
+            url: '/umbraco/management/api/v1/item/member',
             query: {
                 'id': id,
             },

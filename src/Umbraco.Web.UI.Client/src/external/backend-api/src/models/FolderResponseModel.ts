@@ -4,9 +4,10 @@
 /* eslint-disable */
 
 import type { FolderModelBaseModel } from './FolderModelBaseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type FolderResponseModel = (FolderModelBaseModel & {
     id: string;
-    parentId?: string | null;
+    parent?: ReferenceByIdModel | null;
 });
 

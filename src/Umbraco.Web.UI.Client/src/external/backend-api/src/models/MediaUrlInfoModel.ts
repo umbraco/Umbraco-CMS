@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ContentUrlInfoModel = {
-    culture?: string | null;
-    url: string;
-};
+import type { ContentUrlInfoBaseModel } from './ContentUrlInfoBaseModel';
+
+export type MediaUrlInfoModel = ContentUrlInfoBaseModel;
 

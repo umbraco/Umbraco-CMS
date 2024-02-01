@@ -15,14 +15,14 @@ export class MemberTypeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getMemberTypeItem({
+    public static getItemMemberType({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<MemberTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/member-type/item',
+            url: '/umbraco/management/api/v1/item/member-type',
             query: {
                 'id': id,
             },

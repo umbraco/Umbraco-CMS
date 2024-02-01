@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type UserInstallResponseModel = {
+export type UserInstallPresentationModel = {
     name: string;
     email: string;
     password: string;

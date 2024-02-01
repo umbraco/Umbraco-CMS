@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export enum ContentStateModel {
+export enum DocumentVariantStateModel {
     NOT_CREATED = 'NotCreated',
     DRAFT = 'Draft',
     PUBLISHED = 'Published',

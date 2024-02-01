@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type DynamicRootQueryOriginRequestModel = {
-    alias: string;
+export type AuditLogEntityModel = {
     id?: string | null;
+    type?: string | null;
 };
 

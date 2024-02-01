@@ -3,9 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ReferenceByIdModel } from './ReferenceByIdModel';
+import type { ContentUrlInfoBaseModel } from './ContentUrlInfoBaseModel';
 
-export type SetAvatarRequestModel = {
-    file: ReferenceByIdModel;
-};
+export type DocumentUrlInfoModel = ContentUrlInfoBaseModel;
 
