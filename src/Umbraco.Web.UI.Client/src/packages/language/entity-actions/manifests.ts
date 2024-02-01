@@ -1,4 +1,4 @@
-import { UMB_LANGUAGE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_LANGUAGE_ENTITY_TYPE, UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../index.js';
 import { UmbLanguageCreateEntityAction } from './language-create-entity-action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
@@ -11,7 +11,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Delete Language Entity Action',
 		api: UmbDeleteEntityAction,
 		meta: {
-			repositoryAlias: UMB_LANGUAGE_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS,
 			icon: 'icon-trash',
 			label: 'Delete',
 			entityTypes: [UMB_LANGUAGE_ENTITY_TYPE],
@@ -26,7 +26,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: UMB_LANGUAGE_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_LANGUAGE_ROOT_ENTITY_TYPE],
 		},
 	},

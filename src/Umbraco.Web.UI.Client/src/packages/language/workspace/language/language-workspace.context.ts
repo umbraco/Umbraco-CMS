@@ -1,21 +1,21 @@
-import { UmbLanguageRepository } from '../../repository/language.repository.js';
+import { UmbLanguageDetailRepository } from '../../repository/index.js';
+import type { UmbLanguageDetailModel } from '../../types.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { ApiError, type LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ApiError } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbLanguageWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<LanguageResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbLanguageDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	//
-	public readonly repository: UmbLanguageRepository = new UmbLanguageRepository(this);
+	public readonly repository: UmbLanguageDetailRepository = new UmbLanguageDetailRepository(this);
 
-	#data = new UmbObjectState<LanguageResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
 	// TODO: this is a temp solution to bubble validation errors to the UI
@@ -27,7 +27,7 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	async load(isoCode: string) {
-		const { data } = await this.repository.requestByIsoCode(isoCode);
+		const { data } = await this.repository.requestByUnique(isoCode);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
@@ -35,7 +35,7 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	async create() {
-		const { data } = await this.repository.createScaffold();
+		const { data } = await this.repository.createScaffold(null);
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.update(data);
@@ -52,15 +52,15 @@ export class UmbLanguageWorkspaceContext
 
 	// TODO: Convert to uniques:
 	getEntityId() {
-		return this.#data.getValue()?.isoCode;
+		return this.#data.getValue()?.unique;
 	}
 
 	setName(name: string) {
 		this.#data.update({ name });
 	}
 
-	setCulture(isoCode: string) {
-		this.#data.update({ isoCode });
+	setCulture(unique: string) {
+		this.#data.update({ unique });
 	}
 
 	setMandatory(isMandatory: boolean) {
@@ -71,8 +71,8 @@ export class UmbLanguageWorkspaceContext
 		this.#data.update({ isDefault });
 	}
 
-	setFallbackCulture(isoCode: string) {
-		this.#data.update({ fallbackIsoCode: isoCode });
+	setFallbackCulture(unique: string) {
+		this.#data.update({ fallbackIsoCode: unique });
 	}
 
 	// TODO: this is a temp solution to bubble validation errors to the UI

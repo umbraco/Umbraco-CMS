@@ -1,4 +1,4 @@
-import { UmbLanguageRepository } from '../repository/language.repository.js';
+import { UmbLanguageDetailRepository } from '../repository/index.js';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
@@ -7,7 +7,7 @@ import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api'
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
-	#languageRepository: UmbLanguageRepository;
+	#languageRepository: UmbLanguageDetailRepository;
 
 	#languages: Array<LanguageResponseModel> = [];
 
@@ -19,7 +19,7 @@ export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
 
 		this.provideContext(UMB_APP_LANGUAGE_CONTEXT, this);
 
-		this.#languageRepository = new UmbLanguageRepository(this);
+		this.#languageRepository = new UmbLanguageDetailRepository(this);
 		this.#observeLanguages();
 	}
 

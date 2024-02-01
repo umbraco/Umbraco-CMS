@@ -1,4 +1,4 @@
-import { UmbLanguageRepository } from '../repository/language.repository.js';
+import { UmbLanguageDetailRepository } from '../repository/index.js';
 import type { UmbAppLanguageContext } from './app-language.context.js';
 import { UMB_APP_LANGUAGE_CONTEXT } from './app-language.context.js';
 import type { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
@@ -20,7 +20,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	@state()
 	private _isOpen = false;
 
-	#repository = new UmbLanguageRepository(this);
+	#repository = new UmbLanguageDetailRepository(this);
 	#appLanguageContext?: UmbAppLanguageContext;
 	#languagesObserver?: any;
 
