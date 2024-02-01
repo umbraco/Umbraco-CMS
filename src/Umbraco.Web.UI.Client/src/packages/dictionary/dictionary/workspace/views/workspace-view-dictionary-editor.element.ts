@@ -1,10 +1,12 @@
-import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../../dictionary-workspace.context.js';
-import { UmbDictionaryDetailRepository } from '../../../repository/index.js';
-import type { UmbDictionaryDetailModel } from '../../../types.js';
+import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../dictionary-workspace.context.js';
+import { UmbDictionaryDetailRepository } from '../../repository/index.js';
+import type { UmbDictionaryDetailModel } from '../../types.js';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+
 @customElement('umb-workspace-view-dictionary-editor')
 export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	@state()
