@@ -23926,7 +23926,7 @@
           }
         ],
         "properties": {
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid",
             "nullable": true
@@ -25133,7 +25133,7 @@
           "alias": {
             "type": "string"
           },
-          "key": {
+          "id": {
             "type": "string",
             "format": "uuid",
             "nullable": true
