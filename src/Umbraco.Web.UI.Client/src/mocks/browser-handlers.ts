@@ -8,7 +8,7 @@ import { handlers as documentTypeHandlers } from './handlers/document-type/index
 import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers.js';
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';
 import { handlers as installHandlers } from './handlers/install.handlers.js';
-import { handlers as languageHandlers } from './handlers/language.handlers.js';
+import { handlers as languageHandlers } from './handlers/language/index.js';
 import { handlers as logViewerHandlers } from './handlers/log-viewer.handlers.js';
 import { handlers as mediaHandlers } from './handlers/media/index.js';
 import { handlers as mediaTypeHandlers } from './handlers/media-type/index.js';

@@ -16,16 +16,16 @@ import type {
 
 class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDataTypeModel>(this, folderTreeItemMapper);
-	folder = new UmbMockEntityFolderManager<UmbMockDataTypeModel>(this, createMockDataTypeFolderMapper);
-	item = new UmbMockEntityItemManager<UmbMockDataTypeModel>(this, dataTypeItemMapper);
-	detail = new UmbMockEntityDetailManager<UmbMockDataTypeModel>(this, createMockDataTypeMapper, dataTypeDetailMapper);
+	folder = new UmbMockEntityFolderManager<UmbMockDataTypeModel>(this, createFolderMockMapper);
+	item = new UmbMockEntityItemManager<UmbMockDataTypeModel>(this, itemResponseMapper);
+	detail = new UmbMockEntityDetailManager<UmbMockDataTypeModel>(this, createDetailMockMapper, detailResponseMapper);
 
 	constructor(data: Array<UmbMockDataTypeModel>) {
 		super(data);
 	}
 }
 
-const createMockDataTypeFolderMapper = (request: CreateFolderRequestModel): UmbMockDataTypeModel => {
+const createFolderMockMapper = (request: CreateFolderRequestModel): UmbMockDataTypeModel => {
 	return {
 		name: request.name,
 		id: request.id ? request.id : UmbId.new(),
@@ -37,7 +37,7 @@ const createMockDataTypeFolderMapper = (request: CreateFolderRequestModel): UmbM
 	};
 };
 
-const createMockDataTypeMapper = (request: CreateDataTypeRequestModel): UmbMockDataTypeModel => {
+const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDataTypeModel => {
 	return {
 		id: request.id ? request.id : UmbId.new(),
 		parentId: request.parentId,
@@ -50,7 +50,7 @@ const createMockDataTypeMapper = (request: CreateDataTypeRequestModel): UmbMockD
 	};
 };
 
-const dataTypeDetailMapper = (item: UmbMockDataTypeModel): DataTypeResponseModel => {
+const detailResponseMapper = (item: UmbMockDataTypeModel): DataTypeResponseModel => {
 	return {
 		id: item.id,
 		parentId: item.parentId,
@@ -61,7 +61,7 @@ const dataTypeDetailMapper = (item: UmbMockDataTypeModel): DataTypeResponseModel
 	};
 };
 
-const dataTypeItemMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseModel => {
+const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseModel => {
 	return {
 		id: item.id,
 		name: item.name,
