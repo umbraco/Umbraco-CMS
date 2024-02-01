@@ -1,4 +1,3 @@
-import { UMB_DICTIONARY_TREE_STORE_CONTEXT } from '../tree/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
