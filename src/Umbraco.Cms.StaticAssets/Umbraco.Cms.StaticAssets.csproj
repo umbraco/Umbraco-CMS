@@ -25,8 +25,8 @@
 
     <Message Text="Skip BuildLogin target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip BuildLogin target because '$(LoginPath)' already exists" Importance="high" Condition="Exists('$(LoginPath)')" />
-    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)'" />
-    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)'" />
+    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
+    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
   </Target>
 
   <Target Name="BuildBelle">
@@ -47,8 +47,8 @@
 
     <Message Text="Skip CleanLogin target because '$(LoginPath)' doesn't exist" Importance="high" Condition="!Exists('$(LoginPath)')" />
     <Message Text="Skip CleanLogin target because preserve.login marker file exists" Importance="high" Condition="Exists('$(LoginPath)') and Exists('$(SolutionDir)preserve.login')" />
-    <Message Text="Call CleanLogin target because '$(LoginPath)' exists and preserve.login marker file doesn't exist" Importance="high" Condition="Exists('$(LoginPath)' and !Exists('$(SolutionDir)preserve.login')" />
-    <CallTarget Targets="CleanLogin" Condition="Exists('$(LoginPath)' and !Exists('$(SolutionDir)preserve.login')" />
+    <Message Text="Call CleanLogin target because '$(LoginPath)' exists and preserve.login marker file doesn't exist" Importance="high" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
+    <CallTarget Targets="CleanLogin" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
   </Target>
 
   <Target Name="CleanBelle">
