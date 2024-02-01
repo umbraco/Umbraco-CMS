@@ -252,6 +252,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 			// Maybe we need to stop the event in this case.
 
+			// Do not bubble up to parent sorters:
+			e.stopPropagation();
+
 			return;
 		} else {
 			// TODO: Check if dropping here is okay..
@@ -684,6 +687,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 			// TODO: Maybe this should be replaceable/configurable:
 			const oldIndex = this.#model.indexOf(item);
+			if (oldIndex === -1) {
+				console.error('Could not find item in model');
+				return false;
+			}
 
 			if (this.#config.performItemMove) {
 				const result = await this.#config.performItemMove({ item, newIndex, oldIndex });
