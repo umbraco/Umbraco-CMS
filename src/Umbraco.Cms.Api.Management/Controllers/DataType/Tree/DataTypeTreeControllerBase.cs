@@ -30,7 +30,7 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
     protected override DataTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentId, IEntitySlim[] entities)
     {
         var dataTypes = _dataTypeService
-            .GetAll(entities.Select(entity => entity.Id).ToArray())
+            .GetAllAsync(entities.Select(entity => entity.Key).ToArray()).GetAwaiter().GetResult()
             .ToDictionary(contentType => contentType.Id);
 
         return entities.Select(entity =>
