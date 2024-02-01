@@ -31,26 +31,4 @@ export class UmbDictionaryRepository extends UmbBaseController implements UmbApi
 
 		return this.#temporaryFileRepository.upload(UmbId, file);
 	}
-
-	// TODO => temporary only, until languages data source exists, or might be
-	// ok to keep, as it reduces downstream dependencies
-	async getLanguages() {
-		await this.#init;
-
-		const { data } = await this.#detailSource.getLanguages();
-
-		// default first, then sorted by name
-		// easier to unshift than conditionally sorting by bool and string
-		const languages =
-			data?.items.sort((a, b) => {
-				a.name = a.name ?? '';
-				b.name = b.name ?? '';
-				return a.name > b.name ? 1 : b.name > a.name ? -1 : 0;
-			}) ?? [];
-
-		const defaultIndex = languages.findIndex((x) => x.isDefault);
-		languages.unshift(...languages.splice(defaultIndex, 1));
-
-		return languages;
-	}
 }
