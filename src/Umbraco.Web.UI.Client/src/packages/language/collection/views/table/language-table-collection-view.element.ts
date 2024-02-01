@@ -6,6 +6,9 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
+import './column-layouts/boolean/language-table-boolean-column-layout.element.js';
+import './column-layouts/name/language-table-name-column-layout.element.js';
+
 @customElement('umb-language-table-collection-view')
 export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 	@state()
@@ -18,7 +21,7 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 		{
 			name: 'Name',
 			alias: 'languageName',
-			elementName: 'umb-language-root-table-name-column-layout',
+			elementName: 'umb-language-table-name-column-layout',
 		},
 		{
 			name: 'ISO Code',
@@ -27,21 +30,16 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 		{
 			name: 'Default',
 			alias: 'defaultLanguage',
-			elementName: 'umb-language-root-table-boolean-column-layout',
+			elementName: 'umb-language-table-boolean-column-layout',
 		},
 		{
 			name: 'Mandatory',
 			alias: 'mandatoryLanguage',
-			elementName: 'umb-language-root-table-boolean-column-layout',
+			elementName: 'umb-language-table-boolean-column-layout',
 		},
 		{
 			name: 'Fallback',
 			alias: 'fallbackLanguage',
-		},
-		{
-			name: '',
-			alias: 'delete',
-			elementName: 'umb-language-root-table-delete-column-layout',
 		},
 	];
 
@@ -68,19 +66,19 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 	#createTableItems(languages: Array<UmbLanguageDetailModel>) {
 		this._tableItems = languages.map((language) => {
 			return {
-				id: language.isoCode ?? '',
+				id: language.unique,
 				icon: 'icon-globe',
 				data: [
 					{
 						columnAlias: 'languageName',
 						value: {
-							name: language.name ? language.name : this._cultureNames.of(language.isoCode ?? ''),
-							isoCode: language.isoCode,
+							name: language.name ? language.name : this._cultureNames.of(language.unique),
+							unique: language.unique,
 						},
 					},
 					{
 						columnAlias: 'isoCode',
-						value: language.isoCode,
+						value: language.unique,
 					},
 					{
 						columnAlias: 'defaultLanguage',
@@ -92,11 +90,7 @@ export class UmbLanguageTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'fallbackLanguage',
-						value: languages.find((x) => x.isoCode === language.fallbackIsoCode)?.name,
-					},
-					{
-						columnAlias: 'delete',
-						value: language,
+						value: languages.find((x) => x.unique === language.fallbackIsoCode)?.name,
 					},
 				],
 			};
