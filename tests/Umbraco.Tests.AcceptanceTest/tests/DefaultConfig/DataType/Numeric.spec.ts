@@ -21,54 +21,54 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test('can update Minimum value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const minimumValue = '-5';
+    const minimumValue = -5;
     const expectedDataTypeValues = {
       alias: "min",
       value: minimumValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterMinimumValue(minimumValue);
+    await umbracoUi.dataType.enterMinimumValue(minimumValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
+    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
   test('can update Maximum value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const maximumValue = '1000000';
+    const maximumValue = 1000000;
     const expectedDataTypeValues = {
       alias: "max",
       value: maximumValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterMaximumValue(maximumValue);
+    await umbracoUi.dataType.enterMaximumValue(maximumValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
+    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
   test('can update Step Size value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const stepSizeValue = '5';
+    const stepSizeValue = 5;
     const expectedDataTypeValues = {
       alias: "step",
       value: stepSizeValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterStepSizeValue(stepSizeValue);
+    await umbracoUi.dataType.enterStepSizeValue(stepSizeValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
+    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });

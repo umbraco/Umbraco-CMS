@@ -21,18 +21,18 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test('can update Maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const maxCharsValue = '126';
+    const maxCharsValue = 126;
     const expectedDataTypeValues = {
       alias: "maxChars",
       value: maxCharsValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue);
+    await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
+    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });

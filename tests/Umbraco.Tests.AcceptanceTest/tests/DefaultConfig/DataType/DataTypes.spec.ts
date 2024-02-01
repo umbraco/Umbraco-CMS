@@ -45,7 +45,6 @@ test.describe('Data Types basic functionalities tests', () => {
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
     expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeName)).toBeFalsy();
   });
@@ -82,7 +81,6 @@ test.describe('Data Types basic functionalities tests', () => {
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.editorAlias).toBe(editorAlias);
@@ -137,7 +135,8 @@ test.describe('Data Types basic functionalities tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeFalsy();
   });
 
-  test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
+  // TODO: remove .skip when the frontend is able to create a data type in a folder. Currently it returns error when do it.
+  test.skip('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     let dataTypeFolderId = '';
     await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);

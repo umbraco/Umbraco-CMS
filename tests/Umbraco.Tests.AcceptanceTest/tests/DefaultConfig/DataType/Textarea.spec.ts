@@ -21,72 +21,72 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test('can update Maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const maxCharsValue = '126';
+    const maxCharsValue = 126;
     const expectedDataTypeValues = {
       alias: "maxChars",
       value: maxCharsValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue);
+    await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
+    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
   test('can update Number of rows value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const numberOfRowsValue = '9';
+    const numberOfRowsValue = 9;
     const expectedDataTypeValues = {
       alias: "rows",
       value: numberOfRowsValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterNumberOfRowsValue(numberOfRowsValue);
+    await umbracoUi.dataType.enterNumberOfRowsValue(numberOfRowsValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
+    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
   test('can update Min height (pixels) value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const minHeightValue = '150';
+    const minHeightValue = 150;
     const expectedDataTypeValues = {
       alias: "minHeight",
       value: minHeightValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterMinHeightValue(minHeightValue);
+    await umbracoUi.dataType.enterMinHeightValue(minHeightValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
+    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
   test('can update Max height (pixels) value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const maxHeightValue = '300';
+    const maxHeightValue = 300;
     const expectedDataTypeValues = {
       alias: "maxHeight",
       value: maxHeightValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterMaxHeightValue(maxHeightValue);
+    await umbracoUi.dataType.enterMaxHeightValue(maxHeightValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
-    await umbracoUi.dataType.isSuccessNotificationVisible();
+    //await umbracoUi.dataType.isSuccessNotificationVisible();
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });

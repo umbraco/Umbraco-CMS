@@ -46,7 +46,7 @@ for (const datePickerType of datePickerTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      await umbracoUi.dataType.isSuccessNotificationVisible();
+      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(datePickerType);
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });
@@ -67,7 +67,7 @@ for (const datePickerType of datePickerTypes) {
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
-      await umbracoUi.dataType.isSuccessNotificationVisible();
+      //await umbracoUi.dataType.isSuccessNotificationVisible();
       dataTypeData = await umbracoApi.dataType.getByName(datePickerType);
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });

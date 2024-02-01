@@ -20,12 +20,12 @@ test.describe('DataType tests', () => {
     await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   });
 
-  test.afterEach(async ({umbracoApi}) => {
-    await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
-    if (dataTypeFolderId != '') {
-      await umbracoApi.dataType.ensureNameNotExists(folderName);
-    }
-  });
+  // test.afterEach(async ({umbracoApi}) => {
+  //   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+  //   if (dataTypeFolderId != '') {
+  //     await umbracoApi.dataType.ensureNameNotExists(folderName);
+  //   }
+  // });
 
   test('can create dataType', async ({umbracoApi}) => {
     // Act
@@ -66,7 +66,9 @@ test.describe('DataType tests', () => {
     // Arrange
     await umbracoApi.dataType.ensureNameNotExists(folderName);
     dataTypeId = await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, dataTypeData);
+    expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
     dataTypeFolderId = await umbracoApi.dataType.createFolder(folderName);
+    expect(await umbracoApi.dataType.doesFolderExist(dataTypeFolderId)).toBeTruthy();
 
     // Act
     await umbracoApi.dataType.moveToFolder(dataTypeId, dataTypeFolderId);
@@ -74,7 +76,7 @@ test.describe('DataType tests', () => {
     // Assert
     // Checks if the datatype has the parentId of the folder
     const dataTypeInFolder = await umbracoApi.dataType.getChildren(dataTypeFolderId);
-    expect(dataTypeInFolder[0].parentId).toEqual(dataTypeFolderId);
+    expect(dataTypeInFolder[0].parent.id).toEqual(dataTypeFolderId);
   });
 
   test('can copy a dataType to a folder', async ({umbracoApi}) => {
