@@ -10,10 +10,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Item;
 [ApiVersion("1.0")]
 public class ItemPartialViewItemController : PartialViewItemControllerBase
 {
-    private readonly IFileItemPresentationModelFactory _fileItemPresentationModelFactory;
+    private readonly IFileItemPresentationFactory _fileItemPresentationFactory;
 
-    public ItemPartialViewItemController(IFileItemPresentationModelFactory fileItemPresentationModelFactory)
-        => _fileItemPresentationModelFactory = fileItemPresentationModelFactory;
+    public ItemPartialViewItemController(IFileItemPresentationFactory fileItemPresentationFactory)
+        => _fileItemPresentationFactory = fileItemPresentationFactory;
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
@@ -21,7 +21,7 @@ public class ItemPartialViewItemController : PartialViewItemControllerBase
     public async Task<IActionResult> Item([FromQuery(Name = "path")] HashSet<string> paths)
     {
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
-        IEnumerable<PartialViewItemResponseModel> responseModels = _fileItemPresentationModelFactory.CreatePartialViewItemResponseModels(paths);
+        IEnumerable<PartialViewItemResponseModel> responseModels = _fileItemPresentationFactory.CreatePartialViewItemResponseModels(paths);
         return await Task.FromResult(Ok(responseModels));
     }
 }

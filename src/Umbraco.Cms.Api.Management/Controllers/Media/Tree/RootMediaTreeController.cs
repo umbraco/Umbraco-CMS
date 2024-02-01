@@ -20,8 +20,8 @@ public class RootMediaTreeController : MediaTreeControllerBase
         IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IMediaPresentationModelFactory mediaPresentationModelFactory)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationModelFactory)
+        IMediaPresentationFactory mediaPresentationFactory)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationFactory)
     {
     }
 
