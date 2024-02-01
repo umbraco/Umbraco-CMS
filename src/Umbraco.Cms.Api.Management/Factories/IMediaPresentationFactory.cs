@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IMediaPresentationModelFactory
+public interface IMediaPresentationFactory
 {
     Task<MediaResponseModel> CreateResponseModelAsync(IMedia media);
 
