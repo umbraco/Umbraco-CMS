@@ -7,7 +7,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Item;
 
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DataType}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.DataType}")]
 [ApiExplorerSettings(GroupName = "Data Type")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public class DatatypeItemControllerBase : ManagementApiControllerBase

@@ -22,7 +22,7 @@ public class ItemMediaItemController : MediaItemControllerBase
         _mediaPresentationModelFactory = mediaPresentationModelFactory;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
