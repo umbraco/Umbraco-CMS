@@ -139,4 +139,16 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> CopyAsync(Guid key, Guid? containerKey);
 
     Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> MoveAsync(Guid key, Guid? containerKey);
+
+    /// <summary>
+    /// Returns all the content type allowed as root.
+    /// </summary>
+    /// <returns></returns>
+    Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take);
+
+    /// <summary>
+    /// Returns all content types allowed as children for a given content type key.
+    /// </summary>
+    /// <returns></returns>
+    Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take);
 }

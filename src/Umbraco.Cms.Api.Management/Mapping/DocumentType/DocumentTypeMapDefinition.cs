@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
@@ -10,10 +11,14 @@ namespace Umbraco.Cms.Api.Management.Mapping.DocumentType;
 public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, DocumentTypePropertyTypeResponseModel, DocumentTypePropertyTypeContainerResponseModel>, IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
-        => mapper.Define<IContentType, DocumentTypeResponseModel>((_, _) => new DocumentTypeResponseModel(), Map);
+    {
+        mapper.Define<IContentType, DocumentTypeResponseModel>((_, _) => new DocumentTypeResponseModel(), Map);
+        mapper.Define<IContentType, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
+        mapper.Define<ISimpleContentType, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
+        mapper.Define<IContentType, AllowedDocumentType>((_, _) => new AllowedDocumentType(), Map);
+    }
 
-    // TODO: ParentId
-    // Umbraco.Code.MapAll -ParentId
+    // Umbraco.Code.MapAll
     private void Map(IContentType source, DocumentTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -27,15 +32,23 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.IsElement = source.IsElement;
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
-        target.AllowedContentTypes = MapAllowedContentTypes(source);
-        target.Compositions = MapCompositions(source, source.ContentTypeComposition);
+        target.AllowedDocumentTypes = source.AllowedContentTypes?.Select(ct =>
+                new DocumentTypeSort { DocumentType = new ReferenceByIdModel(ct.Key), SortOrder = ct.SortOrder })
+            .ToArray() ?? Enumerable.Empty<DocumentTypeSort>();
+        target.Compositions = source.ContentTypeComposition.Select(contentTypeComposition => new DocumentTypeComposition
+        {
+            DocumentType = new ReferenceByIdModel(contentTypeComposition.Key),
+            CompositionType = CalculateCompositionType(source, contentTypeComposition)
+        }).ToArray();
 
         if (source.AllowedTemplates != null)
         {
-            target.AllowedTemplateIds = source.AllowedTemplates.Select(template => template.Key);
+            target.AllowedTemplates = source.AllowedTemplates.Select(template => new ReferenceByIdModel(template.Key));
         }
 
-        target.DefaultTemplateId = source.DefaultTemplate?.Key;
+        target.DefaultTemplate = source.DefaultTemplate is not null
+            ? new ReferenceByIdModel(source.DefaultTemplate.Key)
+            : null;
 
         if (source.HistoryCleanup != null)
         {
@@ -46,5 +59,30 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
                 KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays
             };
         }
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(IContentType source, DocumentTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Icon = source.Icon ?? string.Empty;
+        target.HasListView = source.IsContainer;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(ISimpleContentType source, DocumentTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Icon = source.Icon ?? string.Empty;
+        target.HasListView = source.IsContainer;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(IContentType source, AllowedDocumentType target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Name = source.Name ?? string.Empty;
+        target.Description = source.Description;
+        target.Icon = source.Icon ?? string.Empty;
     }
 }

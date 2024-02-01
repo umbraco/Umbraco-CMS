@@ -399,8 +399,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             }
         }
 
-        if (content.PublishedVersionId > 0 &&
-            contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
+        if (content.PublishedState is PublishedState.Published && content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
         {
             foreach (ContentVariation v in contentVariation)
             {

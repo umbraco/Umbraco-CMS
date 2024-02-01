@@ -30,44 +30,8 @@ public class TagsPropertyEditor : DataEditor
     private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly ITagPropertyIndexValueFactory _tagPropertyIndexValueFactory;
     private readonly IIOHelper _ioHelper;
-    private readonly ILocalizedTextService _localizedTextService;
-    private readonly ManifestValueValidatorCollection _validators;
 
-    // Scheduled for removal in v12
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
-    public TagsPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        ManifestValueValidatorCollection validators,
-        IIOHelper ioHelper,
-        ILocalizedTextService localizedTextService)
-        : this(
-            dataValueEditorFactory,
-            validators,
-            ioHelper,
-            localizedTextService,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITagPropertyIndexValueFactory>())
-    {
-    }
-
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
-    public TagsPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        ManifestValueValidatorCollection validators,
-        IIOHelper ioHelper,
-        ILocalizedTextService localizedTextService,
-        IEditorConfigurationParser editorConfigurationParser)
-        : this(
-            dataValueEditorFactory,
-            validators,
-            ioHelper,
-            localizedTextService,
-            editorConfigurationParser,
-            StaticServiceProvider.Instance.GetRequiredService<ITagPropertyIndexValueFactory>())
-    {
-
-    }
-
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
     public TagsPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         ManifestValueValidatorCollection validators,
@@ -75,11 +39,18 @@ public class TagsPropertyEditor : DataEditor
         ILocalizedTextService localizedTextService,
         IEditorConfigurationParser editorConfigurationParser,
         ITagPropertyIndexValueFactory tagPropertyIndexValueFactory)
+        : this(dataValueEditorFactory, ioHelper, editorConfigurationParser, tagPropertyIndexValueFactory)
+    {
+    }
+
+    public TagsPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser,
+        ITagPropertyIndexValueFactory tagPropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
-        _validators = validators;
         _ioHelper = ioHelper;
-        _localizedTextService = localizedTextService;
         _editorConfigurationParser = editorConfigurationParser;
         _tagPropertyIndexValueFactory = tagPropertyIndexValueFactory;
     }
@@ -91,7 +62,7 @@ public class TagsPropertyEditor : DataEditor
         DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute!);
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService, _editorConfigurationParser);
+        new TagConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
     internal class TagPropertyValueEditor : DataValueEditor, IDataValueTags
     {
@@ -99,13 +70,12 @@ public class TagsPropertyEditor : DataEditor
         private readonly IDataTypeService _dataTypeService;
 
         public TagPropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
             IDataTypeService dataTypeService)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
             _dataTypeService = dataTypeService;
