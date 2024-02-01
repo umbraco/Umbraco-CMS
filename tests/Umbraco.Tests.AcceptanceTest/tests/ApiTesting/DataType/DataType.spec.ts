@@ -8,7 +8,7 @@ test.describe('DataType tests', () => {
 
   const dataTypeName = 'TestDataType';
   const folderName = 'TestDataTypeFolder';
-  const propertyEditorAlias = 'Umbraco.DateTime';
+  const editorAlias = 'Umbraco.DateTime';
   const dataTypeData = [
     {
       "alias": "tester",
@@ -20,16 +20,16 @@ test.describe('DataType tests', () => {
     await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   });
 
-  // test.afterEach(async ({umbracoApi}) => {
-  //   await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
-  //   if (dataTypeFolderId != '') {
-  //     await umbracoApi.dataType.ensureNameNotExists(folderName);
-  //   }
-  // });
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
+    if (dataTypeFolderId != '') {
+      await umbracoApi.dataType.ensureNameNotExists(folderName);
+    }
+  });
 
   test('can create dataType', async ({umbracoApi}) => {
     // Act
-    dataTypeId = await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, dataTypeData);
+    dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, dataTypeData);
 
     // Assert
     expect(umbracoApi.dataType.doesExist(dataTypeId)).toBeTruthy();
@@ -37,7 +37,7 @@ test.describe('DataType tests', () => {
 
   test('can update dataType', async ({umbracoApi}) => {
     // Arrange
-    dataTypeId = await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, []);
+    dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, []);
     const dataType = await umbracoApi.dataType.get(dataTypeId);
     dataType.values = dataTypeData;
 
@@ -52,7 +52,7 @@ test.describe('DataType tests', () => {
 
   test('can delete dataType', async ({umbracoApi}) => {
     // Arrange
-    dataTypeId = await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, dataTypeData);
+    dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, dataTypeData);
     expect(await umbracoApi.dataType.doesExist(dataTypeId)).toBeTruthy();
 
     // Act
@@ -65,7 +65,7 @@ test.describe('DataType tests', () => {
   test('can move a dataType to a folder', async ({umbracoApi}) => {
     // Arrange
     await umbracoApi.dataType.ensureNameNotExists(folderName);
-    dataTypeId = await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, dataTypeData);
+    dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, dataTypeData);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
     dataTypeFolderId = await umbracoApi.dataType.createFolder(folderName);
     expect(await umbracoApi.dataType.doesFolderExist(dataTypeFolderId)).toBeTruthy();
@@ -82,7 +82,7 @@ test.describe('DataType tests', () => {
   test('can copy a dataType to a folder', async ({umbracoApi}) => {
     // Arrange
     await umbracoApi.dataType.ensureNameNotExists(folderName);
-    dataTypeId = await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, dataTypeData);
+    dataTypeId = await umbracoApi.dataType.create(dataTypeName, editorAlias, dataTypeData);
     dataTypeFolderId = await umbracoApi.dataType.createFolder(folderName);
 
     const dataType = await umbracoApi.dataType.get(dataTypeId);

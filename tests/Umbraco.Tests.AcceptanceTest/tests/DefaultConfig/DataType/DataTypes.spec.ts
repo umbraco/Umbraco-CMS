@@ -4,7 +4,7 @@ import {expect} from "@playwright/test";
 test.describe('Data Types basic functionalities tests', () => {
   const dataTypeName = 'TestDataType';
   const dataTypeFolderName = 'TestDataTypeFolder';
-  const propertyEditorAlias = 'Umbraco.DateTime';
+  const editorAlias = 'Umbraco.DateTime';
 
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
@@ -36,7 +36,7 @@ test.describe('Data Types basic functionalities tests', () => {
     // Arrange
     const wrongDataTypeName = 'Wrong Data Type';
     await umbracoApi.dataType.ensureNameNotExists(wrongDataTypeName);
-    await umbracoApi.dataType.create(wrongDataTypeName, propertyEditorAlias, []);
+    await umbracoApi.dataType.create(wrongDataTypeName, editorAlias, []);
     expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeName)).toBeTruthy();
 
     // Act
@@ -52,7 +52,7 @@ test.describe('Data Types basic functionalities tests', () => {
   test('can delete a data type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
-    await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, []);
+    await umbracoApi.dataType.create(dataTypeName, editorAlias, []);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 
     // Act
@@ -66,25 +66,25 @@ test.describe('Data Types basic functionalities tests', () => {
 
   test('can change Property Editor in a data type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const editorName = 'Text Area';
-    const editorAlias = 'Umbraco.TextArea';
-    const editorUiAlias = 'Umb.PropertyEditorUi.TextArea';
+    const updatedEditorName = 'Text Area';
+    const updatedEditorAlias = 'Umbraco.TextArea';
+    const updatedEditorUiAlias = 'Umb.PropertyEditorUi.TextArea';
     
     await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
-    await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, []);
+    await umbracoApi.dataType.create(dataTypeName, editorAlias, []);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
 
     // Act
     await umbracoUi.dataType.goToDataType(dataTypeName);
     await umbracoUi.dataType.clickChangeButton();
-    await umbracoUi.dataType.selectPropertyEditorUIByName(editorName);
+    await umbracoUi.dataType.selectPropertyEditorUIByName(updatedEditorName);
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    expect(dataTypeData.editorAlias).toBe(editorAlias);
-    expect(dataTypeData.editorUiAlias).toBe(editorUiAlias);
+    expect(dataTypeData.editorAlias).toBe(updatedEditorAlias);
+    expect(dataTypeData.editorUiAlias).toBe(updatedEditorUiAlias);
   });
 
   test('can create a data type folder', async ({umbracoApi, umbracoUi}) => {
@@ -188,9 +188,8 @@ test.describe('Data Types basic functionalities tests', () => {
     await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);
     dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
-    await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, [], dataTypeFolderId);
+    await umbracoApi.dataType.create(dataTypeName, editorAlias, [], dataTypeFolderId);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
-
     
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
