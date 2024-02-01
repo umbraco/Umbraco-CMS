@@ -62,7 +62,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			hasAccessToAllLanguages: true,
 			languageIsoCode: firstUser.languageIsoCode,
 			languages: [],
-			contentStartNodeIds: firstUser.contentStartNodeIds,
+			documentStartNodeIds: firstUser.contentStartNodeIds,
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
 			permissions,
 		};
