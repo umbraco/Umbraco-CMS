@@ -9,6 +9,14 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 	groupOneItems: ModelEntryType[] = [
 		{
 			name: 'Apple',
+			children: [
+				{
+					name: 'Juice',
+				},
+				{
+					name: 'Milk',
+				},
+			],
 		},
 		{
 			name: 'Banana',
@@ -21,6 +29,14 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 		},
 		{
 			name: 'Lemon',
+			children: [
+				{
+					name: 'Cola',
+				},
+				{
+					name: 'Pepsi',
+				},
+			],
 		},
 	];
 
