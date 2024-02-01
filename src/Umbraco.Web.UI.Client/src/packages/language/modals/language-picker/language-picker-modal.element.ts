@@ -1,4 +1,5 @@
-import { UmbLanguageDetailRepository } from '../../repository/index.js';
+import { UmbLanguageCollectionRepository } from '../../collection/index.js';
+import type { UmbLanguageItemModel } from '../../repository/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
@@ -13,7 +14,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _languages: Array<UmbLanguageItemModel> = [];
 
-	#languageRepository = new UmbLanguageDetailRepository(this);
+	#collectionRepository = new UmbLanguageCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 
 	connectedCallback(): void {
@@ -23,7 +24,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	}
 
 	async firstUpdated() {
-		const { data } = await this.#languageRepository.requestLanguages();
+		const { data } = await this.#collectionRepository.requestCollection({ skip: 0, take: 1000 });
 		this._languages = data?.items ?? [];
 	}
 

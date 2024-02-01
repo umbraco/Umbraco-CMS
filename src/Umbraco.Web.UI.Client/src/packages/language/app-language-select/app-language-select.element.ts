@@ -1,4 +1,4 @@
-import { UmbLanguageDetailRepository } from '../repository/index.js';
+import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
 import type { UmbAppLanguageContext } from './app-language.context.js';
 import { UMB_APP_LANGUAGE_CONTEXT } from './app-language.context.js';
@@ -20,7 +20,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	@state()
 	private _isOpen = false;
 
-	#repository = new UmbLanguageDetailRepository(this);
+	#collectionRepository = new UmbLanguageCollectionRepository(this);
 	#appLanguageContext?: UmbAppLanguageContext;
 	#languagesObserver?: any;
 
@@ -42,11 +42,12 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	async #observeLanguages() {
-		const { asObservable } = await this.#repository.requestLanguages();
+		const { data } = await this.#collectionRepository.requestCollection({ skip: 0, take: 1000 });
 
-		this.#languagesObserver = this.observe(asObservable(), (languages) => {
-			this._languages = languages;
-		});
+		// TODO: listen to changes
+		if (data) {
+			this._languages = data.items;
+		}
 	}
 
 	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
