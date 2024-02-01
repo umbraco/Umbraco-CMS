@@ -20,7 +20,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Language.Details',
 		name: 'Language Workspace Details View',
-		js: () => import('./views/details/language-details-workspace-view.element.js'),
+		js: () => import('./views/language-details-workspace-view.element.js'),
 		weight: 90,
 		meta: {
 			label: 'Details',
