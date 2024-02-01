@@ -19,7 +19,7 @@ public class DynamicRootMapDefinition : IMapDefinition
             CurrentKey = source.Context.Id,
             ParentKey = source.Context.Parent.Id
         };
-        target.OriginKey = source.Query.Origin.Key;
+        target.OriginKey = source.Query.Origin.Id;
         target.OriginAlias = source.Query.Origin.Alias;
         target.QuerySteps = source.Query.Steps.Select(x => new DynamicRootQueryStep()
         {
