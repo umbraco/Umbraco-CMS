@@ -4,6 +4,8 @@ import type {
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
+export const UMB_EXTENSION_ROOT_WORKSPACE_ALIAS = 'Umb.Workspace.ExtensionRoot';
+
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.ExtensionRoot',
