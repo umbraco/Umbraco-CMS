@@ -210,7 +210,16 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             // they require.
             using (_contentStore.GetScopedWriteLock(_scopeProvider))
             {
-                NotifyLocked(new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) }, out _, out _);
+                NotifyLocked(
+                    new[]
+                    {
+                        new ContentCacheRefresher.JsonPayload()
+                        {
+                            ChangeTypes = TreeChangeTypes.RefreshAll
+                        }
+                    },
+                    out _,
+                    out _);
             }
 
             using (_mediaStore.GetScopedWriteLock(_scopeProvider))
@@ -852,6 +861,12 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         // contentStore is write-locked during changes - see note above, calls to this method are wrapped in contentStore.GetScopedWriteLock
         foreach (ContentCacheRefresher.JsonPayload payload in payloads)
         {
+            if (payload.Blueprint)
+            {
+                // Skip blueprints
+                continue;
+            }
+
             _logger.LogDebug("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
 
             if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
