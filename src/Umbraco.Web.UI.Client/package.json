@@ -156,7 +156,7 @@
 		"@babel/core": "^7.22.17",
 		"@mdx-js/react": "^2.3.0",
 		"@open-wc/testing": "^3.2.0",
-		"@playwright/test": "^1.40.1",
+		"@playwright/test": "^1.41.1",
 		"@rollup/plugin-commonjs": "^25.0.7",
 		"@rollup/plugin-json": "^6.1.0",
 		"@rollup/plugin-node-resolve": "^15.2.3",
