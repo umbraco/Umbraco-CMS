@@ -15,16 +15,13 @@ export class UmbDocumentCultureAndHostnamesRepository extends UmbBaseController 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				this.#notificationContext = instance;
-			}).asPromise(),
-		]);
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
+			this.#notificationContext = instance;
+		});
 	}
 
 	async readCultureAndHostnames(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		await this.#init;
 
 		const { data, error } = await this.#dataSource.read(unique);
 		if (!error) {
@@ -36,7 +33,6 @@ export class UmbDocumentCultureAndHostnamesRepository extends UmbBaseController 
 	async updateCultureAndHostnames(unique: string, data: DomainsPresentationModelBaseModel) {
 		if (!unique) throw new Error('Unique is missing');
 		if (!data) throw new Error('Data is missing');
-		await this.#init;
 
 		const { error } = await this.#dataSource.update(unique, data);
 		if (!error) {
