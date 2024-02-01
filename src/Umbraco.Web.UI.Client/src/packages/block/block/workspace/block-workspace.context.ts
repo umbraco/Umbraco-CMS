@@ -10,6 +10,7 @@ import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
+export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<
 	LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbEditableWorkspaceContextBase<LayoutDataType> {

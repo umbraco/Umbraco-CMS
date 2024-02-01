@@ -72,7 +72,6 @@ export default {
 						'@umbraco-cms/backoffice/server-file-system': './src/packages/core/server-file-system/index.ts',
 						'@umbraco-cms/backoffice/id': './src/packages/core/id/index.ts',
 						'@umbraco-cms/backoffice/localization': './src/packages/core/localization/index.ts',
-						'@umbraco-cms/backoffice/macro': './src/packages/core/macro/index.ts',
 						'@umbraco-cms/backoffice/menu': './src/packages/core/menu/index.ts',
 						'@umbraco-cms/backoffice/modal': './src/packages/core/modal/index.ts',
 						'@umbraco-cms/backoffice/notification': './src/packages/core/notification/index.ts',

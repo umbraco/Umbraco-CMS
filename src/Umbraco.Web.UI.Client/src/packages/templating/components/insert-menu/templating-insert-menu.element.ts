@@ -61,9 +61,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 				break;
 			}
-			case CodeSnippetType.macro: {
-				throw new Error('Not implemented');
-			}
 		}
 	}
 
@@ -131,10 +128,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 						title="Dictionary item"
 						@click=${this.#openInsertDictionaryItemModal}>
 					</uui-menu-item>
-
-					<!-- <li>
-							<uui-menu-item class="insert-menu-item" label="Macro" title="Macro"> </uui-menu-item>
-						</li> -->
 				</umb-dropdown>
 			</uui-button-group>
 		`;
