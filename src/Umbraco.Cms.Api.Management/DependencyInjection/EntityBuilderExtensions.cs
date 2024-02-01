@@ -1,5 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Mapping.Items;
+using Umbraco.Cms.Api.Management.Mapping.Item;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Extensions;

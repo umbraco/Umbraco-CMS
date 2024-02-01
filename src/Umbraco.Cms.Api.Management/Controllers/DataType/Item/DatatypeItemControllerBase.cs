@@ -4,7 +4,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Web.Common.Authorization;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DataType.Items;
+namespace Umbraco.Cms.Api.Management.Controllers.DataType.Item;
 
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DataType}")]

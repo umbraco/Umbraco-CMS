@@ -151,7 +151,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, unpublishResult.Result);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.AreEqual(0, content.PublishedCultures.Count());
 
         publishResult = await ContentPublishingService.PublishAsync(content.Key, new[] { langDa.IsoCode }, Constants.Security.SuperUserKey);
 
@@ -159,8 +159,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, publishResult.Status);
 
         content = ContentService.GetById(content.Key)!;
-        // FIXME: when work item 32809 has been fixed, this should assert for 1 expected published cultures
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.AreEqual(1, content.PublishedCultures.Count());
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
     }
 
@@ -303,7 +302,7 @@ public partial class ContentPublishingServiceTests
     }
 
     [Test]
-    public async Task Cannot_Publish_Variant_Content_With_Mandatory_Culture()
+    public async Task Can_Publish_Variant_Content_With_Mandatory_Culture()
     {
         var (langEn, langDa, contentType) = await SetupVariantTest(true);
 
