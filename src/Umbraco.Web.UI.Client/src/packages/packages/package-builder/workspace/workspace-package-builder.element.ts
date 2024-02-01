@@ -1,6 +1,6 @@
 import type { UmbInputDocumentElement } from '../../../documents/documents/components/input-document/input-document.element.js';
 import type { UmbInputMediaElement } from '../../../media/media/components/input-media/input-media.element.js';
-import type { UmbInputLanguagePickerElement } from '../../../languages/components/input-language-picker/input-language-picker.element.js';
+import type { UmbInputLanguagePickerElement } from '../../../language/components/input-language-picker/input-language-picker.element.js';
 import type { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,

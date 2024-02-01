@@ -92,7 +92,7 @@
 			"@umbraco-cms/backoffice/temporary-file": ["src/packages/core/temporary-file"],
 
 			"@umbraco-cms/backoffice/data-type": ["./src/packages/core/data-type/index.ts"],
-			"@umbraco-cms/backoffice/language": ["src/packages/languages/index.ts"],
+			"@umbraco-cms/backoffice/language": ["src/packages/language/index.ts"],
 			"@umbraco-cms/backoffice/logviewer": ["src/packages/log-viewer/index.ts"],
 			"@umbraco-cms/backoffice/relation-types": ["src/packages/relations/relation-types/index.ts"],
 			"@umbraco-cms/backoffice/relations": ["src/packages/relations/relations/index.ts"],
