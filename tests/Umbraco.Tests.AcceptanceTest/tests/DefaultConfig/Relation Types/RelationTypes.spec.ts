@@ -87,7 +87,7 @@ test.describe('Relation types tests', () => {
     await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
 
     // Act
-    await umbracoUi.relationType.clickRootFolderCaretButton()
+    await umbracoUi.relationType.clickRootFolderCaretButton();
     await umbracoUi.relationType.clickActionsMenuForRelationType(relationTypeName);
     await umbracoUi.relationType.clickDeleteExactLabel();
     await umbracoUi.relationType.clickConfirmToDeleteButton();
