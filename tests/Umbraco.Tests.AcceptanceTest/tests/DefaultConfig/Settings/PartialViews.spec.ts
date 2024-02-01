@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 test.describe('Partial Views tests', () => {
   const partialViewName = 'TestPartialView';
-  const partialViewFileName = partialViewName + ".cshtml";
+  const partialViewFileName = partialViewName + '.cshtml';
   const folderName = 'TestFolder';
   const dictionaryName = 'TestDictionaryPartialView';
 
@@ -60,7 +60,7 @@ test.describe('Partial Views tests', () => {
   test('can update a partial view name', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongPartialViewName = 'WrongName';
-    const wrongPartialViewFileName = wrongPartialViewName + ".cshtml";
+    const wrongPartialViewFileName = wrongPartialViewName + '.cshtml';
 
     await umbracoApi.partialView.ensureNameNotExists(wrongPartialViewFileName);
     await umbracoApi.partialView.create(wrongPartialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
