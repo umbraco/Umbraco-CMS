@@ -27,7 +27,6 @@ public class ItemMemberItemController : MemberItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<MemberItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
-        // TODO: test this
         IEnumerable<IMemberEntitySlim> members = _entityService
             .GetAll(UmbracoObjectTypes.Member, ids.ToArray())
             .OfType<IMemberEntitySlim>();
