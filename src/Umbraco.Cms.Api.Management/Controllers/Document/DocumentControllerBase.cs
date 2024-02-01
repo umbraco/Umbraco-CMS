@@ -22,7 +22,7 @@ public abstract class DocumentControllerBase : ContentControllerBase
     protected IActionResult DocumentNotFound()
         => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
             => NotFound(problemDetailsBuilder
-                .WithTitle("The requested Document could not be found")
+                .WithTitle("The document could not be found")
                 .Build()));
 
     protected IActionResult DocumentEditingOperationStatusResult<TContentModelBase>(
@@ -39,15 +39,15 @@ public abstract class DocumentControllerBase : ContentControllerBase
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
             ContentPublishingOperationStatus.ContentNotFound => NotFound(problemDetailsBuilder
-                .WithTitle("The requested content could not be found")
+                .WithTitle("The requested document could not be found")
                 .Build()),
             ContentPublishingOperationStatus.CancelledByEvent => BadRequest(problemDetailsBuilder
                 .WithTitle("Publish cancelled by event")
                 .WithDetail("The publish operation was cancelled by an event.")
                 .Build()),
             ContentPublishingOperationStatus.ContentInvalid => BadRequest(problemDetailsBuilder
-                .WithTitle("Invalid content")
-                .WithDetail("The specified content had an invalid configuration.")
+                .WithTitle("Invalid document")
+                .WithDetail("The specified document had an invalid configuration.")
                 .WithExtension("invalidProperties", invalidPropertyAliases ?? Enumerable.Empty<string>())
                 .Build()),
             ContentPublishingOperationStatus.NothingToPublish => BadRequest(problemDetailsBuilder
@@ -59,29 +59,29 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithDetail("Must include all mandatory cultures when publishing.")
                 .Build()),
             ContentPublishingOperationStatus.HasExpired => BadRequest(problemDetailsBuilder
-                .WithTitle("Content expired")
-                .WithDetail("Could not publish the content because it was expired.")
+                .WithTitle("Document expired")
+                .WithDetail("Could not publish the document because it was expired.")
                 .Build()),
             ContentPublishingOperationStatus.CultureHasExpired => BadRequest(problemDetailsBuilder
-                .WithTitle("Content culture expired")
-                .WithDetail("Could not publish the content because some of the specified cultures were expired.")
+                .WithTitle("Document culture expired")
+                .WithDetail("Could not publish the document because some of the specified cultures were expired.")
                 .Build()),
             ContentPublishingOperationStatus.AwaitingRelease => BadRequest(problemDetailsBuilder
-                .WithTitle("Content awaiting release")
-                .WithDetail("Could not publish the content because it was awaiting release.")
+                .WithTitle("Document awaiting release")
+                .WithDetail("Could not publish the document because it was awaiting release.")
                 .Build()),
             ContentPublishingOperationStatus.CultureAwaitingRelease => BadRequest(problemDetailsBuilder
-                .WithTitle("Content culture awaiting release")
+                .WithTitle("Document culture awaiting release")
                 .WithDetail(
-                    "Could not publish the content because some of the specified cultures were awaiting release.")
+                    "Could not publish the document because some of the specified cultures were awaiting release.")
                 .Build()),
             ContentPublishingOperationStatus.InTrash => BadRequest(problemDetailsBuilder
-                .WithTitle("Content in the recycle bin")
-                .WithDetail("Could not publish the content because it was in the recycle bin.")
+                .WithTitle("Document in the recycle bin")
+                .WithDetail("Could not publish the document because it was in the recycle bin.")
                 .Build()),
             ContentPublishingOperationStatus.PathNotPublished => BadRequest(problemDetailsBuilder
                 .WithTitle("Parent not published")
-                .WithDetail("Could not publish the content because its parent was not published.")
+                .WithDetail("Could not publish the document because its parent was not published.")
                 .Build()),
             ContentPublishingOperationStatus.ConcurrencyViolation => BadRequest(problemDetailsBuilder
                 .WithTitle("Concurrency violation detected")
@@ -90,7 +90,7 @@ public abstract class DocumentControllerBase : ContentControllerBase
             ContentPublishingOperationStatus.UnsavedChanges => BadRequest(problemDetailsBuilder
                 .WithTitle("Unsaved changes")
                 .WithDetail(
-                    "Could not publish the content because it had unsaved changes. Make sure to save all changes before attempting a publish.")
+                    "Could not publish the document because it had unsaved changes. Make sure to save all changes before attempting a publish.")
                 .Build()),
             ContentPublishingOperationStatus.FailedBranch => BadRequest(problemDetailsBuilder
                 .WithTitle("Failed branch operation")
@@ -113,7 +113,7 @@ public abstract class DocumentControllerBase : ContentControllerBase
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
             PublicAccessOperationStatus.ContentNotFound => NotFound(problemDetailsBuilder
-                .WithTitle("The content could not be found")
+                .WithTitle("The document could not be found")
                 .Build()),
             PublicAccessOperationStatus.ErrorNodeNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The error page could not be found")
