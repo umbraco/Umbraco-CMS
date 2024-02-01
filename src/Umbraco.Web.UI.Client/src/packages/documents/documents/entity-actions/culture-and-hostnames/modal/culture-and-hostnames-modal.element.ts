@@ -206,9 +206,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 			</uui-button>
 			<uui-popover-container id="more-options" placement="bottom-end">
 				<umb-popover-layout>
-					<uui-button label=${this.localize.term('assignDomain_addCurrent')} @click=${() => this.#onAddDomain(true)}>
-						<umb-localize key="assignDomain_addCurrent"> Add current domain </umb-localize>
-					</uui-button>
+					<uui-button label=${this.localize.term('assignDomain_addCurrent')} @click=${() => this.#onAddDomain(true)}></uui-button>
 				</umb-popover-layout>
 			</uui-popover-container>
 		</uui-button-group> `;
