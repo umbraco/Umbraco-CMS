@@ -62,7 +62,7 @@
 		"./member-type": "./dist-cms/packages/members/member-types/index.js",
 		"./package": "./dist-cms/packages/packages/package/index.js",
 		"./data-type": "./dist-cms/packages/core/data-type/index.js",
-		"./language": "./dist-cms/packages/settings/languages/index.js",
+		"./language": "./dist-cms/packages/language/index.js",
 		"./logviewer": "./dist-cms/packages/settings/logviewer/index.js",
 		"./relation-type": "./dist-cms/packages/relations/relation-types/index.js",
 		"./relation": "./dist-cms/packages/relations/relations/index.js",
