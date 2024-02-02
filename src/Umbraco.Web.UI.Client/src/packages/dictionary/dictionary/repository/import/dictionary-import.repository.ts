@@ -12,16 +12,15 @@ export class UmbDictionaryImportRepository extends UmbRepositoryBase {
 
 	/**
 	 * @description - Import a dictionary
-	 * @param {string} temporaryFileId
+	 * @param {string} temporaryFileUnique
 	 * @param {string} [parentUnique]
 	 * @return {*}
 	 * @memberof UmbDictionaryImportRepository
 	 */
-	import(temporaryFileId: string, parentUnique?: string) {
-		if (!temporaryFileId) {
-			throw new Error('Temporary file id is missing');
-		}
+	import(temporaryFileUnique: string, parentUnique: string | null) {
+		if (!temporaryFileUnique) throw new Error('Temporary file unique is missing');
+		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
-		return this.#importSource.import(temporaryFileId, parentUnique);
+		return this.#importSource.import(temporaryFileUnique, parentUnique);
 	}
 }
