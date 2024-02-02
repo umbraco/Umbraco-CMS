@@ -8,21 +8,30 @@ import ExampleSorterItem from './sorter-item.js';
 
 export type ModelEntryType = {
 	name: string;
+	children?: ModelEntryType[];
 };
 
 @customElement('example-sorter-group')
 export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
-	//
-	// Property that is used to set the model of the sorter.
+	@property({ type: Array, attribute: false })
+	public get initialItems(): ModelEntryType[] {
+		return this.items;
+	}
+	public set initialItems(value: ModelEntryType[]) {
+		// Only want to set the model initially, cause any re-render should not set this again.
+		if (this._items !== undefined) return;
+		this.items = value;
+	}
+
 	@property({ type: Array, attribute: false })
 	public get items(): ModelEntryType[] {
 		return this._items ?? [];
 	}
 	public set items(value: ModelEntryType[]) {
-		// Only want to set the model initially via this one, as this is the initial model, cause any re-render should not set this data again.
-		if (this._items !== undefined) return;
+		const oldValue = this._items;
 		this._items = value;
 		this.#sorter.setModel(this._items);
+		this.requestUpdate('items', oldValue);
 	}
 	private _items?: ModelEntryType[];
 
@@ -44,8 +53,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 	});
 
 	removeItem = (item: ModelEntryType) => {
-		this._items = this._items!.filter((r) => r.name !== item.name);
-		this.#sorter.setModel(this._items);
+		this.items = this.items.filter((r) => r.name !== item.name);
 	};
 
 	render() {
@@ -57,6 +65,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 					(item) =>
 						html`<example-sorter-item name=${item.name}>
 							<button slot="action" @click=${() => this.removeItem(item)}>Delete</button>
+							${item.children ? html`<example-sorter-group .initialItems=${item.children}></example-sorter-group>` : ''}
 						</example-sorter-item>`,
 				)}
 			</div>
@@ -78,6 +87,14 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 			.sorter-container {
 				min-height: 20px;
 			}
+
+			example-sorter-group {
+				display: block;
+				width: 100%;
+				border: 1px dashed rgba(122, 122, 122, 0.25);
+				border-radius: calc(var(--uui-border-radius) * 2);
+				padding: var(--uui-size-space-1);
+			}
 		`,
 	];
 }
@@ -86,6 +103,6 @@ export default ExampleSorterGroup;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'example-sorter-group': ExampleSorterGroup;
+		'example-sorter-group-nested': ExampleSorterGroup;
 	}
 }

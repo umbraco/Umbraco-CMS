@@ -21,11 +21,11 @@ export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 export interface UmbBlockListValueModel extends UmbBlockValueType<UmbBlockListLayoutModel> {}
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbPropertyEditorUIBlockListBlockElement> = {
-	compareElementToModel: (element, model) => {
-		return element.getAttribute('data-udi') === model.contentUdi;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-udi');
 	},
-	querySelectModelToElement: (container, modelEntry) => {
-		return container.querySelector("umb-property-editor-ui-block-list-block[data-udi='" + modelEntry.contentUdi + "']");
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.contentUdi;
 	},
 	identifier: 'block-list-editor',
 	itemSelector: 'umb-property-editor-ui-block-list-block',
