@@ -63,6 +63,8 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 	};
 
 	//private _hasRootProperties = false;
+
+	@state()
 	private _hasRootGroups = false;
 
 	@state()
