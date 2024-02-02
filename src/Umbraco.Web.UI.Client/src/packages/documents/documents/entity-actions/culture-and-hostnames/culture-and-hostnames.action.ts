@@ -10,7 +10,7 @@ export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionB
 		super(host, repositoryAlias, unique, entityType);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalContext = instance as UmbModalManagerContext;
+			this.#modalContext = instance;
 		});
 	}
 
