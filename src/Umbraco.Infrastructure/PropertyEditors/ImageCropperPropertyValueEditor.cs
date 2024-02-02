@@ -152,7 +152,10 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         if (temporaryFileKey.HasValue)
         {
             file = TryGetTemporaryFile(temporaryFileKey.Value);
-            _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey.Value, _scopeProvider);
+            if (file is not null)
+            {
+                _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey.Value, _scopeProvider);
+            }
         }
 
         if (file == null) // not uploading a file
