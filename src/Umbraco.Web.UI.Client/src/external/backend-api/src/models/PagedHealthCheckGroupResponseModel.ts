@@ -9,3 +9,4 @@ export type PagedHealthCheckGroupResponseModel = {
     total: number;
     items: Array<HealthCheckGroupResponseModel>;
 };
+

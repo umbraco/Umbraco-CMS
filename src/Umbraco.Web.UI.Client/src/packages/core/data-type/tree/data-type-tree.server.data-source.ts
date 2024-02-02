@@ -45,11 +45,10 @@ const getChildrenOf = (parentUnique: string | null) => {
 const mapper = (item: DataTypeTreeItemResponseModel): UmbDataTypeTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parentId || null,
+		parentUnique: item.parent?.id || null,
 		name: item.name,
 		entityType: item.isFolder ? 'data-type-folder' : 'data-type',
 		isFolder: item.isFolder,
-		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 	};
 };

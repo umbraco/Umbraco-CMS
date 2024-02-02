@@ -3,7 +3,7 @@ import type { UmbTreeItemModelBase } from './types.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import {
 	type ManifestRepository,
 	type ManifestTree,
@@ -21,7 +21,7 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 export interface UmbTreeContext<TreeItemType extends UmbTreeItemModelBase> extends UmbBaseController {
 	selection: UmbSelectionManager;
 	requestChildrenOf: (parentUnique: string | null) => Promise<{
-		data?: UmbPagedData<TreeItemType>;
+		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;

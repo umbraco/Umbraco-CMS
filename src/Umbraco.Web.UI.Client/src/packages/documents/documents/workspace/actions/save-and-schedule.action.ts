@@ -13,6 +13,6 @@ export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceActio
 		const document = this.workspaceContext.getData();
 		// TODO: handle errors
 		if (!document) return;
-		this.workspaceContext.repository.saveAndSchedule();
+		//this.workspaceContext.repository.saveAndSchedule();
 	}
 }

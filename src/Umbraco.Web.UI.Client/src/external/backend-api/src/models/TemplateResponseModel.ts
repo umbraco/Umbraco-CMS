@@ -6,6 +6,7 @@
 import type { TemplateModelBaseModel } from './TemplateModelBaseModel';
 
 export type TemplateResponseModel = (TemplateModelBaseModel & {
-id: string;
-masterTemplateId?: string | null;
+    id: string;
+    masterTemplateId?: string | null;
 });
+

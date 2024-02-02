@@ -18,9 +18,7 @@ export class UmbStylesheetTreeRepository extends UmbTreeRepositoryBase<
 			unique: null,
 			entityType: UMB_STYLESHEET_ROOT_ENTITY_TYPE,
 			name: 'Stylesheets',
-			icon: 'icon-folder',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 

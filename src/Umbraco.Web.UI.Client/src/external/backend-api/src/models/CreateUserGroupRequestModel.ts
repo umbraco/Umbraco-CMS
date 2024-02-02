@@ -6,3 +6,4 @@
 import type { UserGroupBaseModel } from './UserGroupBaseModel';
 
 export type CreateUserGroupRequestModel = UserGroupBaseModel;
+

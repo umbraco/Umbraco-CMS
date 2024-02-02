@@ -12,7 +12,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	@state()
-	private _defaultTemplateId?: string | null;
+	private _defaultTemplateId: string | null = null;
 
 	@state()
 	private _allowedTemplateIds?: Array<string>;
@@ -28,10 +28,10 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 	private _observeDocumentType() {
 		if (!this.#workspaceContext) return;
 		this.observe(
-			this.#workspaceContext.defaultTemplateId,
-			(defaultTemplateId) => {
+			this.#workspaceContext.defaultTemplate,
+			(defaultTemplate) => {
 				const oldValue = this._defaultTemplateId;
-				this._defaultTemplateId = defaultTemplateId;
+				this._defaultTemplateId = defaultTemplate ? defaultTemplate.id : null;
 				this.requestUpdate('_defaultTemplateId', oldValue);
 			},
 			'defaultTemplate',
@@ -40,7 +40,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 			this.#workspaceContext.allowedTemplateIds,
 			(allowedTemplateIds) => {
 				const oldValue = this._allowedTemplateIds;
-				this._allowedTemplateIds = allowedTemplateIds;
+				this._allowedTemplateIds = allowedTemplateIds?.map((template) => template.id);
 				this.requestUpdate('_allowedTemplateIds', oldValue);
 			},
 			'allowedTemplateIds',
@@ -50,9 +50,14 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 	#templateInputChange(e: CustomEvent) {
 		// save new allowed ids
 		const input = e.target as UmbInputTemplateElement;
-		const idsWithoutRoot = input.selectedIds?.filter((id) => id !== null) ?? [];
+		const idsWithoutRoot =
+			input.selectedIds
+				?.filter((id) => id !== null)
+				.map((id) => {
+					return { id };
+				}) ?? [];
 		this.#workspaceContext?.setAllowedTemplateIds(idsWithoutRoot);
-		this.#workspaceContext?.setDefaultTemplateId(input.defaultId);
+		this.#workspaceContext?.setDefaultTemplate({ id: input.defaultId });
 	}
 
 	render() {
@@ -61,7 +66,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
 				<div id="templates" slot="editor">
 					<umb-input-template
-						.defaultId=${this._defaultTemplateId}
+						.defaultId=${this._defaultTemplateId ?? ''}
 						.selectedIds=${this._allowedTemplateIds}
 						@change=${this.#templateInputChange}></umb-input-template>
 				</div>

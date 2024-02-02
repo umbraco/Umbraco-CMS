@@ -55,6 +55,5 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbStaticFileTreeIte
 		name: item.name,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
-		isContainer: false,
 	};
 };

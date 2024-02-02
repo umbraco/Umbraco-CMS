@@ -3,7 +3,7 @@ import { html, customElement, state, css, nothing } from '@umbraco-cms/backoffic
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
-	UmbDocumentRepository,
+	UmbDocumentDetailRepository,
 	type UmbInputDocumentElement,
 	type UmbPublicAccessModalData,
 	type UmbPublicAccessModalValue,
@@ -51,7 +51,7 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	async #getDocumentName() {
 		if (!this.#unique) return;
 		// Should this be done here or in the action file?
-		const { data } = await new UmbDocumentRepository(this).requestById(this.#unique);
+		const { data } = await new UmbDocumentDetailRepository(this).requestByUnique(this.#unique);
 		if (!data) return;
 		//TODO How do we ensure we get the correct variant?
 		this._documentName = data.variants[0]?.name;

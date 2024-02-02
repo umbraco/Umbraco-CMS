@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -44,23 +45,26 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel => {
 	return {
-		id: item.id,
-		parentId: item.parentId || null,
-		name: item.name,
-		entityType: 'document',
-		isContainer: item.isContainer,
+		unique: item.id,
+		parentUnique: item.parent ? item.parent.id : null,
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
+		noAccess: item.noAccess,
+		isTrashed: item.isTrashed,
 		hasChildren: item.hasChildren,
 		isProtected: item.isProtected,
-		isPublished: item.isPublished,
-		isEdited: item.isEdited,
-		contentTypeId: item.contentTypeId,
-		variants:
-			item.variants?.map((variant) => ({
-				name: variant.name!,
-				culture: variant.culture!,
-				state: variant.state!,
-			})) || [],
-		icon: item.icon,
+		documentType: {
+			unique: item.documentType.id,
+			icon: item.documentType.icon,
+			hasListView: item.documentType.hasListView,
+		},
+		variants: item.variants.map((variant) => {
+			return {
+				name: variant.name,
+				culture: variant.culture || null,
+				state: variant.state,
+			};
+		}),
+		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 		isFolder: false,
 	};
 };

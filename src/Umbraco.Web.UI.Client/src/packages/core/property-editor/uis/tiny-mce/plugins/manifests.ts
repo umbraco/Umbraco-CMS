@@ -66,21 +66,6 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 			],
 		},
 	},
-	{
-		type: 'tinyMcePlugin',
-		alias: 'Umb.TinyMcePlugin.MacroPicker',
-		name: 'Macro Picker TinyMCE Plugin',
-		js: () => import('./tiny-mce-macropicker.plugin.js'),
-		meta: {
-			toolbar: [
-				{
-					alias: 'umbmacro',
-					label: 'Macro',
-					icon: 'preferences',
-				},
-			],
-		},
-	},
 ];
 
 export const manifests = [...pluginManifests];

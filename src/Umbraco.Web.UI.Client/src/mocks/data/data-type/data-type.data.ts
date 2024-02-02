@@ -14,42 +14,38 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Folder 1',
 		id: 'dt-folder1',
-		parentId: null,
+		parent: null,
 		isFolder: true,
 		hasChildren: false,
-		isContainer: false,
 		editorAlias: '',
 		values: [],
 	},
 	{
 		name: 'Folder 2',
 		id: 'dt-folder2',
-		parentId: null,
+		parent: null,
 		isFolder: true,
 		hasChildren: true,
-		isContainer: false,
 		editorAlias: '',
 		values: [],
 	},
 	{
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
-		parentId: null,
+		parent: null,
 		name: 'Textstring',
 		editorAlias: 'Umbraco.TextBox',
 		editorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 		values: [],
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 	},
 	{
 		name: 'Text',
 		id: 'dt-textBox',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.TextBox',
 		editorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -61,33 +57,30 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Text Area',
 		id: 'dt-textArea',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.TextArea',
 		editorUiAlias: 'Umb.PropertyEditorUi.TextArea',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'My JS Property Editor',
 		id: 'dt-custom',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.Label',
 		editorUiAlias: 'My.PropertyEditorUI.Custom',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Color Picker',
 		id: 'dt-colorPicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.ColorPicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.ColorPicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -140,11 +133,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Content Picker',
 		id: 'dt-contentPicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.ContentPicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -156,11 +148,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Eye Dropper',
 		id: 'dt-eyeDropper',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.ColorPicker.EyeDropper',
 		editorUiAlias: 'Umb.PropertyEditorUi.EyeDropper',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -194,11 +185,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Multi URL Picker',
 		id: 'dt-multiUrlPicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.MultiUrlPicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.MultiUrlPicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -226,11 +216,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Multi Node Tree Picker',
 		id: 'dt-multiNodeTreePicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.MultiNodeTreePicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -265,11 +254,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Date Picker',
 		id: 'dt-datePicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.DateTime',
 		editorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -289,10 +277,9 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Date Picker With Time',
 		id: 'dt-datePicker-time',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.DateTime',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -308,11 +295,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Time',
 		id: 'dt-time',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.DateTime',
 		editorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -328,11 +314,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Email',
 		id: 'dt-email',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.EmailAddress',
 		editorUiAlias: 'Umb.PropertyEditorUi.Email',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -344,11 +329,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Multiple Text String',
 		id: 'dt-multipleTextString',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.MultipleTextString',
 		editorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -364,11 +348,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Dropdown',
 		id: 'dt-dropdown',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.DropDown.Flexible',
 		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -388,11 +371,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Slider',
 		id: 'dt-slider',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.Slider',
 		editorUiAlias: 'Umb.PropertyEditorUi.Slider',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -424,11 +406,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Toggle',
 		id: 'dt-toggle',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.TrueFalse',
 		editorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -452,11 +433,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Tags',
 		id: 'dt-tags',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.Tags',
 		editorUiAlias: 'Umb.PropertyEditorUi.Tags',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -472,22 +452,20 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Markdown Editor',
 		id: 'dt-markdownEditor',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.MarkdownEditor',
 		editorUiAlias: 'Umb.PropertyEditorUi.MarkdownEditor',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Radio Button List',
 		id: 'dt-radioButtonList',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.RadioButtonList',
 		editorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -503,11 +481,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Checkbox List',
 		id: 'dt-checkboxList',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.CheckboxList',
 		editorUiAlias: 'Umb.PropertyEditorUi.CheckboxList',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -523,11 +500,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Block List',
 		id: 'dt-blockList',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.BlockList',
 		editorUiAlias: 'Umb.PropertyEditorUi.BlockList',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -536,6 +512,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					{
 						label: 'Mocked Block Type for Block List',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						settingsElementTypeKey: 'all-property-editors-document-type-id',
 						icon: 'icon-server-alt',
 					},
 					{
@@ -575,7 +552,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'useInlineEditingAsDefault',
-				value: true,
+				value: false,
 			},
 			{
 				alias: 'useLiveEditing',
@@ -586,22 +563,20 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Media Picker',
 		id: 'dt-mediaPicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.MediaPicker3',
 		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Image Cropper',
 		id: 'dt-imageCropper',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.ImageCropper',
 		editorUiAlias: 'Umb.PropertyEditorUi.ImageCropper',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -629,11 +604,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Upload Field',
 		id: 'dt-uploadField',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.UploadField',
 		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -649,11 +623,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Block Grid',
 		id: 'dt-blockGrid',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.BlockGrid',
 		editorUiAlias: 'Umb.PropertyEditorUi.BlockGrid',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -720,33 +693,30 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Collection View',
 		id: 'dt-collectionView',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.ListView',
 		editorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Icon Picker',
 		id: 'dt-iconPicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.IconPicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Rich Text Editor',
 		id: 'dt-richTextEditor',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.RichText',
 		editorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -762,7 +732,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'+a[id|style|rel|data-id|data-udi|rev|charset|hreflang|dir|lang|tabindex|accesskey|type|name|href|target|title|class|onfocus|onblur|onclick|ondblclick|onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|onkeydown|onkeyup],-strong/-b[class|style],-em/-i[class|style],-strike[class|style],-s[class|style],-u[class|style],#p[id|style|dir|class|align],-ol[class|reversed|start|style|type],-ul[class|style],-li[class|style],br[class],img[id|dir|lang|longdesc|usemap|style|class|src|onmouseover|onmouseout|border|alt=|title|hspace|vspace|width|height|align|umbracoorgwidth|umbracoorgheight|onresize|onresizestart|onresizeend|rel|data-id],-sub[style|class],-sup[style|class],-blockquote[dir|style|class],-table[border=0|cellspacing|cellpadding|width|height|class|align|summary|style|dir|id|lang|bgcolor|background|bordercolor],-tr[id|lang|dir|class|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor],tbody[id|class],thead[id|class],tfoot[id|class],#td[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|bgcolor|background|bordercolor|scope],-th[id|lang|dir|class|colspan|rowspan|width|height|align|valign|style|scope],caption[id|lang|dir|class|style],-div[id|dir|class|align|style],-span[class|align|style],-pre[class|align|style],address[class|align|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align|style],hr[class|style],small[class|style],dd[id|class|title|style|dir|lang],dl[id|class|title|style|dir|lang],dt[id|class|title|style|dir|lang],object[class|id|width|height|codebase|*],param[name|value|_value|class],embed[type|width|height|src|class|*],map[name|class],area[shape|coords|href|alt|target|class],bdo[class],button[class],iframe[*],figure,figcaption,video[*],audio[*],picture[*],source[*],canvas[*]',
 			},
 			{ alias: 'invalidElements', value: 'font' },
-			// { alias: 'stylesheets', value: ['/css/rte-content.css'] },
+			{ alias: 'stylesheets', value: [] },
 			{
 				alias: 'toolbar',
 				value: [
@@ -784,7 +754,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 					'anchor',
 					'table',
 					'umbmediapicker',
-					'umbmacro',
 					'umbembeddialog',
 				],
 			},
@@ -822,33 +791,30 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'Label',
 		id: 'dt-label',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.Label',
 		editorUiAlias: 'Umb.PropertyEditorUi.Label',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Integer',
 		id: 'dt-integer',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.Integer',
 		editorUiAlias: 'Umb.PropertyEditorUi.Integer',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Decimal',
 		id: 'dt-decimal',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.Decimal',
 		editorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [
 			{
@@ -860,55 +826,50 @@ export const data: Array<UmbMockDataTypeModel> = [
 	{
 		name: 'User Picker',
 		id: 'dt-userPicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.UserPicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.UserPicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Member Picker',
 		id: 'dt-memberPicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.MemberPicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.MemberPicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Member Group Picker',
 		id: 'dt-memberGroupPicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.MemberGroupPicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Data Type in folder',
 		id: 'dt-data-type-in-folder',
-		parentId: 'dt-folder2',
+		parent: { id: 'dt-folder2' },
 		editorAlias: 'Umbraco.MemberGroupPicker',
 		editorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},
 	{
 		name: 'Static File Picker',
 		id: 'dt-staticFilePicker',
-		parentId: null,
+		parent: null,
 		editorAlias: 'Umbraco.Label',
 		editorUiAlias: 'Umb.PropertyEditorUi.StaticFilePicker',
 		hasChildren: false,
-		isContainer: false,
 		isFolder: false,
 		values: [],
 	},

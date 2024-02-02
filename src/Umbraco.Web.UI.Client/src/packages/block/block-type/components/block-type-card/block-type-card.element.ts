@@ -14,7 +14,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.id,
+		(x) => x.unique,
 	);
 
 	@property({ type: String, attribute: false })

@@ -9,3 +9,4 @@ export type PagedTagResponseModel = {
     total: number;
     items: Array<TagResponseModel>;
 };
+

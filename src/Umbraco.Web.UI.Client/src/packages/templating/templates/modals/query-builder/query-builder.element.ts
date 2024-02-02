@@ -3,19 +3,18 @@ import { localizePropertyType, localizeSort } from './utils.js';
 import type { UmbQueryBuilderFilterElement } from './query-builder-filter.element.js';
 import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbModalBaseElement,
 	UMB_DOCUMENT_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import type {
 	TemplateQueryExecuteModel,
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
+import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
 import './query-builder-filter.element.js';
 
 export interface TemplateQueryBuilderModalData {
@@ -57,14 +56,14 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	@state()
 	private _defaultSortDirection: SortOrder = SortOrder.Ascending;
 
-	#documentRepository: UmbDocumentRepository;
+	#documentItemRepository: UmbDocumentItemRepository;
 	#modalManagerContext?: UmbModalManagerContext;
 	#templateRepository: UmbTemplateRepository;
 
 	constructor() {
 		super();
 		this.#templateRepository = new UmbTemplateRepository(this);
-		this.#documentRepository = new UmbDocumentRepository(this);
+		this.#documentItemRepository = new UmbDocumentItemRepository(this);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
@@ -127,9 +126,10 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	};
 
 	async #getDocumentItem(ids: string[]) {
-		const { data, error } = await this.#documentRepository.requestItems(ids);
+		const { data, error } = await this.#documentItemRepository.requestItems(ids);
 		if (data) {
-			this._selectedRootContentName = data[0].name;
+			// TODO: get correct variant name
+			this._selectedRootContentName = data[0].variants[0].name;
 		}
 	}
 
@@ -260,12 +260,15 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								  </uui-button>`
 								: ''}
 						</div>
-						<div class="row">
+						<div class="row query-results">
 							<span id="results-count">
 								${this._templateQuery?.resultCount ?? 0}
 								<umb-localize key="template_itemsReturned">items returned, in</umb-localize>
 								${this._templateQuery?.executionTime ?? 0} ms
 							</span>
+							${this._templateQuery?.sampleResults.map(
+								(sample) => html`<span><uui-icon name=${sample.icon}></uui-icon>${sample.name}</span>`,
+							) ?? ''}
 						</div>
 						<umb-code-block language="C#" copy>${this._templateQuery?.queryExpression ?? ''}</umb-code-block>
 					</uui-box>
@@ -321,6 +324,16 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 			#results-count {
 				font-weight: bold;
+			}
+			.query-results {
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 0;
+			}
+			.query-results span {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-1);
 			}
 		`,
 	];

@@ -1,7 +1,7 @@
-import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDocumentTypeItemModel } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityItemStore } from '@umbraco-cms/backoffice/store';
+import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export
@@ -10,7 +10,7 @@ import { UmbEntityItemStore } from '@umbraco-cms/backoffice/store';
  * @description - Data Store for Document Type items
  */
 
-export class UmbDocumentTypeItemStore extends UmbEntityItemStore<DocumentTypeItemResponseModel> {
+export class UmbDocumentTypeItemStore extends UmbItemStoreBase<UmbDocumentTypeItemModel> {
 	/**
 	 * Creates an instance of UmbDocumentTypeItemStore.
 	 * @param {UmbControllerHostElement} host

@@ -6,3 +6,4 @@
 export type DeleteUsersRequestModel = {
     userIds: Array<string>;
 };
+
