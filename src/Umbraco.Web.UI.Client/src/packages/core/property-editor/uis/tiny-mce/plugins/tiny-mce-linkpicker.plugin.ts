@@ -85,7 +85,7 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 
 		if (this.#anchorElement.href.includes('localLink:')) {
 			const href = this.#anchorElement.getAttribute('href')!;
-			currentTarget.udi = href.split('localLink:')[1].slice(0, -1);
+			currentTarget.unique = href.split('localLink:')[1].slice(0, -1);
 		} else if (this.#anchorElement.host.length) {
 			currentTarget.url = this.#anchorElement.protocol ? this.#anchorElement.protocol + '//' : undefined;
 			currentTarget.url += this.#anchorElement.host + this.#anchorElement.pathname;
@@ -193,14 +193,14 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 			}
 		}
 
-		if (!this.#linkPickerData?.link.url && !this.#linkPickerData?.link.queryString && !this.#linkPickerData?.link.udi) {
+		if (!this.#linkPickerData?.link.url && !this.#linkPickerData?.link.queryString && !this.#linkPickerData?.link.unique) {
 			this.editor.execCommand('unlink');
 			return;
 		}
 
 		//if we have an id, it must be a locallink:id
-		if (this.#linkPickerData?.link.udi) {
-			this.#linkPickerData.link.url = '/{localLink:' + this.#linkPickerData.link.udi + '}';
+		if (this.#linkPickerData?.link.unique) {
+			this.#linkPickerData.link.url = '/{localLink:' + this.#linkPickerData.link.unique + '}';
 			this.#insertLink();
 			return;
 		}
