@@ -409,11 +409,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			return;
 		}
 
-		if (
-			UmbSorterController.originalSorter &&
-			event?.dataTransfer != null &&
-			event?.dataTransfer?.dropEffect === 'none'
-		) {
+		if (UmbSorterController.originalSorter && event?.dataTransfer != null && event.dataTransfer.dropEffect === 'none') {
 			// Revert move, to start position.
 			UmbSorterController.originalSorter.moveItemInModel(
 				UmbSorterController.originalIndex ?? 0,
