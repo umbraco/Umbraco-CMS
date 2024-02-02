@@ -10,6 +10,10 @@ test.describe('Template tests', () => {
     await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
   });
 
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.template.ensureNameNotExists(templateName);
+  });
+
   test('can create a template', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.template.clickActionsMenuAtRoot();
@@ -22,9 +26,6 @@ test.describe('Template tests', () => {
     // Assert
     await umbracoUi.template.isSuccessNotificationVisible();
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeTruthy();
-
-    // Clean
-    await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
   test('can update a template', async ({umbracoApi, umbracoUi}) => {
@@ -49,9 +50,6 @@ test.describe('Template tests', () => {
     // Checks if the template was updated
     const updatedTemplate = await umbracoApi.template.getByName(templateName);
     expect(updatedTemplate.content).toBe(updatedTemplateContent);
-
-    // Clean
-    await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
   test('can delete a template', async ({umbracoApi, umbracoUi}) => {
@@ -95,7 +93,6 @@ test.describe('Template tests', () => {
     expect(childTemplate.masterTemplateId).toBe(masterTemplate.id);
 
     // Clean
-    await umbracoApi.template.ensureNameNotExists(templateName);
     await umbracoApi.template.ensureNameNotExists(childTemplateName);
   });
 
@@ -107,7 +104,7 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    await umbracoUi.template.addQueryBuilderWithOrderByStatement('CreateDateCreated Date', true);
+    await umbracoUi.template.addQueryBuilderWithOrderByStatement('CreateDate', true);
     await umbracoUi.template.clickSubmitButton();
     await umbracoUi.template.clickSaveButton();
 
@@ -115,9 +112,6 @@ test.describe('Template tests', () => {
     await umbracoUi.template.isSuccessNotificationVisible();
     const templateData = await umbracoApi.template.getByName(templateName);
     expect(templateData.content).toBe(expectedTemplateContent);
-
-    // Clean
-    await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
   test('can insert sections into a template', async ({umbracoApi, umbracoUi}) => {
@@ -141,9 +135,6 @@ test.describe('Template tests', () => {
     await umbracoUi.template.isSuccessNotificationVisible();
     const templateData = await umbracoApi.template.getByName(templateName);
     expect(templateData.content).toBe(templateContent);
-
-    // Clean
-    await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
   test('can insert dictionaryItem into a template', async ({umbracoApi, umbracoUi}) => {
@@ -171,6 +162,5 @@ test.describe('Template tests', () => {
 
     // Clean
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
-    await umbracoApi.template.ensureNameNotExists(templateName);
   });
 });
