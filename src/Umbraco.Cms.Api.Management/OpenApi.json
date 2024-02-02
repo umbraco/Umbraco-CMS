@@ -12429,6 +12429,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "The resource is protected and requires an authentication token"
           }
@@ -24662,14 +24682,6 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
-          },
-          "parent": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ],
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -25204,6 +25216,11 @@
           }
         ],
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
           "email": {
             "type": "string"
           },
