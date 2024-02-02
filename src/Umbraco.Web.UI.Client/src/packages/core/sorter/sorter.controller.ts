@@ -60,7 +60,7 @@ function destroyPreventEvent(element: Element) {
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	getUniqueOfElement: (element: ElementType) => string | null | symbol | number;
 	getUniqueOfModel: (modeEntry: T) => string | null | symbol | number;
-	identifier: string;
+	identifier: string | symbol;
 	itemSelector: string;
 	disabledItemSelector?: string;
 	containerSelector: string;
@@ -97,9 +97,9 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 // External type with some properties optional, as they have defaults:
 export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = Omit<
 	INTERNAL_UmbSorterConfig<T, ElementType>,
-	'ignorerSelector' | 'containerSelector'
+	'ignorerSelector' | 'containerSelector' | 'identifier'
 > &
-	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector'>>;
+	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector' | 'identifier'>>;
 
 /**
  * @export
@@ -109,8 +109,6 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
  */
 export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> implements UmbController {
 	//
-	//static initiativeSorter?: UmbSorterController<unknown>;
-
 	// A sorter that is requested to become the next sorter:
 	static dropSorter?: UmbSorterController<unknown>;
 
@@ -151,6 +149,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		this.#host = host;
 
 		// Set defaults:
+		config.identifier ??= Symbol();
 		config.ignorerSelector ??= 'a, img, iframe';
 		if (!config.placeholderClass && !config.placeholderAttr) {
 			config.placeholderAttr = 'drag-placeholder';
@@ -206,10 +205,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		const containerElement = this.#useContainerShadowRoot
 			? this.#containerElement.shadowRoot ?? this.#containerElement
 			: this.#containerElement;
-		//containerElement.addEventListener('dragover', preventDragOver);
 		containerElement.addEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
-		//containerElement.addEventListener('dragenter', this.#handleDragEnter as unknown as EventListener);
-		//containerElement.addEventListener('dragend', this.#handleDragEnd);
 
 		// TODO: Do we need to handle dragleave?
 
@@ -235,8 +231,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				: this.#containerElement;
 
 			containerElement.removeEventListener('dragover', this._itemDraggedOver as unknown as EventListener);
-			//containerElement.removeEventListener('dragenter', this.#handleDragEnter as unknown as EventListener);
-			//containerElement.removeEventListener('dragend', this.#handleDragEnd);
 			(this.#containerElement as any) = undefined;
 		}
 	}
@@ -388,7 +382,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#rqaId = undefined;
 			if (UmbSorterController.activeElement) {
 				UmbSorterController.activeElement.style.transform = '';
-				//this.#setupPlaceholderStyle();// This is already begin called by #setCurrentElement
 			}
 		});
 

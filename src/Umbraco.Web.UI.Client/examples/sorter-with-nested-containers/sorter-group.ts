@@ -11,18 +11,6 @@ export type ModelEntryType = {
 	children?: ModelEntryType[];
 };
 
-const SORTER_CONFIG: UmbSorterConfig<ModelEntryType, ExampleSorterItem> = {
-	getUniqueOfElement: (element) => {
-		return element.name;
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.name;
-	},
-	identifier: 'string-that-identifies-all-example-sorters',
-	itemSelector: 'example-sorter-item',
-	containerSelector: '.sorter-container',
-};
-
 @customElement('example-sorter-group')
 export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 	@property({ type: Array, attribute: false })
@@ -38,7 +26,15 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 	private _items?: ModelEntryType[];
 
 	#sorter = new UmbSorterController<ModelEntryType, ExampleSorterItem>(this, {
-		...SORTER_CONFIG,
+		getUniqueOfElement: (element) => {
+			return element.name;
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry.name;
+		},
+		identifier: 'string-that-identifies-all-example-sorters',
+		itemSelector: 'example-sorter-item',
+		containerSelector: '.sorter-container',
 		onChange: ({ model }) => {
 			const oldValue = this._items;
 			this._items = model;
