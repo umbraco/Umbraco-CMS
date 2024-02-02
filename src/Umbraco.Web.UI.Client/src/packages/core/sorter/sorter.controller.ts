@@ -110,6 +110,10 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
 export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> implements UmbController {
 	//
 	// A sorter that is requested to become the next sorter:
+	static originalSorter?: UmbSorterController<unknown>;
+	static originalIndex?: number;
+
+	// A sorter that is requested to become the next sorter:
 	static dropSorter?: UmbSorterController<unknown>;
 
 	// The sorter of which the element is located within:
@@ -295,8 +299,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		element.removeEventListener('dragstart', this.#handleDragStart);
-		// We are not ready to remove the dragend, as this is might be the active one just moving container:
+		// We are not ready to remove the dragend or drop, as this is might be the active one just moving container:
 		//element.removeEventListener('dragend', this.#handleDragEnd);
+		//element.addEventListener('drop', this.#handleDrop);
 	}
 
 	#setupPlaceholderStyle() {
@@ -356,6 +361,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		this.#setCurrentElement(element as ElementType);
 		UmbSorterController.activeItem = this.getItemOfElement(UmbSorterController.activeElement! as ElementType);
+
+		UmbSorterController.originalSorter = this as unknown as UmbSorterController<unknown>;
+		UmbSorterController.originalIndex = this.#model.indexOf(UmbSorterController.activeItem);
+
 		if (!UmbSorterController.activeItem) {
 			console.error('Could not find item related to this element.');
 			return;
@@ -393,9 +402,23 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		return true;
 	};
 
-	#handleDragEnd = async () => {
+	#handleDragEnd = async (event?: DragEvent) => {
+		// If not good drop, revert model?
+
 		if (!UmbSorterController.activeElement || !UmbSorterController.activeItem) {
 			return;
+		}
+
+		if (
+			UmbSorterController.originalSorter &&
+			event?.dataTransfer != null &&
+			event?.dataTransfer?.dropEffect === 'none'
+		) {
+			// Revert move, to start position.
+			UmbSorterController.originalSorter.moveItemInModel(
+				UmbSorterController.originalIndex ?? 0,
+				UmbSorterController.activeSorter!,
+			);
 		}
 
 		UmbSorterController.activeElement.style.transform = '';
@@ -421,6 +444,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		UmbSorterController.activeDragElement = undefined;
 		UmbSorterController.activeSorter = undefined;
 		UmbSorterController.dropSorter = undefined;
+		UmbSorterController.originalIndex = undefined;
+		UmbSorterController.originalSorter = undefined;
 		this.#dragX = 0;
 		this.#dragY = 0;
 	};
