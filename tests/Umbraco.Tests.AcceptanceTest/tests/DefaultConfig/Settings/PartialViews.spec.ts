@@ -45,6 +45,7 @@ test.describe('Partial Views tests', () => {
     await umbracoUi.partialView.clickNewPartialViewFromSnippetButton();
     await umbracoUi.partialView.clickBreadcrumbButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
+    await umbracoUi.partialView.page.locator('#content').waitFor({state: 'visible'});
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
