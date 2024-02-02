@@ -2,12 +2,11 @@ import { UmbUserDetailRepository } from '../../repository/index.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbModalBaseElement,
 	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_CREATE_USER_SUCCESS_MODAL
+	UMB_CREATE_USER_SUCCESS_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-user-create-modal')
@@ -43,16 +42,19 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
 		const userGroups = userGroupPicker?.selectedIds;
 
-		// TODO: figure out when to use email or username
-		const { data } = await this.#userDetailRepository.create({
-			name,
-			email,
-			userName: email,
-			userGroupIds: userGroups,
-		});
+		const { data: userScaffold } = await this.#userDetailRepository.createScaffold(null);
+		if (!userScaffold) return;
 
-		if (data && data.userId && data.initialPassword) {
-			this.#openSuccessModal(data.userId, data.initialPassword);
+		userScaffold.name = name;
+		userScaffold.email = email;
+		userScaffold.userName = email;
+		userScaffold.userGroupIds = userGroups;
+
+		// TODO: figure out when to use email or username
+		const { data } = await this.#userDetailRepository.create(userScaffold);
+
+		if (data && data.unique && data.initialPassword) {
+			this.#openSuccessModal(data.unique, data.initialPassword);
 		}
 	}
 

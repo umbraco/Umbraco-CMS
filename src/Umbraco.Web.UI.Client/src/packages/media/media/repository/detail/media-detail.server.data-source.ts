@@ -44,7 +44,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			values: [],
 			variants: [
 				{
-					state: null,
 					culture: null,
 					segment: null,
 					name: '',
