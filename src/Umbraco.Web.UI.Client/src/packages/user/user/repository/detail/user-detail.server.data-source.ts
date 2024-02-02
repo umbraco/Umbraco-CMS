@@ -119,8 +119,8 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		);
 
 		if (data) {
-			// TODO: What do we do about the initial password?
-			return this.read(data);
+			// TODO: what do we do with the initial password?
+			return this.read(data.user.id);
 		}
 
 		return { error };

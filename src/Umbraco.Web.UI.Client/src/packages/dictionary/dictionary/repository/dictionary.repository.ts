@@ -13,11 +13,4 @@ export class UmbDictionaryRepository extends UmbBaseController implements UmbApi
 	async list(skip = 0, take = 1000) {
 		return this.#detailSource.list(skip, take);
 	}
-
-	async upload(UmbId: string, file: File) {
-		if (!UmbId) throw new Error('UmbId is missing');
-		if (!file) throw new Error('File is missing');
-
-		return this.#temporaryFileRepository.upload(UmbId, file);
-	}
 }

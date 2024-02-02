@@ -11,6 +11,7 @@ import type {
 	UmbTreeElement,
 	UmbTreeSelectionConfiguration,
 } from '@umbraco-cms/backoffice/tree';
+import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 
 interface UmbDictionaryItemPreview {
 	id: string;
@@ -45,12 +46,12 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	#fileReader;
 	#fileNodes!: NodeListOf<ChildNode>;
 	#fileContent: Array<UmbDictionaryItemPreview> = [];
-	#dictionaryImportRepository: UmbDictionaryImportRepository;
+	#dictionaryImportRepository = new UmbDictionaryImportRepository(this);
+	#temporaryFileRepository = new UmbTemporaryFileRepository(this);
 
 	constructor() {
 		super();
 
-		this.#dictionaryImportRepository = new UmbDictionaryImportRepository(this);
 		this.#fileReader = new FileReader();
 
 		this.#fileReader.onload = (e) => {
@@ -135,13 +136,12 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		e.preventDefault();
 		const formData = new FormData(this._form);
 		const file = formData.get('file') as File;
-
 		if (!file) throw new Error('File is missing');
 
 		this.#fileReader.readAsText(file);
 		this._temporaryFileId = UmbId.new();
 
-		this.#dictionaryImportRepository.upload(this._temporaryFileId, file);
+		this.#temporaryFileRepository.upload(this._temporaryFileId, file);
 	}
 
 	#onParentChange() {
