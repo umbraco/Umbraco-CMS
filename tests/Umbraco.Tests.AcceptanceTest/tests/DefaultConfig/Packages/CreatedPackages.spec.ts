@@ -58,7 +58,8 @@ test.describe('Created packages tests', () => {
   });
 
   // TODO: Update the locators for the choose button. If it is updated or not
-  test('can create a package with content', async ({page, umbracoApi, umbracoUi}) => {
+  // TODO: Remove .skip when the test is able to run. Currently it is not possible to add content to a package
+  test.skip('can create a package with content', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const documentTypeName = 'TestDocumentType';
     const documentName = 'TestDocument';
