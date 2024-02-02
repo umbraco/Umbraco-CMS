@@ -2,6 +2,7 @@ import { umbExtensionsRegistry, type ManifestTypes } from '../../index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-extension-table-action-column-layout')

@@ -4,6 +4,7 @@ import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/e
 import type { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DictionaryOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {

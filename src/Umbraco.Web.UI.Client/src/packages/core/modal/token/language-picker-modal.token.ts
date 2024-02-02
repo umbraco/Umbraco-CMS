@@ -1,3 +1,4 @@
+import type { UmbLanguageItemModel } from '@umbraco-cms/backoffice/language';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbLanguagePickerModalData {

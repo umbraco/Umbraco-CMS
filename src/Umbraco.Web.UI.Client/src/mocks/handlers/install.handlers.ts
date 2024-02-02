@@ -1,12 +1,11 @@
 const { rest } = window.MockServiceWorker;
 import type {
-	DatabaseInstallResponseModel,
+	DatabaseInstallRequestModel,
 	InstallVResponseModel,
 	InstallSettingsResponseModel,
-	ProblemDetails} from '@umbraco-cms/backoffice/backend-api';
-import {
-	TelemetryLevelModel,
+	ProblemDetails,
 } from '@umbraco-cms/backoffice/backend-api';
+import { TelemetryLevelModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
@@ -80,7 +79,7 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/install/validate-database'), async (req, res, ctx) => {
-		const body = await req.json<DatabaseInstallResponseModel>();
+		const body = await req.json<DatabaseInstallRequestModel>();
 
 		if (body.name === 'validate') {
 			return res(
