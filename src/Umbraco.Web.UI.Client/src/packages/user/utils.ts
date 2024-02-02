@@ -18,7 +18,7 @@ const userStates: UmbUserDisplayStatus[] = [
 
 export const getDisplayStateFromUserStatus = (status: UserStateModel): UmbUserDisplayStatus =>
 	userStates
-		.filter((state) => state.key === status)!
+		.filter((state) => state.key === status)
 		.map((state) => ({
 			...state,
 			key: 'state' + state.key,

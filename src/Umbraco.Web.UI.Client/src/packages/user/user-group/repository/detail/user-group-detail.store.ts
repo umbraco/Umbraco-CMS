@@ -18,11 +18,6 @@ export class UmbUserGroupDetailStore extends UmbDetailStoreBase<UmbUserGroupDeta
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_USER_GROUP_DETAIL_STORE_CONTEXT.toString());
 	}
-
-	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {
-		// TODO: Use a model for the data-type tree items: ^^Most likely it should be parsed to the UmbEntityTreeStore as a generic type.
-		return this._data.asObservablePart((items) => items.filter((item) => item.editorUiAlias === propertyEditorUiAlias));
-	}
 }
 
 export const UMB_USER_GROUP_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbUserGroupDetailStore>(

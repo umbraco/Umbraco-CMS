@@ -1,4 +1,6 @@
-export interface UserGroupDetailModel {
+import type { UmbUserGroupEntityType } from './entity.js';
+
+export interface UmbUserGroupDetailModel {
 	unique: string;
 	entityType: UmbUserGroupEntityType;
 	isSystemGroup: boolean;

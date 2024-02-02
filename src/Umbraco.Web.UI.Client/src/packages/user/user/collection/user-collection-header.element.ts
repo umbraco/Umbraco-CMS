@@ -9,9 +9,8 @@ import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import type { UserGroupResponseModel} from '@umbraco-cms/backoffice/backend-api';
 import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
+import { UmbUserGroupCollectionRepository, UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
@@ -28,10 +27,10 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	private _orderBy?: UserOrderModel;
 
 	@state()
-	private _userGroups: Array<UserGroupResponseModel> = [];
+	private _userGroups: Array<UmbUserGroupDetailModel> = [];
 
 	@state()
-	private _userGroupFilterSelection: Array<UserGroupResponseModel> = [];
+	private _userGroupFilterSelection: Array<UmbUserGroupDetailModel> = [];
 
 	#modalContext?: UmbModalManagerContext;
 	#collectionContext?: UmbUserCollectionContext;

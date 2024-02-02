@@ -34,6 +34,6 @@ const mapper = (item: UserGroupItemResponseModel): UmbUserGroupItemModel => {
 	return {
 		unique: item.id,
 		name: item.name,
-		propertyEditorUiAlias: item.editorUiAlias || '', // TODO: why can this be undefined or null on the server?
+		icon: item.icon || null,
 	};
 };
