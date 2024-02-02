@@ -5,7 +5,7 @@ parameters:
     displayName: Run SQL Server Integration Tests
     type: boolean
     default: false
-  - name: sqlServerAcceptanceTests 
+  - name: sqlServerAcceptanceTests
     displayName: Run SQL Server Acceptance Tests
     type: boolean
     default: false
@@ -51,7 +51,7 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 20.10.x
+  nodeVersion: 20
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -287,7 +287,7 @@ stages:
         pool:
           vmImage: $(vmImage)
         variables:
-          Tests__Database__DatabaseType: 'Sqlite'  
+          Tests__Database__DatabaseType: 'Sqlite'
         steps:
           # Setup test environment
           - task: DownloadPipelineArtifact@2
