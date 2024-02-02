@@ -30,7 +30,7 @@ test.describe('Log Viewer tests', () => {
   test('can change the search log level', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const logInformation = await umbracoApi.logViewer.getLevelCount();
-    const expectedLogCount = Math.min(logInformation.information, 100)
+    const expectedLogCount = Math.min(logInformation.information, 100);
     const logLevel = 'Information';
 
     // Act
