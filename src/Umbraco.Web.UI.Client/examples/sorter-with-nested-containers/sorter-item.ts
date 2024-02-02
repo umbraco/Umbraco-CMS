@@ -53,6 +53,6 @@ export default ExampleSorterItem;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'example-sorter-item': ExampleSorterItem;
+		'example-sorter-item-nested': ExampleSorterItem;
 	}
 }
