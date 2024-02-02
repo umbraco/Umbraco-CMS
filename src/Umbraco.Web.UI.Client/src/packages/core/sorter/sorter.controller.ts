@@ -139,6 +139,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#lastIndicationContainerCtrl: UmbSorterController<T, ElementType> | null = null;
 
 	public get controllerAlias() {
+		// We only support one Sorter Controller pr. Controller Host.
 		return 'umbSorterController';
 	}
 	public get identifier() {
