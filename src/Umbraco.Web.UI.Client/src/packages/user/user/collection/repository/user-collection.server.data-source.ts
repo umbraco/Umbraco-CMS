@@ -1,5 +1,6 @@
-import type { UmbUserCollectionFilterModel, UmbUserDetailModel } from '../../types.js';
+import type { UmbUserDetailModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
+import type { UmbUserCollectionFilterModel } from '../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
@@ -42,7 +43,22 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 		const mappedItems: Array<UmbUserDetailModel> = items.map((item: UserResponseModel) => {
 			const userDetail: UmbUserDetailModel = {
 				entityType: UMB_USER_ENTITY_TYPE,
-				...item,
+				email: item.email,
+				userName: item.userName,
+				name: item.name,
+				userGroupIds: item.userGroupIds,
+				unique: item.id,
+				languageIsoCode: item.languageIsoCode || null,
+				contentStartNodeIds: item.contentStartNodeIds,
+				mediaStartNodeIds: item.mediaStartNodeIds,
+				avatarUrls: item.avatarUrls,
+				state: item.state,
+				failedLoginAttempts: item.failedLoginAttempts,
+				createDate: item.createDate,
+				updateDate: item.updateDate,
+				lastLoginDate: item.lastLoginDate || null,
+				lastLockoutDate: item.lastLockoutDate || null,
+				lastPasswordChangeDate: item.lastPasswordChangeDate || null,
 			};
 
 			return userDetail;

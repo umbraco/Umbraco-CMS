@@ -110,7 +110,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	#createTableItems() {
 		this._tableItems = this._users.map((user) => {
 			return {
-				id: user.id ?? '',
+				id: user.unique,
 				icon: 'icon-user',
 				data: [
 					{

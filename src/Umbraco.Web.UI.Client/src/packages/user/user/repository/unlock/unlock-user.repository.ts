@@ -19,7 +19,7 @@ export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 
 		if (!error) {
 			ids.forEach((id) => {
-				this.detailStore?.updateItem(id, { state: UserStateModel.ACTIVE, failedPasswordAttempts: 0 });
+				this.detailStore?.updateItem(id, { state: UserStateModel.ACTIVE, failedLoginAttempts: 0 });
 			});
 
 			const notification = { data: { message: `User unlocked` } };

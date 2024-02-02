@@ -1,12 +1,13 @@
 import type { InterfaceColor, InterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 import type { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
-interface DisplayStatus {
+interface UmbUserDisplayStatus {
 	look: InterfaceLook;
 	color: InterfaceColor;
 	key: string;
 }
-const userStates: DisplayStatus[] = [
+
+const userStates: UmbUserDisplayStatus[] = [
 	{ key: 'All', color: 'positive', look: 'secondary' },
 	{ key: 'Active', color: 'positive', look: 'primary' },
 	{ key: 'Disabled', color: 'danger', look: 'primary' },
@@ -15,7 +16,7 @@ const userStates: DisplayStatus[] = [
 	{ key: 'Inactive', color: 'warning', look: 'primary' },
 ];
 
-export const getDisplayStateFromUserStatus = (status?: UserStateModel): DisplayStatus =>
+export const getDisplayStateFromUserStatus = (status: UserStateModel): UmbUserDisplayStatus =>
 	userStates
 		.filter((state) => state.key === status)!
 		.map((state) => ({
