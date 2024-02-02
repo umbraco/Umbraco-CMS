@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -72,6 +73,7 @@ public class ExamineExternalIndexTests : ExamineBaseTest
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddExamineIndexes();
         builder.AddBackOfficeIdentity();
+        BackOfficeAuthBuilderExtensions.AddBackOfficeAuthentication(builder);
         builder.Services.AddHostedService<QueuedHostedService>();
     }
 

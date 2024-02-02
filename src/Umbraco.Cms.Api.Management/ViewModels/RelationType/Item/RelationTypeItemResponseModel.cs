@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.RelationType.Item;
 
-public class RelationTypeItemResponseModel : ItemResponseModelBase
+public class RelationTypeItemResponseModel : NamedItemResponseModelBase
 {
 
 }

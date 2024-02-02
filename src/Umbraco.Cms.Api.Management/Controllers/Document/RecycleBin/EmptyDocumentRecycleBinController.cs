@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Security;
@@ -22,8 +23,9 @@ public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBas
         IEntityService entityService,
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IContentService contentService)
-        : base(entityService)
+        IContentService contentService,
+        IDocumentPresentationFactory documentPresentationFactory)
+        : base(entityService, documentPresentationFactory)
     {
         _authorizationService = authorizationService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;

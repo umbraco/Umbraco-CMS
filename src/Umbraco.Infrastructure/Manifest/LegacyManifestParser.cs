@@ -175,7 +175,7 @@ public class LegacyManifestParser : ILegacyManifestParser
 
         LegacyPackageManifest? manifest = JsonConvert.DeserializeObject<LegacyPackageManifest>(
             text,
-            new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper, _jsonSerializer),
+            new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _shortStringHelper, _jsonSerializer),
             new ValueValidatorConverter(_validators),
             new DashboardAccessRuleConverter())!;
 

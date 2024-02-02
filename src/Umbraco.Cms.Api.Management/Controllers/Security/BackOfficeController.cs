@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -17,6 +18,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
@@ -59,11 +61,74 @@ public class BackOfficeController : SecurityControllerBase
             return Unauthorized();
         }
 
-        var claims = new List<Claim> { new(ClaimTypes.Name, model.Username) };
-        var claimsIdentity = new ClaimsIdentity(claims, Constants.Security.NewBackOfficeAuthenticationType);
-        await HttpContext.SignInAsync(Constants.Security.NewBackOfficeAuthenticationType, new ClaimsPrincipal(claimsIdentity));
+        IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(
+            model.Username, model.Password, true, true);
 
+        if (result.IsNotAllowed)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is not allowed")
+                .WithDetail("The operation is not allowed on the user")
+                .Build());
+        }
+        if (result.IsLockedOut)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is locked")
+                .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
+                .Build());
+        }
+        if(result.RequiresTwoFactor)
+        {
+            return StatusCode(StatusCodes.Status402PaymentRequired, new ProblemDetailsBuilder()
+                .WithTitle("2FA Required")
+                .WithDetail("The user is protected by 2FA. Please continue the login process and verify a 2FA code.")
+                .Build());
+        }
         return Ok();
+    }
+
+    [HttpPost("verify-2fa")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model)
+    {
+        if (ModelState.IsValid == false)
+        {
+            return BadRequest();
+        }
+
+        BackOfficeIdentityUser? user = await _backOfficeSignInManager.GetTwoFactorAuthenticationUserAsync();
+        if (user is null)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
+                .WithTitle("No user found")
+                .Build());
+        }
+
+        IdentitySignInResult result =
+            await _backOfficeSignInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
+        if (result.Succeeded)
+        {
+            return Ok();
+        }
+
+        if (result.IsLockedOut)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is locked.")
+                .Build());
+        }
+
+        if (result.IsNotAllowed)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is not allowed")
+                .Build());
+        }
+
+        return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+            .WithTitle("Invalid code")
+            .Build());
     }
 
     public class LoginRequestModel

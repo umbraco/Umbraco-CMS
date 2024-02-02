@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Tree;
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Tree;
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessRelationTypes)]
 // NOTE: at the moment relation types aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
-public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTreeItemResponseModel>
+public class RelationTypeTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
     public RelationTypeTreeControllerBase(IEntityService entityService)
         : base(entityService)
@@ -25,14 +26,18 @@ public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTre
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.RelationType;
 
-    protected IEnumerable<EntityTreeItemResponseModel> MapTreeItemViewModels(Guid? parentKey, IEnumerable<IRelationType> relationTypes)
-        => relationTypes.Select(relationType => new EntityTreeItemResponseModel
+    protected IEnumerable<NamedEntityTreeItemResponseModel> MapTreeItemViewModels(Guid? parentKey, IEnumerable<IRelationType> relationTypes)
+        => relationTypes.Select(relationType => new NamedEntityTreeItemResponseModel
         {
             Name = relationType.Name!,
             Id = relationType.Key,
             Type = Constants.UdiEntityType.RelationType,
             HasChildren = false,
-            IsContainer = false,
-            ParentId = parentKey
+            Parent = parentKey.HasValue
+                ? new ReferenceByIdModel
+                {
+                    Id = parentKey.Value
+                }
+                : null
         });
 }

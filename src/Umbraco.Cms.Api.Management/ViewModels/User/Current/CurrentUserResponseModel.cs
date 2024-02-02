@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;
 
-public class CurrentUserResponseModel : INamedEntityPresentationModel
+public class CurrentUserResponseModel
 {
     public required Guid Id { get; init; }
 

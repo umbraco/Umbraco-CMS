@@ -306,12 +306,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentService, ContentService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
             Services.AddUnique<IContentPublishingService, ContentPublishingService>();
-            Services.AddUnique<IContentCreatingService, ContentCreatingService>();
+            Services.AddUnique<IContentValidationService, ContentValidationService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             Services.AddUnique<IMemberService, MemberService>();
             Services.AddUnique<IMediaPermissionService, MediaPermissionService>();
             Services.AddUnique<IMediaService, MediaService>();
             Services.AddUnique<IMediaEditingService, MediaEditingService>();
+            Services.AddUnique<IMediaValidationService, MediaValidationService>();
             Services.AddUnique<IContentTypeService, ContentTypeService>();
             Services.AddUnique<IContentTypeBaseServiceProvider, ContentTypeBaseServiceProvider>();
             Services.AddUnique<IMediaTypeService, MediaTypeService>();
@@ -371,6 +372,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
+
+            //Two factor providers
+            Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
+            Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
+
         }
     }
 }

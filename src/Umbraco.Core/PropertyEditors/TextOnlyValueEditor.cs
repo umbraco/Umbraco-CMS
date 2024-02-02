@@ -12,13 +12,23 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class TextOnlyValueEditor : DataValueEditor
 {
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
     public TextOnlyValueEditor(
         DataEditorAttribute attribute,
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper)
-        : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+        : this(attribute, shortStringHelper, jsonSerializer, ioHelper)
+    {
+    }
+
+    public TextOnlyValueEditor(
+        DataEditorAttribute attribute,
+        IShortStringHelper shortStringHelper,
+        IJsonSerializer jsonSerializer,
+        IIOHelper ioHelper)
+        : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
     }
 

@@ -1,7 +1,10 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Services.Installer;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Upgrade;
 
@@ -19,7 +22,7 @@ public class AuthorizeUpgradeController : UpgradeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Authorize()
     {
-        await _upgradeService.Upgrade();
-        return Ok();
+        Attempt<InstallationResult?, UpgradeOperationStatus> result = await _upgradeService.UpgradeAsync();
+        return UpgradeOperationResult(result.Status, result.Result);
     }
 }

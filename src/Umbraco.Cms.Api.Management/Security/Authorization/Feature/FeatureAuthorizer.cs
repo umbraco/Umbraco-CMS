@@ -22,13 +22,13 @@ internal sealed class FeatureAuthorizer : IFeatureAuthorizer
     }
 
     /// <inheritdoc />
-    public async Task<bool> IsAuthorizedAsync(AuthorizationHandlerContext context)
+    public async Task<bool> IsDeniedAsync(AuthorizationHandlerContext context)
     {
         Endpoint? endpoint = null;
 
         if (_runtimeState.Level != RuntimeLevel.Run && _runtimeState.Level != RuntimeLevel.Upgrade)
         {
-            return false;
+            return true;
         }
 
         switch (context.Resource)
@@ -62,6 +62,6 @@ internal sealed class FeatureAuthorizer : IFeatureAuthorizer
 
         ControllerActionDescriptor? actionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
         Type? controllerType = actionDescriptor?.ControllerTypeInfo.AsType();
-        return await Task.FromResult(_umbracoFeatures.IsControllerEnabled(controllerType));
+        return await Task.FromResult(_umbracoFeatures.IsControllerEnabled(controllerType) is false);
     }
 }

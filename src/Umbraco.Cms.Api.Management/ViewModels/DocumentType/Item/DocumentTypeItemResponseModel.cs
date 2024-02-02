@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 
-public class DocumentTypeItemResponseModel : ItemResponseModelBase
+public class DocumentTypeItemResponseModel : NamedItemResponseModelBase
 {
     public bool IsElement { get; set; }
 

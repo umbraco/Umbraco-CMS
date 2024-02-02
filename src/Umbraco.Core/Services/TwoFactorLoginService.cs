@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -52,6 +50,8 @@ public class TwoFactorLoginService : ITwoFactorLoginService
     public async Task<IEnumerable<string>> GetEnabledTwoFactorProviderNamesAsync(Guid userOrMemberKey) =>
         await GetEnabledProviderNamesAsync(userOrMemberKey);
 
+    /// <inheritdoc />
+    [Obsolete("Use DisableByCodeWithStatusAsync. This will be removed in Umbraco 15.")]
     public async Task<bool> DisableWithCodeAsync(string providerName, Guid userOrMemberKey, string code)
     {
         var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
@@ -71,6 +71,7 @@ public class TwoFactorLoginService : ITwoFactorLoginService
         return await DisableAsync(userOrMemberKey, providerName);
     }
 
+    [Obsolete("Use ValidateAndSaveWithStatusAsync. This will be removed in Umbraco 15.")]
     public async Task<bool> ValidateAndSaveAsync(string providerName, Guid userOrMemberKey, string secret, string code)
     {
         try
@@ -114,6 +115,7 @@ public class TwoFactorLoginService : ITwoFactorLoginService
     }
 
     /// <inheritdoc />
+    [Obsolete("Use GetSetupInfoWithStatusAsync(). This will be removed in Umbraco 15.")]
     public async Task<object?> GetSetupInfoAsync(Guid userOrMemberKey, string providerName)
     {
         var secret = await GetSecretForUserAndProviderAsync(userOrMemberKey, providerName);
