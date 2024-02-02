@@ -66,6 +66,8 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	};
 
 	//private _hasRootProperties = false;
+
+	@state()
 	private _hasRootGroups = false;
 
 	@state()
