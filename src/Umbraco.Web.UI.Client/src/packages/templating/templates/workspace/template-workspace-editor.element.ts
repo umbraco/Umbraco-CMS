@@ -35,7 +35,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#templateWorkspaceContext?: typeof UMB_TEMPLATE_WORKSPACE_CONTEXT.TYPE;
 	#isNew = false;
 
-	#masterTemplateId: string | null = null;
+	#masterTemplateUnique: string | null = null;
 
 	private inputQuery$ = new Subject<string>();
 
@@ -61,7 +61,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			});
 
 			this.observe(this.#templateWorkspaceContext.masterTemplate, (masterTemplate) => {
-				this.#masterTemplateId = masterTemplate?.id ?? null;
+				this.#masterTemplateUnique = masterTemplate?.unique ?? null;
 				this._masterTemplateName = masterTemplate?.name ?? null;
 			});
 
@@ -128,7 +128,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				},
 			},
 			value: {
-				selection: [this.#masterTemplateId],
+				selection: [this.#masterTemplateUnique],
 			},
 		});
 

@@ -1,11 +1,11 @@
 import type { UmbTemplateDetailModel } from '../types.js';
+import type { UmbTemplateItemModel } from '../repository/index.js';
 import { UmbTemplateDetailRepository, UmbTemplateItemRepository } from '../repository/index.js';
 import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { TemplateItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
@@ -18,7 +18,7 @@ export class UmbTemplateWorkspaceContext
 
 	#data = new UmbObjectState<UmbTemplateDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
-	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
+	#masterTemplate = new UmbObjectState<UmbTemplateItemModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
 	alias = this.#data.asObservablePart((data) => data?.alias);

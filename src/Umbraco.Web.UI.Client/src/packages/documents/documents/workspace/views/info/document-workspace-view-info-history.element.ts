@@ -13,13 +13,8 @@ import {
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type {
-	AuditLogWithUsernameResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	AuditLogBaseModel,
-	DirectionModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';
+import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DirectionModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
@@ -76,7 +71,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		if (!data) return;
 
 		// Hack list to only get the items for the current document
-		const list = data.items.filter((item) => item.entityId === this.documentUnique);
+		const list = data.items.filter((item) => item.entity?.id === this.documentUnique);
 		this._total = list.length;
 
 		// Hack list to only get the items for the current page
