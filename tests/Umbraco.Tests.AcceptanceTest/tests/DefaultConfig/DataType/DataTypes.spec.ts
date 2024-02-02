@@ -22,7 +22,7 @@ test.describe('Data Types basic functionalities tests', () => {
     
     // Act
     await umbracoUi.dataType.clickActionsMenuAtRoot();
-    await umbracoUi.dataType.clickCreateMenu();
+    await umbracoUi.dataType.clickCreateThreeDotsButton();
     await umbracoUi.dataType.clickNewDataTypeButton();
     await umbracoUi.dataType.enterDataTypeName(dataTypeName);
     await umbracoUi.dataType.clickSaveButton();
@@ -93,8 +93,8 @@ test.describe('Data Types basic functionalities tests', () => {
     
     // Act
     await umbracoUi.dataType.clickActionsMenuAtRoot();
-    await umbracoUi.dataType.clickCreateMenu();
-    await umbracoUi.dataType.clickNewDataFolderButton();
+    await umbracoUi.dataType.clickCreateThreeDotsButton();
+    await umbracoUi.dataType.clickNewDataTypeFolderButton();
     await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
     await umbracoUi.dataType.clickCreateFolderButton();
 
@@ -112,7 +112,7 @@ test.describe('Data Types basic functionalities tests', () => {
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(wrongDataTypeName);
-    await umbracoUi.dataType.clickRenameFolderMenu();
+    await umbracoUi.dataType.clickRenameFolderThreeDotsButton();
     await umbracoUi.dataType.enterFolderName(dataTypeFolderName);
     await umbracoUi.dataType.clickUpdateFolderButton();
 
@@ -144,7 +144,7 @@ test.describe('Data Types basic functionalities tests', () => {
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-    await umbracoUi.dataType.clickCreateMenu();
+    await umbracoUi.dataType.clickCreateThreeDotsButton();
     await umbracoUi.dataType.clickNewDataTypeButton();
     await umbracoUi.dataType.enterDataTypeName(dataTypeName);
     await umbracoUi.dataType.clickSaveButton();
@@ -166,8 +166,8 @@ test.describe('Data Types basic functionalities tests', () => {
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
-    await umbracoUi.dataType.clickCreateMenu();
-    await umbracoUi.dataType.clickNewDataFolderButton();
+    await umbracoUi.dataType.clickCreateThreeDotsButton();
+    await umbracoUi.dataType.clickNewDataTypeFolderButton();
     await umbracoUi.dataType.enterFolderName(childFolderName);
     await umbracoUi.dataType.clickCreateFolderButton();
 

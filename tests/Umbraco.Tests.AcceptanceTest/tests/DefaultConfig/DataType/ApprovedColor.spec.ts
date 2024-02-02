@@ -72,7 +72,7 @@ test.describe(`${dataTypeName} tests`, () => {
   });
 
   // TODO: remove .skip when the frontend is able to display the added color. Currently the added colors are not displayed after reloading page
-  test('can remove color', async ({umbracoApi, umbracoUi}) => {  
+  test.skip('can remove color', async ({umbracoApi, umbracoUi}) => {  
     // Arrange
     const removedDataTypeValues = [
       {
