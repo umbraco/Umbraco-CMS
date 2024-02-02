@@ -44,7 +44,8 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 	});
 
 	removeItem = (item: ModelEntryType) => {
-		this.items = this._items!.filter((r) => r.name !== item.name);
+		this._items = this._items!.filter((r) => r.name !== item.name);
+		this.#sorter.setModel(this._items);
 	};
 
 	render() {
@@ -74,13 +75,8 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 				opacity: 0.2;
 			}
 
-			example-sorter-group {
-				display: block;
-				width: 100%;
+			.sorter-container {
 				min-height: 20px;
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-size-border-radius);
-				padding: var(--uui-size-space-1);
 			}
 		`,
 	];

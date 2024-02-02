@@ -570,14 +570,17 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 			return;
 		}
-		// We skipped the above part cause we are above or below container:
+		// We skipped the above part cause we are above or below container, or within an empty container:
 
 		// Indication if drop is good:
 		if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
 			return;
 		}
 
-		if (this.#dragY < currentContainerRect.top) {
+		if (this.#model.length === 0) {
+			// Here is no items, so we should just move into the top of the container.
+			this.#moveElementTo(0);
+		} else if (this.#dragY < currentContainerRect.top) {
 			this.#moveElementTo(0);
 		} else if (this.#dragY > currentContainerRect.bottom) {
 			this.#moveElementTo(-1);
