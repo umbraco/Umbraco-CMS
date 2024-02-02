@@ -13,11 +13,11 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbUserGroupRepository } from '@umbraco-cms/backoffice/user-group';
+import type { UmbUserGroupItemModel } from '@umbraco-cms/backoffice/user-group';
+import { UmbUserGroupItemRepository } from '@umbraco-cms/backoffice/user-group';
 
 import './column-layouts/name/user-table-name-column-layout.element.js';
 import './column-layouts/status/user-table-status-column-layout.element.js';
-import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-table-collection-view')
 export class UmbUserTableCollectionViewElement extends UmbLitElement {
@@ -52,9 +52,9 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	@state()
-	private _userGroupItems: Array<UserGroupItemResponseModel> = [];
+	private _userGroupItems: Array<UmbUserGroupItemModel> = [];
 
-	#UmbUserGroupRepository = new UmbUserGroupRepository(this);
+	#userGroupItemRepository = new UmbUserGroupItemRepository(this);
 
 	@state()
 	private _users: Array<UmbUserDetailModel> = [];
@@ -87,8 +87,8 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 
 	async #observeUserGroups() {
 		if (this._users.length === 0) return;
-		const userGroupsIds = [...new Set(this._users.flatMap((user) => user.userGroupIds ?? []))];
-		const { asObservable } = await this.#UmbUserGroupRepository.requestItems(userGroupsIds);
+		const userGroupsIds = [...new Set(this._users.flatMap((user) => user.userGroupIds))];
+		const { asObservable } = await this.#userGroupItemRepository.requestItems(userGroupsIds);
 		this.observe(
 			asObservable(),
 			(userGroups) => {
@@ -99,10 +99,10 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		);
 	}
 
-	#getUserGroupNames(ids: Array<string>) {
-		return ids
-			.map((id: string) => {
-				return this._userGroupItems.find((x) => x.id === id)?.name;
+	#getUserGroupNames(uniques: Array<string>) {
+		return uniques
+			.map((unique: string) => {
+				return this._userGroupItems.find((x) => x.unique === unique)?.name;
 			})
 			.join(', ');
 	}

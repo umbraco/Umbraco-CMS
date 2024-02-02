@@ -9,8 +9,10 @@ import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbUserGroupCollectionRepository, UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
+import type { UserOrderModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
+import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
@@ -19,9 +21,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	@state()
 	private _stateFilterSelection: Array<UserStateModel> = [];
-
-	@state()
-	private _orderByOptions: Array<UserOrderModel> = Object.values(UserOrderModel);
 
 	@state()
 	private _orderBy?: UserOrderModel;
@@ -109,18 +108,18 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	#onUserGroupFilterChange(event: UUIBooleanInputEvent) {
 		const target = event.currentTarget as UUICheckboxElement;
-		const item = this._userGroups.find((group) => group.id === target.value);
+		const item = this._userGroups.find((group) => group.unique === target.value);
 
 		if (!item) return;
 
 		if (target.checked) {
 			this._userGroupFilterSelection = [...this._userGroupFilterSelection, item];
 		} else {
-			this._userGroupFilterSelection = this._userGroupFilterSelection.filter((group) => group.id !== item.id);
+			this._userGroupFilterSelection = this._userGroupFilterSelection.filter((group) => group.unique !== item.unique);
 		}
 
-		const ids = this._userGroupFilterSelection.map((group) => group.id!);
-		this.#collectionContext?.setUserGroupFilter(ids);
+		const uniques = this._userGroupFilterSelection.map((group) => group.unique);
+		this.#collectionContext?.setUserGroupFilter(uniques);
 	}
 
 	#getUserGroupFilterLabel() {
@@ -183,11 +182,11 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 					<div class="filter-dropdown">
 						${repeat(
 							this._userGroups,
-							(group) => group.id,
+							(group) => group.unique,
 							(group) => html`
 								<uui-checkbox
 									label=${ifDefined(group.name)}
-									value=${ifDefined(group.id)}
+									value=${ifDefined(group.unique)}
 									@change=${this.#onUserGroupFilterChange}></uui-checkbox>
 							`,
 						)}

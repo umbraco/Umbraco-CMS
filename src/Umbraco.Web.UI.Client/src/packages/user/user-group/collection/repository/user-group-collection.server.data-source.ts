@@ -1,8 +1,8 @@
-import type { UmbUserGroupCollectionFilterModel } from '../../types.js';
+import type { UmbUserGroupCollectionFilterModel } from '../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UserGroupResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
@@ -23,8 +23,20 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 		this.#host = host;
 	}
 
-	getCollection(filter: UmbUserGroupCollectionFilterModel) {
-		// TODO: Switch this to the filter endpoint when available
-		return tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroup({}));
+	async getCollection(filter: UmbUserGroupCollectionFilterModel) {
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			UserGroupResource.getUserGroup({ skip: filter.skip, take: filter.take }),
+		);
+
+		if (data) {
+			const mappedItems = data.items.map((item) => {
+				return {
+					...item,
+				};
+			});
+		}
+
+		return { error };
 	}
 }

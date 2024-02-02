@@ -1,23 +1,21 @@
-import { UmbUserGroupRepository } from '../repository/user-group.repository.js';
+import { UmbUserGroupDetailRepository } from '../repository/detail/index.js';
 import { UmbUserRepository } from '../../user/repository/user.repository.js';
-import type {
-	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbEditableWorkspaceContextBase,
-} from '@umbraco-cms/backoffice/workspace';
-import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbUserGroupDetailModel } from '../types.js';
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../entity.js';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UserGroupResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbUserGroupDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	//
-	public readonly repository: UmbUserGroupRepository = new UmbUserGroupRepository(this);
+	public readonly repository: UmbUserGroupDetailRepository = new UmbUserGroupDetailRepository(this);
 
-	#data = new UmbObjectState<UserGroupResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbUserGroupDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	#userIds = new UmbArrayState<string>([], (x) => x);
@@ -34,43 +32,28 @@ export class UmbUserGroupWorkspaceContext
 	async create() {
 		const { data } = await this.repository.createScaffold(null);
 		this.setIsNew(true);
-		// TODO: Should the data be the base model or the presentation model?
-		this.#data.setValue(data as unknown as UserGroupResponseModel);
+		this.#data.setValue(data);
 		return { data };
 	}
 
-	async load(id: string) {
-		const { data } = await this.repository.requestById(id);
+	async load(unique: string) {
+		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
 		}
-
-		/* TODO: implement user selection for a user group
-		const { data: users } = await this.#userRepository.filterCollection({
-			skip: 0,
-			take: 10000000,
-			userGroupIds: [id],
-		});
-
-		if (!users) return;
-
-		const ids = users.items.map((user) => user.id ?? '');
-
-		this.#userIds.next(ids);
-		*/
 	}
 
-	getEntityId(): string | undefined {
-		throw new Error('Method not implemented.');
+	getEntityId() {
+		return this.getData()?.unique;
 	}
 
 	getEntityType(): string {
-		return 'user-group';
+		return UMB_USER_GROUP_ENTITY_TYPE;
 	}
 
-	getData(): UserGroupResponseModel | undefined {
-		throw new Error('Method not implemented.');
+	getData() {
+		return this.#data.getValue();
 	}
 
 	async save() {
@@ -79,8 +62,8 @@ export class UmbUserGroupWorkspaceContext
 		//TODO: Could we clean this code up?
 		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
-		} else if (this.#data.value.id) {
-			await this.repository.save(this.#data.value.id, this.#data.value);
+		} else if (this.#data.value.unique) {
+			await this.repository.save(this.#data.value);
 		} else return;
 
 		//TODO: This next user-group section kinda works. But it will overwrite the entire user-group list on the user.
@@ -89,7 +72,7 @@ export class UmbUserGroupWorkspaceContext
 		//TODO: or the new user-group id needs to be removed from the existing list.
 
 		const userIds = this.#userIds.getValue();
-		const userGroupIds = [this.#data.getValue()?.id ?? ''];
+		const userGroupIds = [this.#data.getValue()?.unique ?? ''];
 
 		if (userIds.length > 0 && userGroupIds.length > 0) {
 			await this.#userRepository.setUserGroups(userIds, userGroupIds);
@@ -107,7 +90,7 @@ export class UmbUserGroupWorkspaceContext
 		await this.repository.delete(id);
 	}
 
-	updateProperty<Alias extends keyof UserGroupResponseModel>(alias: Alias, value: UserGroupResponseModel[Alias]) {
+	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
 		this.#data.update({ [alias]: value });
 	}
 

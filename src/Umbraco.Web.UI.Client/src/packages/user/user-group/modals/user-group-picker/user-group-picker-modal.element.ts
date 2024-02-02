@@ -1,10 +1,10 @@
 import { UmbUserGroupCollectionRepository } from '../../collection/repository/index.js';
+import type { UmbUserGroupDetailModel } from '../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import type { UMB_USER_GROUP_PICKER_MODAL} from '@umbraco-cms/backoffice/modal';
+import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 @customElement('umb-user-group-picker-modal')
@@ -13,7 +13,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 	(typeof UMB_USER_GROUP_PICKER_MODAL)['VALUE']
 > {
 	@state()
-	private _userGroups: Array<UserGroupResponseModel> = [];
+	private _userGroups: Array<UmbUserGroupDetailModel> = [];
 
 	#selectionManager = new UmbSelectionManager(this);
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
@@ -37,20 +37,20 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this.observe(asObservable(), (items) => (this._userGroups = items), 'umbUserGroupsObserver');
 	}
 
-	#onSelected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {
-		if (!item.id) throw new Error('User group id is required');
+	#onSelected(event: UUIMenuItemEvent, item: UmbUserGroupDetailModel) {
+		if (!item.unique) throw new Error('User group unique is required');
 		event.stopPropagation();
-		this.#selectionManager.select(item.id);
+		this.#selectionManager.select(item.unique);
 		this.requestUpdate();
-		this.modalContext?.dispatchEvent(new UmbSelectedEvent(item.id));
+		this.modalContext?.dispatchEvent(new UmbSelectedEvent(item.unique));
 	}
 
-	#onDeselected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {
-		if (!item.id) throw new Error('User group id is required');
+	#onDeselected(event: UUIMenuItemEvent, item: UmbUserGroupDetailModel) {
+		if (!item.unique) throw new Error('User group unique is required');
 		event.stopPropagation();
-		this.#selectionManager.deselect(item.id);
+		this.#selectionManager.deselect(item.unique);
 		this.requestUpdate();
-		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.id));
+		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.unique));
 	}
 
 	render() {
@@ -64,7 +64,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 								selectable
 								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, item)}
 								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, item)}
-								?selected=${this.#selectionManager.isSelected(item.id!)}>
+								?selected=${this.#selectionManager.isSelected(item.unique)}>
 								<uui-icon .name=${item.icon || null} slot="icon"></uui-icon>
 							</uui-menu-item>
 						`,

@@ -3,7 +3,6 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import '../components/user-group-table-name-column-layout.element.js';
 import '../components/user-group-table-sections-column-layout.element.js';
@@ -16,6 +15,7 @@ import type {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
+import type { UmbUserGroupDetailModel } from '../../types.js';
 
 @customElement('umb-user-group-collection-table-view')
 export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
@@ -74,29 +74,29 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(userGroups: Array<UserGroupResponseModel>) {
+	private _createTableItems(userGroups: Array<UmbUserGroupDetailModel>) {
 		this._tableItems = userGroups.map((userGroup) => {
 			return {
-				id: userGroup.id || '',
-				icon: userGroup.icon || '',
+				id: userGroup.unique,
+				icon: userGroup.icon,
 				data: [
 					{
 						columnAlias: 'userGroupName',
 						value: {
-							name: userGroup.name || '',
+							name: userGroup.name,
 						},
 					},
 					{
 						columnAlias: 'userGroupSections',
-						value: userGroup.sections || [],
+						value: userGroup.sections,
 					},
 					{
 						columnAlias: 'userGroupContentStartNode',
-						value: userGroup.documentStartNode?.id || this.localize.term('content_contentRoot'),
+						value: userGroup.documentStartNode?.unique || this.localize.term('content_contentRoot'),
 					},
 					{
 						columnAlias: 'userGroupMediaStartNode',
-						value: userGroup.mediaStartNode?.id || this.localize.term('media_mediaRoot'),
+						value: userGroup.mediaStartNode?.unique || this.localize.term('media_mediaRoot'),
 					},
 				],
 			};
