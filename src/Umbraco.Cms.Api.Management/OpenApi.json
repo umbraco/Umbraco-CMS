@@ -30264,8 +30264,8 @@
       "UserResponseModel": {
         "required": [
           "avatarUrls",
-          "contentStartNodeIds",
           "createDate",
+          "documentStartNodeIds",
           "failedLoginAttempts",
           "id",
           "mediaStartNodeIds",
@@ -30287,7 +30287,7 @@
             "type": "string",
             "nullable": true
           },
-          "contentStartNodeIds": {
+          "documentStartNodeIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {

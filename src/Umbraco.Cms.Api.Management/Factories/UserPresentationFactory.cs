@@ -63,7 +63,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             UpdateDate = user.UpdateDate,
             State = user.UserState,
             UserGroupIds = new HashSet<Guid>(user.Groups.Select(x => x.Key)),
-            ContentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
+            DocumentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
