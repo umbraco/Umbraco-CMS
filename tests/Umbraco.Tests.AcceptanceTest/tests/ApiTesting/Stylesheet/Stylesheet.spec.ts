@@ -4,7 +4,7 @@ import {expect} from "@playwright/test";
 test.describe('Stylesheet tests', () => {
   const stylesheetName = 'Stylesheet.css';
   const folderName = 'StyledFolder';
-  let stylesheetPath = null;
+  let stylesheetPath = '';
 
   test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
@@ -67,13 +67,13 @@ test.describe('Stylesheet tests', () => {
   test('can create a stylesheet in a folder', async ({umbracoApi}) => {
     // Arrange
     await umbracoApi.stylesheet.ensureNameNotExists(folderName);
-    const folderPath = await umbracoApi.stylesheet.createFolder(folderName);
+    const stylesheetFolderPath = await umbracoApi.stylesheet.createFolder(folderName);
 
     // Act
     stylesheetPath = await umbracoApi.stylesheet.create(stylesheetName, 'content', folderName);
 
     // Assert
-    const child = await umbracoApi.stylesheet.getChildren(folderPath);
+    const child = await umbracoApi.stylesheet.getChildren(stylesheetFolderPath);
     expect(child[0].name).toEqual(stylesheetName);
   });
 
