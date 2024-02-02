@@ -1,11 +1,10 @@
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_CULTURE_AND_HOSTNAMES_MODAL, type UmbDocumentDetailRepository } from '@umbraco-cms/backoffice/document';
 
 export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionBase<UmbDocumentDetailRepository> {
-	#modalContext?: UmbModalManagerContext;
+	#modalContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias, unique, entityType);
