@@ -4,7 +4,7 @@ import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/e
 import type { UmbTableConfig, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DictionaryOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-dashboard-translation-dictionary')
 export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
@@ -18,7 +18,8 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#dictionaryItems: DictionaryOverviewResponseModel[] = [];
 
-	#repo!: UmbDictionaryRepository;
+	#dictionaryRepository = new UmbDictionaryRepository(this);
+	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 
 	#tableItems: Array<UmbTableItem> = [];
 
@@ -30,18 +31,12 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 		super();
 	}
 
-	async connectedCallback() {
-		super.connectedCallback();
-
-		this.#repo = new UmbDictionaryRepository(this);
-		this.#languages = await this.#repo.getLanguages();
-		await this.#getDictionaryItems();
+	firstUpdated() {
+		this.#getDictionaryItems();
 	}
 
 	async #getDictionaryItems() {
-		if (!this.#repo) return;
-
-		const { data } = await this.#repo.list(0, 1000);
+		const { data } = await this.#dictionaryRepository.list(0, 1000);
 		this.#dictionaryItems = data?.items ?? [];
 
 		this.#setTableColumns();
@@ -65,8 +60,8 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 			if (!l.name) return;
 
 			this.#tableColumns.push({
-				name: l.name ?? '',
-				alias: l.isoCode ?? '',
+				name: l.name,
+				alias: l.unique,
 			});
 		});
 	}
@@ -90,11 +85,11 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 			};
 
 			this.#languages.forEach((l) => {
-				if (!l.isoCode) return;
+				if (!l.unique) return;
 
 				tableItem.data.push({
-					columnAlias: l.isoCode,
-					value: dictionary.translatedIsoCodes?.includes(l.isoCode)
+					columnAlias: l.unique,
+					value: dictionary.translatedIsoCodes?.includes(l.unique)
 						? html`<uui-icon
 								name="check"
 								title="${this.localize.term('visuallyHiddenTexts_hasTranslation')} (${l.name})"
