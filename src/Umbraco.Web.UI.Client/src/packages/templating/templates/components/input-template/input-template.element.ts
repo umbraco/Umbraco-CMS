@@ -5,11 +5,7 @@ import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_TEMPLATE_PICKER_MODAL,
-	UMB_TEMPLATE_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_TEMPLATE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-template')
@@ -141,14 +137,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#openTemplate(e: CustomEvent) {
-		const unique = (e.target as UmbTemplateCardElement).value as string;
-
-		this._modalContext?.open(UMB_TEMPLATE_MODAL, {
-			data: {
-				unique,
-				language: 'razor',
-			},
-		});
+		alert('open template modal');
 	}
 
 	render() {
