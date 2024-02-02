@@ -27,22 +27,6 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 
 	#languages: Array<UmbLanguageDetailModel> = [];
 
-	constructor() {
-		super();
-	}
-
-	firstUpdated() {
-		this.#getDictionaryItems();
-	}
-
-	async #getDictionaryItems() {
-		const { data } = await this.#dictionaryRepository.list(0, 1000);
-		this.#dictionaryItems = data?.items ?? [];
-
-		this.#setTableColumns();
-		this.#setTableItems();
-	}
-
 	/**
 	 * We don't know how many translation items exist for each dictionary until the data arrives
 	 * so can not generate the columns in advance.

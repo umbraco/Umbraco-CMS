@@ -23,6 +23,11 @@ export const detailHandlers = [
 		);
 	}),
 
+	rest.get(umbracoPath(`${UMB_SLUG}`), (req, res, ctx) => {
+		const response: PagedDictionaryOverviewResponseModel = umbDictionaryMockDb.getOverview();
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
 	rest.get(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return res(ctx.status(400));

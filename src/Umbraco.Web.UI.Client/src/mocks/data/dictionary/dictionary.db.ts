@@ -9,6 +9,8 @@ import type {
 	CreateDictionaryItemRequestModel,
 	DictionaryItemResponseModel,
 	DictionaryItemItemResponseModel,
+	PagedDictionaryOverviewResponseModel,
+	DictionaryOverviewResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -19,6 +21,20 @@ export class UmbDictionaryMockDB extends UmbEntityMockDbBase<UmbMockDictionaryMo
 
 	constructor(data: Array<UmbMockDictionaryModel>) {
 		super(data);
+	}
+
+	getOverview(): PagedDictionaryOverviewResponseModel {
+		const all = this.getAll();
+		const items: Array<DictionaryOverviewResponseModel> = all.map((item) => {
+			return {
+				name: item.name,
+				id: item.id,
+				translatedIsoCodes: item.translatedIsoCodes,
+				parent: item.parent,
+			};
+		});
+
+		return { items, total: all.length };
 	}
 }
 
