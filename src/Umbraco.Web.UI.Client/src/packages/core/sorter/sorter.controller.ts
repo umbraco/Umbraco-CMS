@@ -242,6 +242,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (!dropSorter || dropSorter.identifier !== this.identifier) return;
 
 		if (dropSorter === this) {
+			e.preventDefault();
+			if (e.dataTransfer) {
+				e.dataTransfer.dropEffect = 'move';
+			}
+
 			// Do nothing as we are the active sorter.
 			this.#handleDragMove(e);
 
@@ -343,7 +348,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		event.stopPropagation();
 		if (event.dataTransfer) {
 			event.dataTransfer.effectAllowed = 'all'; // copyMove when we enhance the drag with clipboard data.// defaults to 'all'
-			event.dataTransfer.dropEffect = 'copy'; // visual feedback when dropped.
 		}
 
 		if (!this.#scrollElement) {
