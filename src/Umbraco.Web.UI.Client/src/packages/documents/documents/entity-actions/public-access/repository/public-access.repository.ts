@@ -7,8 +7,6 @@ import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbDocumentPublicAccessRepository extends UmbBaseController implements UmbApi {
-	#init!: Promise<unknown>;
-
 	#dataSource: UmbDocumentPublicAccessServerDataSource;
 
 	#notificationContext?: UmbNotificationContext;
@@ -18,19 +16,16 @@ export class UmbDocumentPublicAccessRepository extends UmbBaseController impleme
 
 		this.#dataSource = new UmbDocumentPublicAccessServerDataSource(this);
 
-		this.#init = Promise.all([
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				this.#notificationContext = instance as UmbNotificationContext;
-			}).asPromise(),
-		]);
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
+			this.#notificationContext = instance as UmbNotificationContext;
+		});
 	}
 
-	async create(id: string, data: PublicAccessRequestModel) {
-		if (!id) throw new Error('Id is missing');
+	async create(unique: string, data: PublicAccessRequestModel) {
+		if (!unique) throw new Error('unique is missing');
 		if (!data) throw new Error('Data is missing');
-		await this.#init;
 
-		const { error } = await this.#dataSource.update(id, data);
+		const { error } = await this.#dataSource.update(unique, data);
 		if (!error) {
 			const notification = { data: { message: `Public acccess setting created` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -38,20 +33,18 @@ export class UmbDocumentPublicAccessRepository extends UmbBaseController impleme
 		return { error };
 	}
 
-	async read(id: string) {
-		if (!id) throw new Error('Id is missing');
-		await this.#init;
+	async read(unique: string) {
+		if (!unique) throw new Error('unique is missing');
 
-		const { data, error } = await this.#dataSource.read(id);
+		const { data, error } = await this.#dataSource.read(unique);
 		return { data, error };
 	}
 
-	async update(id: string, data: PublicAccessRequestModel) {
-		if (!id) throw new Error('Id is missing');
+	async update(unique: string, data: PublicAccessRequestModel) {
+		if (!unique) throw new Error('unique is missing');
 		if (!data) throw new Error('Data is missing');
-		await this.#init;
 
-		const { error } = await this.#dataSource.update(id, data);
+		const { error } = await this.#dataSource.update(unique, data);
 		if (!error) {
 			const notification = { data: { message: `Public acccess setting updated` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -59,11 +52,10 @@ export class UmbDocumentPublicAccessRepository extends UmbBaseController impleme
 		return { error };
 	}
 
-	async delete(id: string) {
-		if (!id) throw new Error('Id is missing');
-		await this.#init;
+	async delete(unique: string) {
+		if (!unique) throw new Error('unique is missing');
 
-		const { error } = await this.#dataSource.delete(id);
+		const { error } = await this.#dataSource.delete(unique);
 		if (!error) {
 			const notification = { data: { message: `Public acccess setting deleted` } };
 			this.#notificationContext?.peek('positive', notification);

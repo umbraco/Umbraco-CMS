@@ -22,44 +22,47 @@ export class UmbDocumentPublicAccessServerDataSource {
 	}
 
 	/**
-	 * Creates the Public Access for the given Document id
-	 * @param {string} id
+	 * Creates the Public Access for the given Document unique
+	 * @param {string} unique
 	 * @param {PublicAccessRequestModel} data
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
-	async create(id: string, data: PublicAccessRequestModel) {
-		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.postDocumentByIdPublicAccess({ id, requestBody: data }));
+	async create(unique: string, data: PublicAccessRequestModel) {
+		if (!unique) throw new Error('unique is missing');
+		return tryExecuteAndNotify(
+			this.#host,
+			DocumentResource.postDocumentByIdPublicAccess({ id: unique, requestBody: data }),
+		);
 	}
 
 	/**
-	 * Fetches the Public Access for the given Document id
-	 * @param {string} id
+	 * Fetches the Public Access for the given Document unique
+	 * @param {string} unique
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
-	async read(id: string) {
-		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdPublicAccess({ id }));
+	async read(unique: string) {
+		if (!unique) throw new Error('unique is missing');
+		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdPublicAccess({ id: unique }));
 	}
 
 	/**
-	 * Updates Public Access for the given Document id
-	 * @param {string} id
+	 * Updates Public Access for the given Document unique
+	 * @param {string} unique
 	 * @param {PublicAccessRequestModel} data
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
-	async update(id: string, requestBody: PublicAccessRequestModel) {
-		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdPublicAccess({ id, requestBody }));
+	async update(unique: string, requestBody: PublicAccessRequestModel) {
+		if (!unique) throw new Error('unique is missing');
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdPublicAccess({ id: unique, requestBody }));
 	}
 
 	/**
-	 * Deletes Public Access for the given Document id
-	 * @param {string} id
+	 * Deletes Public Access for the given Document unique
+	 * @param {string} unique
 	 * @memberof UmbDocumentPublicAccessServerDataSource
 	 */
-	async delete(id: string) {
-		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.deleteDocumentByIdPublicAccess({ id }));
+	async delete(unique: string) {
+		if (!unique) throw new Error('unique is missing');
+		return tryExecuteAndNotify(this.#host, DocumentResource.deleteDocumentByIdPublicAccess({ id: unique }));
 	}
 }
