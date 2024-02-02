@@ -6,7 +6,7 @@ import type { UmbTemplateModalData, UmbTemplateModalValue } from '@umbraco-cms/b
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbTemplateDetailModel } from '@umbraco-cms/backoffice/template';
+import type { UmbTemplateDetailModel } from '@umbraco-cms/backoffice/template';
 
 //TODO: make a default tree-picker that can be used across multiple pickers
 // TODO: make use of UmbPickerLayoutBase

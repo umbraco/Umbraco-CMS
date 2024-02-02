@@ -1,8 +1,7 @@
-import {
-	ContentStateModel,
-	type MediaItemResponseModel,
-	type MediaResponseModel,
-	type MediaTreeItemResponseModel,
+import type {
+	MediaItemResponseModel,
+	MediaResponseModel,
+	MediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 type UmbMockMediaModelHack = MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel;
@@ -29,7 +28,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -59,7 +57,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -84,7 +81,6 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -109,7 +105,6 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -139,7 +134,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -189,7 +183,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -219,7 +212,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,

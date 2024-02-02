@@ -12,10 +12,10 @@ export interface UmbUserDetailModel {
 	contentStartNodeIds: Array<string>;
 	mediaStartNodeIds: Array<string>;
 	avatarUrls: Array<string>;
-	state: UserStateModel;
+	state: UserStateModel | null;
 	failedLoginAttempts: number;
-	createDate: string;
-	updateDate: string;
+	createDate: string | null;
+	updateDate: string | null;
 	lastLoginDate: string | null;
 	lastLockoutDate: string | null;
 	lastPasswordChangeDate: string | null;

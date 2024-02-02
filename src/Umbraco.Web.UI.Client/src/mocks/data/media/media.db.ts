@@ -6,12 +6,11 @@ import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbEntityRecycleBin } from '../utils/entity/entity-recycle-bin.js';
 import type { UmbMockMediaModel } from './media.data.js';
 import { data } from './media.data.js';
-import {
-	ContentStateModel,
-	type CreateMediaRequestModel,
-	type MediaItemResponseModel,
-	type MediaResponseModel,
-	type MediaTreeItemResponseModel,
+import type {
+	CreateMediaRequestModel,
+	MediaItemResponseModel,
+	MediaResponseModel,
+	MediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -70,7 +69,6 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
-				state: ContentStateModel.DRAFT,
 				publishDate: null,
 			};
 		}),

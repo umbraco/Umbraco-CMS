@@ -1,8 +1,8 @@
-import type { UmbUserDetailModel, UmbUserPropertyModel } from '../../types.js';
+import type { UmbUserDetailModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateUserRequestModel, UserModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateUserRequestModel, UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -31,15 +31,25 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	 * @return { CreateUserRequestModel }
 	 * @memberof UmbUserServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold() {
 		const data: UmbUserDetailModel = {
+			avatarUrls: [],
+			contentStartNodeIds: [],
+			createDate: null,
+			email: '',
 			entityType: UMB_USER_ENTITY_TYPE,
-			unique: UmbId.new(),
-			parentUnique,
+			failedLoginAttempts: 0,
+			languageIsoCode: '',
+			lastLockoutDate: null,
+			lastLoginDate: null,
+			lastPasswordChangeDate: null,
+			mediaStartNodeIds: [],
 			name: '',
-			editorAlias: undefined,
-			editorUiAlias: null,
-			values: [],
+			state: null,
+			unique: UmbId.new(),
+			updateDate: null,
+			userGroupIds: [],
+			userName: '',
 		};
 
 		return { data };
@@ -62,13 +72,23 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 
 		// TODO: make data mapper to prevent errors
 		const dataType: UmbUserDetailModel = {
+			avatarUrls: data.avatarUrls,
+			contentStartNodeIds: data.contentStartNodeIds,
+			createDate: data.createDate,
+			email: data.email,
 			entityType: UMB_USER_ENTITY_TYPE,
-			unique: data.id,
-			parentUnique: data.parent ? data.parent.id : null,
+			failedLoginAttempts: data.failedLoginAttempts,
+			languageIsoCode: data.languageIsoCode || null,
+			lastLockoutDate: data.lastLockoutDate || null,
+			lastLoginDate: data.lastLoginDate || null,
+			lastPasswordChangeDate: data.lastPasswordChangeDate || null,
+			mediaStartNodeIds: data.mediaStartNodeIds,
 			name: data.name,
-			editorAlias: data.editorAlias,
-			editorUiAlias: data.editorUiAlias || null,
-			values: data.values as Array<UmbUserPropertyModel>,
+			state: data.state,
+			unique: data.id,
+			updateDate: data.updateDate,
+			userGroupIds: data.userGroupIds,
+			userName: data.userName,
 		};
 
 		return { data: dataType };
@@ -82,17 +102,13 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	 */
 	async create(model: UmbUserDetailModel) {
 		if (!model) throw new Error('User is missing');
-		if (!model.unique) throw new Error('User unique is missing');
-		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateUserRequestModel = {
-			id: model.unique,
-			parentId: model.parentUnique,
+			email: model.email,
 			name: model.name,
-			editorAlias: model.editorAlias,
-			editorUiAlias: model.editorUiAlias,
-			values: model.values,
+			userGroupIds: model.userGroupIds,
+			userName: model.userName,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -103,6 +119,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		);
 
 		if (data) {
+			// TODO: What do we do about the initial password?
 			return this.read(data);
 		}
 
@@ -117,14 +134,16 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 	 */
 	async update(model: UmbUserDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
-		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UserModelBaseModel = {
+		const requestBody: UpdateUserRequestModel = {
+			documentStartNodeIds: model.contentStartNodeIds,
+			email: model.email,
+			languageIsoCode: model.languageIsoCode || '',
+			mediaStartNodeIds: model.mediaStartNodeIds,
 			name: model.name,
-			editorAlias: model.editorAlias,
-			editorUiAlias: model.editorUiAlias,
-			values: model.values,
+			userGroupIds: model.userGroupIds,
+			userName: model.userName,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(

@@ -93,7 +93,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 				};
 			}),
 			urls: data.urls,
-			template: data.template ? { id: data.template.id } : null,
+			template: data.template ? { unique: data.template.id } : null,
 			documentType: { unique: data.documentType.id },
 			isTrashed: data.isTrashed,
 		};
@@ -116,7 +116,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			id: model.unique,
 			parent: model.parentUnique ? { id: model.parentUnique } : null,
 			documentType: { id: model.documentType.unique },
-			template: model.template,
+			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
 		};
@@ -146,7 +146,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateDocumentRequestModel = {
-			template: model.template,
+			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
 		};

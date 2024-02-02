@@ -8,7 +8,7 @@ import type { UmbMockDocumentModel } from './document.data.js';
 import { data } from './document.data.js';
 import { UmbMockDocumentPublishingManager } from './document-publishing.manager.js';
 import {
-	ContentStateModel,
+	DocumentVariantStateModel,
 	type CreateDocumentRequestModel,
 	type DocumentItemResponseModel,
 	type DocumentResponseModel,
@@ -79,7 +79,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
-				state: ContentStateModel.DRAFT,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
 			};
 		}),

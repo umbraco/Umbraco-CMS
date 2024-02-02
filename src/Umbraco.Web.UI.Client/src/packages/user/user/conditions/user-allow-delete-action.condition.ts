@@ -12,7 +12,7 @@ export class UmbUserAllowDeleteActionCondition extends UmbUserActionConditionBas
 
 	async onUserDataChange() {
 		// don't allow the current user to delete themselves
-		if (!this.userData || !this.userData.id || (await this.isCurrentUser())) {
+		if (!this.userData || !this.userData.unique || (await this.isCurrentUser())) {
 			this.permitted = false;
 		} else {
 			this.permitted = true;

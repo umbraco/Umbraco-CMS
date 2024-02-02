@@ -52,9 +52,6 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	@state()
-	private _userGroups: Array<UserGroupResponseModel> = [];
-
 	#collectionContext?: UmbDefaultCollectionContext;
 
 	constructor() {
@@ -70,7 +67,6 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 			this.observe(
 				this.#collectionContext.items,
 				(items) => {
-					this._userGroups = items;
 					this._createTableItems(items);
 				},
 				'umbCollectionItemsObserver',
@@ -96,11 +92,11 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'userGroupContentStartNode',
-						value: userGroup.documentStartNodeId || this.localize.term('content_contentRoot'),
+						value: userGroup.documentStartNode?.id || this.localize.term('content_contentRoot'),
 					},
 					{
 						columnAlias: 'userGroupMediaStartNode',
-						value: userGroup.mediaStartNodeId || this.localize.term('media_mediaRoot'),
+						value: userGroup.mediaStartNode?.id || this.localize.term('media_mediaRoot'),
 					},
 				],
 			};

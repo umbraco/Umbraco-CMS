@@ -1,5 +1,6 @@
 import type { UmbDocumentEntityType } from './entity.js';
 import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbDocumentDetailModel {
 	documentType: { unique: string };
@@ -10,7 +11,11 @@ export interface UmbDocumentDetailModel {
 	parentUnique: string | null;
 	urls: Array<UmbDocumentUrlInfoModel>;
 	values: Array<UmbDocumentValueModel>;
-	variants: Array<UmbVariantModel>;
+	variants: Array<UmbDocumentVariantModel>;
+}
+
+export interface UmbDocumentVariantModel extends UmbVariantModel {
+	state: DocumentVariantStateModel | null;
 }
 
 export interface UmbDocumentUrlInfoModel {

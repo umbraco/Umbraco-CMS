@@ -1,16 +1,16 @@
 import { UmbUserCollectionRepository } from '../../collection/repository/user-collection.repository.js';
+import type { UmbUserItemModel } from '../../repository/item/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbUserPickerModalData, UmbUserPickerModalValue} from '@umbraco-cms/backoffice/modal';
+import type { UmbUserPickerModalData, UmbUserPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import type { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-picker-modal')
 export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPickerModalData, UmbUserPickerModalValue> {
 	@state()
-	private _users: Array<UserItemResponseModel> = [];
+	private _users: Array<UmbUserItemModel> = [];
 
 	#selectionManager = new UmbSelectionManager(this);
 	#userCollectionRepository = new UmbUserCollectionRepository(this);

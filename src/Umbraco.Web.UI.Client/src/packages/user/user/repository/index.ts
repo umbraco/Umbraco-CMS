@@ -5,3 +5,4 @@ export * from './unlock/unlock-user.repository.js';
 export * from './user.repository.js';
 export * from './item/index.js';
 export * from './detail/index.js';
+export * from './avatar/index.js';

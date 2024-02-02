@@ -1,11 +1,11 @@
 import type { UmbUserDetailModel } from '../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserDetailRepository } from '../repository/index.js';
+import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
 import { UMB_USER_WORKSPACE_ALIAS } from './manifests.js';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
@@ -46,7 +46,7 @@ export class UmbUserWorkspaceContext
 		Therefore we have to subscribe to the user store to update the state in the workspace data.
 		There might be a less manual way to do this.
 	*/
-	onUserStoreChanges(user: UmbUserDetailModel) {
+	onUserStoreChanges(user: UmbUserDetailModel | undefined) {
 		if (!user) return;
 		this.#data.update({ state: user.state });
 	}

@@ -3,7 +3,7 @@ import type {
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 type UmbMockDocumentTypeModelHack = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
 
@@ -367,7 +367,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -376,7 +376,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da-dk',
 				segment: null,
@@ -469,7 +469,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -478,7 +478,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da-dk',
 				segment: null,
@@ -487,7 +487,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'no-no',
 				segment: null,
@@ -496,7 +496,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.PUBLISHED_PENDING_CHANGES,
+				state: DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'es-es',
 				segment: null,
@@ -505,7 +505,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.NOT_CREATED,
+				state: DocumentVariantStateModel.NOT_CREATED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'pl-pl',
 				segment: null,
@@ -581,7 +581,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.DRAFT,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
 				segment: null,
@@ -612,7 +612,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		isTrashed: false,
 		variants: [
 			{
-				state: ContentStateModel.DRAFT,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
 				segment: null,

@@ -88,7 +88,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDataTypeRequestModel = {
 			id: model.unique,
-			parentId: model.parentUnique,
+			parent: model.parentUnique ? { id: model.parentUnique } : null,
 			name: model.name,
 			editorAlias: model.editorAlias,
 			editorUiAlias: model.editorUiAlias,
