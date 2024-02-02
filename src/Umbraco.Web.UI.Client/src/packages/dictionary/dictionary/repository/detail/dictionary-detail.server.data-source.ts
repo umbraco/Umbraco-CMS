@@ -82,7 +82,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDictionaryItemRequestModel = {
 			id: model.unique,
-			parentId: null,
+			parent: null,
 			name: model.name,
 			translations: model.translations,
 		};

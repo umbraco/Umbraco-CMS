@@ -18,7 +18,6 @@ import {
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-variant-selector')
@@ -148,11 +147,11 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private _switchVariant(variant: UmbVariantModel) {
+	private _switchVariant(variant: UmbDocumentVariantModel) {
 		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
 	}
 
-	private _openSplitView(variant: UmbVariantModel) {
+	private _openSplitView(variant: UmbDocumentVariantModel) {
 		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
 	}
 

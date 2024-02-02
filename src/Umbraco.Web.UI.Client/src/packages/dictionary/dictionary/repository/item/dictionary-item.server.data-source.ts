@@ -1,7 +1,7 @@
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import type { UmbDictionaryItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DictionaryItemItemResponseModel, DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -12,7 +12,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @implements {DocumentTreeDataSource}
  */
 export class UmbDictionaryItemServerDataSource extends UmbItemServerDataSourceBase<
-	DictionaryItemResponseModel,
+	DictionaryItemItemResponseModel,
 	UmbDictionaryItemModel
 > {
 	/**
@@ -31,7 +31,7 @@ export class UmbDictionaryItemServerDataSource extends UmbItemServerDataSourceBa
 /* eslint-disable local-rules/no-direct-api-import */
 const getItems = (uniques: Array<string>) => DictionaryResource.getItemDictionary({ id: uniques });
 
-const mapper = (item: DictionaryItemResponseModel): UmbDictionaryItemModel => {
+const mapper = (item: DictionaryItemItemResponseModel): UmbDictionaryItemModel => {
 	return {
 		entityType: UMB_DICTIONARY_ENTITY_TYPE,
 		unique: item.id,
