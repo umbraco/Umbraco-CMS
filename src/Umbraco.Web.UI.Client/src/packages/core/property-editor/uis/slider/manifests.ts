@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.Slider',
 	name: 'Slider Property Editor UI',
-	js: () => import('./property-editor-ui-slider.element.js'),
+	element: () => import('./property-editor-ui-slider.element.js'),
 	meta: {
 		label: 'Slider',
 		propertyEditorSchemaAlias: 'Umbraco.Slider',

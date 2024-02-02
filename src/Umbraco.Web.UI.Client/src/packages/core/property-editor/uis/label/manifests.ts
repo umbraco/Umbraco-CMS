@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.Label',
 	name: 'Label Property Editor UI',
-	js: () => import('./property-editor-ui-label.element.js'),
+	element: () => import('./property-editor-ui-label.element.js'),
 	meta: {
 		label: 'Label',
 		icon: 'icon-readonly',
