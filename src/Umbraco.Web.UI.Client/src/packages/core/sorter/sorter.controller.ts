@@ -518,10 +518,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			}
 
 			// Indication if drop is good:
-			if (
-				//toBeCurrentContainerCtrl ??
-				this.updateAllowIndication(UmbSorterController.activeItem) === false
-			) {
+			if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
 				return;
 			}
 
@@ -569,7 +566,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 			const foundElIndex = orderedContainerElements.indexOf(foundEl);
 			const newIndex = placeAfter ? foundElIndex + 1 : foundElIndex;
-			//toBeCurrentContainerCtrl ??
 			this.#moveElementTo(newIndex);
 
 			return;
@@ -577,18 +573,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		// We skipped the above part cause we are above or below container:
 
 		// Indication if drop is good:
-		if (
-			//toBeCurrentContainerCtrl ??
-			this.updateAllowIndication(UmbSorterController.activeItem) === false
-		) {
+		if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
 			return;
 		}
 
 		if (this.#dragY < currentContainerRect.top) {
-			//toBeCurrentContainerCtrl ??
 			this.#moveElementTo(0);
 		} else if (this.#dragY > currentContainerRect.bottom) {
-			//toBeCurrentContainerCtrl ??
 			this.#moveElementTo(-1);
 		}
 	};
