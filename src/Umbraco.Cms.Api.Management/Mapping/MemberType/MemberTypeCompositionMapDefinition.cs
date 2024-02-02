@@ -7,11 +7,11 @@ namespace Umbraco.Cms.Api.Management.Mapping.MemberType;
 public class MemberTypeCompositionMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
-        => mapper.Define<IContentType, MemberTypeCompositionResponseModel>(
+        => mapper.Define<IMemberType, MemberTypeCompositionResponseModel>(
             (_, _) => new MemberTypeCompositionResponseModel(), Map);
 
     // Umbraco.Code.MapAll
-    private static void Map(IContentType source, MemberTypeCompositionResponseModel target, MapperContext context)
+    private static void Map(IMemberType source, MemberTypeCompositionResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
