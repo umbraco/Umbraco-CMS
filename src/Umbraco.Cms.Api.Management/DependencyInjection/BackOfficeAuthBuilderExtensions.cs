@@ -19,8 +19,14 @@ public static class BackOfficeAuthBuilderExtensions
         builder
             .AddAuthentication()
             .AddUmbracoOpenIddict()
-            .AddBackOfficeLogin();
+            .AddBackOfficeLogin()
+            .AddTokenRevocation();
 
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddTokenRevocation(this IUmbracoBuilder builder)
+    {
         builder.AddNotificationAsyncHandler<UserSavingNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserSavedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserDeletedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
