@@ -136,15 +136,14 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
             return;
         }
 
-        foreach (IUserGroup userGroup in notification.DeletedEntities)
+        // since the user group was deleted, we can only use the information we collected before the deletion
+        // this means that we will not be able to detect users in any groups that were eventually deleted (due to implementor/3th party supplier interference)
+        // that were not in the initial to be deleted list,
+        foreach (IUser user in preDeletingUsersInGroups
+                     .Where(group => notification.DeletedEntities.Any(entity => group.Key == entity.Key))
+                     .SelectMany(group => group.Value))
         {
-            if (preDeletingUsersInGroups.TryGetValue(userGroup.Key, out IEnumerable<IUser>? preDeletingUsersState))
-            {
-                foreach (IUser user in preDeletingUsersState)
-                {
-                    await RevokeTokensAsync(user);
-                }
-            }
+            await RevokeTokensAsync(user);
         }
     }
 
