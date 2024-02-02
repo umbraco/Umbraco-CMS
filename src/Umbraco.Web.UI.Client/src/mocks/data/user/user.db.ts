@@ -6,9 +6,9 @@ import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manage
 import type { UmbMockUserModel } from './user.data.js';
 import { data } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import type {
 	CreateUserRequestModel,
+	CurrentUserResponseModel,
 	InviteUserRequestModel,
 	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
@@ -49,7 +49,7 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 	 * @return {*}  {UmbLoggedInUser}
 	 * @memberof UmbUserData
 	 */
-	getCurrentUser(): UmbCurrentUser {
+	getCurrentUser(): CurrentUserResponseModel {
 		const firstUser = this.data[0];
 		const permissions = firstUser.userGroupIds?.length ? umbUserGroupMockDb.getPermissions(firstUser.userGroupIds) : [];
 
