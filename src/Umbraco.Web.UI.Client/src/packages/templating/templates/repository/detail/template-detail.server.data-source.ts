@@ -39,7 +39,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 			name: '',
 			alias: '',
 			content: '',
-			masterTemplateId: null,
+			masterTemplate: null,
 		};
 
 		return { data };
@@ -68,7 +68,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 			name: data.name,
 			content: data.content || null,
 			alias: data.alias,
-			masterTemplateId: data.masterTemplateId || null,
+			masterTemplate: data.masterTemplate ? { unique: data.masterTemplate.id } : null,
 		};
 
 		return { data: template };
@@ -85,7 +85,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateTemplateRequestModel = {
-			key: model.unique,
+			id: model.unique,
 			name: model.name,
 			content: model.content,
 			alias: model.alias,

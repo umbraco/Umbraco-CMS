@@ -24,7 +24,7 @@ export class UmbTemplateWorkspaceContext
 	alias = this.#data.asObservablePart((data) => data?.alias);
 	content = this.#data.asObservablePart((data) => data?.content);
 	unique = this.#data.asObservablePart((data) => data?.unique);
-	masterTemplateID = this.#data.asObservablePart((data) => data?.masterTemplateId);
+	masterTemplateUnique = this.#data.asObservablePart((data) => data?.masterTemplate?.unique);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
