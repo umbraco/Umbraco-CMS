@@ -100,7 +100,7 @@
 
 			"@umbraco-cms/backoffice/block": ["./src/packages/block/index.ts"],
 			"@umbraco-cms/backoffice/audit-log": ["src/packages/audit-log/index.ts"],
-			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/dictionary/index.ts"],
+			"@umbraco-cms/backoffice/dictionary": ["src/packages/dictionary/index.ts"],
 
 			// DOCUMENT MANAGEMENT
 			"@umbraco-cms/backoffice/document": ["./src/packages/documents/documents/index.ts"],

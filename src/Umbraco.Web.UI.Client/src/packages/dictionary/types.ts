@@ -1,4 +1,4 @@
-import type { UmbDictionaryEntityType } from './entity.js';
+import type { UmbDictionaryEntityType } from '../dictionary/entity.js';
 
 export interface UmbDictionaryDetailModel {
 	entityType: UmbDictionaryEntityType;

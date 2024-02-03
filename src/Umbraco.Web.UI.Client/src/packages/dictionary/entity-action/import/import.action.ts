@@ -4,8 +4,8 @@ import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_IMPORT_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
-import type { UmbDictionaryTreeStore } from '@umbraco-cms/backoffice/dictionary';
-import { UMB_DICTIONARY_TREE_STORE_CONTEXT } from '@umbraco-cms/backoffice/dictionary';
+import type { UmbDictionaryTreeStore } from 'src/packages/dictionary/index.js';
+import { UMB_DICTIONARY_TREE_STORE_CONTEXT } from 'src/packages/dictionary/index.js';
 
 export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryImportRepository> {
 	static styles = [UmbTextStyles];

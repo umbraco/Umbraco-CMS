@@ -1,6 +1,6 @@
 import './dictionary-workspace.element.js';
 import type { Meta, Story } from '@storybook/web-components';
-import { data } from '../../../../mocks/data/dictionary/dictionary.data.js';
+import { data } from '../../../mocks/data/dictionary/dictionary.data.js';
 import type { UmbWorkspaceDictionaryElement } from './dictionary-workspace.element.js';
 import { html, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
