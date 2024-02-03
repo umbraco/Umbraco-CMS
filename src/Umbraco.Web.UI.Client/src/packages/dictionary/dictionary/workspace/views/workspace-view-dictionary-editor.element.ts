@@ -1,18 +1,17 @@
 import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from '../dictionary-workspace.context.js';
-import { UmbDictionaryDetailRepository } from '../../repository/index.js';
 import type { UmbDictionaryDetailModel } from '../../types.js';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-workspace-view-dictionary-editor')
 export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	@state()
 	private _dictionary?: UmbDictionaryDetailModel;
 
-	#repo!: UmbDictionaryDetailRepository;
+	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 
 	@state()
 	private _languages: Array<UmbLanguageDetailModel> = [];
@@ -22,13 +21,17 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	async connectedCallback() {
 		super.connectedCallback();
 
-		this.#repo = new UmbDictionaryDetailRepository(this);
-		this._languages = await this.#repo.getLanguages();
-
 		this.consumeContext(UMB_DICTIONARY_WORKSPACE_CONTEXT, (_instance) => {
 			this.#workspaceContext = _instance;
 			this.#observeDictionary();
 		});
+	}
+
+	async firstUpdated() {
+		const { data } = await this.#languageCollectionRepository.requestCollection({ skip: 0, take: 200 });
+		if (data) {
+			this._languages = data.items;
+		}
 	}
 
 	#observeDictionary() {
