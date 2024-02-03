@@ -3,6 +3,7 @@ import { umbDictionaryMockDb } from '../../data/dictionary/dictionary.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateDictionaryItemRequestModel,
+	PagedDictionaryOverviewResponseModel,
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
