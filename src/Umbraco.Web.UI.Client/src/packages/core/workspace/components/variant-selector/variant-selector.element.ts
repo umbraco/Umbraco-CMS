@@ -81,6 +81,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				workspaceContext.variants,
 				(variants) => {
 					if (variants) {
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						// TODO: figure out what we do with the different variant models. Document has a state, but the variant model does not.
 						this._variants = variants;
 					}
 				},

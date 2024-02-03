@@ -47,8 +47,8 @@ export class UmbTemplateQueryServerDataSource {
 	 */
 	async executeTemplateQuery(args: any) {
 		const requestBody: TemplateQueryExecuteModel = {
-			rootContentId: args.rootContentUnique,
-			contentTypeAlias: args.contentTypeAlias,
+			rootDocument: { id: args.rootContentUnique },
+			documentTypeAlias: args.contentTypeAlias,
 			filters: args.filters,
 			sort: args.sort,
 			take: args.take,

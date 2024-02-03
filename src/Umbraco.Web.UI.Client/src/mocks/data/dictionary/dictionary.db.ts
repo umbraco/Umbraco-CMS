@@ -54,6 +54,7 @@ const createMockMapper = (request: CreateDictionaryItemRequestModel): UmbMockDic
 		parent: request.parent,
 		translations: request.translations,
 		hasChildren: false,
+		translatedIsoCodes: [],
 	};
 };
 

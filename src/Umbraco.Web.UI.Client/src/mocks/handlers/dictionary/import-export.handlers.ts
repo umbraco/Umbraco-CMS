@@ -14,14 +14,15 @@ const importResponse: UmbMockDictionaryModel = {
 	name: 'Uploaded dictionary',
 	id: 'b7e7d0ab-53ba-485d-dddd-12537f9925cb',
 	hasChildren: false,
+	translatedIsoCodes: ['en', 'da'],
 	translations: [
 		{
 			isoCode: 'en',
 			translation: 'I am an imported US value',
 		},
 		{
-			isoCode: 'fr',
-			translation: 'I am an imported French value',
+			isoCode: 'da',
+			translation: 'I am an imported Danish value',
 		},
 	],
 };
@@ -49,14 +50,12 @@ export const importExportHandlers = [
 			statusCode: 200,
 		};
     */
-		debugger;
 
 		return res(ctx.status(200), ctx.json(contentResult));
 	}),
 
 	// TODO => handle properly, querystring breaks handler
 	rest.get(umbracoPath(`${UMB_SLUG}/:id/export`), (req, res, ctx) => {
-		debugger;
 		const id = req.params.id as string;
 		if (!id) return;
 

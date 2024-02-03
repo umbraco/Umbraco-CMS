@@ -86,13 +86,11 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	}
 
 	async #getTemplateQuerySettings() {
-		debugger;
 		const { data, error } = await this.#templateQueryRepository.getTemplateQuerySettings();
 		if (data) this._queryBuilderSettings = data;
 	}
 
 	#executeTemplateQuery = async () => {
-		debugger;
 		const { data, error } = await this.#templateQueryRepository.executeTemplateQuery();
 		if (data) {
 			this._templateQuery = { ...data };
@@ -206,11 +204,11 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 							<umb-localize key="template_iWant">I want</umb-localize>
 							<umb-dropdown look="outline" id="content-type-dropdown" label="Choose content type">
 								<span slot="label">
-									${this._queryRequest?.contentTypeAlias ?? this.localize.term('template_allContent')}
+									${this._queryRequest?.documentTypeAlias ?? this.localize.term('template_allContent')}
 								</span>
 								<uui-combobox-list @change=${this.#setContentType} class="options-list">
 									<uui-combobox-list-option value="">all content</uui-combobox-list-option>
-									${this._queryBuilderSettings?.contentTypeAliases?.map(
+									${this._queryBuilderSettings?.documentTypeAliases?.map(
 										(alias) =>
 											html`<uui-combobox-list-option .value=${alias}>
 												<umb-localize key="template_contentOfType" .args=${[alias]}>
