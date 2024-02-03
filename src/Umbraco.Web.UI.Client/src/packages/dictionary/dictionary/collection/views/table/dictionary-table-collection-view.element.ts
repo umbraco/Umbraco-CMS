@@ -87,8 +87,6 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 						> `,
 					},
 					...languages.map((language) => {
-						console.log(language);
-						console.log(dictionary);
 						return {
 							columnAlias: language.unique,
 							value: dictionary.translatedIsoCodes?.includes(language.unique)
