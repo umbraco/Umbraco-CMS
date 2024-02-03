@@ -146,7 +146,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			userName: model.userName,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			UserResource.putUserById({
 				id: model.unique,
@@ -154,8 +154,8 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

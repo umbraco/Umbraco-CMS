@@ -146,7 +146,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			permissions: model.permissions,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			UserGroupResource.putUserGroupById({
 				id: model.unique,
@@ -154,8 +154,8 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

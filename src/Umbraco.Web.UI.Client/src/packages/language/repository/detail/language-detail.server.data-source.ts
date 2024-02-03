@@ -124,7 +124,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			name: model.name,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			LanguageResource.putLanguageByIsoCode({
 				isoCode: model.unique,
@@ -132,8 +132,8 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

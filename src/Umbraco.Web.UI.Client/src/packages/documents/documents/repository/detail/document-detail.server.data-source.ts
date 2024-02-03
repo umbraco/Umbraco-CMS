@@ -151,7 +151,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentResource.putDocumentById({
 				id: model.unique,
@@ -159,8 +159,8 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

@@ -127,7 +127,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			values: model.values,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeById({
 				id: model.unique,
@@ -135,8 +135,8 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

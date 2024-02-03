@@ -145,7 +145,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			MediaResource.putMediaById({
 				id: model.unique,
@@ -153,8 +153,8 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

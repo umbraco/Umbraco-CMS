@@ -121,7 +121,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 			alias: model.alias,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			TemplateResource.putTemplateById({
 				id: model.unique,
@@ -129,8 +129,8 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

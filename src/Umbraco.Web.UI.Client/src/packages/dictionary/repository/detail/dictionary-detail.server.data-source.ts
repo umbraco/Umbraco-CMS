@@ -116,7 +116,7 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 			translations: model.translations,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DictionaryResource.putDictionaryById({
 				id: model.unique,
@@ -124,8 +124,8 @@ export class UmbDictionaryServerDataSource implements UmbDetailDataSource<UmbDic
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };
