@@ -1,12 +1,14 @@
 import type {
 	DictionaryItemItemResponseModel,
 	DictionaryItemResponseModel,
+	DictionaryOverviewResponseModel,
 	NamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 type UmbMockDictionaryModelHack = DictionaryItemResponseModel &
 	NamedEntityTreeItemResponseModel &
-	DictionaryItemItemResponseModel;
+	DictionaryItemItemResponseModel &
+	DictionaryOverviewResponseModel;
 
 export interface UmbMockDictionaryModel extends Omit<UmbMockDictionaryModelHack, 'type'> {}
 
@@ -16,13 +18,14 @@ export const data: Array<UmbMockDictionaryModel> = [
 		id: 'aae7d0ab-53ba-485d-b8bd-12537f9925cb',
 		parent: null,
 		hasChildren: false,
+		translatedIsoCodes: ['en'],
 		translations: [
 			{
 				isoCode: 'en',
-				translation: 'hello in en-US',
+				translation: 'hello in en',
 			},
 			{
-				isoCode: 'fr',
+				isoCode: 'da',
 				translation: '',
 			},
 		],
@@ -32,14 +35,15 @@ export const data: Array<UmbMockDictionaryModel> = [
 		id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb',
 		parent: null,
 		hasChildren: true,
+		translatedIsoCodes: ['en', 'da'],
 		translations: [
 			{
 				isoCode: 'en',
-				translation: 'Hello again in en-US',
+				translation: 'Hello again in en',
 			},
 			{
-				isoCode: 'fr',
-				translation: 'Hello in fr',
+				isoCode: 'da',
+				translation: 'Hello in da',
 			},
 		],
 	},
@@ -48,14 +52,15 @@ export const data: Array<UmbMockDictionaryModel> = [
 		id: '438b8693-2156-482b-84af-ccdae0c2df6e',
 		parent: { id: 'bbe7d0ab-53bb-485d-b8bd-12537f9925cb' },
 		hasChildren: false,
+		translatedIsoCodes: ['en', 'da'],
 		translations: [
 			{
 				isoCode: 'en',
-				translation: 'Nested Hello again in en-US',
+				translation: 'Nested Hello again in en',
 			},
 			{
-				isoCode: 'fr',
-				translation: 'Nested Hello in fr',
+				isoCode: 'da',
+				translation: 'Nested Hello in da',
 			},
 		],
 	},
