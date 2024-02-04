@@ -2,11 +2,6 @@ const { rest } = window.MockServiceWorker;
 import type { UmbMockDictionaryModel } from '../../data/dictionary/dictionary.data.js';
 import { umbDictionaryMockDb } from '../../data/dictionary/dictionary.db.js';
 import { UMB_SLUG } from './slug.js';
-import type {
-	DictionaryItemResponseModel,
-	EntityTreeItemResponseModel,
-	ImportDictionaryRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const importResponse: UmbMockDictionaryModel = {
@@ -29,10 +24,12 @@ const importResponse: UmbMockDictionaryModel = {
 
 export const importExportHandlers = [
 	rest.post(umbracoPath(`${UMB_SLUG}/import`), async (req, res, ctx) => {
+		alert('Dictionary import request received. Does not work in mock mode.');
+		/*
 		const file = req.url.searchParams.get('file');
 		if (!file) return;
 
-		/*
+
 		const parentId = req.url.searchParams.get('parentId') ?? null;
 		importResponse.parent = parentId ? { id: parentId } : null;
 		umbDictionaryData.save(importResponse.id, importResponse);
@@ -49,9 +46,11 @@ export const importExportHandlers = [
 			content: path.join(','),
 			statusCode: 200,
 		};
-    */
+
 
 		return res(ctx.status(200), ctx.json(contentResult));
+		*/
+		return res(ctx.status(200));
 	}),
 
 	// TODO => handle properly, querystring breaks handler
