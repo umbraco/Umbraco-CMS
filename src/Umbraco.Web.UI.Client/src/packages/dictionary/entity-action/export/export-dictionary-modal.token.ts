@@ -5,7 +5,7 @@ export interface UmbExportDictionaryModalData {
 }
 
 export interface UmbExportDictionaryModalValue {
-	includeChildren?: boolean;
+	includeChildren: boolean;
 }
 
 export const UMB_EXPORT_DICTIONARY_MODAL = new UmbModalToken<

@@ -1,9 +1,10 @@
 import type { UmbDictionaryExportRepository } from '../../repository/index.js';
+import { UMB_EXPORT_DICTIONARY_MODAL } from './export-dictionary-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_EXPORT_DICTIONARY_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryExportRepository> {
 	static styles = [UmbTextStyles];
@@ -24,7 +25,6 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 		const modalContext = this.#modalContext?.open(UMB_EXPORT_DICTIONARY_MODAL, { data: { unique: this.unique } });
 
 		const { includeChildren } = await modalContext.onSubmit();
-		if (includeChildren === undefined) return;
 
 		// Export the file
 		const result = await this.repository?.export(this.unique, includeChildren);
