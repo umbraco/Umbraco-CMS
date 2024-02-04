@@ -26,6 +26,5 @@ export * from './property-settings-modal.token.js';
 export * from './section-picker-modal.token.js';
 export * from './template-picker-modal.token.js';
 export * from './user-group-picker-modal.token.js';
-export * from './user-picker-modal.token.js';
 export * from './partial-view-picker-modal.token.js';
 export * from './workspace-modal.token.js';
