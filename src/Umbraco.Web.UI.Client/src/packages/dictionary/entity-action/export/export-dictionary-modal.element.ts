@@ -1,11 +1,7 @@
+import type { UmbExportDictionaryModalData, UmbExportDictionaryModalValue } from './export-dictionary-modal.token.js';
 import { html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type {
-	UmbExportDictionaryModalData,
-	UmbExportDictionaryModalValue} from '@umbraco-cms/backoffice/modal';
-import {
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-export-dictionary-modal')
 export class UmbExportDictionaryModalElement extends UmbModalBaseElement<

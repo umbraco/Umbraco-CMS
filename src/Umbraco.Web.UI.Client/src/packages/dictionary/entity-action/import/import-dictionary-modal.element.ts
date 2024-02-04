@@ -1,9 +1,9 @@
 import { UMB_DICTIONARY_TREE_ALIAS } from '../../tree/manifests.js';
 import { UmbDictionaryImportRepository } from '../../repository/index.js';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
+import type { UmbImportDictionaryModalData, UmbImportDictionaryModalValue } from './import-dictionary-modal.token.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbImportDictionaryModalData, UmbImportDictionaryModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
