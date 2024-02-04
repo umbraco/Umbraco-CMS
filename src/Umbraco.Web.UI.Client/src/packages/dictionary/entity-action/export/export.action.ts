@@ -27,7 +27,7 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 		const { includeChildren } = await modalContext.onSubmit();
 
 		// Export the file
-		const result = await this.repository?.export(this.unique, includeChildren);
+		const result = await this.repository?.requestExport(this.unique, includeChildren);
 		const blobContent = await result?.data;
 
 		if (!blobContent) return;

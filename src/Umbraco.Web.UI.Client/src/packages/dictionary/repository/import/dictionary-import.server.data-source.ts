@@ -17,7 +17,7 @@ export class UmbDictionaryImportServerDataSource {
 	 * @returns {*}
 	 * @memberof UmbDictionaryImportServerDataSource
 	 */
-	import(temporaryFileUnique: string, parentUnique: string | null) {
+	async import(temporaryFileUnique: string, parentUnique: string | null) {
 		if (!temporaryFileUnique) throw new Error('temporaryFileUnique is required');
 		if (parentUnique === undefined) throw new Error('parentUnique is required');
 

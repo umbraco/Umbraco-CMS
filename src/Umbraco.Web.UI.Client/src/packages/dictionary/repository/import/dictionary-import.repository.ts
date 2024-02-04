@@ -1,13 +1,16 @@
+import { UmbDictionaryDetailRepository } from '../detail/index.js';
 import { UmbDictionaryImportServerDataSource } from './dictionary-import.server.data-source.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDictionaryImportRepository extends UmbRepositoryBase {
 	#importSource: UmbDictionaryImportServerDataSource;
+	#detailRepository: UmbDictionaryDetailRepository;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#importSource = new UmbDictionaryImportServerDataSource(host);
+		this.#detailRepository = new UmbDictionaryDetailRepository(host);
 	}
 
 	/**
@@ -17,10 +20,17 @@ export class UmbDictionaryImportRepository extends UmbRepositoryBase {
 	 * @return {*}
 	 * @memberof UmbDictionaryImportRepository
 	 */
-	import(temporaryFileUnique: string, parentUnique: string | null) {
+	async requestImport(temporaryFileUnique: string, parentUnique: string | null) {
 		if (!temporaryFileUnique) throw new Error('Temporary file unique is missing');
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
-		return this.#importSource.import(temporaryFileUnique, parentUnique);
+		const { data, error } = await this.#importSource.import(temporaryFileUnique, parentUnique);
+
+		if (data) {
+			// Request the detail for the imported dictionary. This will also append it to the detail store
+			return this.#detailRepository.requestByUnique(data);
+		}
+
+		return { data, error };
 	}
 }

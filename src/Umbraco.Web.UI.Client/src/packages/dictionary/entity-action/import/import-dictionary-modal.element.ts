@@ -1,16 +1,11 @@
 import { UMB_DICTIONARY_TREE_ALIAS } from '../../tree/manifests.js';
 import { UmbDictionaryImportRepository } from '../../repository/index.js';
-import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
 import type { UmbImportDictionaryModalData, UmbImportDictionaryModalValue } from './import-dictionary-modal.token.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type {
-	UmbEntityTreeItemModel,
-	UmbTreeElement,
-	UmbTreeSelectionConfiguration,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeElement, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 
 interface UmbDictionaryItemPreview {
@@ -32,7 +27,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	};
 
 	@state()
-	private _parentId?: string;
+	private _parentUnique: string | null = null;
 
 	@state()
 	private _temporaryFileId = '';
@@ -64,42 +59,16 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this._parentId = this.data?.unique ?? undefined;
-		this._selectionConfiguration.selection = this._parentId ? [this._parentId] : [];
-	}
-
-	#handleClose() {
-		this.modalContext?.reject();
-	}
-
-	#createTreeEntitiesFromTempFile(): Array<UmbEntityTreeItemModel> {
-		const data: Array<UmbEntityTreeItemModel> = [];
-
-		const list = this.#dictionaryPreviewItemBuilder(this.#fileNodes);
-		const scaffold = (items: Array<UmbDictionaryItemPreview>, parentId?: string) => {
-			items.forEach((item) => {
-				data.push({
-					id: item.id,
-					name: item.name,
-					entityType: UMB_DICTIONARY_ENTITY_TYPE,
-					hasChildren: item.children.length ? true : false,
-					parentId: parentId || null,
-					isFolder: false,
-				});
-				scaffold(item.children, item.id);
-			});
-		};
-
-		scaffold(list, this._parentId);
-		return data;
+		this._parentUnique = this.data?.unique ?? null;
+		this._selectionConfiguration.selection = this._parentUnique ? [this._parentUnique] : [];
 	}
 
 	async #submit() {
-		const { error } = await this.#dictionaryImportRepository.import(this._temporaryFileId, this._parentId);
+		const { error } = await this.#dictionaryImportRepository.requestImport(this._temporaryFileId, this._parentUnique);
+		debugger;
 		if (error) return;
 
-		this.value = { entityItems: this.#createTreeEntitiesFromTempFile(), parentId: this._parentId };
-		this.modalContext?.submit();
+		this._submitModal();
 	}
 
 	#dictionaryPreviewBuilder(htmlString: string) {
@@ -145,7 +114,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	}
 
 	#onParentChange() {
-		this._parentId = this._treeElement?.getSelection()[0] ?? undefined;
+		this._parentUnique = this._treeElement?.getSelection()[0] ?? null;
 	}
 
 	async #onFileInput() {
@@ -171,7 +140,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				slot="actions"
 				type="button"
 				label=${this.localize.term('general_cancel')}
-				@click=${this.#handleClose}></uui-button>
+				@click=${this._rejectModal}></uui-button>
 		</umb-body-layout>`;
 	}
 

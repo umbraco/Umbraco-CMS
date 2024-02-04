@@ -17,7 +17,7 @@ export class UmbDictionaryExportRepository extends UmbRepositoryBase {
 	 * @return {*}
 	 * @memberof UmbDictionaryExportRepository
 	 */
-	async export(unique: string, includeChildren = false) {
+	async requestExport(unique: string, includeChildren = false) {
 		if (!unique) {
 			throw new Error('Unique is missing');
 		}
