@@ -1,9 +1,9 @@
 import { UmbLanguageCollectionRepository } from '../../collection/index.js';
 import type { UmbLanguageItemModel } from '../../repository/index.js';
+import type { UmbLanguagePickerModalValue, UmbLanguagePickerModalData } from './language-picker-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import type { UmbLanguagePickerModalValue, UmbLanguagePickerModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-language-picker-modal')

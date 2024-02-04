@@ -1,6 +1,6 @@
 import { UmbDocumentPermissionRepository } from '../../user-permissions/index.js';
 import { UmbDocumentItemRepository } from '../../repository/index.js';
-import { UmbUserGroupItemRepository } from '@umbraco-cms/backoffice/user-group';
+import { UmbUserGroupItemRepository, UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
 import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -9,11 +9,7 @@ import type {
 	UmbModalContext,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_ENTITY_USER_PERMISSION_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_USER_GROUP_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_ENTITY_USER_PERMISSION_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 

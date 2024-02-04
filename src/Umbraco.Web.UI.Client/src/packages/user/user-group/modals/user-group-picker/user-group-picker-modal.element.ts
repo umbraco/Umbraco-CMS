@@ -3,10 +3,11 @@ import type { UmbUserGroupDetailModel } from '../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
+
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 	(typeof UMB_USER_GROUP_PICKER_MODAL)['DATA'],

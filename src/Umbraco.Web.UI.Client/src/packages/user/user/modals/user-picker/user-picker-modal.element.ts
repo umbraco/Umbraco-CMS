@@ -1,9 +1,9 @@
 import { UmbUserCollectionRepository } from '../../collection/repository/user-collection.repository.js';
 import type { UmbUserItemModel } from '../../repository/item/index.js';
+import type { UmbUserPickerModalData, UmbUserPickerModalValue } from './user-picker-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbUserPickerModalData, UmbUserPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
