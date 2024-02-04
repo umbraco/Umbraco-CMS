@@ -29,15 +29,7 @@ export class UmbTemplateQueryServerDataSource {
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
 	async getTemplateQuerySettings() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, TemplateResource.getTemplateQuerySettings());
-
-		if (data) {
-			const model = {};
-
-			return { data: model };
-		}
-
-		return { error };
+		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateQuerySettings());
 	}
 	/**
 	 * Executes a query builder query on the server

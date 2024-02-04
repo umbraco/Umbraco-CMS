@@ -86,12 +86,12 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	}
 
 	async #getTemplateQuerySettings() {
-		const { data, error } = await this.#templateQueryRepository.getTemplateQuerySettings();
+		const { data } = await this.#templateQueryRepository.requestTemplateQuerySettings();
 		if (data) this._queryBuilderSettings = data;
 	}
 
 	#executeTemplateQuery = async () => {
-		const { data, error } = await this.#templateQueryRepository.executeTemplateQuery();
+		const { data } = await this.#templateQueryRepository.executeTemplateQuery();
 		if (data) {
 			this._templateQuery = { ...data };
 			this.value = { value: this._templateQuery?.queryExpression ?? '' };

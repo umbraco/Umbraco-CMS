@@ -10,11 +10,11 @@ export class UmbTemplateQueryRepository extends UmbRepositoryBase {
 		this.#querySource = new UmbTemplateQueryServerDataSource(this);
 	}
 
-	async getTemplateQuerySettings() {
+	async requestTemplateQuerySettings() {
 		return this.#querySource.getTemplateQuerySettings();
 	}
 
-	async postTemplateQueryExecute() {
+	async executeTemplateQuery() {
 		return this.#querySource.executeTemplateQuery();
 	}
 }
