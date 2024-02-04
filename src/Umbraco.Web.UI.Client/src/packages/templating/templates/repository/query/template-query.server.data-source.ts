@@ -1,3 +1,4 @@
+import type { UmbExecuteTemplateQueryArgs } from './types.js';
 import type { TemplateQueryExecuteModel } from '@umbraco-cms/backoffice/backend-api';
 import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -33,14 +34,14 @@ export class UmbTemplateQueryServerDataSource {
 	}
 	/**
 	 * Executes a query builder query on the server
-	 *
+	 * @param {UmbExecuteTemplateQueryArgs} args
 	 * @return {*}
 	 * @memberof UmbTemplateQueryServerDataSource
 	 */
-	async executeTemplateQuery(args: any) {
+	async executeTemplateQuery(args: UmbExecuteTemplateQueryArgs) {
 		const requestBody: TemplateQueryExecuteModel = {
-			rootDocument: { id: args.rootContentUnique },
-			documentTypeAlias: args.contentTypeAlias,
+			rootDocument: args.rootDocument ? { id: args.rootDocument.unique } : null,
+			documentTypeAlias: args.documentTypeAlias,
 			filters: args.filters,
 			sort: args.sort,
 			take: args.take,

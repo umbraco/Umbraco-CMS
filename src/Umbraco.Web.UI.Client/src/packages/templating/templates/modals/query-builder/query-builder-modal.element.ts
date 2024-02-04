@@ -1,3 +1,4 @@
+import type { UmbExecuteTemplateQueryArgs } from '../../repository/query/types.js';
 import { UmbTemplateQueryRepository } from '../../repository/query/index.js';
 import { localizePropertyType, localizeSort } from './utils.js';
 import type { UmbTemplateQueryBuilderFilterElement } from './query-builder-filter.element.js';
@@ -14,7 +15,6 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import type {
-	TemplateQueryExecuteModel,
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -41,7 +41,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	private _templateQuery?: TemplateQueryResultResponseModel;
 
 	@state()
-	private _queryRequest: TemplateQueryExecuteModel = <TemplateQueryExecuteModel>{};
+	private _queryRequest: UmbExecuteTemplateQueryArgs = <UmbExecuteTemplateQueryArgs>{};
 
 	@state()
 	private _queryBuilderSettings?: TemplateQuerySettingsResponseModel;
@@ -80,7 +80,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 		this.modalContext?.submit();
 	}
 
-	#updateQueryRequest(update: TemplateQueryExecuteModel) {
+	#updateQueryRequest(update: Partial<UmbExecuteTemplateQueryArgs>) {
 		this._queryRequest = { ...this._queryRequest, ...update };
 		this.#executeTemplateQuery();
 	}
@@ -91,7 +91,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	}
 
 	#executeTemplateQuery = async () => {
-		const { data } = await this.#templateQueryRepository.executeTemplateQuery();
+		const { data } = await this.#templateQueryRepository.executeTemplateQuery(this._queryRequest);
 		if (data) {
 			this._templateQuery = { ...data };
 			this.value = { value: this._templateQuery?.queryExpression ?? '' };
@@ -103,9 +103,8 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 			?.open(UMB_DOCUMENT_PICKER_MODAL, { data: { hideTreeRoot: true } })
 			.onSubmit()
 			.then((result) => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				this.#updateQueryRequest({ rootContentId: result.selection[0] });
+				const selection = result.selection[0];
+				this.#updateQueryRequest({ rootDocument: selection ? { unique: selection } : null });
 
 				if (result.selection.length > 0 && result.selection[0] === null) {
 					this._selectedRootContentName = 'all pages';
@@ -120,7 +119,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	};
 
 	async #getDocumentItem(ids: string[]) {
-		const { data, error } = await this.#documentItemRepository.requestItems(ids);
+		const { data } = await this.#documentItemRepository.requestItems(ids);
 		if (data) {
 			// TODO: get correct variant name
 			this._selectedRootContentName = data[0].variants[0].name;
@@ -139,9 +138,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 
 	#setContentType(event: Event) {
 		const target = event.target as UUIComboboxListElement;
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this.#updateQueryRequest({ contentTypeAlias: (target.value as string) ?? '' });
+		this.#updateQueryRequest({ documentTypeAlias: target.value as string });
 	}
 
 	#setSortProperty(event: Event) {
@@ -149,10 +146,8 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 
 		if (!this._queryRequest.sort) this.#setSortDirection();
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		this.#updateQueryRequest({
-			sort: { ...this._queryRequest.sort, propertyAlias: (target.value as string) ?? '' },
+			sort: { ...this._queryRequest.sort, propertyAlias: target.value as string },
 		});
 	}
 
@@ -166,8 +161,6 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 			return;
 		}
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		this.#updateQueryRequest({
 			sort: {
 				...this._queryRequest.sort,
@@ -182,8 +175,6 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	};
 
 	#updateFilters = () => {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		this.#updateQueryRequest({ filters: Array.from(this._filterElements)?.map((filter) => filter.filter) ?? [] });
 	};
 
@@ -219,7 +210,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 								</uui-combobox-list></umb-dropdown
 							>
 							<umb-localize key="template_from">from</umb-localize>
-							<uui-button look="outline" @click=${this.#openDocumentPicker} label="Choose root content">
+							<uui-button look="outline" @click=${this.#openDocumentPicker} label="Choose root document">
 								${this._selectedRootContentName}
 							</uui-button>
 						</div>
