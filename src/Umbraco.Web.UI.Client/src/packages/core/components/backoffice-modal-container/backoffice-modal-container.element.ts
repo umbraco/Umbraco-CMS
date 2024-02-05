@@ -1,13 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, repeat, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbModalManagerContext,
-	UmbModalContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UmbModalElement
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UmbModalElement } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-modal-container')
