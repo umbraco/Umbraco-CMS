@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -13,7 +12,7 @@ public class ContentSerializationTests
     [Test]
     public void GivenACacheModel_WhenItsSerializedAndDeserializedWithAnySerializer_TheResultsAreTheSame()
     {
-        var jsonSerializer = new SystemTextJsonNestedDataSerializer();
+        var jsonSerializer = new JsonContentNestedDataSerializer();
         var msgPackSerializer = new MsgPackContentNestedDataSerializer(Mock.Of<IPropertyCacheCompression>());
 
         var now = DateTime.Now;
