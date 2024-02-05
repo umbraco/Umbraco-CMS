@@ -17,6 +17,7 @@ public class ContentCacheDataModel
     [DataMember(Order = 0)]
     [JsonProperty("pd")]
     [JsonPropertyName("pd")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringKeyCaseInsensitiveDictionaryConverter<PropertyData[]>))]
     [Newtonsoft.Json.JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<PropertyData[]>))]
     [MessagePackFormatter(typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<PropertyData[]>))]
     public Dictionary<string, PropertyData[]>? PropertyData { get; set; }
@@ -24,6 +25,7 @@ public class ContentCacheDataModel
     [DataMember(Order = 1)]
     [JsonProperty("cd")]
     [JsonPropertyName("cd")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringKeyCaseInsensitiveDictionaryConverter<CultureVariation>))]
     [Newtonsoft.Json.JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<CultureVariation>))]
     [MessagePackFormatter(
         typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<CultureVariation>))]

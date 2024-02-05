@@ -49,6 +49,7 @@ public class AutoInterningStringConverterTests
         [JsonConverter(typeof(AutoInterningStringConverter))]
         public string Name { get; set; }
 
+        [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringKeyCaseInsensitiveDictionaryConverter<int>))]
         [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<int>))]
         public Dictionary<string, int> Values { get; set; } = new();
     }
