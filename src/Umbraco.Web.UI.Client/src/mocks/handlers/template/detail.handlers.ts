@@ -22,7 +22,6 @@ export const detailHandlers = [
 
 	rest.get(umbracoPath(`${UMB_SLUG}/scaffold`), (req, res, ctx) => {
 		const response = umbTemplateMockDb.detail.createScaffold();
-		debugger;
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
