@@ -41,12 +41,14 @@ public class ContentCacheDataModel
     [JsonProperty("properties")]
     [JsonPropertyName("properties")]
     [Newtonsoft.Json.JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(TextCaseInsensitiveDictionaryConverter<PropertyData[]>))]
     private Dictionary<string, PropertyData[]> LegacyPropertyData { set => PropertyData = value; }
 
     [IgnoreDataMember]
     [JsonProperty("cultureData")]
     [JsonPropertyName("cultureData")]
     [Newtonsoft.Json.JsonConverter(typeof(CaseInsensitiveDictionaryConverter<CultureVariation>))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(TextCaseInsensitiveDictionaryConverter<CultureVariation>))]
     private Dictionary<string, CultureVariation> LegacyCultureData { set => CultureData = value; }
 
     [IgnoreDataMember]
