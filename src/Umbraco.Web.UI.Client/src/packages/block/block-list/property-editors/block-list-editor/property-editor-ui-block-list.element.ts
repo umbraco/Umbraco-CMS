@@ -15,6 +15,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/mod
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 
@@ -44,6 +45,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			this.#context.setLayouts(model);
 		},
 	});
+
+	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
 	private _value: UmbBlockListValueModel = {
 		layout: {},
@@ -121,6 +124,16 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	constructor() {
 		super();
 
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
+			this.observe(
+				propertyContext?.alias,
+				(alias) => {
+					this.#catalogueModal.setUniquePathValue('propertyAlias', alias);
+				},
+				'observePropertyAlias',
+			);
+		});
+
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#context.layouts, (layouts) => {
 			this._value = { ...this._value, layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts } };
@@ -147,7 +160,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			this._blocks = blockTypes;
 		});
 
-		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+			.addUniquePaths(['propertyAlias'])
 			.addAdditionalPath(':view/:index')
 			.onSetup((routingInfo) => {
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;

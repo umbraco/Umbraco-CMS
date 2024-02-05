@@ -1,9 +1,6 @@
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestPropertyEditorUi, UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import {
@@ -14,12 +11,15 @@ import {
 } from '@umbraco-cms/backoffice/block';
 import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 /**
  * @element umb-property-editor-ui-block-grid
  */
 @customElement('umb-property-editor-ui-block-grid')
 export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
+
 	@property()
 	value = '';
 
@@ -79,35 +79,18 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	constructor() {
 		super();
 
-		/*
-		// TODO: Prevent initial notification from these observes:
-		this.observe(this.#context.layouts, (layouts) => {
-			this._value = { ...this._value, layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts } };
-			// Notify that the value has changed.
-			//console.log('layout changed', this._value);
-			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
-			this._layouts = layouts;
-			this.#sorter.setModel(layouts);
-			this.dispatchEvent(new UmbChangeEvent());
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
+			this.observe(
+				propertyContext?.alias,
+				(alias) => {
+					this.#catalogueModal.setUniquePathValue('propertyAlias', alias);
+				},
+				'observePropertyAlias',
+			);
 		});
-		this.observe(this.#context.contents, (contents) => {
-			this._value = { ...this._value, contentData: contents };
-			// Notify that the value has changed.
-			//console.log('content changed', this._value);
-			this.dispatchEvent(new UmbChangeEvent());
-		});
-		this.observe(this.#context.settings, (settings) => {
-			this._value = { ...this._value, settingsData: settings };
-			// Notify that the value has changed.
-			//console.log('settings changed', this._value);
-			this.dispatchEvent(new UmbChangeEvent());
-		});
-		this.observe(this.#context.blockTypes, (blockTypes) => {
-			this._blocks = blockTypes;
-		});
-		*/
 
-		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+			.addUniquePaths(['propertyAlias'])
 			.addAdditionalPath(':view/:index')
 			.onSetup((routingInfo) => {
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
@@ -145,70 +128,6 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 			</uui-button>
 		</uui-button-group>`;
 	}
-
-	/*
-setupRoutes() {
-	this._routes = [];
-	if (this._variantId !== undefined) {
-		this._routes = [
-			{
-				path: 'modal-1',
-				component: () => {
-					return import('./property-editor-ui-block-grid-inner-test.element.js');
-				},
-				setup: (component) => {
-					if (component instanceof HTMLElement) {
-						(component as any).name = 'block-grid-1';
-					}
-				},
-			},
-			{
-				path: 'modal-2',
-				component: () => {
-					return import('./property-editor-ui-block-grid-inner-test.element.js');
-				},
-				setup: (component) => {
-					if (component instanceof HTMLElement) {
-						(component as any).name = 'block-grid-2';
-					}
-				},
-			},
-		];
-	}
-}
-*/
-	/*
-	render() {
-		return this._variantId
-			? html`<div>
-					umb-property-editor-ui-block-grid, inner routing test:
-
-					<uui-tab-group slot="navigation">
-						<uui-tab
-							label="TAB 1"
-							href="${this._routerPath + '/'}modal-1"
-							.active=${this._routerPath + '/' + 'modal-1' === this._activePath}></uui-tab>
-						<uui-tab
-							label="TAB 2"
-							href="${this._routerPath + '/'}modal-2"
-							.active=${this._routerPath + '/' + 'modal-2' === this._activePath}></uui-tab>
-					</uui-tab-group>
-
-					<umb-variant-router-slot
-						.variantId=${[this._variantId]}
-						id="router-slot"
-						.routes="${this._routes}"
-						@init=${(event: UmbRouterSlotInitEvent) => {
-							this._routerPath = event.target.absoluteRouterPath;
-						}}
-						@change=${(event: UmbRouterSlotChangeEvent) => {
-							this._activePath = event.target.localActiveViewPath;
-						}}>
-					</umb-variant-router-slot>
-			  </div>`
-			: 'loading...';
-	}
-	*/
 
 	static styles = [
 		UmbTextStyles,
