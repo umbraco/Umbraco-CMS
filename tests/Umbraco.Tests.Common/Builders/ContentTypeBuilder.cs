@@ -116,7 +116,7 @@ public class ContentTypeBuilder
         contentType.Thumbnail = GetThumbnail();
         contentType.CreatorId = GetCreatorId();
         contentType.Trashed = GetTrashed();
-        contentType.IsContainer = GetIsContainer();
+        contentType.ListView = GetListView();
         contentType.HistoryCleanup = new HistoryCleanup();
 
         contentType.Variations = contentVariation;

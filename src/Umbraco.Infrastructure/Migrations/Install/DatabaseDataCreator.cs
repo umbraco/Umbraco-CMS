@@ -1079,7 +1079,6 @@ internal class DatabaseDataCreator
                     Alias = Constants.Conventions.MediaTypes.Folder,
                     Icon = Constants.Icons.MediaFolder,
                     Thumbnail = Constants.Icons.MediaFolder,
-                    IsContainer = false,
                     AllowAtRoot = true,
                     Variations = (byte)ContentVariation.Nothing,
                 });

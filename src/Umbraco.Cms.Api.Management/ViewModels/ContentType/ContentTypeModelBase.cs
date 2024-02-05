@@ -23,6 +23,8 @@ public abstract class ContentTypeModelBase<TPropertyType, TPropertyTypeContainer
 
     public bool VariesBySegment { get; set; }
 
+    public Guid? ListView { get; set; }
+
     public bool IsElement { get; set; }
 
     [Required]

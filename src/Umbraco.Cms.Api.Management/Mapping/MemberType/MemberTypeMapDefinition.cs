@@ -30,6 +30,7 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         target.IsElement = source.IsElement;
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
+        target.ListView = source.ListView;
         target.Compositions = source.ContentTypeComposition.Select(contentTypeComposition => new MemberTypeComposition
         {
             MemberType = new ReferenceByIdModel(contentTypeComposition.Key),
@@ -42,7 +43,7 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
+        target.ListView = source.ListView;
     }
 
     // Umbraco.Code.MapAll
@@ -50,6 +51,6 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
+        target.ListView = source.ListView;
     }
 }
