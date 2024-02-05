@@ -5,7 +5,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
- * A implementation of the Block Manager specifically for the Block List.
+ * A implementation of the Block Manager specifically for the Block List Editor.
  */
 export class UmbBlockListManagerContext<
 	BlockLayoutType extends UmbBlockListLayoutModel = UmbBlockListLayoutModel,
@@ -27,6 +27,7 @@ export class UmbBlockListManagerContext<
 	}
 }
 
+// TODO: Make discriminator method for this:
 export const UMB_BLOCK_LIST_MANAGER_CONTEXT = new UmbContextToken<
 	UmbBlockListManagerContext,
 	UmbBlockListManagerContext

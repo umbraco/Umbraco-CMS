@@ -3,23 +3,16 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import {
-	UMB_BLOCK_CATALOGUE_MODAL,
-	type UmbBlockLayoutBaseModel,
-	type UmbBlockTypeBaseModel,
-	type UmbBlockTypeGroup,
-} from '@umbraco-cms/backoffice/block';
-import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import type { UmbBlockGridLayoutModel, UmbBlockTypeBaseModel, UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests';
 
 /**
  * @element umb-property-editor-ui-block-grid
  */
 @customElement('umb-property-editor-ui-block-grid')
 export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
-
 	@property()
 	value = '';
 
@@ -35,10 +28,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	private _blockGroups?: Array<UmbBlockTypeGroup>;
 
 	@state()
-	private _layouts: Array<UmbBlockLayoutBaseModel> = [];
-
-	@state()
-	private _catalogueRouteBuilder?: UmbModalRouteBuilder;
+	private _rootLayouts: Array<UmbBlockGridLayoutModel> = [];
 
 	@state()
 	private _directRoute?: string;
@@ -76,57 +66,40 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		//this.#context.setEditorConfiguration(config);
 	}
 
+	#context = new UmbBlockGridManagerContext(this);
+
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
-			this.observe(
-				propertyContext?.alias,
-				(alias) => {
-					this.#catalogueModal.setUniquePathValue('propertyAlias', alias);
-				},
-				'observePropertyAlias',
-			);
+		// TODO: Prevent initial notification from these observes:
+		this.observe(this.#context.layouts, (layouts) => {
+			this._value = { ...this._value, layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS]: layouts } };
+			// Notify that the value has changed.
+			//console.log('layout changed', this._value);
+			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
+			this._rootLayouts = layouts;
+			this.dispatchEvent(new UmbChangeEvent());
 		});
-
-		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
-			.addUniquePaths(['propertyAlias'])
-			.addAdditionalPath(':view/:index')
-			.onSetup((routingInfo) => {
-				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
-				return {
-					data: {
-						blocks: this._blocks ?? [],
-						blockGroups: this._blockGroups ?? [],
-						openClipboard: routingInfo.view === 'clipboard',
-						blockOriginData: { index: index },
-					},
-				};
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._catalogueRouteBuilder = routeBuilder;
-			});
+		this.observe(this.#context.contents, (contents) => {
+			this._value = { ...this._value, contentData: contents };
+			// Notify that the value has changed.
+			//console.log('content changed', this._value);
+			this.dispatchEvent(new UmbChangeEvent());
+		});
+		this.observe(this.#context.settings, (settings) => {
+			this._value = { ...this._value, settingsData: settings };
+			// Notify that the value has changed.
+			//console.log('settings changed', this._value);
+			this.dispatchEvent(new UmbChangeEvent());
+		});
+		this.observe(this.#context.blockTypes, (blockTypes) => {
+			this._blocks = blockTypes;
+		});
 	}
 
 	render() {
-		if (this._blocks?.length === 1) {
-			const elementKey = this._blocks[0].contentElementTypeKey;
-			this._directRoute =
-				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
-		}
-		return html`<uui-button-group>
-			<uui-button
-				id="add-button"
-				look="placeholder"
-				label=${this._createButtonLabel}
-				href=${this._directRoute ?? this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) ?? ''}></uui-button>
-			<uui-button
-				label=${this.localize.term('content_createFromClipboard')}
-				look="placeholder"
-				href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}>
-				<uui-icon name="icon-paste-in"></uui-icon>
-			</uui-button>
-		</uui-button-group>`;
+		return html`<umb-property-editor-ui-block-grid-entries
+			.layoutEntries=${this._rootLayouts}></umb-property-editor-ui-block-grid-entries>`;
 	}
 
 	static styles = [
