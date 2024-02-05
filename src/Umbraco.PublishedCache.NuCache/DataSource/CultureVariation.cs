@@ -1,6 +1,7 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
@@ -23,6 +24,7 @@ public class CultureVariation
     [DataMember(Order = 2)]
     [JsonProperty("dt")]
     [JsonPropertyName("dt")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(ForceUtcDateTimeConverter))]
     public DateTime Date { get; set; }
 
     [DataMember(Order = 3)]
@@ -44,6 +46,7 @@ public class CultureVariation
     [IgnoreDataMember]
     [JsonProperty("date")]
     [JsonPropertyName("date")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(ForceUtcDateTimeConverter))]
     private DateTime LegacyDate { set => Date = value; }
 
     [IgnoreDataMember]
