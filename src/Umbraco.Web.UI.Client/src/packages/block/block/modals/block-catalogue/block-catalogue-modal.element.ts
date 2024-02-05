@@ -1,5 +1,4 @@
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
-import { DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
 import type {
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue,
@@ -12,19 +11,12 @@ import {
 	UmbModalBaseElement,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue
 > {
-	#itemManager = new UmbRepositoryItemsManager<UmbBlockTypeWithGroupKey>(
-		this,
-		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.contentElementTypeKey,
-	);
-
 	@state()
 	private _groupedBlocks: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
 
