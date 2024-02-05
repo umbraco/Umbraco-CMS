@@ -6,11 +6,11 @@ export interface UmbUserDetailModel {
 	email: string;
 	userName: string;
 	name: string;
-	userGroupIds: Array<string>;
+	userGroupUniques: Array<string>;
 	unique: string;
 	languageIsoCode: string | null;
-	contentStartNodeIds: Array<string>;
-	mediaStartNodeIds: Array<string>;
+	documentStartNodeUniques: Array<string>;
+	mediaStartNodeUniques: Array<string>;
 	avatarUrls: Array<string>;
 	state: UserStateModel | null;
 	failedLoginAttempts: number;

@@ -87,7 +87,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 
 	async #observeUserGroups() {
 		if (this._users.length === 0) return;
-		const userGroupsIds = [...new Set(this._users.flatMap((user) => user.userGroupIds))];
+		const userGroupsIds = [...new Set(this._users.flatMap((user) => user.userGroupUniques))];
 		const { asObservable } = await this.#userGroupItemRepository.requestItems(userGroupsIds);
 		this.observe(
 			asObservable(),
@@ -121,7 +121,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 					},
 					{
 						columnAlias: 'userGroup',
-						value: this.#getUserGroupNames(user.userGroupIds ?? []),
+						value: this.#getUserGroupNames(user.userGroupUniques ?? []),
 					},
 					{
 						columnAlias: 'userLastLogin',

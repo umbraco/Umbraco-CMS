@@ -45,7 +45,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		userScaffold.name = name;
 		userScaffold.email = email;
 		userScaffold.userName = email;
-		userScaffold.userGroupIds = userGroups;
+		userScaffold.userGroupUniques = userGroups;
 
 		// TODO: figure out when to use email or username
 		const { data } = await this.#userDetailRepository.create(userScaffold);
