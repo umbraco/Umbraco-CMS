@@ -14,6 +14,7 @@ public class PropertyData
 
     [DataMember(Order = 0)]
     [Newtonsoft.Json.JsonConverter(typeof(AutoInterningStringConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringConverter))]
     [DefaultValue("")]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, PropertyName = "c")]
     [JsonPropertyName("c")]
@@ -27,6 +28,7 @@ public class PropertyData
 
     [DataMember(Order = 1)]
     [Newtonsoft.Json.JsonConverter(typeof(AutoInterningStringConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringConverter))]
     [DefaultValue("")]
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, PropertyName = "s")]
     [JsonPropertyName("s")]

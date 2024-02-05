@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Serialization;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization;
 
@@ -18,8 +17,8 @@ public class AutoInterningStringConverterTests
         // ensure the raw value is not interned
         Assert.IsNull(string.IsInterned(obj.Name));
 
-        var serialized = JsonConvert.SerializeObject(obj);
-        obj = JsonConvert.DeserializeObject<Test>(serialized);
+        var serialized = JsonSerializer.Serialize(obj);
+        obj = JsonSerializer.Deserialize<Test>(serialized);
 
         Assert.IsNotNull(string.IsInterned(obj.Name));
     }
@@ -46,6 +45,7 @@ public class AutoInterningStringConverterTests
 
     public class Test
     {
+        [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringConverter))]
         [JsonConverter(typeof(AutoInterningStringConverter))]
         public string Name { get; set; }
 
