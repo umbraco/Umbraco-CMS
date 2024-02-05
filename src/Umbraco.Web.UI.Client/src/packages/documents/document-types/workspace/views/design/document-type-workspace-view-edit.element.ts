@@ -4,12 +4,16 @@ import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import {
+	UmbContentTypeCompositionModel,
+	UmbContentTypeContainerStructureHelper,
+} from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type {
-	DocumentTypePropertyTypeContainerResponseModel,
-	PropertyTypeContainerModelBaseModel,
+import {
+	CompositionTypeModel,
+	type DocumentTypePropertyTypeContainerResponseModel,
+	type PropertyTypeContainerModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
@@ -295,8 +299,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 		const compositionIds = modalContext.getValue().selection;
 
-		console.log(compositionIds);
-		//TODO: observe the document types...
+		this._workspaceContext?.setCompositions(
+			compositionIds.map((unique) => ({ contentType: { unique }, compositionType: CompositionTypeModel.COMPOSITION })),
+		);
 	}
 
 	render() {
