@@ -42,10 +42,19 @@ export class UmbModalElement extends UmbLitElement {
 	#modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
 	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
 
+	#onClose = () => {
+		this.element?.removeEventListener('close', this.#onClose);
+		this.#modalContext?.reject({ type: 'close' });
+	};
+
 	#createModalElement() {
 		if (!this.#modalContext) return;
 
 		this.element = this.#createContainerElement();
+
+		// Makes sure that the modal triggers the reject of the context promise when it is closed by pressing escape.
+		this.element.addEventListener('close', this.#onClose);
+
 		if (this.#modalContext.originTarget) {
 			// The following code is the context api proxy.
 			// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal.
