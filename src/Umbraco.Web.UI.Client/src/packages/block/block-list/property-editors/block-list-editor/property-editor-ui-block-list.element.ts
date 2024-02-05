@@ -116,9 +116,6 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	@state()
 	private _catalogueRouteBuilder?: UmbModalRouteBuilder;
 
-	@state()
-	private _directRoute?: string;
-
 	#context = new UmbBlockListManagerContext(this);
 
 	constructor() {
@@ -179,10 +176,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	}
 
 	render() {
+		let createPath: string | undefined;
 		if (this._blocks?.length === 1) {
 			const elementKey = this._blocks[0].contentElementTypeKey;
-			this._directRoute =
+			createPath =
 				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
+		} else {
+			createPath = this._catalogueRouteBuilder?.({ view: 'create', index: -1 });
 		}
 		return html` ${repeat(
 				this._layouts,
@@ -198,7 +198,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 					id="add-button"
 					look="placeholder"
 					label=${this._createButtonLabel}
-					href=${this._directRoute ?? this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) ?? ''}></uui-button>
+					href=${createPath ?? ''}></uui-button>
 				<uui-button
 					label=${this.localize.term('content_createFromClipboard')}
 					look="placeholder"
