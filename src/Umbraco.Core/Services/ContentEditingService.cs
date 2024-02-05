@@ -8,9 +8,8 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-// FIXME: add granular permissions check (for inspiration, check how the old ContentController utilizes IAuthorizationService)
 internal sealed class ContentEditingService
-    : ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
+    : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
 {
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
@@ -26,7 +25,7 @@ internal sealed class ContentEditingService
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService,
         IContentValidationService contentValidationService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService, contentValidationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, contentValidationService, treeEntitySortingService)
     {
         _templateService = templateService;
         _logger = logger;

@@ -64,11 +64,13 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 .Build()),
             ContentTypeOperationStatus.InvalidComposition => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Invalid composition")
-                .WithDetail($"The specified {type} type composition is invalid")),
+                .WithDetail($"The specified {type} type composition is invalid")
+                .Build()),
             ContentTypeOperationStatus.InvalidParent => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Invalid parent")
                 .WithDetail(
-                    "The specified parent is invalid, or cannot be used in combination with the specified composition/inheritance")),
+                    "The specified parent is invalid, or cannot be used in combination with the specified composition/inheritance")
+                .Build()),
             ContentTypeOperationStatus.DuplicatePropertyTypeAlias => new BadRequestObjectResult(
                 new ProblemDetailsBuilder()
                     .WithTitle("Duplicate property type alias")
@@ -91,7 +93,8 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 .Build()),
             ContentTypeStructureOperationStatus.NotAllowedByPath => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Not allowed by path")
-                .WithDetail($"The {type} type operation cannot be performed due to not allowed path (i.e. a child of itself)")),
+                .WithDetail($"The {type} type operation cannot be performed due to not allowed path (i.e. a child of itself)")
+                .Build()),
             ContentTypeStructureOperationStatus.NotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Not Found")
                 .WithDetail($"The specified {type} type was not found")
