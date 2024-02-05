@@ -26,7 +26,7 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
-    await umbracoUi.partialView.isSuccessNotificationVisible(); 
+    await umbracoUi.partialView.isSuccessNotificationVisible();
     expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
     // Verify the new partial view is displayed under the Partial Views section
     await umbracoUi.partialView.clickRootFolderCaretButton();
@@ -50,7 +50,7 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.isSuccessNotificationVisible();
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
     const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
-    expect(partialViewData.content).toEqual(expectedPartialViewContent);
+    expect(partialViewData.content === expectedPartialViewContent).toBeTruthy();
     // Verify the new partial view is displayed under the Partial Views section
     await umbracoUi.partialView.clickRootFolderCaretButton();
     await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).toBeVisible();
@@ -212,10 +212,10 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.deletePartialView();
 
     // Assert
-    await umbracoUi.partialView.isSuccessNotificationVisible(); 
+    await umbracoUi.partialView.isSuccessNotificationVisible();
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeFalsy();
     // Verify the partial view is NOT displayed under the Partial Views section
     await umbracoUi.partialView.clickRootFolderCaretButton();
-    await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).not.toBeVisible();  
+    await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).not.toBeVisible();
   });
 });
