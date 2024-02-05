@@ -23,8 +23,6 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 		if (!this.#modalContext) return;
 
 		const modalContext = this.#modalContext?.open(UMB_IMPORT_DICTIONARY_MODAL, { data: { unique: this.unique } });
-		const { entityItems, parentId } = await modalContext.onSubmit();
-
-		if (!entityItems?.length) return;
+		await modalContext.onSubmit();
 	}
 }
