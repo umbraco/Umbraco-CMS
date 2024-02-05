@@ -20,6 +20,7 @@ export type UmbTreePickerDynamicRoot = {
 };
 
 export type UmbTreePickerDynamicRootQueryStep = {
+	unique: string;
 	alias: string;
 	anyOfDocTypeKeys?: Array<string>;
 };
