@@ -12,11 +12,11 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import './media-type-workspace-view-edit-properties.element.js';
 
 const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-	compareElementToModel: (element: HTMLElement, model: PropertyTypeContainerModelBaseModel) => {
-		return element.getAttribute('data-umb-group-id') === model.id;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-group-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: PropertyTypeContainerModelBaseModel) => {
-		return container.querySelector('data-umb-group-id=[' + modelEntry.id + ']');
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
 	},
 	identifier: 'content-type-group-sorter',
 	itemSelector: '[data-umb-group-id]',

@@ -1,12 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, repeat, query } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbNotificationHandler,
-	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
-import {
-	UMB_NOTIFICATION_CONTEXT,
-} from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationHandler, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-notification-container')
@@ -38,11 +34,11 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			this._notificationsElement?.hidePopover();
+			this._notificationsElement?.hidePopover?.(); // To prevent issues in FireFox I added `?.` before `()`  [NL]
 			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			this._notificationsElement?.showPopover();
+			this._notificationsElement?.showPopover?.(); // To prevent issues in FireFox I added `?.` before `()`  [NL]
 		});
 	}
 
