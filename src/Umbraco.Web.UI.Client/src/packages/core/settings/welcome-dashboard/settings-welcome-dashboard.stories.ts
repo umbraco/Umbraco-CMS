@@ -1,8 +1,8 @@
 import type { Meta, Story } from '@storybook/web-components';
-import type { UmbDashboardSettingsWelcomeElement } from './dashboard-settings-welcome.element.js';
+import type { UmbSettingsWelcomeDashboardElement } from './settings-welcome-dashboard.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import './dashboard-settings-welcome.element.js';
+import './settings-welcome-dashboard.element.js';
 
 export default {
 	title: 'Dashboards/Settings Welcome',
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-dashboard-settings-welcome',
 } as Meta;
 
-export const AAAOverview: Story<UmbDashboardSettingsWelcomeElement> = () =>
-	html` <umb-dashboard-settings-welcome></umb-dashboard-settings-welcome>`;
+export const AAAOverview: Story<UmbSettingsWelcomeDashboardElement> = () =>
+	html` <umb-settings-welcome-dashboard></umb-settings-welcome-dashboard>`;
 AAAOverview.storyName = 'Overview';

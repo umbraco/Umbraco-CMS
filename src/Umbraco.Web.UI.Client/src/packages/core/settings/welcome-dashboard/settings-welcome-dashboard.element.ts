@@ -2,8 +2,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@customElement('umb-dashboard-settings-welcome')
-export class UmbDashboardSettingsWelcomeElement extends UmbLitElement {
+@customElement('umb-settings-welcome-dashboard')
+export class UmbSettingsWelcomeDashboardElement extends UmbLitElement {
 	render() {
 		return html`
 			<section id="settings-dashboard" class="uui-text">
@@ -119,9 +119,9 @@ export class UmbDashboardSettingsWelcomeElement extends UmbLitElement {
 	];
 }
 
-export default UmbDashboardSettingsWelcomeElement;
+export default UmbSettingsWelcomeDashboardElement;
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dashboard-settings-welcome': UmbDashboardSettingsWelcomeElement;
+		'umb-settings-welcome-dashboard': UmbSettingsWelcomeDashboardElement;
 	}
 }

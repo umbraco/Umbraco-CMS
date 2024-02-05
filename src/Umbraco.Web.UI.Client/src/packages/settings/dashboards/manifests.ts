@@ -5,24 +5,6 @@ const sectionAlias = 'Umb.Section.Settings';
 const dashboards: Array<ManifestDashboard> = [
 	{
 		type: 'dashboard',
-		alias: 'Umb.Dashboard.SettingsWelcome',
-		name: 'Welcome Settings Dashboard',
-		elementName: 'umb-dashboard-settings-welcome',
-		js: () => import('./settings-welcome/dashboard-settings-welcome.element.js'),
-		weight: 500,
-		meta: {
-			label: 'Welcome',
-			pathname: 'welcome',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.SectionAlias',
-				match: sectionAlias,
-			},
-		],
-	},
-	{
-		type: 'dashboard',
 		alias: 'Umb.Dashboard.PublishedStatus',
 		name: 'Published Status Dashboard',
 		elementName: 'umb-dashboard-published-status',
