@@ -18,8 +18,8 @@ export class UmbUserGroupWorkspaceContext
 	#data = new UmbObjectState<UmbUserGroupDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
-	#userIds = new UmbArrayState<string>([], (x) => x);
-	userIds = this.#userIds.asObservable();
+	#userUniques = new UmbArrayState<string>([], (x) => x);
+	userUniques = this.#userUniques.asObservable();
 
 	#userRepository: UmbUserRepository;
 
@@ -40,7 +40,7 @@ export class UmbUserGroupWorkspaceContext
 		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.update(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -49,7 +49,7 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	getEntityType(): string {
-		return UMB_USER_GROUP_ENTITY_TYPE;
+		return 'user-group';
 	}
 
 	getData() {
@@ -71,11 +71,11 @@ export class UmbUserGroupWorkspaceContext
 		//TODO: these user-groups need to be updated together with the new user-group id.
 		//TODO: or the new user-group id needs to be removed from the existing list.
 
-		const userIds = this.#userIds.getValue();
-		const userGroupIds = [this.#data.getValue()?.unique ?? ''];
+		const userUniques = this.#userUniques.getValue();
+		const userGroupUniques = [this.#data.getValue()?.unique ?? ''];
 
-		if (userIds.length > 0 && userGroupIds.length > 0) {
-			await this.#userRepository.setUserGroups(userIds, userGroupIds);
+		if (userUniques.length > 0 && userGroupUniques.length > 0) {
+			await this.#userRepository.setUserGroups(userUniques, userGroupUniques);
 		}
 
 		// If it went well, then its not new anymore?.
@@ -95,7 +95,7 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	updateUserKeys(keys: Array<string>) {
-		this.#userIds.setValue(keys);
+		this.#userUniques.setValue(keys);
 	}
 
 	/**
