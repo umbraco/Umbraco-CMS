@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -22,7 +23,10 @@ internal sealed class ContentPublishingService : IContentPublishingService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(Guid key, IEnumerable<string> cultures, Guid userKey)
+    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+        Guid key,
+        CultureAndScheduleModel cultureAndSchedule,
+        Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
@@ -31,8 +35,40 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
         }
 
+        var cultures =
+            cultureAndSchedule.CulturesToPublishImmediately.Union(
+                cultureAndSchedule.Schedules.FullSchedule.Select(x => x.Culture)).ToArray();
+
+        if (content.ContentType.VariesByCulture())
+        {
+
+            if (cultures.Any() is false)
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.CultureMissing, new ContentPublishingResult());
+            }
+
+            if (cultures.Any(x=>x == "*"))
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
+            }
+        }
+        else
+        {
+            if (cultures.Length != 1 || cultures.Any(x=>x != "*"))
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
+            }
+        }
+
         var userId = await _userIdKeyResolver.GetAsync(userKey);
-        PublishResult result = _contentService.Publish(content, cultures.ToArray(), userId);
+
+        PublishResult result = _contentService.Publish(content, cultureAndSchedule.CulturesToPublishImmediately.ToArray(), userId);
+
+        if (result.Success)
+        {
+            _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
+        }
+
         scope.Complete();
 
         ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);

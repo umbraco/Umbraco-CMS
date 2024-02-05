@@ -83,6 +83,14 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithTitle("Parent not published")
                 .WithDetail("Could not publish the document because its parent was not published.")
                 .Build()),
+            ContentPublishingOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid cultures specified")
+                .WithDetail("A specified culture is not valid for the operation.")
+                .Build()),
+            ContentPublishingOperationStatus.CultureMissing => BadRequest(problemDetailsBuilder
+                .WithTitle("Culture missing")
+                .WithDetail("A culture needs to be specified to execute the operation.")
+                .Build()),
             ContentPublishingOperationStatus.ConcurrencyViolation => BadRequest(problemDetailsBuilder
                 .WithTitle("Concurrency violation detected")
                 .WithDetail("An attempt was made to publish a version older than the latest version.")
@@ -91,6 +99,11 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithTitle("Unsaved changes")
                 .WithDetail(
                     "Could not publish the document because it had unsaved changes. Make sure to save all changes before attempting a publish.")
+                .Build()),
+            ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime => BadRequest(problemDetailsBuilder
+                .WithTitle("Unpublish time needs to be after the publish time")
+                .WithDetail(
+                    "Cannot handle a unpublish time that is not after the specified publish time.")
                 .Build()),
             ContentPublishingOperationStatus.FailedBranch => BadRequest(problemDetailsBuilder
                 .WithTitle("Failed branch operation")

@@ -5,10 +5,13 @@ using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -113,4 +116,47 @@ internal sealed class DocumentPresentationFactory
 
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
         => CreateContentTypeReferenceResponseModel<DocumentTypeReferenceResponseModel>(entity);
+
+    public Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel)
+    {
+        var contentScheduleCollection = new ContentScheduleCollection();
+        var culturesToPublishImmediately = new List<string>();
+        foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in requestModel.PublishSchedules)
+        {
+            if (cultureAndScheduleRequestModel.Schedule is null)
+            {
+                culturesToPublishImmediately.Add(cultureAndScheduleRequestModel.Culture ?? "*"); // API have `null` for invariant, but service layer has "*".
+                continue;
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null)
+            {
+                contentScheduleCollection.Add(new ContentSchedule(
+                    cultureAndScheduleRequestModel.Culture ?? string.Empty,
+                    cultureAndScheduleRequestModel.Schedule.PublishTime.Value.UtcDateTime,
+                    ContentScheduleAction.Release));
+            }
+            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime is not null)
+            {
+                if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
+                {
+                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, new CultureAndScheduleModel()
+                    {
+                        Schedules = contentScheduleCollection,
+                        CulturesToPublishImmediately = culturesToPublishImmediately,
+                    });
+                }
+
+                contentScheduleCollection.Add(new ContentSchedule(
+                    cultureAndScheduleRequestModel.Culture ?? string.Empty,
+                    cultureAndScheduleRequestModel.Schedule.UnpublishTime.Value.UtcDateTime,
+                    ContentScheduleAction.Expire));
+            }
+        }
+        return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, new CultureAndScheduleModel()
+        {
+            Schedules = contentScheduleCollection,
+            CulturesToPublishImmediately = culturesToPublishImmediately,
+        });
+    }
 }
