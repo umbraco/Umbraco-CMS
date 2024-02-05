@@ -2,7 +2,7 @@ import type {
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue,
 } from './composition-picker-modal.token.js';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
@@ -11,7 +11,10 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue
 > {
-	#selectionConfiguration = {
+	//
+
+	@state()
+	private _selectionConfiguration = {
 		multiple: true,
 		selectable: true,
 		selection: [],
@@ -21,10 +24,14 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		super();
 	}
 
+	firstUpdated() {
+		this._selectionConfiguration = { ...this._selectionConfiguration, selection: (this.data?.selection as []) ?? [] };
+	}
+
 	#onSelectionChange(e: CustomEvent) {
 		const values = (e.target as UmbTreeElement).getSelection() ?? [];
 		this.value = { selection: values as string[] };
-		this.#selectionConfiguration = { ...this.#selectionConfiguration, selection: values as [] };
+		this._selectionConfiguration = { ...this._selectionConfiguration, selection: values as [] };
 	}
 
 	render() {
@@ -41,8 +48,8 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 					hide-tree-root
 					alias="Umb.Tree.DocumentType"
 					@selection-change=${this.#onSelectionChange}
-					.selectionConfiguration=${this.#selectionConfiguration}
-					.filter=${(item: any) => item.unique}></umb-tree>
+					.selectionConfiguration=${this._selectionConfiguration}
+					.selectableFilter=${(item: any) => item.unique !== this.data?.unique}></umb-tree>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button

@@ -1,4 +1,4 @@
-import { UMB_COMPOSITION_PICKER_MODAL } from '../../../modals/index.js';
+import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
@@ -19,11 +19,6 @@ import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backo
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import {
-	DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-	type UmbDocumentTypeItemModel,
-} from '@umbraco-cms/backoffice/document-type';
-import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 
 const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeContainerResponseModel) => {
@@ -98,6 +93,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
+	@state()
+	private _compositionConfiguration?: UmbCompositionPickerModalData;
+
 	constructor() {
 		super();
 		this.sorter = new UmbSorterController(this, this.config);
@@ -121,6 +119,16 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				(isSorting) => (this.sortModeActive = isSorting),
 				'_observeIsSorting',
 			);
+
+			const unique = this._workspaceContext.getEntityId();
+
+			this.observe(this._workspaceContext.structure.contentTypes, (contentTypes) => {
+				this._compositionConfiguration = {
+					unique: unique ?? '',
+					selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
+				};
+			});
+
 			this._observeRootGroups();
 		});
 
@@ -278,12 +286,16 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	async #openCompositionModal() {
-		const modalContext = this._modalManagerContext?.open(UMB_COMPOSITION_PICKER_MODAL);
+		const modalContext = this._modalManagerContext?.open(UMB_COMPOSITION_PICKER_MODAL, {
+			data: this._compositionConfiguration,
+		});
 		await modalContext?.onSubmit();
 
 		if (!modalContext?.value) return;
 
 		const compositionIds = modalContext.getValue().selection;
+
+		console.log(compositionIds);
 		//TODO: observe the document types...
 	}
 
