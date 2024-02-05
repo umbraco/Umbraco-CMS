@@ -31,7 +31,11 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup), 'umbUserGroupObserver');
-			this.observe(this.#workspaceContext.userIds, (userIds) => (this._userUniques = userIds), 'umbUserIdsObserver');
+			this.observe(
+				this.#workspaceContext.userUniques,
+				(userUniques) => (this._userUniques = userUniques),
+				'umbUserIdsObserver',
+			);
 		});
 	}
 
