@@ -19,6 +19,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 
 	connectedCallback(): void {
 		super.connectedCallback();
+		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
