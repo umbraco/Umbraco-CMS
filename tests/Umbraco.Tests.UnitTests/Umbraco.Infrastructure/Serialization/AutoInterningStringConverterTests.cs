@@ -1,7 +1,7 @@
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Serialization;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization;
 
@@ -36,8 +36,8 @@ public class AutoInterningStringConverterTests
         Assert.IsNull(string.IsInterned(obj.Values.Keys.First()));
         Assert.IsNull(string.IsInterned(obj.Values.Keys.Last()));
 
-        var serialized = JsonConvert.SerializeObject(obj);
-        obj = JsonConvert.DeserializeObject<Test>(serialized);
+        var serialized = JsonSerializer.Serialize(obj);
+        obj = JsonSerializer.Deserialize<Test>(serialized);
 
         Assert.IsNotNull(string.IsInterned(obj.Values.Keys.First()));
         Assert.IsNotNull(string.IsInterned(obj.Values.Keys.Last()));
@@ -45,12 +45,10 @@ public class AutoInterningStringConverterTests
 
     public class Test
     {
-        [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringConverter))]
-        [JsonConverter(typeof(AutoInterningStringConverter))]
+        [JsonConverter(typeof(TextAutoInterningStringConverter))]
         public string Name { get; set; }
 
-        [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringKeyCaseInsensitiveDictionaryConverter<int>))]
-        [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<int>))]
+        [JsonConverter(typeof(TextAutoInterningStringKeyCaseInsensitiveDictionaryConverter<int>))]
         public Dictionary<string, int> Values { get; set; } = new();
     }
 }

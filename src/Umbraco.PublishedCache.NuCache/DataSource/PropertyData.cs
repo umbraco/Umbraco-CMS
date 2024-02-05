@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
@@ -13,10 +12,8 @@ public class PropertyData
     private string? _segment;
 
     [DataMember(Order = 0)]
-    [Newtonsoft.Json.JsonConverter(typeof(AutoInterningStringConverter))]
-    [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringConverter))]
+    [JsonConverter(typeof(TextAutoInterningStringConverter))]
     [DefaultValue("")]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, PropertyName = "c")]
     [JsonPropertyName("c")]
     public string? Culture
     {
@@ -27,10 +24,8 @@ public class PropertyData
     }
 
     [DataMember(Order = 1)]
-    [Newtonsoft.Json.JsonConverter(typeof(AutoInterningStringConverter))]
-    [System.Text.Json.Serialization.JsonConverter(typeof(TextAutoInterningStringConverter))]
+    [JsonConverter(typeof(TextAutoInterningStringConverter))]
     [DefaultValue("")]
-    [JsonProperty(DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate, PropertyName = "s")]
     [JsonPropertyName("s")]
     public string? Segment
     {
@@ -41,20 +36,17 @@ public class PropertyData
     }
 
     [DataMember(Order = 2)]
-    [JsonProperty("v")]
     [JsonPropertyName("v")]
     public object? Value { get; set; }
 
     // Legacy properties used to deserialize existing nucache db entries
     [IgnoreDataMember]
-    [JsonProperty("culture")]
     private string LegacyCulture
     {
         set => Culture = value;
     }
 
     [IgnoreDataMember]
-    [JsonProperty("seg")]
     [JsonPropertyName("seg")]
     private string LegacySegment
     {
@@ -62,7 +54,6 @@ public class PropertyData
     }
 
     [IgnoreDataMember]
-    [JsonProperty("val")]
     [JsonPropertyName("val")]
     private object LegacyValue
     {
