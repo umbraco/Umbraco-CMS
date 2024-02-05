@@ -50,7 +50,7 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.isSuccessNotificationVisible();
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
     const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
-    expect(partialViewData.content).toBe(expectedTemplateContent);
+    expect(partialViewData.content).toEqual(expectedTemplateContent);
     // Verify the new partial view is displayed under the Partial Views section
     await umbracoUi.partialView.clickRootFolderCaretButton();
     await expect(umbracoUi.partialView.checkItemNameUnderPartialViewTree(partialViewFileName)).toBeVisible();
