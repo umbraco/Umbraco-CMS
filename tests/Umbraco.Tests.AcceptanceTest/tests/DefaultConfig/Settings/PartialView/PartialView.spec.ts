@@ -43,15 +43,13 @@ test.describe('Partial View tests', () => {
     await umbracoUi.partialView.clickNewPartialViewFromSnippetButton();
     await umbracoUi.partialView.clickBreadcrumbButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
-    await umbracoUi.waitForTimeout(500);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
     await umbracoUi.partialView.isSuccessNotificationVisible();
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
     const partialViewData = await umbracoApi.partialView.getByName(partialViewFileName);
-    console.log(partialViewData.content);
-    console.log(expectedPartialViewContent);
     expect(partialViewData.content).toEqual(expectedPartialViewContent);
     // Verify the new partial view is displayed under the Partial Views section
     await umbracoUi.partialView.clickRootFolderCaretButton();
