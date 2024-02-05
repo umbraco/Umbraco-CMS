@@ -15,13 +15,13 @@ public class ContentCacheDataModel
     // dont serialize empty properties
     [DataMember(Order = 0)]
     [JsonPropertyName("pd")]
-    [JsonConverter(typeof(TextAutoInterningStringKeyCaseInsensitiveDictionaryConverter<PropertyData[]>))]
+    [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<PropertyData[]>))]
     [MessagePackFormatter(typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<PropertyData[]>))]
     public Dictionary<string, PropertyData[]>? PropertyData { get; set; }
 
     [DataMember(Order = 1)]
     [JsonPropertyName("cd")]
-    [JsonConverter(typeof(TextAutoInterningStringKeyCaseInsensitiveDictionaryConverter<CultureVariation>))]
+    [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<CultureVariation>))]
     [MessagePackFormatter(typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<CultureVariation>))]
     public Dictionary<string, CultureVariation>? CultureData { get; set; }
 
@@ -32,12 +32,12 @@ public class ContentCacheDataModel
     // Legacy properties used to deserialize existing nucache db entries
     [IgnoreDataMember]
     [JsonPropertyName("properties")]
-    [JsonConverter(typeof(TextCaseInsensitiveDictionaryConverter<PropertyData[]>))]
+    [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]
     private Dictionary<string, PropertyData[]> LegacyPropertyData { set => PropertyData = value; }
 
     [IgnoreDataMember]
     [JsonPropertyName("cultureData")]
-    [JsonConverter(typeof(TextCaseInsensitiveDictionaryConverter<CultureVariation>))]
+    [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<CultureVariation>))]
     private Dictionary<string, CultureVariation> LegacyCultureData { set => CultureData = value; }
 
     [IgnoreDataMember]

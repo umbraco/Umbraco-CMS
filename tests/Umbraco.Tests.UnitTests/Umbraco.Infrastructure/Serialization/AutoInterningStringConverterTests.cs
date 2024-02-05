@@ -45,10 +45,10 @@ public class AutoInterningStringConverterTests
 
     public class Test
     {
-        [JsonConverter(typeof(TextAutoInterningStringConverter))]
+        [JsonConverter(typeof(AutoInterningStringConverter))]
         public string Name { get; set; }
 
-        [JsonConverter(typeof(TextAutoInterningStringKeyCaseInsensitiveDictionaryConverter<int>))]
+        [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<int>))]
         public Dictionary<string, int> Values { get; set; } = new();
     }
 }

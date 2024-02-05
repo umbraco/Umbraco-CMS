@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
-public class TextAutoInterningStringKeyCaseInsensitiveDictionaryConverter<TValue> : JsonConverter<IDictionary<string, TValue>>
+public class AutoInterningStringKeyCaseInsensitiveDictionaryConverter<TValue> : JsonConverter<IDictionary<string, TValue>>
 {
     // This is a hacky workaround to creating a "read only converter", since System.Text.Json doesn't support it.
     // Taken from https://github.com/dotnet/runtime/issues/46372#issuecomment-1660515178
