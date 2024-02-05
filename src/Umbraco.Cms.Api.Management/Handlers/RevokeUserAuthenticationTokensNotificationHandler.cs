@@ -40,7 +40,7 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         var usersAccess = new Dictionary<Guid, UserStartNodesAndGroupAccess>();
         foreach (IUser user in notification.SavedEntities)
         {
-            UserStartNodesAndGroupAccess? priorUserAccess = await GetRelevantUserAccessDataByUserKey(user.Key);
+            UserStartNodesAndGroupAccess? priorUserAccess = await GetRelevantUserAccessDataByUserKeyAsync(user.Key);
             if (priorUserAccess == null)
             {
                 continue;
@@ -109,7 +109,7 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         var usersInGroups = new Dictionary<Guid, IEnumerable<IUser>>();
         foreach (IUserGroup userGroup in notification.DeletedEntities)
         {
-            var users = await GetUsersByGroupKey(userGroup.Key);
+            var users = await GetUsersByGroupKeyAsync(userGroup.Key);
             if (users == null)
             {
                 continue;
@@ -147,7 +147,7 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
     }
 
     // Get data about the user before saving
-    private async Task<UserStartNodesAndGroupAccess?> GetRelevantUserAccessDataByUserKey(Guid userKey)
+    private async Task<UserStartNodesAndGroupAccess?> GetRelevantUserAccessDataByUserKeyAsync(Guid userKey)
     {
         IUser? user = await _userService.GetAsync(userKey);
 
@@ -160,7 +160,7 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         => new(user.Groups.Select(g => g.Key), user.StartContentIds, user.StartMediaIds);
 
     // Get data about the users part of a group before deleting it
-    private async Task<IEnumerable<IUser>?> GetUsersByGroupKey(Guid userGroupKey)
+    private async Task<IEnumerable<IUser>?> GetUsersByGroupKeyAsync(Guid userGroupKey)
     {
         IUserGroup? userGroup = await _userGroupService.GetAsync(userGroupKey);
 
