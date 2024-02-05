@@ -11,10 +11,9 @@ import type {
 	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
-	UserResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	UserStateModel,
+	UserResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
 	return {
@@ -90,7 +89,7 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 
 	/**
 	 * Get current user
-	 * @return {*}  {UmbLoggedInUser}
+	 * @return {*}  {UmbCurrentUser}
 	 * @memberof UmbUserData
 	 */
 	getCurrentUser(): UmbCurrentUser {

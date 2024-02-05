@@ -12,11 +12,11 @@ import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel> = {
-	compareElementToModel: (element: HTMLElement, model: UmbPropertyTypeModel) => {
-		return element.getAttribute('data-umb-property-id') === model.id;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-property-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbPropertyTypeModel) => {
-		return container.querySelector('[data-umb-property-id=' + modelEntry.id + ']');
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
 	},
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',
