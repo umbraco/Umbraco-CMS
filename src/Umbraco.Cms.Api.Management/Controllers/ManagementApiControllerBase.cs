@@ -9,6 +9,7 @@ using Umbraco.Cms.Api.Common.Mvc.ActionResults;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -40,9 +41,10 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
     }
 
     protected static Guid CurrentUserKey(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-    {
-        return backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? throw new InvalidOperationException("No backoffice user found");
-    }
+        => CurrentUser(backOfficeSecurityAccessor).Key;
+
+    protected static IUser CurrentUser(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        => backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser ?? throw new InvalidOperationException("No backoffice user found");
 
     /// <summary>
     ///     Creates a 403 Forbidden result.

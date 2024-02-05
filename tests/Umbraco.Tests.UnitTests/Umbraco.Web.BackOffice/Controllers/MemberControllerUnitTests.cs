@@ -496,7 +496,7 @@ public class MemberControllerUnitTests
         Mock.Get(umbracoMembersUserManager)
             .Verify(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()));
         Mock.Get(memberService)
-            .Verify(m => m.Save(It.IsAny<Member>()));
+            .Verify(m => m.Save(It.IsAny<Member>(), It.IsAny<int>()));
         AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
     }
 
