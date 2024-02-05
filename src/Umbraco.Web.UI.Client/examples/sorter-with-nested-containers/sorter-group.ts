@@ -78,6 +78,9 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 			:host {
 				display: block;
 				width: 100%;
+				border: 1px dashed rgba(122, 122, 122, 0.25);
+				border-radius: calc(var(--uui-border-radius) * 2);
+				padding: var(--uui-size-space-1);
 			}
 
 			.sorter-placeholder {
@@ -86,14 +89,6 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 
 			.sorter-container {
 				min-height: 20px;
-			}
-
-			example-sorter-group {
-				display: block;
-				width: 100%;
-				border: 1px dashed rgba(122, 122, 122, 0.25);
-				border-radius: calc(var(--uui-border-radius) * 2);
-				padding: var(--uui-size-space-1);
 			}
 		`,
 	];
