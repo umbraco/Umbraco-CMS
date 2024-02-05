@@ -18,7 +18,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-	#appContext?: typeof UMB_APP_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -30,10 +29,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this.#authContext = instance;
-		});
-
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.#appContext = instance;
 		});
 	}
 
