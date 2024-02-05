@@ -1,4 +1,4 @@
-import type { UmbExecuteTemplateQueryArgs } from '../../repository/query/types.js';
+import type { UmbExecuteTemplateQueryRequestModel } from '../../repository/query/types.js';
 import { UmbTemplateQueryRepository } from '../../repository/query/index.js';
 import { localizePropertyType, localizeSort } from './utils.js';
 import type { UmbTemplateQueryBuilderFilterElement } from './query-builder-filter.element.js';
@@ -41,7 +41,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 	private _templateQuery?: TemplateQueryResultResponseModel;
 
 	@state()
-	private _queryRequest: UmbExecuteTemplateQueryArgs = <UmbExecuteTemplateQueryArgs>{};
+	private _queryRequest: UmbExecuteTemplateQueryRequestModel = <UmbExecuteTemplateQueryRequestModel>{};
 
 	@state()
 	private _queryBuilderSettings?: TemplateQuerySettingsResponseModel;
@@ -80,7 +80,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 		this.modalContext?.submit();
 	}
 
-	#updateQueryRequest(update: Partial<UmbExecuteTemplateQueryArgs>) {
+	#updateQueryRequest(update: Partial<UmbExecuteTemplateQueryRequestModel>) {
 		this._queryRequest = { ...this._queryRequest, ...update };
 		this.#executeTemplateQuery();
 	}

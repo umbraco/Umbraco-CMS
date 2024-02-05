@@ -3,7 +3,7 @@ import type {
 	TemplateQueryExecuteSortModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export interface UmbExecuteTemplateQueryArgs {
+export interface UmbExecuteTemplateQueryRequestModel {
 	rootDocument: { unique: string } | null;
 	documentTypeAlias: string | null;
 	filters: Array<TemplateQueryExecuteFilterPresentationModel> | null;
