@@ -1,5 +1,6 @@
 import { UmbAuthFlow } from './auth-flow.js';
 import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
+import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -125,12 +126,21 @@ export class UmbAuthContext extends UmbBaseController {
 	 * @example <caption>Using the default OpenAPI configuration</caption>
 	 * ```js
 	 *  	const defaultOpenApi = authContext.getOpenApiConfiguration();
-	 *  	OpenAPI = { ...OpenAPI, ...openApi };
+	 *  	OpenAPI.BASE = defaultOpenApi.base;
+	 * 		OpenAPI.WITH_CREDENTIALS = defaultOpenApi.withCredentials;
+	 * 		OpenAPI.CREDENTIALS = defaultOpenApi.credentials;
+	 * 		OpenAPI.TOKEN = defaultOpenApi.token;
 	 * ```
 	 * @returns The default OpenAPI configuration
 	 */
-	getOpenApiConfiguration() {
-		return this.#openApi;
+	getOpenApiConfiguration(): UmbOpenApiConfiguration {
+		return {
+			base: OpenAPI.BASE,
+			version: OpenAPI.VERSION,
+			withCredentials: OpenAPI.WITH_CREDENTIALS,
+			credentials: OpenAPI.CREDENTIALS,
+			token: () => this.getLatestToken(),
+		};
 	}
 
 	#getRedirectUrl() {
