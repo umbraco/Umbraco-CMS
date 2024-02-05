@@ -1,8 +1,8 @@
+import type { UmbDataTypeItemModel } from '../../repository/item/types.js';
 import { UmbDataTypePickerContext } from './data-type-input.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-data-type-input')
@@ -67,7 +67,7 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items?: Array<DataTypeItemResponseModel>;
+	private _items?: Array<UmbDataTypeItemModel>;
 
 	#pickerContext = new UmbDataTypePickerContext(this);
 
@@ -103,13 +103,13 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderItem(item: DataTypeItemResponseModel) {
-		if (!item.id) return;
+	private _renderItem(item: UmbDataTypeItemModel) {
+		if (!item.unique) return;
 		return html`
 			<uui-ref-node-data-type name=${item.name}>
 				<uui-action-bar slot="actions">
 					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
 						label="Remove Data Type ${item.name}"
 						>Remove</uui-button
 					>
