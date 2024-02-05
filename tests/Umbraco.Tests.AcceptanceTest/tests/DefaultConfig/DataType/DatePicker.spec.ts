@@ -1,7 +1,7 @@
 ﻿import { test } from "@umbraco/playwright-testhelpers";
 import { expect } from "@playwright/test";
 
-const datePickerTypes = ["Date Picker", "Date Picker with time"];
+const datePickerTypes = ['Date Picker', 'Date Picker with time'];
 for (const datePickerType of datePickerTypes) {
   test.describe(`${datePickerType} tests`, () => {
     let dataTypeDefaultData = null;
@@ -9,7 +9,7 @@ for (const datePickerType of datePickerTypes) {
 
     test.beforeEach(async ({ umbracoUi, umbracoApi }) => {
       await umbracoUi.goToBackOffice();
-      await umbracoUi.dataType.goToSettingsTreeItem("Data Types");
+      await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
       dataTypeDefaultData = await umbracoApi.dataType.getByName(datePickerType);
       await umbracoUi.dataType.goToDataType(datePickerType);
     });
@@ -23,7 +23,7 @@ for (const datePickerType of datePickerTypes) {
     test(`can update offset time`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const expectedDataTypeValues =
-        datePickerType === "Date Picker"
+        datePickerType === 'Date Picker'
           ? [
               {
                 alias: "format",
@@ -53,7 +53,7 @@ for (const datePickerType of datePickerTypes) {
     test(`can update date format`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const dateFormatValue =
-        datePickerType === "Date Picker" ? "DD-MM-YYYY" : "DD-MM-YYYY hh:mm:ss";
+        datePickerType === 'Date Picker' ? 'DD-MM-YYYY' : 'DD-MM-YYYY hh:mm:ss';
       const expectedDataTypeValues = [
         {
           alias: "format",

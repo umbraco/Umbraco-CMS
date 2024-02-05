@@ -1,7 +1,7 @@
 ﻿import { test } from "@umbraco/playwright-testhelpers";
 import { expect } from "@playwright/test";
 
-const uploadTypes = ["Upload Article", "Upload Audio", "Upload File", "Upload Vector Graphics", "Upload Video"];
+const uploadTypes = ['Upload Article', 'Upload Audio', 'Upload File', 'Upload Vector Graphics', 'Upload Video'];
 for (const uploadType of uploadTypes) {
   test.describe(`${uploadType} tests`, () => {
     let dataTypeDefaultData = null;

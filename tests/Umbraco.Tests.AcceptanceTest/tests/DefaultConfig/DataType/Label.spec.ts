@@ -1,7 +1,7 @@
 ﻿import { test } from "@umbraco/playwright-testhelpers";
 import { expect } from "@playwright/test";
 
-const labelTypes = ["Label (bigint)", "Label (datetime)", "Label (decimal)", "Label (integer)", "Label (string)", "Label (time)"];
+const labelTypes = ['Label (bigint)', 'Label (datetime)', 'Label (decimal)', 'Label (integer)', 'Label (string)', 'Label (time)'];
 for (const labelType of labelTypes) {
   test.describe(`${labelType} tests`, () => {
     let dataTypeDefaultData = null;

@@ -1,7 +1,7 @@
 ﻿import { test } from "@umbraco/playwright-testhelpers";
 import { expect } from "@playwright/test";
 
-const listViewTypes = ["List View - Content", "List View - Media", "List View - Members"];
+const listViewTypes = ['List View - Content', 'List View - Media', 'List View - Members'];
 for (const listViewType of listViewTypes) {
   test.describe(`${listViewType} tests`, () => {
     let dataTypeDefaultData = null;
@@ -9,7 +9,7 @@ for (const listViewType of listViewTypes) {
 
     test.beforeEach(async ({ umbracoUi, umbracoApi }) => {
       await umbracoUi.goToBackOffice();
-      await umbracoUi.dataType.goToSettingsTreeItem("Data Types");
+      await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
       dataTypeDefaultData = await umbracoApi.dataType.getByName(listViewType);
       await umbracoUi.dataType.goToDataType(listViewType);
     });
@@ -39,8 +39,8 @@ for (const listViewType of listViewTypes) {
 
     test(`can update Order Direction`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
-      const isAscending = listViewType == "List View - Members" ? false : true;
-      const orderDirectionValue = isAscending ? "asc" : "desc";
+      const isAscending = listViewType == 'List View - Members' ? false : true;
+      const orderDirectionValue = isAscending ? 'asc' : 'desc';
       const expectedDataTypeValues = {
         alias: "orderDirection",
         value: orderDirectionValue,
@@ -153,7 +153,7 @@ for (const listViewType of listViewTypes) {
 
     test(`can update Content App Name`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
-      const contentAppName = "Test Content App Name";
+      const contentAppName = 'Test Content App Name';
       const expectedDataTypeValues = {
         alias: "tabName",
         value: contentAppName,
