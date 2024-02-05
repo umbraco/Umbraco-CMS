@@ -41,7 +41,6 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 
 	#onSelected(event: UUIMenuItemEvent, item: UmbUserGroupDetailModel) {
 		if (!item.unique) throw new Error('User group unique is required');
-		debugger;
 		event.stopPropagation();
 		this.#selectionManager.select(item.unique);
 		this.requestUpdate();
