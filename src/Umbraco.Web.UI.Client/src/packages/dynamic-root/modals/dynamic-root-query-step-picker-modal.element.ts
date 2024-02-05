@@ -35,6 +35,7 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 		this.#documentTypePickerContext
 			.openPicker({
 				hideTreeRoot: true,
+				pickableFilter: (x) => x.isElement === false,
 			})
 			.then(() => {
 				const selectedItems = this.#documentTypePickerContext.getSelection();
