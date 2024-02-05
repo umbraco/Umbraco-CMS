@@ -2,7 +2,7 @@ import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../mod
 import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils/index.js';
 import type { UmbChooseInsertTypeModalValue } from '../../modals/insert-choose-type-sidebar.element.js';
 import { CodeSnippetType } from '../../modals/insert-choose-type-sidebar.element.js';
-import { UmbDictionaryDetailRepository } from 'src/packages/dictionary/index.js';
+import { UmbDictionaryDetailRepository } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
