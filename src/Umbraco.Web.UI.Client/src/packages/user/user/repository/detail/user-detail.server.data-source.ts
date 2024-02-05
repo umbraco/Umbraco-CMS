@@ -119,7 +119,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		);
 
 		if (data) {
-			// TODO: what do we do with the initial password?
+			// TODO: get back to this when we get a location header
 			return this.read(data.user.id);
 		}
 

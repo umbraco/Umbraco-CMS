@@ -1,8 +1,9 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCreateUserSuccessModalData {
-	userId: string;
-	initialPassword: string;
+	user: {
+		unique: string;
+	};
 }
 
 export type UmbCreateUserSuccessModalValue = undefined;

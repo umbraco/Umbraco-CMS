@@ -1,20 +1,26 @@
 import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
 import type { UmbUserItemModel } from '../../repository/item/types.js';
+import type {
+	UmbCreateUserSuccessModalData,
+	UmbCreateUserSuccessModalValue,
+} from './create-user-success-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbNotificationDefaultData, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { UmbCreateUserSuccessModalData, UmbCreateUserSuccessModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-user-create-success-modal')
-export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
+@customElement('umb-create-user-success-modal')
+export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 	UmbCreateUserSuccessModalData,
 	UmbCreateUserSuccessModalValue
 > {
 	@state()
 	_userItem?: UmbUserItemModel;
+
+	@state()
+	_initialPassword: string = 'INITIAL PASSWORD GOES HERE';
 
 	#userItemRepository = new UmbUserItemRepository(this);
 	#notificationContext?: UmbNotificationContext;
@@ -26,9 +32,10 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	}
 
 	protected async firstUpdated(): Promise<void> {
-		if (!this.data?.userId) throw new Error('No userId provided');
+		if (!this.data?.user.unique) throw new Error('No user unique is provided');
 
-		const { data } = await this.#userItemRepository.requestItems([this.data?.userId]);
+		// TODO: generate a new random password for the user, when the end point is ready
+		const { data } = await this.#userItemRepository.requestItems([this.data?.user.unique]);
 		if (data) {
 			this._userItem = data[0];
 		}
@@ -55,8 +62,8 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 
 	#onGoToProfile(event: Event) {
 		event.stopPropagation();
-		history.pushState(null, '', 'section/user-management/view/users/user/' + this.id); //TODO: URL Should be dynamic
-		this.modalContext?.submit();
+		history.pushState(null, '', 'section/user-management/view/users/user/' + this.data?.user.unique); //TODO: URL Should be dynamic
+		this._submitModal();
 	}
 
 	render() {
@@ -65,12 +72,7 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 			<uui-form-layout-item>
 				<uui-label slot="label" for="password">Password</uui-label>
 				<div id="password-control">
-					<uui-input-password
-						id="password"
-						label="password"
-						name="password"
-						value="${this.data?.initialPassword ?? ''}"
-						readonly>
+					<uui-input-password id="password" label="password" name="password" value="${this._initialPassword}" readonly>
 					</uui-input-password>
 					<uui-button compact label="Copy" @click=${this.#copyPassword} look="outline"></uui-button>
 				</div>
@@ -104,10 +106,10 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	];
 }
 
-export default UmbUserCreateSuccessModalElement;
+export default UmbCreateUserSuccessModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-create-success-modal': UmbUserCreateSuccessModalElement;
+		'umb-create-user-success-modal': UmbCreateUserSuccessModalElement;
 	}
 }

@@ -1,16 +1,13 @@
 import { UmbUserDetailRepository } from '../../repository/index.js';
+import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import {
-	UmbModalBaseElement,
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_CREATE_USER_SUCCESS_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-user-create-modal')
-export class UmbUserCreateModalElement extends UmbModalBaseElement {
+@customElement('umb-create-user-modal')
+export class UmbCreateUserModalElement extends UmbModalBaseElement {
 	#userDetailRepository = new UmbUserDetailRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
 
@@ -53,16 +50,17 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 		// TODO: figure out when to use email or username
 		const { data } = await this.#userDetailRepository.create(userScaffold);
 
-		if (data && data.unique && data.initialPassword) {
-			this.#openSuccessModal(data.unique, data.initialPassword);
+		if (data) {
+			this.#openSuccessModal(data.unique);
 		}
 	}
 
-	#openSuccessModal(userId: string, initialPassword: string) {
+	#openSuccessModal(userUnique: string) {
 		const modalContext = this.#modalManagerContext?.open(UMB_CREATE_USER_SUCCESS_MODAL, {
 			data: {
-				userId,
-				initialPassword,
+				user: {
+					unique: userUnique,
+				},
 			},
 		});
 
@@ -137,10 +135,10 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 	];
 }
 
-export default UmbUserCreateModalElement;
+export default UmbCreateUserModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-create-modal': UmbUserCreateModalElement;
+		'umb-create-user-modal': UmbCreateUserModalElement;
 	}
 }
