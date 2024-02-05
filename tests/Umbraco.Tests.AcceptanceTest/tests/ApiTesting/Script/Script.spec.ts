@@ -2,7 +2,7 @@ import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Script tests', () => {
-  let scriptPath = "";
+  let scriptPath = '';
   const scriptName = 'scriptName.js';
 
   test.beforeEach(async ({umbracoApi}) => {
@@ -16,20 +16,35 @@ test.describe('Script tests', () => {
   test('can create a script', async ({umbracoApi}) => {
     // Act
     scriptPath = await umbracoApi.script.create(scriptName, 'test');
+    await umbracoApi.script.get(scriptPath);
 
     // Assert
     expect(await umbracoApi.script.doesExist(scriptPath)).toBeTruthy();
   });
 
-  test('can update a script', async ({umbracoApi}) => {
+  test('can update script name', async ({umbracoApi}) => {
+    // Arrange
+    const oldName = 'RandomScriptName.js';
+    await umbracoApi.script.ensureNameNotExists(oldName);
+    const oldScriptPath = await umbracoApi.script.create(oldName, 'test');
+
+    // Act
+    scriptPath = await umbracoApi.script.updateName(oldScriptPath, scriptName);
+
+    // Assert
+    // Checks if the content was updated for the script
+    const updatedScript = await umbracoApi.script.get(scriptPath);
+    expect(updatedScript.name).toEqual(scriptName);
+  });
+
+  test('can update script content', async ({umbracoApi}) => {
     // Arrange
     const newContent = 'Howdy';
     scriptPath = await umbracoApi.script.create(scriptName, 'test');
-    const script = await umbracoApi.script.get(scriptPath);
-    script.content = newContent;
+    await umbracoApi.script.get(scriptPath);
 
     // Act
-    await umbracoApi.script.update(script);
+    await umbracoApi.script.updateContent(scriptPath, newContent);
 
     // Assert
     // Checks if the content was updated for the script

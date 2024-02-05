@@ -55,8 +55,13 @@ public class GetPublicAccessDocumentController : DocumentControllerBase
             return PublicAccessOperationStatusResult(accessAttempt.Status);
         }
 
+        if (accessAttempt.Result is null)
+        {
+            return Ok();
+        }
+
         Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> responseModelAttempt =
-            _publicAccessPresentationFactory.CreatePublicAccessResponseModel(accessAttempt.Result!);
+            _publicAccessPresentationFactory.CreatePublicAccessResponseModel(accessAttempt.Result);
 
         if (responseModelAttempt.Success is false)
         {

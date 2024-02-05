@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.BackOffice.ModelBinders;
 
-internal class BlueprintItemBinder : ContentItemBinder
+public class BlueprintItemBinder : ContentItemBinder
 {
     private readonly IContentService _contentService;
 

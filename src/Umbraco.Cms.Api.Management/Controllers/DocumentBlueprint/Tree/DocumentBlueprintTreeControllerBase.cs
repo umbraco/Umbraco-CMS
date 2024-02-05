@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint.Tree;
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentBlueprint}")]
 [ApiExplorerSettings(GroupName = "Document Blueprint")]
 [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessContent)]
-public class DocumentBlueprintTreeControllerBase : EntityTreeControllerBase<DocumentBlueprintTreeItemResponseModel>
+public class DocumentBlueprintTreeControllerBase : NamedEntityTreeControllerBase<DocumentBlueprintTreeItemResponseModel>
 {
     private readonly IContentTypeService _contentTypeService;
 

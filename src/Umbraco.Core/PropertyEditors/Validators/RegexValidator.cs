@@ -4,7 +4,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
@@ -13,9 +12,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 /// </summary>
 public sealed class RegexValidator : IValueFormatValidator, IManifestValueValidator
 {
-    private const string ValueIsInvalid = "Value is invalid, it does not match the correct pattern";
-    private readonly ILocalizedTextService _textService;
     private string _regex;
+
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
+    public RegexValidator(ILocalizedTextService textService)
+        : this(string.Empty)
+    {
+    }
+
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
+    public RegexValidator(ILocalizedTextService textService, string regex)
+        : this(regex)
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RegexValidator" /> class.
@@ -26,8 +35,8 @@ public sealed class RegexValidator : IValueFormatValidator, IManifestValueValida
     ///     the validator is used as an <see cref="IManifestValueValidator" /> and the regular expression
     ///     is supplied via the <see cref="Configuration" /> method.
     /// </remarks>
-    public RegexValidator(ILocalizedTextService textService)
-        : this(textService, string.Empty)
+    public RegexValidator()
+        : this(string.Empty)
     {
     }
 
@@ -38,11 +47,8 @@ public sealed class RegexValidator : IValueFormatValidator, IManifestValueValida
     ///     Use this constructor when the validator is used as an <see cref="IValueValidator" />,
     ///     and the regular expression must be supplied when the validator is created.
     /// </remarks>
-    public RegexValidator(ILocalizedTextService textService, string regex)
-    {
-        _textService = textService;
-        _regex = regex;
-    }
+    public RegexValidator(string regex)
+        => _regex = regex;
 
     /// <summary>
     ///     Gets or sets the configuration, when parsed as <see cref="IManifestValueValidator" />.
@@ -99,9 +105,7 @@ public sealed class RegexValidator : IValueFormatValidator, IManifestValueValida
 
         if (value == null || !new Regex(format).IsMatch(value.ToString()!))
         {
-            yield return new ValidationResult(
-                _textService?.Localize("validation", "invalidPattern") ?? ValueIsInvalid,
-                new[] { "value" });
+            yield return new ValidationResult(Constants.Validation.ErrorMessages.Properties.PatternMismatch, new[] { "value" });
         }
     }
 }

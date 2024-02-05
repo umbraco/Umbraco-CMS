@@ -21,18 +21,33 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class DataValueEditor : IDataValueEditor
 {
     private readonly IJsonSerializer? _jsonSerializer;
-    private readonly ILocalizedTextService _localizedTextService;
     private readonly IShortStringHelper _shortStringHelper;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DataValueEditor" /> class.
-    /// </summary>
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
     public DataValueEditor(
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer? jsonSerializer) // for tests, and manifest
+        : this(shortStringHelper, jsonSerializer)
     {
-        _localizedTextService = localizedTextService;
+    }
+
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
+    public DataValueEditor(
+        ILocalizedTextService localizedTextService,
+        IShortStringHelper shortStringHelper,
+        IJsonSerializer jsonSerializer,
+        IIOHelper ioHelper,
+        DataEditorAttribute attribute)
+        : this(shortStringHelper, jsonSerializer, ioHelper, attribute)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DataValueEditor" /> class.
+    /// </summary>
+    public DataValueEditor(IShortStringHelper shortStringHelper, IJsonSerializer? jsonSerializer) // for tests, and manifest
+    {
         _shortStringHelper = shortStringHelper;
         _jsonSerializer = jsonSerializer;
         ValueType = ValueTypes.String;
@@ -43,7 +58,6 @@ public class DataValueEditor : IDataValueEditor
     ///     Initializes a new instance of the <see cref="DataValueEditor" /> class.
     /// </summary>
     public DataValueEditor(
-        ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
@@ -54,7 +68,6 @@ public class DataValueEditor : IDataValueEditor
             throw new ArgumentNullException(nameof(attribute));
         }
 
-        _localizedTextService = localizedTextService;
         _shortStringHelper = shortStringHelper;
         _jsonSerializer = jsonSerializer;
 
@@ -85,12 +98,12 @@ public class DataValueEditor : IDataValueEditor
     /// <summary>
     ///     Gets the validator used to validate the special property type -level "required".
     /// </summary>
-    public virtual IValueRequiredValidator RequiredValidator => new RequiredValidator(_localizedTextService);
+    public virtual IValueRequiredValidator RequiredValidator => new RequiredValidator();
 
     /// <summary>
     ///     Gets the validator used to validate the special property type -level "format".
     /// </summary>
-    public virtual IValueFormatValidator FormatValidator => new RegexValidator(_localizedTextService);
+    public virtual IValueFormatValidator FormatValidator => new RegexValidator();
 
     /// <summary>
     ///     Gets or sets the editor view.

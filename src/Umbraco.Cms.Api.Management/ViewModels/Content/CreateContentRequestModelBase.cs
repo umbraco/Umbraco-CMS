@@ -6,6 +6,4 @@ public abstract class CreateContentRequestModelBase<TValueModel, TVariantModel>
     where TVariantModel : VariantModelBase
 {
     public Guid? Id { get; set; }
-
-    public Guid? ParentId { get; set; }
 }

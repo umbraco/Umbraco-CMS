@@ -1,15 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-// FIXME: add granular permissions check (for inspiration, check how the old MediaController utilizes IAuthorizationService)
 internal sealed class MediaEditingService
-    : ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
+    : ContentEditingServiceWithSortingBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
 {
     private readonly ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
 
@@ -21,8 +21,9 @@ internal sealed class MediaEditingService
         ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
-        ITreeEntitySortingService treeEntitySortingService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService)
+        ITreeEntitySortingService treeEntitySortingService,
+        IMediaValidationService mediaValidationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, mediaValidationService, treeEntitySortingService)
         => _logger = logger;
 
     public async Task<IMedia?> GetAsync(Guid key)
@@ -31,36 +32,52 @@ internal sealed class MediaEditingService
         return await Task.FromResult(media);
     }
 
-    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMedia media, MediaUpdateModel updateModel)
+        => await ValidatePropertiesAsync(updateModel, media.ContentType.Key);
+
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MediaCreateModel createModel)
+        => await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
+
+    public async Task<Attempt<MediaCreateResult, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
     {
-        Attempt<IMedia?, ContentEditingOperationStatus> result = await MapCreate(createModel);
+        Attempt<MediaCreateResult, ContentEditingOperationStatus> result = await MapCreate<MediaCreateResult>(createModel);
         if (result.Success == false)
         {
             return result;
         }
 
-        IMedia media = result.Result!;
+        // the create mapping might succeed, but this doesn't mean the model is valid at property level.
+        // we'll return the actual property validation status if the entire operation succeeds.
+        ContentEditingOperationStatus validationStatus = result.Status;
+        ContentValidationResult validationResult = result.Result.ValidationResult;
+
+        IMedia media = result.Result.Content!;
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus<IMedia?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, media)
-            : Attempt.FailWithStatus<IMedia?, ContentEditingOperationStatus>(operationStatus, media);
+            ? Attempt.SucceedWithStatus(validationStatus, new MediaCreateResult { Content = media, ValidationResult = validationResult })
+            : Attempt.FailWithStatus(operationStatus, new MediaCreateResult { Content = media });
     }
 
-    public async Task<Attempt<IMedia, ContentEditingOperationStatus>> UpdateAsync(IMedia media, MediaUpdateModel updateModel, Guid userKey)
+    public async Task<Attempt<MediaUpdateResult, ContentEditingOperationStatus>> UpdateAsync(IMedia media, MediaUpdateModel updateModel, Guid userKey)
     {
-        Attempt<ContentEditingOperationStatus> result = await MapUpdate(media, updateModel);
+        Attempt<MediaUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<MediaUpdateResult>(media, updateModel);
         if (result.Success == false)
         {
-            return Attempt.FailWithStatus(result.Result, media);
+            return result;
         }
+
+        // the update mapping might succeed, but this doesn't mean the model is valid at property level.
+        // we'll return the actual property validation status if the entire operation succeeds.
+        ContentEditingOperationStatus validationStatus = result.Status;
+        ContentValidationResult validationResult = result.Result.ValidationResult;
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, media)
-            : Attempt.FailWithStatus(operationStatus, media);
+            ? Attempt.SucceedWithStatus(validationStatus, new MediaUpdateResult { Content = media, ValidationResult = validationResult })
+            : Attempt.FailWithStatus(operationStatus, new MediaUpdateResult { Content = media });
     }
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
