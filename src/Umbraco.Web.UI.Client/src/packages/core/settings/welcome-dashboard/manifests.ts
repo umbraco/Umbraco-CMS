@@ -1,5 +1,3 @@
-import { UMB_SETTINGS_SECTION_ALIAS } from '../manifests.js';
-
 export const manifests = [
 	{
 		type: 'dashboard',
