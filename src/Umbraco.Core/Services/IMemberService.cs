@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Defines the MemberService, which is an easy access to operations involving (umbraco) members.
 /// </summary>
-public interface IMemberService : IMembershipMemberService
+public interface IMemberService : IMembershipMemberService, IContentServiceBase<IMember>
 {
     /// <summary>
     ///     Gets a list of paged <see cref="IMember" /> objects
@@ -174,6 +174,20 @@ public interface IMemberService : IMembershipMemberService
     IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
 
     /// <summary>
+    ///     Saves a single <see cref="IMember" /> object
+    /// </summary>
+    /// <param name="media">The <see cref="IMember" /> to save</param>
+    /// <param name="userId">Id of the User saving the Member</param>
+    Attempt<OperationResult?> Save(IMember media, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Saves a list of <see cref="IMember" /> objects
+    /// </summary>
+    /// <param name="members">Collection of <see cref="IMember" /> to save</param>
+    /// <param name="userId">Id of the User saving the Members</param>
+    Attempt<OperationResult?> Save(IEnumerable<IMember> members, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
     ///     Gets the count of Members by an optional MemberType alias
     /// </summary>
     /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
@@ -255,6 +269,13 @@ public interface IMemberService : IMembershipMemberService
     ///     <see cref="IMember" />
     /// </returns>
     Task<IEnumerable<IMember>> GetByKeysAsync(params Guid[] ids);
+
+    /// <summary>
+    ///     Permanently deletes an <see cref="IMember" /> object
+    /// </summary>
+    /// <param name="member">The <see cref="IMember" /> to delete</param>
+    /// <param name="userId">Id of the User deleting the Member</param>
+    Attempt<OperationResult?> Delete(IMember member, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Delete Members of the specified MemberType id

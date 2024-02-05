@@ -24,6 +24,7 @@ public class MediaControllerBase : ContentControllerBase
             => NotFound(problemDetailsBuilder
                 .WithTitle("The requested Media could not be found")
                 .Build()));
+
     protected IActionResult MediaEditingOperationStatusResult<TContentModelBase>(
         ContentEditingOperationStatus status,
         TContentModelBase requestModel,

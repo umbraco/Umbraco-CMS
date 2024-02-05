@@ -1,13 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Common.Security;
+namespace Umbraco.Cms.Core.Security;
 
 /// <summary>
 ///     Changes the password for an identity user

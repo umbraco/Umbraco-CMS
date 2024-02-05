@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
 [ShortGenericSchemaName<CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>("CreateContentTypeForDocumentTypeRequestModel")]
 public class CreateDocumentTypeRequestModel
-    : CreateContentTypeRequestModelBase<CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>
+    : CreateContentTypeInFolderRequestModelBase<CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>
 {
     public IEnumerable<ReferenceByIdModel> AllowedTemplates { get; set; } = Enumerable.Empty<ReferenceByIdModel>();
 
