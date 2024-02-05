@@ -65,7 +65,6 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 
 	async #submit() {
 		const { error } = await this.#dictionaryImportRepository.requestImport(this._temporaryFileId, this._parentUnique);
-		debugger;
 		if (error) return;
 
 		this._submitModal();
@@ -113,10 +112,6 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this.#temporaryFileRepository.upload(this._temporaryFileId, file);
 	}
 
-	#onParentChange() {
-		this._parentUnique = this._treeElement?.getSelection()[0] ?? null;
-	}
-
 	async #onFileInput() {
 		requestAnimationFrame(() => {
 			this._form.requestSubmit();
@@ -157,16 +152,6 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				<div>
 					<strong><umb-localize key="visuallyHiddenTexts_dictionaryItems">Dictionary items</umb-localize>:</strong>
 					<div id="item-list">${this.#renderFileContents(this.#fileContent)}</div>
-				</div>
-				<div>
-					<strong><umb-localize key="actions_chooseWhereToImport">Choose where to import</umb-localize>:</strong>
-					<br />parentId:
-
-					<umb-tree
-						?hide-tree-root=${true}
-						alias=${UMB_DICTIONARY_TREE_ALIAS}
-						@selection-change=${this.#onParentChange}
-						.selectionConfiguration=${this._selectionConfiguration}></umb-tree>
 				</div>
 
 				${this.#renderNavigate()}
