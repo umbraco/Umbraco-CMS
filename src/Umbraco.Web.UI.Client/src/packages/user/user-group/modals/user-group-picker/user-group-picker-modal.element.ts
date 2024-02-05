@@ -23,6 +23,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 
 		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
+		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
 		this.observe(this.#selectionManager.selection, (selection) => this.updateValue({ selection }), 'selectionObserver');
@@ -40,6 +41,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 
 	#onSelected(event: UUIMenuItemEvent, item: UmbUserGroupDetailModel) {
 		if (!item.unique) throw new Error('User group unique is required');
+		debugger;
 		event.stopPropagation();
 		this.#selectionManager.select(item.unique);
 		this.requestUpdate();
@@ -52,6 +54,11 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 		this.#selectionManager.deselect(item.unique);
 		this.requestUpdate();
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.unique));
+	}
+
+	#onSubmit() {
+		this.updateValue({ selection: this.#selectionManager.getSelection() });
+		this._submitModal();
 	}
 
 	render() {
@@ -73,7 +80,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this._submitModal}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.#onSubmit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
