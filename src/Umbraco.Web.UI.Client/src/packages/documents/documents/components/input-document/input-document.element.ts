@@ -10,11 +10,13 @@ import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
-	#sorter = new UmbSorterController(this, {
-		compareElementToModel: (element, model: string) => {
-			return element.getAttribute('detail') === model;
+	#sorter = new UmbSorterController<string>(this, {
+		getUniqueOfElement: (element) => {
+			return element.getAttribute('detail');
 		},
-		querySelectModelToElement: () => null,
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry;
+		},
 		identifier: 'Umb.SorterIdentifier.InputDocument',
 		itemSelector: 'uui-ref-node',
 		containerSelector: 'uui-ref-list',

@@ -13,7 +13,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.TextBox',
 		name: 'Text Box Property Editor UI',
-		js: () => import('./property-editor-ui-text-box.element.js'),
+		element: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
 			label: 'Text Box',
 			propertyEditorSchemaAlias: 'Umbraco.TextBox',
@@ -34,7 +34,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Email',
 		name: 'Email Property Editor UI',
-		js: () => import('./property-editor-ui-text-box.element.js'),
+		element: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
 			label: 'Email',
 			propertyEditorSchemaAlias: 'Umbraco.EmailAddress',

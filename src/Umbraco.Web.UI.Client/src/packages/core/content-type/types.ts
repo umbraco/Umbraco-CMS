@@ -31,6 +31,10 @@ export interface UmbContentTypeModel {
 	compositions: Array<UmbContentTypeCompositionModel>;
 }
 
+export interface UmbPropertyTypeScaffoldModel extends Omit<UmbPropertyTypeModel, 'dataType'> {
+	dataType?: UmbPropertyTypeModel['dataType'];
+}
+
 export interface UmbPropertyTypeModel extends Omit<PropertyTypeModelBaseModel, 'dataType'> {
 	dataType: { unique: string };
 }

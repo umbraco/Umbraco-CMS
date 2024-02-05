@@ -10,73 +10,42 @@ export type ModelEntryType = {
 	name: string;
 };
 
-const SORTER_CONFIG: UmbSorterConfig<ModelEntryType, ExampleSorterItem> = {
-	compareElementToModel: (element, model) => {
-		return element.name === model.name;
-	},
-	querySelectModelToElement: (container, modelEntry) => {
-		return container.querySelector("example-sorter-item[name='" + modelEntry.name + "']");
-	},
-	identifier: 'string-that-identifies-all-example-sorters',
-	itemSelector: 'example-sorter-item',
-	containerSelector: '.sorter-container',
-};
-
 @customElement('example-sorter-group')
 export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
+	//
+	// Property that is used to set the model of the sorter.
 	@property({ type: Array, attribute: false })
 	public get items(): ModelEntryType[] {
-		return this._items;
+		return this._items ?? [];
 	}
 	public set items(value: ModelEntryType[]) {
+		// Only want to set the model initially via this one, as this is the initial model, cause any re-render should not set this data again.
+		if (this._items !== undefined) return;
 		this._items = value;
 		this.#sorter.setModel(this._items);
 	}
-	private _items: ModelEntryType[] = [];
+	private _items?: ModelEntryType[];
 
 	#sorter = new UmbSorterController<ModelEntryType, ExampleSorterItem>(this, {
-		...SORTER_CONFIG,
-		/*performItemInsert: ({ item, newIndex }) => {
-			const oldValue = this._items;
-			//console.log('inserted', item.name, 'at', newIndex, '	', this._items.map((x) => x.name).join(', '));
-			const newItems = [...this._items];
-			newItems.splice(newIndex, 0, item);
-			this.items = newItems;
-			this.requestUpdate('_items', oldValue);
-			return true;
+		getUniqueOfElement: (element) => {
+			return element.name;
 		},
-		performItemRemove: ({ item }) => {
-			const oldValue = this._items;
-			//console.log('removed', item.name, 'at', indexToMove, '	', this._items.map((x) => x.name).join(', '));
-			const indexToMove = this._items.findIndex((x) => x.name === item.name);
-			const newItems = [...this._items];
-			newItems.splice(indexToMove, 1);
-			this.items = newItems;
-			this.requestUpdate('_items', oldValue);
-			return true;
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry.name;
 		},
-		performItemMove: ({ item, newIndex, oldIndex }) => {
-			const oldValue = this._items;
-			//console.log('move', item.name, 'from', oldIndex, 'to', newIndex, '	', this._items.map((x) => x.name).join(', '));
-			const newItems = [...this._items];
-			newItems.splice(oldIndex, 1);
-			if (oldIndex <= newIndex) {
-				newIndex--;
-			}
-			newItems.splice(newIndex, 0, item);
-			this.items = newItems;
-			this.requestUpdate('_items', oldValue);
-			return true;
-		},*/
+		identifier: 'string-that-identifies-all-example-sorters',
+		itemSelector: 'example-sorter-item',
+		containerSelector: '.sorter-container',
 		onChange: ({ model }) => {
 			const oldValue = this._items;
 			this._items = model;
-			this.requestUpdate('_items', oldValue);
+			this.requestUpdate('items', oldValue);
 		},
 	});
 
 	removeItem = (item: ModelEntryType) => {
-		this.items = this._items.filter((r) => r.name !== item.name);
+		this._items = this._items!.filter((r) => r.name !== item.name);
+		this.#sorter.setModel(this._items);
 	};
 
 	render() {
@@ -87,7 +56,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 					(item) => item.name,
 					(item) =>
 						html`<example-sorter-item name=${item.name}>
-							<button @click=${() => this.removeItem(item)}>Delete</button>
+							<button slot="action" @click=${() => this.removeItem(item)}>Delete</button>
 						</example-sorter-item>`,
 				)}
 			</div>
@@ -104,6 +73,10 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 
 			.sorter-placeholder {
 				opacity: 0.2;
+			}
+
+			.sorter-container {
+				min-height: 20px;
 			}
 		`,
 	];

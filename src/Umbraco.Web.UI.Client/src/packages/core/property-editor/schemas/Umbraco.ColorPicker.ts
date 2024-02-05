@@ -19,7 +19,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'items',
 					label: 'Colors',
 					description: 'Add, remove or sort colors',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ColorEditor',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ColorSwatchesEditor',
 				},
 			],
 		},

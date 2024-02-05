@@ -6,10 +6,10 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbMultipleColorPickerInputElement } from '@umbraco-cms/backoffice/components';
 
 /**
- * @element umb-property-editor-ui-color-editor
+ * @element umb-property-editor-ui-color-swatches-editor
  */
-@customElement('umb-property-editor-ui-color-editor')
-export class UmbPropertyEditorUIColorEditorElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement('umb-property-editor-ui-color-swatches-editor')
+export class UmbPropertyEditorUIColorSwatchesEditorElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#defaultShowLabels = true;
 
 	@property({ type: Array })
@@ -37,10 +37,10 @@ export class UmbPropertyEditorUIColorEditorElement extends UmbLitElement impleme
 	}
 }
 
-export default UmbPropertyEditorUIColorEditorElement;
+export default UmbPropertyEditorUIColorSwatchesEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-color-editor': UmbPropertyEditorUIColorEditorElement;
+		'umb-property-editor-ui-color-swatches-editor': UmbPropertyEditorUIColorSwatchesEditorElement;
 	}
 }
