@@ -47,7 +47,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 					culture: null,
 					segment: null,
 					name: '',
-					publishDate: null,
 					createDate: null,
 					updateDate: null,
 				},
@@ -84,7 +83,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 					culture: variant.culture || null,
 					segment: variant.segment || null,
 					name: variant.name,
-					publishDate: null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
 				};

@@ -154,7 +154,9 @@ export class UmbDocumentWorkspaceContext
 		value: UmbDocumentValueModel,
 		variantId?: UmbVariantId,
 	) {
-		const entry = { ...variantId?.toObject(), alias, value };
+		if (!variantId) throw new Error('VariantId is missing');
+
+		const entry = { ...variantId.toObject(), alias, value };
 		const currentData = this.#currentData.value;
 		if (currentData) {
 			const values = appendToFrozenArray(
