@@ -38,6 +38,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Services.FileSystem;
+using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -376,10 +377,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
 
-            //Two factor providers
+            // Two factor providers
             Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
             Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
 
+            // Add Query services
+            Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
+            Services.AddUnique<IMediaRecycleBinQueryService, MediaRecycleBinQueryService>();
         }
     }
 }
