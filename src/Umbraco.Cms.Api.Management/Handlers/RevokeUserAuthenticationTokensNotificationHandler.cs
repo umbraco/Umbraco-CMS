@@ -78,17 +78,16 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
             if (user.IsLockedOut || user.IsApproved is false)
             {
                 await RevokeTokensAsync(user);
+                continue;
             }
-            else
+
+            // Check if the user access has changed - we also need to revoke all tokens in this case
+            if (preSavingUsersState.TryGetValue(user.Key, out UserStartNodesAndGroupAccess? preSavingState))
             {
-                // Check if the user access has changed - we also need to revoke all tokes in this case
-                if (preSavingUsersState.TryGetValue(user.Key, out UserStartNodesAndGroupAccess? preSavingState))
+                UserStartNodesAndGroupAccess postSavingState = MapToUserStartNodesAndGroupAccess(user);
+                if (preSavingState.CompareAccess(postSavingState) == false)
                 {
-                    UserStartNodesAndGroupAccess postSavingState = MapToUserStartNodesAndGroupAccess(user);
-                    if (preSavingState.CompareAccess(postSavingState) == false)
-                    {
-                        await RevokeTokensAsync(user);
-                    }
+                    await RevokeTokensAsync(user);
                 }
             }
         }
