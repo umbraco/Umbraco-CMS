@@ -23,24 +23,6 @@ const dashboards: Array<ManifestDashboard> = [
 	},
 	{
 		type: 'dashboard',
-		alias: 'Umb.Dashboard.ModelsBuilder',
-		name: 'Models Builder Dashboard',
-		elementName: 'umb-dashboard-models-builder',
-		js: () => import('./models-builder/dashboard-models-builder.element.js'),
-		weight: 300,
-		meta: {
-			label: 'Models Builder',
-			pathname: 'models-builder',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.SectionAlias',
-				match: sectionAlias,
-			},
-		],
-	},
-	{
-		type: 'dashboard',
 		alias: 'Umb.Dashboard.PublishedStatus',
 		name: 'Published Status Dashboard',
 		elementName: 'umb-dashboard-published-status',

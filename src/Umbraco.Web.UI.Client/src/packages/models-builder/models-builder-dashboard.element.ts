@@ -1,18 +1,14 @@
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
-import type {
-	ModelsBuilderResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	ModelsBuilderResource,
-	ModelsModeModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { ModelsBuilderResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ModelsBuilderResource, ModelsModeModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-@customElement('umb-dashboard-models-builder')
-export class UmbDashboardModelsBuilderElement extends UmbLitElement {
+@customElement('umb-models-builder-dashboard')
+export class UmbModelsBuilderDashboardElement extends UmbLitElement {
 	@state()
 	private _modelsBuilder?: ModelsBuilderResponseModel;
 
@@ -171,10 +167,10 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	];
 }
 
-export default UmbDashboardModelsBuilderElement;
+export default UmbModelsBuilderDashboardElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dashboard-models-builder': UmbDashboardModelsBuilderElement;
+		'umb-models-builder-dashboard': UmbModelsBuilderDashboardElement;
 	}
 }

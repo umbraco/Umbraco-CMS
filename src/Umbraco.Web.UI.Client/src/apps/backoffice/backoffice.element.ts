@@ -31,6 +31,7 @@ const CORE_PACKAGES = [
 	import('../../packages/templating/umbraco-package.js'),
 	import('../../packages/umbraco-news/umbraco-package.js'),
 	import('../../packages/user/umbraco-package.js'),
+	import('../../packages/models-builder/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')
