@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.TextArea',
 	name: 'Text Area Property Editor UI',
-	js: () => import('./property-editor-ui-textarea.element.js'),
+	element: () => import('./property-editor-ui-textarea.element.js'),
 	meta: {
 		label: 'Text Area',
 		propertyEditorSchemaAlias: 'Umbraco.TextArea',

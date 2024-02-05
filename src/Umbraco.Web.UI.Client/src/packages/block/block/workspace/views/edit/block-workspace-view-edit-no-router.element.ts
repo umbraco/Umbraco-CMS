@@ -10,6 +10,8 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 @customElement('umb-block-workspace-view-edit-no-router')
 export class UmbBlockWorkspaceViewEditNoRouterElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	//private _hasRootProperties = false;
+
+	@state()
 	private _hasRootGroups = false;
 
 	@state()
@@ -39,7 +41,6 @@ export class UmbBlockWorkspaceViewEditNoRouterElement extends UmbLitElement impl
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._workspaceContext = workspaceContext;
-			console.log('workspaceContext.content.structure', workspaceContext.content.structure);
 			this._tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
 			this._observeRootGroups();
 		});

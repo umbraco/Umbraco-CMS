@@ -1,1 +1,1 @@
-export * from './block.context.js';
+export * from './block-entity.context.js';
