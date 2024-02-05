@@ -1,8 +1,9 @@
 import type { UmbUserGroupCollectionFilterModel } from '../types.js';
+import type { UmbUserGroupDetailModel } from '../../types.js';
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
@@ -11,7 +12,7 @@ import { UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
  * @class UmbUserGroupCollectionServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbUserGroupCollectionServerDataSource implements UmbCollectionDataSource<UserGroupResponseModel> {
+export class UmbUserGroupCollectionServerDataSource implements UmbCollectionDataSource<UmbUserGroupDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -31,10 +32,25 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 
 		if (data) {
 			const mappedItems = data.items.map((item) => {
-				return {
-					...item,
+				const userGroup: UmbUserGroupDetailModel = {
+					unique: item.id,
+					entityType: UMB_USER_GROUP_ENTITY_TYPE,
+					isSystemGroup: item.isSystemGroup,
+					name: item.name,
+					icon: item.icon || null,
+					sections: item.sections,
+					languages: item.languages,
+					hasAccessToAllLanguages: item.hasAccessToAllLanguages,
+					documentStartNode: item.documentStartNode ? { unique: item.documentStartNode.id } : null,
+					documentRootAccess: item.documentRootAccess,
+					mediaStartNode: item.mediaStartNode ? { unique: item.mediaStartNode.id } : null,
+					mediaRootAccess: item.mediaRootAccess,
+					permissions: item.permissions,
 				};
+				return userGroup;
 			});
+
+			return { data: { items: mappedItems, total: data.total } };
 		}
 
 		return { error };
