@@ -9,7 +9,6 @@ import {
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
 	type UmbVariantableWorkspaceContextInterface,
-	type UmbPublishableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -36,7 +35,6 @@ export class UmbMediaWorkspaceContext
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
-	// readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbMediaTypeDetailRepository(this));
 	readonly splitView = new UmbWorkspaceSplitViewManager();

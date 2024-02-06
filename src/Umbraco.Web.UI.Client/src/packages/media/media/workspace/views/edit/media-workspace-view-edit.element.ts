@@ -1,6 +1,6 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../media-workspace.context-token.js';
 import type { UmbMediaWorkspaceViewEditTabElement } from './media-workspace-view-edit-tab.element.js';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
@@ -54,6 +54,8 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 
 	private _observeRootGroups() {
 		if (!this._workspaceContext) return;
+
+		console.log('whiio', this._workspaceContext.structure);
 
 		this.observe(
 			this._workspaceContext.structure.hasRootContainers('Group'),
@@ -110,7 +112,8 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 	}
 
 	render() {
-		if (!this._routes || !this._tabs) return;
+		if (!this._routes || !this._tabs) return nothing;
+
 		return html`
 			<umb-body-layout header-fit-height>
 				${this._routerPath && (this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups))
