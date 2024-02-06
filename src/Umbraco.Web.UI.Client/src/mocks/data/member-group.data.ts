@@ -4,7 +4,7 @@ import type {
 	EntityTreeItemResponseModel,
 	PagedNamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbMemberGroupDetailModel } from '@umbraco-cms/backoffice/member-group';
+import type { UmbMemberGroupDetailModel } from 'src/packages/members/member-group/index.js';
 
 export const data: Array<any> = [
 	{

@@ -113,7 +113,7 @@
 
 			// MEMBER MANAGEMENT
 			"@umbraco-cms/backoffice/member": ["src/packages/members/member/index.ts"],
-			"@umbraco-cms/backoffice/member-group": ["./src/packages/members/member-groups/index.ts"],
+			"@umbraco-cms/backoffice/member-group": ["src/packages/members/member-group/index.ts"],
 			"@umbraco-cms/backoffice/member-type": ["./src/packages/members/member-types/index.ts"],
 
 			// PACKAGE MANAGEMENT
