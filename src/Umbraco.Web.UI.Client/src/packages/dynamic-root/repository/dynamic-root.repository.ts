@@ -1,7 +1,7 @@
 import { UmbDynamicRootServerDataSource } from './dynamic-root.server.data.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { DynamicRootRequestModel, DynamicRootResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbTreePickerDynamicRoot } from '@umbraco-cms/backoffice/components';
 
 const GUID_EMPTY: string = '00000000-0000-0000-0000-000000000000';
@@ -35,12 +35,8 @@ export class UmbDynamicRootRepository extends UmbBaseController {
 			},
 		};
 
-		const result = (await this.#dataSource.postDynamicRootQuery(model)) as DynamicRootResponseModel;
+		const result = await this.#dataSource.postDynamicRootQuery(model);
 
-		return result.roots;
-	}
-
-	async getQuerySteps() {
-		return this.#dataSource.getQuerySteps();
+		return result?.roots;
 	}
 }
