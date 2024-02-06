@@ -11,7 +11,10 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue
 > {
-	//
+	// TODO: We need to make a filter for the tree that hides the items that can't be used for composition.
+	// From what I've observed in old BO: Document types that inherit from other document types cannot be picked as a composition. (document types that are made under other document types)
+	// As well as other document types that has a composition already.
+	// OBS: If a document type 1 has a composition document type 2, document type 2 cannot add any compositions.
 
 	@state()
 	private _selectionConfiguration = {
@@ -24,7 +27,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		super();
 	}
 
-	firstUpdated() {
+	connectedCallback() {
+		super.connectedCallback();
+
 		this._selectionConfiguration = { ...this._selectionConfiguration, selection: (this.data?.selection as []) ?? [] };
 	}
 
