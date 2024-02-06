@@ -19,12 +19,12 @@ export class UmbDynamicRootRepository extends UmbBaseController {
 		const model: DynamicRootRequestModel = {
 			context: {
 				id: entityId,
-				parentId: parentId ?? GUID_EMPTY,
+				parent: { id: parentId ?? GUID_EMPTY },
 			},
 			query: {
 				origin: {
 					alias: query.originAlias,
-					key: query.originKey,
+					id: query.originKey,
 				},
 				steps: query.querySteps!.map((step) => {
 					return {
