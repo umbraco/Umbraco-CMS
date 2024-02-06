@@ -112,7 +112,7 @@
 			"@umbraco-cms/backoffice/media-type": ["./src/packages/media/media-types/index.ts"],
 
 			// MEMBER MANAGEMENT
-			"@umbraco-cms/backoffice/member": ["./src/packages/members/members/index.ts"],
+			"@umbraco-cms/backoffice/member": ["src/packages/members/member/index.ts"],
 			"@umbraco-cms/backoffice/member-group": ["./src/packages/members/member-groups/index.ts"],
 			"@umbraco-cms/backoffice/member-type": ["./src/packages/members/member-types/index.ts"],
 

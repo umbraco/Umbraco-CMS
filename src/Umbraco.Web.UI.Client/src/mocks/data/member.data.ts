@@ -1,4 +1,4 @@
-import type { UmbMemberDetailModel } from '../../packages/members/members/types.js';
+import type { UmbMemberDetailModel } from '../../packages/members/member/types.js';
 import { UmbEntityData } from './entity.data.js';
 import { createEntityTreeItem } from './utils.js';
 import type {

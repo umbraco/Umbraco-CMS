@@ -2,9 +2,9 @@ import { manifests as memberSectionManifests } from './section.manifests.js';
 import { manifests as menuSectionManifests } from './menu.manifests.js';
 import { manifests as memberGroupManifests } from './member-groups/manifests.js';
 import { manifests as memberTypeManifests } from './member-types/manifests.js';
-import { manifests as memberManifests } from './members/manifests.js';
+import { manifests as memberManifests } from './member/manifests.js';
 
-import './members/components/index.js';
+import './member/components/index.js';
 
 export const manifests = [
 	...memberSectionManifests,
