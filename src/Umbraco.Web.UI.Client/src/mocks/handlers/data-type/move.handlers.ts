@@ -11,9 +11,9 @@ export const moveHandlers = [
 
 		const requestBody = (await req.json()) as MoveDataTypeRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		if (!requestBody.targetId) return res(ctx.status(400, 'no targetId found'));
+		if (!requestBody.target?.id) return res(ctx.status(400, 'no targetId found'));
 
-		umbDataTypeMockDb.tree.move([id], requestBody.targetId);
+		umbDataTypeMockDb.tree.move([id], requestBody.target.id);
 		return res(ctx.status(200));
 	}),
 ];

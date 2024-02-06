@@ -1,13 +1,11 @@
 import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
-export const UMB_MODAL_TEMPLATING_QUERY_BUILDER_SIDEBAR_ALIAS = 'Umb.Modal.Templating.Query.Builder.Sidebar';
-
 const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
-		alias: UMB_MODAL_TEMPLATING_QUERY_BUILDER_SIDEBAR_ALIAS,
+		alias: 'Umb.Modal.Template.QueryBuilder',
 		name: 'Template query builder',
-		js: () => import('./query-builder/query-builder.element.js'),
+		js: () => import('./query-builder/query-builder-modal.element.js'),
 	},
 ];
 

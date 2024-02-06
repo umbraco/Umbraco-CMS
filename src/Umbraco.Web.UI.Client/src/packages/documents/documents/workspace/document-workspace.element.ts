@@ -36,7 +36,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 				component: this.#editorElement,
 				setup: async (_component, info) => {
 					// TODO: Remember the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
-					const parentUnique = info.match.params.parentId === 'null' ? null : info.match.params.parentUnique;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					this.#workspaceContext!.create(parentUnique, documentTypeUnique);
 

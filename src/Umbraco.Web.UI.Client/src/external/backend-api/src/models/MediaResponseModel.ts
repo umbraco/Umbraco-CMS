@@ -4,11 +4,11 @@
 /* eslint-disable */
 
 import type { ContentForMediaResponseModel } from './ContentForMediaResponseModel';
-import type { ContentUrlInfoModel } from './ContentUrlInfoModel';
 import type { MediaTypeReferenceResponseModel } from './MediaTypeReferenceResponseModel';
+import type { MediaUrlInfoModel } from './MediaUrlInfoModel';
 
 export type MediaResponseModel = (ContentForMediaResponseModel & {
-    urls: Array<ContentUrlInfoModel>;
+    urls: Array<MediaUrlInfoModel>;
     isTrashed: boolean;
     mediaType: MediaTypeReferenceResponseModel;
 });

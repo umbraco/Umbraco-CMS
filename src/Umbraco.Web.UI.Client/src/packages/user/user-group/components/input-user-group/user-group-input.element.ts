@@ -1,8 +1,8 @@
+import type { UmbUserGroupItemModel } from '../../repository/index.js';
 import { UmbUserGroupPickerContext } from './user-group-input.context.js';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-user-group-input')
@@ -67,7 +67,7 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items?: Array<UserGroupItemResponseModel>;
+	private _items?: Array<UmbUserGroupItemModel>;
 
 	#pickerContext = new UmbUserGroupPickerContext(this);
 
@@ -111,14 +111,14 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderItem(item: UserGroupItemResponseModel) {
-		if (!item.id) return;
+	private _renderItem(item: UmbUserGroupItemModel) {
+		if (!item.unique) return;
 		return html`
 			<umb-user-group-ref name="${ifDefined(item.name)}">
 				${item.icon ? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>` : nothing}
 
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.id!)} label="Remove ${item.name}"
+					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique)} label="Remove ${item.name}"
 						>Remove</uui-button
 					>
 				</uui-action-bar>

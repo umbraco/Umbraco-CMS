@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbUsersData } from '../../data/user/user.db.js';
+import { umbUserMockDb } from '../../data/user/user.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
@@ -23,7 +23,7 @@ export const handlers = [
 			filter: filter || undefined,
 		};
 
-		const response = umbUsersData.filter(options);
+		const response = umbUserMockDb.filter(options);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 ];

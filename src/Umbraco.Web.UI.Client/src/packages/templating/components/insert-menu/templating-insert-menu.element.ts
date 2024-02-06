@@ -2,7 +2,7 @@ import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../mod
 import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils/index.js';
 import type { UmbChooseInsertTypeModalValue } from '../../modals/insert-choose-type-sidebar.element.js';
 import { CodeSnippetType } from '../../modals/insert-choose-type-sidebar.element.js';
-import { UmbDictionaryRepository } from '@umbraco-cms/backoffice/dictionary';
+import { UmbDictionaryDetailRepository } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -38,7 +38,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	#openModal?: UmbModalContext;
 
-	#dictionaryRepository = new UmbDictionaryRepository(this);
+	#dictionaryDetailRepository = new UmbDictionaryDetailRepository(this);
 
 	constructor() {
 		super();
@@ -65,9 +65,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	#getDictionaryItemSnippet = async (modalValue: UmbDictionaryItemPickerModalValue) => {
-		const id = modalValue.selection[0];
-		if (id === null) return;
-		const { data } = await this.#dictionaryRepository.requestById(id);
+		const unique = modalValue.selection[0];
+		if (unique === null) return;
+		const { data } = await this.#dictionaryDetailRepository.requestByUnique(unique);
 		this.value = getInsertDictionarySnippet(data?.name ?? '');
 	};
 

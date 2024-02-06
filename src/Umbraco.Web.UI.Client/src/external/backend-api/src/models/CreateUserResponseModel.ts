@@ -3,8 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type CreateUserResponseModel = {
-    userId: string;
+    user: ReferenceByIdModel;
     initialPassword?: string | null;
 };
 

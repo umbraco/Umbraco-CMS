@@ -4,9 +4,10 @@
 /* eslint-disable */
 
 import type { ItemSortingRequestModel } from './ItemSortingRequestModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type SortingRequestModel = {
-    parentId?: string | null;
+    parent?: ReferenceByIdModel | null;
     sorting: Array<ItemSortingRequestModel>;
 };
 

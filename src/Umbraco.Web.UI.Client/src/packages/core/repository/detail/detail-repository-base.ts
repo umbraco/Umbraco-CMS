@@ -9,7 +9,7 @@ import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export abstract class UmbDetailRepositoryBase<
-		DetailModelType extends { unique: string; entityType: string; parentUnique: string | null },
+		DetailModelType extends { unique: string; entityType: string; parentUnique?: string | null },
 	>
 	extends UmbRepositoryBase
 	implements UmbDetailRepository<DetailModelType>, UmbApi

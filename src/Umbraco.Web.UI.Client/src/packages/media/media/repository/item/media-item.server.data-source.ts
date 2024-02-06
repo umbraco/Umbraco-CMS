@@ -28,7 +28,7 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MediaResource.getMediaItem({ id: uniques });
+const getItems = (uniques: Array<string>) => MediaResource.getItemMedia({ id: uniques });
 
 const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	return {

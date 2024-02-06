@@ -1,5 +1,6 @@
-import type { UmbUserCollectionFilterModel, UmbUserDetailModel } from '../types.js';
+import type { UmbUserDetailModel } from '../types.js';
 import { UMB_COLLECTION_VIEW_USER_GRID } from './views/index.js';
+import type { UmbUserCollectionFilterModel } from './types.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

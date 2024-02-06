@@ -5,7 +5,7 @@ import type {
 	PartialViewSnippetResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockPartialViewModelHack = PartialViewResponseModel &
+type UmbMockPartialViewModelHack = PartialViewResponseModel &
 	FileSystemTreeItemPresentationModel &
 	PartialViewItemResponseModel;
 
