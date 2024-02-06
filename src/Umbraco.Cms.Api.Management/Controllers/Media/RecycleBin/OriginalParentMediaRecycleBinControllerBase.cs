@@ -42,7 +42,7 @@ public class OriginalParentMediaRecycleBinControllerBase : MediaRecycleBinContro
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             MediaPermissionResource.RecycleBin(),
-            AuthorizationPolicies.ContentPermissionByResource);
+            AuthorizationPolicies.MediaPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {
