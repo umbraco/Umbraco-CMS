@@ -50,8 +50,10 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 		this.observe(
 			await this.#datasetContext.propertyValueByAlias('startNode'),
 			(value) => {
+				if (!value) return;
+
 				const startNode = value as UmbTreePickerSource;
-				if (startNode.type) {
+				if (startNode?.type) {
 					// If we had a sourceType before, we can see this as a change and not the initial value,
 					// so let's reset the value, so we don't carry over content-types to the new source type.
 					if (this.#initialized && this.sourceType !== startNode.type) {

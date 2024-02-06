@@ -30,6 +30,7 @@ const CORE_PACKAGES = [
 	import('../../packages/log-viewer/umbraco-package.js'),
 	import('../../packages/health-check/umbraco-package.js'),
 	import('../../packages/static-file/umbraco-package.js'),
+	import('../../packages/dynamic-root/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')

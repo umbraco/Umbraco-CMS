@@ -36,6 +36,7 @@ import { handlers as partialViewHandlers } from './handlers/partial-view/index.j
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
 import { handlers as scriptHandlers } from './handlers/script/index.js';
+import { handlers as dynamicRootHandlers } from './handlers/dynamic-root.handlers.js';
 
 const handlers = [
 	serverHandlers.serverInformationHandler,
@@ -46,6 +47,7 @@ const handlers = [
 	...dictionaryHandlers,
 	...documentHandlers,
 	...documentTypeHandlers,
+	...dynamicRootHandlers,
 	...examineManagementHandlers,
 	...healthCheckHandlers,
 	...installHandlers,
