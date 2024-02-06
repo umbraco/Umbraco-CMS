@@ -39,19 +39,18 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 		this.modalContext?.reject();
 	}
 
-	#openDocumentPicker(originAlias: string) {
-		this.#documentPickerContext
-			.openPicker({
-				hideTreeRoot: true,
-			})
-			.then(() => {
-				const selectedItems = this.#documentPickerContext.getSelection();
-				if (selectedItems.length !== 1) return;
-				this.#submit({
-					originAlias,
-					originKey: selectedItems[0],
-				});
-			});
+	async #openDocumentPicker(originAlias: string) {
+		await this.#documentPickerContext.openPicker({
+			hideTreeRoot: true,
+		});
+
+		const selectedItems = this.#documentPickerContext.getSelection();
+		if (selectedItems.length !== 1) return;
+
+		this.#submit({
+			originAlias,
+			originKey: selectedItems[0],
+		});
 	}
 
 	#submit(value: UmbTreePickerDynamicRoot) {

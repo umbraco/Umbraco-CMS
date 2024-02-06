@@ -76,18 +76,17 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		this.#setStartNodeId();
 	}
 
-	#setStartNodeId() {
+	async #setStartNodeId() {
 		if (this.startNodeId) return;
 
 		const entityId = this.#workspaceContext?.getEntityId();
 		// TODO: Awaiting the workspace context to have a parent entity ID value. [LK]
 		// e.g. const parentEntityId = this.#workspaceContext?.getParentEntityId();
 		if (entityId && this.#dynamicRoot) {
-			this.#dynamicRootRepository.postDynamicRootQuery(this.#dynamicRoot, entityId).then((result) => {
-				if (result) {
-					this.startNodeId = result[0];
-				}
-			});
+			const result = await this.#dynamicRootRepository.postDynamicRootQuery(this.#dynamicRoot, entityId);
+			if (result && result.length > 0) {
+				this.startNodeId = result[0];
+			}
 		}
 	}
 

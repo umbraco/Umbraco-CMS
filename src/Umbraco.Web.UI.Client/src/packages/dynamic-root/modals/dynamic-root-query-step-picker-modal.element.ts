@@ -33,20 +33,19 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 		this.modalContext?.reject();
 	}
 
-	#openDocumentTypePicker(alias: string) {
-		this.#documentTypePickerContext
-			.openPicker({
-				hideTreeRoot: true,
-				pickableFilter: (x) => x.isElement === false,
-			})
-			.then(() => {
-				const selectedItems = this.#documentTypePickerContext.getSelection();
-				this.#submit({
-					unique: UmbId.new(),
-					alias: alias,
-					anyOfDocTypeKeys: selectedItems,
-				});
-			});
+	async #openDocumentTypePicker(alias: string) {
+		await this.#documentTypePickerContext.openPicker({
+			hideTreeRoot: true,
+			pickableFilter: (x) => x.isElement === false,
+		});
+
+		const selectedItems = this.#documentTypePickerContext.getSelection();
+
+		this.#submit({
+			unique: UmbId.new(),
+			alias: alias,
+			anyOfDocTypeKeys: selectedItems,
+		});
 	}
 
 	#submit(value: UmbTreePickerDynamicRootQueryStep) {
