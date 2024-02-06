@@ -117,6 +117,13 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 				this._editDocumentPath = routeBuilder({});
 			});
 
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
@@ -128,9 +135,6 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			() => this.maxMessage,
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
-
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	protected getFormElement() {
@@ -146,7 +150,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	#openPicker() {
 		// TODO: Configure the content picker, with `startNodeId` and `ignoreUserStartNodes` [LK]
-		console.log('_openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
+		console.log('#openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment

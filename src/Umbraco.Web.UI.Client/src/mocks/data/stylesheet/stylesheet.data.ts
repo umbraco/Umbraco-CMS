@@ -4,7 +4,7 @@ import type {
 	StylesheetResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockStylesheetModelHack = StylesheetResponseModel &
+type UmbMockStylesheetModelHack = StylesheetResponseModel &
 	FileSystemTreeItemPresentationModel &
 	StylesheetItemResponseModel;
 

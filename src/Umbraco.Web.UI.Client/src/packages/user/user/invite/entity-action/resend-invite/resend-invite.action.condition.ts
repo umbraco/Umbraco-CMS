@@ -12,7 +12,7 @@ export class UmbUserAllowResendInviteActionCondition extends UmbUserActionCondit
 	}
 
 	async onUserDataChange() {
-		if (!this.userData || !this.userData.id) {
+		if (!this.userData || !this.userData.unique) {
 			this.permitted = false;
 			super.onUserDataChange();
 			return;

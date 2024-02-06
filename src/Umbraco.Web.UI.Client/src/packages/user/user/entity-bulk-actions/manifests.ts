@@ -2,9 +2,8 @@ import {
 	UMB_DISABLE_USER_REPOSITORY_ALIAS,
 	UMB_ENABLE_USER_REPOSITORY_ALIAS,
 	UMB_UNLOCK_USER_REPOSITORY_ALIAS,
-	UMB_USER_REPOSITORY_ALIAS,
-} from '../repository/manifests.js';
-import { UMB_USER_ENTITY_TYPE } from '../entity.js';
+	UMB_USER_DETAIL_REPOSITORY_ALIAS,
+} from '../repository/index.js';
 import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
@@ -22,7 +21,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbSetGroupUserEntityBulkAction,
 		meta: {
 			label: 'SetGroup',
-			repositoryAlias: UMB_USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_USER_DETAIL_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

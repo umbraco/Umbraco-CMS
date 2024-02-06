@@ -6,13 +6,11 @@ import type {
 	UmbModalManagerContext,
 	UmbModalToken,
 	UmbPickerModalData,
-	UmbPickerModalValue} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT
+	UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export class UmbPickerInputContext<ItemType extends { name: string }> extends UmbBaseController {
+export class UmbPickerInputContext<ItemType extends { name: string; unique: string }> extends UmbBaseController {
 	// TODO: We are way too unsecure about the requirements for the Modal Token, as we have certain expectation for the data and value.
 	modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>;
 	repository?: UmbItemRepository<ItemType>;
@@ -59,9 +57,7 @@ export class UmbPickerInputContext<ItemType extends { name: string }> extends Um
 	) {
 		super(host);
 		this.modalAlias = modalAlias;
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		//@ts-ignore
-		this.#getUnique = getUniqueMethod || ((entry) => entry.unique || entry.id || '');
+		this.#getUnique = getUniqueMethod || ((entry) => entry.unique);
 
 		this.#itemManager = new UmbRepositoryItemsManager<ItemType>(this, repositoryAlias, this.#getUnique);
 

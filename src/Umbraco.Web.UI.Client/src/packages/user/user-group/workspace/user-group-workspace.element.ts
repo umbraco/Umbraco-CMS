@@ -27,11 +27,11 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 			},
 		},
 		{
-			path: 'edit/:id',
+			path: 'edit/:unique',
 			component: this.#createElement,
 			setup: (component, info) => {
-				const id = info.match.params.id;
-				this.#workspaceContext.load(id);
+				const unique = info.match.params.unique;
+				this.#workspaceContext.load(unique);
 			},
 		},
 	];

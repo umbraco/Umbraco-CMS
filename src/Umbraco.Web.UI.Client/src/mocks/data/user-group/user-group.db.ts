@@ -1,23 +1,21 @@
-import { UmbEntityData } from '../entity.data.js';
+import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
+import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
+import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
+import type { UmbMockUserGroupModel } from './user-group.data.js';
 import { data } from './user-group.data.js';
-import type { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	CreateUserGroupRequestModel,
+	UserGroupItemResponseModel,
+	UserGroupResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
-const createUserGroupItem = (item: UserGroupResponseModel): UserGroupItemResponseModel => {
-	return {
-		name: item.name,
-		id: item.id,
-		icon: item.icon,
-	};
-};
+export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupModel> {
+	item = new UmbMockEntityItemManager<UmbMockUserGroupModel>(this, itemMapper);
+	detail = new UmbMockEntityDetailManager<UmbMockUserGroupModel>(this, createMockMapper, detailResponseMapper);
 
-class UmbUserGroupData extends UmbEntityData<UserGroupResponseModel> {
-	constructor(data: Array<UserGroupResponseModel>) {
+	constructor(data: Array<UmbMockUserGroupModel>) {
 		super(data);
-	}
-
-	getItems(ids: Array<string>): Array<UserGroupItemResponseModel> {
-		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createUserGroupItem(item));
 	}
 
 	/**
@@ -37,4 +35,46 @@ class UmbUserGroupData extends UmbEntityData<UserGroupResponseModel> {
 	}
 }
 
-export const umbUserGroupData = new UmbUserGroupData(data);
+const itemMapper = (item: UmbMockUserGroupModel): UserGroupItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		icon: item.icon,
+	};
+};
+
+const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupModel => {
+	return {
+		documentRootAccess: item.documentRootAccess,
+		documentStartNode: item.documentStartNode,
+		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
+		icon: item.icon,
+		id: UmbId.new(),
+		isSystemGroup: false,
+		languages: item.languages,
+		mediaRootAccess: item.mediaRootAccess,
+		mediaStartNode: item.mediaStartNode,
+		name: item.name,
+		permissions: item.permissions,
+		sections: item.sections,
+	};
+};
+
+const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseModel => {
+	return {
+		documentRootAccess: item.documentRootAccess,
+		documentStartNode: item.documentStartNode,
+		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
+		icon: item.icon,
+		id: item.id,
+		isSystemGroup: item.isSystemGroup,
+		languages: item.languages,
+		mediaRootAccess: item.mediaRootAccess,
+		mediaStartNode: item.mediaStartNode,
+		name: item.name,
+		permissions: item.permissions,
+		sections: item.sections,
+	};
+};
+
+export const umbUserGroupMockDb = new UmbUserGroupMockDB(data);

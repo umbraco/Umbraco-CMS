@@ -1,12 +1,14 @@
-import { UmbEntityData } from '../entity.data.js';
-import { umbUserGroupData } from '../user-group/user-group.db.js';
+import { umbUserGroupMockDb } from '../user-group/user-group.db.js';
 import { arrayFilter, stringFilter, queryFilter } from '../utils.js';
+import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
+import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
+import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
+import type { UmbMockUserModel } from './user.data.js';
 import { data } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import type {
 	CreateUserRequestModel,
-	CreateUserResponseModel,
+	CurrentUserResponseModel,
 	InviteUserRequestModel,
 	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
@@ -15,64 +17,19 @@ import type {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
-const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
-	return {
-		name: item.name,
-		id: item.id,
-	};
-};
-
-const userGroupFilter = (filterOptions: any, item: UserResponseModel) =>
+const userGroupFilter = (filterOptions: any, item: UmbMockUserModel) =>
 	arrayFilter(filterOptions.userGroupIds, item.userGroupIds);
-const userStateFilter = (filterOptions: any, item: UserResponseModel) =>
+const userStateFilter = (filterOptions: any, item: UmbMockUserModel) =>
 	stringFilter(filterOptions.userStates, item.state);
-const userQueryFilter = (filterOptions: any, item: UserResponseModel) => queryFilter(filterOptions.filter, item.name);
+const userQueryFilter = (filterOptions: any, item: UmbMockUserModel) => queryFilter(filterOptions.filter, item.name);
 
 // Temp mocked database
-class UmbUserData extends UmbEntityData<UserResponseModel> {
-	constructor(data: UserResponseModel[]) {
+class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
+	item = new UmbMockEntityItemManager<UmbMockUserModel>(this, itemMapper);
+	detail = new UmbMockEntityDetailManager<UmbMockUserModel>(this, createMockMapper, detailResponseMapper);
+
+	constructor(data: UmbMockUserModel[]) {
 		super(data);
-	}
-
-	/**
-	 * Create user
-	 * @param {CreateUserRequestModel} data
-	 * @memberof UmbUserData
-	 */
-	createUser = (data: CreateUserRequestModel): CreateUserResponseModel => {
-		const userId = UmbId.new();
-		const initialPassword = 'mocked-initial-password';
-
-		const user: UserResponseModel = {
-			id: userId,
-			languageIsoCode: null,
-			contentStartNodeIds: [],
-			mediaStartNodeIds: [],
-			avatarUrls: [],
-			state: UserStateModel.INACTIVE,
-			failedLoginAttempts: 0,
-			createDate: new Date().toUTCString(),
-			updateDate: new Date().toUTCString(),
-			lastLoginDate: null,
-			lastLockoutDate: null,
-			lastPasswordChangeDate: null,
-			...data,
-		};
-
-		this.insert(user);
-
-		return { userId, initialPassword };
-	};
-
-	/**
-	 * Get user items
-	 * @param {Array<string>} ids
-	 * @return {*}  {Array<UserItemResponseModel>}
-	 * @memberof UmbUserData
-	 */
-	getItems(ids: Array<string>): Array<UserItemResponseModel> {
-		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createUserItem(item));
 	}
 
 	/**
@@ -92,9 +49,9 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	 * @return {*}  {UmbCurrentUser}
 	 * @memberof UmbUserData
 	 */
-	getCurrentUser(): UmbCurrentUser {
+	getCurrentUser(): CurrentUserResponseModel {
 		const firstUser = this.data[0];
-		const permissions = firstUser.userGroupIds?.length ? umbUserGroupData.getPermissions(firstUser.userGroupIds) : [];
+		const permissions = firstUser.userGroupIds?.length ? umbUserGroupMockDb.getPermissions(firstUser.userGroupIds) : [];
 
 		return {
 			id: firstUser.id,
@@ -105,7 +62,7 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 			hasAccessToAllLanguages: true,
 			languageIsoCode: firstUser.languageIsoCode,
 			languages: [],
-			contentStartNodeIds: firstUser.contentStartNodeIds,
+			documentStartNodeIds: firstUser.documentStartNodeIds,
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
 			permissions,
 		};
@@ -129,7 +86,7 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	 * @memberof UmbUserData
 	 */
 	enable(ids: Array<string>): void {
-		const users = this.data.filter((user) => ids.includes(user.id ?? ''));
+		const users = this.data.filter((user) => ids.includes(user.id));
 		users.forEach((user) => {
 			user.state = UserStateModel.ACTIVE;
 		});
@@ -141,7 +98,7 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	 * @memberof UmbUserData
 	 */
 	unlock(ids: Array<string>): void {
-		const users = this.data.filter((user) => ids.includes(user.id ?? ''));
+		const users = this.data.filter((user) => ids.includes(user.id));
 		users.forEach((user) => {
 			user.failedLoginAttempts = 0;
 			user.state = UserStateModel.ACTIVE;
@@ -159,13 +116,13 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 			state: UserStateModel.INVITED,
 		};
 
-		const response = this.createUser(invitedUser);
+		const newUserId = this.detail.create(invitedUser);
 
-		return { userId: response.userId };
+		return { userId: newUserId };
 	}
 
 	filter(options: any): PagedUserResponseModel {
-		const { items: allItems } = this.getAll();
+		const allItems = this.getAll();
 
 		const filterOptions = {
 			skip: options.skip || 0,
@@ -191,4 +148,53 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	}
 }
 
-export const umbUsersData = new UmbUserData(data);
+const itemMapper = (item: UmbMockUserModel): UserItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+	};
+};
+
+const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
+	return {
+		email: item.email,
+		userName: item.userName,
+		name: item.name,
+		userGroupIds: item.userGroupIds,
+		id: UmbId.new(),
+		languageIsoCode: null,
+		documentStartNodeIds: [],
+		mediaStartNodeIds: [],
+		avatarUrls: [],
+		state: UserStateModel.INACTIVE,
+		failedLoginAttempts: 0,
+		createDate: new Date().toUTCString(),
+		updateDate: new Date().toUTCString(),
+		lastLoginDate: null,
+		lastLockoutDate: null,
+		lastPasswordChangeDate: null,
+	};
+};
+
+const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
+	return {
+		email: item.email,
+		userName: item.userName,
+		name: item.name,
+		userGroupIds: item.userGroupIds,
+		id: item.id,
+		languageIsoCode: item.languageIsoCode,
+		documentStartNodeIds: item.documentStartNodeIds,
+		mediaStartNodeIds: item.mediaStartNodeIds,
+		avatarUrls: item.avatarUrls,
+		state: item.state,
+		failedLoginAttempts: item.failedLoginAttempts,
+		createDate: item.createDate,
+		updateDate: item.updateDate,
+		lastLoginDate: item.lastLoginDate,
+		lastLockoutDate: item.lastLockoutDate,
+		lastPasswordChangeDate: item.lastPasswordChangeDate,
+	};
+};
+
+export const umbUserMockDb = new UmbUserMockDB(data);

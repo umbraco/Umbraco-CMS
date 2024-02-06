@@ -15,6 +15,7 @@
  * // customDelimiterResult: ['apple', 'orange', 'banana']
  */
 export function splitStringToArray(string: string, split: string = ','): string[] {
+	if (!string) return [];
 	return (
 		string
 			.split(split)

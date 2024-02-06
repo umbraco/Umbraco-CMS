@@ -1,8 +1,8 @@
 import { UMB_USER_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbUserDetailModel } from '../../types.js';
+import { UMB_USER_PICKER_MODAL } from '../../modals/user-picker/user-picker-modal.token.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_USER_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
 export class UmbUserPickerContext extends UmbPickerInputContext<UmbUserDetailModel> {
 	constructor(host: UmbControllerHost) {
