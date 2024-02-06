@@ -11,7 +11,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Can_Unpublish_Root()
     {
-        await ContentPublishingService.PublishAsync(Textpage.Key, _allCultures, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
         VerifyIsPublished(Textpage.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
@@ -24,8 +24,8 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Can_Unpublish_Child()
     {
-        await ContentPublishingService.PublishAsync(Textpage.Key, _allCultures, Constants.Security.SuperUserKey);
-        await ContentPublishingService.PublishAsync(Subpage.Key, _allCultures, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Subpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
         VerifyIsPublished(Textpage.Key);
         VerifyIsPublished(Subpage.Key);
 
@@ -40,10 +40,10 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Can_Unpublish_Structure()
     {
-        await ContentPublishingService.PublishAsync(Textpage.Key, _allCultures, Constants.Security.SuperUserKey);
-        await ContentPublishingService.PublishAsync(Subpage.Key, _allCultures, Constants.Security.SuperUserKey);
-        await ContentPublishingService.PublishAsync(Subpage2.Key, _allCultures, Constants.Security.SuperUserKey);
-        await ContentPublishingService.PublishAsync(Subpage3.Key, _allCultures, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Subpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Subpage2.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Subpage3.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
         VerifyIsPublished(Textpage.Key);
         VerifyIsPublished(Subpage.Key);
         VerifyIsPublished(Subpage2.Key);
@@ -79,7 +79,7 @@ public partial class ContentPublishingServiceTests
     [Test]
     public async Task Can_Cancel_Unpublishing_With_Notification()
     {
-        await ContentPublishingService.PublishAsync(Textpage.Key, _allCultures, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(Textpage.Key, MakeModel(_allCultures), Constants.Security.SuperUserKey);
         VerifyIsPublished(Textpage.Key);
 
         ContentNotificationHandler.UnpublishingContent = notification => notification.Cancel = true;
@@ -104,7 +104,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
-        await ContentPublishingService.PublishAsync(content.Key, new[] { langEn.IsoCode, langDa.IsoCode }, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, langEn.IsoCode, Constants.Security.SuperUserKey);
@@ -130,7 +130,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
-        await ContentPublishingService.PublishAsync(content.Key, new[] { langEn.IsoCode, langDa.IsoCode }, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, null, Constants.Security.SuperUserKey);
@@ -155,7 +155,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
-        await ContentPublishingService.PublishAsync(content.Key, new[] { langEn.IsoCode, langDa.IsoCode }, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
@@ -185,7 +185,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
-        await ContentPublishingService.PublishAsync(content.Key, new[] { langEn.IsoCode, langDa.IsoCode }, Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;

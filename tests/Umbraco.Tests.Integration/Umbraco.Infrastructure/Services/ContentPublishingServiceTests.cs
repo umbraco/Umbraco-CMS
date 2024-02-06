@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -17,7 +18,13 @@ public partial class ContentPublishingServiceTests : UmbracoIntegrationTestWithC
 {
     private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
 
-    private static readonly string[] _allCultures = new[] { "*" };
+    private static readonly string[] _allCultures = new []{ "*" };
+
+    private static  CultureAndScheduleModel MakeModel(string[] cultures) => new CultureAndScheduleModel()
+    {
+        CulturesToPublishImmediately = cultures,
+        Schedules = new ContentScheduleCollection()
+    };
 
     [SetUp]
     public void SetupTest()
