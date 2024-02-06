@@ -1,6 +1,6 @@
 import type { MemberResponseModel, MemberItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
+export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 
 export const data: Array<UmbMockMemberModel> = [
 	{
@@ -15,7 +15,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: '', icon: '', hasListView: false },
+		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
 		username: 'member1',
 		values: [],
 		variants: [],
@@ -32,7 +32,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: '', icon: '', hasListView: false },
+		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
 		username: 'member2',
 		values: [],
 		variants: [],
@@ -49,7 +49,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: '', icon: '', hasListView: false },
+		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
 		username: 'member3',
 		values: [],
 		variants: [],

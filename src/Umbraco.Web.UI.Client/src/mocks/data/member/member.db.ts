@@ -1,7 +1,8 @@
 import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
-import type { UmbMockDataTypeModel as UmbMockMemberModel } from './member.data.js';
+import { umbMemberTypeMockDb } from '../member-type/member-type.db.js';
+import type { UmbMockMemberModel } from './member.data.js';
 import { data } from './member.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
@@ -20,10 +21,15 @@ class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
 }
 
 const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMemberModel => {
+	const memberType = umbMemberTypeMockDb.read(request.memberType.id);
+	if (!memberType) throw new Error(`Member type with id ${request.memberType.id} not found`);
+
+	const now = new Date().toString();
+
 	return {
 		email: request.email,
 		failedPasswordAttempts: 0,
-		groups: request.groups,
+		groups: request.groups ? request.groups : [],
 		id: request.id ? request.id : UmbId.new(),
 		isApproved: request.isApproved,
 		isLockedOut: false,
@@ -31,10 +37,22 @@ const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMembe
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: request.memberType,
+		memberType: {
+			id: memberType.id,
+			icon: memberType.icon,
+			hasListView: memberType.hasListView,
+		},
 		username: request.username,
 		values: request.values,
-		variants: request.variants,
+		variants: request.variants.map((variantRequest) => {
+			return {
+				culture: variantRequest.culture,
+				segment: variantRequest.segment,
+				name: variantRequest.name,
+				createDate: now,
+				updateDate: now,
+			};
+		}),
 	};
 };
 
@@ -51,7 +69,7 @@ const detailResponseMapper = (item: UmbMockMemberModel): MemberResponseModel => 
 		lastLoginDate: item.lastLoginDate,
 		lastPasswordChangeDate: item.lastPasswordChangeDate,
 		memberType: item.memberType,
-		username: item.userName,
+		username: item.username,
 		values: item.values,
 		variants: item.variants,
 	};
@@ -66,4 +84,4 @@ const itemResponseMapper = (item: UmbMockMemberModel): MemberItemResponseModel =
 	};
 };
 
-export const umbDataTypeMockDb = new UmbMemberMockDB(data);
+export const umbMemberMockDb = new UmbMemberMockDB(data);
