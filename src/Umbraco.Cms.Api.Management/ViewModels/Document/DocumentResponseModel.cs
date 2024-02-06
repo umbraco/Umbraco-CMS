@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 [ShortGenericSchemaName<DocumentValueModel, DocumentVariantResponseModel>("ContentForDocumentResponseModel")]
 public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel, DocumentVariantResponseModel>
 {
-    public IEnumerable<ContentUrlInfo> Urls { get; set; } = Enumerable.Empty<ContentUrlInfo>();
+    public IEnumerable<DocumentUrlInfo> Urls { get; set; } = Enumerable.Empty<DocumentUrlInfo>();
 
     public ReferenceByIdModel? Template { get; set; }
 

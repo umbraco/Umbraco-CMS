@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -47,9 +48,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Name = userGroup.Name ?? string.Empty,
             Id = userGroup.Key,
-            DocumentStartNodeId = contentStartNodeKey,
+            DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
             DocumentRootAccess = contentRootAccess,
-            MediaStartNodeId = mediaStartNodeKey,
+            MediaStartNode = ReferenceByIdModel.ReferenceOrNull(mediaStartNodeKey),
             MediaRootAccess = mediaRootAccess,
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
@@ -77,8 +78,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             Name = userGroup.Name ?? string.Empty,
             Id = userGroup.Key,
-            DocumentStartNodeId = contentStartNodeKey,
-            MediaStartNodeId = mediaStartNodeKey,
+            DocumentStartNode = ReferenceByIdModel.ReferenceOrNull(contentStartNodeKey),
+            MediaStartNode = ReferenceByIdModel.ReferenceOrNull(mediaStartNodeKey),
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
@@ -213,9 +214,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
     private Attempt<UserGroupOperationStatus> AssignStartNodesToUserGroup(UserGroupBase source, IUserGroup target)
     {
-        if (source.DocumentStartNodeId is not null)
+        if (source.DocumentStartNode is not null)
         {
-            var contentId = GetIdFromKey(source.DocumentStartNodeId.Value, UmbracoObjectTypes.Document);
+            var contentId = GetIdFromKey(source.DocumentStartNode.Id, UmbracoObjectTypes.Document);
 
             if (contentId is null)
             {
@@ -233,9 +234,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             target.StartContentId = null;
         }
 
-        if (source.MediaStartNodeId is not null)
+        if (source.MediaStartNode is not null)
         {
-            var mediaId = GetIdFromKey(source.MediaStartNodeId.Value, UmbracoObjectTypes.Media);
+            var mediaId = GetIdFromKey(source.MediaStartNode.Id, UmbracoObjectTypes.Media);
 
             if (mediaId is null)
             {

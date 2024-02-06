@@ -36,7 +36,7 @@ public class CreateTemplateController : TemplateControllerBase
             requestModel.Alias,
             requestModel.Content,
             CurrentUserKey(_backOfficeSecurityAccessor),
-            requestModel.Key);
+            requestModel.Id);
 
         return result.Success
             ? CreatedAtId<ByKeyTemplateController>(controller => nameof(controller.ByKey), result.Result.Key)

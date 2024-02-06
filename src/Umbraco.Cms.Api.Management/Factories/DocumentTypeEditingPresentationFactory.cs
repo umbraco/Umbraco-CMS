@@ -1,9 +1,7 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
-using ContentTypeCleanupViewModel = Umbraco.Cms.Api.Management.ViewModels.ContentType.ContentTypeCleanup;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -59,7 +57,7 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
     public IEnumerable<AvailableDocumentTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
         => compositionResults.Select(MapCompositionModel<AvailableDocumentTypeCompositionResponseModel>);
 
-    private void MapCleanup(ContentTypeModelBase model, ContentTypeCleanupViewModel cleanup)
+    private void MapCleanup(ContentTypeModelBase model, DocumentTypeCleanup cleanup)
         => model.Cleanup = new ContentTypeCleanup
         {
             PreventCleanup = cleanup.PreventCleanup,

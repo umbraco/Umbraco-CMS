@@ -63,7 +63,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             UpdateDate = user.UpdateDate,
             State = user.UserState,
             UserGroupIds = new HashSet<Guid>(user.Groups.Select(x => x.Key)),
-            ContentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
+            DocumentStartNodeIds = GetKeysFromIds(user.StartContentIds, UmbracoObjectTypes.Document),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
@@ -105,7 +105,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     {
         var inviteModel = new UserResendInviteModel
         {
-            InvitedUserKey = requestModel.UserId,
+            InvitedUserKey = requestModel.User.Id,
             Message = requestModel.Message,
         };
 
@@ -140,7 +140,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             Name = updateModel.Name,
             UserName = updateModel.UserName,
             LanguageIsoCode = updateModel.LanguageIsoCode,
-            ContentStartNodeKeys = updateModel.ContentStartNodeIds,
+            ContentStartNodeKeys = updateModel.DocumentStartNodeIds,
             MediaStartNodeKeys = updateModel.MediaStartNodeIds,
         };
 
@@ -170,7 +170,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             AvatarUrls = presentationUser.AvatarUrls,
             LanguageIsoCode = presentationUser.LanguageIsoCode,
             MediaStartNodeIds = mediaStartNodeKeys,
-            ContentStartNodeIds = documentStartNodeKeys,
+            DocumentStartNodeIds = documentStartNodeKeys,
             Permissions = permissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages
         });

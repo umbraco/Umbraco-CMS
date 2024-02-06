@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.AuditLogs;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -32,50 +33,38 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
 
     private AuditLogWithUsernameResponseModel CreateAuditLogWithUsernameViewModel(IAuditItem auditItem)
     {
-        IEntitySlim? entitySlim = _entityService.Get(auditItem.Id);
+        AuditLogWithUsernameResponseModel target = CreateResponseModel<AuditLogWithUsernameResponseModel>(auditItem, out IUser user);
 
-        var target = new AuditLogWithUsernameResponseModel
-        {
-            Comment = auditItem.Comment,
-            EntityType = auditItem.EntityType,
-            EntityId = entitySlim?.Key,
-            LogType = auditItem.AuditType,
-            Parameters = auditItem.Parameters,
-            Timestamp = auditItem.CreateDate,
-        };
-
-        IUser? user = _userService.GetUserById(auditItem.UserId);
-        if (user is null)
-        {
-            throw new ArgumentException($"Could not find user with id {auditItem.UserId}");
-        }
-
-        target.UserId = user.Key;
         target.UserAvatars = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
         target.UserName = user.Name;
         return target;
     }
 
     private AuditLogResponseModel CreateAuditLogViewModel(IAuditItem auditItem)
+        => CreateResponseModel<AuditLogResponseModel>(auditItem, out _);
+
+    private T CreateResponseModel<T>(IAuditItem auditItem, out IUser user)
+        where T : AuditLogBaseModel, new()
     {
+        user = _userService.GetUserById(auditItem.UserId)
+               ?? throw new ArgumentException($"Could not find user with id {auditItem.UserId}");
+
         IEntitySlim? entitySlim = _entityService.Get(auditItem.Id);
-        var target = new AuditLogResponseModel
-            {
-                Comment = auditItem.Comment,
-                EntityType = auditItem.EntityType,
-                EntityId = entitySlim?.Key,
-                LogType = auditItem.AuditType,
-                Parameters = auditItem.Parameters,
-                Timestamp = auditItem.CreateDate,
-            };
 
-        IUser? user = _userService.GetUserById(auditItem.UserId);
-        if (user is null)
+        return new T
         {
-            throw new ArgumentException($"Could not find user with id {auditItem.UserId}");
-        }
-
-        target.UserId = user.Key;
-        return target;
+            Comment = auditItem.Comment,
+            Entity = auditItem.EntityType is not null || entitySlim is not null
+                ? new AuditLogEntity
+                {
+                    Id = entitySlim?.Key,
+                    Type = auditItem.EntityType
+                }
+                : null,
+            LogType = auditItem.AuditType,
+            Parameters = auditItem.Parameters,
+            Timestamp = auditItem.CreateDate,
+            User = new ReferenceByIdModel(user.Key)
+        };
     }
 }

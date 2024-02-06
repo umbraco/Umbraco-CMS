@@ -4,7 +4,7 @@ public class DynamicRootContextRequestModel
 {
     public Guid? Id { get; set; }
 
-    public required Guid ParentId { get; set; }
+    public required ReferenceByIdModel Parent { get; set; }
 
     public string? Culture { get; set; }
 

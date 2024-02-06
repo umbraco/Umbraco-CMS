@@ -12,7 +12,7 @@ public class CurrentUserResponseModel
 
     public required string? LanguageIsoCode { get; init; }
 
-    public required ISet<Guid> ContentStartNodeIds { get; init; } = new HashSet<Guid>();
+    public required ISet<Guid> DocumentStartNodeIds { get; init; } = new HashSet<Guid>();
 
     public required ISet<Guid> MediaStartNodeIds { get; init; } = new HashSet<Guid>();
 
