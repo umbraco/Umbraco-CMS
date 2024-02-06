@@ -75,6 +75,7 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 
 			.outer-wrapper {
 				display: flex;
+				gap: var(--uui-size-layout-1);
 			}
 		`,
 	];
