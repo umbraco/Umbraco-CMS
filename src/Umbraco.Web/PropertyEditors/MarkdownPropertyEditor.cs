@@ -1,6 +1,7 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -16,14 +17,24 @@ namespace Umbraco.Web.PropertyEditors
         Icon = "icon-code")]
     public class MarkdownPropertyEditor : DataEditor
     {
+        private readonly IMarkdownSanitizer _markdownSanitizer;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkdownPropertyEditor"/> class.
         /// </summary>
-        public MarkdownPropertyEditor(ILogger logger)
+        public MarkdownPropertyEditor(ILogger logger, IMarkdownSanitizer markdownSanitizer)
             : base(logger)
-        { }
+        {
+            _markdownSanitizer = markdownSanitizer;
+        }
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MarkdownConfigurationEditor();
+
+        /// <summary>
+        ///     Create a custom value editor
+        /// </summary>
+        /// <returns></returns>
+        protected override IDataValueEditor CreateValueEditor() => new MarkDownPropertyValueEditor(Attribute, _markdownSanitizer);
     }
 }

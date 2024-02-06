@@ -201,7 +201,9 @@
     <Compile Include="Security\IFileStreamSecurityAnalyzer.cs" />
     <Compile Include="Security\IFileStreamSecurityValidator.cs" />
     <Compile Include="Security\IHtmlSanitizer.cs" />
+    <Compile Include="Security\IMarkdownSanitizer.cs" />
     <Compile Include="Security\NoopHtmlSanitizer.cs" />
+    <Compile Include="Security\NoopMarkdownSanitizer.cs" />
     <Compile Include="Serialization\AutoInterningStringConverter.cs" />
     <Compile Include="Serialization\AutoInterningStringKeyCaseInsensitiveDictionaryConverter.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerConfiguration.cs" />
