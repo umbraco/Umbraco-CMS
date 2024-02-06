@@ -8,10 +8,11 @@ import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import type {
-	UUIDialogElement,
-	UUIModalDialogElement,
-	UUIModalSidebarElement,
+import {
+	UUIModalCloseEvent,
+	type UUIDialogElement,
+	type UUIModalDialogElement,
+	type UUIModalSidebarElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
@@ -43,7 +44,7 @@ export class UmbModalElement extends UmbLitElement {
 	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
 
 	#onClose = () => {
-		this.element?.removeEventListener('close', this.#onClose);
+		this.element?.removeEventListener(UUIModalCloseEvent, this.#onClose);
 		this.#modalContext?.reject({ type: 'close' });
 	};
 
@@ -53,7 +54,7 @@ export class UmbModalElement extends UmbLitElement {
 		this.element = this.#createContainerElement();
 
 		// Makes sure that the modal triggers the reject of the context promise when it is closed by pressing escape.
-		this.element.addEventListener('close', this.#onClose);
+		this.element.addEventListener(UUIModalCloseEvent, this.#onClose);
 
 		if (this.#modalContext.originTarget) {
 			// The following code is the context api proxy.
