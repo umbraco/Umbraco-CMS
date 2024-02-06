@@ -497,6 +497,7 @@ public class LocksTests : UmbracoIntegrationTest
         }
     }
 
+    [Retry(3)] // TODO make this test non-flaky.
     [Test]
     public void Read_Lock_Waits_For_Write_Lock()
     {

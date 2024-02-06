@@ -58,6 +58,6 @@ public class UnpublishDocumentController : DocumentControllerBase
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            : ContentPublishingOperationStatusResult(attempt.Result);
+            : DocumentPublishingOperationStatusResult(attempt.Result);
     }
 }

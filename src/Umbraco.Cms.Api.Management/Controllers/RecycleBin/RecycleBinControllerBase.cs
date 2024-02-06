@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Content;
+using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Services.Paging;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;

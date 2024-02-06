@@ -30,8 +30,8 @@ public class LegacyManifestParserTests
     {
         var validators = new IManifestValueValidator[]
         {
-            new RequiredValidator(Mock.Of<ILocalizedTextService>()),
-            new RegexValidator(Mock.Of<ILocalizedTextService>(), null),
+            new RequiredValidator(),
+            new RegexValidator(),
             new DelimitedValueValidator(),
         };
         _ioHelper = TestHelper.IOHelper;
