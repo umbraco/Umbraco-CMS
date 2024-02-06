@@ -227,6 +227,15 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: {
 					type: 'content',
 					id: null,
+					dynamicRoot: {
+						originAlias: 'Root',
+						querySteps: [
+							{
+								alias: 'FurthestAncestorOrSelf',
+								anyOfDocTypeKeys: ['all-property-editors-document-type-id'],
+							},
+						],
+					},
 				},
 			},
 			{
