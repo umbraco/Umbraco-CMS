@@ -26,7 +26,7 @@ public class UpdateMemberGroupController : MemberGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MemberGroupResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create(Guid id, UpdateMemberGroupRequestModel model)
+    public async Task<IActionResult> Update(Guid id, UpdateMemberGroupRequestModel model)
     {
         IMemberGroup? current = await _memberGroupService.GetAsync(id);
         if (current is null)
