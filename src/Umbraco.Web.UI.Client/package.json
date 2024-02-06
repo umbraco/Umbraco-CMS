@@ -155,7 +155,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.23.7",
-		"@mdx-js/react": "^2.3.0",
+		"@mdx-js/react": "^3.0.0",
 		"@open-wc/testing": "^4.0.0",
 		"@playwright/test": "^1.41.1",
 		"@rollup/plugin-commonjs": "^25.0.7",
