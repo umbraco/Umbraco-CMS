@@ -5,6 +5,7 @@ import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
 import { handlers as dictionaryHandlers } from './handlers/dictionary/index.js';
 import { handlers as documentHandlers } from './handlers/document/index.js';
 import { handlers as documentTypeHandlers } from './handlers/document-type/index.js';
+import { handlers as dynamicRootHandlers } from './handlers/dynamic-root.handlers.js';
 import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers.js';
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';
 import { handlers as installHandlers } from './handlers/install.handlers.js';
@@ -45,6 +46,7 @@ const handlers = [
 	...dictionaryHandlers,
 	...documentHandlers,
 	...documentTypeHandlers,
+	...dynamicRootHandlers,
 	...examineManagementHandlers,
 	...healthCheckHandlers,
 	...installHandlers,

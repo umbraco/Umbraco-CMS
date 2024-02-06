@@ -37,8 +37,9 @@ export class UmbPropertyEditorUITreePickerSourcePickerElement
 	render() {
 		return html`<umb-input-tree-picker-source
 			@change=${this.#onChange}
-			.type=${this.value?.type}
-			.nodeId=${this.value?.id}></umb-input-tree-picker-source>`;
+			.type=${this.value?.type ?? 'content'}
+			.nodeId=${this.value?.id}
+			.dynamicRoot=${this.value?.dynamicRoot}></umb-input-tree-picker-source>`;
 	}
 
 	static styles = [UmbTextStyles];
