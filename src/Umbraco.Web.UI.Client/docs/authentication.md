@@ -34,7 +34,7 @@ There are two ways to use this:
 ```json
 "Umbraco": {
 	"CMS": {
-		"NewBackOffice":{
+		"Security":{
 			"BackOfficeHost": "http://localhost:5173",
 			"AuthorizeCallbackPathName": "/"
 		},
