@@ -3,27 +3,28 @@ using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
 
-namespace Umbraco.Web.PropertyEditors;
-
-internal class MarkDownPropertyValueEditor : DataValueEditor
+namespace Umbraco.Web.PropertyEditors
 {
-    private readonly IMarkdownSanitizer _markdownSanitizer;
-
-    public MarkDownPropertyValueEditor(DataEditorAttribute attribute, IMarkdownSanitizer markdownSanitizer) : base(attribute)
+    internal class MarkDownPropertyValueEditor : DataValueEditor
     {
-        _markdownSanitizer = markdownSanitizer;
-    }
+        private readonly IMarkdownSanitizer _markdownSanitizer;
 
-    public override object FromEditor(ContentPropertyData editorValue, object currentValue)
-    {
-        var editorValueString = editorValue.Value?.ToString();
-        if (string.IsNullOrWhiteSpace(editorValueString))
+        public MarkDownPropertyValueEditor(DataEditorAttribute attribute, IMarkdownSanitizer markdownSanitizer) : base(attribute)
         {
-            return null;
+            _markdownSanitizer = markdownSanitizer;
         }
 
-        var sanitized = _markdownSanitizer.Sanitize(editorValueString);
+        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+        {
+            var editorValueString = editorValue.Value?.ToString();
+            if (string.IsNullOrWhiteSpace(editorValueString))
+            {
+                return null;
+            }
 
-        return sanitized.NullOrWhiteSpaceAsNull();
+            var sanitized = _markdownSanitizer.Sanitize(editorValueString);
+
+            return sanitized.NullOrWhiteSpaceAsNull();
+        }
     }
 }
