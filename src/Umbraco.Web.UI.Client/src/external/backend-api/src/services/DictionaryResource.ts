@@ -220,14 +220,14 @@ export class DictionaryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDictionaryItem({
+    public static getItemDictionary({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<DictionaryItemItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/dictionary/item',
+            url: '/umbraco/management/api/v1/item/dictionary',
             query: {
                 'id': id,
             },

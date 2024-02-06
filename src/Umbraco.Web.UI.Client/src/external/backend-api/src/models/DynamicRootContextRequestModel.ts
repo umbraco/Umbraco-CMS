@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type DynamicRootContextRequestModel = {
     id?: string | null;
-    parentId: string;
+    parent: ReferenceByIdModel;
     culture?: string | null;
     segment?: string | null;
 };

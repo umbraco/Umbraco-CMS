@@ -1,4 +1,5 @@
 import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
+import type { UmbDataTypeTreeItemModel } from '../../tree/types.js';
 import { css, html, repeat, customElement, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -14,7 +15,6 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/data-type';
 
 interface GroupedItems<T> {
@@ -31,7 +31,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	@state()
-	private _groupedDataTypes?: GroupedItems<UmbEntityTreeItemModel>;
+	private _groupedDataTypes?: GroupedItems<UmbDataTypeTreeItemModel>;
 
 	@state()
 	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUi> = {};
@@ -45,7 +45,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	private _createDataTypeModal: UmbModalRouteRegistrationController;
 
 	#treeRepository;
-	#dataTypes: Array<UmbEntityTreeItemModel> = [];
+	#dataTypes: Array<UmbDataTypeTreeItemModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
 
@@ -118,15 +118,15 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	private _handleDataTypeClick(dataType: UmbEntityTreeItemModel) {
-		if (dataType.id) {
-			this._select(dataType.id);
+	private _handleDataTypeClick(dataType: UmbDataTypeTreeItemModel) {
+		if (dataType.unique) {
+			this._select(dataType.unique);
 			this._submitModal();
 		}
 	}
 
-	private _select(id: string | undefined) {
-		this.value = { selection: id ? [id] : [] };
+	private _select(unique: string | undefined) {
+		this.value = { selection: unique ? [unique] : [] };
 	}
 
 	private _handleFilterInput(event: UUIInputEvent) {
@@ -270,13 +270,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		</ul>`;
 	}
 
-	private _renderGroupDataTypes(dataTypes: Array<UmbEntityTreeItemModel>) {
+	private _renderGroupDataTypes(dataTypes: Array<UmbDataTypeTreeItemModel>) {
 		return html` <ul id="item-grid">
 			${repeat(
 				dataTypes,
-				(dataType) => dataType.id,
+				(dataType) => dataType.unique,
 				(dataType) =>
-					html`<li class="item" ?selected=${this.value.selection.includes(dataType.id!)}>
+					html`<li class="item" ?selected=${this.value.selection.includes(dataType.unique)}>
 						<uui-button .label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
 							<div class="item-content">
 								<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>

@@ -4,12 +4,8 @@ import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
-import type {
-	CreatePartialViewRequestModel,
-	UpdatePartialViewRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	PartialViewResource
-} from '@umbraco-cms/backoffice/backend-api';
+import type { CreatePartialViewRequestModel, UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -103,7 +99,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 			content: model.content,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			PartialViewResource.putPartialViewByPath({
 				path: encodeURIComponent(path),
@@ -111,8 +107,8 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

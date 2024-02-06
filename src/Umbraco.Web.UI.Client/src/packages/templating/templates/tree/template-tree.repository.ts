@@ -16,7 +16,7 @@ export class UmbTemplateTreeRepository
 
 	async requestTreeRoot() {
 		const data: UmbTemplateTreeRootModel = {
-			id: null,
+			unique: null,
 			entityType: UMB_TEMPLATE_ROOT_ENTITY_TYPE,
 			name: 'Templates',
 			hasChildren: true,

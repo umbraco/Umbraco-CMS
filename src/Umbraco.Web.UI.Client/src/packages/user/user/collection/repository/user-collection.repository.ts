@@ -1,5 +1,5 @@
-import type { UmbUserCollectionFilterModel } from '../../types.js';
 import { UmbUserRepositoryBase } from '../../repository/user-repository-base.js';
+import type { UmbUserCollectionFilterModel } from '../types.js';
 import { UmbUserCollectionServerDataSource } from './user-collection.server.data-source.js';
 import type { UmbUserCollectionDataSource } from './types.js';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';

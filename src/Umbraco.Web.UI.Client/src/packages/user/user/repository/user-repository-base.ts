@@ -1,5 +1,5 @@
-import type { UmbUserStore } from './user.store.js';
-import { UMB_USER_STORE_CONTEXT } from './user.store.js';
+import type { UmbUserDetailStore } from './detail/user-detail.store.js';
+import { UMB_USER_DETAIL_STORE_CONTEXT } from './detail/user-detail.store.js';
 import type { UmbUserItemStore } from './item/user-item.store.js';
 import { UMB_USER_ITEM_STORE_CONTEXT } from './item/user-item.store.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -7,10 +7,9 @@ import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notificatio
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
-export class UmbUserRepositoryBase extends UmbRepositoryBase {
+export abstract class UmbUserRepositoryBase extends UmbRepositoryBase {
 	protected init;
-
-	protected detailStore?: UmbUserStore;
+	protected detailStore?: UmbUserDetailStore;
 	protected itemStore?: UmbUserItemStore;
 	protected notificationContext?: UmbNotificationContext;
 
@@ -18,7 +17,7 @@ export class UmbUserRepositoryBase extends UmbRepositoryBase {
 		super(host);
 
 		this.init = Promise.all([
-			this.consumeContext(UMB_USER_STORE_CONTEXT, (instance) => {
+			this.consumeContext(UMB_USER_DETAIL_STORE_CONTEXT, (instance) => {
 				this.detailStore = instance;
 			}).asPromise(),
 

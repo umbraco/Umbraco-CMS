@@ -1,3 +1,4 @@
+import type { UmbDocumentTypeItemModel } from '../../repository/index.js';
 import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
 import {
 	css,
@@ -11,7 +12,6 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
@@ -86,7 +86,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	}
 
 	@state()
-	private _items?: Array<DocumentTypeItemResponseModel>;
+	private _items?: Array<UmbDocumentTypeItemModel>;
 
 	@state()
 	private _editDocumentTypePath = '';
@@ -148,7 +148,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 			<uui-ref-list
 				>${repeat(
 					this._items,
-					(item) => item.id,
+					(item) => item.unique,
 					(item) => this.#renderItem(item),
 				)}</uui-ref-list
 			>
@@ -168,21 +168,21 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 		`;
 	}
 
-	#renderItem(item: DocumentTypeItemResponseModel) {
-		if (!item.id) return;
+	#renderItem(item: UmbDocumentTypeItemModel) {
+		if (!item.unique) return;
 		return html`
 			<uui-ref-node-document-type name=${ifDefined(item.name)}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
 						compact
-						href=${this._editDocumentTypePath + 'edit/' + item.id}
+						href=${this._editDocumentTypePath + 'edit/' + item.unique}
 						label=${this.localize.term('general_edit') + ` ${item.name}`}>
 						<uui-icon name="icon-edit"></uui-icon>
 					</uui-button>
 					<uui-button
 						compact
-						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
 						label="Edit Document Type ${item.name}">
 						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
@@ -191,7 +191,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 		`;
 	}
 
-	#renderIcon(item: DocumentTypeItemResponseModel) {
+	#renderIcon(item: UmbDocumentTypeItemModel) {
 		if (!item.icon) return;
 		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
 	}
