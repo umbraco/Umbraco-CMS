@@ -80,5 +80,35 @@ public class ContentPickerPropertyEditor : DataEditor
                 yield return new UmbracoEntityReference(udi);
             }
         }
+
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+        {
+            if (editorValue.Value is null)
+            {
+                return null;
+            }
+
+            // starting in v14 the passed in value is always a guid, we store it as a document Udi string. Else it's an invalid value
+            return Guid.TryParse(editorValue.Value as string, out Guid guidValue)
+                ? GuidUdi.Create(Constants.UdiEntityType.Document, guidValue).ToString()
+                : null;
+        }
+
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+            // since our storage type is a string, we can expect the base to return a string
+            var stringValue = base.ToEditor(property, culture, segment) as string;
+
+            // this string can actually be an Int value from old versions => convert to it's guid counterpart
+            if (int.TryParse(stringValue, out var oldInt))
+            {
+                // This is a temporary code path that should be removed ASAP
+                Attempt<Guid> conversionAttempt = StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>()
+                    .GetKeyForId(oldInt, UmbracoObjectTypes.Document);
+                return conversionAttempt.Success ? conversionAttempt.Result : null;
+            }
+
+            return Guid.TryParse(stringValue, out Guid guid) ? guid : null;
+        }
     }
 }
