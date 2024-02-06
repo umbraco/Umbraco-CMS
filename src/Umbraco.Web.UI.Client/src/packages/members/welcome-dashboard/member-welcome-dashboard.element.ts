@@ -1,8 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
-@customElement('umb-dashboard-members-welcome')
-export class UmbDashboardMembersWelcomeElement extends LitElement {
+@customElement('umb-member-welcome-dashboard')
+export class UmbMemberWelcomeDashboardElement extends LitElement {
 	render() {
 		return html`
 			<uui-box class="uui-text">
@@ -26,10 +26,10 @@ export class UmbDashboardMembersWelcomeElement extends LitElement {
 	];
 }
 
-export default UmbDashboardMembersWelcomeElement;
+export default UmbMemberWelcomeDashboardElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-dashboard-members-welcome': UmbDashboardMembersWelcomeElement;
+		'umb-member-welcome-dashboard': UmbMemberWelcomeDashboardElement;
 	}
 }

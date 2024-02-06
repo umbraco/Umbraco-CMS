@@ -1,7 +1,7 @@
-import './dashboard-members-welcome.element.js';
+import './member-welcome-dashboard.element.js';
 
 import type { Meta, Story } from '@storybook/web-components';
-import type { UmbDashboardMembersWelcomeElement } from './dashboard-members-welcome.element.js';
+import type { UmbMemberWelcomeDashboardElement } from './member-welcome-dashboard.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
@@ -10,6 +10,6 @@ export default {
 	id: 'umb-dashboard-members-welcome',
 } as Meta;
 
-export const AAAOverview: Story<UmbDashboardMembersWelcomeElement> = () =>
+export const AAAOverview: Story<UmbMemberWelcomeDashboardElement> = () =>
 	html` <umb-dashboard-members-welcome></umb-dashboard-members-welcome>`;
 AAAOverview.storyName = 'Overview';
