@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -11,6 +13,15 @@ public class WebhookMapDefinition : IMapDefinition
 {
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizedTextService _localizedTextService;
+
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
+    public WebhookMapDefinition() : this(
+        StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>(),
+        StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>()
+        )
+    {
+
+    }
 
     public WebhookMapDefinition(IHostingEnvironment hostingEnvironment, ILocalizedTextService localizedTextService)
     {
