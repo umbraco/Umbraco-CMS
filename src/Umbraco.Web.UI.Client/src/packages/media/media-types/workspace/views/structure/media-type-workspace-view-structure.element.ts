@@ -1,11 +1,12 @@
-import { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
+import type { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
 import type { UmbInputMediaTypeElement } from '../../../components/input-media-type/input-media-type.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 
 @customElement('umb-media-type-workspace-view-structure')
 export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -33,7 +34,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 		this.observe(this.#workspaceContext.allowedContentTypes, (allowedContentTypes) => {
 			const oldValue = this._allowedContentTypeIDs;
 			this._allowedContentTypeIDs = allowedContentTypes
-				?.map((x) => x.id)
+				?.map((x) => x.contentType.unique)
 				.filter((x) => x !== undefined) as Array<string>;
 			this.requestUpdate('_allowedContentTypeIDs', oldValue);
 		});
@@ -62,8 +63,10 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 						<umb-input-media-type
 							.selectedIds=${this._allowedContentTypeIDs ?? []}
 							@change="${(e: CustomEvent) => {
-								const sortedContentTypesList = (e.target as UmbInputMediaTypeElement).selectedIds.map((id, index) => ({
-									id: id,
+								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
+									e.target as UmbInputMediaTypeElement
+								).selectedIds.map((id, index) => ({
+									contentType: { unique: id },
 									sortOrder: index,
 								}));
 								this.#workspaceContext?.updateProperty('allowedContentTypes', sortedContentTypesList);

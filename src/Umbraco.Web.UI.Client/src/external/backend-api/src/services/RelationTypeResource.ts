@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateRelationTypeRequestModel } from '../models/CreateRelationTypeRequestModel';
-import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { RelationTypeItemResponseModel } from '../models/RelationTypeItemResponseModel';
 import type { RelationTypeResponseModel } from '../models/RelationTypeResponseModel';
 import type { UpdateRelationTypeRequestModel } from '../models/UpdateRelationTypeRequestModel';
@@ -28,7 +28,7 @@ export class RelationTypeResource {
             url: '/umbraco/management/api/v1/relation-type',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -129,7 +129,7 @@ export class RelationTypeResource {
     }
 
     /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeRelationTypeRoot({
@@ -138,7 +138,7 @@ export class RelationTypeResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/relation-type/root',

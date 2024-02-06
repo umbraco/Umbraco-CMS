@@ -4,16 +4,12 @@ import {
 } from './property-settings-modal.context.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbPropertySettingsModalValue,
-	UmbPropertySettingsModalData,
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbPropertySettingsModalValue, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 // TODO: Could base take a token to get its types?.
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
@@ -50,6 +46,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	protected _originalPropertyData!: UmbPropertySettingsModalValue;
 
+	/** Indicates if the currently edited property is a new property or an existing */
+	#isNew = false;
+
 	#context = new UmbPropertyTypeWorkspaceContext(this);
 
 	@state()
@@ -62,7 +61,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			console.log('GOT UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT', instance);
 			if (!this.data?.documentTypeId) return;
 
 			this.observe(instance.variesByCulture, (variesByCulture) => (this._documentVariesByCulture = variesByCulture));
@@ -70,6 +68,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		}).skipOrigin();
 
 		this._originalPropertyData = this.value;
+		this.#isNew = this.value.alias === '';
 
 		const regEx = this.value.validation?.regEx ?? null;
 		if (regEx) {
@@ -134,8 +133,8 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#onDataTypeIdChange(event: UUIInputEvent) {
-		const dataTypeId = event.target.value.toString();
-		this.updateValue({ dataTypeId });
+		const dataTypeUnique = event.target.value.toString();
+		this.updateValue({ dataType: { unique: dataTypeUnique } });
 	}
 
 	#onMandatoryChange(event: UUIBooleanInputEvent) {
@@ -223,7 +222,11 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">
-					<umb-workspace-editor alias=${UMB_PROPERTY_TYPE_WORKSPACE_ALIAS} headline="Property settings">
+					<umb-workspace-editor
+						alias=${UMB_PROPERTY_TYPE_WORKSPACE_ALIAS}
+						headline=${this.localize.term(
+							this.#isNew ? 'contentTypeEditor_addProperty' : 'contentTypeEditor_editProperty',
+						)}>
 						<div id="content">
 							<uui-box>
 								<div class="container">
@@ -256,7 +259,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										.value=${this.value.description}></uui-textarea>
 								</div>
 								<umb-data-type-flow-input
-									.value=${this.value.dataTypeId ?? ''}
+									.value=${this.value.dataType?.unique}
 									@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
 								<hr />
 								<div class="container">
@@ -274,7 +277,11 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 							</uui-box>
 						</div>
 						<div slot="actions">
-							<uui-button label="Submit" look="primary" color="positive" type="submit"></uui-button>
+							<uui-button
+								label="${this.localize.term(this.#isNew ? 'general_add' : 'general_update')}"
+								look="primary"
+								color="positive"
+								type="submit"></uui-button>
 						</div>
 					</umb-workspace-editor>
 				</form>

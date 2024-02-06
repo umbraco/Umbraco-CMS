@@ -17,7 +17,7 @@ describe('UmbDeepState', () => {
 	});
 
 	it('update via next', () => {
-		subject.next({ key: 'some', another: 'myNewValue' });
+		subject.setValue({ key: 'some', another: 'myNewValue' });
 		expect(subject.getValue().another).to.be.equal('myNewValue');
 	});
 
@@ -47,7 +47,7 @@ describe('UmbDeepState', () => {
 			}
 		});
 
-		subject.next({ key: 'change_this_first_should_not_trigger_update', another: 'myValue' });
-		subject.next({ key: 'some', another: 'myNewValue' });
+		subject.setValue({ key: 'change_this_first_should_not_trigger_update', another: 'myValue' });
+		subject.setValue({ key: 'some', another: 'myNewValue' });
 	});
 });

@@ -1,32 +1,33 @@
-import {
-	PropertyContainerTypes,
-	UmbContentTypePropertyStructureManager,
-} from './content-type-structure-manager.class.js';
-import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
+import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from './types.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbContentTypeContainerStructureHelper {
+export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeModel> {
 	#host: UmbControllerHostElement;
 	#init;
 	#initResolver?: (value: unknown) => void;
 
-	#structure?: UmbContentTypePropertyStructureManager;
+	#structure?: UmbContentTypePropertyStructureManager<T>;
 
-	private _ownerType?: PropertyContainerTypes = 'Tab';
-	private _childType?: PropertyContainerTypes = 'Group';
+	private _ownerType?: UmbPropertyContainerTypes = 'Tab';
+	private _childType?: UmbPropertyContainerTypes = 'Group';
 	private _isRoot = false;
+	/**
+	 * The owner id is the owning container (The container that is begin presented, the container is the parent of the child containers)
+	 * If set to null, this helper class will provide containers of the root.
+	 */
 	private _ownerId?: string | null;
 	private _ownerName?: string;
 
 	// Containers defined in data might be more than actual containers to display as we merge them by name.
 	// Direct containers are the containers defining the total of this container(Multiple containers with the same name and type)
-	private _ownerAlikeContainers: PropertyTypeContainerModelBaseModel[] = [];
+	private _ownerAlikeContainers: UmbPropertyTypeContainerModel[] = [];
 	// Owner containers are containers owned by the owner Content Type (The specific one up for editing)
-	private _ownerContainers: PropertyTypeContainerModelBaseModel[] = [];
+	private _ownerContainers: UmbPropertyTypeContainerModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
-	#containers = new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
+	#containers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
 	readonly containers = this.#containers.asObservable();
 
 	#hasProperties = new UmbBooleanState(false);
@@ -41,14 +42,14 @@ export class UmbContentTypeContainerStructureHelper {
 		this.#containers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 	}
 
-	public setStructureManager(structure: UmbContentTypePropertyStructureManager) {
+	public setStructureManager(structure: UmbContentTypePropertyStructureManager<T>) {
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
 		this._observeOwnerAlikeContainers();
 	}
 
-	public setType(value?: PropertyContainerTypes) {
+	public setType(value?: UmbPropertyContainerTypes) {
 		if (this._ownerType === value) return;
 		this._ownerType = value;
 		this._observeOwnerAlikeContainers();
@@ -57,7 +58,7 @@ export class UmbContentTypeContainerStructureHelper {
 		return this._ownerType;
 	}
 
-	public setContainerChildType(value?: PropertyContainerTypes) {
+	public setContainerChildType(value?: UmbPropertyContainerTypes) {
 		if (this._childType === value) return;
 		this._childType = value;
 		this._observeOwnerAlikeContainers();
@@ -96,9 +97,9 @@ export class UmbContentTypeContainerStructureHelper {
 		if (!this.#structure || !this._ownerType) return;
 
 		if (this._isRoot) {
-			this.#containers.next([]);
+			this.#containers.setValue([]);
 			// We cannot have root properties currently, therefor we set it to false:
-			this.#hasProperties.next(false);
+			this.#hasProperties.setValue(false);
 			this._observeRootContainers();
 			new UmbObserverController(
 				this.#host,
@@ -113,7 +114,7 @@ export class UmbContentTypeContainerStructureHelper {
 				this.#host,
 				this.#structure.containersByNameAndType(this._ownerName, this._ownerType),
 				(ownerALikeContainers) => {
-					this.#containers.next([]);
+					this.#containers.setValue([]);
 					this._ownerContainers = ownerALikeContainers.filter((x) => x.id === this._ownerId) || [];
 					this._ownerAlikeContainers = ownerALikeContainers || [];
 					if (this._ownerAlikeContainers.length > 0) {
@@ -134,7 +135,7 @@ export class UmbContentTypeContainerStructureHelper {
 				this.#host,
 				this.#structure!.hasPropertyStructuresOf(container.id!),
 				(hasProperties) => {
-					this.#hasProperties.next(hasProperties);
+					this.#hasProperties.setValue(hasProperties);
 				},
 				'_observeOwnerHasProperties_' + container.id,
 			);
@@ -161,14 +162,14 @@ export class UmbContentTypeContainerStructureHelper {
 			this.#host,
 			this.#structure.rootContainers(this._childType!),
 			(rootContainers) => {
-				this.#containers.next([]);
+				this.#containers.setValue([]);
 				this._insertGroupContainers(rootContainers);
 			},
 			'_observeRootContainers',
 		);
 	}
 
-	private _insertGroupContainers = (groupContainers: PropertyTypeContainerModelBaseModel[]) => {
+	private _insertGroupContainers = (groupContainers: UmbPropertyTypeContainerModel[]) => {
 		groupContainers.forEach((group) => {
 			if (group.name !== null && group.name !== undefined) {
 				if (!this.#containers.getValue().find((x) => x.name === group.name)) {
@@ -193,12 +194,17 @@ export class UmbContentTypeContainerStructureHelper {
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;
 
-		return this.#containers.getValue().find((x) => x.id === containerId && x.parentId === this._ownerId) !== undefined;
+		return (
+			this.#containers
+				.getValue()
+				.find((x) => (x.id === containerId && this._ownerId ? x.parent?.id === this._ownerId : x.parent === null)) !==
+			undefined
+		);
 	}
 
 	/** Manipulate methods: */
 
-	async insertContainer(container: PropertyTypeContainerModelBaseModel, sortOrder = 0) {
+	async insertContainer(container: UmbPropertyTypeContainerModel, sortOrder = 0) {
 		await this.#init;
 		if (!this.#structure) return false;
 
@@ -222,7 +228,7 @@ export class UmbContentTypeContainerStructureHelper {
 		return true;
 	}
 
-	async partialUpdateContainer(containerId: string, partialUpdate: Partial<PropertyTypeContainerModelBaseModel>) {
+	async partialUpdateContainer(containerId: string, partialUpdate: Partial<UmbPropertyTypeContainerModel>) {
 		await this.#init;
 		if (!this.#structure || !containerId || !partialUpdate) return;
 

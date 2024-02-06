@@ -6,9 +6,8 @@ import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbra
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
-import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
-import { ContentUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';
+import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import type { ContentUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
@@ -67,7 +66,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		/** TODO: Doubt this is the right way to get the create date... */
 		this.observe((this._workspaceContext as UmbDocumentWorkspaceContext).variants, (variants) => {
-			this._createDate = Array.isArray(variants) ? variants[0].createDate : 'Unknown';
+			this._createDate = Array.isArray(variants) ? variants[0].createDate || 'Unknown' : 'Unknown';
 		});
 	}
 

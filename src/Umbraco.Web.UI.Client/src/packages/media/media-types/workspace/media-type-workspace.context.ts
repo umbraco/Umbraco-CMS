@@ -1,20 +1,23 @@
 import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../index.js';
+import type { UmbMediaTypeDetailModel } from '../types.js';
+import type {
+	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { type MediaTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-type EntityType = MediaTypeResponseModel;
+type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMediaTypeDetailRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
 
 	// General for content types:
@@ -28,17 +31,13 @@ export class UmbMediaTypeWorkspaceContext
 	readonly allowedContentTypes;
 	readonly compositions;
 
-	readonly structure;
+	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.MediaType', new UmbMediaTypeDetailRepository(host));
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.MediaType');
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;
@@ -56,7 +55,7 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	setIsSorting(isSorting: boolean) {
-		this.#isSorting.next(isSorting);
+		this.#isSorting.setValue(isSorting);
 	}
 
 	getData() {
@@ -64,7 +63,7 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.id;
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {

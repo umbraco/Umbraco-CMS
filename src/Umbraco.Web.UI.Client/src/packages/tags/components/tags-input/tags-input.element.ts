@@ -10,9 +10,10 @@ import {
 	state,
 	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-tags-input')
 export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {

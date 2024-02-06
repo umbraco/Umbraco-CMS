@@ -1,6 +1,6 @@
-import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbItemStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import type { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
@@ -10,10 +10,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
  * @description - Data Store for Data Type items
  */
 
-export class UmbEntityItemStore<T extends ItemResponseModelBaseModel>
-	extends UmbStoreBase<T>
-	implements UmbItemStore<T>
-{
+export class UmbEntityItemStore<T extends ItemResponseModelBaseModel> extends UmbStoreBase<T> {
 	/**
 	 * Creates an instance of UmbEntityItemStore.
 	 * @param {UmbControllerHost} host
@@ -24,6 +21,6 @@ export class UmbEntityItemStore<T extends ItemResponseModelBaseModel>
 	}
 
 	items(ids: Array<string>) {
-		return this._data.asObservablePart((items) => items.filter((item) => ids.includes(item.id ?? '')));
+		return this._data.asObservablePart((items) => items.filter((item) => ids.includes(item.id)));
 	}
 }

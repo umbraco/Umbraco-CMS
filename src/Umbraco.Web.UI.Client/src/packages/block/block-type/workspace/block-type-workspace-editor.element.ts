@@ -3,7 +3,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS, UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
+import { DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-block-type-workspace-editor')
 export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
@@ -11,7 +12,7 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.id,
+		(x) => x.unique,
 	);
 
 	#workspaceContext?: typeof UMB_BLOCK_TYPE_WORKSPACE_CONTEXT.TYPE;

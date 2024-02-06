@@ -4,28 +4,31 @@ import {
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 // TODO => use correct tpye
 type EntityType = any;
 
 export class UmbMemberTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMemberTypeRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbMemberTypeRepository = new UmbMemberTypeRepository(this);
+
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	name = this.#data.asObservablePart((data) => data?.name);
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.MemberType', new UmbMemberTypeRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.MemberType');
 	}
 
 	async load(entityId: string) {
 		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -33,7 +36,7 @@ export class UmbMemberTypeWorkspaceContext
 		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		this.#data.setValue(data);
 	}
 
 	getData() {

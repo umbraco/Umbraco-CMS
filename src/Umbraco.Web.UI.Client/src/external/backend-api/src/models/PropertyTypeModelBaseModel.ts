@@ -5,15 +5,16 @@
 
 import type { PropertyTypeAppearanceModel } from './PropertyTypeAppearanceModel';
 import type { PropertyTypeValidationModel } from './PropertyTypeValidationModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type PropertyTypeModelBaseModel = {
     id: string;
-    containerId?: string | null;
+    container?: ReferenceByIdModel | null;
     sortOrder: number;
     alias: string;
     name: string;
     description?: string | null;
-    dataTypeId: string;
+    dataType: ReferenceByIdModel;
     variesByCulture: boolean;
     variesBySegment: boolean;
     validation: PropertyTypeValidationModel;

@@ -3,10 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { FileSystemFolderModel } from './FileSystemFolderModel';
 import type { TreeItemPresentationModel } from './TreeItemPresentationModel';
 
 export type FileSystemTreeItemPresentationModel = (TreeItemPresentationModel & {
+    name: string;
     path: string;
+    parent?: FileSystemFolderModel | null;
     isFolder: boolean;
 });
 

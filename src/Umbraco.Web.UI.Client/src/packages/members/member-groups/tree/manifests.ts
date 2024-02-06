@@ -1,6 +1,7 @@
 import { UMB_MEMBER_GROUP_ENTITY_TYPE, UMB_MEMBER_GROUP_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbMemberGroupTreeRepository } from './member-group-tree.repository.js';
 import { UmbMemberGroupTreeStore } from './member-group-tree.store.js';
+import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -45,4 +46,4 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifest];

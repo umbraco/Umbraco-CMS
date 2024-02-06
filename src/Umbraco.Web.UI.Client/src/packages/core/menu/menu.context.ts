@@ -8,8 +8,8 @@ export class UmbMenuContext {
 	public readonly alias = this.#manifest.asObservablePart((x) => x?.alias);
 
 	public setManifest(manifest: ManifestMenu | undefined) {
-		this.#manifest.next(manifest);
+		this.#manifest.setValue(manifest);
 	}
 }
 
-export const UMB_MENU_CONTEXT_TOKEN = new UmbContextToken<UmbMenuContext>('UMB_MENU_CONTEXT_TOKEN');
+export const UMB_MENU_CONTEXT = new UmbContextToken<UmbMenuContext>('UMB_MENU_CONTEXT');

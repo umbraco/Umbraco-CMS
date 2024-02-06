@@ -1,6 +1,10 @@
-import { UmbTemplateTreeItemModel } from './types.js';
+import type { UmbTemplateTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { EntityTreeItemResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	EntityTreeItemResponseModel,
+	NamedEntityTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -10,7 +14,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @implements {UmbTreeDataSource}
  */
 export class UmbTemplateTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	EntityTreeItemResponseModel,
+	NamedEntityTreeItemResponseModel,
 	UmbTemplateTreeItemModel
 > {
 	/**
@@ -41,13 +45,12 @@ const getChildrenOf = (parentUnique: string | null) => {
 	}
 };
 
-const mapper = (item: EntityTreeItemResponseModel): UmbTemplateTreeItemModel => {
+const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemModel => {
 	return {
 		id: item.id,
-		parentId: item.parentId || null,
+		parentId: item.parent ? item.parent.id : null,
 		name: item.name,
 		entityType: 'template',
-		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 		isFolder: false,
 	};

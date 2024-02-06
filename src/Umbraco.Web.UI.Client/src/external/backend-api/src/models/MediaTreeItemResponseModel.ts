@@ -4,8 +4,11 @@
 /* eslint-disable */
 
 import type { ContentTreeItemResponseModel } from './ContentTreeItemResponseModel';
+import type { MediaTypeReferenceResponseModel } from './MediaTypeReferenceResponseModel';
+import type { VariantItemResponseModel } from './VariantItemResponseModel';
 
 export type MediaTreeItemResponseModel = (ContentTreeItemResponseModel & {
-    icon: string;
+    mediaType: MediaTypeReferenceResponseModel;
+    variants: Array<VariantItemResponseModel>;
 });
 

@@ -1,20 +1,22 @@
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import type { UmbDocumentTypeDetailModel } from '../../../types.js';
+import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 import './document-type-workspace-view-edit-properties.element.js';
 
 const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-	compareElementToModel: (element: HTMLElement, model: PropertyTypeContainerModelBaseModel) => {
-		return element.getAttribute('data-umb-group-id') === model.id;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-group-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: PropertyTypeContainerModelBaseModel) => {
-		return container.querySelector('data-umb-group-id=[' + modelEntry.id + ']');
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
 	},
 	identifier: 'content-type-group-sorter',
 	itemSelector: '[data-umb-group-id]',
@@ -93,7 +95,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		this._groupStructureHelper.setIsRoot(value);
 	}
 
-	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	_groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbDocumentTypeDetailModel>(this);
 
 	@state()
 	_groups: Array<PropertyTypeContainerModelBaseModel> = [];
@@ -170,7 +172,11 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 													value=${group.name ?? ''}
 													@change=${(e: InputEvent) => {
 														const newName = (e.target as HTMLInputElement).value;
-														this._groupStructureHelper.updateContainerName(group.id!, group.parentId ?? null, newName);
+														this._groupStructureHelper.updateContainerName(
+															group.id!,
+															group.parent?.id ?? null,
+															newName,
+														);
 													}}>
 												</uui-input>
 											</div>

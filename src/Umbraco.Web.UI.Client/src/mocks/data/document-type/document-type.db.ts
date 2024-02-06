@@ -1,81 +1,156 @@
-import { UmbEntityData } from '../entity.data.js';
-import { createEntityTreeItem } from '../utils.js';
-import { UmbMockDocumentTypeModel, data } from './document-type.data.js';
-import {
-	DocumentTypeTreeItemResponseModel,
-	DocumentTypeResponseModel,
+import { UmbEntityMockDbBase } from '../entity/entity-base.js';
+import { UmbMockEntityFolderManager } from '../entity/entity-folder.manager.js';
+import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
+import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
+import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
+import type { UmbMockDocumentTypeModel } from './document-type.data.js';
+import { data } from './document-type.data.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import type {
+	AllowedDocumentTypeModel,
+	CreateDocumentTypeRequestModel,
+	CreateFolderRequestModel,
 	DocumentTypeItemResponseModel,
+	DocumentTypeResponseModel,
+	DocumentTypeSortModel,
+	DocumentTypeTreeItemResponseModel,
+	PagedAllowedDocumentTypeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-class UmbDocumentTypeData extends UmbEntityData<UmbMockDocumentTypeModel> {
-	constructor() {
+class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel> {
+	tree = new UmbMockEntityTreeManager<UmbMockDocumentTypeModel>(this, documentTypeTreeItemMapper);
+	folder = new UmbMockEntityFolderManager<UmbMockDocumentTypeModel>(this, createMockDocumentTypeFolderMapper);
+	item = new UmbMockEntityItemManager<UmbMockDocumentTypeModel>(this, documentTypeItemMapper);
+	detail = new UmbMockEntityDetailManager<UmbMockDocumentTypeModel>(
+		this,
+		createMockDocumentTypeMapper,
+		documentTypeDetailMapper,
+	);
+
+	constructor(data: Array<UmbMockDocumentTypeModel>) {
 		super(data);
 	}
 
-	// TODO: Can we do this smarter so we don't need to make this for each mock data:
-	insert(item: DocumentTypeResponseModel) {
-		const mockItem: UmbMockDocumentTypeModel = {
-			...item,
-			type: 'document-type',
-			isContainer: false,
-			hasChildren: false,
-			isFolder: false,
-		};
-
-		super.insert(mockItem);
+	getAllowedChildren(id: string): PagedAllowedDocumentTypeModel {
+		const documentType = this.detail.read(id);
+		const allowedDocumentTypes = documentType.allowedDocumentTypes.map((sortModel: DocumentTypeSortModel) =>
+			this.detail.read(sortModel.documentType.id),
+		);
+		const mappedItems = allowedDocumentTypes.map((item: UmbMockDocumentTypeModel) => allowedDocumentTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
 	}
 
-	update(id: string, item: DocumentTypeResponseModel) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		super.save(id, item);
-	}
-
-	getTreeRoot(): Array<DocumentTypeTreeItemResponseModel> {
-		const rootItems = this.data.filter((item) => item.parentId === null);
-		return rootItems.map((item) => createDocumentTypeTreeItem(item));
-	}
-
-	getTreeItemChildren(id: string): Array<DocumentTypeTreeItemResponseModel> {
-		const childItems = this.data.filter((item) => item.parentId === id);
-		return childItems.map((item) => createDocumentTypeTreeItem(item));
-	}
-
-	getTreeItem(ids: Array<string>): Array<DocumentTypeTreeItemResponseModel> {
-		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createDocumentTypeTreeItem(item));
-	}
-
-	getAllowedTypesOf(id: string): Array<DocumentTypeTreeItemResponseModel> {
-		const documentType = this.getById(id);
-		const allowedTypeKeys = documentType?.allowedContentTypes?.map((documentType) => documentType.id) ?? [];
-		const items = this.data.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
-		return items.map((item) => createDocumentTypeTreeItem(item));
-	}
-
-	getItems(ids: Array<string>): Array<DocumentTypeItemResponseModel> {
-		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createDocumentTypeItem(item));
+	getAllowedAtRoot(): PagedAllowedDocumentTypeModel {
+		const mockItems = this.data.filter((item) => item.allowedAsRoot);
+		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
 	}
 }
 
-export const createDocumentTypeTreeItem = (item: DocumentTypeResponseModel): DocumentTypeTreeItemResponseModel => {
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
+const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): UmbMockDocumentTypeModel => {
 	return {
-		...createEntityTreeItem(item),
-		type: 'document-type',
+		name: request.name,
+		id: request.id ? request.id : UmbId.new(),
+		parent: request.parentId ? { id: request.parentId } : null,
+		description: '',
+		alias: '',
+		icon: '',
+		properties: [],
+		containers: [],
+		allowedAsRoot: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		allowedDocumentTypes: [],
+		compositions: [],
+		isFolder: true,
+		hasChildren: false,
+		allowedTemplates: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	};
+};
+
+const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): UmbMockDocumentTypeModel => {
+	return {
+		name: request.name,
+		id: request.id ? request.id : UmbId.new(),
+		description: request.description,
+		alias: request.alias,
+		icon: request.icon,
+		properties: request.properties,
+		containers: request.containers,
+		allowedAsRoot: request.allowedAsRoot,
+		variesByCulture: request.variesByCulture,
+		variesBySegment: request.variesBySegment,
+		isElement: request.isElement,
+		allowedDocumentTypes: request.allowedDocumentTypes,
+		compositions: request.compositions,
+		parent: request.folder,
+		isFolder: false,
+		hasChildren: false,
+		allowedTemplates: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	};
+};
+
+const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeResponseModel => {
+	return {
+		name: item.name,
+		id: item.id,
+		description: item.description,
+		alias: item.alias,
+		icon: item.icon,
+		properties: item.properties,
+		containers: item.containers,
+		allowedAsRoot: item.allowedAsRoot,
+		variesByCulture: item.variesByCulture,
+		variesBySegment: item.variesBySegment,
+		isElement: item.isElement,
+		allowedDocumentTypes: item.allowedDocumentTypes,
+		compositions: item.compositions,
+		allowedTemplates: item.allowedTemplates,
+		cleanup: item.cleanup,
+	};
+};
+
+const documentTypeTreeItemMapper = (
+	item: UmbMockDocumentTypeModel,
+): Omit<DocumentTypeTreeItemResponseModel, 'type'> => {
+	return {
+		name: item.name,
+		hasChildren: item.hasChildren,
+		id: item.id,
+		parent: item.parent,
+		isFolder: item.isFolder,
+		icon: item.icon,
 		isElement: item.isElement,
 	};
 };
 
-const createDocumentTypeItem = (item: DocumentTypeResponseModel): DocumentTypeItemResponseModel => {
+const documentTypeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeItemResponseModel => {
 	return {
 		id: item.id,
 		name: item.name,
+		icon: item.icon,
 		isElement: item.isElement,
+	};
+};
+
+const allowedDocumentTypeMapper = (item: UmbMockDocumentTypeModel): AllowedDocumentTypeModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		description: item.description,
 		icon: item.icon,
 	};
 };
 
-export const umbDocumentTypeData = new UmbDocumentTypeData();
+export const umbDocumentTypeMockDb = new UmbDocumentTypeMockDB(data);

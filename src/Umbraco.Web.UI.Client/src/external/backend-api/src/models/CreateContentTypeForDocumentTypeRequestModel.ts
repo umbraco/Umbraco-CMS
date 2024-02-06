@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCompositionModel } from './ContentTypeCompositionModel';
-import type { ContentTypeSortModel } from './ContentTypeSortModel';
 import type { CreateDocumentTypePropertyTypeContainerRequestModel } from './CreateDocumentTypePropertyTypeContainerRequestModel';
 import type { CreateDocumentTypePropertyTypeRequestModel } from './CreateDocumentTypePropertyTypeRequestModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type CreateContentTypeForDocumentTypeRequestModel = {
     alias: string;
@@ -19,9 +18,7 @@ export type CreateContentTypeForDocumentTypeRequestModel = {
     isElement: boolean;
     properties: Array<CreateDocumentTypePropertyTypeRequestModel>;
     containers: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
-    allowedContentTypes: Array<ContentTypeSortModel>;
-    compositions: Array<ContentTypeCompositionModel>;
     id?: string | null;
-    containerId?: string | null;
+    folder?: ReferenceByIdModel | null;
 };
 

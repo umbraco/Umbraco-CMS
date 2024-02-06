@@ -1,5 +1,5 @@
-import { UmbEditableWorkspaceContextBase } from '../workspace-context/index.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEditableWorkspaceContextBase } from '../workspace-context/index.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { createRoutePathBuilder, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
@@ -16,7 +16,7 @@ import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 export class UmbWorkspaceIsNewRedirectController extends UmbBaseController {
 	constructor(
 		host: UmbControllerHost,
-		workspaceContext: UmbEditableWorkspaceContextBase<unknown, unknown>,
+		workspaceContext: UmbEditableWorkspaceContextBase<unknown>,
 		router: UmbRouterSlotElement,
 	) {
 		super(host, 'isNewRedirectController');

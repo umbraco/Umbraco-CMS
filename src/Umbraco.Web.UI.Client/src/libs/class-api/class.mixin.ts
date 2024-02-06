@@ -20,13 +20,30 @@ type UmbClassMixinConstructor = new (
 	controllerAlias?: UmbControllerAlias,
 ) => UmbClassMixinDeclaration;
 
-declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
+// TODO: we need the interface from EventTarget to be part of the controller base. As a temp solution the UmbClassMixinDeclaration extends EventTarget.
+declare class UmbClassMixinDeclaration extends EventTarget implements UmbClassMixinInterface {
 	_host: UmbControllerHost;
+
+	/**
+	 * @description Observe a RxJS source of choice.
+	 * @param {Observable<T>} source RxJS source
+	 * @param {method} callback Callback method called when data is changed.
+	 * @return {UmbObserverController} Reference to a Observer Controller instance
+	 * @memberof UmbClassMixin
+	 */
 	observe<T>(
 		source: Observable<T>,
 		callback: (_value: T) => void,
 		controllerAlias?: UmbControllerAlias,
 	): UmbObserverController<T>;
+
+	/**
+	 * @description Provide a context API for this or child elements.
+	 * @param {string} contextAlias
+	 * @param {instance} instance The API instance to be exposed.
+	 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
+	 * @memberof UmbClassMixin
+	 */
 	provideContext<
 		BaseType = unknown,
 		ResultType extends BaseType = BaseType,
@@ -35,10 +52,19 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 		alias: string | UmbContextToken<BaseType, ResultType>,
 		instance: InstanceType,
 	): UmbContextProviderController<BaseType, ResultType, InstanceType>;
+
+	/**
+	 * @description Setup a subscription for a context. The callback is called when the context is resolved.
+	 * @param {string} contextAlias
+	 * @param {method} callback Callback method called when context is resolved.
+	 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
+	 * @memberof UmbClassMixin
+	 */
 	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
 		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
+
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
@@ -49,6 +75,11 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	get controllerAlias(): UmbControllerAlias;
 	hostConnected(): void;
 	hostDisconnected(): void;
+
+	/**
+	 * @description Destroys the controller and removes it from the host.
+	 * @memberof UmbClassMixin
+	 */
 	destroy(): void;
 }
 
@@ -72,24 +103,10 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			return this._controllerAlias;
 		}
 
-		/**
-		 * @description Observe a RxJS source of choice.
-		 * @param {Observable<T>} source RxJS source
-		 * @param {method} callback Callback method called when data is changed.
-		 * @return {UmbObserverController} Reference to a Observer Controller instance
-		 * @memberof UmbElementMixin
-		 */
 		observe<T>(source: Observable<T>, callback: (_value: T) => void, controllerAlias?: UmbControllerAlias) {
 			return new UmbObserverController<T>(this, source, callback, controllerAlias);
 		}
 
-		/**
-		 * @description Provide a context API for this or child elements.
-		 * @param {string} contextAlias
-		 * @param {instance} instance The API instance to be exposed.
-		 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
-		 * @memberof UmbElementMixin
-		 */
 		provideContext<
 			BaseType = unknown,
 			ResultType extends BaseType = BaseType,
@@ -98,13 +115,6 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			return new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, contextAlias, instance);
 		}
 
-		/**
-		 * @description Setup a subscription for a context. The callback is called when the context is resolved.
-		 * @param {string} contextAlias
-		 * @param {method} callback Callback method called when context is resolved.
-		 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
-		 * @memberof UmbElementMixin
-		 */
 		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			callback: UmbContextCallback<ResultType>,
@@ -112,10 +122,6 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 
-		/**
-		 * @description Destroys the controller and removes it from the host.
-		 * @memberof UmbClassMixin
-		 */
 		public destroy() {
 			if (this._host) {
 				this._host.removeController(this);

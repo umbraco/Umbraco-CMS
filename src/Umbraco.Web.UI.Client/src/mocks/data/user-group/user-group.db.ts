@@ -1,6 +1,6 @@
 import { UmbEntityData } from '../entity.data.js';
 import { data } from './user-group.data.js';
-import { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 const createUserGroupItem = (item: UserGroupResponseModel): UserGroupItemResponseModel => {
 	return {

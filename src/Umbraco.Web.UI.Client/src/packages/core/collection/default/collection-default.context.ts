@@ -1,14 +1,16 @@
-import { UmbCollectionConfiguration, UmbCollectionContext } from '../types.js';
+import type { UmbCollectionConfiguration, UmbCollectionContext } from '../types.js';
 import { UmbCollectionViewManager } from '../collection-view.manager.js';
-import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbApi, UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import {
+import type { UmbApi} from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type {
 	ManifestCollection,
-	ManifestRepository,
+	ManifestRepository} from '@umbraco-cms/backoffice/extension-registry';
+import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
@@ -99,8 +101,8 @@ export class UmbDefaultCollectionContext<
 		const { data } = await this.repository.requestCollection(filter);
 
 		if (data) {
-			this.#items.next(data.items);
-			this.#totalItems.next(data.total);
+			this.#items.setValue(data.items);
+			this.#totalItems.setValue(data.total);
 			this.pagination.setTotalItems(data.total);
 		}
 	}
@@ -111,14 +113,14 @@ export class UmbDefaultCollectionContext<
 	 * @memberof UmbCollectionContext
 	 */
 	public setFilter(filter: Partial<FilterModelType>) {
-		this.#filter.next({ ...this.#filter.getValue(), ...filter });
+		this.#filter.setValue({ ...this.#filter.getValue(), ...filter });
 		this.requestCollection();
 	}
 
 	#configure(configuration: UmbCollectionConfiguration) {
 		this.selection.setMultiple(true);
 		this.pagination.setPageSize(configuration.pageSize!);
-		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
+		this.#filter.setValue({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
 	}
 
 	#onPageChange = (event: UmbChangeEvent) => {

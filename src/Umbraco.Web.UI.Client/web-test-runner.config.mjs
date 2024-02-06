@@ -69,9 +69,9 @@ export default {
 						'@umbraco-cms/backoffice/entity-action': './src/packages/core/entity-action/index.ts',
 						'@umbraco-cms/backoffice/entity-bulk-action': './src/packages/core/entity-bulk-action/index.ts',
 						'@umbraco-cms/backoffice/extension-registry': './src/packages/core/extension-registry/index.ts',
+						'@umbraco-cms/backoffice/server-file-system': './src/packages/core/server-file-system/index.ts',
 						'@umbraco-cms/backoffice/id': './src/packages/core/id/index.ts',
 						'@umbraco-cms/backoffice/localization': './src/packages/core/localization/index.ts',
-						'@umbraco-cms/backoffice/macro': './src/packages/core/macro/index.ts',
 						'@umbraco-cms/backoffice/menu': './src/packages/core/menu/index.ts',
 						'@umbraco-cms/backoffice/modal': './src/packages/core/modal/index.ts',
 						'@umbraco-cms/backoffice/notification': './src/packages/core/notification/index.ts',
@@ -106,6 +106,7 @@ export default {
 						'@umbraco-cms/backoffice/package': './src/packages/packages/package/index.ts',
 
 						'@umbraco-cms/backoffice/data-type': './src/packages/core/data-type/index.ts',
+						'@umbraco-cms/backoffice/dynamic-root': './src/packages/dynamic-root/index.ts',
 						'@umbraco-cms/backoffice/language': './src/packages/settings/languages/index.ts',
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
 						'@umbraco-cms/backoffice/relation-type': './src/packages/relations/relation-types/index.ts',
@@ -154,6 +155,9 @@ export default {
 					const systemWarn = window.console.warn;
 					window.console.warn = (...args) => {
 						if (args[0].indexOf('Lit is in dev mode.') === 0) {
+							return;
+						}
+						if (args[0].indexOf('Multiple versions of Lit loaded.') === 0) {
 							return;
 						}
 						systemWarn(...args);

@@ -34,7 +34,7 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 	public readonly notifications = this._notifications.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_NOTIFICATION_CONTEXT_TOKEN);
+		super(host, UMB_NOTIFICATION_CONTEXT);
 	}
 
 	/**
@@ -47,7 +47,7 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 		const notificationHandler = new UmbNotificationHandler(options);
 		notificationHandler.element.addEventListener('closed', () => this._handleClosed(notificationHandler));
 
-		this._notifications.next([...this._notifications.getValue(), notificationHandler]);
+		this._notifications.setValue([...this._notifications.getValue(), notificationHandler]);
 
 		return notificationHandler;
 	}
@@ -58,7 +58,7 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 	 * @memberof UmbNotificationContext
 	 */
 	private _close(key: string) {
-		this._notifications.next(this._notifications.getValue().filter((notification) => notification.key !== key));
+		this._notifications.setValue(this._notifications.getValue().filter((notification) => notification.key !== key));
 	}
 
 	/**
@@ -94,4 +94,4 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 	}
 }
 
-export const UMB_NOTIFICATION_CONTEXT_TOKEN = new UmbContextToken<UmbNotificationContext>('UmbNotificationContext');
+export const UMB_NOTIFICATION_CONTEXT = new UmbContextToken<UmbNotificationContext>('UmbNotificationContext');

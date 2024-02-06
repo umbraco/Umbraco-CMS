@@ -3,8 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type CopyDocumentRequestModel = {
-    targetId?: string | null;
+    target?: ReferenceByIdModel | null;
     relateToOriginal: boolean;
     includeDescendants: boolean;
 };

@@ -15,10 +15,10 @@ export class UmbSectionContext {
 	}
 
 	public setManifest(manifest?: ManifestSection) {
-		this.#manifestAlias.next(manifest?.alias);
-		this.#manifestPathname.next(manifest?.meta?.pathname);
-		this.#manifestLabel.next(manifest ? manifest.meta?.label || manifest.name : undefined);
+		this.#manifestAlias.setValue(manifest?.alias);
+		this.#manifestPathname.setValue(manifest?.meta?.pathname);
+		this.#manifestLabel.setValue(manifest ? manifest.meta?.label || manifest.name : undefined);
 	}
 }
 
-export const UMB_SECTION_CONTEXT_TOKEN = new UmbContextToken<UmbSectionContext>('UmbSectionContext');
+export const UMB_SECTION_CONTEXT = new UmbContextToken<UmbSectionContext>('UmbSectionContext');

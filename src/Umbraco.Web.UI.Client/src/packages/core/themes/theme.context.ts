@@ -1,9 +1,11 @@
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbStringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { ManifestTheme, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { loadManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
 
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
@@ -19,7 +21,7 @@ export class UmbThemeContext extends UmbBaseController {
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 
-		this.provideContext(UMB_THEME_CONTEXT_TOKEN, this);
+		this.provideContext(UMB_THEME_CONTEXT, this);
 
 		const storedTheme = localStorage.getItem(LOCAL_STORAGE_KEY);
 		if (storedTheme) {
@@ -28,14 +30,14 @@ export class UmbThemeContext extends UmbBaseController {
 	}
 
 	public setThemeByAlias(themeAlias: string) {
-		this.#theme.next(themeAlias);
+		this.#theme.setValue(themeAlias);
 
 		this.#themeObserver?.destroy();
 		if (themeAlias) {
 			localStorage.setItem(LOCAL_STORAGE_KEY, themeAlias);
 			this.#themeObserver = this.observe(
 				umbExtensionsRegistry
-					.extensionsOfType('theme')
+					.byType('theme')
 					.pipe(map((extensions) => extensions.filter((extension) => extension.alias === themeAlias))),
 				async (themes) => {
 					this.#styleElement?.remove();
@@ -81,7 +83,7 @@ export class UmbThemeContext extends UmbBaseController {
 	}
 }
 
-export const UMB_THEME_CONTEXT_TOKEN = new UmbContextToken<UmbThemeContext>('umbThemeContext');
+export const UMB_THEME_CONTEXT = new UmbContextToken<UmbThemeContext>('umbThemeContext');
 
 // Default export to enable this as a globalContext extension js:
 export default UmbThemeContext;

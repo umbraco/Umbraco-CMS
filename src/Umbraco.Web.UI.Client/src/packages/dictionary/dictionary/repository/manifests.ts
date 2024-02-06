@@ -1,6 +1,6 @@
 import { UmbDictionaryRepository } from './dictionary.repository.js';
 import { UmbDictionaryStore } from './dictionary.store.js';
-import { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DICTIONARY_REPOSITORY_ALIAS = 'Umb.Repository.Dictionary';
 

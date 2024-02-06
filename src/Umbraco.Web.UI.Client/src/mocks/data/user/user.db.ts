@@ -3,8 +3,8 @@ import { umbUserGroupData } from '../user-group/user-group.db.js';
 import { arrayFilter, stringFilter, queryFilter } from '../utils.js';
 import { data } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
-import {
+import type { UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
+import type {
 	CreateUserRequestModel,
 	CreateUserResponseModel,
 	InviteUserRequestModel,
@@ -12,8 +12,8 @@ import {
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
 	UserResponseModel,
-	UserStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
 	return {
@@ -89,7 +89,7 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 
 	/**
 	 * Get current user
-	 * @return {*}  {UmbLoggedInUser}
+	 * @return {*}  {UmbCurrentUser}
 	 * @memberof UmbUserData
 	 */
 	getCurrentUser(): UmbCurrentUser {

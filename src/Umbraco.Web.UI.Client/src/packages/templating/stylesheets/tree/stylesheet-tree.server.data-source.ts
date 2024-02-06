@@ -1,5 +1,8 @@
-import { UmbStylesheetTreeItemModel } from './types.js';
-import { FileSystemTreeItemPresentationModel, StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../entity.js';
+import type { UmbStylesheetTreeItemModel } from './types.js';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
@@ -31,23 +34,27 @@ export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBa
 const getRootItems = () => StylesheetResource.getTreeStylesheetRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
+
+	if (parentPath === null) {
 		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return StylesheetResource.getTreeStylesheetChildren({
-			path: parentUnique,
+			parentPath,
 		});
 	}
 };
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeItemModel => {
+	const serializer = new UmbServerFilePathUniqueSerializer();
+
 	return {
-		path: item.path,
+		unique: serializer.toUnique(item.path),
+		parentUnique: item.parent ? serializer.toUnique(item.parent?.path) : null,
+		entityType: item.isFolder ? UMB_STYLESHEET_FOLDER_ENTITY_TYPE : UMB_STYLESHEET_ENTITY_TYPE,
 		name: item.name,
-		entityType: 'stylesheet',
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
-		isContainer: false,
 	};
 };

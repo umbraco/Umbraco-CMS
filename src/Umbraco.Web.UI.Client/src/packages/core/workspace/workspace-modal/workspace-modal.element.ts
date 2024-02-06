@@ -1,6 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, CSSResultGroup, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbWorkspaceData } from '@umbraco-cms/backoffice/modal';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbWorkspaceData } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-modal')

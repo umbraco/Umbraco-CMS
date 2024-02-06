@@ -1,6 +1,7 @@
-import { UmbDataTypeTreeItemModel } from './types.js';
+import type { UmbDataTypeTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { DataTypeResource, DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -44,11 +45,10 @@ const getChildrenOf = (parentUnique: string | null) => {
 const mapper = (item: DataTypeTreeItemResponseModel): UmbDataTypeTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parentId || null,
+		parentUnique: item.parent?.id || null,
 		name: item.name,
 		entityType: item.isFolder ? 'data-type-folder' : 'data-type',
 		isFolder: item.isFolder,
-		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 	};
 };

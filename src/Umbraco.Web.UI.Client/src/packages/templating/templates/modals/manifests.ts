@@ -1,4 +1,4 @@
-import { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_MODAL_TEMPLATING_QUERY_BUILDER_SIDEBAR_ALIAS = 'Umb.Modal.Templating.Query.Builder.Sidebar';
 

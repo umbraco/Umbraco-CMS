@@ -1,8 +1,9 @@
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
-import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type {
+	UmbInvariantableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
@@ -12,19 +13,23 @@ import {
 	UmbObjectState,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
-import {
+import type {
 	PropertyEditorConfigDefaultData,
-	PropertyEditorConfigProperty,
+	PropertyEditorConfigProperty} from '@umbraco-cms/backoffice/extension-registry';
+import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbDataTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, UmbDataTypeDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailModel>
 	implements UmbInvariantableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+
 	#data = new UmbObjectState<UmbDataTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	#getDataPromise?: Promise<any>;
@@ -32,8 +37,8 @@ export class UmbDataTypeWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 
-	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.propertyEditorUiAlias);
-	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.propertyEditorAlias);
+	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.editorUiAlias);
+	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.editorAlias);
 
 	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
@@ -59,8 +64,8 @@ export class UmbDataTypeWorkspaceContext
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.DataType', new UmbDataTypeDetailRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.DataType');
 		this.#observePropertyEditorUIAlias();
 	}
 
@@ -110,8 +115,8 @@ export class UmbDataTypeWorkspaceContext
 		return this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUIAlias),
 			(manifest) => {
-				this.#propertyEditorUiIcon.next(manifest?.meta.icon || null);
-				this.#propertyEditorUiName.next(manifest?.name || null);
+				this.#propertyEditorUiIcon.setValue(manifest?.meta.icon || null);
+				this.#propertyEditorUiName.setValue(manifest?.name || null);
 
 				this._propertyEditorUISettingsSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
 				this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
@@ -123,7 +128,7 @@ export class UmbDataTypeWorkspaceContext
 	private _mergeConfigProperties() {
 		if (this._propertyEditorSchemaConfigProperties && this._propertyEditorUISettingsProperties) {
 			// TODO: Consider the ability to to omit a schema config if a UI config has same alias. Otherwise we should make an error when this case happens.
-			this.#properties.next([
+			this.#properties.setValue([
 				...this._propertyEditorSchemaConfigProperties,
 				...this._propertyEditorUISettingsProperties,
 			]);
@@ -137,7 +142,7 @@ export class UmbDataTypeWorkspaceContext
 			...this._propertyEditorSchemaConfigDefaultData,
 			...this._propertyEditorUISettingsDefaultData,
 		];
-		this.#defaults.next(this._configDefaultData);
+		this.#defaults.setValue(this._configDefaultData);
 	}
 
 	public getPropertyDefaultValue(alias: string) {
@@ -207,7 +212,7 @@ export class UmbDataTypeWorkspaceContext
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.
 		// Create and response models are different. We need to look into this.
-		this.#data.next(data as unknown as UmbDataTypeDetailModel);
+		this.#data.setValue(data as unknown as UmbDataTypeDetailModel);
 		return { data };
 	}
 
@@ -231,10 +236,10 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	setPropertyEditorSchemaAlias(alias?: string) {
-		this.#data.update({ propertyEditorAlias: alias });
+		this.#data.update({ editorAlias: alias });
 	}
 	setPropertyEditorUiAlias(alias?: string) {
-		this.#data.update({ propertyEditorUiAlias: alias });
+		this.#data.update({ editorUiAlias: alias });
 	}
 
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {

@@ -19,4 +19,13 @@ export * from './unique-tree-item/index.js';
 // Data Source
 export * from './data-source/index.js';
 
+// Folder
+export * from './folder/index.js';
+
+//
+export {
+	UmbReloadTreeItemChildrenEntityAction,
+	UmbReloadTreeItemChildrenRequestEntityActionEvent,
+} from './reload-tree-item-children/index.js';
+
 export { UmbTreeRepositoryBase } from './tree-repository-base.js';

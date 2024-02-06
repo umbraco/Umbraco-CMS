@@ -1,17 +1,16 @@
-import { UmbBlockTypeBase } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel, UmbBlockTypeGroup, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockCatalogueModalData {
-	blocks: Array<UmbBlockTypeBase>;
-	blockGroups?: Array<{ name: string; key: string }>;
+	blocks: Array<UmbBlockTypeBaseModel>;
+	blockGroups?: Array<UmbBlockTypeGroup>;
 	openClipboard?: boolean;
+	blockOriginData: UmbBlockWorkspaceData['originData'];
 }
 
-export interface UmbBlockCatalogueModalValue {
-	key: string;
-}
+export type UmbBlockCatalogueModalValue = never;
 
-export const UMB_BLOCK_CATALOGUE_MODAL = new UmbModalToken<UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue>(
+export const UMB_BLOCK_CATALOGUE_MODAL = new UmbModalToken<UmbBlockCatalogueModalData, undefined>(
 	'Umb.Modal.BlockCatalogue',
 	{
 		modal: {

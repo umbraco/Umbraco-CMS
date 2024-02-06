@@ -9,7 +9,6 @@ const menuItem: ManifestTypes = {
 	weight: 20,
 	meta: {
 		label: 'Stylesheets',
-		icon: 'icon-folder',
 		treeAlias: UMB_STYLESHEET_TREE_ALIAS,
 		menus: ['Umb.Menu.Templating'],
 	},

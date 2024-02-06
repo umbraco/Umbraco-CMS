@@ -1,8 +1,9 @@
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbTreePickerModalData, UmbPickerModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbTreeElement, UmbTreeItemModelBase, type UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeElement, UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -50,7 +51,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
-					<uui-button label=${this.localize.term('general_choose')} look="primary" color="positive" @click=${this._submitModal}></uui-button>
+					<uui-button
+						label=${this.localize.term('general_choose')}
+						look="primary"
+						color="positive"
+						@click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;

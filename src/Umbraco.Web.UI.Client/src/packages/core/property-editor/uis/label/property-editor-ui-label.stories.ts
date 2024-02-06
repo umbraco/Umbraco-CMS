@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUILabelElement } from './property-editor-ui-label.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

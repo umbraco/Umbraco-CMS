@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { ManifestElement, ManifestElementAndApi } from '../types/index.js';
+import type { ManifestElement, ManifestElementAndApi } from '../types/index.js';
 import { createExtensionElement } from './create-extension-element.function.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
@@ -61,7 +61,9 @@ describe('Extension-Api: Create Extension Element', () => {
 			type: 'my-test-type',
 			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			api: class TestApi {},
+			api: class TestApi {
+				destroy() {}
+			},
 		};
 
 		const element = await createExtensionElement(manifest, 'umb-extension-api-true-test-element');

@@ -1,49 +1,37 @@
-import { UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../repository/folder/manifests.js';
-import { UmbDataTypeCreateOptionsModalData } from './index.js';
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
+import type { UmbDataTypeCreateOptionsModalData } from './index.js';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
-	UmbModalManagerContext,
-	UmbModalContext,
-	UMB_FOLDER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	type UmbModalManagerContext,
+	UmbModalBaseElement,
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_FOLDER_CREATE_MODAL } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-data-type-create-options-modal')
-export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbDataTypeCreateOptionsModalData>;
-
-	@property({ type: Object })
-	data?: UmbDataTypeCreateOptionsModalData;
-
+export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<UmbDataTypeCreateOptionsModalData> {
 	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
 		});
 	}
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
-		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
+		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
+
+		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
-				repositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
+				folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
+				parentUnique: this.data.parentUnique,
 			},
 		});
-		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());
-	}
 
-	// close the modal when navigating to data type
-	#onNavigate() {
-		this.modalContext?.submit();
-	}
-
-	#onCancel() {
-		this.modalContext?.reject();
+		folderModalHandler?.onSubmit().then(() => this._submitModal());
 	}
 
 	render() {
@@ -52,16 +40,16 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item
-						href=${`section/settings/workspace/data-type/create/${this.data?.parentKey || null}`}
+						href=${`section/settings/workspace/data-type/create/${this.data?.parentUnique || null}`}
 						label="New Data Type..."
-						@click=${this.#onNavigate}>
+						@click=${this._submitModal}>
 						<uui-icon slot="icon" name="icon-autofill"></uui-icon>
 					</uui-menu-item>
 					<uui-menu-item @click=${this.#onClick} label="New Folder...">
 						<uui-icon slot="icon" name="icon-folder"></uui-icon>
 					</uui-menu-item>
 				</uui-box>
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this.#onCancel}">Cancel</uui-button>
+				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}">Cancel</uui-button>
 			</umb-body-layout>
 		`;
 	}

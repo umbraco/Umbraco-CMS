@@ -1,7 +1,8 @@
-import {
-	LanguageResource,
+import type {
 	LanguageResponseModel,
-	CreateLanguageRequestModel,
+	CreateLanguageRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	LanguageResource
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

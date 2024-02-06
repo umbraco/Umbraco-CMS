@@ -2,7 +2,7 @@ import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testin
 import { UmbLocalizeElement } from './localize.element.js';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 const english = {
 	type: 'localization',
@@ -62,7 +62,7 @@ describe('umb-localize', () => {
 		});
 
 		it('should have a localize controller', () => {
-			expect(element.localize).to.be.instanceOf(UmbLocalizeController);
+			expect(element.localize).to.be.instanceOf(UmbLocalizationController);
 		});
 
 		it('should localize a key', async () => {

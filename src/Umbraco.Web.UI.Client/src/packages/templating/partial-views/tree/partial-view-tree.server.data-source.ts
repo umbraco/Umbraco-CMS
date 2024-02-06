@@ -1,6 +1,9 @@
-import { UmbPartialViewTreeItemModel } from './types.js';
+import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../entity.js';
+import type { UmbPartialViewTreeItemModel } from './types.js';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { FileSystemTreeItemPresentationModel, PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
+import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -31,23 +34,27 @@ export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceB
 const getRootItems = () => PartialViewResource.getTreePartialViewRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
+
+	if (parentPath === null) {
 		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return PartialViewResource.getTreePartialViewChildren({
-			path: parentUnique,
+			parentPath,
 		});
 	}
 };
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeItemModel => {
+	const serializer = new UmbServerFilePathUniqueSerializer();
+
 	return {
-		path: item.path,
+		unique: serializer.toUnique(item.path),
+		parentUnique: item.parent ? serializer.toUnique(item.parent?.path) : null,
+		entityType: item.isFolder ? UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE : UMB_PARTIAL_VIEW_ENTITY_TYPE,
 		name: item.name,
-		entityType: 'partial-view',
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
-		isContainer: false,
 	};
 };

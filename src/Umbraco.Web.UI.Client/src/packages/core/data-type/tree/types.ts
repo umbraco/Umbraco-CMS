@@ -1,8 +1,10 @@
+import type { UmbDataTypeEntityType, UmbDataTypeFolderEntityType, UmbDataTypeRootEntityType } from '../entity.js';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbDataTypeTreeItemModel extends UmbUniqueTreeItemModel {
-	isFolder: boolean;
-	isContainer: boolean;
+	entityType: UmbDataTypeEntityType | UmbDataTypeFolderEntityType;
 }
 
-export interface UmbDataTypeTreeRootModel extends UmbUniqueTreeRootModel {}
+export interface UmbDataTypeTreeRootModel extends UmbUniqueTreeRootModel {
+	entityType: UmbDataTypeRootEntityType;
+}

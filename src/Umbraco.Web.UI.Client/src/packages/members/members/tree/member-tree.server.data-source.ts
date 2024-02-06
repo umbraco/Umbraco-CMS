@@ -1,5 +1,5 @@
-import { UmbMemberTreeItemModel } from './types.js';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbMemberTreeItemModel } from './types.js';
+import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
@@ -10,7 +10,7 @@ import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
  * @extends {UmbTreeServerDataSourceBase}
  */
 export class UmbMemberTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	EntityTreeItemResponseModel,
+	NamedEntityTreeItemResponseModel,
 	UmbMemberTreeItemModel
 > {
 	/**
@@ -33,14 +33,13 @@ const getChildrenOf = (parentUnique: string | null): any => {
 	alert('not implemented');
 };
 
-const mapper = (item: EntityTreeItemResponseModel): UmbMemberTreeItemModel => {
+const mapper = (item: NamedEntityTreeItemResponseModel): UmbMemberTreeItemModel => {
 	return {
 		id: item.id,
-		parentId: item.parentId || null,
+		parentId: item.parent ? item.parent.id : null,
 		name: item.name,
 		entityType: 'member',
 		hasChildren: item.hasChildren,
-		isContainer: item.isContainer,
 		isFolder: false,
 	};
 };

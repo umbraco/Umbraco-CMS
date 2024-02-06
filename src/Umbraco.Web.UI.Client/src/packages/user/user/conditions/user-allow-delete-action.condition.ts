@@ -1,5 +1,5 @@
 import { UmbUserActionConditionBase } from './user-allow-action-base.condition.js';
-import {
+import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,

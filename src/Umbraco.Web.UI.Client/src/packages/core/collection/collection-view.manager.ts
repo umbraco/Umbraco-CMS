@@ -1,9 +1,10 @@
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionView} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 export interface UmbCollectionViewManagerConfig {
 	defaultViewAlias?: string;
@@ -33,7 +34,7 @@ export class UmbCollectionViewManager extends UmbBaseController {
 		// TODO: hack - we need to figure out how to get the "parent path" from the router
 		setTimeout(() => {
 			const currentUrl = new URL(window.location.href);
-			this.#rootPathname.next(currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/')));
+			this.#rootPathname.setValue(currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/')));
 		}, 100);
 	}
 
@@ -44,7 +45,7 @@ export class UmbCollectionViewManager extends UmbBaseController {
 	 * @memberof UmbCollectionContext
 	 */
 	public setCurrentView(view: ManifestCollectionView) {
-		this.#currentView.next(view);
+		this.#currentView.setValue(view);
 	}
 
 	/**
@@ -59,7 +60,7 @@ export class UmbCollectionViewManager extends UmbBaseController {
 	#observeViews() {
 		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
 			const manifests = views.map((view) => view.manifest);
-			this.#views.next(manifests);
+			this.#views.setValue(manifests);
 			this.#createRoutes(manifests);
 		});
 	}
@@ -88,6 +89,6 @@ export class UmbCollectionViewManager extends UmbBaseController {
 			});
 		}
 
-		this.#routes.next(routes);
+		this.#routes.setValue(routes);
 	}
 }

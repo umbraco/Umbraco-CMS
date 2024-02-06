@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateTemplateRequestModel } from '../models/CreateTemplateRequestModel';
-import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
+import type { TemplateConfigurationResponseModel } from '../models/TemplateConfigurationResponseModel';
 import type { TemplateItemResponseModel } from '../models/TemplateItemResponseModel';
 import type { TemplateQueryExecuteModel } from '../models/TemplateQueryExecuteModel';
 import type { TemplateQueryResultResponseModel } from '../models/TemplateQueryResultResponseModel';
@@ -32,7 +33,7 @@ export class TemplateResource {
             url: '/umbraco/management/api/v1/template',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -117,6 +118,20 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getTemplateConfiguration(): CancelablePromise<TemplateConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/template/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static getTemplateItem({
         id,
     }: {
@@ -191,7 +206,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeTemplateChildren({
@@ -202,7 +217,7 @@ export class TemplateResource {
         parentId?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/children',
@@ -218,7 +233,7 @@ export class TemplateResource {
     }
 
     /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeTemplateRoot({
@@ -227,7 +242,7 @@ export class TemplateResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/root',

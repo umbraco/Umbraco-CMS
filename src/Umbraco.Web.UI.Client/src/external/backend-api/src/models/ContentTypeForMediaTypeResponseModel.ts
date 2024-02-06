@@ -3,8 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCompositionModel } from './ContentTypeCompositionModel';
-import type { ContentTypeSortModel } from './ContentTypeSortModel';
 import type { MediaTypePropertyTypeContainerResponseModel } from './MediaTypePropertyTypeContainerResponseModel';
 import type { MediaTypePropertyTypeResponseModel } from './MediaTypePropertyTypeResponseModel';
 
@@ -19,8 +17,6 @@ export type ContentTypeForMediaTypeResponseModel = {
     isElement: boolean;
     properties: Array<MediaTypePropertyTypeResponseModel>;
     containers: Array<MediaTypePropertyTypeContainerResponseModel>;
-    allowedContentTypes: Array<ContentTypeSortModel>;
-    compositions: Array<ContentTypeCompositionModel>;
     id: string;
 };
 

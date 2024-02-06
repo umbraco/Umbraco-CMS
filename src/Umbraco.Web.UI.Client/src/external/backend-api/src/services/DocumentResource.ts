@@ -4,14 +4,14 @@
 /* eslint-disable */
 import type { CopyDocumentRequestModel } from '../models/CopyDocumentRequestModel';
 import type { CreateDocumentRequestModel } from '../models/CreateDocumentRequestModel';
+import type { DocumentConfigurationResponseModel } from '../models/DocumentConfigurationResponseModel';
 import type { DocumentItemResponseModel } from '../models/DocumentItemResponseModel';
 import type { DocumentNotificationResponseModel } from '../models/DocumentNotificationResponseModel';
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
 import type { DomainsResponseModel } from '../models/DomainsResponseModel';
 import type { MoveDocumentRequestModel } from '../models/MoveDocumentRequestModel';
+import type { PagedDocumentRecycleBinItemResponseModel } from '../models/PagedDocumentRecycleBinItemResponseModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
-import type { PagedDocumentTypeResponseModel } from '../models/PagedDocumentTypeResponseModel';
-import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
 import type { PublicAccessRequestModel } from '../models/PublicAccessRequestModel';
 import type { PublishDocumentRequestModel } from '../models/PublishDocumentRequestModel';
 import type { PublishDocumentWithDescendantsRequestModel } from '../models/PublishDocumentWithDescendantsRequestModel';
@@ -41,7 +41,7 @@ export class DocumentResource {
             url: '/umbraco/management/api/v1/document',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -66,6 +66,30 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteDocumentById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/document/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
@@ -119,7 +143,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -294,7 +318,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -461,29 +485,15 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedDocumentTypeResponseModel Success
+     * @returns any Success
      * @throws ApiError
      */
-    public static getDocumentAllowedDocumentTypes({
-        parentId,
-        skip,
-        take = 100,
-    }: {
-        parentId?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedDocumentTypeResponseModel> {
+    public static getDocumentConfiguration(): CancelablePromise<DocumentConfigurationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/document/allowed-document-types',
-            query: {
-                'parentId': parentId,
-                'skip': skip,
-                'take': take,
-            },
+            url: '/umbraco/management/api/v1/document/configuration',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
-                404: `Not Found`,
             },
         });
     }
@@ -494,20 +504,14 @@ export class DocumentResource {
      */
     public static getDocumentItem({
         id,
-        dataTypeId,
-        culture,
     }: {
         id?: Array<string>,
-        dataTypeId?: string,
-        culture?: string,
     }): CancelablePromise<Array<DocumentItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/item',
             query: {
                 'id': id,
-                'dataTypeId': dataTypeId,
-                'culture': culture,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
@@ -539,7 +543,47 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedRecycleBinItemResponseModel Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteRecycleBinDocument(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/recycle-bin/document',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteRecycleBinDocumentById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/recycle-bin/document/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedDocumentRecycleBinItemResponseModel Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentChildren({
@@ -550,7 +594,7 @@ export class DocumentResource {
         parentId?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRecycleBinItemResponseModel> {
+    }): CancelablePromise<PagedDocumentRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/children',
@@ -566,7 +610,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns PagedRecycleBinItemResponseModel Success
+     * @returns PagedDocumentRecycleBinItemResponseModel Success
      * @throws ApiError
      */
     public static getRecycleBinDocumentRoot({
@@ -575,7 +619,7 @@ export class DocumentResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRecycleBinItemResponseModel> {
+    }): CancelablePromise<PagedDocumentRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/root',
@@ -598,13 +642,11 @@ export class DocumentResource {
         skip,
         take = 100,
         dataTypeId,
-        culture,
     }: {
         parentId?: string,
         skip?: number,
         take?: number,
         dataTypeId?: string,
-        culture?: string,
     }): CancelablePromise<PagedDocumentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -614,7 +656,6 @@ export class DocumentResource {
                 'skip': skip,
                 'take': take,
                 'dataTypeId': dataTypeId,
-                'culture': culture,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
@@ -630,12 +671,10 @@ export class DocumentResource {
         skip,
         take = 100,
         dataTypeId,
-        culture,
     }: {
         skip?: number,
         take?: number,
         dataTypeId?: string,
-        culture?: string,
     }): CancelablePromise<PagedDocumentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -644,7 +683,6 @@ export class DocumentResource {
                 'skip': skip,
                 'take': take,
                 'dataTypeId': dataTypeId,
-                'culture': culture,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

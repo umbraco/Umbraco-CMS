@@ -9,7 +9,6 @@ const menuItem: ManifestTypes = {
 	weight: 40,
 	meta: {
 		label: 'Partial Views',
-		icon: 'icon-folder',
 		treeAlias: UMB_PARTIAL_VIEW_TREE_ALIAS,
 		menus: ['Umb.Menu.Templating'],
 	},

@@ -1,10 +1,14 @@
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
-import { StylesheetOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	UmbPropertyEditorConfigCollection} from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbStylesheetInputElement } from '@umbraco-cms/backoffice/stylesheet';
 
 /**
  * @element umb-property-editor-ui-tiny-mce-stylesheets-configuration
@@ -14,78 +18,33 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	private _value: Array<string> = [];
 	@property({ type: Array })
-	value: string[] = [];
+	public get value(): Array<string> {
+		if (!this._value) return [];
+		return this._value.map((unique) => this.#serverFilePathUniqueSerializer.toServerPath(unique)) as string[];
+	}
+	public set value(value: Array<string>) {
+		if (!value) return;
+		this._value = value.map((unique) => this.#serverFilePathUniqueSerializer.toUnique(unique));
+	}
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	@state()
-	stylesheetList: Array<StylesheetOverviewResponseModel & Partial<{ selected: boolean }>> = [];
-
-	#repository;
-
-	constructor() {
-		super();
-		this.#repository = new UmbStylesheetRepository(this);
-
-		this.#getAllStylesheets();
-	}
-	async #getAllStylesheets() {
-		const { data } = await this.#repository.getAll();
-		if (!data) return;
-
-		const styles = data.items;
-
-		this.stylesheetList = styles.map((stylesheet) => ({
-			...stylesheet,
-			selected: this.value?.some((path) => path === stylesheet.path),
-		}));
-	}
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	#onChange(event: CustomEvent) {
-		const checkbox = event.target as HTMLInputElement;
-
-		if (checkbox.checked) {
-			if (this.value) {
-				this.value = [...this.value, checkbox.value];
-			} else {
-				this.value = [checkbox.value];
-			}
-		} else {
-			this.value = this.value.filter((v) => v !== checkbox.value);
-		}
-
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		const target = event.target as UmbStylesheetInputElement;
+		this._value = target.selectedIds;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<ul>
-			${this.stylesheetList.map(
-				(stylesheet) =>
-					html`<li>
-						<uui-checkbox
-							.label=${stylesheet.name}
-							.value=${stylesheet.path ?? ''}
-							@change=${this.#onChange}
-							?checked=${stylesheet.selected}>
-							${stylesheet.name}
-						</uui-checkbox>
-					</li>`,
-			)}
-		</ul>`;
+		return html`<umb-stylesheet-input @change=${this.#onChange} .selectedIds=${this._value}></umb-stylesheet-input>`;
 	}
 
-	static styles = [
-		UmbTextStyles,
-		css`
-			ul {
-				list-style: none;
-				padding: 0;
-				margin: 0;
-			}
-		`,
-	];
+	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbPropertyEditorUITinyMceStylesheetsConfigurationElement;

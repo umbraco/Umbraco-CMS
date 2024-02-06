@@ -1,3 +1,6 @@
-import { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-
-export type UmbDocumentTypeItemModel = DocumentTypeItemResponseModel;
+export type UmbDocumentTypeItemModel = {
+	unique: string;
+	name: string;
+	isElement: boolean;
+	icon?: string | null;
+};

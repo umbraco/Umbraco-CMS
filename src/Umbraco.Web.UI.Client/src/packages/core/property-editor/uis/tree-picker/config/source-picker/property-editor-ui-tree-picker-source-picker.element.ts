@@ -1,7 +1,10 @@
-import { type UmbTreePickerSource, UmbInputTreePickerSourceElement } from '@umbraco-cms/backoffice/components';
+import type { UmbInputTreePickerSourceElement, UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	type UmbPropertyEditorConfigCollection,
+	UmbPropertyValueChangeEvent,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -9,7 +12,10 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @element umb-property-editor-ui-tree-picker-source-picker
  */
 @customElement('umb-property-editor-ui-tree-picker-source-picker')
-export class UmbPropertyEditorUITreePickerSourcePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUITreePickerSourcePickerElement
+	extends UmbLitElement
+	implements UmbPropertyEditorUiElement
+{
 	@property({ type: Object })
 	value?: UmbTreePickerSource;
 
@@ -25,14 +31,15 @@ export class UmbPropertyEditorUITreePickerSourcePickerElement extends UmbLitElem
 			dynamicRoot: target.dynamicRoot,
 		};
 
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		return html`<umb-input-tree-picker-source
 			@change=${this.#onChange}
-			.type=${this.value?.type}
-			.nodeId=${this.value?.id}></umb-input-tree-picker-source>`;
+			.type=${this.value?.type ?? 'content'}
+			.nodeId=${this.value?.id}
+			.dynamicRoot=${this.value?.dynamicRoot}></umb-input-tree-picker-source>`;
 	}
 
 	static styles = [UmbTextStyles];

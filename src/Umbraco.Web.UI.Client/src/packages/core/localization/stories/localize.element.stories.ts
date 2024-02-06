@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbLocalizeElement } from '../localize.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import '../localize.element.js';

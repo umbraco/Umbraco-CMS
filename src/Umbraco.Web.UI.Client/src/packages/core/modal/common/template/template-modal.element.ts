@@ -1,9 +1,11 @@
-import { UmbInputEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, ifDefined, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbTemplateModalData, UmbTemplateModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { TemplateResource, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbTemplateModalData, UmbTemplateModalValue} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 //TODO: make a default tree-picker that can be used across multiple pickers

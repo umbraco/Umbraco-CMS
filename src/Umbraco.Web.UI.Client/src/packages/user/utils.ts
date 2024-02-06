@@ -1,9 +1,9 @@
-import { InterfaceColor, InterfaceLook } from '@umbraco-cms/backoffice/external/uui';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+import type { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 interface DisplayStatus {
-	look: InterfaceLook;
-	color: InterfaceColor;
+	look: UUIInterfaceLook;
+	color: UUIInterfaceColor;
 	key: string;
 }
 const userStates: DisplayStatus[] = [

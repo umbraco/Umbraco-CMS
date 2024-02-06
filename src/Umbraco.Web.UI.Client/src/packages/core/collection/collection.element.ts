@@ -1,7 +1,8 @@
-import { UmbCollectionContext } from './types.js';
+import type { UmbCollectionContext } from './types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestCollection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollection} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-collection')
@@ -37,7 +38,7 @@ export class UmbCollectionElement extends UmbLitElement {
 
 	async #createApi() {
 		if (!this.#manifest) throw new Error('No manifest');
-		const api = (await createExtensionApi(this.#manifest, [this])) as UmbCollectionContext;
+		const api = (await createExtensionApi(this.#manifest, [this])) as unknown as UmbCollectionContext;
 		if (!api) throw new Error('No api');
 		api.setManifest(this.#manifest);
 	}

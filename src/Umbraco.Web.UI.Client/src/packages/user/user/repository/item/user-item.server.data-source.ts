@@ -1,7 +1,8 @@
-import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbUserItemModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UserItemResponseModel, UserResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for user items that fetches data from the server
@@ -9,32 +10,26 @@ import { UserItemResponseModel, UserResource } from '@umbraco-cms/backoffice/bac
  * @class UmbUserItemServerDataSource
  * @implements {UmbItemDataSource}
  */
-export class UmbUserItemServerDataSource implements UmbItemDataSource<UserItemResponseModel> {
-	#host: UmbControllerHost;
-
+export class UmbUserItemServerDataSource extends UmbItemServerDataSourceBase<UserItemResponseModel, UmbUserItemModel> {
 	/**
 	 * Creates an instance of UmbUserItemServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbUserItemServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the items for the given ids from the server
-	 * @param {Array<string>} ids
-	 * @return {*}
-	 * @memberof UmbUserItemServerDataSource
-	 */
-	async getItems(ids: Array<string>) {
-		if (!ids) throw new Error('Ids are missing');
-
-		return tryExecuteAndNotify(
-			this.#host,
-			UserResource.getUserItem({
-				id: ids,
-			}),
-		);
+		super(host, {
+			getItems,
+			mapper,
+		});
 	}
 }
+
+/* eslint-disable local-rules/no-direct-api-import */
+const getItems = (uniques: Array<string>) => UserResource.getUserItem({ id: uniques });
+
+const mapper = (item: UserItemResponseModel): UmbUserItemModel => {
+	return {
+		unique: item.id,
+		name: item.name,
+	};
+};

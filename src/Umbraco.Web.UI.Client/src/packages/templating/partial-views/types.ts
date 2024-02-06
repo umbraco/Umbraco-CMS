@@ -1,3 +1,10 @@
-import { PartialViewResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbPartialViewEntityType } from './entity.js';
 
-export type UmbPartialViewDetailModel = PartialViewResponseModel;
+export interface UmbPartialViewDetailModel {
+	entityType: UmbPartialViewEntityType;
+	unique: string;
+	parentUnique: string | null;
+	path: string;
+	name: string;
+	content: string;
+}

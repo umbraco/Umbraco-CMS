@@ -1,3 +1,10 @@
-import { ScriptResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbScriptEntityType } from './entity.js';
 
-export type UmbScripDetailModel = ScriptResponseModel;
+export interface UmbScriptDetailModel {
+	entityType: UmbScriptEntityType;
+	unique: string;
+	parentUnique: string | null;
+	path: string;
+	name: string;
+	content: string;
+}

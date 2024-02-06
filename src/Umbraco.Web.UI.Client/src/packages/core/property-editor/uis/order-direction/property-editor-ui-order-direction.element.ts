@@ -1,12 +1,13 @@
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type {
+	UmbPropertyEditorConfigCollection} from '@umbraco-cms/backoffice/property-editor';
 import {
-	UmbPropertyEditorConfigCollection,
 	UmbPropertyValueChangeEvent,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-order-direction

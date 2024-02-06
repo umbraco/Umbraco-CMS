@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/entity-action';
 
 export const manifests = [
@@ -12,7 +12,7 @@ export const manifests = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Trash',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 		conditions: [

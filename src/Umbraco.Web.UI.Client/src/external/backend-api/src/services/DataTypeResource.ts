@@ -5,6 +5,7 @@
 import type { CopyDataTypeRequestModel } from '../models/CopyDataTypeRequestModel';
 import type { CreateDataTypeRequestModel } from '../models/CreateDataTypeRequestModel';
 import type { CreateFolderRequestModel } from '../models/CreateFolderRequestModel';
+import type { DatatypeConfigurationResponseModel } from '../models/DatatypeConfigurationResponseModel';
 import type { DataTypeItemResponseModel } from '../models/DataTypeItemResponseModel';
 import type { DataTypeReferenceResponseModel } from '../models/DataTypeReferenceResponseModel';
 import type { DataTypeResponseModel } from '../models/DataTypeResponseModel';
@@ -34,7 +35,7 @@ export class DataTypeResource {
             url: '/umbraco/management/api/v1/data-type',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -134,7 +135,7 @@ export class DataTypeResource {
             },
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
@@ -168,7 +169,7 @@ export class DataTypeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static postDataTypeByIdMove({
+    public static putDataTypeByIdMove({
         id,
         requestBody,
     }: {
@@ -176,7 +177,7 @@ export class DataTypeResource {
         requestBody?: MoveDataTypeRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'PUT',
             url: '/umbraco/management/api/v1/data-type/{id}/move',
             path: {
                 'id': id,
@@ -213,6 +214,20 @@ export class DataTypeResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDataTypeConfiguration(): CancelablePromise<DatatypeConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/data-type/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns string Created
      * @throws ApiError
      */
@@ -226,7 +241,7 @@ export class DataTypeResource {
             url: '/umbraco/management/api/v1/data-type/folder',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

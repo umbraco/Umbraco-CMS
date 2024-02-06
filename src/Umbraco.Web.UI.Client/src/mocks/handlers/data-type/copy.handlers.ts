@@ -1,18 +1,20 @@
 const { rest } = window.MockServiceWorker;
-import { umbDataTypeData } from '../../data/data-type.data.js';
+import { umbDataTypeMockDb } from '../../data/data-type/data-type.db.js';
 import { UMB_SLUG } from './slug.js';
+import type { CopyDataTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const copyHandlers = [
 	rest.post(umbracoPath(`${UMB_SLUG}/:id/copy`), async (req, res, ctx) => {
 		const id = req.params.id as string;
-		if (!id) return;
+		if (!id) return res(ctx.status(400, 'no id found'));
 
-		const data = await req.json();
-		if (!data) return;
+		const requestBody = (await req.json()) as CopyDataTypeRequestModel;
+		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		if (!requestBody.targetId) return res(ctx.status(400, 'no targetId found'));
 
-		const newIds = umbDataTypeData.copy([id], data.targetId);
+		const newIds = umbDataTypeMockDb.tree.copy([id], requestBody.targetId);
 
-		return res(ctx.status(200), ctx.set({ Location: newIds[0] }));
+		return res(ctx.status(201), ctx.set({ Location: newIds[0] }));
 	}),
 ];

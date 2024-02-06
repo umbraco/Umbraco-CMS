@@ -1,6 +1,8 @@
-import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbScriptTreeRepository } from './script-tree.repository.js';
 import { UmbScriptTreeStore } from './script-tree.store.js';
+import { manifests as folderManifests } from './folder/manifests.js';
+import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -37,12 +39,19 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'fileSystem',
+	kind: 'unique',
 	alias: 'Umb.TreeItem.Script',
 	name: 'Script Tree Item',
 	meta: {
-		entityTypes: [UMB_SCRIPT_ROOT_ENTITY_TYPE, UMB_SCRIPT_ENTITY_TYPE],
+		entityTypes: [UMB_SCRIPT_ROOT_ENTITY_TYPE, UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE],
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	...folderManifests,
+	...reloadTreeItemChildrenManifest,
+];

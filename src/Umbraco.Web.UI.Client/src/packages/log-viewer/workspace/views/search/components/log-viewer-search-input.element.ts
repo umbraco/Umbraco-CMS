@@ -1,20 +1,22 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbLogViewerWorkspaceContext} from '../../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
-import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
-import {
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+import type {
 	UmbModalManagerContext,
-	UmbModalContext,
+	UmbModalContext} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT,
 	UmbModalToken,
 	UMB_CONFIRM_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
 import './log-viewer-search-input-modal.element.js';
-import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
+import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 export interface UmbContextSaveSearchModalData {
 	query: string;
 }
@@ -54,13 +56,13 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
 			this.#logViewerContext?.getSavedSearches();
 		});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 

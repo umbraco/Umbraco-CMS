@@ -1,6 +1,6 @@
 import { getDisplayStateFromUserStatus } from '../../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
-import { UmbUserDetailModel } from '../../../types.js';
+import type { UmbUserDetailModel } from '../../../types.js';
 import {
 	html,
 	customElement,

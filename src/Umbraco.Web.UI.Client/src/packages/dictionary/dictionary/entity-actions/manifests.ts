@@ -1,6 +1,5 @@
 import { UMB_DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests.js';
-import { UMB_DICTIONARY_ENTITY_TYPE } from '../entities.js';
-import UmbReloadDictionaryEntityAction from './reload.action.js';
+import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import UmbImportDictionaryEntityAction from './import/import.action.js';
 import UmbExportDictionaryEntityAction from './export/export.action.js';
 import UmbCreateDictionaryEntityAction from './create/create.action.js';
@@ -18,7 +17,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
+			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -57,20 +56,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-page-up',
 			label: 'Import',
 			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Dictionary.Reload',
-		name: 'Reload Dictionary Entity Action',
-		weight: 200,
-		api: UmbReloadDictionaryEntityAction,
-		meta: {
-			icon: 'icon-refresh',
-			label: 'Reload',
-			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
+			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		},
 	},
 	{

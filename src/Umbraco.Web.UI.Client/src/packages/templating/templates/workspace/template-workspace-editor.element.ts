@@ -1,16 +1,17 @@
 import type { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/modal-tokens.js';
-import { getQuerySnippet } from '../../utils.js';
+import { getQuerySnippet } from '../../utils/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
-import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_TEMPLATE_PICKER_MODAL,
-	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT,
+	UMB_TEMPLATE_PICKER_MODAL
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
@@ -45,7 +46,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 

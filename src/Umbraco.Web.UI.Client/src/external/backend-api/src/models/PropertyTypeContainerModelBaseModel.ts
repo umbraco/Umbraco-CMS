@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type PropertyTypeContainerModelBaseModel = {
     id: string;
-    parentId?: string | null;
+    parent?: ReferenceByIdModel | null;
     name?: string | null;
     type: string;
     sortOrder: number;

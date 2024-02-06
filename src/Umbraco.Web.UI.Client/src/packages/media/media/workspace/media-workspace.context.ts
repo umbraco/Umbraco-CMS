@@ -1,25 +1,27 @@
-import { UmbMediaRepository } from '../repository/media.repository.js';
+import { UmbMediaDetailRepository } from '../repository/detail/index.js';
 import type { UmbMediaDetailModel } from '../index.js';
-import {
-	UmbSaveableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMediaRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface, UmbApi
 {
+	//
+	public readonly repository = new UmbMediaDetailRepository(this);
+
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
+	// TODO: get correct variant name
+	name = this.#data.asObservablePart((data) => data?.variants[0].name);
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Media', new UmbMediaRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.Media');
 	}
 
 	getData() {
@@ -28,15 +30,11 @@ export class UmbMediaWorkspaceContext
 
 	// TODO: this should be async because it can only return the id if the data is loaded.
 	getEntityId() {
-		return this.getData()?.id || '';
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
 		return 'media';
-	}
-
-	setName(name: string) {
-		this.#data.update({ name });
 	}
 
 	setPropertyValue(alias: string, value: unknown) {
@@ -44,27 +42,27 @@ export class UmbMediaWorkspaceContext
 
 		const currentData = this.#data.value;
 		if (currentData) {
-			const newDataSet = appendToFrozenArray(currentData.data, entry, (x) => x.alias);
+			const newDataSet = appendToFrozenArray(currentData.values, entry, (x) => x.alias);
 
-			this.#data.update({ data: newDataSet });
+			this.#data.update({ values: newDataSet });
 		}
 	}
 
-	async load(entityId: string) {
-		const { data } = await this.repository.requestById(entityId);
+	async load(unique: string) {
+		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
-	async create(parentId: string | null) {
-		const { data } = await this.repository.createScaffold(parentId);
+	async create(parentUnique: string | null) {
+		const { data } = await this.repository.createScaffold(parentUnique);
 		if (!data) return;
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.
 		// Create and response models are different. We need to look into this.
-		this.#data.next(data as unknown as UmbMediaDetailModel);
+		this.#data.setValue(data as unknown as UmbMediaDetailModel);
 	}
 
 	async save() {

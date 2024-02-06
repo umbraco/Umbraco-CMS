@@ -47,6 +47,7 @@ describe('UmbExtensionRegistry', () => {
 				type: 'workspace',
 				name: 'test-editor-1',
 				alias: 'Umb.Test.Editor.1',
+				weight: 2,
 				meta: {
 					entityType: 'testEntity',
 				},
@@ -66,12 +67,44 @@ describe('UmbExtensionRegistry', () => {
 		expect(extensionRegistry.isRegistered('Umb.Test.Section.1')).to.be.true;
 	});
 
+	it('should get several extensions by type', (done) => {
+		extensionRegistry
+			.byType('section')
+			.subscribe((extensions) => {
+				expect(extensions.length).to.eq(3);
+				done();
+			})
+			.unsubscribe();
+	});
+
 	it('should get an extension by alias', (done) => {
 		const alias = 'Umb.Test.Section.1';
 		extensionRegistry
-			.getByTypeAndAlias('section', alias)
+			.byAlias(alias)
 			.subscribe((extension) => {
 				expect(extension?.alias).to.eq(alias);
+				done();
+			})
+			.unsubscribe();
+	});
+
+	it('should get an extension by type and alias', (done) => {
+		const alias = 'Umb.Test.Section.1';
+		extensionRegistry
+			.byTypeAndAlias('section', alias)
+			.subscribe((extension) => {
+				expect(extension?.alias).to.eq(alias);
+				done();
+			})
+			.unsubscribe();
+	});
+
+	it('should get an extension by type and filter', (done) => {
+		extensionRegistry
+			.byTypeAndFilter('section', (ext) => ext.weight === 25)
+			.subscribe((extensions) => {
+				expect(extensions.length).to.eq(1);
+				expect(extensions[0].alias).to.eq('Umb.Test.Section.3');
 				done();
 			})
 			.unsubscribe();
@@ -80,7 +113,7 @@ describe('UmbExtensionRegistry', () => {
 	it('should get an extension by aliases', (done) => {
 		const aliases = ['Umb.Test.Section.1', 'Umb.Test.Section.2'];
 		extensionRegistry
-			.getByTypeAndAliases('section', aliases)
+			.byTypeAndAliases('section', aliases)
 			.subscribe((extensions) => {
 				expect(extensions[0]?.alias).to.eq(aliases[1]);
 				expect(extensions[1]?.alias).to.eq(aliases[0]);
@@ -89,12 +122,12 @@ describe('UmbExtensionRegistry', () => {
 			.unsubscribe();
 	});
 
-	describe('getByType', () => {
+	describe('byType', () => {
 		const type = 'section';
 
 		it('should get all extensions by type', (done) => {
 			extensionRegistry
-				.extensionsOfType(type)
+				.byType(type)
 				.subscribe((extensions) => {
 					expect(extensions).to.have.lengthOf(3);
 					expect(extensions?.[0]?.type).to.eq(type);
@@ -106,7 +139,7 @@ describe('UmbExtensionRegistry', () => {
 
 		it('should return extensions ordered by weight', (done) => {
 			extensionRegistry
-				.extensionsOfType(type)
+				.byType(type)
 				.subscribe((extensions) => {
 					expect(extensions?.[0]?.weight).to.eq(200);
 					expect(extensions?.[1]?.weight).to.eq(25);
@@ -121,7 +154,7 @@ describe('UmbExtensionRegistry', () => {
 			let lastAmount = 0;
 
 			extensionRegistry
-				.extensionsOfType('section')
+				.byType('section')
 				.subscribe((extensions) => {
 					amountOfTimesTriggered++;
 					const newAmount = extensions?.length ?? 0;
@@ -165,6 +198,37 @@ describe('UmbExtensionRegistry', () => {
 							done();
 						}
 					}
+				})
+				.unsubscribe();
+		});
+	});
+
+	describe('byTypes', () => {
+		const types = ['section', 'workspace'];
+
+		it('should get all extensions of the given types', (done) => {
+			extensionRegistry
+				.byTypes(types)
+				.subscribe((extensions) => {
+					expect(extensions).to.have.lengthOf(4);
+					expect(extensions?.[0]?.type).to.eq('section');
+					expect(extensions?.[1]?.type).to.eq('section');
+					expect(extensions?.[2]?.type).to.eq('workspace');
+					expect(extensions?.[3]?.type).to.eq('section');
+					done();
+				})
+				.unsubscribe();
+		});
+
+		it('should return extensions ordered by weight', (done) => {
+			extensionRegistry
+				.byTypes(types)
+				.subscribe((extensions) => {
+					expect(extensions?.[0]?.weight).to.eq(200);
+					expect(extensions?.[1]?.weight).to.eq(25);
+					expect(extensions?.[2]?.weight).to.eq(2);
+					expect(extensions?.[3]?.weight).to.eq(1);
+					done();
 				})
 				.unsubscribe();
 		});
@@ -244,7 +308,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 
 	it('should merge with kinds', (done) => {
 		extensionRegistry
-			.extensionsOfType('section')
+			.byType('section')
 			.subscribe((extensions) => {
 				expect(extensions).to.have.lengthOf(3);
 				expect(extensions?.[0]?.elementName).to.not.eq('my-kind-element');
@@ -265,7 +329,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 		extensionRegistry.unregister('Umb.Test.Kind');
 
 		extensionRegistry
-			.extensionsOfType('section')
+			.byType('section')
 			.subscribe((extensions) => {
 				amountOfTimesTriggered++;
 				expect(extensions).to.have.lengthOf(3);
@@ -287,7 +351,7 @@ describe('UmbExtensionRegistry with kinds', () => {
 		let amountOfTimesTriggered = -1;
 
 		extensionRegistry
-			.extensionsOfType('section')
+			.byType('section')
 			.subscribe((extensions) => {
 				amountOfTimesTriggered++;
 				expect(extensions).to.have.lengthOf(3);

@@ -1,20 +1,22 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
 import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import {
-	DirectionModel,
+import type {
 	LogLevelCountsReponseModel,
-	LogLevelModel,
 	PagedLoggerResponseModel,
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
-	SavedLogSearchPresenationBaseModel,
+	SavedLogSearchPresenationBaseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	DirectionModel,
+	LogLevelModel
 } from '@umbraco-cms/backoffice/backend-api';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { query } from '@umbraco-cms/backoffice/router';
-import { UMB_WORKSPACE_CONTEXT, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
 export interface PoolingCOnfig {
@@ -111,7 +113,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		super(host);
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.
-		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this);
+		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT, this);
 		this.#repository = new UmbLogViewerRepository(host);
 	}
 
@@ -158,7 +160,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 			return;
 		}
 
-		this.#dateRange.next({ startDate, endDate });
+		this.#dateRange.setValue({ startDate, endDate });
 		this.validateLogSize();
 		this.getLogCount();
 		this.getMessageTemplates(0, 10);
@@ -171,10 +173,10 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 	async getSavedSearches() {
 		const { data } = await this.#repository.getSavedSearches({ skip: 0, take: 100 });
 		if (data) {
-			this.#savedSearches.next(data);
+			this.#savedSearches.setValue(data);
 		} else {
 			//falback to some default searches resembling Umbraco <= 12
-			this.#savedSearches.next({
+			this.#savedSearches.setValue({
 				items: [
 					{
 						name: 'Find all logs where the Level is NOT Verbose and NOT Debug',
@@ -230,7 +232,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		const { data } = await this.#repository.getLogCount({ ...this.#dateRange.getValue() });
 
 		if (data) {
-			this.#logCount.next(data);
+			this.#logCount.setValue(data);
 		}
 	}
 
@@ -238,7 +240,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		const { data } = await this.#repository.getMessageTemplates({ skip, take, ...this.#dateRange.getValue() });
 
 		if (data) {
-			this.#messageTemplates.next(data);
+			this.#messageTemplates.setValue(data);
 		}
 	}
 
@@ -246,17 +248,17 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		const { data } = await this.#repository.getLogLevels({ skip, take });
 
 		if (data) {
-			this.#loggers.next(data);
+			this.#loggers.setValue(data);
 		}
 	}
 
 	async validateLogSize() {
 		const { error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
 		if (error) {
-			this.#canShowLogs.next(false);
+			this.#canShowLogs.setValue(false);
 			return;
 		}
-		this.#canShowLogs.next(true);
+		this.#canShowLogs.setValue(true);
 	}
 
 	setCurrentPage(page: number) {
@@ -270,7 +272,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 
 		const isPollingEnabled = this.#polling.getValue().enabled;
 
-		if (!isPollingEnabled) this.#isLoadingLogs.next(true);
+		if (!isPollingEnabled) this.#isLoadingLogs.setValue(true);
 
 		const skip = (this.currentPage - 1) * 100;
 		const take = 100;
@@ -285,18 +287,18 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		};
 
 		const { data } = await this.#repository.getLogs(options);
-		this.#isLoadingLogs.next(false);
+		this.#isLoadingLogs.setValue(false);
 		if (data) {
-			this.#logs.next(data);
+			this.#logs.setValue(data);
 		}
 	};
 
 	setFilterExpression(query: string) {
-		this.#filterExpression.next(query);
+		this.#filterExpression.setValue(query);
 	}
 
 	setLogLevelsFilter(logLevels: LogLevelModel[]) {
-		this.#logLevelsFilter.next(logLevels);
+		this.#logLevelsFilter.setValue(logLevels);
 	}
 
 	togglePolling() {
@@ -323,10 +325,10 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 	toggleSortOrder() {
 		const direction = this.#sortingDirection.getValue();
 		const newDirection = direction === DirectionModel.ASCENDING ? DirectionModel.DESCENDING : DirectionModel.ASCENDING;
-		this.#sortingDirection.next(newDirection);
+		this.#sortingDirection.setValue(newDirection);
 	}
 }
 
-export const UMB_APP_LOG_VIEWER_CONTEXT_TOKEN = new UmbContextToken<UmbLogViewerWorkspaceContext>(
+export const UMB_APP_LOG_VIEWER_CONTEXT = new UmbContextToken<UmbLogViewerWorkspaceContext>(
 	UmbLogViewerWorkspaceContext.name,
 );

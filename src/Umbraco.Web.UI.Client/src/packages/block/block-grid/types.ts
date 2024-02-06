@@ -1,6 +1,8 @@
-import type { UmbBlockTypeBase } from '../block-type/index.js';
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../block-type/index.js';
 
-export interface UmbBlockGridType extends UmbBlockTypeBase {
+export const UMB_BLOCK_GRID_TYPE = 'block-grid-type';
+
+export interface UmbBlockGridType extends UmbBlockTypeBaseModel {
 	columnSpanOptions: Array<number>;
 	allowAtRoot: boolean;
 	allowInAreas: boolean;
@@ -9,5 +11,13 @@ export interface UmbBlockGridType extends UmbBlockTypeBase {
 	thumbnail?: string;
 	areaGridColumns?: number;
 	areas: Array<any>;
-	groupKey: null | string;
+}
+
+export interface UmbBlockGridGroupType {
+	name: string;
+	key: string;
+}
+
+export interface UmbBlockGridGroupTypeConfiguration extends Partial<UmbBlockGridGroupType> {
+	blocks: Array<UmbBlockTypeWithGroupKey>;
 }

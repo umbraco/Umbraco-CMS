@@ -1,18 +1,21 @@
-import type { UmbBlockTypeBase } from '../types.js';
-import { UMB_PROPERTY_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import {
+import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
+import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type {
 	UmbInvariantableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
+} from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEditableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase = UmbBlockTypeBase>
-	extends UmbEditableWorkspaceContextBase<never, BlockTypeData>
+export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
+	extends UmbEditableWorkspaceContextBase<BlockTypeData>
 	implements UmbInvariantableWorkspaceContextInterface
 {
 	// Just for context token safety:
@@ -31,7 +34,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 
 	constructor(host: UmbControllerHostElement, workspaceArgs: { manifest: ManifestWorkspace }) {
 		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
-		super(host, workspaceArgs.manifest.alias, undefined as never);
+		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 	}
 
@@ -43,25 +46,27 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.value, (value) => {
 				if (value) {
-					const blockTypeData = value.find((x: UmbBlockTypeBase) => x.contentElementTypeKey === unique);
+					const blockTypeData = value.find((x: UmbBlockTypeBaseModel) => x.contentElementTypeKey === unique);
 					if (blockTypeData) {
-						this.#data.next(blockTypeData);
+						this.#data.setValue(blockTypeData);
 						return;
 					}
 				}
 				// Fallback to undefined:
-				this.#data.next(undefined);
+				this.#data.setValue(undefined);
 			});
 		});
 	}
 
-	async create(contentElementTypeId: string) {
+	async create(contentElementTypeId: string, groupKey?: string | null) {
+		//Only set groupKey property if it exists
 		const data: BlockTypeData = {
 			contentElementTypeKey: contentElementTypeId,
+			...(groupKey && { groupKey: groupKey }),
 		} as BlockTypeData;
 
 		this.setIsNew(true);
-		this.#data.next(data);
+		this.#data.setValue(data);
 		return { data };
 	}
 

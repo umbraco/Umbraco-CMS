@@ -20,7 +20,7 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	public readonly modals = this.#modals.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MODAL_MANAGER_CONTEXT_TOKEN);
+		super(host, UMB_MODAL_MANAGER_CONTEXT);
 	}
 
 	/**
@@ -42,7 +42,9 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 		const modalContext = new UmbModalContext(modalAlias, args);
 
 		// Append to store:
-		this.#modals.next(appendToFrozenArray(this.#modals.value, modalContext, (entry) => entry.key === modalContext.key));
+		this.#modals.setValue(
+			appendToFrozenArray(this.#modals.value, modalContext, (entry) => entry.key === modalContext.key),
+		);
 
 		// Return to implementor:
 		return modalContext;
@@ -62,10 +64,10 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	}
 
 	public remove(key: string) {
-		this.#modals.next(this.#modals.getValue().filter((modal) => modal.key !== key));
+		this.#modals.setValue(this.#modals.getValue().filter((modal) => modal.key !== key));
 	}
 }
 
-export const UMB_MODAL_MANAGER_CONTEXT_TOKEN = new UmbContextToken<UmbModalManagerContext, UmbModalManagerContext>(
+export const UMB_MODAL_MANAGER_CONTEXT = new UmbContextToken<UmbModalManagerContext, UmbModalManagerContext>(
 	'UmbModalManagerContext',
 );

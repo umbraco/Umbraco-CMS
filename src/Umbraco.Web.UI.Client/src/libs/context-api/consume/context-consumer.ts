@@ -1,11 +1,12 @@
-import { UmbContextDiscriminator, UmbContextToken } from '../token/context-token.js';
+import type { UmbContextDiscriminator, UmbContextToken } from '../token/context-token.js';
 import {
 	isUmbContextProvideEventType,
 	//isUmbContextUnprovidedEventType,
 	UMB_CONTEXT_PROVIDE_EVENT_TYPE,
 	//umbContextUnprovidedEventType,
 } from '../provide/context-provide.event.js';
-import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event.js';
+import type { UmbContextCallback } from './context-request.event.js';
+import { UmbContextRequestEventImplementation } from './context-request.event.js';
 
 /**
  * @export

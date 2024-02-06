@@ -1,13 +1,15 @@
-import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
+import type { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_IMPORT_DICTIONARY_MODAL,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_DICTIONARY_TREE_STORE_CONTEXT, UmbDictionaryTreeStore } from '@umbraco-cms/backoffice/dictionary';
+import type { UmbDictionaryTreeStore } from '@umbraco-cms/backoffice/dictionary';
+import { UMB_DICTIONARY_TREE_STORE_CONTEXT } from '@umbraco-cms/backoffice/dictionary';
 
 export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UmbTextStyles];
@@ -15,10 +17,10 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 	#modalContext?: UmbModalManagerContext;
 	#treeStore?: UmbDictionaryTreeStore;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+		super(host, repositoryAlias, unique, entityType);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
 		});
 		this.consumeContext(UMB_DICTIONARY_TREE_STORE_CONTEXT, (instance) => {

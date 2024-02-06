@@ -1,6 +1,7 @@
+import type {
+	CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
 import {
 	css,
-	CSSResultGroup,
 	html,
 	customElement,
 	property,
@@ -9,12 +10,14 @@ import {
 	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
+import type {
 	ManifestPropertyAction,
-	ManifestTypes,
+	ManifestTypes} from '@umbraco-cms/backoffice/extension-registry';
+import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionElementInitializer, UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionElementInitializer} from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-action-menu')

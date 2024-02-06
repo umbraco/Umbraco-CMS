@@ -3,11 +3,11 @@ import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.
 import type { UmbDataTypeDetailModel } from '../../types.js';
 import { css, html, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
+import type {
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalValue,
-	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
 export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBaseElement<

@@ -1,12 +1,10 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbSectionPickerModalData,
-	UmbSectionPickerModalValue,
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbSectionPickerModalData, UmbSectionPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-section-picker-modal')
 export class UmbSectionPickerModalElement extends UmbModalBaseElement<
@@ -26,7 +24,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelection(this.data?.selection ?? []);
 
 		this.observe(
-			umbExtensionsRegistry.extensionsOfType('section'),
+			umbExtensionsRegistry.byType('section'),
 			(sections: Array<ManifestSection>) => (this._sections = sections),
 		),
 			'umbSectionsObserver';

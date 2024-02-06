@@ -1,13 +1,14 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import '../components/user-group-table-name-column-layout.element.js';
 import '../components/user-group-table-sections-column-layout.element.js';
 
-import {
+import type {
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,

@@ -1,15 +1,17 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
+import type { UmbLogViewerWorkspaceContext} from '../../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type {
+	PropertyValueMap} from '@umbraco-cms/backoffice/external/lit';
 import {
 	css,
 	html,
-	PropertyValueMap,
 	customElement,
 	property,
 	query,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { query as getQuery, toQueryString } from '@umbraco-cms/backoffice/router';
 
@@ -58,7 +60,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 		});
 	}

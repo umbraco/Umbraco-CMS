@@ -16,7 +16,7 @@ import { handlers as objectTypeHandlers } from './handlers/object-type/index.js'
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
 import { handlers as documentHandlers } from './handlers/document/index.js';
-import { handlers as mediaHandlers } from './handlers/media.handlers.js';
+import { handlers as mediaHandlers } from './handlers/media/index.js';
 import { handlers as dictionaryHandlers } from './handlers/dictionary.handlers.js';
 import { handlers as mediaTypeHandlers } from './handlers/media-type/index.js';
 import { handlers as memberGroupHandlers } from './handlers/member-group.handlers.js';
@@ -30,15 +30,16 @@ import { handlers as redirectManagementHandlers } from './handlers/redirect-mana
 import { handlers as logViewerHandlers } from './handlers/log-viewer.handlers.js';
 import { handlers as packageHandlers } from './handlers/package.handlers.js';
 import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers.js';
-import { handlers as staticFileHandlers } from './handlers/static-file.handlers.js';
-import { handlers as stylesheetHandlers } from './handlers/stylesheet.handlers.js';
-import { handlers as partialViewsHandlers } from './handlers/partial-views.handlers.js';
+import { handlers as staticFileHandlers } from './handlers/static-file/index.js';
+import { handlers as stylesheetHandlers } from './handlers/stylesheet/index.js';
+import { handlers as partialViewHandlers } from './handlers/partial-view/index.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
-import { handlers as scriptHandlers } from './handlers/scripts.handlers.js';
+import { handlers as scriptHandlers } from './handlers/script/index.js';
+import { handlers as dynamicRootHandlers } from './handlers/dynamic-root.handlers.js';
 
 const handlers = [
-	serverHandlers.serverVersionHandler,
+	serverHandlers.serverInformationHandler,
 	...auditLogHandlers,
 	...configHandlers,
 	...cultureHandlers,
@@ -46,6 +47,7 @@ const handlers = [
 	...dictionaryHandlers,
 	...documentHandlers,
 	...documentTypeHandlers,
+	...dynamicRootHandlers,
 	...examineManagementHandlers,
 	...healthCheckHandlers,
 	...installHandlers,
@@ -58,7 +60,7 @@ const handlers = [
 	...memberTypeHandlers,
 	...modelsBuilderHandlers,
 	...packageHandlers,
-	...partialViewsHandlers,
+	...partialViewHandlers,
 	...profilingHandlers,
 	...publishedStatusHandlers,
 	...redirectManagementHandlers,

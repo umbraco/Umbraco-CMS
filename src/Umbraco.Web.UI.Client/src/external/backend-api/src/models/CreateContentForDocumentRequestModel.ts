@@ -5,11 +5,12 @@
 
 import type { DocumentValueModel } from './DocumentValueModel';
 import type { DocumentVariantRequestModel } from './DocumentVariantRequestModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type CreateContentForDocumentRequestModel = {
     values: Array<DocumentValueModel>;
     variants: Array<DocumentVariantRequestModel>;
     id?: string | null;
-    parentId?: string | null;
+    parent?: ReferenceByIdModel | null;
 };
 

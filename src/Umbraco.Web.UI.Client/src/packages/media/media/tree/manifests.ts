@@ -1,6 +1,7 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaTreeRepository } from './media-tree.repository.js';
 import { UmbMediaTreeStore } from './media-tree.store.js';
+import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -37,7 +38,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'entity',
+	kind: 'unique',
 	alias: 'Umb.TreeItem.Media',
 	name: 'Media Tree Item',
 	meta: {
@@ -45,4 +46,4 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifests];

@@ -3,12 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateMediaRequestModel } from '../models/CreateMediaRequestModel';
-import type { DocumentResponseModel } from '../models/DocumentResponseModel';
+import type { MediaConfigurationResponseModel } from '../models/MediaConfigurationResponseModel';
 import type { MediaItemResponseModel } from '../models/MediaItemResponseModel';
-import type { MediaTreeItemResponseModel } from '../models/MediaTreeItemResponseModel';
+import type { MediaResponseModel } from '../models/MediaResponseModel';
 import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
+import type { PagedMediaRecycleBinItemResponseModel } from '../models/PagedMediaRecycleBinItemResponseModel';
 import type { PagedMediaTreeItemResponseModel } from '../models/PagedMediaTreeItemResponseModel';
-import type { PagedRecycleBinItemResponseModel } from '../models/PagedRecycleBinItemResponseModel';
 import type { SortingRequestModel } from '../models/SortingRequestModel';
 import type { UpdateMediaRequestModel } from '../models/UpdateMediaRequestModel';
 
@@ -32,7 +32,7 @@ export class MediaResource {
             url: '/umbraco/management/api/v1/media',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -49,7 +49,7 @@ export class MediaResource {
         id,
     }: {
         id: string,
-    }): CancelablePromise<DocumentResponseModel> {
+    }): CancelablePromise<MediaResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/media/{id}',
@@ -146,19 +146,30 @@ export class MediaResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getMediaConfiguration(): CancelablePromise<MediaConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static getMediaItem({
         id,
-        dataTypeId,
     }: {
         id?: Array<string>,
-        dataTypeId?: string,
     }): CancelablePromise<Array<MediaItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/media/item',
             query: {
                 'id': id,
-                'dataTypeId': dataTypeId,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
@@ -190,7 +201,23 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedRecycleBinItemResponseModel Success
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteRecycleBinMedia(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/recycle-bin/media',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedMediaRecycleBinItemResponseModel Success
      * @throws ApiError
      */
     public static getRecycleBinMediaChildren({
@@ -201,7 +228,7 @@ export class MediaResource {
         parentId?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRecycleBinItemResponseModel> {
+    }): CancelablePromise<PagedMediaRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/media/children',
@@ -217,7 +244,7 @@ export class MediaResource {
     }
 
     /**
-     * @returns PagedRecycleBinItemResponseModel Success
+     * @returns PagedMediaRecycleBinItemResponseModel Success
      * @throws ApiError
      */
     public static getRecycleBinMediaRoot({
@@ -226,7 +253,7 @@ export class MediaResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedRecycleBinItemResponseModel> {
+    }): CancelablePromise<PagedMediaRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/media/root',
@@ -262,30 +289,6 @@ export class MediaResource {
                 'parentId': parentId,
                 'skip': skip,
                 'take': take,
-                'dataTypeId': dataTypeId,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeMediaItem({
-        id,
-        dataTypeId,
-    }: {
-        id?: Array<string>,
-        dataTypeId?: string,
-    }): CancelablePromise<Array<MediaTreeItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/media/item',
-            query: {
-                'id': id,
                 'dataTypeId': dataTypeId,
             },
             errors: {

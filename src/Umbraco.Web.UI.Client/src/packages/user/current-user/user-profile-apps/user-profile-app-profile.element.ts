@@ -1,10 +1,11 @@
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
-	UmbModalManagerContext,
 	UMB_CHANGE_PASSWORD_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 
@@ -19,7 +20,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 		});
 

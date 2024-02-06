@@ -8,9 +8,9 @@ export interface ManifestMenuItem extends ManifestElement<UmbMenuItemElement> {
 
 export interface MetaMenuItem {
 	label: string;
-	icon: string;
-	entityType?: string;
 	menus: Array<string>;
+	entityType?: string;
+	icon?: string;
 }
 
 export interface ManifestMenuItemTreeKind extends ManifestMenuItem {

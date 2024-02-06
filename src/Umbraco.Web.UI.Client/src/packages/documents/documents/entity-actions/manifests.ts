@@ -1,23 +1,24 @@
-import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbPublishDocumentEntityAction } from './publish.action.js';
-import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action.js';
 import { UmbDocumentPublicAccessEntityAction } from './public-access.action.js';
 import { UmbUnpublishDocumentEntityAction } from './unpublish.action.js';
 import { UmbRollbackDocumentEntityAction } from './rollback.action.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as permissionManifests } from './permissions/manifests.js';
+import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import {
 	UmbCopyEntityAction,
 	UmbMoveEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	...createManifests,
 	...permissionManifests,
+	...cultureAndHostnamesManifests,
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.CreateBlueprint',
@@ -27,7 +28,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-blueprint',
 			label: 'Create Document Blueprint (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -40,7 +41,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -53,7 +54,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-documents',
 			label: 'Copy (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -66,21 +67,8 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-navigation-vertical',
 			label: 'Sort (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.CultureAndHostnames',
-		name: 'Culture And Hostnames Document Entity Action',
-		weight: 400,
-		api: UmbDocumentCultureAndHostnamesEntityAction,
-		meta: {
-			icon: 'icon-home',
-			label: 'Culture And Hostnames (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -91,7 +79,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-lock',
 			label: 'Public Access (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -103,7 +91,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-globe',
 			label: 'Publish (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -115,7 +103,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-globe',
 			label: 'Unpublish (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
@@ -127,7 +115,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-undo',
 			label: 'Rollback (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
