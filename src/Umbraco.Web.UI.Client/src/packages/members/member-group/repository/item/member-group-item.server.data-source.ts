@@ -3,6 +3,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { MemberGroupResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 
 /**
  * A server data source for Member Group items
@@ -34,6 +35,6 @@ const mapper = (item: MemberGroupItemResponseModel): UmbMemberGroupItemModel => 
 	return {
 		unique: item.id,
 		name: item.name,
-		propertyEditorUiAlias: item.editorUiAlias || '', // TODO: why can this be undefined or null on the server?
+		entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
 	};
 };

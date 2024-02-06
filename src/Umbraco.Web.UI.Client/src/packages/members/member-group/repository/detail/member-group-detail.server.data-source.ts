@@ -1,8 +1,7 @@
-import type { UmbMemberGroupDetailModel, UmbMemberGroupPropertyModel } from '../../types.js';
+import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateMemberGroupRequestModel, MemberGroupModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { MemberGroupResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -31,15 +30,11 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	 * @return { CreateMemberGroupRequestModel }
 	 * @memberof UmbMemberGroupServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold() {
 		const data: UmbMemberGroupDetailModel = {
 			entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
 			name: '',
-			editorAlias: undefined,
-			editorUiAlias: null,
-			values: [],
 		};
 
 		return { data };
@@ -67,11 +62,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 		const memberGroup: UmbMemberGroupDetailModel = {
 			entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: data.parent ? data.parent.id : null,
 			name: data.name,
-			editorAlias: data.editorAlias,
-			editorUiAlias: data.editorUiAlias || null,
-			values: data.values as Array<UmbMemberGroupPropertyModel>,
 		};
 
 		return { data: memberGroup };
@@ -85,17 +76,11 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	 */
 	async create(model: UmbMemberGroupDetailModel) {
 		if (!model) throw new Error('Member Group is missing');
-		if (!model.unique) throw new Error('Member Group unique is missing');
-		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateMemberGroupRequestModel = {
 			id: model.unique,
-			parent: model.parentUnique ? { id: model.parentUnique } : null,
 			name: model.name,
-			editorAlias: model.editorAlias,
-			editorUiAlias: model.editorUiAlias,
-			values: model.values,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -120,14 +105,10 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	 */
 	async update(model: UmbMemberGroupDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
-		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: MemberGroupModelBaseModel = {
+		const requestBody: UpdateMemberGroupRequestModel = {
 			name: model.name,
-			editorAlias: model.editorAlias,
-			editorUiAlias: model.editorUiAlias,
-			values: model.values,
 		};
 
 		const { error } = await tryExecuteAndNotify(
