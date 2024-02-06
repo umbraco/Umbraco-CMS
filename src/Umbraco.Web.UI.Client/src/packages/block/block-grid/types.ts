@@ -14,12 +14,12 @@ export interface UmbBlockGridTypeModel extends UmbBlockTypeBaseModel {
 	areas: Array<any>;
 }
 
-export interface UmbBlockGridGroupType {
+export interface UmbBlockGridTypeGroupType {
 	name: string;
 	key: string;
 }
 
-export interface UmbBlockGridGroupTypeConfiguration extends Partial<UmbBlockGridGroupType> {
+export interface UmbBlockGridGroupTypeConfiguration extends Partial<UmbBlockGridTypeGroupType> {
 	blocks: Array<UmbBlockTypeWithGroupKey>;
 }
 
