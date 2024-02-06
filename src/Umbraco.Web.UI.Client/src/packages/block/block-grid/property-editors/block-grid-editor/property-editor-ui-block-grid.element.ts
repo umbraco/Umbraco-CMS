@@ -34,7 +34,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	private _directRoute?: string;
 
 	@state()
-	private _createButtonLabel = this.localize.term('content_createEmpty');
+	private _createButtonLabel = this.localize.term('blockEditor_addBlock');
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -52,7 +52,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		if (customCreateButtonLabel) {
 			this._createButtonLabel = customCreateButtonLabel;
 		} else if (this._blocks.length === 1) {
-			this._createButtonLabel = `${this.localize.term('general_add')} ${this._blocks[0].label}`;
+			this._createButtonLabel = this.localize.term('blockEditor_addThis', [this._blocks[0].label]);
 		}
 
 		//const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
