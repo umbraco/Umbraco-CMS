@@ -14,15 +14,15 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 public class ItemMediaItemController : MediaItemControllerBase
 {
     private readonly IEntityService _entityService;
-    private readonly IMediaPresentationModelFactory _mediaPresentationModelFactory;
+    private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
-    public ItemMediaItemController(IEntityService entityService, IMediaPresentationModelFactory mediaPresentationModelFactory)
+    public ItemMediaItemController(IEntityService entityService, IMediaPresentationFactory mediaPresentationFactory)
     {
         _entityService = entityService;
-        _mediaPresentationModelFactory = mediaPresentationModelFactory;
+        _mediaPresentationFactory = mediaPresentationFactory;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<MediaItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
@@ -31,7 +31,7 @@ public class ItemMediaItemController : MediaItemControllerBase
             .GetAll(UmbracoObjectTypes.Media, ids.ToArray())
             .OfType<IMediaEntitySlim>();
 
-        IEnumerable<MediaItemResponseModel> responseModels = media.Select(_mediaPresentationModelFactory.CreateItemResponseModel);
+        IEnumerable<MediaItemResponseModel> responseModels = media.Select(_mediaPresentationFactory.CreateItemResponseModel);
         return await Task.FromResult(Ok(responseModels));
     }
 }

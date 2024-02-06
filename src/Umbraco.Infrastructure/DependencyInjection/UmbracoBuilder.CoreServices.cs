@@ -242,6 +242,10 @@ public static partial class UmbracoBuilderExtensions
         builder.AddDeliveryApiCoreServices();
         builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
 
+        builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
+        builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
+        builder.Services.AddTransient<IMemberEditingService, MemberEditingService>();
+
         return builder;
     }
 

@@ -8,7 +8,7 @@ public class UserResponseModel : UserPresentationBase
 
     public string? LanguageIsoCode { get; set; }
 
-    public ISet<Guid> ContentStartNodeIds { get; set; } = new HashSet<Guid>();
+    public ISet<Guid> DocumentStartNodeIds { get; set; } = new HashSet<Guid>();
 
     public ISet<Guid> MediaStartNodeIds { get; set; } = new HashSet<Guid>();
 

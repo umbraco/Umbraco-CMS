@@ -23,7 +23,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 {
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-    private readonly IMediaPresentationModelFactory _mediaPresentationModelFactory;
+    private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
     public MediaTreeControllerBase(
         IEntityService entityService,
@@ -31,12 +31,12 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         IDataTypeService dataTypeService,
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IMediaPresentationModelFactory mediaPresentationModelFactory)
+        IMediaPresentationFactory mediaPresentationFactory)
         : base(entityService, userStartNodeEntitiesService, dataTypeService)
     {
         _appCaches = appCaches;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
-        _mediaPresentationModelFactory = mediaPresentationModelFactory;
+        _mediaPresentationFactory = mediaPresentationFactory;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
@@ -52,8 +52,8 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
 
-            responseModel.Variants = _mediaPresentationModelFactory.CreateVariantsItemResponseModels(mediaEntitySlim);
-            responseModel.MediaType = _mediaPresentationModelFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);
+            responseModel.Variants = _mediaPresentationFactory.CreateVariantsItemResponseModels(mediaEntitySlim);
+            responseModel.MediaType = _mediaPresentationFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);
         }
 
         return responseModel;

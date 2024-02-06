@@ -68,6 +68,7 @@ public static partial class Constants
         {
             public const string Tree = "tree";
             public const string RecycleBin = "recycle-bin";
+            public const string Item = "item";
         }
 
         public static class AttributeRouting

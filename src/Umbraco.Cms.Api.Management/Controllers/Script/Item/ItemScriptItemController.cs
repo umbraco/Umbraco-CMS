@@ -10,18 +10,18 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Item;
 [ApiVersion("1.0")]
 public class ItemScriptItemController : ScriptItemControllerBase
 {
-    private readonly IFileItemPresentationModelFactory _fileItemPresentationModelFactory;
+    private readonly IFileItemPresentationFactory _fileItemPresentationFactory;
 
-    public ItemScriptItemController(IFileItemPresentationModelFactory fileItemPresentationModelFactory)
-        => _fileItemPresentationModelFactory = fileItemPresentationModelFactory;
+    public ItemScriptItemController(IFileItemPresentationFactory fileItemPresentationFactory)
+        => _fileItemPresentationFactory = fileItemPresentationFactory;
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ScriptItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "path")] HashSet<string> paths)
     {
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
-        IEnumerable<ScriptItemResponseModel> responseModels = _fileItemPresentationModelFactory.CreateScriptItemResponseModels(paths);
+        IEnumerable<ScriptItemResponseModel> responseModels = _fileItemPresentationFactory.CreateScriptItemResponseModels(paths);
         return await Task.FromResult(Ok(responseModels));
     }
 }

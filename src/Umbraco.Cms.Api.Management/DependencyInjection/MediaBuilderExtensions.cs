@@ -12,7 +12,7 @@ internal static class MediaBuilderExtensions
 {
     internal static IUmbracoBuilder AddMedia(this IUmbracoBuilder builder)
     {
-        builder.Services.AddTransient<IMediaPresentationModelFactory, MediaPresentationModelFactory>();
+        builder.Services.AddTransient<IMediaPresentationFactory, MediaPresentationFactory>();
         builder.Services.AddTransient<IMediaEditingPresentationFactory, MediaEditingPresentationFactory>();
         builder.Services.AddTransient<IUrlAssembler, DefaultUrlAssembler>();
         builder.Services.AddScoped<IAbsoluteUrlBuilder, DefaultAbsoluteUrlBuilder>();

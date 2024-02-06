@@ -57,6 +57,6 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
 
         return attempt.Success
             ? Ok()
-            : ContentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
+            : DocumentPublishingOperationStatusResult(attempt.Status, failedBranchItems: attempt.Result.FailedItems);
     }
 }

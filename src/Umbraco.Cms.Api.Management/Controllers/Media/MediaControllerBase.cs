@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
-using Umbraco.Cms.Api.Management.Content;
+using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
@@ -24,6 +24,7 @@ public class MediaControllerBase : ContentControllerBase
             => NotFound(problemDetailsBuilder
                 .WithTitle("The requested Media could not be found")
                 .Build()));
+
     protected IActionResult MediaEditingOperationStatusResult<TContentModelBase>(
         ContentEditingOperationStatus status,
         TContentModelBase requestModel,

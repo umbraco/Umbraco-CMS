@@ -31,7 +31,7 @@ public class SettingsTemplateQueryController : TemplateQueryControllerBase
 
         return await Task.FromResult(Ok(new TemplateQuerySettingsResponseModel
         {
-            ContentTypeAliases = contentTypeAliases,
+            DocumentTypeAliases = contentTypeAliases,
             Properties = properties,
             Operators = operators
         }));

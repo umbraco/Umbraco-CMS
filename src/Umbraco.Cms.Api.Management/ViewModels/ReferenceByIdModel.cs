@@ -11,5 +11,8 @@ public sealed class ReferenceByIdModel
     public ReferenceByIdModel(Guid id)
         => Id = id;
 
+    public static ReferenceByIdModel? ReferenceOrNull(Guid? id)
+        => id.HasValue ? new ReferenceByIdModel(id.Value) : null;
+
     public Guid Id { get; set; }
 }
