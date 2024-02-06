@@ -17,11 +17,13 @@ const CORE_PACKAGES = [
 	import('../../packages/core/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
+	import('../../packages/dynamic-root/umbraco-package.js'),
 	import('../../packages/health-check/umbraco-package.js'),
 	import('../../packages/language/umbraco-package.js'),
 	import('../../packages/log-viewer/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
+	import('../../packages/models-builder/umbraco-package.js'),
 	import('../../packages/packages/umbraco-package.js'),
 	import('../../packages/relations/umbraco-package.js'),
 	import('../../packages/search/umbraco-package.js'),
@@ -31,12 +33,6 @@ const CORE_PACKAGES = [
 	import('../../packages/templating/umbraco-package.js'),
 	import('../../packages/umbraco-news/umbraco-package.js'),
 	import('../../packages/user/umbraco-package.js'),
-	import('../../packages/models-builder/umbraco-package.js'),
-	import('../../packages/tags/umbraco-package.js'),
-	import('../../packages/log-viewer/umbraco-package.js'),
-	import('../../packages/health-check/umbraco-package.js'),
-	import('../../packages/static-file/umbraco-package.js'),
-	import('../../packages/dynamic-root/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')
