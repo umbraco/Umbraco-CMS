@@ -3,8 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type VerifyResetPasswordTokenRequestModel = {
-    userId: string;
+    user: ReferenceByIdModel;
     resetCode: string;
 };
 

@@ -126,14 +126,14 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			},
 			{ labelKey: 'user_createDate', value: this.localize.date(user.createDate!) },
 			{ labelKey: 'user_updateDate', value: this.localize.date(user.updateDate!) },
-			{ labelKey: 'general_id', value: user.id },
+			{ labelKey: 'general_id', value: user.unique },
 		];
 	};
 
 	render() {
 		if (!this._user) return html`User not found`;
 
-		const displayState = getDisplayStateFromUserStatus(this._user.state);
+		const displayState = this._user.state ? getDisplayStateFromUserStatus(this._user.state) : undefined;
 
 		return html`
 			${this.#renderAvatar()}
@@ -142,7 +142,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 				<div id="user-status-info" class="user-info-item">
 					<b><umb-localize key="general_status">Status</umb-localize>:</b>
 					<uui-tag look="${ifDefined(displayState?.look)}" color="${ifDefined(displayState?.color)}">
-						${this.localize.term('user_' + displayState.key)}
+						${this.localize.term('user_' + displayState?.key)}
 					</uui-tag>
 				</div>
 

@@ -20,6 +20,27 @@ import { request as __request } from '../core/request';
 export class TemplateResource {
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemTemplate({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<TemplateItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/template',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns string Created
      * @throws ApiError
      */
@@ -122,27 +143,6 @@ export class TemplateResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/configuration',
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTemplateItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<TemplateItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/template/item',
-            query: {
-                'id': id,
-            },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },

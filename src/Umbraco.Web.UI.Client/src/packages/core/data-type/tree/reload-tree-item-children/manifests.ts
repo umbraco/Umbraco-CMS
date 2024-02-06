@@ -5,7 +5,7 @@ import {
 } from '../../entity.js';
 import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbReloadTreeItemChildrenEntityAction } from '@umbraco-cms/backoffice/tree';
-import { type ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestEntityAction> = [
 	{

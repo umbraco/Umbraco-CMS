@@ -15,14 +15,14 @@ export class MemberGroupResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getMemberGroupItem({
+    public static getItemMemberGroup({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<MemberGroupItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/member-group/item',
+            url: '/umbraco/management/api/v1/item/member-group',
             query: {
                 'id': id,
             },

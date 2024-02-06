@@ -25,7 +25,7 @@ export class UmbUserItemServerDataSource extends UmbItemServerDataSourceBase<Use
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => UserResource.getUserItem({ id: uniques });
+const getItems = (uniques: Array<string>) => UserResource.getItemUser({ id: uniques });
 
 const mapper = (item: UserItemResponseModel): UmbUserItemModel => {
 	return {

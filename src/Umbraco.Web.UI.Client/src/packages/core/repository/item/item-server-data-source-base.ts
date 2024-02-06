@@ -1,12 +1,8 @@
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import type { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-export interface UmbItemServerDataSourceBaseArgs<
-	ServerItemType extends ItemResponseModelBaseModel,
-	ClientItemType extends { unique: string },
-> {
+export interface UmbItemServerDataSourceBaseArgs<ServerItemType, ClientItemType extends { unique: string }> {
 	getItems: (uniques: Array<string>) => Promise<Array<ServerItemType>>;
 	mapper: (item: ServerItemType) => ClientItemType;
 }
@@ -17,10 +13,8 @@ export interface UmbItemServerDataSourceBaseArgs<
  * @class UmbItemServerDataSourceBase
  * @implements {DocumentTreeDataSource}
  */
-export abstract class UmbItemServerDataSourceBase<
-	ServerItemType extends ItemResponseModelBaseModel,
-	ClientItemType extends { unique: string },
-> implements UmbItemDataSource<ClientItemType>
+export abstract class UmbItemServerDataSourceBase<ServerItemType, ClientItemType extends { unique: string }>
+	implements UmbItemDataSource<ClientItemType>
 {
 	#host: UmbControllerHost;
 	#getItems: (uniques: Array<string>) => Promise<Array<ServerItemType>>;
