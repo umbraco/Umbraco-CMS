@@ -1015,6 +1015,8 @@
     <key alias="createHeader">Opret header</key>
     <key alias="deliveries">Leverancer</key>
     <key alias="noHeaders">Der er ikke tilføjet nogen webhook headers</key>
+    <key alias="toggleDebug">Skift til debug mode for mere information.</key>
+    <key alias="statusNotOk">Ikke OK status kode.</key>
   </area>
   <area alias="language">
     <key alias="cultureCode">Culture Code</key>
