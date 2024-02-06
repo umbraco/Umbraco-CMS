@@ -1,40 +1,31 @@
+import { UmbBlockGridManagerContext } from '../../manager/block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbBlockGridLayoutModel, UmbBlockTypeBaseModel, UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block';
+import type {
+	UmbBlockGridLayoutModel,
+	UmbBlockGridTypeModel,
+	UmbBlockGridValueModel,
+	UmbBlockTypeGroup,
+} from '@umbraco-cms/backoffice/block';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests';
 
 /**
  * @element umb-property-editor-ui-block-grid
  */
 @customElement('umb-property-editor-ui-block-grid')
 export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value = '';
-
-	@state()
-	private _limitMin?: number;
-	@state()
-	private _limitMax?: number;
-
-	@state()
-	private _blocks?: Array<UmbBlockTypeBaseModel>;
-
-	@state()
-	private _blockGroups?: Array<UmbBlockTypeGroup>;
-
-	@state()
-	private _rootLayouts: Array<UmbBlockGridLayoutModel> = [];
-
-	@state()
-	private _directRoute?: string;
-
-	@state()
-	private _createButtonLabel = this.localize.term('blockEditor_addBlock');
+	#context = new UmbBlockGridManagerContext(this);
+	//
+	private _value: UmbBlockGridValueModel = {
+		layout: {},
+		contentData: [],
+		settingsData: [],
+	};
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -45,28 +36,42 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		this._limitMin = validationLimit?.min;
 		this._limitMax = validationLimit?.max;
 
-		this._blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
-		this._blockGroups = config.getValueByAlias<Array<UmbBlockTypeGroup>>('blockGroups') ?? [];
+		const blocks = config.getValueByAlias<Array<UmbBlockGridTypeModel>>('blocks') ?? [];
+		this.#context.setBlockTypes(blocks);
 
-		const customCreateButtonLabel = config.getValueByAlias<string>('createLabel');
-		if (customCreateButtonLabel) {
-			this._createButtonLabel = customCreateButtonLabel;
-		} else if (this._blocks.length === 1) {
-			this._createButtonLabel = this.localize.term('blockEditor_addThis', [this._blocks[0].label]);
-		}
+		const blockGroups = config.getValueByAlias<Array<UmbBlockTypeGroup>>('blockGroups') ?? [];
+		this.#context.setBlockGroups(blockGroups);
 
-		//const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
-
-		//this.#context.setInlineEditingMode(useInlineEditingAsDefault);
-		//config.useSingleBlockMode
-		//config.useLiveEditing
-		//config.useInlineEditingAsDefault
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
-		//this.#context.setEditorConfiguration(config);
+		//config.useLiveEditing, is covered by the EditorConfiguration of context.
+		this.#context.setEditorConfiguration(config);
 	}
 
-	#context = new UmbBlockGridManagerContext(this);
+	//
+	@state()
+	private _limitMin?: number;
+	@state()
+	private _limitMax?: number;
+
+	@property({ attribute: false })
+	public get value(): UmbBlockGridValueModel {
+		return this._value;
+	}
+	public set value(value: UmbBlockGridValueModel | undefined) {
+		const buildUpValue: Partial<UmbBlockGridValueModel> = value ? { ...value } : {};
+		buildUpValue.layout ??= {};
+		buildUpValue.contentData ??= [];
+		buildUpValue.settingsData ??= [];
+		this._value = buildUpValue as UmbBlockGridValueModel;
+
+		this.#context.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
+		this.#context.setContents(buildUpValue.contentData);
+		this.#context.setSettings(buildUpValue.settingsData);
+	}
+
+	@state()
+	private _rootLayouts: Array<UmbBlockGridLayoutModel> = [];
 
 	constructor() {
 		super();
@@ -92,14 +97,13 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 			//console.log('settings changed', this._value);
 			this.dispatchEvent(new UmbChangeEvent());
 		});
-		this.observe(this.#context.blockTypes, (blockTypes) => {
-			this._blocks = blockTypes;
-		});
 	}
 
 	render() {
 		return html`<umb-property-editor-ui-block-grid-entries
-			.layoutEntries=${this._rootLayouts}></umb-property-editor-ui-block-grid-entries>`;
+			.layoutEntries=${this._rootLayouts}
+			.parentUnique=${'root'}
+			.areaKey=${'root'}></umb-property-editor-ui-block-grid-entries>`;
 	}
 
 	static styles = [

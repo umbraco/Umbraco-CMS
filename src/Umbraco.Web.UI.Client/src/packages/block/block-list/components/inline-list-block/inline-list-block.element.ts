@@ -1,4 +1,4 @@
-import { UMB_BLOCK_LIST_CONTEXT } from '../../index.js';
+import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../index.js';
 import type { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../../block/index.js';
 import { UMB_BLOCK_WORKSPACE_ALIAS } from '../../../block/index.js';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
@@ -13,7 +13,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  */
 @customElement('umb-inline-list-block')
 export class UmbInlineListBlockElement extends UmbLitElement {
-	#blockContext?: typeof UMB_BLOCK_LIST_CONTEXT.TYPE;
+	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentUdi?: string;
 
@@ -26,7 +26,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_BLOCK_LIST_CONTEXT, (blockContext) => {
+		this.consumeContext(UMB_BLOCK_LIST_ENTRY_CONTEXT, (blockContext) => {
 			this.#blockContext = blockContext;
 			this.observe(
 				this.#blockContext.contentUdi,

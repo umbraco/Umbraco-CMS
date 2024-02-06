@@ -6,6 +6,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export abstract class UmbBlockContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
@@ -20,6 +21,8 @@ export abstract class UmbBlockContext<
 
 	#blockTypeName = new UmbStringState(undefined);
 	public readonly blockTypeName = this.#blockTypeName.asObservable();
+
+	// TODO: index state + observable?
 
 	#label = new UmbStringState('');
 	public readonly label = this.#label.asObservable();
@@ -57,6 +60,15 @@ export abstract class UmbBlockContext<
 	 */
 	setLayout(layout: BlockLayoutType | undefined) {
 		this.#layout.setValue(layout);
+	}
+
+	/**
+	 * Get the current value of this Blocks label.
+	 * @method getLabel
+	 * @returns {string}
+	 */
+	getLabel() {
+		return this.#label.value;
 	}
 
 	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
@@ -190,14 +202,34 @@ export abstract class UmbBlockContext<
 
 	// Public methods:
 
+	//activate
+	public edit() {}
+	//editSettings
+
+	requestDelete() {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
+			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
+				data: {
+					headline: `Delete ${this.getLabel()}`,
+					content: 'Are you sure you want to delete this [INSERT BLOCK TYPE NAME]?',
+					confirmLabel: 'Delete',
+					color: 'danger',
+				},
+			});
+			await modalContext.onSubmit();
+			this.delete();
+		});
+	}
 	public delete() {
 		if (!this._manager) return;
 		const contentUdi = this.#layout.value?.contentUdi;
 		if (!contentUdi) return;
 		this._manager.deleteBlock(contentUdi);
 	}
+
+	//copy
 }
 
 export const UMB_BLOCK_ENTITY_CONTEXT = new UmbContextToken<
 	UmbBlockContext<typeof UMB_BLOCK_MANAGER_CONTEXT, typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE>
->('UmbBlockContext');
+>('UmbBlockEntryContext');

@@ -1,4 +1,4 @@
-import { UMB_BLOCK_LIST_CONTEXT } from '../../context/block-list.context-token.js';
+import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../context/block-list-entry.context-token.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -17,7 +17,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_BLOCK_LIST_CONTEXT, (context) => {
+		this.consumeContext(UMB_BLOCK_LIST_ENTRY_CONTEXT, (context) => {
 			this.observe(
 				context.workspaceEditPath,
 				(workspaceEditPath) => {

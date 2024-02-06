@@ -10,6 +10,7 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/mod
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 // TODO: We are using backend model here, I think we should get our own model:
 type ElementTypeModel = UmbContentTypeModel;
@@ -20,9 +21,13 @@ export abstract class UmbBlockManagerContext<
 > extends UmbContextBase<UmbBlockManagerContext> {
 	//
 	#contentTypeRepository = new UmbDocumentTypeDetailRepository(this);
+	#workspaceModal: UmbModalRouteRegistrationController;
 
 	#workspacePath = new UmbStringState(undefined);
 	workspacePath = this.#workspacePath.asObservable();
+
+	#propertyAlias = new UmbStringState(undefined);
+	propertyAlias = this.#propertyAlias.asObservable();
 
 	#contentTypes = new UmbArrayState(<Array<ElementTypeModel>>[], (x) => x.unique);
 	public readonly contentTypes = this.#contentTypes.asObservable();
@@ -41,6 +46,14 @@ export abstract class UmbBlockManagerContext<
 
 	#settings = new UmbArrayState(<Array<UmbBlockDataType>>[], (x) => x.udi);
 	public readonly settings = this.#settings.asObservable();
+
+	setPropertyAlias(alias: string) {
+		this.#propertyAlias.setValue(alias);
+		this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
+	}
+	getPropertyAlias() {
+		this.#propertyAlias.value;
+	}
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this.#editorConfiguration.setValue(configs);
@@ -67,9 +80,18 @@ export abstract class UmbBlockManagerContext<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
 
-		// TODO: This might will need the property alias as part of the URL, to avoid collision if multiple of these Editor on same Node.
-		// IDEA: Make a Workspace registration controller that can be used to register a workspace, which does both edit and create?.
-		new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
+			this.observe(
+				propertyContext?.alias,
+				(alias) => {
+					this.#propertyAlias.setValue(alias);
+				},
+				'observePropertyAlias',
+			);
+		});
+
+		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
+			.addUniquePaths(['propertyAlias'])
 			.addAdditionalPath('block')
 			.onSetup(() => {
 				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
@@ -191,9 +213,12 @@ export abstract class UmbBlockManagerContext<
 		return true;
 	}
 
+	// Idea: should we return true if it was successful?
 	deleteBlock(contentUdi: string) {
 		const layout = this._layouts.value.find((x) => x.contentUdi === contentUdi);
-		if (!layout) return;
+		if (!layout) {
+			throw new Error(`Cannot delete block, missing layout for ${contentUdi}`);
+		}
 
 		if (layout.settingsUdi) {
 			this.#settings.removeOne(layout.settingsUdi);

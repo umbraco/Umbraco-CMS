@@ -76,6 +76,7 @@ export class UmbBlockWorkspaceContext<
 		}
 
 		this.observe(
+			// TODO: Make a general concept of Block Entries Context, use it to retrieve the layout:
 			this.#blockManager.layoutOf(unique),
 			(layoutData) => {
 				this.#layout.setValue(layoutData as LayoutDataType);
