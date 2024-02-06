@@ -18,6 +18,26 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		icon: 'icon-bug',
 		properties: [
 			{
+				id: '19',
+				container: { id: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75' },
+				alias: 'mediaPicker',
+				name: 'Media Picker',
+				description: '',
+				dataType: { id: 'dt-uploadField' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
 				id: '5b4ca208-134e-4865-b423-06e5e97adf3c',
 				container: { id: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75' },
 				alias: 'mediaType1Property1',
@@ -26,7 +46,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				dataType: { id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae' },
 				variesByCulture: false,
 				variesBySegment: false,
-				sortOrder: 0,
+				sortOrder: 1,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
