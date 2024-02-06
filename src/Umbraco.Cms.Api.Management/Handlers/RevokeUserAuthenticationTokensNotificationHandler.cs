@@ -69,15 +69,21 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
 
         foreach (IUser user in notification.SavedEntities)
         {
-            if (user.IsAdmin())
+            if (user.IsSuper())
             {
-                return;
+                continue;
             }
 
-            // When non-admin user is locked out and/or un-approved, make sure we revoke all tokens
+            // When a user is locked out and/or un-approved, make sure we revoke all tokens
             if (user.IsLockedOut || user.IsApproved is false)
             {
                 await RevokeTokensAsync(user);
+                continue;
+            }
+
+            // Don't revoke admin tokens to prevent log out when accidental changes
+            if (user.IsAdmin())
+            {
                 continue;
             }
 
@@ -137,7 +143,7 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
 
         // since the user group was deleted, we can only use the information we collected before the deletion
         // this means that we will not be able to detect users in any groups that were eventually deleted (due to implementor/3th party supplier interference)
-        // that were not in the initial to be deleted list,
+        // that were not in the initial to be deleted list
         foreach (IUser user in preDeletingUsersInGroups
                      .Where(group => notification.DeletedEntities.Any(entity => group.Key == entity.Key))
                      .SelectMany(group => group.Value))
@@ -177,7 +183,7 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
             return;
         }
 
-        _logger.LogInformation("Deleting {count} active tokens for user with ID {id}", tokens.Length, user.Id);
+        _logger.LogInformation("Revoking {count} active tokens for user with ID {id}", tokens.Length, user.Id);
         foreach (var token in tokens)
         {
             await _tokenManager.DeleteAsync(token);
@@ -215,5 +221,3 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         }
     }
 }
-
-
