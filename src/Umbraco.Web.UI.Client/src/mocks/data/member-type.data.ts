@@ -1,4 +1,4 @@
-import type { MemberTypeDetails } from '../../packages/members/member-types/types.js';
+import type { MemberTypeDetails } from '../../packages/members/member-type/types.js';
 import { UmbMockDBBase } from './utils/mock-db-base.js';
 import { createEntityTreeItem } from './utils.js';
 import type {
