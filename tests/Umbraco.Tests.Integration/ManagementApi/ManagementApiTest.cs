@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 
@@ -39,6 +40,13 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     protected override void CustomTestAuthSetup(IServiceCollection services)
     {
         // We do not wanna fake anything, and thereby have protection
+    }
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        // Remove the NuCacheStartupHandler, as we do not want to rebuild the cache. Since there is no reason to build as it is not used in the tests.
+        builder.Services.Remove(
+            builder.Services.FirstOrDefault(x => x.ImplementationType == typeof(NuCacheStartupHandler)));
     }
 
     protected abstract Expression<Func<T, object>> MethodSelector { get; }
