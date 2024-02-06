@@ -10,7 +10,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		meta: {
 			label: 'Members',
 			pathname: 'members',
-			icon: 'icon-members',
+			icon: 'icon-user',
 		},
 		conditions: [
 			{

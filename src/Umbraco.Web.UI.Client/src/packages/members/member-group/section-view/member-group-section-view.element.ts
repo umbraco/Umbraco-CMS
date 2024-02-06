@@ -21,7 +21,7 @@ export class UmbMemberGroupSectionViewElement extends UmbLitElement {
 		},
 		{
 			path: '',
-			redirectTo: 'member-group',
+			redirectTo: 'collection',
 		},
 	];
 
