@@ -1,3 +1,4 @@
+import { UMB_MEMBER_GROUP_COLLECTION_ALIAS } from '../collection/manifests.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -6,16 +7,14 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 @customElement('umb-member-group-section-view')
 export class UmbMemberGroupSectionViewElement extends UmbLitElement {
 	#routes: UmbRoute[] = [
-		/*
 		{
 			path: 'collection',
 			component: () => {
 				const element = document.createElement('umb-collection');
-				element.setAttribute('alias', UMB_MEMBER_COLLECTION_ALIAS);
+				element.setAttribute('alias', UMB_MEMBER_GROUP_COLLECTION_ALIAS);
 				return element;
 			},
 		},
-		*/
 		{
 			path: 'member-group',
 			component: () => import('../workspace/member-group-workspace.element.js'),

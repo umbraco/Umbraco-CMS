@@ -1,3 +1,4 @@
+import { UMB_MEMBER_COLLECTION_ALIAS } from '../collection/manifests.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -6,7 +7,6 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 @customElement('umb-member-section-view')
 export class UmbMemberSectionViewElement extends UmbLitElement {
 	#routes: UmbRoute[] = [
-		/*
 		{
 			path: 'collection',
 			component: () => {
@@ -15,7 +15,6 @@ export class UmbMemberSectionViewElement extends UmbLitElement {
 				return element;
 			},
 		},
-		*/
 		{
 			path: 'member',
 			component: () => import('../workspace/member-workspace.element.js'),
