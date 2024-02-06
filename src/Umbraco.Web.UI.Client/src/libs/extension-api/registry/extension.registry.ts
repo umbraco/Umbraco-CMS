@@ -114,7 +114,7 @@ export class UmbExtensionRegistry<
 		this._extensions.setValue([...this._extensions.getValue(), manifest as ManifestTypes]);
 	}
 
-	getExtensions(): Array<ManifestTypes> {
+	getAllExtensions(): Array<ManifestTypes> {
 		return this._extensions.getValue();
 	}
 

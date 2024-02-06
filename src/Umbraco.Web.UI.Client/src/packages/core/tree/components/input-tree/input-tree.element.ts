@@ -13,7 +13,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 		return undefined;
 	}
 
-	private _type: UmbTreePickerSource['type'] = undefined;
+	private _type: UmbTreePickerSource['type'] = 'content';
 	@property()
 	public set type(newType: UmbTreePickerSource['type']) {
 		const oldType = this._type;

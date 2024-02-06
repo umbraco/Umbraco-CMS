@@ -8,7 +8,7 @@ export class UmbExtensionCollectionRepository extends UmbRepositoryBase implemen
 	}
 
 	async requestCollection(filter: any) {
-		const extensions = umbExtensionsRegistry.getExtensions();
+		const extensions = umbExtensionsRegistry.getAllExtensions();
 		const total = extensions.length;
 		const items = extensions.slice(filter.skip, filter.skip + filter.take);
 		const data = { items, total };

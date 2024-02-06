@@ -108,6 +108,7 @@ export default {
 						'@umbraco-cms/backoffice/language': './src/packages/language/index.ts',
 
 						'@umbraco-cms/backoffice/data-type': './src/packages/core/data-type/index.ts',
+						'@umbraco-cms/backoffice/dynamic-root': './src/packages/dynamic-root/index.ts',
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
 						'@umbraco-cms/backoffice/relation-type': './src/packages/relations/relation-types/index.ts',
 						'@umbraco-cms/backoffice/relation': './src/packages/relations/relations/index.ts',
