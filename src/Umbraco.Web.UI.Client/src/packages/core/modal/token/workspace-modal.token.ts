@@ -1,4 +1,4 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
 export interface UmbWorkspaceData<DataModelType = unknown> {
 	entityType: string;
 	preset: Partial<DataModelType>;
