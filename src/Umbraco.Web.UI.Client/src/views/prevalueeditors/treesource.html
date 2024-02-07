@@ -6,9 +6,10 @@
 		<option value="member">Members</option>
 	</select>
 
-    <umb-node-preview
-		ng-show="node"
-        class="mt1"
+  <h5 ng-if="node"><localize key="contentPicker_configurationStartNodeTitle">Root node</localize></h5>
+  <umb-node-preview
+		ng-if="node"
+    class="mt1"
 		icon="node.icon"
 		name="node.name"
 		published="node.published"
@@ -19,19 +20,31 @@
 		on-edit="openContentPicker()">
 	</umb-node-preview>
 
-    <div ng-if="!node && model.value.type !== 'member'" class="mt2">
-        <div ng-hide="showSearch || model.value.query">
-            <button type="button" class="umb-node-preview-add"
-                    ng-click="openContentPicker()">
-                <localize key="general_choose">Choose a root node</localize>
-            </button>
-            <div class="mt2" ng-show="model.value.type == 'content'">
-                <umb-icon icon="icon-search" class="icon"></umb-icon>
-                <button type="button" class="btn-link" ng-click="showSearch = true">Query for root node with XPath</button>
-            </div>
+    <div ng-if="!node && model.value.type === 'content'" class="mt2">
+        <div ng-hide="(showXPath || model.value.query) || (showDynamicStartNode || model.value.dynamicRoot)" class="flex">
+          <button
+            type="button"
+            class="umb-node-preview-add"
+            ng-click="openContentPicker()">
+            <localize key="contentPicker_defineRootNode">Pick root node</localize>
+          </button>
+          <button
+            type="button"
+            class="umb-node-preview-add"
+            ng-click="chooseXPath()">
+            <localize key="contentPicker_defineXPathOrigin">Specify root via XPath</localize>
+          </button>
+          <button
+            type="button"
+            class="umb-node-preview-add"
+            ng-click="chooseDynamicStartNode()">
+            <localize key="contentPicker_defineDynamicRoot">Specify a Dynamic Root</localize>
+          </button>
         </div>
 
-        <div ng-show="showSearch || model.value.query">
+        <div ng-if="showXPath || model.value.query">
+
+          <h5><localize key="contentPicker_configurationXPathTitle">XPath Query</localize></h5>
 
             <input type="text"
                    ng-model="model.value.query"
@@ -51,9 +64,9 @@
                         <p>
                             A placeholder finds the nearest published ID and runs its query from there, so for instance:
                         </p>
-                        
+
                         <pre>$parent/newsArticle</pre>
-                        
+
                         <p>
                             Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news article children there.
                         </p>
@@ -72,10 +85,80 @@
                 </li>
                 <li>
                     <umb-icon icon="icon-delete" class="icon red"></umb-icon>
-                    <button type="button" class="btn-link" ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</button>
+                    <button type="button" class="btn-link" ng-click="clearXPath()">Cancel and clear query</button>
                 </li>
             </ul>
         </div>
+      <div ng-if="showDynamicStartNode || model.value.dynamicRoot">
+
+        <h5><localize key="dynamicRoot_configurationTitle">Dynamic Root Query</localize></h5>
+
+        <!-- origin -->
+        <div class="umb-node-preview" single>
+          <div class="flex">
+            <umb-icon class="umb-node-preview__icon" icon="{{dynamicRootOriginIcon}}"></umb-icon>
+            <div class="umb-node-preview__content">
+              <div class="umb-node-preview__name">
+                <!-- ng-repeat is used here to enforce re-rendering when originAlias is changed: -->
+                <localize ng-repeat="originAlias in [model.value.dynamicRoot.originAlias]" key="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title"></localize>
+              </div>
+              <div class="umb-node-preview__description" ng-if="model.value.dynamicRoot.originKey">
+                {{ ("umb://" + (model.value.type === 'content' ? 'document' : model.value.type) + "/" + model.value.dynamicRoot.originKey | ncNodeName)}}
+              </div>
+            </div>
+          </div>
+          <div class="umb-node-preview__actions">
+            <button type="button" class="umb-node-preview__action" ng-click="openDynamicRootOriginPicker()"><localize key="general_change">Change</localize></button>
+          </div>
+        </div>
+
+        <!-- list of query steps -->
+        <div ui-sortable="sortableOptionsForQuerySteps" ng-model="model.value.dynamicRoot.querySteps">
+          <div class="umb-node-preview" single ng-repeat="queryStep in model.value.dynamicRoot.querySteps track by $index">
+            <div class="flex">
+              <umb-icon class="umb-node-preview__icon" icon="{{getIconForQueryStepAlias(queryStep.alias)}}"></umb-icon>
+              <div class="umb-node-preview__content">
+                <div class="umb-node-preview__name">
+                  <localize ng-if="queryStep.alias === 'NearestAncestorOrSelf' ||
+                  queryStep.alias === 'FurthestAncestorOrSelf' ||
+                  queryStep.alias === 'NearestDescendantOrSelf' ||
+                  queryStep.alias === 'FurthestDescendantOrSelf'" key="dynamicRoot_queryStep{{queryStep.alias}}Title"></localize>
+                  <span ng-if="queryStep.alias !== 'NearestAncestorOrSelf' &&
+                  queryStep.alias !== 'FurthestAncestorOrSelf' &&
+                  queryStep.alias !== 'NearestDescendantOrSelf' &&
+                  queryStep.alias !== 'FurthestDescendantOrSelf'">{{queryStep.alias}}</span>
+                </div>
+                <div class="umb-node-preview__description" ng-if="queryStep.anyOfDocTypeKeys && queryStep.anyOfDocTypeKeys.length > 0">
+                  <!-- todo: Maybe get the name to display here. -->
+                  <localize key="dynamicRoot_queryStepTypes">of type: </localize>
+
+                  <span ng-repeat="key in queryStep.anyOfDocTypeKeys track by $index">
+                    {{ key | umbCmsJoinArray:', '}}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="umb-node-preview__actions">
+              <button type="button" class="umb-node-preview__action" ng-click="removeQueryStep(queryStep)"><localize key="general_remove">Remove</localize></button>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="umb-node-preview-add"
+          ng-click="appendDynamicQueryStep()">
+          <localize key="dynamicRoot_addQueryStep">Add query step</localize>
+        </button>
+
+
+        <ul class="unstyled list-icons mt3">
+          <li>
+            <umb-icon icon="icon-delete" class="icon red"></umb-icon>
+            <button type="button" class="btn-link" ng-click="clearDynamicStartNode()">Cancel and clear query</button>
+          </li>
+        </ul>
+      </div>
     </div>
 
 </div>

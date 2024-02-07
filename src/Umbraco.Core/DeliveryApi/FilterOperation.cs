@@ -5,5 +5,9 @@ public enum FilterOperation
     Is,
     IsNot,
     Contains,
-    DoesNotContain
+    DoesNotContain,
+    LessThan,
+    LessThanOrEqual,
+    GreaterThan,
+    GreaterThanOrEqual
 }

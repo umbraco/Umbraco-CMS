@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -56,7 +57,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
         builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
-        builder.Services.AddSingleton<ExamineIndexRebuilder>();
+
+        builder.Services.AddSingleton<ExamineIndexRebuilder>();  //TODO remove in Umbraco 15. Only the interface should be in the service provider
+
+        builder.Services.AddUnique<IDeliveryApiCompositeIdHandler, DeliveryApiCompositeIdHandler>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, ContentIndexingNotificationHandler>();
