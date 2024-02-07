@@ -183,19 +183,6 @@ public class TemplateService : RepositoryService, ITemplateService
     }
 
     /// <inheritdoc />
-    public async Task<string> GetScaffoldAsync(Guid? masterTemplateKey)
-    {
-        string? masterAlias = null;
-        if (masterTemplateKey is not null)
-        {
-            ITemplate? masterTemplate = await GetAsync(masterTemplateKey.Value);
-            masterAlias = masterTemplate?.Alias;
-        }
-
-        return _defaultViewContentProvider.GetDefaultFileContent(masterAlias);
-    }
-
-    /// <inheritdoc />
     public async Task<IEnumerable<ITemplate>> GetDescendantsAsync(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))

@@ -19798,86 +19798,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/template/scaffold": {
-      "get": {
-        "tags": [
-          "Template"
-        ],
-        "operationId": "GetTemplateScaffold",
-        "parameters": [
-          {
-            "name": "masterTemplateId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/TemplateScaffoldResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/TemplateScaffoldResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/TemplateScaffoldResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/tree/template/children": {
       "get": {
         "tags": [
@@ -31029,19 +30949,6 @@
               }
             ],
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "TemplateScaffoldResponseModel": {
-        "required": [
-          "content"
-        ],
-        "type": "object",
-        "properties": {
-          "content": {
-            "minLength": 1,
-            "type": "string"
           }
         },
         "additionalProperties": false
