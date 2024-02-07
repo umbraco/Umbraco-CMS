@@ -41,7 +41,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 			const mappedData = {
 				unique: data.id,
 				name: data.name,
-				parentUnique: data.parentId || null,
+				parentUnique: data.parent ? data.parent.id : null,
 			};
 
 			return { data: mappedData };

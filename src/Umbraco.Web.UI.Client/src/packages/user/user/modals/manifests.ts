@@ -5,13 +5,13 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.User.Create',
 		name: 'Create User Modal',
-		js: () => import('./create/user-create-modal.element.js'),
+		js: () => import('./create/create-user-modal.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.User.CreateSuccess',
 		name: 'Create Success User Modal',
-		js: () => import('./create/user-create-success-modal.element.js'),
+		js: () => import('./create/create-user-success-modal.element.js'),
 	},
 	{
 		type: 'modal',

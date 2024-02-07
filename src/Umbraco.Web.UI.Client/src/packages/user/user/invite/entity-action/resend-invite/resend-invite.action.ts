@@ -20,7 +20,9 @@ export class UmbResendInviteToUserEntityAction extends UmbEntityActionBase<UmbEn
 
 		const modalContext = this.#modalManager.open(UMB_RESEND_INVITE_TO_USER_MODAL, {
 			data: {
-				userId: this.unique,
+				user: {
+					unique: this.unique,
+				},
 			},
 		});
 

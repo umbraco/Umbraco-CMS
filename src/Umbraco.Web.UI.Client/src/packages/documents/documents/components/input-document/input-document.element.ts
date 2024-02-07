@@ -5,23 +5,21 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
-import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
-
-const SORTER_CONFIG: UmbSorterConfig<string> = {
-	compareElementToModel: (element, model) => {
-		return element.getAttribute('detail') === model;
-	},
-	querySelectModelToElement: () => null,
-	identifier: 'Umb.SorterIdentifier.InputDocument',
-	itemSelector: 'uui-ref-node',
-	containerSelector: 'uui-ref-list',
-};
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
-	#sorter = new UmbSorterController(this, {
-		...SORTER_CONFIG,
+	#sorter = new UmbSorterController<string>(this, {
+		getUniqueOfElement: (element) => {
+			return element.getAttribute('detail');
+		},
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry;
+		},
+		identifier: 'Umb.SorterIdentifier.InputDocument',
+		itemSelector: 'uui-ref-node',
+		containerSelector: 'uui-ref-list',
 		onChange: ({ model }) => {
 			this.selectedIds = model;
 		},
@@ -119,6 +117,13 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 				this._editDocumentPath = routeBuilder({});
 			});
 
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
@@ -130,9 +135,6 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			() => this.maxMessage,
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
-
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	protected getFormElement() {
@@ -148,7 +150,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	#openPicker() {
 		// TODO: Configure the content picker, with `startNodeId` and `ignoreUserStartNodes` [LK]
-		console.log('_openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
+		console.log('#openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -158,7 +160,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
+		return html`${this.#renderItems()} ${this.#renderAddButton()}`;
 	}
 
 	#renderItems() {

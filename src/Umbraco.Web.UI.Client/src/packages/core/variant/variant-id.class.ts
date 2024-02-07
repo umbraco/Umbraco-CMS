@@ -1,4 +1,4 @@
-export type variantObject = { culture?: string | null; segment?: string | null };
+export type variantObject = { culture: string | null; segment: string | null };
 
 export const UMB_INVARIANT_CULTURE = 'invariant';
 
@@ -8,7 +8,7 @@ export class UmbVariantId {
 	}
 
 	public static CreateInvariant(): UmbVariantId {
-		return Object.freeze(new UmbVariantId({}));
+		return Object.freeze(new UmbVariantId({ culture: null, segment: null }));
 	}
 
 	public readonly culture: string | null = null;

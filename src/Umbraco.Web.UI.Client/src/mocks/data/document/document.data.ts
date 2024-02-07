@@ -3,11 +3,9 @@ import type {
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockDocumentTypeModelHack = DocumentResponseModel &
-	DocumentTreeItemResponseModel &
-	DocumentItemResponseModel;
+type UmbMockDocumentTypeModelHack = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
 
 export interface UmbMockDocumentModel extends Omit<UmbMockDocumentTypeModelHack, 'type'> {}
 
@@ -40,7 +38,7 @@ export const data: Array<UmbMockDocumentModel> = [
 					blocks: {},
 					markup: `
 						<p>
-							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a href="/{localLink:umb://document/c05da24d7740447b9cdcbd8ce2172e38}">internal link</a> foo foo
+							Some value for the RTE with an <a href="https://google.com">external link</a> and an <a type="document" href="/{localLink:c05da24d-7740-447b-9cdc-bd8ce2172e38}">internal link</a> foo foo
 						</p>
 						<div class="umb-macro-holder TestMacro umb-macro-mce_1 mceNonEditable"><!-- <?UMBRACO_MACRO macroAlias="TestMacro" /> --><ins>Macro alias: <strong>TestMacro</strong></ins></div>
 						<p>The following tests the embed plugin:</p>
@@ -369,7 +367,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -378,7 +376,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da-dk',
 				segment: null,
@@ -471,7 +469,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -480,7 +478,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da-dk',
 				segment: null,
@@ -489,7 +487,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.PUBLISHED,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'no-no',
 				segment: null,
@@ -498,7 +496,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.PUBLISHED_PENDING_CHANGES,
+				state: DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'es-es',
 				segment: null,
@@ -507,7 +505,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				updateDate: '2023-02-06T15:31:51.354764',
 			},
 			{
-				state: ContentStateModel.NOT_CREATED,
+				state: DocumentVariantStateModel.NOT_CREATED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'pl-pl',
 				segment: null,
@@ -583,7 +581,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.DRAFT,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
 				segment: null,
@@ -614,7 +612,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		isTrashed: false,
 		variants: [
 			{
-				state: ContentStateModel.DRAFT,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
 				segment: null,

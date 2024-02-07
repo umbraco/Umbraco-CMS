@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DatabaseInstallResponseModel } from '../models/DatabaseInstallResponseModel';
+import type { DatabaseInstallRequestModel } from '../models/DatabaseInstallRequestModel';
+import type { InstallRequestModel } from '../models/InstallRequestModel';
 import type { InstallSettingsResponseModel } from '../models/InstallSettingsResponseModel';
-import type { InstallVResponseModel } from '../models/InstallVResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -21,7 +21,6 @@ export class InstallResource {
             method: 'GET',
             url: '/umbraco/management/api/v1/install/settings',
             errors: {
-                400: `Bad Request`,
                 428: `Client Error`,
             },
         });
@@ -34,7 +33,7 @@ export class InstallResource {
     public static postInstallSetup({
         requestBody,
     }: {
-        requestBody?: InstallVResponseModel,
+        requestBody?: InstallRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -42,7 +41,6 @@ export class InstallResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                400: `Bad Request`,
                 428: `Client Error`,
             },
         });
@@ -55,7 +53,7 @@ export class InstallResource {
     public static postInstallValidateDatabase({
         requestBody,
     }: {
-        requestBody?: DatabaseInstallResponseModel,
+        requestBody?: DatabaseInstallRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',

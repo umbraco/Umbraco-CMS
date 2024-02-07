@@ -3,8 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type ImportDictionaryRequestModel = {
-    temporaryFileId: string;
-    parentId?: string | null;
+    temporaryFile: ReferenceByIdModel;
+    parent?: ReferenceByIdModel | null;
 };
 

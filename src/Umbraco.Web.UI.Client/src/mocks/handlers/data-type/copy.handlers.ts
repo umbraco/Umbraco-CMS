@@ -11,9 +11,9 @@ export const copyHandlers = [
 
 		const requestBody = (await req.json()) as CopyDataTypeRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		if (!requestBody.targetId) return res(ctx.status(400, 'no targetId found'));
+		if (!requestBody.target?.id) return res(ctx.status(400, 'no targetId found'));
 
-		const newIds = umbDataTypeMockDb.tree.copy([id], requestBody.targetId);
+		const newIds = umbDataTypeMockDb.tree.copy([id], requestBody.target.id);
 
 		return res(ctx.status(201), ctx.set({ Location: newIds[0] }));
 	}),

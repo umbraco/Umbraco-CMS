@@ -4,9 +4,7 @@ import type {
 	DataTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockDataTypeModelHack = DataTypeResponseModel &
-	DataTypeTreeItemResponseModel &
-	DataTypeItemResponseModel;
+type UmbMockDataTypeModelHack = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
 
 export interface UmbMockDataTypeModel extends Omit<UmbMockDataTypeModelHack, 'type'> {}
 
@@ -227,6 +225,15 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: {
 					type: 'content',
 					id: null,
+					dynamicRoot: {
+						originAlias: 'Root',
+						querySteps: [
+							{
+								alias: 'FurthestAncestorOrSelf',
+								anyOfDocTypeKeys: ['all-property-editors-document-type-id'],
+							},
+						],
+					},
 				},
 			},
 			{

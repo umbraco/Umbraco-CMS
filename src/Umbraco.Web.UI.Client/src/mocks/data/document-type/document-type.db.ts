@@ -1,8 +1,8 @@
-import { UmbEntityMockDbBase } from '../entity/entity-base.js';
-import { UmbMockEntityFolderManager } from '../entity/entity-folder.manager.js';
-import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
-import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
+import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
+import { UmbMockEntityFolderManager } from '../utils/entity/entity-folder.manager.js';
+import { UmbMockEntityTreeManager } from '../utils/entity/entity-tree.manager.js';
+import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
+import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import type { UmbMockDocumentTypeModel } from './document-type.data.js';
 import { data } from './document-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -51,7 +51,7 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 	return {
 		name: request.name,
 		id: request.id ? request.id : UmbId.new(),
-		parent: request.parentId ? { id: request.parentId } : null,
+		parent: request.parent,
 		description: '',
 		alias: '',
 		icon: '',

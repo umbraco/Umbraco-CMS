@@ -4,11 +4,11 @@ import type { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoff
 import type {
 	UmbLinkPickerConfig,
 	UmbLinkPickerLink,
+	UmbLinkPickerLinkType,
 	UmbLinkPickerModalData,
 	UmbLinkPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 import { UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-link-picker-modal')
@@ -57,7 +57,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (this.modalContext) {
 			this.observe(this.modalContext.value, (value) => {
 				(this._link as any) = value.link;
-				this._selectedKey = this._link?.udi ? getKeyFromUdi(this._link.udi) : undefined;
+				this._selectedKey = this._link?.unique ?? undefined;
 				this._selectionConfiguration.selection = this._selectedKey ? [this._selectedKey] : [];
 			});
 		}
@@ -88,18 +88,18 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const selectedKey = selection[selection.length - 1];
 
 		if (!selectedKey) {
-			this.#partialUpdateLink({ udi: '', url: undefined });
+			this.#partialUpdateLink({ type: undefined, unique: '', url: undefined });
 			this._selectedKey = undefined;
 			this._selectionConfiguration.selection = [];
 			this.requestUpdate();
 			return;
 		}
 
-		const udi = buildUdi(entityType, selectedKey);
+		const linkType = (entityType as UmbLinkPickerLinkType) ?? 'external';
 
 		this._selectedKey = selectedKey;
 		this._selectionConfiguration.selection = [this._selectedKey];
-		this.#partialUpdateLink({ udi: udi, url: udi });
+		this.#partialUpdateLink({ type: linkType, unique: selectedKey, url: selectedKey });
 		this.requestUpdate();
 	}
 
@@ -154,9 +154,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				id="link-input"
 				placeholder=${this.localize.term('general_url')}
 				label=${this.localize.term('general_url')}
-				.value="${this._link.udi ?? this._link.url ?? ''}"
-				@input=${() => this.#partialUpdateLink({ url: this._linkInput.value as string })}
-				?disabled="${this._link.udi ? true : false}"></uui-input>
+				.value="${this._link.unique ?? this._link.url ?? ''}"
+				@input=${() => this.#partialUpdateLink({ type: 'external', url: this._linkInput.value as string })}
+				?disabled="${this._link.unique ? true : false}"></uui-input>
 		</span>`;
 	}
 

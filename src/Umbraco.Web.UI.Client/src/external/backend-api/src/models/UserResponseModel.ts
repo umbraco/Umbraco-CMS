@@ -9,7 +9,7 @@ import type { UserStateModel } from './UserStateModel';
 export type UserResponseModel = (UserPresentationBaseModel & {
     id: string;
     languageIsoCode?: string | null;
-    contentStartNodeIds: Array<string>;
+    documentStartNodeIds: Array<string>;
     mediaStartNodeIds: Array<string>;
     avatarUrls: Array<string>;
     state: UserStateModel;

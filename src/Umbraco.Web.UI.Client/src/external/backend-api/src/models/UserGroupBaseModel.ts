@@ -3,15 +3,17 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type UserGroupBaseModel = {
     name: string;
     icon?: string | null;
     sections: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
-    documentStartNodeId?: string | null;
+    documentStartNode?: ReferenceByIdModel | null;
     documentRootAccess: boolean;
-    mediaStartNodeId?: string | null;
+    mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
     permissions: Array<string>;
 };

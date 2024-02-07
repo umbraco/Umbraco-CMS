@@ -18,7 +18,7 @@ export const handlers = [
 		const id = _req.params.id as string;
 		if (!id) return;
 
-		const foundLogs = logs.filter((log) => log.entityId === id);
+		const foundLogs = logs.filter((log) => log.entity?.id === id);
 		const PagedAuditLog = {
 			total: foundLogs.length,
 			items: foundLogs,
@@ -30,7 +30,7 @@ export const handlers = [
 		const logType = _req.params.logType as string;
 		if (!logType) return;
 
-		const foundLogs = logs.filter((log) => log.entityType === logType);
+		const foundLogs = logs.filter((log) => log.entity?.type === logType);
 		const PagedAuditLog = {
 			total: foundLogs.length,
 			items: foundLogs,

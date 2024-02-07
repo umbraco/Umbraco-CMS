@@ -251,7 +251,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			cleanup: model.cleanup,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeResource.putDocumentTypeById({
 				id: model.unique,
@@ -259,8 +259,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

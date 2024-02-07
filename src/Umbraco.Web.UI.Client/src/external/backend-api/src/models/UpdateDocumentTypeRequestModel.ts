@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCleanupModel } from './ContentTypeCleanupModel';
+import type { DocumentTypeCleanupModel } from './DocumentTypeCleanupModel';
 import type { DocumentTypeCompositionModel } from './DocumentTypeCompositionModel';
 import type { DocumentTypeSortModel } from './DocumentTypeSortModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
@@ -12,7 +12,7 @@ import type { UpdateContentTypeForDocumentTypeRequestModel } from './UpdateConte
 export type UpdateDocumentTypeRequestModel = (UpdateContentTypeForDocumentTypeRequestModel & {
     allowedTemplates: Array<ReferenceByIdModel>;
     defaultTemplate?: ReferenceByIdModel | null;
-    cleanup: ContentTypeCleanupModel;
+    cleanup: DocumentTypeCleanupModel;
     allowedDocumentTypes: Array<DocumentTypeSortModel>;
     compositions: Array<DocumentTypeCompositionModel>;
 });

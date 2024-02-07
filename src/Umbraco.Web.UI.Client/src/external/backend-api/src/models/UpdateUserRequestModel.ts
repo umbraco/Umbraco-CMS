@@ -7,7 +7,7 @@ import type { UserPresentationBaseModel } from './UserPresentationBaseModel';
 
 export type UpdateUserRequestModel = (UserPresentationBaseModel & {
     languageIsoCode: string;
-    contentStartNodeIds: Array<string>;
+    documentStartNodeIds: Array<string>;
     mediaStartNodeIds: Array<string>;
 });
 

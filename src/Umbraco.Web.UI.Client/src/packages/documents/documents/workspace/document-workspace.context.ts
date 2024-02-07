@@ -38,7 +38,7 @@ export class UmbDocumentWorkspaceContext
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
-	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.id || null);
+	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly splitView = new UmbWorkspaceSplitViewManager();
@@ -149,12 +149,14 @@ export class UmbDocumentWorkspaceContext
 		}
 		return undefined;
 	}
-	async setPropertyValue<PropertyValueType = unknown>(
+	async setPropertyValue<UmbDocumentValueModel = unknown>(
 		alias: string,
-		value: PropertyValueType,
+		value: UmbDocumentValueModel,
 		variantId?: UmbVariantId,
 	) {
-		const entry = { ...variantId?.toObject(), alias, value };
+		if (!variantId) throw new Error('VariantId is missing');
+
+		const entry = { ...variantId.toObject(), alias, value };
 		const currentData = this.#currentData.value;
 		if (currentData) {
 			const values = appendToFrozenArray(

@@ -5,7 +5,7 @@ const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.TinyMCE',
 	name: 'Rich Text Editor Property Editor UI',
-	js: () => import('./property-editor-ui-tiny-mce.element.js'),
+	element: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
 		label: 'Rich Text Editor',
 		propertyEditorSchemaAlias: 'Umbraco.RichText',

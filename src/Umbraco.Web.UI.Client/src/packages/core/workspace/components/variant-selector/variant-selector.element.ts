@@ -17,8 +17,8 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -26,7 +26,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	private _popoverElement?: UUIPopoverContainerElement;
 
 	@state()
-	_variants: Array<UmbVariantModel> = [];
+	_variants: Array<UmbDocumentVariantModel> = [];
 
 	// TODO: Stop using document context specific ActiveVariant type.
 	@state()
@@ -81,6 +81,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				workspaceContext.variants,
 				(variants) => {
 					if (variants) {
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						// TODO: figure out what we do with the different variant models. Document has a state, but the variant model does not.
 						this._variants = variants;
 					}
 				},
@@ -147,11 +150,11 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private _switchVariant(variant: UmbVariantModel) {
+	private _switchVariant(variant: UmbDocumentVariantModel) {
 		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
 	}
 
-	private _openSplitView(variant: UmbVariantModel) {
+	private _openSplitView(variant: UmbDocumentVariantModel) {
 		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
 	}
 
@@ -163,8 +166,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return this._activeVariantsCultures.includes(culture);
 	}
 
-	private _isNotPublishedMode(culture: string, state: ContentStateModel) {
-		return state !== ContentStateModel.PUBLISHED && !this._isVariantActive(culture!);
+	private _isNotPublishedMode(culture: string, state: DocumentVariantStateModel) {
+		return state !== DocumentVariantStateModel.PUBLISHED && !this._isVariantActive(culture!);
 	}
 
 	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.

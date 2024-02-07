@@ -1,13 +1,11 @@
 import type { UmbUserDetailModel } from '../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserDetailRepository } from '../repository/index.js';
-import type {
-	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbEditableWorkspaceContextBase,
-} from '@umbraco-cms/backoffice/workspace';
+import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
+import { UMB_USER_WORKSPACE_ALIAS } from './manifests.js';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
@@ -17,13 +15,13 @@ export class UmbUserWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbUserDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	//
-	public readonly repository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
+	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
+	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
 
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.User');
+		super(host, UMB_USER_WORKSPACE_ALIAS);
 
 		new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT, (instance) => {
 			this.#currentUserContext = instance;
@@ -33,8 +31,8 @@ export class UmbUserWorkspaceContext
 	#data = new UmbObjectState<UmbUserDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
-	async load(id: string) {
-		const { data, asObservable } = await this.repository.requestById(id);
+	async load(unique: string) {
+		const { data, asObservable } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
@@ -48,13 +46,13 @@ export class UmbUserWorkspaceContext
 		Therefore we have to subscribe to the user store to update the state in the workspace data.
 		There might be a less manual way to do this.
 	*/
-	onUserStoreChanges(user: UmbUserDetailModel) {
+	onUserStoreChanges(user: UmbUserDetailModel | undefined) {
 		if (!user) return;
 		this.#data.update({ state: user.state });
 	}
 
 	getEntityId(): string | undefined {
-		return this.getData()?.id || '';
+		return this.getData()?.unique;
 	}
 
 	getEntityType(): string {
@@ -73,41 +71,40 @@ export class UmbUserWorkspaceContext
 	}
 
 	async save() {
-		if (!this.#data.value) return;
-		if (!this.#data.value.id) return;
+		if (!this.#data.value) throw new Error('Data is missing');
+		if (!this.#data.value.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
+			await this.detailRepository.create(this.#data.value);
 		} else {
-			//TODO: temp hack: why does the response model allow for nulls but not the request model?
-			await this.repository.save(this.#data.value.id, this.#data.value as UpdateUserRequestModel);
+			await this.detailRepository.save(this.#data.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
 
 		// If we are saving the current user, we need to refetch it
-		await this.#reloadCurrentUser(this.#data.value.id);
+		await this.#reloadCurrentUser(this.#data.value.unique);
 	}
 
-	async #reloadCurrentUser(savedUserId: string): Promise<void> {
+	async #reloadCurrentUser(savedUserUnique: string): Promise<void> {
 		if (!this.#currentUserContext) return;
 		const currentUser = await firstValueFrom(this.#currentUserContext.currentUser);
-		if (currentUser?.id === savedUserId) {
+		if (currentUser?.unique === savedUserUnique) {
 			await this.#currentUserContext.requestCurrentUser();
 		}
 	}
 
 	// TODO: implement upload progress
 	async uploadAvatar(file: File) {
-		const id = this.getEntityId();
-		if (!id) throw new Error('Id is missing');
-		return this.repository.uploadAvatar(id, file);
+		const unique = this.getEntityId();
+		if (!unique) throw new Error('Unique is missing');
+		return this.avatarRepository.uploadAvatar(unique, file);
 	}
 
 	async deleteAvatar() {
-		const id = this.getEntityId();
-		if (!id) throw new Error('Id is missing');
-		return this.repository.deleteAvatar(id);
+		const unique = this.getEntityId();
+		if (!unique) throw new Error('Unique is missing');
+		return this.avatarRepository.deleteAvatar(unique);
 	}
 
 	destroy(): void {
