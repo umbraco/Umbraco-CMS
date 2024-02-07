@@ -19,6 +19,27 @@ export class UserGroupResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getItemUserGroup({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<UserGroupItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/user-group',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static deleteUserGroup({
         requestBody,
     }: {
@@ -205,27 +226,6 @@ export class UserGroupResource {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getUserGroupItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<UserGroupItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/user-group/item',
-            query: {
-                'id': id,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

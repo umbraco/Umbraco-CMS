@@ -15,6 +15,27 @@ import { request as __request } from '../core/request';
 export class LanguageResource {
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemLanguage({
+        isoCode,
+    }: {
+        isoCode?: Array<string>,
+    }): CancelablePromise<Array<LanguageItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/language',
+            query: {
+                'isoCode': isoCode,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns PagedLanguageResponseModel Success
      * @throws ApiError
      */
@@ -129,27 +150,6 @@ export class LanguageResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getLanguageItem({
-        isoCode,
-    }: {
-        isoCode?: Array<string>,
-    }): CancelablePromise<Array<LanguageItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/language/item',
-            query: {
-                'isoCode': isoCode,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

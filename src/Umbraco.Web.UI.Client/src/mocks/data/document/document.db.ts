@@ -1,14 +1,14 @@
-import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
-import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
+import { UmbMockEntityTreeManager } from '../utils/entity/entity-tree.manager.js';
+import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
+import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import { umbDocumentTypeMockDb } from '../document-type/document-type.db.js';
-import { UmbEntityMockDbBase } from '../entity/entity-base.js';
-import { UmbEntityRecycleBin } from '../entity/entity-recycle-bin.js';
+import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
+import { UmbEntityRecycleBin } from '../utils/entity/entity-recycle-bin.js';
 import type { UmbMockDocumentModel } from './document.data.js';
 import { data } from './document.data.js';
 import { UmbMockDocumentPublishingManager } from './document-publishing.manager.js';
 import {
-	ContentStateModel,
+	DocumentVariantStateModel,
 	type CreateDocumentRequestModel,
 	type DocumentItemResponseModel,
 	type DocumentResponseModel,
@@ -79,7 +79,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
-				state: ContentStateModel.DRAFT,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
 			};
 		}),

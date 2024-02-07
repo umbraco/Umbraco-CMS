@@ -4,7 +4,7 @@ import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { MemberTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbMemberTypePickerContext extends UmbPickerInputContext<MemberTypeItemResponseModel> {
+export class UmbMemberTypePickerContext extends UmbPickerInputContext<any> {
 	constructor(host: UmbControllerHostElement) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore

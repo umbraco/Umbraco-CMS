@@ -1,8 +1,8 @@
+import type { UmbMediaTypeItemModel } from '../../repository/index.js';
 import { UmbMediaTypePickerContext } from './input-media-type.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-media-type')
@@ -67,7 +67,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items?: Array<MediaTypeItemResponseModel>;
+	private _items?: Array<UmbMediaTypeItemModel>;
 
 	#pickerContext = new UmbMediaTypePickerContext(this);
 
@@ -110,7 +110,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 			<uui-ref-list
 				>${repeat(
 					this._items,
-					(item) => item.id,
+					(item) => item.unique,
 					(item) => this.#renderItem(item),
 				)}</uui-ref-list
 			>
@@ -130,14 +130,14 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	#renderItem(item: MediaTypeItemResponseModel) {
-		if (!item.id) return;
+	#renderItem(item: UmbMediaTypeItemModel) {
+		if (!item.unique) return;
 		return html`
 			<uui-ref-node-document-type name=${ifDefined(item.name)}>
 				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
 						label="Remove Media Type ${item.name}"
 						>${this.localize.term('general_remove')}</uui-button
 					>
@@ -146,7 +146,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	#renderIcon(item: MediaTypeItemResponseModel) {
+	#renderIcon(item: UmbMediaTypeItemModel) {
 		if (!item.icon) return;
 		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
 	}

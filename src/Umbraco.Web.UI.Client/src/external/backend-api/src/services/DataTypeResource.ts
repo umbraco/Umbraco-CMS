@@ -326,14 +326,14 @@ export class DataTypeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDataTypeItem({
+    public static getItemDataType({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<DataTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/data-type/item',
+            url: '/umbraco/management/api/v1/item/data-type',
             query: {
                 'id': id,
             },
@@ -347,14 +347,14 @@ export class DataTypeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDataTypeItemByAlias({
+    public static getItemDataTypeByAlias({
         alias,
     }: {
         alias: string,
     }): CancelablePromise<DataTypeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/data-type/item/{alias}',
+            url: '/umbraco/management/api/v1/item/data-type/{alias}',
             path: {
                 'alias': alias,
             },

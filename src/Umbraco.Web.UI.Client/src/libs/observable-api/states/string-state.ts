@@ -1,4 +1,5 @@
-import { createObservablePart, type MappingFunction, type MemoizationFunction } from '../index.js';
+import type { MappingFunction, MemoizationFunction } from '../types/index.js';
+import { createObservablePart } from '../utils/index.js';
 import { UmbBasicState } from './basic-state.js';
 
 /**

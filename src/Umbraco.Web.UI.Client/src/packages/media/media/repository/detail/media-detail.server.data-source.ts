@@ -44,11 +44,9 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			values: [],
 			variants: [
 				{
-					state: null,
 					culture: null,
 					segment: null,
 					name: '',
-					publishDate: null,
 					createDate: null,
 					updateDate: null,
 				},
@@ -85,7 +83,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 					culture: variant.culture || null,
 					segment: variant.segment || null,
 					name: variant.name,
-					publishDate: null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
 				};
@@ -146,7 +143,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			MediaResource.putMediaById({
 				id: model.unique,
@@ -154,8 +151,8 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

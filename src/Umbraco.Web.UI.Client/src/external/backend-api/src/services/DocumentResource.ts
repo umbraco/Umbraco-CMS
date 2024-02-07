@@ -43,6 +43,7 @@ export class DocumentResource {
             mediaType: 'application/json',
             responseHeader: 'Umb-Generated-Resource',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
@@ -117,6 +118,7 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
@@ -488,12 +490,26 @@ export class DocumentResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDocumentConfiguration(): CancelablePromise<DocumentConfigurationResponseModel> {
+    public static putDocumentByIdValidate({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDocumentRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/document/configuration',
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/document/{id}/validate',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
             },
         });
     }
@@ -502,17 +518,10 @@ export class DocumentResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDocumentItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<DocumentItemResponseModel>> {
+    public static getDocumentConfiguration(): CancelablePromise<DocumentConfigurationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/document/item',
-            query: {
-                'id': id,
-            },
+            url: '/umbraco/management/api/v1/document/configuration',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },
@@ -538,6 +547,50 @@ export class DocumentResource {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postDocumentValidate({
+        requestBody,
+    }: {
+        requestBody?: CreateDocumentRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/document/validate',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemDocument({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<DocumentItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/document',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

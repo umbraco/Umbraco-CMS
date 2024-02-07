@@ -35,7 +35,7 @@ export class UmbDataTypeCopyServerDataSource implements UmbCopyDataSource {
 			DataTypeResource.postDataTypeByIdCopy({
 				id: unique,
 				requestBody: {
-					targetId: targetUnique,
+					target: targetUnique ? { id: targetUnique } : null,
 				},
 			}),
 		);

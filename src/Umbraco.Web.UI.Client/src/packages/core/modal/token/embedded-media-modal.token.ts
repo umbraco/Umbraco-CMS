@@ -1,4 +1,4 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
 
 export enum OEmbedStatus {
 	NotSupported,

@@ -114,6 +114,10 @@ export class UmbExtensionRegistry<
 		this._extensions.setValue([...this._extensions.getValue(), manifest as ManifestTypes]);
 	}
 
+	getAllExtensions(): Array<ManifestTypes> {
+		return this._extensions.getValue();
+	}
+
 	registerMany(manifests: Array<ManifestTypes | ManifestKind<ManifestTypes>>): void {
 		// we have to register extensions individually, so we ensure a manifest is valid before continuing to the next one
 		manifests.forEach((manifest) => this.register(manifest));

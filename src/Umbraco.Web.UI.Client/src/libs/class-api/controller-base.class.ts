@@ -1,5 +1,5 @@
 import type { UmbController } from '../controller-api/controller.interface.js';
-import { UmbClassMixin } from './index.js';
+import { UmbClassMixin } from './class.mixin.js';
 
 /**
  * This mixin enables a web-component to host controllers.

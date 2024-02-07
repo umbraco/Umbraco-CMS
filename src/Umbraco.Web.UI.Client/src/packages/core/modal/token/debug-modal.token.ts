@@ -1,5 +1,5 @@
+import { UmbModalToken } from './modal-token.js';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbContextDebuggerModalData {
 	content: TemplateResult | string;

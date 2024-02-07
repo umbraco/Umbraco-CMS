@@ -5,7 +5,7 @@ import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/bac
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
+export class UmbRepositoryItemsManager<ItemType extends { unique: string }> extends UmbBaseController {
 	//
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
@@ -31,9 +31,8 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
 		super(host);
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		//@ts-ignore
-		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
+
+		this.#getUnique = getUniqueMethod || ((entry) => entry.unique);
 
 		this.#init = new UmbExtensionApiInitializer<ManifestRepository<UmbItemRepository<ItemType>>>(
 			this,
@@ -83,7 +82,7 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
 		// This is where this.#getUnique comes in play. Unless that can come from the repository, but that collides with the idea of having a multi-type repository. If that happens.
-		const { data, asObservable } = await this.repository.requestItems(this.getUniques());
+		const { asObservable } = await this.repository.requestItems(this.getUniques());
 
 		if (asObservable) {
 			this.observe(
@@ -104,15 +103,4 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 			return aIndex - bIndex;
 		});
 	}
-
-	/*
-	#removeItem(unique: string) {
-		const newSelection = this.getSelection().filter((value) => value !== unique);
-		this.#selection.next(newSelection);
-		// remove items items from selectedItems array
-		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
-		const newSelectedItems = this.#selectedItems.value.filter((item) => this.#getUnique(item) !== unique);
-		this.#selectedItems.next(newSelectedItems);
-	}
-	*/
 }

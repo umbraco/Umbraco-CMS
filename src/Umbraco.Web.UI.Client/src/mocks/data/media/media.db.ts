@@ -1,17 +1,16 @@
-import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
-import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
-import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
+import { UmbMockEntityTreeManager } from '../utils/entity/entity-tree.manager.js';
+import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
+import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import { umbMediaTypeMockDb } from '../media-type/media-type.db.js';
-import { UmbEntityMockDbBase } from '../entity/entity-base.js';
-import { UmbEntityRecycleBin } from '../entity/entity-recycle-bin.js';
+import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
+import { UmbEntityRecycleBin } from '../utils/entity/entity-recycle-bin.js';
 import type { UmbMockMediaModel } from './media.data.js';
 import { data } from './media.data.js';
-import {
-	ContentStateModel,
-	type CreateMediaRequestModel,
-	type MediaItemResponseModel,
-	type MediaResponseModel,
-	type MediaTreeItemResponseModel,
+import type {
+	CreateMediaRequestModel,
+	MediaItemResponseModel,
+	MediaResponseModel,
+	MediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -70,7 +69,6 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
-				state: ContentStateModel.DRAFT,
 				publishDate: null,
 			};
 		}),

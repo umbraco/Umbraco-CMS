@@ -36,7 +36,7 @@ export class UmbDataTypeMoveServerDataSource implements UmbMoveDataSource {
 			DataTypeResource.putDataTypeByIdMove({
 				id: unique,
 				requestBody: {
-					targetId: targetUnique,
+					target: targetUnique ? { id: targetUnique } : null,
 				},
 			}),
 		);

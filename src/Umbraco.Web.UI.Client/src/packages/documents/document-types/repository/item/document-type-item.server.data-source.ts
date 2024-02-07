@@ -25,7 +25,7 @@ export class UmbDocumentTypeItemServerDataSource extends UmbItemServerDataSource
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DocumentTypeResource.getDocumentTypeItem({ id: uniques });
+const getItems = (uniques: Array<string>) => DocumentTypeResource.getItemDocumentType({ id: uniques });
 
 const mapper = (item: DocumentTypeItemResponseModel): UmbDocumentTypeItemModel => {
 	return {

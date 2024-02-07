@@ -12,10 +12,9 @@ import type {
 	HealthCheckGroupResponseModel,
 	HealthCheckGroupWithResultResponseModel,
 	HealthCheckResultResponseModel,
-	PagedHealthCheckGroupResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	StatusResultTypeModel,
+	PagedHealthCheckGroupResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
@@ -55,7 +54,7 @@ export const handlers = [
 
 	rest.post<HealthCheckActionRequestModel>(umbracoPath('/health-check/execute-action'), async (req, res, ctx) => {
 		const body = await req.json<HealthCheckActionRequestModel>();
-		const healthCheckId = body.healthCheckId;
+		const healthCheckId = body.healthCheck.id;
 		// Find the health check based on the healthCheckId from the healthGroups[].checks
 		const healthCheck = healthGroups.flatMap((group) => group.checks).find((check) => check?.id === healthCheckId);
 

@@ -14,7 +14,7 @@ import {
 // TODO: move to UI Library - entity actions should NOT be moved to UI Library but stay in an UmbTable element
 export interface UmbTableItem {
 	id: string;
-	icon?: string;
+	icon?: string | null;
 	entityType?: string;
 	data: Array<UmbTableItemData>;
 }

@@ -3,9 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { MemberTypeReferenceResponseModel } from './MemberTypeReferenceResponseModel';
 import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
+import type { VariantItemResponseModel } from './VariantItemResponseModel';
 
 export type MemberItemResponseModel = (NamedItemResponseModelBaseModel & {
-    icon?: string | null;
+    memberType: MemberTypeReferenceResponseModel;
+    variants: Array<VariantItemResponseModel>;
 });
 

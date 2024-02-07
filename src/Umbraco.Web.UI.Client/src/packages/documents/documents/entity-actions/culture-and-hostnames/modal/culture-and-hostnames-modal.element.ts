@@ -1,8 +1,9 @@
 import { html, customElement, state, css, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbLanguageRepository } from '@umbraco-cms/backoffice/language';
-import type { DomainPresentationModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import type { DomainPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UmbDocumentCultureAndHostnamesRepository,
 	type UmbCultureAndHostnamesModalData,
@@ -16,12 +17,12 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	UmbCultureAndHostnamesModalValue
 > {
 	#documentRepository = new UmbDocumentCultureAndHostnamesRepository(this);
-	#languageRepository = new UmbLanguageRepository(this);
+	#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 
 	#unique?: string | null;
 
 	@state()
-	private _languageModel: Array<LanguageResponseModel> = [];
+	private _languageModel: Array<UmbLanguageDetailModel> = [];
 
 	@state()
 	private _defaultIsoCode?: string | null;
@@ -50,7 +51,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	}
 
 	async #requestLanguages() {
-		const { data } = await this.#languageRepository.requestLanguages();
+		const { data } = await this.#languageCollectionRepository.requestCollection({ skip: 0, take: 500 });
 		if (!data) return;
 		this._languageModel = data.items;
 	}
@@ -98,9 +99,9 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			this.popoverContainerElement?.hidePopover();
-			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: window.location.host }];
+			this._domains = [...this._domains, { isoCode: defaultModel?.unique ?? '', domainName: window.location.host }];
 		} else {
-			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: '' }];
+			this._domains = [...this._domains, { isoCode: defaultModel?.unique ?? '', domainName: '' }];
 		}
 	}
 
@@ -186,8 +187,8 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#renderLanguageModelOptions() {
 		return html`${repeat(
 			this._languageModel,
-			(model) => model.isoCode,
-			(model) => html`<uui-combobox-list-option .value=${model.isoCode}>${model.name}</uui-combobox-list-option>`,
+			(model) => model.unique,
+			(model) => html`<uui-combobox-list-option .value=${model.unique}>${model.name}</uui-combobox-list-option>`,
 		)}`;
 	}
 
@@ -206,7 +207,9 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 			</uui-button>
 			<uui-popover-container id="more-options" placement="bottom-end">
 				<umb-popover-layout>
-					<uui-button label=${this.localize.term('assignDomain_addCurrent')} @click=${() => this.#onAddDomain(true)}></uui-button>
+					<uui-button
+						label=${this.localize.term('assignDomain_addCurrent')}
+						@click=${() => this.#onAddDomain(true)}></uui-button>
 				</umb-popover-layout>
 			</uui-popover-container>
 		</uui-button-group> `;
