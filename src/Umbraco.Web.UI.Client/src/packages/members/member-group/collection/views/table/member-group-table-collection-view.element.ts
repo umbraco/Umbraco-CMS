@@ -17,7 +17,7 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 	private _tableColumns: Array<UmbTableColumn> = [
 		{
 			name: 'Name',
-			alias: 'memberName',
+			alias: 'memberGroupName',
 		},
 	];
 
@@ -40,15 +40,18 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
 	}
 
-	#createTableItems(members: Array<UmbMemberGroupCollectionModel>) {
-		this._tableItems = members.map((member) => {
+	#createTableItems(memberGroups: Array<UmbMemberGroupCollectionModel>) {
+		this._tableItems = memberGroups.map((memberGroup) => {
+			console.log(memberGroup);
 			return {
-				id: member.unique,
+				id: memberGroup.unique,
 				icon: 'icon-users',
 				data: [
 					{
-						columnAlias: 'memberName',
-						value: member.name,
+						columnAlias: 'memberGroupName',
+						value: html`<a href=${'section/member-management/workspace/member-group/edit/' + memberGroup.unique}
+							>${memberGroup.name}</a
+						>`,
 					},
 				],
 			};
