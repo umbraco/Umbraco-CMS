@@ -25,7 +25,6 @@ class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
 	}
 
 	// TODO: make collection manager we can user across content types
-	// TODO: can we somehow align it with other methods that take in filter options?
 	getCollection(options: any): any {
 		const allItems = this.getAll();
 
@@ -38,7 +37,16 @@ class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
 		const filteredItems = allItems.filter((item) => memberQueryFilter(filterOptions, item));
 		const paginatedResult = pagedResult(filteredItems, filterOptions.skip, filterOptions.take);
 
-		return { items: paginatedResult.items, total: paginatedResult.total };
+		// return the correct properties based on a dataType
+		const mappedItems = paginatedResult.items.map((item) => {
+			return {
+				id: item.id,
+				name: item.name,
+				email: item.email,
+			};
+		});
+
+		return { items: mappedItems, total: paginatedResult.total };
 	}
 }
 
