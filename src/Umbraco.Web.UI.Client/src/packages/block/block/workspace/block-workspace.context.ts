@@ -143,7 +143,7 @@ export class UmbBlockWorkspaceContext<
 		this.#layout.setValue(layoutData as LayoutDataType);
 
 		if (this.#liveEditingMode) {
-			const blockCreated = this.#blockManager.createBlock(
+			const blockCreated = this.#blockManager.create(
 				this.#modalContext.data as UmbBlockWorkspaceData,
 				layoutData,
 				contentElementTypeId,
@@ -225,7 +225,7 @@ export class UmbBlockWorkspaceContext<
 
 		if (!this.#liveEditingMode) {
 			if (this.getIsNew() === true) {
-				const blockCreated = this.#blockManager.createBlock(
+				const blockCreated = this.#blockManager.create(
 					this.#modalContext.data as UmbBlockWorkspaceData,
 					layoutData,
 					contentData.contentTypeKey,

@@ -19,7 +19,7 @@ export class UmbBlockListManagerContext<
 	}
 
 	create(modalData: UmbBlockListWorkspaceData, layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
-		super.createBlock(modalData, layoutEntry, contentElementTypeKey, this.#createLayoutEntry);
+		return super.createBlock(modalData, layoutEntry, contentElementTypeKey, this.#createLayoutEntry);
 	}
 
 	#createLayoutEntry(

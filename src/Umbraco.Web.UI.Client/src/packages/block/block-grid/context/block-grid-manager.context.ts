@@ -22,7 +22,7 @@ export class UmbBlockGridManagerContext extends UmbBlockManagerContext<UmbBlockG
 	}
 
 	create(modalData: UmbBlockGridWorkspaceData, layoutEntry: UmbBlockGridLayoutModel, contentElementTypeKey: string) {
-		super.createBlock(modalData, layoutEntry, contentElementTypeKey, this.#createLayoutEntry);
+		return super.createBlock(modalData, layoutEntry, contentElementTypeKey, this.#createLayoutEntry);
 	}
 
 	#createLayoutEntry(

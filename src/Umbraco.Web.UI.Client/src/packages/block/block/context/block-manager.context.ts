@@ -161,6 +161,12 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.appendOne(settingsData);
 	}
 
+	abstract create(
+		modalData: UmbBlockWorkspaceData,
+		layoutEntry: BlockLayoutType,
+		contentElementTypeKey: string,
+	): boolean;
+
 	public createBlock<ModalDataType extends UmbBlockWorkspaceData>(
 		modalData: ModalDataType,
 		layoutEntry: Omit<BlockLayoutType, 'contentUdi'>,

@@ -15,10 +15,12 @@ describe('UmbPropertyEditorUIImageCropsConfigurationElement', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUIImageCropsConfigurationElement);
 	});
 
+	/*
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			//TODO: This test is broken. It fails at forms because of missing labels even if you have them.
 			// await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});
 	}
+	*/
 });
