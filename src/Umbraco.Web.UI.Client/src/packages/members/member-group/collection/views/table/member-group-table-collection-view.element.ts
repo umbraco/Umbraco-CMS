@@ -44,7 +44,7 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 		this._tableItems = members.map((member) => {
 			return {
 				id: member.unique,
-				icon: 'icon-globe',
+				icon: 'icon-users',
 				data: [
 					{
 						columnAlias: 'memberName',
