@@ -19,10 +19,14 @@ export class UmbBlockListManagerContext<
 	}
 
 	create(modalData: UmbBlockListWorkspaceData, layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
-		super.createBlock(modalData, layoutEntry, contentElementTypeKey, this._createBlock);
+		super.createBlock(modalData, layoutEntry, contentElementTypeKey, this.#createLayoutEntry);
 	}
 
-	_createBlock(modalData: UmbBlockListWorkspaceData, layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
+	#createLayoutEntry(
+		modalData: UmbBlockListWorkspaceData,
+		layoutEntry: BlockLayoutType,
+		contentElementTypeKey: string,
+	) {
 		// Here is room to append some extra layout properties if needed for this type.
 
 		this._layouts.appendOneAt(layoutEntry, modalData.originData.index ?? -1);
