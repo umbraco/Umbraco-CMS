@@ -38,7 +38,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'entity',
+	kind: 'unique',
 	alias: 'Umb.TreeItem.MemberType',
 	name: 'Member Type Tree Item',
 	meta: {

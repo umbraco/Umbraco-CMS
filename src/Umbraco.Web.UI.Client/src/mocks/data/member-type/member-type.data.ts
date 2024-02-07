@@ -1,6 +1,10 @@
 import type { MemberTypeItemResponseModel, MemberTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-type UmbMockMemberTypeModel = MemberTypeResponseModel & MemberTypeItemResponseModel;
+export type UmbMockMemberTypeModel = MemberTypeResponseModel &
+	MemberTypeItemResponseModel & {
+		hasChildren: boolean;
+		parent: { id: string } | null;
+	};
 
 export const data: Array<UmbMockMemberTypeModel> = [
 	{
@@ -16,5 +20,7 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		variesBySegment: false,
 		isElement: false,
 		compositions: [],
+		parent: null,
+		hasChildren: false,
 	},
 ];

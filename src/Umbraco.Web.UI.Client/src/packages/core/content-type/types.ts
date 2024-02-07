@@ -24,7 +24,6 @@ export interface UmbContentTypeModel {
 	variesByCulture: boolean;
 	variesBySegment: boolean;
 	isElement: boolean;
-	// TODO: investigate if we need our own model for these
 	properties: Array<UmbPropertyTypeModel>;
 	containers: Array<UmbPropertyTypeContainerModel>;
 	allowedContentTypes: Array<UmbContentTypeSortModel>;

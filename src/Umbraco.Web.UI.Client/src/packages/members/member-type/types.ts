@@ -1,7 +1,6 @@
-import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbMemberTypeEntityType } from './entity.js';
+import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 
-export interface MemberTypeDetails extends UmbEntityTreeItemModel {
-	id: string; // TODO: Remove this when the backend is fixed
-	alias: string;
-	properties: [];
+export interface UmbMemberTypeDetailModel extends UmbContentTypeModel {
+	entityType: UmbMemberTypeEntityType;
 }

@@ -15,12 +15,11 @@ export class UmbMemberTypeTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
-			id: null,
+		const data: UmbMemberTypeTreeRootModel = {
+			unique: null,
 			entityType: UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Member Types',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 
