@@ -1,13 +1,11 @@
+import type { ManifestBase } from '../types/index.js';
+import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import { UmbExtensionElementInitializer } from './extension-element-initializer.controller.js';
 import {
 	type PermittedControllerType,
 	UmbBaseExtensionsInitializer,
 } from './base-extensions-initializer.controller.js';
-import {
-	type ManifestBase,
-	UmbExtensionElementInitializer,
-	type UmbExtensionRegistry,
-} from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**

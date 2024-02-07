@@ -1,6 +1,6 @@
+import { UmbStoreBase } from './store-base.js';
+import type { UmbItemStore } from './item-store.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbItemStore} from '@umbraco-cms/backoffice/store';
-import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**

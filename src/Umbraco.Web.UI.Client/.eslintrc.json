@@ -38,6 +38,8 @@
 				"no-var": "error",
 				"import/no-unresolved": "off",
 				"import/order": "warn",
+				"import/no-self-import": "error",
+				"import/no-cycle": ["error", { "maxDepth": 2, "allowUnsafeDynamicCyclicDependency": true }],
 				"local-rules/bad-type-import": "error",
 				"local-rules/enforce-element-suffix-on-element-class-name": "error",
 				"local-rules/enforce-umb-prefix-on-element-name": "error",

@@ -1,5 +1,5 @@
 import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from '../../tree/index.js';
+import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from '../data-type-tree.store.js';
 import { UmbDataTypeFolderServerDataSource } from './data-type-folder.server.data-source.js';
 import type { UmbDataTypeFolderTreeItemModel } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
