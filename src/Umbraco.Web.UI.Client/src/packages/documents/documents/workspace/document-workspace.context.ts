@@ -15,6 +15,11 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import {
+	UMB_LISTITEM_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT,
+	type UmbListitemPickerModalData,
+} from '@umbraco-cms/backoffice/modal';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -44,8 +49,14 @@ export class UmbDocumentWorkspaceContext
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
+	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
+			this.#modalManagerContext = instance;
+		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 
@@ -168,26 +179,49 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async #selectVariants(): Promise<UmbVariantId[]> {
+	async #selectVariants(): Promise<UmbVariantId[] | null> {
 		const currentData = this.getData();
 		if (!currentData) throw new Error('Data is missing');
 
-		// TODO: Let user select variants.
-		return currentData.variants.map((x) => UmbVariantId.Create(x));
+		// TODO: Use the available cultures
+		const availableVariants = currentData.variants;
+
+		// If there is only one variant, we don't need to select anything.
+		if (availableVariants.length === 1) {
+			// TODO: Apply this when we have a way to get cultures
+			//return [UmbVariantId.Create(availableVariants[0])];
+		}
+
+		if (!this.#modalManagerContext) throw new Error('Modal manager context is missing');
+
+		const modalData: UmbListitemPickerModalData = {
+			headline: 'Select variants',
+			// TODO: Match the available variants to the available cultures.
+			items: availableVariants.map((x) => ({ key: x.culture!, name: x.name })),
+		};
+
+		const modalContext = this.#modalManagerContext.open(UMB_LISTITEM_PICKER_MODAL, { data: modalData });
+
+		const result = await modalContext.onSubmit().catch(() => undefined);
+
+		if (!result) return null;
+
+		// Match the result to the available variants.
+		return availableVariants.filter((x) => result.includes(x.culture!)).map((x) => UmbVariantId.Create(x));
 	}
 
-	async #createOrSave(): Promise<UmbVariantId[]> {
+	async #createOrSave(): Promise<UmbVariantId[] | null> {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		if (!data.unique) throw new Error('Unique is missing');
 
 		const selectedVariants = await this.#selectVariants();
 
+		// If no variants are selected, we don't save anything.
+		if (selectedVariants === null) return null;
+
 		// TODO: Use selected variants
-		console.log(
-			'Saving',
-			selectedVariants.map((x) => x.culture),
-		);
+		console.log('Saving', selectedVariants?.map((x) => x.culture));
 
 		if (this.getIsNew()) {
 			if ((await this.repository.create(data)).data !== undefined) {
@@ -210,7 +244,7 @@ export class UmbDocumentWorkspaceContext
 	public async publish() {
 		const variantIds = await this.#createOrSave();
 		const unique = this.getEntityId();
-		if (variantIds.length && unique) {
+		if (variantIds?.length && unique) {
 			await this.publishingRepository.publish(unique, variantIds);
 		}
 	}
