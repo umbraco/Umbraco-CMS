@@ -161,16 +161,11 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.appendOne(settingsData);
 	}
 
-	abstract _createBlock(
-		modalData: UmbBlockWorkspaceData,
+	public createBlock<ModalDataType extends UmbBlockWorkspaceData>(
+		modalData: ModalDataType,
 		layoutEntry: Omit<BlockLayoutType, 'contentUdi'>,
 		contentElementTypeKey: string,
-	): boolean;
-
-	public createBlock(
-		modalData: UmbBlockWorkspaceData,
-		layoutEntry: Omit<BlockLayoutType, 'contentUdi'>,
-		contentElementTypeKey: string,
+		callback: (modalData: ModalDataType, layoutEntry: BlockLayoutType, contentElementTypeKey: string) => boolean,
 	) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
@@ -188,7 +183,7 @@ export abstract class UmbBlockManagerContext<
 			fullLayoutEntry.settingsUdi = buildUdi('element', UmbId.new());
 		}
 
-		if (this._createBlock(modalData, fullLayoutEntry, contentElementTypeKey) === false) {
+		if (callback(modalData, fullLayoutEntry, contentElementTypeKey) === false) {
 			return false;
 		}
 

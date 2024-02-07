@@ -8,9 +8,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 /**
  * A implementation of the Block Manager specifically for the Block Grid Editor.
  */
-export class UmbBlockGridManagerContext<
-	BlockLayoutType extends UmbBlockGridLayoutModel = UmbBlockGridLayoutModel,
-> extends UmbBlockManagerContext<UmbBlockGridTypeModel, BlockLayoutType> {
+export class UmbBlockGridManagerContext extends UmbBlockManagerContext<UmbBlockGridTypeModel, UmbBlockGridLayoutModel> {
 	//
 	//
 	#blockGroups = new UmbArrayState(<Array<UmbBlockTypeGroup>>[], (x) => x.key);
@@ -23,12 +21,18 @@ export class UmbBlockGridManagerContext<
 		return this.#blockGroups.value;
 	}
 
-	_createBlock(modalData: UmbBlockGridWorkspaceData, layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
+	create(modalData: UmbBlockGridWorkspaceData, layoutEntry: UmbBlockGridLayoutModel, contentElementTypeKey: string) {
+		super.createBlock(modalData, layoutEntry, contentElementTypeKey, this._createBlock);
+	}
+
+	_createBlock(
+		modalData: UmbBlockGridWorkspaceData,
+		layoutEntry: UmbBlockGridLayoutModel,
+		contentElementTypeKey: string,
+	) {
 		// Here is room to append some extra layout properties if needed for this type.
 
 		this._layouts.appendOneAt(layoutEntry, modalData.originData.index ?? -1);
-
-		// TODO: Ability to add at a specific Area.
 
 		return true;
 	}

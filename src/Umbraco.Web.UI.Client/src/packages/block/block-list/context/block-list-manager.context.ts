@@ -18,6 +18,10 @@ export class UmbBlockListManagerContext<
 		this.#inlineEditingMode.setValue(inlineEditingMode ?? false);
 	}
 
+	create(modalData: UmbBlockListWorkspaceData, layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
+		super.createBlock(modalData, layoutEntry, contentElementTypeKey, this._createBlock);
+	}
+
 	_createBlock(modalData: UmbBlockListWorkspaceData, layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
 		// Here is room to append some extra layout properties if needed for this type.
 
