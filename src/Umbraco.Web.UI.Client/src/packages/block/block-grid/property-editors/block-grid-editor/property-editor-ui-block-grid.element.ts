@@ -1,4 +1,4 @@
-import { UmbBlockGridManagerContext } from '../../manager/block-grid-manager.context.js';
+import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

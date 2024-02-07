@@ -1,5 +1,5 @@
 import { UMB_BLOCK_CATALOGUE_MODAL } from '../../block/index.js';
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../manager/block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import type { UmbBlockGridLayoutModel } from '../types.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from './block-grid-entries.context-token.js';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT } from './block-grid-entry.context-token.js';

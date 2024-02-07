@@ -1,5 +1,5 @@
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
-import { UmbBlockManagerContext } from '../../block/manager/block-manager.context.js';
+import { UmbBlockManagerContext } from '../../block/context/block-manager.context.js';
 import type { UmbBlockListWorkspaceData } from '../index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';

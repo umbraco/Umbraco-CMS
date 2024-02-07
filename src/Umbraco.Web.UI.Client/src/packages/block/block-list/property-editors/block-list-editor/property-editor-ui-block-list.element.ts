@@ -1,4 +1,4 @@
-import { UmbBlockListManagerContext } from '../../manager/block-list-manager.context.js';
+import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
 import '../../components/block-list-block/index.js';
 import type { UmbPropertyEditorUIBlockListBlockElement } from '../../components/block-list-block/index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';

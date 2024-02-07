@@ -1,5 +1,5 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
-import { UmbBlockManagerContext } from '../../block/manager/block-manager.context.js';
+import { UmbBlockManagerContext } from '../../block/context/block-manager.context.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
 import type { UmbBlockTypeGroup } from '../../block-type/types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';

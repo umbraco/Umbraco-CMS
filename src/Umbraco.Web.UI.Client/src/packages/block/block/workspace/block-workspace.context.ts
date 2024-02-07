@@ -6,7 +6,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
-import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 

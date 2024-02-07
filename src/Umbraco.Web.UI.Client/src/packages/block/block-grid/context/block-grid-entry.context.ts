@@ -1,4 +1,4 @@
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../manager/block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import {
 	UmbBlockContext,
 	type UmbBlockGridTypeModel,
