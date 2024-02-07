@@ -93,6 +93,11 @@ public class AddListViewKeysToDocumentTypes : UnscopedMigrationBase
 
     private Guid? CalculateListView(ContentTypeDtoOld dto)
     {
+        if (dto.IsContainer is false)
+        {
+            return null;
+        }
+
         var name = Constants.Conventions.DataTypes.ListViewPrefix + dto.Alias;
         IDataType? listview = _dataTypeService.GetAsync(name).GetAwaiter().GetResult();
         if (listview is not null)
