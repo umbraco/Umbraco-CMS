@@ -101,14 +101,17 @@ interface UmbPropertyEditorUIElement {}
 ```ts
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-base/lib/styles';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbElementMixin } from '@umbraco-cms/element';
 
 // TODO: should we make examples with LitElement or just vanilla JS? or should we have for more libraries?
 @customElement('my-text-box')
-export class UmbPropertyEditorUITextBoxElement extends UmbElementMixin(LitElement) implements UmbPropertyEditorUIElement {
+export class UmbPropertyEditorUITextBoxElement
+	extends UmbElementMixin(LitElement)
+	implements UmbPropertyEditorUIElement
+{
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			uui-input {
 				width: 100%;

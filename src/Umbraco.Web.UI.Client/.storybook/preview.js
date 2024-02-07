@@ -64,12 +64,6 @@ const dataTypeStoreProvider = (story) => html`
 	>
 `;
 
-const documentTypeStoreProvider = (story) => html`
-	<umb-controller-host-provider .create=${(host) => new UmbDocumentTypeStore(host)}
-		>${story()}</umb-controller-host-provider
-	>
-`;
-
 const documentStoreProvider = (story) => html`
 	<umb-controller-host-provider .create=${(host) => new UmbDocumentDetailStore(host)}
 		>${story()}</umb-controller-host-provider
@@ -88,7 +82,6 @@ export const decorators = [
 	documentStoreProvider,
 	documentTreeStoreProvider,
 	dataTypeStoreProvider,
-	documentTypeStoreProvider,
 ];
 
 export const parameters = {
