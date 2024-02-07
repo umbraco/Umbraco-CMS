@@ -30,7 +30,14 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.VariesByCulture = source.VariesByCulture();
         target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
-        target.ListView = source.ListView;
+        if (source.ListView is not null)
+        {
+            target.Collection = new ReferenceByIdModel
+            {
+                Id = source.ListView.Value,
+            };
+        }
+
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
         target.AllowedDocumentTypes = source.AllowedContentTypes?.Select(ct =>
@@ -67,7 +74,14 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.ListView = source.ListView;
+
+        if (source.ListView is not null)
+        {
+            target.Collection = new ReferenceByIdModel
+            {
+                Id = source.ListView.Value,
+            };
+        }
     }
 
     // Umbraco.Code.MapAll
@@ -75,7 +89,14 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.ListView = source.ListView;
+
+        if (source.ListView is not null)
+        {
+            target.Collection = new ReferenceByIdModel
+            {
+                Id = source.ListView.Value,
+            };
+        }
     }
 
     // Umbraco.Code.MapAll

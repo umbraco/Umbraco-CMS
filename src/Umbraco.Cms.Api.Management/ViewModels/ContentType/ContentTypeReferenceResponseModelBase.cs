@@ -6,5 +6,5 @@ public abstract class ContentTypeReferenceResponseModelBase
 
     public string Icon { get; set; } = string.Empty;
 
-    public Guid? ListView { get; set; }
+    public ReferenceByIdModel? Collection { get; set; }
 }
