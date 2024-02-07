@@ -23,6 +23,7 @@ class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
 }
 
 const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMemberModel => {
+	debugger;
 	const memberType = umbMemberTypeMockDb.read(request.memberType.id);
 	if (!memberType) throw new Error(`Member type with id ${request.memberType.id} not found`);
 

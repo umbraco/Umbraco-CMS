@@ -4,10 +4,10 @@ type UmbMockMemberTypeModel = MemberTypeResponseModel & MemberTypeItemResponseMo
 
 export const data: Array<UmbMockMemberTypeModel> = [
 	{
-		name: 'Media Type 1',
-		id: 'media-type-1-id',
-		description: 'Media type 1 description',
-		alias: 'mediaType1',
+		name: 'Member Type 1',
+		id: 'member-type-1-id',
+		description: 'Member type 1 description',
+		alias: 'memberType1',
 		icon: 'icon-bug',
 		properties: [],
 		containers: [],

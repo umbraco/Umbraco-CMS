@@ -121,6 +121,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateMemberRequestModel = {
+			id: model.unique,
 			email: model.email,
 			username: model.username,
 			password: '', // TODO: figure out what to get password from

@@ -9,7 +9,7 @@ export const createManifest: ManifestTypes = {
 	weight: 200,
 	meta: {
 		label: 'Create',
-		href: 'section/member-management/workspace/member/create',
+		href: 'section/member-management/workspace/member/create/member-type-1-id', // TODO: remove hardcoded member type id
 	},
 	conditions: [
 		{

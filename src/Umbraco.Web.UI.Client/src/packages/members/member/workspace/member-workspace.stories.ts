@@ -13,6 +13,6 @@ export default {
 
 export const AAAOverview: Story<UmbMemberWorkspaceElement> = () =>
 	html` <!--
-<umb-member-workspace></umb-member-workspace>
+	<umb-member-workspace"></umb-member-workspace>
 -->`;
 AAAOverview.storyName = 'Overview';

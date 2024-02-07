@@ -1,41 +1,47 @@
-import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UmbMemberWorkspaceContext } from './member-workspace.context.js';
+import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-member-workspace')
 export class UmbMemberWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbMemberWorkspaceContext(this);
 	#createElement = () => new UmbMemberWorkspaceEditorElement();
 
-	@state()
-	_routes: UmbRoute[] = [
+	private _routes: UmbRoute[] = [
 		{
-			path: 'edit/:id',
+			path: 'create/:memberTypeUnique',
 			component: this.#createElement,
 			setup: (_component, info) => {
-				const id = info.match.params.id;
-				this.#workspaceContext.load(id);
+				const memberTypeUnique = info.match.params.memberTypeUnique;
+				this.#workspaceContext.create(null, memberTypeUnique);
+
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#workspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!,
+				);
+			},
+		},
+		{
+			path: 'edit/:unique',
+			component: this.#createElement,
+			setup: (_component, info) => {
+				const unique = info.match.params.unique;
+				this.#workspaceContext.load(unique);
 			},
 		},
 	];
 
 	render() {
-		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 
-	static styles = [
-		UmbTextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-		`,
-	];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbMemberWorkspaceElement;
