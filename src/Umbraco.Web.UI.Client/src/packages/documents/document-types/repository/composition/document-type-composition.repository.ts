@@ -10,8 +10,8 @@ export class UmbDocumentTypeCompositionRepository extends UmbRepositoryBase {
 		this.#compositionSource = new UmbDocumentTypeCompositionServerDataSource(this);
 	}
 
-	async read(unique:string) {
-		return this.#compositionSource.read(unique);
+	async getReferences(unique:string) {
+		return this.#compositionSource.getReferences(unique);
 	}
 
 	async update(args: any) {

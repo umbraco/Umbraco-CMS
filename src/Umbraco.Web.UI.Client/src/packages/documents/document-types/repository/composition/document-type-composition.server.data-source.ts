@@ -24,7 +24,7 @@ export class UmbDocumentTypeCompositionServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
-	async read(unique: string) {
+	async getReferences(unique: string) {
 		return tryExecuteAndNotify(this.#host, DocumentTypeResource.getDocumentTypeByIdCompositionReferences({id:unique}));
 	}
 	/**

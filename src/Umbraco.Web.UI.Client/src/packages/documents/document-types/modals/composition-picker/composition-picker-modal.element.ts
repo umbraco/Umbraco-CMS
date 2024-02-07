@@ -41,7 +41,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		if (!unique) throw new Error('Unique is required');
 
-		const something = await this.#compositionRepository.read(unique);
+		const something = await this.#compositionRepository.getReferences(unique);
 		console.log(something)
 
 	}
