@@ -2,7 +2,6 @@ import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import { MemberGroupResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -88,7 +87,8 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 		if (!model) throw new Error('Member Group is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: CreateMemberGroupRequestModel = {
+		// TODO: add type CreateMemberGroupRequestModel
+		const requestBody: any = {
 			id: model.unique,
 			name: model.name,
 		};
@@ -127,7 +127,8 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateMemberGroupRequestModel = {
+		// TODO:  add type UpdateMemberGroupRequestModel
+		const requestBody: any = {
 			name: model.name,
 		};
 
