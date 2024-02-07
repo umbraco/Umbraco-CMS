@@ -31,13 +31,16 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 	 */
 	async getCollection(filter: UmbMemberGroupCollectionFilterModel) {
 		//const { data, error } = await tryExecuteAndNotify(this.#host, MemberGroupResource.getCollectionMemberGroup(filter));
-		const { data, error } = await tryExecuteAndNotify(
+
+		// TODO => use backend cli when available.
+		const { data, error } = (await tryExecuteAndNotify(
 			this.#host,
-			fetch('/umbraco/management/api/v1/member-group/collection'),
-		);
+			fetch(`/umbraco/management/api/v1/member-group/filter`),
+		)) as any;
 
 		if (data) {
-			const items = data.items.map((item) => {
+			const json = await data.json(); // remove this line when backend cli is available
+			const items = json.items.map((item: any) => {
 				const model: UmbMemberGroupCollectionModel = {
 					unique: item.isoCode,
 					name: item.name,
@@ -47,7 +50,7 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 				return model;
 			});
 
-			return { data: { items, total: data.total } };
+			return { data: { items, total: json.total } };
 		}
 
 		return { error };
