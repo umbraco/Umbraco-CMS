@@ -286,12 +286,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	async #openCompositionModal() {
-		const repo = new UmbDocumentTypeDetailRepository(this);
-
-
-		console.log('repo',repo)
-		const something = await repo.readCompositions(this._compositionConfiguration!.unique);
-		console.log('data',something)
 
 		const modalContext = this._modalManagerContext?.open(UMB_COMPOSITION_PICKER_MODAL, {
 			data: this._compositionConfiguration,

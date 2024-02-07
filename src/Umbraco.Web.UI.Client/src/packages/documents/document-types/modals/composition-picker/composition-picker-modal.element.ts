@@ -1,3 +1,4 @@
+import { UmbDocumentTypeCompositionRepository } from '../../repository/index.js';
 import type {
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue,
@@ -5,7 +6,6 @@ import type {
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
-import { UmbDocumentTypeDetailRepository } from '../../repository/index.js';
 
 @customElement('umb-composition-picker-modal')
 export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
@@ -16,6 +16,8 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	// From what I've observed in old BO: Document types that inherit from other document types cannot be picked as a composition. (document types that are made under other document types)
 	// As well as other document types that has a composition already.
 	// OBS: If a document type 1 has a composition document type 2, document type 2 cannot add any compositions.
+
+	#compositionRepository = new UmbDocumentTypeCompositionRepository(this);
 
 	@state()
 	private _selectionConfiguration = {
@@ -30,12 +32,17 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 	connectedCallback() {
 		super.connectedCallback();
-
 		this._selectionConfiguration = { ...this._selectionConfiguration, selection: (this.data?.selection as []) ?? [] };
-	this.#getcomposition()
+		this.#getcomposition()
 	}
 
 	async #getcomposition() {
+		const unique = this.data?.unique;
+
+		if (!unique) throw new Error('Unique is required');
+
+		const something = await this.#compositionRepository.read(unique);
+		console.log(something)
 
 	}
 
