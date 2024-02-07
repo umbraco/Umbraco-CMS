@@ -282,4 +282,14 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			}),
 		);
 	}
+	async readCompositions(unique: string) {
+		if (!unique) throw new Error('Unique is missing.');
+
+		return tryExecuteAndNotify(
+			this.#host,
+			DocumentTypeResource.getDocumentTypeByIdCompositionReferences({
+				id: unique,
+			}),
+		);
+	}
 }

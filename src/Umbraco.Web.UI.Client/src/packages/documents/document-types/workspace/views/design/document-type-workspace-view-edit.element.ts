@@ -16,6 +16,7 @@ import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backo
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbDocumentTypeDetailRepository } from '../../../repository/detail/document-type-detail.repository.js';
 
 const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 	getUniqueOfElement: (element) => {
@@ -285,10 +286,18 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	async #openCompositionModal() {
+		const repo = new UmbDocumentTypeDetailRepository(this);
+
+
+		console.log('repo',repo)
+		const something = await repo.readCompositions(this._compositionConfiguration!.unique);
+		console.log('data',something)
+
 		const modalContext = this._modalManagerContext?.open(UMB_COMPOSITION_PICKER_MODAL, {
 			data: this._compositionConfiguration,
 		});
 		await modalContext?.onSubmit();
+
 
 		if (!modalContext?.value) return;
 

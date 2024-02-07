@@ -5,6 +5,7 @@ import type {
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
+import { UmbDocumentTypeDetailRepository } from '../../repository/index.js';
 
 @customElement('umb-composition-picker-modal')
 export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
@@ -31,6 +32,11 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 
 		this._selectionConfiguration = { ...this._selectionConfiguration, selection: (this.data?.selection as []) ?? [] };
+	this.#getcomposition()
+	}
+
+	async #getcomposition() {
+
 	}
 
 	#onSelectionChange(e: CustomEvent) {
