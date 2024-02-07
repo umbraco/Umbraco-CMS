@@ -42,7 +42,6 @@ export class UmbMemberGroupTableCollectionViewElement extends UmbLitElement {
 
 	#createTableItems(memberGroups: Array<UmbMemberGroupCollectionModel>) {
 		this._tableItems = memberGroups.map((memberGroup) => {
-			console.log(memberGroup);
 			return {
 				id: memberGroup.unique,
 				icon: 'icon-users',
