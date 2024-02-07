@@ -1,13 +1,13 @@
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import {
-	UmbBlockContext,
+	UmbBlockEntryContext,
 	type UmbBlockGridTypeModel,
 	type UmbBlockGridLayoutModel,
 	type UmbBlockGridLayoutAreaItemModel,
 } from '@umbraco-cms/backoffice/block';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-export class UmbBlockGridEntryContext extends UmbBlockContext<
+export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT.TYPE,
 	UmbBlockGridTypeModel,

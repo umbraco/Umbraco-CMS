@@ -1,20 +1,20 @@
 import type { UmbBlockTypeBaseModel } from '../../block-type/types.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
-import type { UMB_BLOCK_MANAGER_CONTEXT, UmbBlockManagerContext } from '../manager/index.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_BLOCK_ENTRY_CONTEXT, type UmbBlockManagerContext } from '../index.js';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export abstract class UmbBlockContext<
+export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
 	BlockManagerContextType extends UmbBlockManagerContext<BlockType, BlockLayoutType>,
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbContextBase<
-	UmbBlockContext<BlockManagerContextTokenType, BlockManagerContextType, BlockType, BlockLayoutType>
+	UmbBlockEntryContext<BlockManagerContextTokenType, BlockManagerContextType, BlockType, BlockLayoutType>
 > {
 	//
 	_manager?: BlockManagerContextType;
@@ -72,7 +72,7 @@ export abstract class UmbBlockContext<
 	}
 
 	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
-		super(host, UMB_BLOCK_ENTITY_CONTEXT.toString());
+		super(host, UMB_BLOCK_ENTRY_CONTEXT.toString());
 
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
@@ -229,7 +229,3 @@ export abstract class UmbBlockContext<
 
 	//copy
 }
-
-export const UMB_BLOCK_ENTITY_CONTEXT = new UmbContextToken<
-	UmbBlockContext<typeof UMB_BLOCK_MANAGER_CONTEXT, typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE>
->('UmbBlockEntryContext');

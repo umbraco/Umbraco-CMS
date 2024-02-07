@@ -1,8 +1,8 @@
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context.js';
-import { UmbBlockContext } from '@umbraco-cms/backoffice/block';
+import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-export class UmbBlockListEntryContext extends UmbBlockContext<
+export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT.TYPE
 > {
