@@ -47,13 +47,15 @@ export abstract class UmbBlockManagerContext<
 	#settings = new UmbArrayState(<Array<UmbBlockDataType>>[], (x) => x.udi);
 	public readonly settings = this.#settings.asObservable();
 
-	setPropertyAlias(alias: string) {
+	// TODO: maybe its bad to consume Property Context, and instead wire this up manually in the property editor? With these:
+	/*setPropertyAlias(alias: string) {
 		this.#propertyAlias.setValue(alias);
+		console.log('!!!!!manager got alias: ', alias);
 		this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
 	}
 	getPropertyAlias() {
 		this.#propertyAlias.value;
-	}
+	}*/
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this.#editorConfiguration.setValue(configs);
@@ -100,6 +102,10 @@ export abstract class UmbBlockManagerContext<
 				const newPath = routeBuilder({});
 				this.#workspacePath.setValue(newPath);
 			});
+
+		this.observe(this.propertyAlias, (alias) => {
+			this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
+		});
 	}
 
 	async ensureContentType(unique?: string) {

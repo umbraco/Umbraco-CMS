@@ -29,11 +29,11 @@ export abstract class UmbBlockEntryContext<
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
-	public readonly workspaceEditPath = this.#workspacePath.asObservablePart(
-		(path) => path + 'edit/' + encodeFilePath(this.getContentUdi() ?? ''),
+	public readonly workspaceEditPath = this.#workspacePath.asObservablePart((path) =>
+		path ? path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') : '',
 	);
-	public readonly workspaceEditSettingsPath = this.#workspacePath.asObservablePart(
-		(path) => path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') + '/view/settings',
+	public readonly workspaceEditSettingsPath = this.#workspacePath.asObservablePart((path) =>
+		path ? path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') + '/view/settings' : '',
 	);
 
 	_blockType = new UmbObjectState<BlockType | undefined>(undefined);
@@ -77,6 +77,7 @@ export abstract class UmbBlockEntryContext<
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
 			this._manager = manager;
+			this.#gotManager();
 			this._gotManager();
 		});
 
@@ -104,7 +105,7 @@ export abstract class UmbBlockEntryContext<
 		return this.#layout.value?.contentUdi;
 	}
 
-	_gotManager() {
+	#gotManager() {
 		if (this._manager) {
 			this.observe(
 				this._manager.workspacePath,
@@ -119,6 +120,8 @@ export abstract class UmbBlockEntryContext<
 		this.#observeBlockType();
 		this.#observeData();
 	}
+
+	abstract _gotManager(): void;
 
 	#observeData() {
 		if (!this._manager) return;

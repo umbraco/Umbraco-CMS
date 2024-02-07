@@ -14,7 +14,6 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	}
 
 	_gotManager() {
-		super._gotManager();
 		if (this._manager) {
 			this.observe(
 				this._manager.inlineEditingMode,
