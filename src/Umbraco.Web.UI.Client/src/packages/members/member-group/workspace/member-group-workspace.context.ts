@@ -1,6 +1,5 @@
 import { UmbMemberGroupDetailRepository } from '../repository/index.js';
 import type { UmbMemberGroupDetailModel } from '../types.js';
-import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
@@ -28,7 +27,6 @@ export class UmbMemberGroupWorkspaceContext
 
 	async load(unique: string) {
 		const { data } = await this.repository.requestByUnique(unique);
-		debugger;
 
 		if (data) {
 			this.setIsNew(false);
@@ -38,7 +36,6 @@ export class UmbMemberGroupWorkspaceContext
 
 	async create(parentUnique: string | null) {
 		const { data } = await this.repository.createScaffold(parentUnique);
-		debugger;
 
 		if (data) {
 			this.setIsNew(true);

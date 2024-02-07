@@ -1,9 +1,6 @@
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../entity.js';
-import type {
-	ManifestWorkspace,
-	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type { ManifestWorkspace, ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_MEMBER_GROUP_WORKSPACE_ALIAS = 'Umb.Workspace.MemberGroup';
 
@@ -17,31 +14,7 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
-	/*
-	{
-		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.MemberGroup.Info',
-		name: 'Member Group Workspace Info View',
-		js: () => import('./views/info/workspace-view-member-group-info.element.js'),
-		weight: 90,
-		meta: {
-			label: 'Info',
-			pathname: 'info',
-			icon: 'info',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
-	*/
-];
-
 const workspaceActions: Array<ManifestWorkspaceAction> = [
-	/*
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.MemberGroup.Save',
@@ -55,11 +28,10 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_MEMBER_GROUP_WORKSPACE_ALIAS,
 			},
 		],
 	},
-	*/
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceActions];

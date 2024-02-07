@@ -102,16 +102,16 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 		);
 		*/
 
+		// TODO => use backend cli when available.
 		const { data, error } = (await tryExecuteAndNotify(
 			this.#host,
 			fetch(`/umbraco/management/api/v1/member-group`, { method: 'POST', body: JSON.stringify(requestBody) }),
 		)) as any;
 
-		const json = await data.json(); // remove this line when backend cli is available
-		debugger;
+		const newUnqiue = data.headers.get('Umb-Generated-Resource'); // TODO: remove when backend cli is available
 
 		if (data) {
-			return this.read(data);
+			return this.read(newUnqiue);
 		}
 
 		return { error };
@@ -131,6 +131,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 			name: model.name,
 		};
 
+		/*
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			MemberGroupResource.putMemberGroupById({
@@ -138,6 +139,15 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 				requestBody,
 			}),
 		);
+		*/
+
+		const { error } = (await tryExecuteAndNotify(
+			this.#host,
+			fetch(`/umbraco/management/api/v1/member-group/${model.unique}`, {
+				method: 'PUT',
+				body: JSON.stringify(requestBody),
+			}),
+		)) as any;
 
 		if (!error) {
 			return this.read(model.unique);
@@ -155,11 +165,22 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
+		/*
 		return tryExecuteAndNotify(
 			this.#host,
 			MemberGroupResource.deleteMemberGroupById({
 				id: unique,
 			}),
 		);
+		*/
+
+		const { error } = (await tryExecuteAndNotify(
+			this.#host,
+			fetch(`/umbraco/management/api/v1/member-group/${unique}`, {
+				method: 'DELETE',
+			}),
+		)) as any;
+
+		return { error };
 	}
 }
