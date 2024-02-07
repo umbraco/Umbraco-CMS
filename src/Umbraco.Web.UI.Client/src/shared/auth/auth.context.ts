@@ -14,7 +14,6 @@ export class UmbAuthContext extends UmbBaseController {
 	#serverUrl;
 	#backofficePath;
 	#authFlow;
-	#openApi = OpenAPI;
 
 	constructor(host: UmbControllerHostElement, serverUrl: string, backofficePath: string, isBypassed: boolean) {
 		super(host);
