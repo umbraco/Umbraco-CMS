@@ -45,7 +45,6 @@ export class UmbDocumentWorkspaceContext
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	constructor(host: UmbControllerHost) {
-		// TODO: Get Workspace Alias via Manifest.
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
