@@ -42,7 +42,7 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 			const json = await data.json(); // remove this line when backend cli is available
 			const items = json.items.map((item: any) => {
 				const model: UmbMemberGroupCollectionModel = {
-					unique: item.isoCode,
+					unique: item.id,
 					name: item.name,
 					entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
 				};
