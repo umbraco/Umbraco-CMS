@@ -1,10 +1,16 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
 public class JsonContentNestedDataSerializer : IContentCacheDataSerializer
 {
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+
     /// <inheritdoc />
     public ContentCacheDataModel? Deserialize(
         IReadOnlyContentBase content,
@@ -18,7 +24,7 @@ public class JsonContentNestedDataSerializer : IContentCacheDataSerializer
                 $"{typeof(JsonContentNestedDataSerializer)} does not support byte[] serialization");
         }
 
-        return JsonSerializer.Deserialize<ContentCacheDataModel>(stringData!);
+        return JsonSerializer.Deserialize<ContentCacheDataModel>(stringData!, _jsonSerializerOptions);
     }
 
     /// <inheritdoc />
@@ -27,7 +33,7 @@ public class JsonContentNestedDataSerializer : IContentCacheDataSerializer
         ContentCacheDataModel model,
         bool published)
     {
-        var json = JsonSerializer.Serialize(model);
+        var json = JsonSerializer.Serialize(model, _jsonSerializerOptions);
         return new ContentCacheDataSerializationResult(json, null);
     }
 }
