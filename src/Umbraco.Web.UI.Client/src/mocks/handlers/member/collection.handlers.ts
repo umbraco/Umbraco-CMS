@@ -15,7 +15,7 @@ export const collectionHandlers = [
 			filter: filter || undefined,
 		};
 
-		const items = umbMemberMockDb.getCollection(options);
+		const items = umbMemberMockDb.collection.getItems(options);
 		return res(ctx.status(200), ctx.json(items));
 	}),
 ];

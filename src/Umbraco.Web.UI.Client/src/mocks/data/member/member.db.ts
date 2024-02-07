@@ -2,8 +2,7 @@ import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from '../utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manager.js';
 import { umbMemberTypeMockDb } from '../member-type/member-type.db.js';
-import { pagedResult } from '../utils/paged-result.js';
-import { queryFilter } from '../utils.js';
+import { UmbMockContentCollectionManager } from '../utils/content/content-collection.manager.js';
 import type { UmbMockMemberModel } from './member.data.js';
 import { data } from './member.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -13,40 +12,13 @@ import type {
 	MemberResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-const memberQueryFilter = (filterOptions: any, item: UmbMockMemberModel) =>
-	queryFilter(filterOptions.filter, item.name);
-
 class UmbMemberMockDB extends UmbEntityMockDbBase<UmbMockMemberModel> {
 	item = new UmbMockEntityItemManager<UmbMockMemberModel>(this, itemResponseMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMemberModel>(this, createDetailMockMapper, detailResponseMapper);
+	collection = new UmbMockContentCollectionManager(this, collectionItemResponseMapper);
 
 	constructor(data: Array<UmbMockMemberModel>) {
 		super(data);
-	}
-
-	// TODO: make collection manager we can user across content types
-	getCollection(options: any): any {
-		const allItems = this.getAll();
-
-		const filterOptions = {
-			skip: options.skip || 0,
-			take: options.take || 25,
-			filter: options.filter,
-		};
-
-		const filteredItems = allItems.filter((item) => memberQueryFilter(filterOptions, item));
-		const paginatedResult = pagedResult(filteredItems, filterOptions.skip, filterOptions.take);
-
-		// return the correct properties based on a dataType
-		const mappedItems = paginatedResult.items.map((item) => {
-			return {
-				id: item.id,
-				name: item.name,
-				email: item.email,
-			};
-		});
-
-		return { items: mappedItems, total: paginatedResult.total };
 	}
 }
 
@@ -111,6 +83,14 @@ const itemResponseMapper = (item: UmbMockMemberModel): MemberItemResponseModel =
 		name: item.name,
 		memberType: item.memberType,
 		variants: item.variants,
+	};
+};
+
+const collectionItemResponseMapper = (item: UmbMockMemberModel): any => {
+	return {
+		id: item.id,
+		name: item.name,
+		email: item.email,
 	};
 };
 
