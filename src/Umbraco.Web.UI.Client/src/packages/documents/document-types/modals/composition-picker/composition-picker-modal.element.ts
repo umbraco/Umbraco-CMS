@@ -3,81 +3,173 @@ import type {
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue,
 } from './composition-picker-modal.token.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbDocumentTypeCompositionCompatibleModel,
+	UmbDocumentTypeCompositionReferenceModel,
+} from '@umbraco-cms/backoffice/document-type';
+
+interface CompatibleCompositions {
+	path: string;
+	compositions: Array<UmbDocumentTypeCompositionCompatibleModel>;
+}
 
 @customElement('umb-composition-picker-modal')
 export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue
 > {
-	// TODO: We need to make a filter for the tree that hides the items that can't be used for composition.
-	// From what I've observed in old BO: Document types that inherit from other document types cannot be picked as a composition. (document types that are made under other document types)
-	// As well as other document types that has a composition already.
-	// OBS: If a document type 1 has a composition document type 2, document type 2 cannot add any compositions.
-
 	#compositionRepository = new UmbDocumentTypeCompositionRepository(this);
+	#unique?: string;
 
 	@state()
-	private _selectionConfiguration = {
-		multiple: true,
-		selectable: true,
-		selection: [],
-	};
+	private _references: Array<UmbDocumentTypeCompositionReferenceModel> = [];
 
-	constructor() {
-		super();
-	}
+	@state()
+	private _compatibleCompositions?: Array<CompatibleCompositions>;
+
+	@state()
+	private _selection: Array<string> = [];
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._selectionConfiguration = { ...this._selectionConfiguration, selection: (this.data?.selection as []) ?? [] };
-		this.#getcomposition()
+
+		this._selection = this.data?.selection ?? [];
+		this.modalContext?.setValue({ selection: this._selection });
+
+		this.#requestReference();
 	}
 
-	async #getcomposition() {
-		const unique = this.data?.unique;
+	async #requestReference() {
+		this.#unique = this.data?.unique;
+		if (!this.#unique) return;
 
-		if (!unique) throw new Error('Unique is required');
+		const { data } = await this.#compositionRepository.getReferences(this.#unique);
 
-		const something = await this.#compositionRepository.getReferences(unique);
-		console.log(something)
+		this._references = data ?? [];
 
+		if (!this._references.length) {
+			this.#requestAvailableCompositions();
+		}
 	}
 
-	#onSelectionChange(e: CustomEvent) {
-		const values = (e.target as UmbTreeElement).getSelection() ?? [];
-		this.value = { selection: values as string[] };
-		this._selectionConfiguration = { ...this._selectionConfiguration, selection: values as [] };
+	async #requestAvailableCompositions() {
+		if (!this.#unique) return;
+
+		const isElement = this.data?.isElement;
+		const currentPropertyAliases = this.data?.currentPropertyAliases;
+
+		const { data } = await this.#compositionRepository.availableCompositions({
+			unique: this.#unique,
+			isElement: isElement ?? false,
+			currentCompositeUniques: this._selection,
+			currentPropertyAliases: currentPropertyAliases ?? [],
+		});
+
+		if (!data) return;
+
+		const folders = Array.from(new Set(data.map((c) => '/' + c.folderPath.join('/'))));
+		this._compatibleCompositions = folders.map((path) => ({
+			path,
+			compositions: data.filter((c) => '/' + c.folderPath.join('/') === path),
+		}));
 	}
 
 	render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('contentTypeEditor_compositions')}">
-				<umb-localize key="contentTypeEditor_compositionsDescription">
-					Inherit tabs and properties from an existing Document Type. New tabs will be<br />added to the current
-					Document Type or merged if a tab with an identical name exists.<br />
-				</umb-localize>
-				<uui-input id="search" placeholder=${this.localize.term('placeholders_filter')}>
-					<uui-icon name="icon-search" slot="prepend"></uui-icon>
-				</uui-input>
-				<umb-tree
-					hide-tree-root
-					alias="Umb.Tree.DocumentType"
-					@selection-change=${this.#onSelectionChange}
-					.selectionConfiguration=${this._selectionConfiguration}
-					.selectableFilter=${(item: any) => item.unique !== this.data?.unique}></umb-tree>
+				${this._references.length ? this.#renderHasReference() : this.#renderAvailableCompositions()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
-					<uui-button
-						label=${this.localize.term('general_submit')}
-						look="primary"
-						color="positive"
-						@click=${this._submitModal}></uui-button>
+					${!this._references.length
+						? html`<uui-button
+								label=${this.localize.term('general_submit')}
+								look="primary"
+								color="positive"
+								@click=${this._submitModal}></uui-button>`
+						: nothing}
 				</div>
 			</umb-body-layout>
 		`;
+	}
+
+	#renderHasReference() {
+		return html` <umb-localize key="contentTypeEditor_compositionInUse">
+				This Content Type is used in a composition, and therefore cannot be composed itself.
+			</umb-localize>
+			<h4>
+				<umb-localize key="contentTypeEditor_compositionUsageHeading">Where is this composition used?</umb-localize>
+			</h4>
+			<umb-localize key="contentTypeEditor_compositionUsageSpecification">
+				This composition is currently used in the composition of the following Content Types:
+			</umb-localize>
+			<div class="reference-list">
+				${repeat(
+					this._references,
+					(item) => item.unique,
+					(item) =>
+						html`<uui-ref-node-document-type
+							href=${'/section/settings/workspace/document-type/edit/' + item.unique}
+							name=${item.name}>
+							<uui-icon slot="icon" name=${item.icon}></uui-icon>
+						</uui-ref-node-document-type>`,
+				)}
+			</div>`;
+	}
+
+	#renderAvailableCompositions() {
+		if (this._compatibleCompositions) {
+			return html`<umb-localize key="contentTypeEditor_compositionsDescription">
+					Inherit tabs and properties from an existing Document Type. New tabs will be<br />added to the current
+					Document Type or merged if a tab with an identical name exists.<br />
+				</umb-localize>
+				<!--- TODO: Implement search functionality
+				<uui-input id="search" placeholder=this.localize.term('placeholders_filter')>
+					<uui-icon name="icon-search" slot="prepend"></uui-icon>
+				</uui-input> -->
+				<div class="compositions-list">
+					${repeat(
+						this._compatibleCompositions,
+						(folder) => folder.path,
+						(folder) =>
+							html`${this._compatibleCompositions!.length > 1
+								? html`<strong><uui-icon name="icon-folder"></uui-icon>${folder.path}</strong>`
+								: nothing}
+							${this.#renderCompositionsItems(folder.compositions)}`,
+					)}
+				</div>`;
+		} else {
+			return html`<umb-localize key="contentTypeEditor_noAvailableCompositions">
+				There are no Content Types available to use as a composition
+			</umb-localize>`;
+		}
+	}
+
+	#onSelectionAdd(unique: string) {
+		this._selection = [...this._selection, unique];
+		this.modalContext?.setValue({ selection: this._selection });
+	}
+
+	#onSelectionRemove(unique: string) {
+		this._selection = this._selection.filter((s) => s !== unique);
+		this.modalContext?.setValue({ selection: this._selection });
+	}
+
+	#renderCompositionsItems(compositionsList: Array<UmbDocumentTypeCompositionCompatibleModel>) {
+		return repeat(
+			compositionsList,
+			(compositions) => compositions.unique,
+			(compositions) =>
+				html`<uui-menu-item
+					label=${compositions.name}
+					selectable
+					@selected=${() => this.#onSelectionAdd(compositions.unique)}
+					@deselected=${() => this.#onSelectionRemove(compositions.unique)}
+					?selected=${this._selection.find((unique) => unique === compositions.unique)}>
+					<uui-icon name=${compositions.icon} slot="icon"></uui-icon>
+				</uui-menu-item>`,
+		);
 	}
 
 	static styles = [
@@ -87,8 +179,21 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				display: flex;
 				align-items: center;
 			}
-			uui-icon {
+
+			#search uui-icon {
 				padding-left: var(--uui-size-3);
+			}
+
+			.reference-list {
+				margin-block: var(--uui-size-3);
+				display: grid;
+				gap: var(--uui-size-1);
+			}
+
+			.compositions-list strong {
+				display: flex;
+				align-items: center;
+				gap: var(--uui-size-3);
 			}
 		`,
 	];

@@ -122,10 +122,13 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 			const unique = this._workspaceContext.getEntityId();
 
+			//TODO Figure out the correct data that needs to be sent to the compositions modal. Do we really have to send isElement, currentPropertyAliases - isn't unique enough?
 			this.observe(this._workspaceContext.structure.contentTypes, (contentTypes) => {
 				this._compositionConfiguration = {
 					unique: unique ?? '',
 					selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
+					isElement: contentTypes.find((contentType) => contentType.unique === unique)?.isElement ?? false,
+					currentPropertyAliases: [],
 				};
 			});
 
@@ -286,12 +289,10 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	async #openCompositionModal() {
-
 		const modalContext = this._modalManagerContext?.open(UMB_COMPOSITION_PICKER_MODAL, {
 			data: this._compositionConfiguration,
 		});
 		await modalContext?.onSubmit();
-
 
 		if (!modalContext?.value) return;
 

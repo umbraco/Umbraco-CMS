@@ -1,3 +1,8 @@
+import type {
+	UmbDocumentTypeCompositionCompatibleModel,
+	UmbDocumentTypeCompositionReferenceModel,
+	UmbDocumentTypeCompositionRequestModel,
+} from '../../types.js';
 import { type DocumentTypeCompositionRequestModel, DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -25,7 +30,20 @@ export class UmbDocumentTypeCompositionServerDataSource {
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
 	async getReferences(unique: string) {
-		return tryExecuteAndNotify(this.#host, DocumentTypeResource.getDocumentTypeByIdCompositionReferences({id:unique}));
+		const response = await tryExecuteAndNotify(
+			this.#host,
+			DocumentTypeResource.getDocumentTypeByIdCompositionReferences({ id: unique }),
+		);
+		const error = response.error;
+		const data: Array<UmbDocumentTypeCompositionReferenceModel> | undefined = response.data?.map((reference) => {
+			return {
+				unique: reference.id,
+				icon: reference.icon,
+				name: reference.name,
+			};
+		});
+
+		return { data, error };
 	}
 	/**
 	 * Updates the compositions for a document type on the server
@@ -33,13 +51,29 @@ export class UmbDocumentTypeCompositionServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDocumentTypeCompositionServerDataSource
 	 */
-	async update(data: any) {
+	async availableCompositions(args: UmbDocumentTypeCompositionRequestModel) {
 		const requestBody: DocumentTypeCompositionRequestModel = {
-			id: '',
-			isElement: false,
-			currentCompositeIds: [],
-			currentPropertyAliases:  [],
-		}
-		return tryExecuteAndNotify(this.#host, DocumentTypeResource.postDocumentTypeAvailableCompositions({ requestBody }));
+			id: args.unique,
+			isElement: args.isElement,
+			currentCompositeIds: args.currentCompositeUniques,
+			currentPropertyAliases: args.currentPropertyAliases,
+		};
+
+		const response = await tryExecuteAndNotify(
+			this.#host,
+			DocumentTypeResource.postDocumentTypeAvailableCompositions({ requestBody }),
+		);
+		const error = response.error;
+		const data: Array<UmbDocumentTypeCompositionCompatibleModel> | undefined = response.data?.map((composition) => {
+			return {
+				unique: composition.id,
+				name: composition.name,
+				icon: composition.icon,
+				folderPath: composition.folderPath,
+				isCompatible: composition.isCompatible,
+			};
+		});
+
+		return { data, error };
 	}
 }

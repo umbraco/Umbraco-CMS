@@ -8,3 +8,25 @@ export interface UmbDocumentTypeDetailModel extends UmbContentTypeModel {
 	defaultTemplate: { id: string } | null;
 	cleanup: ContentTypeCleanupBaseModel;
 }
+
+export interface UmbDocumentTypeCompositionRequestModel {
+	unique: string;
+	//Do we really need to send this to the server - Why isn't unique enough?
+	isElement: boolean;
+	currentPropertyAliases: Array<string>;
+	currentCompositeUniques: Array<string>;
+}
+
+export interface UmbDocumentTypeCompositionCompatibleModel {
+	unique: string;
+	name: string;
+	icon: string;
+	folderPath: Array<string>;
+	isCompatible: boolean;
+}
+
+export interface UmbDocumentTypeCompositionReferenceModel {
+	unique: string;
+	name: string;
+	icon: string;
+}
