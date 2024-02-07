@@ -32,15 +32,17 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 	 */
 	async getCollection(filter: UmbMemberCollectionFilterModel) {
 		//const { data, error } = await tryExecuteAndNotify(this.#host, MemberResource.getCollectionMember(filter));
+
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			fetch('/umbraco/management/api/v1/member/collection'),
+			fetch('/umbraco/management/api/v1/collection/member'),
 		);
 
 		if (data) {
-			const items = data.items.map((item) => {
+			const json = await data.json();
+			const items = json.items.map((item) => {
 				const model: UmbMemberCollectionModel = {
-					unique: item.isoCode,
+					unique: item.id,
 					name: item.name,
 					entityType: UMB_MEMBER_ENTITY_TYPE,
 				};
@@ -48,7 +50,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 				return model;
 			});
 
-			return { data: { items, total: data.total } };
+			return { data: { items, total: json.total } };
 		}
 
 		return { error };

@@ -44,11 +44,13 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 		this._tableItems = members.map((member) => {
 			return {
 				id: member.unique,
-				icon: 'icon-globe',
+				icon: 'icon-user',
 				data: [
 					{
 						columnAlias: 'memberName',
-						value: member.name,
+						value: html`<a href=${'section/member-management/workspace/member/edit/' + member.unique}
+							>${member.name}</a
+						>`,
 					},
 				],
 			};
