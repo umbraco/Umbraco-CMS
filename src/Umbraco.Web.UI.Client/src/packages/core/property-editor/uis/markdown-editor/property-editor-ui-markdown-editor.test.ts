@@ -1,6 +1,6 @@
 /*import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIMarkdownEditorElement } from './property-editor-ui-markdown-editor.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIMarkdownEditorElement', () => {
 	let element: UmbPropertyEditorUIMarkdownEditorElement;
@@ -13,7 +13,7 @@ describe('UmbPropertyEditorUIMarkdownEditorElement', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUIMarkdownEditorElement);
 	});
 
-	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});

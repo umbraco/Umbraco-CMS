@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbInputBlockTypeElement } from './input-block-type.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbInputMediaElement', () => {
 	let element: UmbInputBlockTypeElement;
 
@@ -12,7 +12,7 @@ describe('UmbInputMediaElement', () => {
 		expect(element).to.be.instanceOf(UmbInputBlockTypeElement);
 	});
 
-	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});

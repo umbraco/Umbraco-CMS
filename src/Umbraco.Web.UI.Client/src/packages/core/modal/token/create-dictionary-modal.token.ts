@@ -1,5 +1,5 @@
+import { UmbModalToken } from './modal-token.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCreateDictionaryModalData {
 	parentId: string | null;

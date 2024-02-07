@@ -17,8 +17,8 @@ import type {
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import type { UmbTreePickerDynamicRoot, UmbTreePickerDynamicRootQueryStep } from '@umbraco-cms/backoffice/components';
 
-@customElement('umb-input-document-picker-root')
-export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-document-root-picker')
+export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
@@ -257,10 +257,10 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 	];
 }
 
-export default UmbInputDocumentPickerRootElement;
+export default UmbInputDocumentRootPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-document-picker-root': UmbInputDocumentPickerRootElement;
+		'umb-input-document-root-picker': UmbInputDocumentRootPickerElement;
 	}
 }

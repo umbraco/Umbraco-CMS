@@ -1,7 +1,6 @@
 import { UmbUserGroupDetailRepository } from '../repository/detail/index.js';
 import { UmbUserRepository } from '../../user/repository/user.repository.js';
 import type { UmbUserGroupDetailModel } from '../types.js';
-import { UMB_USER_GROUP_ENTITY_TYPE } from '../entity.js';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
