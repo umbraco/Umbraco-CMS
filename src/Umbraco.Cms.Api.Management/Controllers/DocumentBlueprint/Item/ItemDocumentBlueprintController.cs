@@ -22,13 +22,13 @@ public class ItemDocumentBlueprintController : DocumentBlueprintItemControllerBa
         _documentPresentationFactory = documentPresentationFactory;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentBlueprintResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IDocumentEntitySlim> documents = _entityService.GetAll(UmbracoObjectTypes.Document, ids.ToArray()).Select(x => x as IDocumentEntitySlim).WhereNotNull();
         IEnumerable<DocumentBlueprintResponseModel> responseModels = documents.Select(x => _documentPresentationFactory.CreateBlueprintItemResponseModel(x));
-        return Ok(responseModels);
+        return await Task.FromResult(Ok(responseModels));
     }
 }

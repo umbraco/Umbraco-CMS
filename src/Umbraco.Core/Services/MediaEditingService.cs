@@ -84,7 +84,10 @@ internal sealed class MediaEditingService
         => await HandleMoveToRecycleBinAsync(key, userKey);
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
-        => await HandleDeleteAsync(key, userKey);
+        => await HandleDeleteAsync(key, userKey,false);
+
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
+        => await HandleDeleteAsync(key, userKey, true);
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);

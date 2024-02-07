@@ -46,7 +46,7 @@ public class SetAvatarCurrentUserController : CurrentUserControllerBase
             return Forbidden();
         }
 
-        UserOperationStatus result = await _userService.SetAvatarAsync(userKey, model.FileId);
+        UserOperationStatus result = await _userService.SetAvatarAsync(userKey, model.File.Id);
 
         return result is UserOperationStatus.Success
             ? Ok()

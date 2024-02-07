@@ -1,9 +1,9 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
 /// <summary>
 ///     The saved state of a content item
 /// </summary>
-public enum ContentState
+public enum DocumentVariantState
 {
     /// <summary>
     ///     The item isn't created yet

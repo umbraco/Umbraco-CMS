@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Media;
 [ShortGenericSchemaName<MediaValueModel, MediaVariantResponseModel>("ContentForMediaResponseModel")]
 public class MediaResponseModel : ContentResponseModelBase<MediaValueModel, MediaVariantResponseModel>
 {
-    public IEnumerable<ContentUrlInfo> Urls { get; set; } = Enumerable.Empty<ContentUrlInfo>();
+    public IEnumerable<MediaUrlInfo> Urls { get; set; } = Enumerable.Empty<MediaUrlInfo>();
 
     public bool IsTrashed { get; set; }
 

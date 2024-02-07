@@ -4,5 +4,5 @@ public class DataTypeResponseModel : DataTypeModelBase
 {
     public Guid Id { get; set; }
 
-    public Guid? ParentId { get; set; }
+    public ReferenceByIdModel? Parent { get; set; }
 }

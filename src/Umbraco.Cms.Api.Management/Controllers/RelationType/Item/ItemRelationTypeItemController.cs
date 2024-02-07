@@ -20,7 +20,7 @@ public class ItemRelationTypeItemController : RelationTypeItemControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<RelationTypeItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "id")] HashSet<Guid> ids)
@@ -33,6 +33,6 @@ public class ItemRelationTypeItemController : RelationTypeItemControllerBase
 
         List<RelationTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IRelationType, RelationTypeItemResponseModel>(relationTypes);
 
-        return Ok(responseModels);
+        return await Task.FromResult(Ok(responseModels));
     }
 }

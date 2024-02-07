@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.PublicAccess;
 using Umbraco.Cms.Core;
@@ -76,8 +77,8 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
         {
             Members = members,
             Groups = memberGroups,
-            LoginPageId = loginNodeKeyAttempt.Result,
-            ErrorPageId = noAccessNodeKeyAttempt.Result,
+            LoginDocument = new ReferenceByIdModel(loginNodeKeyAttempt.Result),
+            ErrorDocument = new ReferenceByIdModel(noAccessNodeKeyAttempt.Result),
         };
 
         return Attempt.SucceedWithStatus<PublicAccessResponseModel?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, responseModel);
@@ -89,7 +90,7 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
             ContentId = contentKey,
             MemberGroupNames = requestModel.MemberGroupNames,
             MemberUserNames = requestModel.MemberUserNames,
-            ErrorPageId = requestModel.ErrorPageId,
-            LoginPageId = requestModel.LoginPageId,
+            ErrorPageId = requestModel.ErrorDocument.Id,
+            LoginPageId = requestModel.LoginDocument.Id,
         };
 }

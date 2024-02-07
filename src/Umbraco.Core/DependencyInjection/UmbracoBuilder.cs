@@ -356,8 +356,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<CompiledPackageXmlParser>();
             Services.AddUnique<IPreviewService, PreviewService>();
 
-            // Register a noop IHtmlSanitizer to be replaced
+            // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
+            Services.AddUnique<IMarkdownSanitizer, NoopMarkdownSanitizer>();
 
             Services.AddUnique<IPropertyTypeUsageService, PropertyTypeUsageService>();
             Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();

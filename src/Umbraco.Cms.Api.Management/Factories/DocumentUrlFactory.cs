@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
@@ -9,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class ContentUrlFactory : IContentUrlFactory
+public class DocumentUrlFactory : IDocumentUrlFactory
 {
     private readonly IPublishedRouter _publishedRouter;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -21,7 +22,7 @@ public class ContentUrlFactory : IContentUrlFactory
     private readonly UriUtility _uriUtility;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
-    public ContentUrlFactory(
+    public DocumentUrlFactory(
         IPublishedRouter publishedRouter,
         IUmbracoContextAccessor umbracoContextAccessor,
         ILanguageService languageService,
@@ -43,7 +44,7 @@ public class ContentUrlFactory : IContentUrlFactory
         _publishedUrlProvider = publishedUrlProvider;
     }
 
-    public async Task<IEnumerable<ContentUrlInfo>> GetUrlsAsync(IContent content)
+    public async Task<IEnumerable<DocumentUrlInfo>> GetUrlsAsync(IContent content)
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
@@ -60,7 +61,7 @@ public class ContentUrlFactory : IContentUrlFactory
 
         return urlInfos
             .Where(urlInfo => urlInfo.IsUrl)
-            .Select(urlInfo => new ContentUrlInfo { Culture = urlInfo.Culture, Url = urlInfo.Text })
+            .Select(urlInfo => new DocumentUrlInfo { Culture = urlInfo.Culture, Url = urlInfo.Text })
             .ToArray();
     }
 }

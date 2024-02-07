@@ -25,7 +25,7 @@ public class VerifyInviteUserController : UserControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Invite(VerifyInviteUserRequestModel model)
     {
-        Attempt<UserOperationStatus> result = await _userService.VerifyInviteAsync(model.UserId, model.Token);
+        Attempt<UserOperationStatus> result = await _userService.VerifyInviteAsync(model.User.Id, model.Token);
 
         return result.Success
             ? Ok()

@@ -4,5 +4,5 @@ public class DynamicRootQueryOriginRequestModel
 {
     public required string Alias { get; set; }
 
-    public Guid? Key { get; set; }
+    public Guid? Id { get; set; }
 }
