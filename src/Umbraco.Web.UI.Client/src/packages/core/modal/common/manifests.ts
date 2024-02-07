@@ -49,6 +49,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Tree Picker Modal',
 		js: () => import('./tree-picker/tree-picker-modal.element.js'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.ListitemPicker',
+		name: 'Listitem Picker Modal',
+		js: () => import('./listitem-picker/listitem-picker-modal.element.js'),
+	},
 ];
 
 export const manifests = [...modals];
