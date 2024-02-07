@@ -1,8 +1,7 @@
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import type {
-	UmbInvariantableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
+import type { UmbInvariantableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEditableWorkspaceContextBase,
 	UmbInvariantWorkspacePropertyDatasetContext,
@@ -17,10 +16,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	PropertyEditorConfigDefaultData,
-	PropertyEditorConfigProperty} from '@umbraco-cms/backoffice/extension-registry';
-import {
-	umbExtensionsRegistry,
+	PropertyEditorConfigProperty,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbDataTypeWorkspaceContext
@@ -210,9 +208,7 @@ export class UmbDataTypeWorkspaceContext
 			data = { ...data, ...this.modalContext.data.preset };
 		}
 		this.setIsNew(true);
-		// TODO: This is a hack to get around the fact that the data is not typed correctly.
-		// Create and response models are different. We need to look into this.
-		this.#data.setValue(data as unknown as UmbDataTypeDetailModel);
+		this.#data.setValue(data);
 		return { data };
 	}
 

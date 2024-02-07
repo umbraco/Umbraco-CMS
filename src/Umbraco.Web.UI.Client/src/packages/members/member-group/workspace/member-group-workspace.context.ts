@@ -8,36 +8,77 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbMemberGroupWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberGroupDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	//
-	public readonly repository: UmbMemberGroupDetailRepository = new UmbMemberGroupDetailRepository(this);
+	public readonly repository = new UmbMemberGroupDetailRepository(this);
+
+	#data = new UmbObjectState<UmbMemberGroupDetailModel | undefined>(undefined);
+	readonly data = this.#data.asObservable();
+
+	readonly name = this.#data.asObservablePart((data) => data?.name);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_GROUP_WORKSPACE_ALIAS);
 	}
 
-	getEntityType(): string {
-		return UMB_MEMBER_GROUP_ENTITY_TYPE;
+	async load(unique: string) {
+		const { data } = await this.repository.requestByUnique(unique);
+		debugger;
+
+		if (data) {
+			this.setIsNew(false);
+			this.#data.update(data);
+		}
 	}
 
-	getEntityId() {
-		return '1234';
-	}
+	async create(parentUnique: string | null) {
+		const { data } = await this.repository.createScaffold(parentUnique);
+		debugger;
 
-	getData() {
-		return 'fake' as unknown as UmbMemberGroupDetailModel;
+		if (data) {
+			this.setIsNew(true);
+			this.#data.setValue(data);
+		}
+
+		return { data };
 	}
 
 	async save() {
-		console.log('save');
+		const data = this.getData();
+		if (!data) throw new Error('No data to save');
+
+		if (this.getIsNew()) {
+			await this.repository.create(data);
+		} else {
+			await this.repository.save(data);
+		}
+
+		this.saveComplete(data);
 	}
 
-	async load(id: string) {
-		console.log('load', id);
+	getData() {
+		return this.#data.getValue();
+	}
+
+	getEntityId() {
+		return this.getData()?.unique || '';
+	}
+
+	getEntityType() {
+		return 'member-group';
+	}
+
+	getName() {
+		return this.#data.getValue()?.name;
+	}
+
+	setName(name: string | undefined) {
+		this.#data.update({ name });
 	}
 
 	public destroy(): void {
@@ -51,5 +92,5 @@ export const UMB_MEMBER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<
 >(
 	'UmbWorkspaceContext',
 	undefined,
-	(context): context is UmbMemberGroupWorkspaceContext => context.getEntityType?.() === UMB_MEMBER_GROUP_ENTITY_TYPE,
+	(context): context is UmbMemberGroupWorkspaceContext => context.getEntityType?.() === 'member-group',
 );

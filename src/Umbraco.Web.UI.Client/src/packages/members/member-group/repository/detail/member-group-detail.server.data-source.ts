@@ -49,10 +49,20 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
+		/*
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			MemberGroupResource.getMemberGroupById({ id: unique }),
 		);
+		*/
+
+		// TODO => use backend cli when available.
+		const { data, error } = (await tryExecuteAndNotify(
+			this.#host,
+			fetch(`/umbraco/management/api/v1/member-group/${unique}`),
+		)) as any;
+
+		const json = await data.json(); // remove this line when backend cli is available
 
 		if (error || !data) {
 			return { error };
@@ -61,8 +71,8 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 		// TODO: make data mapper to prevent errors
 		const memberGroup: UmbMemberGroupDetailModel = {
 			entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
-			unique: data.id,
-			name: data.name,
+			unique: json.id,
+			name: json.name,
 		};
 
 		return { data: memberGroup };
@@ -83,12 +93,22 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 			name: model.name,
 		};
 
+		/*
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			MemberGroupResource.postMemberGroup({
 				requestBody,
 			}),
 		);
+		*/
+
+		const { data, error } = (await tryExecuteAndNotify(
+			this.#host,
+			fetch(`/umbraco/management/api/v1/member-group`, { method: 'POST', body: JSON.stringify(requestBody) }),
+		)) as any;
+
+		const json = await data.json(); // remove this line when backend cli is available
+		debugger;
 
 		if (data) {
 			return this.read(data);
