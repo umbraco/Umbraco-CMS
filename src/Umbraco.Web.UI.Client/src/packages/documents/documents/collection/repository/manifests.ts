@@ -1,0 +1,13 @@
+import { UmbDocumentCollectionRepository } from './document-collection.repository.js';
+import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+
+export const UMB_DOCUMENT_COLLECTION_REPOSITORY_ALIAS = 'Umb.Repository.DocumentCollection';
+
+const collectionRepositoryManifest: ManifestRepository = {
+	type: 'repository',
+	alias: UMB_DOCUMENT_COLLECTION_REPOSITORY_ALIAS,
+	name: 'Document Collection Repository',
+	api: UmbDocumentCollectionRepository,
+};
+
+export const manifests = [collectionRepositoryManifest];
