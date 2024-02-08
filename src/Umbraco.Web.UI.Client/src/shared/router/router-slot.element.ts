@@ -103,7 +103,6 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 			const newActiveLocalPath = this.#router.match?.route.path;
 			if (this._activeLocalPath !== newActiveLocalPath) {
-				console.log('update', newActiveLocalPath);
 				this._activeLocalPath = newActiveLocalPath;
 				this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
 				this.dispatchEvent(new UmbRouterSlotChangeEvent());

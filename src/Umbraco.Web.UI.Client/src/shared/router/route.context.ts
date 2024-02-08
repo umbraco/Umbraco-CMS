@@ -72,8 +72,17 @@ export class UmbRouteContext extends UmbBaseController {
 	}
 
 	#removeModalPath(info: IRoutingInfo) {
-		if (window.location.href.includes(info.match.fragments.consumed)) {
-			window.history.pushState({}, '', window.location.href.split(info.match.fragments.consumed)[0]);
+		/*
+		NOTICE:
+		This piece of code remove the last occurrence of the modal path from the current url.
+		This means if the same type of modal is opened multiple times, the url will be cleaned from the last opened modal.
+		This is okay for now as we do not have any situations where we close a parent modal before a child modal.
+		*/
+		const currentUrl = window.location.href;
+		const folderToRemove = info.match.fragments.consumed;
+		if (currentUrl.includes(folderToRemove)) {
+			const split = currentUrl.split(folderToRemove);
+			window.history.pushState({}, '', split[split.length - 1]);
 		}
 	}
 
