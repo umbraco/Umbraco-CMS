@@ -42,6 +42,8 @@ export class UmbMediaTreeStore extends UmbUniqueTreeStore {
 			hasChildren: false,
 			variants: item.variants,
 			isTrashed: item.isTrashed,
+			mediaType: { unique: item.mediaType.unique, icon: '', hasListView: false },
+			noAccess: false,
 		};
 
 		return treeItem;
