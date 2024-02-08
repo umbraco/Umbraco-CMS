@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 
 [ApiVersion("1.0")]
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Media}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.Media}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessForMediaTree)]
 public class MediaItemControllerBase : ManagementApiControllerBase

@@ -31,6 +31,8 @@ public static class UmbracoBuilderExtensions
                 .AddMedia()
                 .AddMediaTypes()
                 .AddMemberGroups()
+                .AddMember()
+                .AddMemberTypes()
                 .AddLanguages()
                 .AddDictionary()
                 .AddHealthChecks()

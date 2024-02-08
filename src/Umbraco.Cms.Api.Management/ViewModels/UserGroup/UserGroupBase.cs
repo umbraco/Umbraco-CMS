@@ -41,12 +41,12 @@ public class UserGroupBase
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
     /// </summary>
-    public Guid? DocumentStartNodeId { get; init; }
+    public ReferenceByIdModel? DocumentStartNode { get; init; }
 
     /// <summary>
     /// If the group should have access to the document root.
     /// <remarks>
-    /// This will be ignored if an explicit start node has been specified in <see cref="DocumentStartNodeId"/>.
+    /// This will be ignored if an explicit start node has been specified in <see cref="DocumentStartNode"/>.
     /// </remarks>
     /// </summary>
     public bool DocumentRootAccess { get; init; }
@@ -57,12 +57,12 @@ public class UserGroupBase
     /// This can be overwritten by a different user group if a user is a member of multiple groups
     /// </remarks>
     /// </summary>
-    public Guid? MediaStartNodeId { get; init; }
+    public ReferenceByIdModel? MediaStartNode { get; init; }
 
     /// <summary>
     /// If the group should have access to the media root.
     /// <remarks>
-    /// This will be ignored if an explicit start node has been specified in <see cref="MediaStartNodeId"/>.
+    /// This will be ignored if an explicit start node has been specified in <see cref="MediaStartNode"/>.
     /// </remarks>
     /// </summary>
     public bool MediaRootAccess { get; init; }

@@ -10,18 +10,18 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Item;
 [ApiVersion("1.0")]
 public class ItemStylesheetItemController : StylesheetItemControllerBase
 {
-    private readonly IFileItemPresentationModelFactory _fileItemPresentationModelFactory;
+    private readonly IFileItemPresentationFactory _fileItemPresentationFactory;
 
-    public ItemStylesheetItemController(IFileItemPresentationModelFactory fileItemPresentationModelFactory)
-        => _fileItemPresentationModelFactory = fileItemPresentationModelFactory;
+    public ItemStylesheetItemController(IFileItemPresentationFactory fileItemPresentationFactory)
+        => _fileItemPresentationFactory = fileItemPresentationFactory;
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<StylesheetItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "path")] HashSet<string> paths)
     {
         paths = paths.Select(path => path.VirtualPathToSystemPath()).ToHashSet();
-        IEnumerable<StylesheetItemResponseModel> responseModels = _fileItemPresentationModelFactory.CreateStylesheetItemResponseModels(paths);
+        IEnumerable<StylesheetItemResponseModel> responseModels = _fileItemPresentationFactory.CreateStylesheetItemResponseModels(paths);
         return await Task.FromResult(Ok(responseModels));
     }
 }

@@ -7,7 +7,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Item;
 
 [ApiController]
-[VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}")]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.PartialView}")]
 [ApiExplorerSettings(GroupName = "Partial View")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessPartialViews)]
 public class PartialViewItemControllerBase : ManagementApiControllerBase

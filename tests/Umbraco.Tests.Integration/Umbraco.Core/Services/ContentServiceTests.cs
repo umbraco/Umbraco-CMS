@@ -2877,7 +2877,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.Published);
         Assert.IsTrue(content.Edited);
 
-        Assert.AreEqual("foo", content.GetValue("title", published: true));
+        Assert.IsNull(content.GetValue("title", published: true));
         Assert.AreEqual("foo", content.GetValue("title"));
 
         var vpk = ((Content)content).VersionId;
@@ -3410,9 +3410,9 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
         Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-        Assert.AreEqual("name-fr2", content2.PublishName); // not null, see note above
+        Assert.IsNull(content2.PublishName);
         Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode)); // not null, see note above
+        Assert.IsNull(content2.GetPublishName(langUk.IsoCode));
 
         Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
         Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
@@ -3426,68 +3426,16 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
             (langDe, false));
 
-        // fr is not published anymore - uk still is, see note above
-        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
-            (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
-            (langDe, false));
+        // Everything should be unpublished
+        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, false), (langDe, false));
+        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, false), (langDe, false));
 
         // and so, fr has to be edited - uk still is
         AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
         AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
 
-        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
-            (langUk, false)); // FR, DE would throw
-        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
-            (langUk, false)); // FR, DE would throw
-
-        // Act
-
-        // that HAS to be SavePublishing, because SaveAndPublish would just republish everything!
-        // TODO: This is using an internal API - the test can't pass without this but we want to keep the test here
-        // will need stephane to have a look at this test at some stage since there is a lot of logic here that we
-        // want to keep on testing but don't need the public API to do these more complicated things.
-        ContentService.CommitDocumentChanges(content);
-
-        // content has been re-published,
-        // everything is back to what it was before being unpublished
-        content2 = ContentService.GetById(content.Id);
-
-        Assert.IsTrue(content2.Published);
-
-        Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
-        Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
-        Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
-
-        Assert.AreEqual("name-fr2", content2.PublishName);
-        Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
-        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
-
-        Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
-        Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
-        Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
-        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
-
-        // no change
-        AssertPerCulture(content, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
-            (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureAvailable(c), (langFr, true), (langUk, true),
-            (langDe, false));
-
-        // no change, back to published
-        AssertPerCulture(content, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
-            (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCulturePublished(c), (langFr, false), (langUk, true),
-            (langDe, false));
-
-        // no change, back to published
-        AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
-        AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, false));
-
-        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
-            (langUk, false)); // FR, DE would throw
-        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue,
-            (langUk, false)); // FR, DE would throw
+        AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+        AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
         // Act
         ContentService.Publish(content, new[] { langUk.IsoCode });

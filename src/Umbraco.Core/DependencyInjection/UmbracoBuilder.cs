@@ -309,6 +309,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IContentValidationService, ContentValidationService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             Services.AddUnique<IMemberService, MemberService>();
+            Services.AddUnique<IMemberValidationService, MemberValidationService>();
             Services.AddUnique<IMediaPermissionService, MediaPermissionService>();
             Services.AddUnique<IMediaService, MediaService>();
             Services.AddUnique<IMediaEditingService, MediaEditingService>();
@@ -331,6 +332,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IEntityService, EntityService>();
             Services.AddUnique<IRelationService, RelationService>();
             Services.AddUnique<IMemberTypeService, MemberTypeService>();
+            Services.AddUnique<IMemberContentEditingService, MemberContentEditingService>();
+            Services.AddUnique<IMemberTypeEditingService, MemberTypeEditingService>();
             Services.AddUnique<INotificationService, NotificationService>();
             Services.AddUnique<ITrackedReferencesService, TrackedReferencesService>();
             Services.AddUnique<ITreeEntitySortingService, TreeEntitySortingService>();
@@ -352,8 +355,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<CompiledPackageXmlParser>();
             Services.AddUnique<IPreviewService, PreviewService>();
 
-            // Register a noop IHtmlSanitizer to be replaced
+            // Register a noop IHtmlSanitizer & IMarkdownSanitizer to be replaced
             Services.AddUnique<IHtmlSanitizer, NoopHtmlSanitizer>();
+            Services.AddUnique<IMarkdownSanitizer, NoopMarkdownSanitizer>();
 
             Services.AddUnique<IPropertyTypeUsageService, PropertyTypeUsageService>();
             Services.AddUnique<IDataTypeUsageService, DataTypeUsageService>();

@@ -37,7 +37,7 @@ public class MoveDictionaryController : DictionaryControllerBase
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = await _dictionaryItemService.MoveAsync(
             source,
-            moveDictionaryRequestModel.TargetId,
+            moveDictionaryRequestModel.Target?.Id,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

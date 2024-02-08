@@ -56,6 +56,6 @@ public class PublishDocumentController : DocumentControllerBase
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            : ContentPublishingOperationStatusResult(attempt.Status, invalidPropertyAliases: attempt.Result.InvalidPropertyAliases);
+            : DocumentPublishingOperationStatusResult(attempt.Status, invalidPropertyAliases: attempt.Result.InvalidPropertyAliases);
     }
 }

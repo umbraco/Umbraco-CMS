@@ -152,7 +152,10 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         if (temporaryFileKey.HasValue)
         {
             file = TryGetTemporaryFile(temporaryFileKey.Value);
-            _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey.Value, _scopeProvider);
+            if (file is not null)
+            {
+                _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey.Value, _scopeProvider);
+            }
         }
 
         if (file == null) // not uploading a file
@@ -166,6 +169,11 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
                 return null; // clear
             }
 
+            if (editorImageCropperValue is not null && temporaryFileKey.HasValue)
+            {
+                // a plausible tempFile value was supplied, but could not be converted to an actual file => clear the src
+                editorImageCropperValue.Src = null;
+            }
             return _jsonSerializer.Serialize(editorImageCropperValue); // unchanged
         }
 

@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.RedirectUrlManagement;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
 
@@ -25,7 +26,7 @@ public class RedirectUrlPresentationFactory : IRedirectUrlPresentationFactory
         {
             OriginalUrl = originalUrl,
             DestinationUrl = destinationUrl,
-            ContentId = source.ContentKey,
+            Document = new ReferenceByIdModel(source.ContentKey),
             Created = source.CreateDateUtc,
             Culture = source.Culture,
             Id = source.Key,
