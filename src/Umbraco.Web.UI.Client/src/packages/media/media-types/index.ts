@@ -1,10 +1,12 @@
 import './components/index.js';
 
+export type { UmbAllowedMediaTypeModel } from './repository/index.js';
 export {
 	UmbMediaTypeItemRepository,
 	UMB_MEDIA_TYPE_ITEM_STORE_ALIAS,
 	UMB_MEDIA_TYPE_DETAIL_STORE_ALIAS,
 	UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT,
+	UmbMediaTypeStructureRepository,
 } from './repository/index.js';
 
 export {
