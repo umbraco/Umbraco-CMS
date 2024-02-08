@@ -1,7 +1,9 @@
+import type { UmbDocumentCollectionFilterModel } from '../../types.js';
 import type { UmbDocumentTreeItemModel } from '../../../tree/types.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -12,10 +14,8 @@ import type {
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import './column-layouts/document-table-actions-column-layout.element.js';
+//import './column-layouts/document-table-actions-column-layout.element.js';
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
@@ -35,12 +35,12 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			allowSorting: true,
 		},
 		// TODO: actions should live in an UmbTable element when we have moved the current UmbTable to UUI.
-		{
-			name: 'Actions',
-			alias: 'entityActions',
-			elementName: 'umb-document-table-actions-column-layout',
-			width: '80px',
-		},
+		// {
+		// 	name: 'Actions',
+		// 	alias: 'entityActions',
+		// 	elementName: 'umb-document-table-actions-column-layout',
+		// 	width: '80px',
+		// },
 	];
 
 	@state()
@@ -49,7 +49,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbDefaultCollectionContext<UmbDocumentTreeItemModel, any>;
+	private _collectionContext?: UmbDefaultCollectionContext<UmbDocumentTreeItemModel, UmbDocumentCollectionFilterModel>;
 
 	constructor() {
 		super();
@@ -77,17 +77,18 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			if (!item.unique) throw new Error('Item id is missing.');
 			return {
 				id: item.unique,
+				icon: item.documentType.icon,
 				data: [
 					{
 						columnAlias: 'entityName',
-						value: item.name || 'Untitled',
+						value: item.name || 'Unnamed Document',
 					},
-					{
-						columnAlias: 'entityActions',
-						value: {
-							entityType: item.entityType,
-						},
-					},
+					// {
+					// 	columnAlias: 'entityActions',
+					// 	value: {
+					// 		entityType: item.entityType,
+					// 	},
+					// },
 				],
 			};
 		});
@@ -135,7 +136,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				box-sizing: border-box;
 				height: 100%;
 				width: 100%;
-				padding: var(--uui-size-space-3) var(--uui-size-space-6);
+				padding: var(--uui-size-space-3) 0;
 			}
 
 			/* TODO: Should we have embedded padding in the table component? */
