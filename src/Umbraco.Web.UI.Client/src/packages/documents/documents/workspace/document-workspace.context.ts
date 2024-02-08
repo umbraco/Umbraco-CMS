@@ -194,7 +194,12 @@ export class UmbDocumentWorkspaceContext
 			type,
 		};
 
-		const modalContext = this.#modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, { data: modalData });
+		const activeVariants = this.splitView.getActiveVariants();
+		const activeVariant = activeVariants[activeVariants.length - 1];
+		const modalContext = this.#modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
+			data: modalData,
+			value: { selection: activeVariant ? [activeVariant.culture] : [] },
+		});
 
 		const result = await modalContext.onSubmit().catch(() => undefined);
 
@@ -218,9 +223,6 @@ export class UmbDocumentWorkspaceContext
 
 		// If no variants are selected, we don't save anything.
 		if (!selectedVariants.length) return [];
-
-		// TODO: Use selected variants
-		console.log('Saving', selectedVariants?.map((x) => x.culture));
 
 		if (this.getIsNew()) {
 			if ((await this.repository.create(data)).data !== undefined) {
