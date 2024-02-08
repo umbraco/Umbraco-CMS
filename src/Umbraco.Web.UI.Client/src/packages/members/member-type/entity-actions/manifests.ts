@@ -1,9 +1,7 @@
-import { UMB_MEMBER_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/index.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-
-const entityType = 'member-type';
-const repositoryAlias = UMB_MEMBER_TYPE_REPOSITORY_ALIAS;
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -15,8 +13,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS,
+			entityTypes: [UMB_MEMBER_TYPE_ENTITY_TYPE],
 		},
 	},
 ];
