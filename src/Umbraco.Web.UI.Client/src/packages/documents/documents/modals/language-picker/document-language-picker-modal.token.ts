@@ -4,15 +4,14 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDocumentLanguagePickerModalData {
 	filter?: (language: UmbLanguageItemModel) => boolean;
-	headline: string;
-	confirmLabel?: string;
+	type: 'save' | 'publish' | 'schedule' | 'unpublish';
 }
 
 export interface UmbDocumentLanguagePickerModalValue {
 	selection: Array<string | null>;
 }
 
-export const UMB_LANGUAGE_PICKER_MODAL = new UmbModalToken<
+export const UMB_DOCUMENT_LANGUAGE_PICKER_MODAL = new UmbModalToken<
 	UmbDocumentLanguagePickerModalData,
 	UmbDocumentLanguagePickerModalValue
 >(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL_ALIAS, {

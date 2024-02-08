@@ -7,7 +7,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: UMB_DOCUMENT_LANGUAGE_PICKER_MODAL_ALIAS,
 		name: 'Document Language Picker Modal',
-		js: () => import('./language-picker/language-picker-modal.element.js'),
+		js: () => import('./language-picker/document-language-picker-modal.element.js'),
 	},
 ];
 

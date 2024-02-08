@@ -3,11 +3,7 @@ import { UmbDocumentPropertyDataContext } from '../property-dataset-context/docu
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type { UmbDocumentDetailModel } from '../types.js';
-import {
-	type UmbDocumentLanguagePickerModalData,
-	UMB_DOCUMENT_LANGUAGE_PICKER_MODAL_ALIAS,
-	UMB_LANGUAGE_PICKER_MODAL,
-} from '../modals/index.js';
+import { type UmbDocumentLanguagePickerModalData, UMB_DOCUMENT_LANGUAGE_PICKER_MODAL } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -180,7 +176,7 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async #selectVariants(): Promise<UmbVariantId[]> {
+	async #selectVariants(type: UmbDocumentLanguagePickerModalData['type']): Promise<UmbVariantId[]> {
 		const currentData = this.getData();
 		if (!currentData) throw new Error('Data is missing');
 
@@ -195,10 +191,10 @@ export class UmbDocumentWorkspaceContext
 		if (!this.#modalManagerContext) throw new Error('Modal manager context is missing');
 
 		const modalData: UmbDocumentLanguagePickerModalData = {
-			headline: 'Select variants',
+			type,
 		};
 
-		const modalContext = this.#modalManagerContext.open(UMB_LANGUAGE_PICKER_MODAL, { data: modalData });
+		const modalContext = this.#modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, { data: modalData });
 
 		const result = await modalContext.onSubmit().catch(() => undefined);
 
@@ -211,12 +207,12 @@ export class UmbDocumentWorkspaceContext
 		return variantIds;
 	}
 
-	async #createOrSave(): Promise<UmbVariantId[]> {
+	async #createOrSave(type: UmbDocumentLanguagePickerModalData['type']): Promise<UmbVariantId[]> {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		if (!data.unique) throw new Error('Unique is missing');
 
-		const selectedVariants = await this.#selectVariants();
+		const selectedVariants = await this.#selectVariants(type);
 
 		// If no variants are selected, we don't save anything.
 		if (!selectedVariants.length) return [];
@@ -238,12 +234,12 @@ export class UmbDocumentWorkspaceContext
 	async save() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
-		await this.#createOrSave();
+		await this.#createOrSave('save');
 		this.saveComplete(data);
 	}
 
 	public async publish() {
-		const variantIds = await this.#createOrSave();
+		const variantIds = await this.#createOrSave('publish');
 		const unique = this.getEntityId();
 		if (variantIds.length && unique) {
 			await this.publishingRepository.publish(unique, variantIds);
@@ -255,7 +251,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async unpublish() {
-		const variantIds = await this.#selectVariants();
+		const variantIds = await this.#selectVariants('unpublish');
 		const unique = this.getEntityId();
 		if (variantIds.length && unique) {
 			await this.publishingRepository.unpublish(unique, variantIds);

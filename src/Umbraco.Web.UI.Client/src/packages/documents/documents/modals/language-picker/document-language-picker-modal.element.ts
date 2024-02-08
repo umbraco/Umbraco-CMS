@@ -1,11 +1,11 @@
 import type {
 	UmbDocumentLanguagePickerModalValue,
 	UmbDocumentLanguagePickerModalData,
-} from './language-picker-modal.token.js';
+} from './document-language-picker-modal.token.js';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbLanguageItemModel } from '@umbraco-cms/backoffice/language';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
@@ -40,6 +40,45 @@ export class UmbDocumentLanguagePickerModalElement extends UmbModalBaseElement<
 		}
 	}
 
+	get #headline(): string {
+		switch (this.data?.type) {
+			case 'publish':
+				return 'content_readyToPublish';
+			case 'unpublish':
+				return 'content_unpublish';
+			case 'schedule':
+				return 'content_readyToPublish';
+			default:
+				return 'content_readyToSave';
+		}
+	}
+
+	get #subtitle(): string {
+		switch (this.data?.type) {
+			case 'publish':
+				return 'content_variantsToPublish';
+			case 'unpublish':
+				return 'content_languagesToUnpublish';
+			case 'schedule':
+				return 'content_languagesToSchedule';
+			default:
+				return 'content_variantsToSave';
+		}
+	}
+
+	get #confirmLabel(): string {
+		switch (this.data?.type) {
+			case 'publish':
+				return 'buttons_saveAndPublish';
+			case 'unpublish':
+				return 'actions_unpublish';
+			case 'schedule':
+				return 'buttons_schedulePublish';
+			default:
+				return 'buttons_saveAndClose';
+		}
+	}
+
 	#submit() {
 		this.value = { selection: this.#selectionManager.getSelection() };
 		this.modalContext?.submit();
@@ -50,27 +89,26 @@ export class UmbDocumentLanguagePickerModalElement extends UmbModalBaseElement<
 	}
 
 	render() {
-		return html`<umb-body-layout headline=${ifDefined(this.data?.headline)}>
-			<uui-box>
-				${repeat(
-					this.#filteredLanguages,
-					(item) => item.unique,
-					(item) => html`
-						<uui-menu-item
-							label=${item.name ?? ''}
-							selectable
-							@selected=${() => this.#selectionManager.select(item.unique)}
-							@deselected=${() => this.#selectionManager.deselect(item.unique)}
-							?selected=${this.#selectionManager.isSelected(item.unique)}>
-							<uui-icon slot="icon" name="icon-globe"></uui-icon>
-						</uui-menu-item>
-					`,
-				)}
-			</uui-box>
+		return html`<umb-body-layout headline=${this.localize.term(this.#headline)}>
+			<p id="subtitle">${this.localize.term(this.#subtitle)}</p>
+			${repeat(
+				this.#filteredLanguages,
+				(item) => item.unique,
+				(item) => html`
+					<uui-menu-item
+						label=${item.name ?? ''}
+						selectable
+						@selected=${() => this.#selectionManager.select(item.unique)}
+						@deselected=${() => this.#selectionManager.deselect(item.unique)}
+						?selected=${this.#selectionManager.isSelected(item.unique)}>
+						<uui-icon slot="icon" name="icon-globe"></uui-icon>
+					</uui-menu-item>
+				`,
+			)}
 			<div slot="actions">
-				<uui-button label=${this.localize.term('general_cancel')} @click=${this.#close}></uui-button>
+				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
-					label="${this.data?.confirmLabel ?? this.localize.term('general_submit')}"
+					label="${this.localize.term(this.#confirmLabel)}"
 					look="primary"
 					color="positive"
 					@click=${this.#submit}></uui-button>
@@ -78,7 +116,14 @@ export class UmbDocumentLanguagePickerModalElement extends UmbModalBaseElement<
 		</umb-body-layout> `;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [
+		UmbTextStyles,
+		css`
+			#subtitle {
+				margin-top: 0;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentLanguagePickerModalElement;

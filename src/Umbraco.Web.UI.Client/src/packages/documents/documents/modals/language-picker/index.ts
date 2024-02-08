@@ -1,1 +1,1 @@
-export * from './language-picker-modal.token.js';
+export * from './document-language-picker-modal.token.js';
