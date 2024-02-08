@@ -7,8 +7,13 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-block-workspace-view-edit-no-router')
-export class UmbBlockWorkspaceViewEditNoRouterElement extends UmbLitElement implements UmbWorkspaceViewElement {
+/**
+ * @element umb-block-workspace-view-edit-content-no-router
+ * @description
+ * A specific view for editing content in a block workspace placed inline within a block view/element.
+ */
+@customElement('umb-block-workspace-view-edit-content-no-router')
+export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	//private _hasRootProperties = false;
 
 	@state()
@@ -42,6 +47,7 @@ export class UmbBlockWorkspaceViewEditNoRouterElement extends UmbLitElement impl
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._workspaceContext = workspaceContext;
 			this._tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
+			workspaceContext.content.createPropertyDatasetContext(this);
 			this._observeRootGroups();
 		});
 	}
@@ -55,7 +61,7 @@ export class UmbBlockWorkspaceViewEditNoRouterElement extends UmbLitElement impl
 				this._hasRootGroups = hasRootGroups;
 				this._checkDefaultTabName();
 			},
-			'_observeGroups',
+			'observeGroups',
 		);
 	}
 
@@ -134,10 +140,10 @@ export class UmbBlockWorkspaceViewEditNoRouterElement extends UmbLitElement impl
 	];
 }
 
-export default UmbBlockWorkspaceViewEditNoRouterElement;
+export default UmbBlockWorkspaceViewEditContentNoRouterElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-workspace-view-edit-no-router': UmbBlockWorkspaceViewEditNoRouterElement;
+		'umb-block-workspace-view-edit-content-no-router': UmbBlockWorkspaceViewEditContentNoRouterElement;
 	}
 }

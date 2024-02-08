@@ -5,7 +5,7 @@ import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/ba
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../block/workspace/views/edit/block-workspace-view-edit-no-router.element.js';
+import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
@@ -73,7 +73,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				<span>${this.label}</span>
 			</button>
 			${this._isOpen === true
-				? html`<umb-block-workspace-view-edit-no-router></umb-block-workspace-view-edit-no-router>`
+				? html`<umb-block-workspace-view-edit-content-no-router></umb-block-workspace-view-edit-content-no-router>`
 				: ''}
 		</uui-box>`;
 	}

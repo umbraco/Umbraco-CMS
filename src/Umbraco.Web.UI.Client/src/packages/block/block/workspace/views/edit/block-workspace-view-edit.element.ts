@@ -59,7 +59,11 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 
 	#setStructureManager() {
 		if (!this.#blockWorkspace || !this.#managerName) return;
-		this.#tabsStructureHelper.setStructureManager(this.#blockWorkspace[this.#managerName].structure);
+		const dataManager = this.#blockWorkspace[this.#managerName];
+		this.#tabsStructureHelper.setStructureManager(dataManager.structure);
+
+		// Create Data Set:
+		dataManager.createPropertyDatasetContext(this);
 
 		this.observe(
 			this.#blockWorkspace![this.#managerName!].structure.hasRootContainers('Group'),

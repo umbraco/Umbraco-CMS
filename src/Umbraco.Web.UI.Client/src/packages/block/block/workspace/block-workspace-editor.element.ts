@@ -1,4 +1,3 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -10,15 +9,6 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 
 	@property({ type: String, attribute: false })
 	workspaceAlias?: string;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
-			this.#workspaceContext?.content.createPropertyDatasetContext(this);
-		});
-	}
 
 	render() {
 		return this.workspaceAlias

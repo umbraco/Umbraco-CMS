@@ -204,6 +204,31 @@ export const data: Array<UmbMockDocumentModel> = [
 							udi: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
 							elementProperty: 'Hello world',
+							textBox: 'Hello world 123',
+							blockList: {
+								layout: {
+									'Umbraco.BlockList': [
+										{
+											contentUdi: '1234b',
+											settingsUdi: '5678b',
+										},
+									],
+								},
+								contentData: [
+									{
+										udi: '1234b',
+										contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+										elementProperty: 'Hello world',
+									},
+								],
+								settingsData: [
+									{
+										udi: '5678b',
+										contentTypeKey: 'all-property-editors-document-type-id',
+										elementProperty: 'Hello world',
+									},
+								],
+							},
 						},
 					],
 				},
