@@ -22,7 +22,7 @@ public class ByEditorUiAliasController : DatatypeItemControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("item/{*alias}")]
+    [HttpGet("{*alias}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DataTypeItemResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> ByEditorUiAlias(string alias)

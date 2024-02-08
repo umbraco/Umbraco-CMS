@@ -6,5 +6,5 @@ public class ImportDictionaryItemsPresentationModel
 
     public string? Name { get; set; }
 
-    public Guid? ParentId { get; set; }
+    public ReferenceByIdModel? Parent { get; set; }
 }

@@ -20,21 +20,21 @@ internal sealed class DocumentPresentationFactory
     : ContentPresentationFactoryBase<IContentType, IContentTypeService>, IDocumentPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IContentUrlFactory _contentUrlFactory;
+    private readonly IDocumentUrlFactory _documentUrlFactory;
     private readonly IFileService _fileService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IPublicAccessService _publicAccessService;
 
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
-        IContentUrlFactory contentUrlFactory,
+        IDocumentUrlFactory documentUrlFactory,
         IFileService fileService,
         IContentTypeService contentTypeService,
         IPublicAccessService publicAccessService)
         : base(contentTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
-        _contentUrlFactory = contentUrlFactory;
+        _documentUrlFactory = documentUrlFactory;
         _fileService = fileService;
         _contentTypeService = contentTypeService;
         _publicAccessService = publicAccessService;
@@ -44,7 +44,7 @@ internal sealed class DocumentPresentationFactory
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
 
-        responseModel.Urls = await _contentUrlFactory.GetUrlsAsync(content);
+        responseModel.Urls = await _documentUrlFactory.GetUrlsAsync(content);
 
         Guid? templateKey = content.TemplateId.HasValue
             ? _fileService.GetTemplate(content.TemplateId.Value)?.Key
@@ -97,7 +97,7 @@ internal sealed class DocumentPresentationFactory
             yield return new()
             {
                 Name = entity.Name ?? string.Empty,
-                State = ContentStateHelper.GetContentState(entity, null),
+                State = DocumentVariantStateHelper.GetState(entity, null),
                 Culture = null,
             };
             yield break;
@@ -109,7 +109,7 @@ internal sealed class DocumentPresentationFactory
             {
                 Name = cultureNamePair.Value,
                 Culture = cultureNamePair.Key,
-                State = ContentStateHelper.GetContentState(entity, cultureNamePair.Key)
+                State = DocumentVariantStateHelper.GetState(entity, cultureNamePair.Key)
             };
         }
     }

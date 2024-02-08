@@ -34,8 +34,8 @@ public class ImportDictionaryController : DictionaryControllerBase
     {
         Attempt<IDictionaryItem?, DictionaryImportOperationStatus> result = await _dictionaryItemImportService
             .ImportDictionaryItemFromUdtFileAsync(
-                importDictionaryRequestModel.TemporaryFileId,
-                importDictionaryRequestModel.ParentId,
+                importDictionaryRequestModel.TemporaryFile.Id,
+                importDictionaryRequestModel.Parent?.Id,
                 CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Status switch

@@ -15,7 +15,7 @@ public class ItemScriptItemController : ScriptItemControllerBase
     public ItemScriptItemController(IFileItemPresentationFactory fileItemPresentationFactory)
         => _fileItemPresentationFactory = fileItemPresentationFactory;
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<ScriptItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "path")] HashSet<string> paths)

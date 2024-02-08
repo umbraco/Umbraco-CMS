@@ -10,7 +10,7 @@ public class RedirectUrlResponseModel
 
     public DateTimeOffset Created { get; set; }
 
-    public Guid ContentId { get; set; }
+    public required ReferenceByIdModel Document { get; set; }
 
     public string? Culture { get; set; }
 }
