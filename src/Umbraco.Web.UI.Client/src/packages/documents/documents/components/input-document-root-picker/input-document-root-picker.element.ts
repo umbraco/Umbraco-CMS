@@ -224,7 +224,7 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 		if (!item.alias) return;
 		const step = this.#getQueryStepMeta(item);
 		return html`
-			<uui-ref-node border standalone id=${step.unique} name=${step.label} detail="${ifDefined(step.description)}">
+			<uui-ref-node standalone id=${step.unique} name=${step.label} detail="${ifDefined(step.description)}">
 				<uui-icon slot="icon" name=${step.icon}></uui-icon>
 				<uui-action-bar slot="actions">
 					<uui-button

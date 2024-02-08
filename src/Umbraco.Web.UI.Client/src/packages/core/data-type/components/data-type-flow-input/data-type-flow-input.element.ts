@@ -76,7 +76,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 							// TODO: Could use something smarter for workspace modals, as I would like to avoid setting the rest of the URL here:
 							this.#editDataTypeModal?.open({}, 'edit/' + this._ids![0]);
 						}}
-						border>
+						standalone>
 						<!-- TODO: Get the icon from property editor UI -->
 						<uui-icon name="${'document'}" slot="icon"></uui-icon>
 						<uui-action-bar slot="actions">
