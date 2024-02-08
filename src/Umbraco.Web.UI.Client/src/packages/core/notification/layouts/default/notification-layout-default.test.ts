@@ -1,9 +1,6 @@
 import { fixture, expect, html } from '@open-wc/testing';
-import type {
-	UmbNotificationDefaultData} from './notification-layout-default.element.js';
-import {
-	UmbNotificationLayoutDefaultElement
-} from './notification-layout-default.element.js';
+import type { UmbNotificationDefaultData } from './notification-layout-default.element.js';
+import { UmbNotificationLayoutDefaultElement } from './notification-layout-default.element.js';
 import type { UUIToastNotificationLayoutElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
 
@@ -32,7 +29,7 @@ describe('UmbNotificationLayoutDefault', () => {
 		expect(element).to.be.instanceOf(UmbNotificationLayoutDefaultElement);
 	});
 
-	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).to.be.accessible();
 		});
