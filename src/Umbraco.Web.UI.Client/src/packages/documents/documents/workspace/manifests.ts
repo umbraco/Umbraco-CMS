@@ -7,7 +7,6 @@ import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
-	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspace = {
@@ -24,9 +23,26 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Document.Collection',
+		name: 'Document Workspace Collection View',
+		element: () => import('./views/collection/document-workspace-view-collection.element.js'),
+		weight: 300,
+		meta: {
+			label: 'Documents',
+			pathname: 'collection',
+			icon: 'icon-grid',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.DocumentWorkspaceHasCollection',
+			},
+		],
+	},
+	{
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
-		js: () => import('./views/edit/document-workspace-view-edit.element.js'),
+		element: () => import('./views/edit/document-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Content',
@@ -44,7 +60,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Info',
 		name: 'Document Workspace Info View',
-		js: () => import('./views/info/document-workspace-view-info.element.js'),
+		element: () => import('./views/info/document-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Info',
@@ -58,25 +74,6 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			},
 		],
 	},
-];
-
-const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
-	/*
-	// TODO: Reenable this:
-	{
-		type: 'workspaceViewCollection',
-		alias: 'Umb.WorkspaceView.Document.Collection',
-		name: 'Document Workspace Collection View',
-		weight: 300,
-		meta: {
-			label: 'Documents',
-			pathname: 'collection',
-			icon: 'icon-grid',
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-		}
-	},
-	*/
 ];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [
@@ -152,4 +149,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	*/
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
