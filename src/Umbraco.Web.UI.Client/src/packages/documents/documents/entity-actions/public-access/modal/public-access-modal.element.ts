@@ -102,8 +102,8 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 		const requestBody: PublicAccessRequestModel = {
 			memberGroupNames: groups,
 			memberUserNames: members,
-			loginPageId: this._loginPageId,
-			errorPageId: this._errorPageId,
+			loginDocument: { id: this._loginPageId },
+			errorDocument: { id: this._errorPageId },
 		};
 
 		if (this.#isNew) {
