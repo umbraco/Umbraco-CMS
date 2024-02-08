@@ -12,6 +12,17 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
+/**
+ * Base class for a tree repository.
+ * @export
+ * @abstract
+ * @class UmbTreeRepositoryBase
+ * @extends {UmbRepositoryBase}
+ * @implements {UmbTreeRepository<TreeItemType, TreeRootType>}
+ * @implements {UmbApi}
+ * @template TreeItemType
+ * @template TreeRootType
+ */
 export abstract class UmbTreeRepositoryBase<
 		// TODO: remove UmbEntityTreeItemModel when we have unique in place
 		TreeItemType extends UmbUniqueTreeItemModel | UmbEntityTreeItemModel,
