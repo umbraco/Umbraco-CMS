@@ -132,15 +132,13 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         }
 
         Attempt<ListViewConfiguration?, ContentCollectionOperationStatus> listViewConfigurationAttempt;
-
-        if (dataTypeKey.HasValue && contentTypeKey.HasValue)
+        if (dataTypeKey.HasValue && contentType != null)
         {
             listViewConfigurationAttempt = await GetListViewConfigurationFromDataTypeAsync(dataTypeKey.Value, contentType);
         }
         else
         {
-            // Find list view configuration from content type
-            listViewConfigurationAttempt = await GetListViewConfigurationFromContentTypeAsync(contentTypeKey);
+            listViewConfigurationAttempt = await GetListViewConfigurationFromContentTypeAsync(contentType);
         }
 
         return listViewConfigurationAttempt.Success
@@ -148,7 +146,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             : listViewConfigurationAttempt;
     }
 
-    private async Task<Attempt<ListViewConfiguration?, ContentCollectionOperationStatus>> GetListViewConfigurationFromDataTypeAsync(Guid dataTypeKey, Guid contentTypeKey)
+    private async Task<Attempt<ListViewConfiguration?, ContentCollectionOperationStatus>> GetListViewConfigurationFromDataTypeAsync(Guid dataTypeKey, TContentType contentType)
     {
         IDataType? dataType = await _dataTypeService.GetAsync(dataTypeKey);
         if (dataType == null)
@@ -167,22 +165,11 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             : Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.DataTypeNotContentProperty, null);
     }
 
-    private async Task<Attempt<ListViewConfiguration?, ContentCollectionOperationStatus>> GetListViewConfigurationFromContentTypeAsync(Guid? contentTypeKey)
+    private async Task<Attempt<ListViewConfiguration?, ContentCollectionOperationStatus>> GetListViewConfigurationFromContentTypeAsync(TContentType? contentType)
     {
-        TContentType? contentType = null;
-
-        if (contentTypeKey.HasValue)
+        if (contentType?.IsContainer == false)
         {
-            contentType = await _contentTypeService.GetAsync(contentTypeKey.Value);
-            if (contentType == null)
-            {
-                return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentTypeNotFound, null);
-            }
-
-            if (contentType.IsContainer == false)
-            {
-                return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotCollection, null);
-            }
+            return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotCollection, null);
         }
 
         IDataType? currentListViewDataType = await GetConfiguredListViewDataTypeAsync(contentType);
