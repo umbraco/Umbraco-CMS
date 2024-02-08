@@ -99,7 +99,8 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'multiNodeTreePicker',
 				culture: null,
 				segment: null,
-				value: null,
+				value:
+					'all-property-editors-document-id,c05da24d-7740-447b-9cdc-bd8ce2172e38,fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
 			},
 			{
 				alias: 'datePicker',

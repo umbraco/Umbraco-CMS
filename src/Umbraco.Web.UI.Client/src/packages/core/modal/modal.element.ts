@@ -124,7 +124,7 @@ export class UmbModalElement extends UmbLitElement {
 	#observeModal(alias: string) {
 		this.#modalExtensionObserver?.destroy();
 
-		this.observe(umbExtensionsRegistry.getByTypeAndAlias('modal', alias), async (manifest) => {
+		this.observe(umbExtensionsRegistry.byTypeAndAlias('modal', alias), async (manifest) => {
 			this.#removeInnerElement();
 
 			if (manifest) {
