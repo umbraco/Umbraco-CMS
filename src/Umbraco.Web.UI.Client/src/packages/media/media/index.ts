@@ -9,3 +9,4 @@ export * from './entity.js';
 
 export { UMB_MEDIA_TREE_ALIAS } from './tree/index.js';
 export { UMB_MEDIA_COLLECTION_ALIAS } from './collection/index.js';
+export { UMB_MEDIA_MENU_ALIAS } from './menu.manifests.js';

@@ -1,8 +1,11 @@
 import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as createManifests } from './create/manifests.js';
 import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/entity-action';
 
-const entityActions: Array<ManifestEntityAction> = [
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+
+const entityActions: Array<ManifestTypes> = [
+	...createManifests,
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Media.Trash',
