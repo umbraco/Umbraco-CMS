@@ -136,7 +136,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 									name=${ifDefined(userGroup.name)}
 									.userPermissionAliases=${userGroup.permissions}
 									@open=${() => this.#openUserPermissionsModal(userGroup.id)}
-									border>
+									standalone>
 									${userGroup.icon ? html`<uui-icon slot="icon" name=${userGroup.icon}></uui-icon>` : nothing}
 								</umb-user-group-ref>`,
 						)}
