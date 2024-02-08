@@ -17,6 +17,7 @@ import {
 import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -192,6 +193,9 @@ export class UmbDocumentWorkspaceContext
 
 		const modalData: UmbDocumentLanguagePickerModalData = {
 			type,
+			publishedVariants: availableVariants
+				.filter((x) => x.state === DocumentVariantStateModel.PUBLISHED)
+				.map((x) => x.culture?.toLowerCase() ?? ''),
 		};
 
 		const activeVariants = this.splitView.getActiveVariants();

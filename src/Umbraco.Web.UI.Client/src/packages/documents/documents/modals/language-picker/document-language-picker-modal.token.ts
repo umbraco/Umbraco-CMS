@@ -5,6 +5,7 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbDocumentLanguagePickerModalData {
 	filter?: (language: UmbLanguageItemModel) => boolean;
 	type: 'save' | 'publish' | 'schedule' | 'unpublish';
+	publishedVariants: Array<string>;
 }
 
 export interface UmbDocumentLanguagePickerModalValue {

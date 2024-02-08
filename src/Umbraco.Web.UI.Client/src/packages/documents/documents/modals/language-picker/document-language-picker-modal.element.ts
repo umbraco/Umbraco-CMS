@@ -102,6 +102,14 @@ export class UmbDocumentLanguagePickerModalElement extends UmbModalBaseElement<
 						@deselected=${() => this.#selectionManager.deselect(item.unique)}
 						?selected=${this.#selectionManager.isSelected(item.unique)}>
 						<uui-icon slot="icon" name="icon-globe"></uui-icon>
+						<div class="label" slot="label">
+							<strong>${item.name}</strong>
+							<div class="label-status">
+								${this.localize.term(
+									this.data?.publishedVariants.includes(item.unique) ? 'content_published' : 'content_unpublished',
+								)}
+							</div>
+						</div>
 					</uui-menu-item>
 				`,
 			)}
@@ -121,6 +129,13 @@ export class UmbDocumentLanguagePickerModalElement extends UmbModalBaseElement<
 		css`
 			#subtitle {
 				margin-top: 0;
+			}
+			.label {
+				padding: 0.5rem 0;
+			}
+			.label-status {
+				font-size: 0.8rem;
+				color: rgba(var(--uui-color-text), 0.6);
 			}
 		`,
 	];
