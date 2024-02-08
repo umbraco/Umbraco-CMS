@@ -685,7 +685,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		alias: 'blogPost',
 		name: 'All property editors document type',
 		description: null,
-		icon: 'umb:item-arrangement',
+		icon: 'icon-eco',
 		allowedAsRoot: true,
 		variesByCulture: true,
 		variesBySegment: false,
@@ -714,6 +714,26 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 					labelOnTop: false,
 				},
 			},
+			{
+				id: '7',
+				container: { id: 'all-properties-group-key' },
+				alias: 'listView',
+				name: 'List View',
+				description: '',
+				dataType: { id: 'dt-collectionView' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 1,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{
@@ -724,7 +744,10 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				sortOrder: 0,
 			},
 		],
-		allowedDocumentTypes: [{ documentType: { id: 'simple-document-type-id' }, sortOrder: 0 }],
+		allowedDocumentTypes: [
+			{ documentType: { id: 'simple-document-type-id' }, sortOrder: 0 },
+			{ documentType: { id: '29643452-cff9-47f2-98cd-7de4b6807681' }, sortOrder: 1 },
+		],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
