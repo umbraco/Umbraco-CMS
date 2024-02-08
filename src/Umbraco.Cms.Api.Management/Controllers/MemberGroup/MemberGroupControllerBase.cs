@@ -19,6 +19,11 @@ public class MemberGroupControllerBase : ManagementApiControllerBase
         status switch
         {
             MemberGroupOperationStatus.Success => Ok(),
+            MemberGroupOperationStatus.NotFound => MemberGroupNotFound(),
+            MemberGroupOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cancelled by notification")
+                .WithDetail("A notification handler prevented the member group operation.")
+                .Build()),
             MemberGroupOperationStatus.CannotHaveEmptyName => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Name was empty or null")
                 .WithDetail("The provided member group name cannot be null or empty.")
