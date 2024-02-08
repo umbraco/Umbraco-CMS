@@ -10,7 +10,6 @@ export * from './types.js';
 export * from './tree-repository.interface.js';
 export * from './tree-store.interface.js';
 export * from './entity-tree-store.js';
-export * from './file-system-tree.store.js';
 
 // Unique
 export * from './unique-tree-store.js';
