@@ -109,7 +109,6 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.DuplicateKey, null);
         }
 
-
         if (await NameAlreadyExistsAsync(memberGroup))
         {
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.DuplicateName, null);
@@ -168,7 +167,9 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        if (await NameAlreadyExistsAsync(memberGroup))
+        IMemberGroup? existingMemberGroup = await GetByNameAsync(memberGroup.Name!);
+
+        if (existingMemberGroup is not null && existingMemberGroup.Key != memberGroup.Key)
         {
             return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.DuplicateName, null);
         }
