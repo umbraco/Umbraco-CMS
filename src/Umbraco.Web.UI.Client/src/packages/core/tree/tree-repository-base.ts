@@ -35,13 +35,20 @@ export abstract class UmbTreeRepositoryBase<
 	protected _treeStore?: UmbTreeStore<TreeItemType>;
 	#treeSource: UmbTreeDataSource<TreeItemType>;
 
+	/**
+	 * Creates an instance of UmbTreeRepositoryBase.
+	 * @param {UmbControllerHost} host
+	 * @param {UmbTreeDataSourceConstructor<TreeItemType>} treeSourceConstructor
+	 * @param {(string | UmbContextToken<any, any>)} treeStoreContextAlias
+	 * @memberof UmbTreeRepositoryBase
+	 */
 	constructor(
 		host: UmbControllerHost,
-		treeSource: UmbTreeDataSourceConstructor<TreeItemType>,
+		treeSourceConstructor: UmbTreeDataSourceConstructor<TreeItemType>,
 		treeStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);
-		this.#treeSource = new treeSource(this);
+		this.#treeSource = new treeSourceConstructor(this);
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
 			this._treeStore = instance;
