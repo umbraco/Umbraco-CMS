@@ -1,5 +1,8 @@
+import type { UmbMemberTypeEntityType } from '../../entity.js';
+
 export interface UmbMemberTypeItemModel {
+	entityType: UmbMemberTypeEntityType;
 	unique: string;
 	name: string;
-	propertyEditorUiAlias: string;
+	icon: string;
 }

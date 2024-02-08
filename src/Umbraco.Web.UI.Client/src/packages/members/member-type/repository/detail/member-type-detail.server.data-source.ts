@@ -1,15 +1,12 @@
-import type { UmbMemberTypeDetailModel, UmbMemberTypePropertyModel } from '../../types.js';
+import type { UmbMemberTypeDetailModel } from '../../types.js';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type {
-	CreateMemberTypeRequestModel,
-	MemberTypeModelBaseModel,
-	UpdateMemberTypeRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { CreateMemberTypeRequestModel, UpdateMemberTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { MemberTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Member Type that fetches data from the server
@@ -86,11 +83,36 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
 			properties: data.properties.map((property) => {
-				return {};
+				return {
+					id: property.id,
+					container: property.container ? { id: property.container.id } : null,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { unique: property.dataType.id },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
 			}),
-			containers: data.containers,
+			containers: data.containers.map((container) => {
+				return {
+					id: container.id,
+					parent: container.parent ? { id: container.parent.id } : null,
+					name: container.name || null,
+					type: container.type as UmbPropertyContainerTypes, // TODO: check if the value is valid
+					sortOrder: container.sortOrder,
+				};
+			}),
 			allowedContentTypes: [],
-			compositions: data.compositions,
+			compositions: data.compositions.map((composition) => {
+				return {
+					contentType: { unique: composition.memberType.id },
+					compositionType: composition.compositionType,
+				};
+			}),
 		};
 
 		return { data: memberType };
@@ -115,10 +137,29 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			properties: model.properties,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container ? { id: property.container.id } : null,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: model.containers,
 			id: model.unique,
-			Compositions: model.compositions,
+			compositions: model.compositions.map((composition) => {
+				return {
+					memberType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -154,10 +195,28 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			properties: model.properties.map((property) => {}),
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container ? { id: property.container.id } : null,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: model.containers,
-			id: model.unique,
-			Compositions: model.compositions,
+			compositions: model.compositions.map((composition) => {
+				return {
+					memberType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
 		};
 
 		const { error } = await tryExecuteAndNotify(

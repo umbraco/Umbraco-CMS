@@ -3,6 +3,7 @@ import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository'
 import type { MemberTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { MemberTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../../entity.js';
 
 /**
  * A server data source for Member Type items
@@ -32,8 +33,9 @@ const getItems = (uniques: Array<string>) => MemberTypeResource.getItemMemberTyp
 
 const mapper = (item: MemberTypeItemResponseModel): UmbMemberTypeItemModel => {
 	return {
+		entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 		unique: item.id,
 		name: item.name,
-		propertyEditorUiAlias: item.editorUiAlias || '', // TODO: why can this be undefined or null on the server?
+		icon: item.icon || '',
 	};
 };
