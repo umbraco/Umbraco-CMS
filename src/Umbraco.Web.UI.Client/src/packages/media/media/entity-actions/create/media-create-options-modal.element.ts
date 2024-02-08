@@ -65,7 +65,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 						(mediaType) => html`
 							<uui-menu-item
 								data-id=${ifDefined(mediaType.unique)}
-								href="${`section/content/workspace/media/create/${this.data?.media?.unique ?? 'null'}/${
+								href="${`section/media/workspace/media/create/${this.data?.media?.unique ?? 'null'}/${
 									mediaType.unique
 								}`}"
 								label="${mediaType.name}"

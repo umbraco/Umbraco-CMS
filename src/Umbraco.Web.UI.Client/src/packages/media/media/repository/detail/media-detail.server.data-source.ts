@@ -38,7 +38,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			parentUnique,
 			urls: [],
 			mediaType: {
-				unique: 'mediaTypeId',
+				unique: 'cc07b313-0843-4aa8-bbda-871c8da728c8',
 			},
 			isTrashed: false,
 			values: [],
