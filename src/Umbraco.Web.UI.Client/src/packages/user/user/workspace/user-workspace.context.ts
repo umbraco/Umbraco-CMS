@@ -98,7 +98,7 @@ export class UmbUserWorkspaceContext
 	async uploadAvatar(file: File) {
 		const unique = this.getEntityId();
 		if (!unique) throw new Error('Id is missing');
-		const { error } = await this.detailRepository.uploadAvatar(unique, file);
+		const { error } = await this.avatarRepository.uploadAvatar(unique, file);
 
 		// TODO: temp solution until we know how to update stores
 		if (!error) {
@@ -111,7 +111,7 @@ export class UmbUserWorkspaceContext
 	async deleteAvatar() {
 		const unique = this.getEntityId();
 		if (!unique) throw new Error('Id is missing');
-		const { error } = await this.detailRepository.deleteAvatar(unique);
+		const { error } = await this.avatarRepository.deleteAvatar(unique);
 
 		// TODO: temp solution until we know how to update stores
 		if (!error) {
