@@ -1,4 +1,4 @@
-import { UmbUserDetailModel } from '../../../types.js';
+import type { UmbUserDetailModel } from '../../../types.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { css, html, customElement, query, nothing, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
