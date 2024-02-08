@@ -22,7 +22,7 @@ public class MediaMapDefinition : ContentMapDefinition<IMedia, MediaValueModel, 
     {
         target.Id = source.Key;
         target.MediaType = context.Map<MediaTypeReferenceResponseModel>(source.ContentType)!;
-        target.Values = MapValueViewModels(source);
+        target.Values = MapValueViewModels(source.Properties);
         target.Variants = MapVariantViewModels(source);
         target.IsTrashed = source.Trashed;
     }

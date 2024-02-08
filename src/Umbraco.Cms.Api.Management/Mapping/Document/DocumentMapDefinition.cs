@@ -22,7 +22,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
     {
         target.Id = source.Key;
         target.DocumentType = context.Map<DocumentTypeReferenceResponseModel>(source.ContentType)!;
-        target.Values = MapValueViewModels(source);
+        target.Values = MapValueViewModels(source.Properties);
         target.Variants = MapVariantViewModels(
             source,
             (culture, _, documentVariantViewModel) =>
