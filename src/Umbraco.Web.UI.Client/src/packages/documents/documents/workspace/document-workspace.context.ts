@@ -198,11 +198,13 @@ export class UmbDocumentWorkspaceContext
 
 		const result = await modalContext.onSubmit().catch(() => undefined);
 
-		if (!result) return [];
+		if (!result?.selection.length) return [];
+
+		const selectedVariants = result.selection.map((x) => x?.toLowerCase() ?? '');
 
 		// Match the result to the available variants.
 		const variantIds = availableVariants
-			.filter((x) => result.selection.includes(x.culture!))
+			.filter((x) => selectedVariants.includes(x.culture!))
 			.map((x) => UmbVariantId.Create(x));
 		return variantIds;
 	}
