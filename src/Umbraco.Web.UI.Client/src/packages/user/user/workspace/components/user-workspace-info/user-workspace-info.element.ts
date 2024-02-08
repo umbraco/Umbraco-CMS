@@ -28,7 +28,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 				async (user) => {
 					if (!user) return;
 					this.#setUserInfoItems(user);
-					this._userDisplayState = getDisplayStateFromUserStatus(user.state);
+					this._userDisplayState = user.state ? getDisplayStateFromUserStatus(user.state) : null;
 				},
 				'umbUserObserver',
 			);
