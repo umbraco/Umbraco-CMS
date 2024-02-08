@@ -5,8 +5,11 @@ import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/ba
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
-import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import {
+	UMB_BLOCK_ENTRIES_CONTEXT,
+	UMB_BLOCK_MANAGER_CONTEXT,
+	type UmbBlockWorkspaceData,
+} from '@umbraco-cms/backoffice/block';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
@@ -21,6 +24,8 @@ export class UmbBlockWorkspaceContext<
 
 	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#retrieveBlockManager;
+	#blockEntries?: typeof UMB_BLOCK_ENTRIES_CONTEXT.TYPE;
+	#retrieveBlockEntries;
 	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
 	#editorConfigPromise?: Promise<unknown>;
@@ -63,21 +68,25 @@ export class UmbBlockWorkspaceContext<
 					this.#liveEditingMode = value;
 				}
 			}).asPromise();
-			// TODO: Observe or just get the LiveEditing setting?
+		}).asPromise();
+
+		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
+			this.#blockEntries = context;
 		}).asPromise();
 	}
 
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
+		await this.#retrieveBlockEntries;
 		await this.#editorConfigPromise;
-		if (!this.#blockManager) {
+		if (!this.#blockManager || !this.#blockEntries) {
 			throw new Error('Block manager not found');
 			return;
 		}
 
 		this.observe(
 			// TODO: Make a general concept of Block Entries Context, use it to retrieve the layout:
-			this.#blockManager.layoutOf(unique),
+			this.#blockEntries.layoutOf(unique),
 			(layoutData) => {
 				this.#layout.setValue(layoutData as LayoutDataType);
 
@@ -114,10 +123,10 @@ export class UmbBlockWorkspaceContext<
 	}
 
 	async create(contentElementTypeId: string) {
-		await this.#retrieveBlockManager;
+		await this.#retrieveBlockEntries;
 		await this.#retrieveModalContext;
-		if (!this.#blockManager) {
-			throw new Error('Block Manager not found');
+		if (!this.#blockEntries) {
+			throw new Error('Block Entries not found');
 			return;
 		}
 		if (!this.#modalContext) {
@@ -143,13 +152,13 @@ export class UmbBlockWorkspaceContext<
 		this.#layout.setValue(layoutData as LayoutDataType);
 
 		if (this.#liveEditingMode) {
-			const blockCreated = this.#blockManager.create(
+			const blockCreated = this.#blockEntries.create(
 				this.#modalContext.data as UmbBlockWorkspaceData,
 				layoutData,
 				contentElementTypeId,
 			);
 			if (!blockCreated) {
-				throw new Error('Block Manager could not create block');
+				throw new Error('Block Entries could not create block');
 				return;
 			}
 
@@ -160,7 +169,7 @@ export class UmbBlockWorkspaceContext<
 	#establishLiveSync() {
 		this.observe(this.layout, (layoutData) => {
 			if (layoutData) {
-				this.#blockManager?.setOneLayout(layoutData);
+				this.#blockEntries?.setOneLayout(layoutData);
 			}
 		});
 		this.observe(this.content.data, (contentData) => {
@@ -221,7 +230,7 @@ export class UmbBlockWorkspaceContext<
 	async save() {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
-		if (!layoutData || !this.#blockManager || !contentData || !this.#modalContext) return;
+		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#modalContext) return;
 
 		if (!this.#liveEditingMode) {
 			if (this.getIsNew() === true) {
@@ -237,7 +246,7 @@ export class UmbBlockWorkspaceContext<
 			}
 
 			// TODO: Save the block, but only in non-live-editing mode.
-			this.#blockManager.setOneLayout(layoutData);
+			this.#blockEntries.setOneLayout(layoutData);
 
 			if (contentData) {
 				this.#blockManager.setOneContent(contentData);
@@ -259,7 +268,7 @@ export class UmbBlockWorkspaceContext<
 				// Remove the block?
 				const contentUdi = this.#layout.value?.contentUdi;
 				if (contentUdi) {
-					this.#blockManager?.deleteBlock(contentUdi);
+					this.#blockEntries?.delete(contentUdi);
 				}
 			}
 		}

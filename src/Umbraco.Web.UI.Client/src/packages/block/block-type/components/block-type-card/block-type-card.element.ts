@@ -58,7 +58,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 				data: {
 					color: 'danger',
 					headline: `Remove ${this._name}?`,
-					content: 'Are you sure you want to remove this item',
+					content: 'Are you sure you want to remove this block type?',
 					confirmLabel: 'Remove',
 				},
 			});

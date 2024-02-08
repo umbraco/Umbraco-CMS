@@ -1,15 +1,15 @@
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
-import type { UmbBlockGridWorkspaceData } from '../index.js';
-import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
-import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
+import type { UmbBlockListWorkspaceData } from '../index.js';
+import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
+import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
-export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
-	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
-	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT.TYPE,
-	UmbBlockGridTypeModel,
-	UmbBlockGridLayoutModel
+export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
+	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
+	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT.TYPE,
+	UmbBlockListTypeModel,
+	UmbBlockListLayoutModel
 > {
 	//
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
@@ -30,7 +30,7 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT);
+		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT);
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addUniquePaths(['propertyAlias', 'parentUnique', 'areaKey'])
@@ -74,20 +74,11 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	async create(
-		modalData: UmbBlockGridWorkspaceData,
-		layoutEntry: UmbBlockGridLayoutModel,
+		modalData: UmbBlockListWorkspaceData,
+		layoutEntry: UmbBlockListLayoutModel,
 		contentElementTypeKey: string,
 	) {
 		await this._retrieveManager;
-		// TODO: This must be implemented differently so the layout entry is created here..
 		return this._manager?.create(modalData, layoutEntry, contentElementTypeKey) ?? false;
-	}
-
-	// create Block?
-
-	// create Block?
-	async delete(contentUdi: string) {
-		// TODO: Loop through children and delete them as well?
-		await super.delete(contentUdi);
 	}
 }

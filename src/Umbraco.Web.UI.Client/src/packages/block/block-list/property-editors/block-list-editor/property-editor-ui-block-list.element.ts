@@ -2,6 +2,7 @@ import { UmbBlockListManagerContext } from '../../context/block-list-manager.con
 import '../../components/block-list-block/index.js';
 import type { UmbPropertyEditorUIBlockListBlockElement } from '../../components/block-list-block/index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
+import { UmbBlockListEntriesContext } from '../../context/block-list-entries.context.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -39,7 +40,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	#sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbPropertyEditorUIBlockListBlockElement>(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
-			this.#context.setLayouts(model);
+			this.#entriesContext.setLayoutEntries(model);
 		},
 	});
 
@@ -113,6 +114,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	private _catalogueRouteBuilder?: UmbModalRouteBuilder;
 
 	#context = new UmbBlockListManagerContext(this);
+	#entriesContext = new UmbBlockListEntriesContext(this);
 
 	constructor() {
 		super();
@@ -133,9 +135,15 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			// Notify that the value has changed.
 			//console.log('layout changed', this._value);
 			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
-			this._layouts = layouts;
-			this.#sorter.setModel(layouts);
+			this.#entriesContext.setLayoutEntries(layouts);
 			this.dispatchEvent(new UmbChangeEvent());
+		});
+		this.observe(this.#entriesContext.layoutEntries, (layouts) => {
+			this._layouts = layouts;
+			// Update sorter.
+			this.#sorter.setModel(layouts);
+			// Update manager:
+			this.#context.setLayouts(layouts);
 		});
 		this.observe(this.#context.contents, (contents) => {
 			this._value = { ...this._value, contentData: contents };

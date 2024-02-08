@@ -12,9 +12,6 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
-// TODO: We are using backend model here, I think we should get our own model:
-type ElementTypeModel = UmbContentTypeModel;
-
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
@@ -29,7 +26,7 @@ export abstract class UmbBlockManagerContext<
 	#propertyAlias = new UmbStringState(undefined);
 	propertyAlias = this.#propertyAlias.asObservable();
 
-	#contentTypes = new UmbArrayState(<Array<ElementTypeModel>>[], (x) => x.unique);
+	#contentTypes = new UmbArrayState(<Array<UmbContentTypeModel>>[], (x) => x.unique);
 	public readonly contentTypes = this.#contentTypes.asObservable();
 
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
@@ -141,9 +138,11 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
+	/*
 	layoutOf(contentUdi: string) {
 		return this._layouts.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
 	}
+	*/
 	contentOf(udi: string) {
 		return this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi));
 	}
@@ -151,14 +150,23 @@ export abstract class UmbBlockManagerContext<
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
 	}
 
+	/*
 	setOneLayout(layoutData: BlockLayoutType) {
 		return this._layouts.appendOne(layoutData);
 	}
+	*/
 	setOneContent(contentData: UmbBlockDataType) {
 		this.#contents.appendOne(contentData);
 	}
 	setOneSettings(settingsData: UmbBlockDataType) {
 		this.#settings.appendOne(settingsData);
+	}
+
+	removeOneContent(contentUdi: string) {
+		this.#contents.removeOne(contentUdi);
+	}
+	removeOneSettings(settingsUdi: string) {
+		this.#settings.removeOne(settingsUdi);
 	}
 
 	abstract create(
@@ -218,20 +226,5 @@ export abstract class UmbBlockManagerContext<
 		}
 
 		return true;
-	}
-
-	// Idea: should we return true if it was successful?
-	deleteBlock(contentUdi: string) {
-		const layout = this._layouts.value.find((x) => x.contentUdi === contentUdi);
-		if (!layout) {
-			throw new Error(`Cannot delete block, missing layout for ${contentUdi}`);
-		}
-
-		if (layout.settingsUdi) {
-			this.#settings.removeOne(layout.settingsUdi);
-		}
-
-		this._layouts.removeOne(contentUdi);
-		this.#contents.removeOne(contentUdi);
 	}
 }

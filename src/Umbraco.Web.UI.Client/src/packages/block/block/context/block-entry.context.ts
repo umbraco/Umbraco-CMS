@@ -1,6 +1,7 @@
 import type { UmbBlockTypeBaseModel } from '../../block-type/types.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
-import { UMB_BLOCK_ENTRY_CONTEXT, type UmbBlockManagerContext } from '../index.js';
+import type { UmbBlockManagerContext } from '../index.js';
+import type { UmbBlockEntriesContext } from './block-entries.context.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -9,15 +10,21 @@ import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export abstract class UmbBlockEntryContext<
-	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
+	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
 	BlockManagerContextType extends UmbBlockManagerContext<BlockType, BlockLayoutType>,
+	BlockEntriesContextTokenType extends UmbContextToken<BlockEntriesContextType>,
+	BlockEntriesContextType extends UmbBlockEntriesContext<
+		BlockManagerContextTokenType,
+		BlockManagerContextType,
+		BlockType,
+		BlockLayoutType
+	>,
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
-> extends UmbContextBase<
-	UmbBlockEntryContext<BlockManagerContextTokenType, BlockManagerContextType, BlockType, BlockLayoutType>
-> {
+> extends UmbContextBase<any> {
 	//
 	_manager?: BlockManagerContextType;
+	_entries?: BlockEntriesContextType;
 
 	#blockTypeName = new UmbStringState(undefined);
 	public readonly blockTypeName = this.#blockTypeName.asObservable();
@@ -71,14 +78,25 @@ export abstract class UmbBlockEntryContext<
 		return this.#label.value;
 	}
 
-	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
-		super(host, UMB_BLOCK_ENTRY_CONTEXT.toString());
+	constructor(
+		host: UmbControllerHost,
+		blockManagerContextToken: BlockManagerContextTokenType,
+		blockEntriesContextToken: BlockEntriesContextTokenType,
+	) {
+		super(host, 'UmbBlockEntryContext');
 
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
 			this._manager = manager;
 			this.#gotManager();
 			this._gotManager();
+		});
+
+		// Consume block entries:
+		this.consumeContext(blockEntriesContextToken, (entries) => {
+			this._entries = entries;
+			this.#gotEntries();
+			this._gotEntries();
 		});
 
 		// Observe UDI:
@@ -122,6 +140,10 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	abstract _gotManager(): void;
+
+	#gotEntries() {}
+
+	abstract _gotEntries(): void;
 
 	#observeData() {
 		if (!this._manager) return;
@@ -224,10 +246,10 @@ export abstract class UmbBlockEntryContext<
 		});
 	}
 	public delete() {
-		if (!this._manager) return;
+		if (!this._entries) return;
 		const contentUdi = this.#layout.value?.contentUdi;
 		if (!contentUdi) return;
-		this._manager.deleteBlock(contentUdi);
+		this._entries.delete(contentUdi);
 	}
 
 	//copy
