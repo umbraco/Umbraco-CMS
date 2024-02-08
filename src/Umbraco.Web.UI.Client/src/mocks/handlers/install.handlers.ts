@@ -1,11 +1,11 @@
 const { rest } = window.MockServiceWorker;
-import {
-	DatabaseInstallResponseModel,
-	InstallVResponseModel,
+import type {
+	DatabaseInstallRequestModel,
 	InstallSettingsResponseModel,
 	ProblemDetails,
-	TelemetryLevelModel,
+	InstallRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { TelemetryLevelModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
@@ -29,7 +29,7 @@ export const handlers = [
 						{
 							level: TelemetryLevelModel.DETAILED,
 							description:
-								'We will send:<ul><li>Anonymized site ID, umbraco version, and packages installed.</li><li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li><li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li><li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li></ul><i>We might change what we send on the Detailed level in the future. If so, it will be listed above.<br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>',
+								'We will send:<ul><li>Anonymized site ID, umbraco version, and packages installed.</li><li>Number of: Root nodes, Content nodes, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li><li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li><li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li></ul><i>We might change what we send on the Detailed level in the future. If so, it will be listed above.<br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>',
 						},
 					],
 				},
@@ -79,7 +79,7 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/install/validate-database'), async (req, res, ctx) => {
-		const body = await req.json<DatabaseInstallResponseModel>();
+		const body = await req.json<DatabaseInstallRequestModel>();
 
 		if (body.name === 'validate') {
 			return res(
@@ -99,7 +99,7 @@ export const handlers = [
 	}),
 
 	rest.post(umbracoPath('/install/setup'), async (req, res, ctx) => {
-		const body = await req.json<InstallVResponseModel>();
+		const body = await req.json<InstallRequestModel>();
 
 		if (body.database?.name === 'fail') {
 			return res(

@@ -1,7 +1,8 @@
-import {
+import type {
 	LogViewerDateRange,
-	UmbLogViewerWorkspaceContext,
-	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
+	UmbLogViewerWorkspaceContext} from '../workspace/logviewer.context.js';
+import {
+	UMB_APP_LOG_VIEWER_CONTEXT,
 } from '../workspace/logviewer.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
@@ -27,7 +28,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.addEventListener('input', this.#setDates);
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeStuff();
 		});

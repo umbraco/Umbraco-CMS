@@ -1,12 +1,9 @@
-import { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../types.js';
+import type { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../types.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import {
-	CreateDataTypeRequestModel,
-	DataTypeModelBaseModel,
-	DataTypeResource,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { CreateDataTypeRequestModel, DataTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -67,7 +64,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		const dataType: UmbDataTypeDetailModel = {
 			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: data.parentId || null,
+			parentUnique: data.parent ? data.parent.id : null,
 			name: data.name,
 			editorAlias: data.editorAlias,
 			editorUiAlias: data.editorUiAlias || null,
@@ -91,7 +88,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDataTypeRequestModel = {
 			id: model.unique,
-			parentId: model.parentUnique,
+			parent: model.parentUnique ? { id: model.parentUnique } : null,
 			name: model.name,
 			editorAlias: model.editorAlias,
 			editorUiAlias: model.editorUiAlias,
@@ -130,7 +127,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			values: model.values,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeById({
 				id: model.unique,
@@ -138,8 +135,8 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

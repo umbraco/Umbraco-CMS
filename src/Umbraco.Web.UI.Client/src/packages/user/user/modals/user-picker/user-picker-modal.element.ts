@@ -1,14 +1,16 @@
 import { UmbUserCollectionRepository } from '../../collection/repository/user-collection.repository.js';
+import type { UmbUserItemModel } from '../../repository/item/index.js';
+import type { UmbUserPickerModalData, UmbUserPickerModalValue } from './user-picker-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, ifDefined, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { UmbUserPickerModalData, UmbUserPickerModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-picker-modal')
 export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPickerModalData, UmbUserPickerModalValue> {
 	@state()
-	private _users: Array<UserItemResponseModel> = [];
+	private _users: Array<UmbUserItemModel> = [];
 
 	#selectionManager = new UmbSelectionManager(this);
 	#userCollectionRepository = new UmbUserCollectionRepository(this);
@@ -53,9 +55,9 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 							<uui-menu-item
 								label=${ifDefined(user.name)}
 								selectable
-								@selected=${() => this.#selectionManager.select(user.id!)}
-								@deselected=${() => this.#selectionManager.deselect(user.id!)}
-								?selected=${this.#selectionManager.isSelected(user.id!)}>
+								@selected=${() => this.#selectionManager.select(user.unique)}
+								@deselected=${() => this.#selectionManager.deselect(user.unique)}
+								?selected=${this.#selectionManager.isSelected(user.unique)}>
 								<uui-avatar slot="icon" name=${ifDefined(user.name)}></uui-avatar>
 							</uui-menu-item>
 						`,

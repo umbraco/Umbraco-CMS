@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type PublicAccessBaseModel = {
-    loginPageId: string;
-    errorPageId: string;
+    loginDocument: ReferenceByIdModel;
+    errorDocument: ReferenceByIdModel;
 };
+

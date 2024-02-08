@@ -1,4 +1,4 @@
-import { UmbUserGroupInputElement } from '../../../../user-group/components/input-user-group/user-group-input.element.js';
+import type { UmbUserGroupInputElement } from '../../../../user-group/components/input-user-group/user-group-input.element.js';
 import { UmbInviteUserRepository } from '../../repository/invite-user.repository.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -24,18 +24,17 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 
 		//TODO: How should we handle pickers forms?
 		const userGroupPicker = form.querySelector('#userGroups') as UmbUserGroupInputElement;
-		const userGroupIds = userGroupPicker?.selectedIds;
+		const userGroupUniques = userGroupPicker?.selectedIds;
 
 		const message = formData.get('message') as string;
 
 		// TODO: figure out when to use email or username
-		// TODO: invite request gives 500 error.
 		const { error } = await this.#inviteUserRepository.invite({
 			name,
 			email,
 			userName: email,
 			message,
-			userGroupIds,
+			userGroupUniques,
 		});
 
 		if (!error) {

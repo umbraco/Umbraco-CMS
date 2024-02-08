@@ -3,11 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type RedirectUrlResponseModel = {
     id: string;
     originalUrl: string;
     destinationUrl: string;
     created: string;
-    contentId: string;
+    document: ReferenceByIdModel;
     culture?: string | null;
 };
+

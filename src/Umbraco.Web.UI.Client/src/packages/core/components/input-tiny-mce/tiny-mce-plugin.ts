@@ -1,6 +1,6 @@
 import type { UmbInputTinyMceElement } from '@umbraco-cms/backoffice/components';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 

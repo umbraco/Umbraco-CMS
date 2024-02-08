@@ -6,9 +6,11 @@ import type {
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
+export const UMB_USER_WORKSPACE_ALIAS = 'Umb.Workspace.User';
+
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: 'Umb.Workspace.User',
+	alias: UMB_USER_WORKSPACE_ALIAS,
 	name: 'User Workspace',
 	element: () => import('./user-workspace.element.js'),
 	meta: {

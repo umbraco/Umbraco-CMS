@@ -7,10 +7,12 @@ import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbra
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG: UmbSorterConfig<string> = {
-	compareElementToModel: (element, model) => {
-		return element.getAttribute('detail') === model;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('detail');
 	},
-	querySelectModelToElement: () => null,
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry;
+	},
 	identifier: 'Umb.SorterIdentifier.InputMember',
 	itemSelector: 'uui-ref-node',
 	containerSelector: 'uui-ref-list',

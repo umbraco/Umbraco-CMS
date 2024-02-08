@@ -12,6 +12,7 @@ import type { MediaTypeCompositionResponseModel } from '../models/MediaTypeCompo
 import type { MediaTypeItemResponseModel } from '../models/MediaTypeItemResponseModel';
 import type { MediaTypeResponseModel } from '../models/MediaTypeResponseModel';
 import type { MoveMediaTypeRequestModel } from '../models/MoveMediaTypeRequestModel';
+import type { PagedAllowedMediaTypeModel } from '../models/PagedAllowedMediaTypeModel';
 import type { PagedMediaTypeTreeItemResponseModel } from '../models/PagedMediaTypeTreeItemResponseModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
 import type { UpdateMediaTypeRequestModel } from '../models/UpdateMediaTypeRequestModel';
@@ -21,6 +22,27 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class MediaTypeResource {
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemMediaType({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<MediaTypeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/media-type',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
 
     /**
      * @returns string Created
@@ -117,6 +139,36 @@ export class MediaTypeResource {
     }
 
     /**
+     * @returns PagedAllowedMediaTypeModel Success
+     * @throws ApiError
+     */
+    public static getMediaTypeByIdAllowedChildren({
+        id,
+        skip,
+        take = 100,
+    }: {
+        id: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedAllowedMediaTypeModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media-type/{id}/allowed-children',
+            path: {
+                'id': id,
+            },
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -190,6 +242,30 @@ export class MediaTypeResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns PagedAllowedMediaTypeModel Success
+     * @throws ApiError
+     */
+    public static getMediaTypeAllowedAtRoot({
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedAllowedMediaTypeModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media-type/allowed-at-root',
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -305,27 +381,6 @@ export class MediaTypeResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getMediaTypeItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<MediaTypeItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/media-type/item',
-            query: {
-                'id': id,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

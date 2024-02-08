@@ -1,7 +1,7 @@
 import { UmbRouterSlotElement } from './router-slot.element.js';
+import type { UmbRoute } from './route.interface.js';
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 function variantIdsToString(variantIds: UmbVariantId[]): string {
 	return variantIds.map((id) => id.toString()).join('_&_');

@@ -1,4 +1,4 @@
-import { UmbTreeItemElement } from '../interfaces/index.js';
+import type { UmbTreeItemElement } from '../interfaces/index.js';
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestTreeItem extends ManifestElement<UmbTreeItemElement> {

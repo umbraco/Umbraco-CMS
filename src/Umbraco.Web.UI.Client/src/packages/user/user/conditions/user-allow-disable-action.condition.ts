@@ -1,6 +1,6 @@
 import { UmbUserActionConditionBase } from './user-allow-action-base.condition.js';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
-import {
+import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
@@ -13,7 +13,7 @@ export class UmbUserAllowDisableActionCondition extends UmbUserActionConditionBa
 
 	async onUserDataChange() {
 		// don't allow the current user to disable themselves
-		if (!this.userData || !this.userData.id || (await this.isCurrentUser())) {
+		if (!this.userData || !this.userData.unique || (await this.isCurrentUser())) {
 			this.permitted = false;
 			super.onUserDataChange();
 			return;

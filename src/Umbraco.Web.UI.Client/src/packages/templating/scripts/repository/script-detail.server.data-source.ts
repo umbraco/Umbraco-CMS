@@ -1,16 +1,13 @@
-import { UmbScriptDetailModel } from '../types.js';
+import type { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
-import {
-	CreateScriptRequestModel,
-	ScriptResource,
-	UpdateScriptRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { CreateScriptRequestModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { ScriptResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbScriptDetailModel> {
@@ -101,7 +98,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			content: model.content,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.putScriptByPath({
 				path: encodeURIComponent(path),
@@ -109,8 +106,8 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

@@ -10,5 +10,5 @@ export type ContentForDocumentResponseModel = {
     values: Array<DocumentValueModel>;
     variants: Array<DocumentVariantResponseModel>;
     id: string;
-    contentTypeId: string;
 };
+

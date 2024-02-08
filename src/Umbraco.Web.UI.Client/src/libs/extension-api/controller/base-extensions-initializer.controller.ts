@@ -1,4 +1,4 @@
-import { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import type { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	ManifestBase,
@@ -6,7 +6,7 @@ import type {
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
@@ -56,8 +56,8 @@ export abstract class UmbBaseExtensionsInitializer<
 	}
 	protected _init() {
 		let source = Array.isArray(this.#type)
-			? this.#extensionRegistry.extensionsOfTypes<ManifestType>(this.#type as string[])
-			: this.#extensionRegistry.extensionsOfType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
+			? this.#extensionRegistry.byTypes<ManifestType>(this.#type as string[])
+			: this.#extensionRegistry.byType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
 		if (this.#filter) {
 			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(this.#filter!)));
 		}

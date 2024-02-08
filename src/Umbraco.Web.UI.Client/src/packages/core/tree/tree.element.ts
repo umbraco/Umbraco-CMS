@@ -1,8 +1,8 @@
 import { UmbTreeContextBase } from './tree.context.js';
-import { UmbTreeItemModelBase } from './types.js';
+import type { UmbTreeItemModelBase } from './types.js';
 import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 import './tree-item-default/tree-item.element.js';
 import './tree-item-base/tree-item-base.element.js';
@@ -79,19 +79,21 @@ export class UmbTreeElement extends UmbLitElement {
 	private _treeRoot?: UmbTreeItemModelBase;
 
 	#treeContext = new UmbTreeContextBase<UmbTreeItemModelBase>(this);
-
 	#rootItemsObserver?: UmbObserverController<Array<UmbTreeItemModelBase>>;
 
 	constructor() {
 		super();
-		this.#requestTreeRoot();
+		this.#observeTreeRoot();
 	}
 
-	async #requestTreeRoot() {
-		if (!this.#treeContext?.requestTreeRoot) throw new Error('Tree does not support root');
-
-		const { data } = await this.#treeContext.requestTreeRoot();
-		this._treeRoot = data;
+	#observeTreeRoot() {
+		this.observe(
+			this.#treeContext.treeRoot,
+			(treeRoot) => {
+				this._treeRoot = treeRoot;
+			},
+			'umbTreeRootObserver',
+		);
 	}
 
 	async #observeRootItems() {

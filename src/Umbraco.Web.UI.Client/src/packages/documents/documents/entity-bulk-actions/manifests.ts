@@ -1,9 +1,9 @@
-import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbDocumentMoveEntityBulkAction } from './move/move.action.js';
 import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action.js';
-import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
@@ -15,7 +15,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbDocumentMoveEntityBulkAction,
 		meta: {
 			label: 'Move',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -33,7 +33,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbDocumentCopyEntityBulkAction,
 		meta: {
 			label: 'Copy',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

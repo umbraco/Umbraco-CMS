@@ -4,7 +4,7 @@ import { html, css, customElement, state, repeat } from '@umbraco-cms/backoffice
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import './installed-packages-section-view-item.element.js';
 

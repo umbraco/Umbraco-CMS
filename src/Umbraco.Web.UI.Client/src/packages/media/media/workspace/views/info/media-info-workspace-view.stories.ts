@@ -1,6 +1,6 @@
 import './media-info-workspace-view.element.js';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbMediaInfoWorkspaceViewElement } from './media-info-workspace-view.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

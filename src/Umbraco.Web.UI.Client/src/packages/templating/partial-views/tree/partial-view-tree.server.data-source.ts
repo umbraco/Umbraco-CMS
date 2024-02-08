@@ -1,8 +1,9 @@
-import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../entity.js';
-import { UmbPartialViewTreeItemModel } from './types.js';
+import type { UmbPartialViewTreeItemModel } from './types.js';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { FileSystemTreeItemPresentationModel, PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
+import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -55,6 +56,5 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeIt
 		name: item.name,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
-		isContainer: false,
 	};
 };

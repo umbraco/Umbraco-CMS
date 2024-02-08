@@ -1148,10 +1148,45 @@ export default {
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
-		defineDynamicRoot: 'Specify a Dynamic Root',
+		defineDynamicRoot: 'Specify root node',
 		defineRootNode: 'Pick root node',
 		pickedTrashedItem: 'You have picked a content item currently deleted or in the recycle bin',
 		pickedTrashedItems: 'You have picked content items currently deleted or in the recycle bin',
+	},
+	dynamicRoot: {
+		configurationTitle: 'Dynamic Root Query',
+		pickDynamicRootOriginTitle: 'Pick origin',
+		pickDynamicRootOriginDesc: 'Define the origin for your Dynamic Root Query',
+		originRootTitle: 'Root',
+		originRootDesc: 'Root node of this editing session',
+		originParentTitle: 'Parent',
+		originParentDesc: 'The parent node of the source in this editing session',
+		originCurrentTitle: 'Current',
+		originCurrentDesc: 'The content node that is source for this editing session',
+		originSiteTitle: 'Site',
+		originSiteDesc: 'Find nearest node with a hostname',
+		originByKeyTitle: 'Specific Node',
+		originByKeyDesc: 'Pick a specific Node as the origin for this query',
+		pickDynamicRootQueryStepTitle: 'Append step to query',
+		pickDynamicRootQueryStepDesc: 'Define the next step of your Dynamic Root Query',
+		queryStepNearestAncestorOrSelfTitle: 'Nearest Ancestor Or Self',
+		queryStepNearestAncestorOrSelfDesc: 'Query the nearest ancestor or self that fits with one of the configured types',
+		queryStepFurthestAncestorOrSelfTitle: 'Furthest Ancestor Or Self',
+		queryStepFurthestAncestorOrSelfDesc:
+			'Query the Furthest ancestor or self that fits with one of the configured types',
+		queryStepNearestDescendantOrSelfTitle: 'Nearest Descendant Or Self',
+		queryStepNearestDescendantOrSelfDesc:
+			'Query the nearest descendant or self that fits with one of the configured types',
+		queryStepFurthestDescendantOrSelfTitle: 'Furthest Descendant Or Self',
+		queryStepFurthestDescendantOrSelfDesc:
+			'Query the Furthest descendant or self that fits with one of the configured types',
+		queryStepCustomTitle: 'Custom',
+		queryStepCustomDesc: 'Query the using a custom Query Step',
+		addQueryStep: 'Add query step',
+		queryStepTypes: 'That matches types: ',
+		noValidStartNodeTitle: 'No matching content',
+		noValidStartNodeDesc:
+			'The configuration of this property does not match any content. Create the missing content or contact your administrator to adjust the Dynamic Root settings for this property.',
 	},
 	mediaPicker: {
 		deletedItem: 'Deleted item',
@@ -1522,7 +1557,7 @@ export default {
 		addGroup: 'Add group',
 		inheritedFrom: 'Inherited from',
 		addProperty: 'Add property',
-		editProperty : 'Edit property',
+		editProperty: 'Edit property',
 		requiredLabel: 'Required label',
 		enableListViewHeading: 'Enable list view',
 		enableListViewDescription:
@@ -2470,7 +2505,7 @@ export default {
 		minimalLevelDescription: 'We will only send an anonymized site ID to let us know that the site exists.',
 		basicLevelDescription: 'We will send an anonymized site ID, Umbraco version, and packages installed',
 		detailedLevelDescription:
-			'\n          We will send:\n          <ul>\n            <li>Anonymized site ID, Umbraco version, and packages installed.</li>\n            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>\n            <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>\n            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>\n          </ul>\n          <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>\n       ',
+			'\n          We will send:\n          <ul>\n            <li>Anonymized site ID, Umbraco version, and packages installed.</li>\n            <li>Number of: Root nodes, Content nodes, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>\n            <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>\n            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>\n          </ul>\n          <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n          <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>\n       ',
 	},
 	umbId: {
 		editProfile: 'Edit your Umbraco ID profile',

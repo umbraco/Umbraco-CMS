@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { EntityTreeItemResponseModel } from './EntityTreeItemResponseModel';
+import type { NamedEntityTreeItemResponseModel } from './NamedEntityTreeItemResponseModel';
 
-export type FolderTreeItemResponseModel = (EntityTreeItemResponseModel & {
-isFolder: boolean;
+export type FolderTreeItemResponseModel = (NamedEntityTreeItemResponseModel & {
+    isFolder: boolean;
 });
+

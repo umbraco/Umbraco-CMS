@@ -1,4 +1,4 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
 
 export interface UmbDataTypePickerFlowModalData {
 	submitLabel?: string;
@@ -14,6 +14,6 @@ export const UMB_DATA_TYPE_PICKER_FLOW_MODAL = new UmbModalToken<
 >('Umb.Modal.DataTypePickerFlow', {
 	modal: {
 		type: 'sidebar',
-		size: 'small',
+		size: 'medium',
 	},
 });

@@ -1,21 +1,19 @@
-import { UmbPropertyEditorUiElement } from '../../extension-registry/interfaces/property-editor-ui-element.interface.js';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/index.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbArrayState,
 	UmbBasicState,
 	UmbClassState,
 	UmbDeepState,
-	UmbObserverController,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import {
-	UmbPropertyEditorConfigCollection,
-	UmbPropertyEditorConfigProperty,
-} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	private _providerController: UmbContextProviderController;

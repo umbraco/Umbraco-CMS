@@ -1,12 +1,10 @@
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import type { TinyMcePluginArguments } from '@umbraco-cms/backoffice/components';
+import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
-import {
-	UMB_MEDIA_TREE_PICKER_MODAL,
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-} from '@umbraco-cms/backoffice/modal';
-import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
-import { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MEDIA_TREE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
+import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -29,7 +27,7 @@ interface MediaPickerResultData {
 
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#mediaHelper: UmbMediaHelper;
-	#currentUser?: UmbCurrentUser;
+	#currentUser?: UmbCurrentUserModel;
 	#modalContext?: UmbModalManagerContext;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#temporaryFileRepository;
@@ -40,7 +38,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		this.#mediaHelper = new UmbMediaHelper();
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(args.host);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 

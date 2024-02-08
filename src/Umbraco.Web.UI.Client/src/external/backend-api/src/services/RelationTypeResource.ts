@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateRelationTypeRequestModel } from '../models/CreateRelationTypeRequestModel';
-import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { RelationTypeItemResponseModel } from '../models/RelationTypeItemResponseModel';
 import type { RelationTypeResponseModel } from '../models/RelationTypeResponseModel';
 import type { UpdateRelationTypeRequestModel } from '../models/UpdateRelationTypeRequestModel';
@@ -15,14 +15,35 @@ import { request as __request } from '../core/request';
 export class RelationTypeResource {
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemRelationType({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<RelationTypeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/relation-type',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns string Created
      * @throws ApiError
      */
     public static postRelationType({
-requestBody,
-}: {
-requestBody?: CreateRelationTypeRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateRelationTypeRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/relation-type',
@@ -41,10 +62,10 @@ requestBody?: CreateRelationTypeRequestModel,
      * @throws ApiError
      */
     public static getRelationTypeById({
-id,
-}: {
-id: string,
-}): CancelablePromise<RelationTypeResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<RelationTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/relation-type/{id}',
@@ -63,10 +84,10 @@ id: string,
      * @throws ApiError
      */
     public static deleteRelationTypeById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/relation-type/{id}',
@@ -85,12 +106,12 @@ id: string,
      * @throws ApiError
      */
     public static putRelationTypeById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateRelationTypeRequestModel,
-}): CancelablePromise<RelationTypeResponseModel> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateRelationTypeRequestModel,
+    }): CancelablePromise<RelationTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/relation-type/{id}',
@@ -108,37 +129,16 @@ requestBody?: UpdateRelationTypeRequestModel,
     }
 
     /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getRelationTypeItem({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<RelationTypeItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/relation-type/item',
-            query: {
-                'id': id,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeRelationTypeRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedEntityTreeItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/relation-type/root',

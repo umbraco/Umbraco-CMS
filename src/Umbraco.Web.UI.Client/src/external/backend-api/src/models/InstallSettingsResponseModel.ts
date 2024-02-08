@@ -4,9 +4,10 @@
 /* eslint-disable */
 
 import type { DatabaseSettingsPresentationModel } from './DatabaseSettingsPresentationModel';
-import type { UserSettingsModel } from './UserSettingsModel';
+import type { UserSettingsPresentationModel } from './UserSettingsPresentationModel';
 
 export type InstallSettingsResponseModel = {
-    user: UserSettingsModel;
+    user: UserSettingsPresentationModel;
     databases: Array<DatabaseSettingsPresentationModel>;
 };
+

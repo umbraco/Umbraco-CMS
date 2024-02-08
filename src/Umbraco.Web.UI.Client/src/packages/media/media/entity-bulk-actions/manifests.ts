@@ -1,9 +1,9 @@
-import { UMB_MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbMediaMoveEntityBulkAction } from './move/move.action.js';
 import { UmbMediaCopyEntityBulkAction } from './copy/copy.action.js';
 import { UmbMediaTrashEntityBulkAction } from './trash/trash.action.js';
-import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
@@ -15,7 +15,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbMediaMoveEntityBulkAction,
 		meta: {
 			label: 'Move',
-			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -33,7 +33,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbMediaCopyEntityBulkAction,
 		meta: {
 			label: 'Copy',
-			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -51,7 +51,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbMediaTrashEntityBulkAction,
 		meta: {
 			label: 'Trash',
-			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

@@ -8,7 +8,7 @@ import type { DictionaryItemResponseModel } from '../models/DictionaryItemRespon
 import type { ImportDictionaryRequestModel } from '../models/ImportDictionaryRequestModel';
 import type { MoveDictionaryRequestModel } from '../models/MoveDictionaryRequestModel';
 import type { PagedDictionaryOverviewResponseModel } from '../models/PagedDictionaryOverviewResponseModel';
-import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { UpdateDictionaryItemRequestModel } from '../models/UpdateDictionaryItemRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -59,6 +59,7 @@ export class DictionaryResource {
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
                 409: `Conflict`,
             },
@@ -132,6 +133,7 @@ export class DictionaryResource {
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -218,14 +220,14 @@ export class DictionaryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDictionaryItem({
+    public static getItemDictionary({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<DictionaryItemItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/dictionary/item',
+            url: '/umbraco/management/api/v1/item/dictionary',
             query: {
                 'id': id,
             },
@@ -236,7 +238,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDictionaryChildren({
@@ -247,7 +249,7 @@ export class DictionaryResource {
         parentId?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/children',
@@ -263,7 +265,7 @@ export class DictionaryResource {
     }
 
     /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDictionaryRoot({
@@ -272,7 +274,7 @@ export class DictionaryResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/root',

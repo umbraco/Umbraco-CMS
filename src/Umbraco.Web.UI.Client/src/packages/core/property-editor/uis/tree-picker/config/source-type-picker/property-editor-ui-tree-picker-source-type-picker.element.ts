@@ -1,6 +1,6 @@
-import { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
-import { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
-import { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
+import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
+import type { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
+import type { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -50,8 +50,10 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 		this.observe(
 			await this.#datasetContext.propertyValueByAlias('startNode'),
 			(value) => {
+				if (!value) return;
+
 				const startNode = value as UmbTreePickerSource;
-				if (startNode.type) {
+				if (startNode?.type) {
 					// If we had a sourceType before, we can see this as a change and not the initial value,
 					// so let's reset the value, so we don't carry over content-types to the new source type.
 					if (this.#initialized && this.sourceType !== startNode.type) {

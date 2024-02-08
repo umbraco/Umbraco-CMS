@@ -1,17 +1,15 @@
 import { UmbDocumentPermissionRepository } from '../../user-permissions/index.js';
-import { UmbDocumentRepository } from '../../repository/index.js';
-import { UmbUserGroupRepository } from '@umbraco-cms/backoffice/user-group';
+import { UmbDocumentItemRepository } from '../../repository/index.js';
+import { UmbUserGroupItemRepository, UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
 import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UMB_ENTITY_USER_PERMISSION_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_USER_GROUP_PICKER_MODAL,
+import type {
 	UmbEntityUserPermissionSettingsModalData,
 	UmbEntityUserPermissionSettingsModalValue,
 	UmbModalContext,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
+import { UMB_ENTITY_USER_PERMISSION_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
@@ -37,9 +35,9 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 	_userGroupRefs: Array<UmbUserGroupRefData> = [];
 
 	#userPermissions: Array<any> = [];
-	#userGroupRepository = new UmbUserGroupRepository(this);
+	#userGroupIemRepository = new UmbUserGroupItemRepository(this);
 	#documentPermissionRepository = new UmbDocumentPermissionRepository(this);
-	#documentRepository = new UmbDocumentRepository(this);
+	#documentItemRepository = new UmbDocumentItemRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
 	#userGroupPickerModal?: UmbModalContext;
 
@@ -54,7 +52,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 		});
 	}
@@ -66,7 +64,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 	}
 
 	async #getEntityItem(unique: string) {
-		const { data } = await this.#documentRepository.requestItems([unique]);
+		const { data } = await this.#documentItemRepository.requestItems([unique]);
 		if (!data) throw new Error('Could not load item');
 		this._entityItem = data[0];
 	}
@@ -81,12 +79,12 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 
 	async #mapToUserGroupRefs() {
 		const userGroupIds = [...new Set(this.#userPermissions.map((permission) => permission.target.userGroupId))];
-		const { data } = await this.#userGroupRepository.requestItems(userGroupIds);
+		const { data } = await this.#userGroupIemRepository.requestItems(userGroupIds);
 
 		const userGroups = data ?? [];
 
 		this._userGroupRefs = this.#userPermissions.map((entry) => {
-			const userGroup = userGroups.find((userGroup) => userGroup.id == entry.target.userGroupId);
+			const userGroup = userGroups.find((userGroup) => userGroup.unique == entry.target.userGroupId);
 			return {
 				id: entry.target.userGroupId,
 				name: userGroup?.name,
@@ -138,7 +136,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 									name=${ifDefined(userGroup.name)}
 									.userPermissionAliases=${userGroup.permissions}
 									@open=${() => this.#openUserPermissionsModal(userGroup.id)}
-									border>
+									standalone>
 									${userGroup.icon ? html`<uui-icon slot="icon" name=${userGroup.icon}></uui-icon>` : nothing}
 								</umb-user-group-ref>`,
 						)}

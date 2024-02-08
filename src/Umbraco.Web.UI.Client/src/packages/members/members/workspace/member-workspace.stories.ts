@@ -1,6 +1,6 @@
 import './member-workspace.element.js';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 
 import { data } from '../../../../mocks/data/member.data.js';
 

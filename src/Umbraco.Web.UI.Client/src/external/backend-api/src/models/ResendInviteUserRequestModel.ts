@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type ResendInviteUserRequestModel = {
-    userId: string;
+    user: ReferenceByIdModel;
     message?: string | null;
 };
+

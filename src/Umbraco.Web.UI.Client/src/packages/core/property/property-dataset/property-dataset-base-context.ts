@@ -1,10 +1,8 @@
 import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
-import {
-	UMB_PROPERTY_DATASET_CONTEXT,
-	type UmbNameablePropertyDatasetContext,
-	type UmbPropertyDatasetContext,
-} from '@umbraco-cms/backoffice/property';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_PROPERTY_DATASET_CONTEXT } from './property-dataset-context.token.js';
+import type { UmbPropertyDatasetContext } from './property-dataset-context.interface.js';
+import type { UmbNameablePropertyDatasetContext } from './nameable-property-dataset-context.interface.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';

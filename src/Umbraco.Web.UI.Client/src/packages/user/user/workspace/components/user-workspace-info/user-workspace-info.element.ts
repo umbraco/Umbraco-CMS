@@ -1,6 +1,7 @@
-import { UmbUserDisplayStatus, getDisplayStateFromUserStatus } from '../../../utils.js';
+import type { UmbUserDisplayStatus } from '../../../utils.js';
+import { getDisplayStateFromUserStatus } from '../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
-import { UmbUserDetailModel } from '../../../types.js';
+import type { UmbUserDetailModel } from '../../../types.js';
 import { html, customElement, state, css, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -62,7 +63,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			},
 			{ labelKey: 'user_createDate', value: this.localize.date(user.createDate!) },
 			{ labelKey: 'user_updateDate', value: this.localize.date(user.updateDate!) },
-			{ labelKey: 'general_id', value: user.id },
+			{ labelKey: 'general_id', value: user.unique },
 		];
 	};
 

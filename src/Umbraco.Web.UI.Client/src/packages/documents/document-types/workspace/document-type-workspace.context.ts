@@ -1,12 +1,10 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
-import { UmbDocumentTypeDetailModel } from '../types.js';
+import type { UmbDocumentTypeDetailModel } from '../types.js';
+import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbEditableWorkspaceContextBase,
-	UmbSaveableWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
-import type { ContentTypeCompositionModel, ContentTypeSortModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = UmbDocumentTypeDetailModel;
@@ -34,7 +32,7 @@ export class UmbDocumentTypeWorkspaceContext
 
 	// Document type specific:
 	readonly allowedTemplateIds;
-	readonly defaultTemplateId;
+	readonly defaultTemplate;
 	readonly cleanup;
 
 	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
@@ -59,9 +57,9 @@ export class UmbDocumentTypeWorkspaceContext
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 
 		// Document type specific:
-		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplateIds);
-		this.defaultTemplateId = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplateId);
-		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplateId);
+		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplates);
+		this.defaultTemplate = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
+		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
 	}
 
 	getIsSorting() {
@@ -111,19 +109,19 @@ export class UmbDocumentTypeWorkspaceContext
 	setIsElement(isElement: boolean) {
 		this.structure.updateOwnerContentType({ isElement });
 	}
-	setAllowedContentTypes(allowedContentTypes: Array<ContentTypeSortModel>) {
+	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
 		this.structure.updateOwnerContentType({ allowedContentTypes });
 	}
-	setCompositions(compositions: Array<ContentTypeCompositionModel>) {
+	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
 		this.structure.updateOwnerContentType({ compositions });
 	}
 
 	// Document type specific:
-	setAllowedTemplateIds(allowedTemplateIds: Array<string>) {
-		this.structure.updateOwnerContentType({ allowedTemplateIds });
+	setAllowedTemplateIds(allowedTemplates: Array<{ id: string }>) {
+		this.structure.updateOwnerContentType({ allowedTemplates });
 	}
-	setDefaultTemplateId(defaultTemplateId: string) {
-		this.structure.updateOwnerContentType({ defaultTemplateId });
+	setDefaultTemplate(defaultTemplate: { id: string }) {
+		this.structure.updateOwnerContentType({ defaultTemplate });
 	}
 
 	async create(parentUnique: string | null) {

@@ -1,10 +1,9 @@
-import { UmbUserSetGroupDataSource } from '../types.js';
 import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data-source.js';
 import { UmbUserRepositoryBase } from './user-repository-base.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserRepository extends UmbUserRepositoryBase {
-	#setUserGroupsSource: UmbUserSetGroupDataSource;
+	#setUserGroupsSource: UmbUserSetGroupsServerDataSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);

@@ -3,6 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type CopyDataTypeRequestModel = {
-    targetId?: string | null;
+    target?: ReferenceByIdModel | null;
 };
+

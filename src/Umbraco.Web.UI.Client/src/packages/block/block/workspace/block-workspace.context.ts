@@ -2,13 +2,15 @@ import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UMB_BLOCK_MANAGER_CONTEXT, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
-import { UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
+export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 export class UmbBlockWorkspaceContext<
 	LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbEditableWorkspaceContextBase<LayoutDataType> {
@@ -19,7 +21,7 @@ export class UmbBlockWorkspaceContext<
 
 	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#retrieveBlockManager;
-	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
+	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
 	#editorConfigPromise?: Promise<unknown>;
 
@@ -44,12 +46,11 @@ export class UmbBlockWorkspaceContext<
 	readonly name = this.#label.asObservable();
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
-		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
 		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 		this.workspaceAlias = workspaceArgs.manifest.alias;
 
-		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
+		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;
 			context.onSubmit().catch(this.#modalRejected);
 		}).asPromise();

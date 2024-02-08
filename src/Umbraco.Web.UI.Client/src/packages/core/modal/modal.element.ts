@@ -1,18 +1,23 @@
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from './modal.context.js';
-import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbModalContext } from './modal.context.js';
+import { UMB_MODAL_CONTEXT } from './modal.context.js';
+import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { CSSResultGroup, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UUIDialogElement, UUIModalDialogElement, UUIModalSidebarElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
-	UMB_CONTENT_REQUEST_EVENT_TYPE,
-	UmbContextProvider,
-	UmbContextRequestEvent,
-} from '@umbraco-cms/backoffice/context-api';
+	UUIModalCloseEvent,
+	type UUIDialogElement,
+	type UUIModalDialogElement,
+	type UUIModalSidebarElement,
+} from '@umbraco-cms/backoffice/external/uui';
+import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbContextRequestEvent } from '@umbraco-cms/backoffice/context-api';
+import { UMB_CONTENT_REQUEST_EVENT_TYPE, UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
@@ -38,10 +43,19 @@ export class UmbModalElement extends UmbLitElement {
 	#modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
 	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
 
+	#onClose = () => {
+		this.element?.removeEventListener(UUIModalCloseEvent, this.#onClose);
+		this.#modalContext?.reject({ type: 'close' });
+	};
+
 	#createModalElement() {
 		if (!this.#modalContext) return;
 
 		this.element = this.#createContainerElement();
+
+		// Makes sure that the modal triggers the reject of the context promise when it is closed by pressing escape.
+		this.element.addEventListener(UUIModalCloseEvent, this.#onClose);
+
 		if (this.#modalContext.originTarget) {
 			// The following code is the context api proxy.
 			// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal.
@@ -51,7 +65,7 @@ export class UmbModalElement extends UmbLitElement {
 					// Note for this hack (The if-sentence):
 					// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
 					// To avoid such this hack just prevents proxying the event if its a request for the Modal Context.
-					if (event.contextAlias !== UMB_MODAL_CONTEXT_TOKEN.contextAlias) {
+					if (event.contextAlias !== UMB_MODAL_CONTEXT.contextAlias) {
 						event.stopImmediatePropagation();
 						this.#modalContext.originTarget.dispatchEvent(event.clone());
 					}
@@ -86,7 +100,7 @@ export class UmbModalElement extends UmbLitElement {
 		this.element.appendChild(this.#modalRouterElement);
 		this.#observeModal(this.#modalContext.alias.toString());
 
-		const provider = new UmbContextProvider(this.element, UMB_MODAL_CONTEXT_TOKEN, this.#modalContext);
+		const provider = new UmbContextProvider(this.element, UMB_MODAL_CONTEXT, this.#modalContext);
 		provider.hostConnected();
 	}
 

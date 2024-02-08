@@ -3,7 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type VerifyInviteUserRequestModel = {
-    userId: string;
+    user: ReferenceByIdModel;
     token: string;
 };
+

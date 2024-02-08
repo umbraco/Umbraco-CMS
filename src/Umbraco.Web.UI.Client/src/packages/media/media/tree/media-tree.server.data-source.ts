@@ -1,6 +1,7 @@
-import { UmbMediaTreeItemModel } from './types.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import type { UmbMediaTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { MediaResource, MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { MediaResource, type MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -27,6 +28,7 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
 const getRootItems = () => MediaResource.getTreeMediaRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
@@ -42,14 +44,24 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 	return {
-		id: item.id,
-		parentId: item.parentId || null,
-		name: item.name,
-		entityType: 'media',
+		unique: item.id,
+		parentUnique: item.parent ? item.parent.id : null,
+		entityType: UMB_MEDIA_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
-		isContainer: item.isContainer,
 		noAccess: item.noAccess,
 		isTrashed: item.isTrashed,
 		isFolder: false,
+		mediaType: {
+			unique: item.mediaType.id,
+			icon: item.mediaType.icon,
+			hasListView: item.mediaType.hasListView,
+		},
+		name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
+		variants: item.variants.map((variant) => {
+			return {
+				name: variant.name,
+				culture: variant.culture || null,
+			};
+		}),
 	};
 };

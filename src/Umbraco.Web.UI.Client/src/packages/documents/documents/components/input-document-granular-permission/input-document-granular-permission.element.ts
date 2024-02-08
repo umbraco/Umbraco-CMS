@@ -1,16 +1,13 @@
-import { css, html, customElement, property, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentItemRepository } from '../../repository/index.js';
+import type { UmbDocumentItemModel } from '../../repository/item/types.js';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CONFIRM_MODAL,
-	UMB_DOCUMENT_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_DOCUMENT_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-document-granular-permission')
@@ -33,15 +30,15 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 	}
 
 	@state()
-	private _items?: Array<DocumentItemResponseModel>;
+	private _items?: Array<UmbDocumentItemModel>;
 
-	#documentRepository = new UmbDocumentRepository(this);
+	#documentItemRepository = new UmbDocumentItemRepository(this);
 	#modalContext?: UmbModalManagerContext;
-	#pickedItemsObserver?: UmbObserverController<Array<DocumentItemResponseModel>>;
+	#pickedItemsObserver?: UmbObserverController<Array<UmbDocumentItemModel>>;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => (this.#modalContext = instance));
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => (this.#modalContext = instance));
 	}
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -56,7 +53,7 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 	async #observePickedDocuments() {
 		this.#pickedItemsObserver?.destroy();
 
-		const { asObservable } = await this.#documentRepository.requestItems(this._selectedIds);
+		const { asObservable } = await this.#documentItemRepository.requestItems(this._selectedIds);
 		this.#pickedItemsObserver = this.observe(asObservable(), (items) => (this._items = items));
 	}
 
@@ -69,24 +66,9 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 			},
 		});
 
-		modalContext?.onSubmit().then((value) => {
-			//this.#setSelection(selection);
-		});
-	}
-
-	async #removeItem(item: DocumentItemResponseModel) {
-		const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-			data: {
-				color: 'danger',
-				headline: `Remove ${item.name}?`,
-				content: 'Are you sure you want to remove this item',
-				confirmLabel: 'Remove',
-			},
-		});
-
-		await modalContext?.onSubmit();
-		const newSelection = this._selectedIds.filter((value) => value !== item.id);
-		this.#setSelection(newSelection);
+		//modalContext?.onSubmit().then((value) => {
+		//this.#setSelection(selection);
+		//});
 	}
 
 	#setSelection(newSelection: Array<string>) {
@@ -106,8 +88,8 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 		`;
 	}
 
-	#renderItem(item: DocumentItemResponseModel) {
-		return html` <div>Render something here</div> `;
+	#renderItem(item: UmbDocumentItemModel) {
+		return html` <div>Render something here ${item.unique}</div> `;
 	}
 
 	static styles = [

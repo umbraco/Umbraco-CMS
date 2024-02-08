@@ -1,8 +1,8 @@
-import { Meta } from '@storybook/web-components';
+import type { Meta } from '@storybook/web-components';
 import './property-editor-ui-tiny-mce-dimensions-configuration.element.js';
 import { umbDataTypeMockDb } from '../../../../../../../mocks/data/data-type/data-type.db.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 
 const dataTypeData = umbDataTypeMockDb.read('dt-richTextEditor') as unknown as UmbDataTypeDetailModel;
 

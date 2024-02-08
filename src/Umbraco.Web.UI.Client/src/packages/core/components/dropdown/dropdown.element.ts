@@ -1,19 +1,12 @@
-import {
-	InterfaceColor,
-	InterfaceLook,
+import type {
+	UUIInterfaceColor,
+	UUIInterfaceLook,
 	PopoverContainerPlacement,
 	UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	css,
-	html,
-	customElement,
-	property,
-	PropertyValueMap,
-	query,
-	when,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, query, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 // TODO: maybe move this to UI Library.
@@ -28,10 +21,10 @@ export class UmbDropdownElement extends UmbLitElement {
 	label = '';
 
 	@property()
-	look: InterfaceLook = 'default';
+	look: UUIInterfaceLook = 'default';
 
 	@property()
-	color: InterfaceColor = 'default';
+	color: UUIInterfaceColor = 'default';
 
 	@property()
 	placement: PopoverContainerPlacement = 'bottom-start';

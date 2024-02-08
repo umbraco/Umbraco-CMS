@@ -1,4 +1,4 @@
-import { UmbHealthCheckContext } from './health-check.context.js';
+import type { UmbHealthCheckContext } from './health-check.context.js';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
@@ -34,6 +34,6 @@ export class UmbHealthCheckDashboardContext {
 	}
 }
 
-export const UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN = new UmbContextToken<UmbHealthCheckDashboardContext>(
+export const UMB_HEALTHCHECK_DASHBOARD_CONTEXT = new UmbContextToken<UmbHealthCheckDashboardContext>(
 	'UmbHealthCheckDashboardContext',
 );

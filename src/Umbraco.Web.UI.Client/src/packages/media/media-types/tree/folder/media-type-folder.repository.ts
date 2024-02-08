@@ -1,9 +1,10 @@
 import { UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UMB_MEDIA_TYPE_TREE_STORE_CONTEXT } from '../index.js';
+import { UMB_MEDIA_TYPE_TREE_STORE_CONTEXT } from '../media-type-tree.store.js';
 import { UmbMediaTypeFolderServerDataSource } from './media-type-folder.server.data-source.js';
-import { UmbMediaTypeFolderTreeItemModel } from './types.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbFolderModel, UmbFolderRepositoryBase } from '@umbraco-cms/backoffice/tree';
+import type { UmbMediaTypeFolderTreeItemModel } from './types.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
+import { UmbFolderRepositoryBase } from '@umbraco-cms/backoffice/tree';
 
 export class UmbMediaTypeFolderRepository extends UmbFolderRepositoryBase<UmbMediaTypeFolderTreeItemModel> {
 	constructor(host: UmbControllerHost) {
@@ -17,7 +18,6 @@ const folderToMediaTypeTreeItemMapper = (folder: UmbFolderModel) => {
 		parentUnique: folder.parentUnique,
 		name: folder.name,
 		entityType: UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE,
-		isContainer: false,
 		hasChildren: false,
 		isFolder: true,
 	};

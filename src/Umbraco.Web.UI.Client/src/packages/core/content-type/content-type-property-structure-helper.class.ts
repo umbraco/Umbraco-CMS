@@ -1,10 +1,6 @@
-import {
-	PropertyContainerTypes,
-	UmbContentTypePropertyStructureManager,
-} from './content-type-structure-manager.class.js';
-import { UmbContentTypeModel } from './types.js';
-import { DocumentTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
+import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeModel } from './types.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel> {
@@ -14,11 +10,11 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 	#structure?: UmbContentTypePropertyStructureManager<T>;
 
-	private _containerType?: PropertyContainerTypes;
+	private _containerType?: UmbPropertyContainerTypes;
 	private _isRoot?: boolean;
 	private _containerName?: string;
 
-	#propertyStructure = new UmbArrayState<DocumentTypePropertyTypeResponseModel>([], (x) => x.id);
+	#propertyStructure = new UmbArrayState<UmbPropertyTypeModel>([], (x) => x.id);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -30,8 +26,10 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.#propertyStructure.sortBy((a, b) => ((a as any).sortOrder ?? 0) - ((b as any).sortOrder ?? 0));
 	}
 
-	get ownerDocumentTypes() {
-		return this.#structure?.contentTypes;
+	async ownerDocumentTypes() {
+		await this.#init;
+		if (!this.#structure) return;
+		return this.#structure.contentTypes;
 	}
 
 	public setStructureManager(structure: UmbContentTypePropertyStructureManager<T>) {
@@ -41,7 +39,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this._observeGroupContainers();
 	}
 
-	public setContainerType(value?: PropertyContainerTypes) {
+	public setContainerType(value?: UmbPropertyContainerTypes) {
 		if (this._containerType === value) return;
 		this._containerType = value;
 		this._observeGroupContainers();
@@ -93,7 +91,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 			this.#structure.propertyStructuresOf(groupId),
 			(properties) => {
 				// If this need to be able to remove properties, we need to clean out the ones of this group.id before inserting them:
-				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.containerId !== groupId);
+				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.container?.id !== groupId);
 
 				properties?.forEach((property) => {
 					if (!_propertyStructure.find((x) => x.alias === property.alias)) {
@@ -125,7 +123,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return await this.#structure.createProperty(null, ownerId, sortOrder);
 	}
 
-	async insertProperty(property: PropertyTypeModelBaseModel, sortOrder = 0) {
+	async insertProperty(property: UmbPropertyTypeModel, sortOrder = 0) {
 		await this.#init;
 		if (!this.#structure) return false;
 
@@ -145,7 +143,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	}
 
 	// Takes optional arguments as this is easier for the implementation in the view:
-	async partialUpdateProperty(propertyKey?: string, partialUpdate?: Partial<DocumentTypePropertyTypeResponseModel>) {
+	async partialUpdateProperty(propertyKey?: string, partialUpdate?: Partial<UmbPropertyTypeModel>) {
 		await this.#init;
 		if (!this.#structure || !propertyKey || !partialUpdate) return;
 		return await this.#structure.updateProperty(null, propertyKey, partialUpdate);

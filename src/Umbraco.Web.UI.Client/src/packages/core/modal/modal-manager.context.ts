@@ -1,5 +1,5 @@
 import type { UmbModalToken } from './token/modal-token.js';
-import { UmbModalContext, type UmbModalContextClassArgs } from './index.js';
+import { UmbModalContext, type UmbModalContextClassArgs } from './modal.context.js';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -20,7 +20,7 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	public readonly modals = this.#modals.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MODAL_MANAGER_CONTEXT_TOKEN);
+		super(host, UMB_MODAL_MANAGER_CONTEXT);
 	}
 
 	/**
@@ -68,6 +68,6 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	}
 }
 
-export const UMB_MODAL_MANAGER_CONTEXT_TOKEN = new UmbContextToken<UmbModalManagerContext, UmbModalManagerContext>(
+export const UMB_MODAL_MANAGER_CONTEXT = new UmbContextToken<UmbModalManagerContext, UmbModalManagerContext>(
 	'UmbModalManagerContext',
 );

@@ -1,15 +1,12 @@
-import {
-	DocumentTypePropertyTypeContainerResponseModel,
-	PropertyTypeContainerModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG_HORIZONTAL: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeContainerResponseModel) => {
-		return element.getAttribute('data-umb-tabs-id') === model.id;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-tabs-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: PropertyTypeContainerModelBaseModel) => {
-		return container.querySelector(`[data-umb-tabs-id='` + modelEntry.id + `']`);
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
 	},
 	identifier: 'content-type-tabs-sorter',
 	itemSelector: '[data-umb-tabs-id]',
@@ -21,11 +18,11 @@ const SORTER_CONFIG_HORIZONTAL: UmbSorterConfig<PropertyTypeContainerModelBaseMo
 };
 
 const SORTER_CONFIG_VERTICAL: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeContainerResponseModel) => {
-		return element.getAttribute('data-umb-property-id') === model.id;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-property-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: PropertyTypeContainerModelBaseModel) => {
-		return container.querySelector(`[data-umb-property-id='` + modelEntry.id + `']`);
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
 	},
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',

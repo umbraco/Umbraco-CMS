@@ -1,7 +1,7 @@
-import { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbMediaTypeItemModel } from './index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityItemStore } from '@umbraco-cms/backoffice/store';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export
@@ -10,7 +10,7 @@ import { UmbEntityItemStore } from '@umbraco-cms/backoffice/store';
  * @description - Data Store for Media Type items
  */
 
-export class UmbMediaTypeItemStore extends UmbEntityItemStore<MediaTypeItemResponseModel> {
+export class UmbMediaTypeItemStore extends UmbItemStoreBase<UmbMediaTypeItemModel> {
 	/**
 	 * Creates an instance of UmbMediaTypeItemStore.
 	 * @param {UmbControllerHostElement} host

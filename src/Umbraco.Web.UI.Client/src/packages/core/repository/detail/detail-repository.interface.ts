@@ -1,5 +1,5 @@
 import type { DataSourceResponse, UmbDataSourceErrorResponse } from '../data-source/index.js';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbDetailRepository<DetailModelType> {
 	createScaffold(

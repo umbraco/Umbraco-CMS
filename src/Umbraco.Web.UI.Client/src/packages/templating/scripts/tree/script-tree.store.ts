@@ -1,9 +1,9 @@
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
-import { UmbScriptDetailModel } from '../types.js';
+import type { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_DETAIL_STORE_CONTEXT } from '../repository/index.js';
-import { UmbScriptTreeItemModel } from './types.js';
+import type { UmbScriptTreeItemModel } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 
@@ -39,7 +39,6 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			name: item.name,
 			hasChildren: false,
-			isContainer: false,
 			isFolder: false,
 		};
 

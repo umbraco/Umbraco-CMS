@@ -1,4 +1,4 @@
-import { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
 
 export const dashboard: ManifestDashboard = {
 	type: 'dashboard',

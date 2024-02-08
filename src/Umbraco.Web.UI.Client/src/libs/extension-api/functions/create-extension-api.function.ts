@@ -1,5 +1,5 @@
-import { UmbApi } from '../models/api.interface.js';
-import { ManifestApi, ManifestElementAndApi } from '../types/base.types.js';
+import type { UmbApi } from '../models/api.interface.js';
+import type { ManifestApi, ManifestElementAndApi } from '../types/base.types.js';
 import { loadManifestApi } from './load-manifest-api.function.js';
 
 export async function createExtensionApi<ApiType extends UmbApi = UmbApi>(

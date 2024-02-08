@@ -1,7 +1,9 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export type UmbResendInviteToUserModalData = {
-	userId: string;
+	user: {
+		unique: string;
+	};
 };
 
 export type UmbResendInviteToUserModalValue = never;

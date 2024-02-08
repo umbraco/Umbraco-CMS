@@ -1,13 +1,10 @@
 import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/index.js';
 import { UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL } from '../snippet-modal/create-from-snippet-modal.token.js';
-import { UmbPartialViewCreateOptionsModalData } from './index.js';
+import type { UmbPartialViewCreateOptionsModalData } from './index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-partial-view-create-options-modal')
@@ -21,7 +18,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManager = instance;
 		});
 	}
@@ -38,6 +35,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 			// @ts-ignore
 			// TODO: allow null for entity actions. Some actions can be executed on the root item
 			this.data.parentUnique,
+			this.data.entityType,
 		);
 	}
 

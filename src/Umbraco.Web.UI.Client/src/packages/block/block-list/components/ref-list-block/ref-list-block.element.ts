@@ -1,6 +1,5 @@
 import { UMB_BLOCK_LIST_CONTEXT } from '../../context/block-list.context-token.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -10,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export class UmbRefListBlockElement extends UmbLitElement {
 	//
 	@property({ type: String })
-	name?: string;
+	label?: string;
 
 	@state()
 	_workspaceEditPath?: string;
@@ -31,13 +30,12 @@ export class UmbRefListBlockElement extends UmbLitElement {
 
 	render() {
 		// href=${this._workspaceEditPath ?? '#'}
-		return html`<uui-ref-node border .name=${this.name ?? ''}></uui-ref-node>`;
+		return html`<uui-ref-node standalone .name=${this.label ?? ''}></uui-ref-node>`;
 	}
 
 	static styles = [
-		...UUIRefNodeElement.styles,
 		css`
-			:host {
+			uui-ref-node {
 				min-height: var(--uui-size-16);
 			}
 		`,

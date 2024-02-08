@@ -1,11 +1,10 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import {
-	InstallVResponseModel,
-	InstallResource,
+import type {
 	InstallSettingsResponseModel,
 	ProblemDetails,
-	TelemetryLevelModel,
+	InstallRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { InstallResource, TelemetryLevelModel } from '@umbraco-cms/backoffice/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
@@ -16,7 +15,7 @@ import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observab
  * @class UmbInstallerContext
  */
 export class UmbInstallerContext {
-	private _data = new UmbObjectState<InstallVResponseModel>({
+	private _data = new UmbObjectState<InstallRequestModel>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
 		database: { id: '', providerName: '', useIntegratedAuthentication: false, trustServerCertificate: false },
 		telemetryLevel: TelemetryLevelModel.BASIC,
@@ -90,7 +89,7 @@ export class UmbInstallerContext {
 	 * @param {Partial<PostInstallRequest>} data
 	 * @memberof UmbInstallerContext
 	 */
-	public appendData(data: Partial<InstallVResponseModel>): void {
+	public appendData(data: Partial<InstallRequestModel>): void {
 		this._data.setValue({ ...this.getData(), ...data });
 	}
 
@@ -100,7 +99,7 @@ export class UmbInstallerContext {
 	 * @return {*}  {PostInstallRequest}
 	 * @memberof UmbInstallerContext
 	 */
-	public getData(): InstallVResponseModel {
+	public getData(): InstallRequestModel {
 		return this._data.getValue();
 	}
 
@@ -129,4 +128,4 @@ export class UmbInstallerContext {
 	}
 }
 
-export const UMB_INSTALLER_CONTEXT_TOKEN = new UmbContextToken<UmbInstallerContext>('UmbInstallerContext');
+export const UMB_INSTALLER_CONTEXT = new UmbContextToken<UmbInstallerContext>('UmbInstallerContext');

@@ -1,7 +1,8 @@
-import { UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextProviderController } from './context-provider.controller.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-// TODO: There is some circular reference from this to Controller-api which is not good. We should move this elsewhere as we do not encourage the use of this element. Its only purpose is within Storybook and tests.
 /**
  * Provides a value to the context down the DOM tree.
  *

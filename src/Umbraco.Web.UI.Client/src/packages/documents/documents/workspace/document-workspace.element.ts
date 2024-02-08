@@ -6,8 +6,10 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
-import { UmbApi, UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestWorkspace, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement {
@@ -30,13 +32,13 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 
 		this._routes = [
 			{
-				path: 'create/:parentId/:documentTypeKey',
+				path: 'create/:parentUnique/:documentTypeUnique',
 				component: this.#editorElement,
 				setup: async (_component, info) => {
 					// TODO: Remember the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
-					const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
-					const documentTypeKey = info.match.params.documentTypeKey;
-					this.#workspaceContext!.create(documentTypeKey, parentId);
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+					const documentTypeUnique = info.match.params.documentTypeUnique;
+					this.#workspaceContext!.create(parentUnique, documentTypeUnique);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,
@@ -46,11 +48,11 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 				},
 			},
 			{
-				path: 'edit/:id',
+				path: 'edit/:unique',
 				component: this.#editorElement,
 				setup: (_component, info) => {
-					const id = info.match.params.id;
-					this.#workspaceContext!.load(id);
+					const unique = info.match.params.unique;
+					this.#workspaceContext!.load(unique);
 				},
 			},
 		];

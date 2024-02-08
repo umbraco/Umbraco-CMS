@@ -1,23 +1,15 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
-import { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	CSSResultGroup,
-	html,
-	nothing,
-	customElement,
-	property,
-	query,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { UmbInstallerContext } from '../installer.context.js';
+import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
+import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 
-import {
-	ApiError,
-	DatabaseInstallResponseModel,
+import type {
+	DatabaseInstallRequestModel,
 	DatabaseSettingsPresentationModel,
-	InstallResource,
 	ProblemDetails,
 } from '@umbraco-cms/backoffice/backend-api';
+import { ApiError, InstallResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
@@ -27,7 +19,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	private _installButton!: UUIButtonElement;
 
 	@property({ attribute: false })
-	public databaseFormData!: DatabaseInstallResponseModel;
+	public databaseFormData!: DatabaseInstallRequestModel;
 
 	@state()
 	private _options: Option[] = [];
@@ -46,7 +38,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallerSettings();
 			this._observeInstallerData();
@@ -116,12 +108,12 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			providerName: '',
 			...this._installerContext?.getData().database,
 			...value,
-		} as DatabaseInstallResponseModel;
+		} as DatabaseInstallRequestModel;
 
 		this._setDatabase(database);
 	}
 
-	private _setDatabase(database: DatabaseInstallResponseModel) {
+	private _setDatabase(database: DatabaseInstallRequestModel) {
 		this._installerContext?.appendData({ database });
 	}
 
@@ -159,7 +151,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			}
 
 			if (selectedDatabase.requiresConnectionTest) {
-				const databaseDetails: DatabaseInstallResponseModel = {
+				const databaseDetails: DatabaseInstallRequestModel = {
 					id,
 					username,
 					password,
@@ -184,7 +176,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				}
 			}
 
-			const database: DatabaseInstallResponseModel = {
+			const database: DatabaseInstallRequestModel = {
 				...this._installerContext?.getData().database,
 				id,
 				username,

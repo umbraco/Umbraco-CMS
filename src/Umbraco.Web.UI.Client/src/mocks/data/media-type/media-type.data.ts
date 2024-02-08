@@ -1,20 +1,18 @@
-import {
+import type {
 	MediaTypeItemResponseModel,
 	MediaTypeResponseModel,
 	MediaTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockMediaTypeModelHack = MediaTypeResponseModel &
-	MediaTypeTreeItemResponseModel &
-	MediaTypeItemResponseModel;
+type UmbMockMediaTypeModelHack = MediaTypeResponseModel & MediaTypeTreeItemResponseModel & MediaTypeItemResponseModel;
 
 export interface UmbMockMediaTypeModel extends Omit<UmbMockMediaTypeModelHack, 'type'> {}
 
 export const data: Array<UmbMockMediaTypeModel> = [
 	{
 		name: 'Media Type 1',
-		id: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
-		parentId: null,
+		id: 'media-type-1-id',
+		parent: null,
 		description: 'Media type 1 description',
 		alias: 'mediaType1',
 		icon: 'icon-bug',
@@ -24,10 +22,9 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		allowedContentTypes: [],
+		allowedMediaTypes: [],
 		compositions: [],
 		isFolder: false,
 		hasChildren: false,
-		isContainer: false,
 	},
 ];

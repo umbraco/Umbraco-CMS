@@ -2,7 +2,8 @@ import { expect, oneEvent } from '@open-wc/testing';
 import { UmbContextProvider } from '../provide/context-provider.js';
 import { UmbContextToken } from '../token/context-token.js';
 import { UmbContextConsumer } from './context-consumer.js';
-import { UmbContextRequestEventImplementation, UMB_CONTENT_REQUEST_EVENT_TYPE } from './context-request.event.js';
+import type { UmbContextRequestEventImplementation} from './context-request.event.js';
+import { UMB_CONTENT_REQUEST_EVENT_TYPE } from './context-request.event.js';
 
 const testContextAlias = 'my-test-context';
 const testContextAliasAndApiAlias = 'my-test-context#testApi';
@@ -38,7 +39,7 @@ describe('UmbContextConsumer', () => {
 
 		describe('events', () => {
 			it('dispatches context request event when constructed', async () => {
-				const listener = oneEvent(window, UMB_CONTENT_REQUEST_EVENT_TYPE);
+				const listener = oneEvent(window, UMB_CONTENT_REQUEST_EVENT_TYPE, false);
 
 				consumer.hostConnected();
 

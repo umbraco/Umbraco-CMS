@@ -9,3 +9,4 @@ export type PropertyTypeValidationModel = {
     regEx?: string | null;
     regExMessage?: string | null;
 };
+

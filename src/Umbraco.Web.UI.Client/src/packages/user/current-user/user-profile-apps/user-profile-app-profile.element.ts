@@ -1,17 +1,14 @@
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	UmbModalManagerContext,
-	UMB_CHANGE_PASSWORD_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-} from '@umbraco-cms/backoffice/modal';
-import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-user-profile-app-profile')
 export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	@state()
-	private _currentUser?: UmbCurrentUser;
+	private _currentUser?: UmbCurrentUserModel;
 
 	#modalManagerContext?: UmbModalManagerContext;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
@@ -19,7 +16,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 		});
 
@@ -44,15 +41,18 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	private _edit() {
 		if (!this._currentUser) return;
 
-		history.pushState(null, '', 'section/user-management/view/users/user/' + this._currentUser.id); //TODO Change to a tag with href and make dynamic
+		history.pushState(null, '', 'section/user-management/view/users/user/' + this._currentUser.unique); //TODO Change to a tag with href and make dynamic
 		//TODO Implement modal routing for the current-user-modal, so that the modal closes when navigating to the edit profile page
 	}
 	private _changePassword() {
 		if (!this.#modalManagerContext) return;
+		if (!this._currentUser) throw new Error('Current User not found');
 
 		this.#modalManagerContext.open(UMB_CHANGE_PASSWORD_MODAL, {
 			data: {
-				userId: this._currentUser?.id ?? '',
+				user: {
+					unique: this._currentUser.unique,
+				},
 			},
 		});
 	}

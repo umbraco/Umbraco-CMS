@@ -1,5 +1,3 @@
 # Property Dataset Dashboard Example
 
-This example demonstrates the how to setup the Sorter.
-
-This example can still NOT sort between two groups. This will come later.
+This example demonstrates how to set up the Sorter, and how it can be linked with another Sorter.

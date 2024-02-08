@@ -1,23 +1,27 @@
-import { type UmbTreeItemModelBase } from './types.js';
-import { type UmbTreeRepository } from './tree-repository.interface.js';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from './reload-tree-item-children/index.js';
+import type { UmbTreeItemModelBase } from './types.js';
+import type { UmbTreeRepository } from './tree-repository.interface.js';
+import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import {
 	type ManifestRepository,
 	type ManifestTree,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: update interface
 export interface UmbTreeContext<TreeItemType extends UmbTreeItemModelBase> extends UmbBaseController {
 	selection: UmbSelectionManager;
 	requestChildrenOf: (parentUnique: string | null) => Promise<{
-		data?: UmbPagedData<TreeItemType>;
+		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
@@ -27,14 +31,16 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 	extends UmbBaseController
 	implements UmbTreeContext<TreeItemType>
 {
+	#treeRoot = new UmbObjectState<TreeItemType | undefined>(undefined);
+	treeRoot = this.#treeRoot.asObservable();
+
 	public repository?: UmbTreeRepository<TreeItemType>;
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
-
 	public filter?: (item: TreeItemType) => boolean = () => true;
-
 	public readonly selection = new UmbSelectionManager(this._host);
 
 	#treeAlias?: string;
+	#actionEventContext?: UmbActionEventContext;
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -46,6 +52,20 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 		this.provideContext('umbTreeContext', this);
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#actionEventContext = instance;
+			this.#actionEventContext.removeEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+			this.#actionEventContext.addEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+		});
+
+		this.requestTreeRoot();
 	}
 
 	// TODO: find a generic way to do this
@@ -69,7 +89,13 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 
 	public async requestTreeRoot() {
 		await this.#init;
-		return this.repository!.requestTreeRoot();
+		const { data } = await this.repository!.requestTreeRoot();
+
+		if (data) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			this.#treeRoot.setValue(data);
+		}
 	}
 
 	public async requestRootItems() {
@@ -120,5 +146,24 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 				this.#checkIfInitialized();
 			},
 		);
+	}
+
+	#onReloadRequest = (event: UmbEntityActionEvent) => {
+		// Only handle root request here. Items are handled by the tree item context
+		const treeRoot = this.#treeRoot.getValue();
+		if (treeRoot === undefined) return;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		if (event.getUnique() !== treeRoot.unique) return;
+		if (event.getEntityType() !== treeRoot.entityType) return;
+		this.requestRootItems();
+	};
+
+	destroy(): void {
+		this.#actionEventContext?.removeEventListener(
+			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+			this.#onReloadRequest as EventListener,
+		);
+		super.destroy();
 	}
 }

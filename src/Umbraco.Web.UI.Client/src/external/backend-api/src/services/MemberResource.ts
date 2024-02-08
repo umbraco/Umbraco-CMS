@@ -2,7 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CreateMemberRequestModel } from '../models/CreateMemberRequestModel';
 import type { MemberItemResponseModel } from '../models/MemberItemResponseModel';
+import type { MemberResponseModel } from '../models/MemberResponseModel';
+import type { UpdateMemberRequestModel } from '../models/UpdateMemberRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -14,19 +17,163 @@ export class MemberResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getMemberItem({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<MemberItemResponseModel>> {
+    public static getItemMember({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<MemberItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/member/item',
+            url: '/umbraco/management/api/v1/item/member',
             query: {
                 'id': id,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns string Created
+     * @throws ApiError
+     */
+    public static postMember({
+        requestBody,
+    }: {
+        requestBody?: CreateMemberRequestModel,
+    }): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/member',
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Umb-Generated-Resource',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getMemberById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<MemberResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/member/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteMemberById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/member/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putMemberById({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateMemberRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/member/{id}',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putMemberByIdValidate({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateMemberRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/member/{id}/validate',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postMemberValidate({
+        requestBody,
+    }: {
+        requestBody?: CreateMemberRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/member/validate',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }

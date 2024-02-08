@@ -1,13 +1,13 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 
 import '../components/user-group-table-name-column-layout.element.js';
 import '../components/user-group-table-sections-column-layout.element.js';
 
-import {
+import type {
 	UmbTableColumn,
 	UmbTableConfig,
 	UmbTableDeselectedEvent,
@@ -15,6 +15,7 @@ import {
 	UmbTableItem,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
+import type { UmbUserGroupDetailModel } from '../../types.js';
 
 @customElement('umb-user-group-collection-table-view')
 export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
@@ -51,9 +52,6 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	@state()
-	private _userGroups: Array<UserGroupResponseModel> = [];
-
 	#collectionContext?: UmbDefaultCollectionContext;
 
 	constructor() {
@@ -69,7 +67,6 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 			this.observe(
 				this.#collectionContext.items,
 				(items) => {
-					this._userGroups = items;
 					this._createTableItems(items);
 				},
 				'umbCollectionItemsObserver',
@@ -77,29 +74,29 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(userGroups: Array<UserGroupResponseModel>) {
+	private _createTableItems(userGroups: Array<UmbUserGroupDetailModel>) {
 		this._tableItems = userGroups.map((userGroup) => {
 			return {
-				id: userGroup.id || '',
-				icon: userGroup.icon || '',
+				id: userGroup.unique,
+				icon: userGroup.icon,
 				data: [
 					{
 						columnAlias: 'userGroupName',
 						value: {
-							name: userGroup.name || '',
+							name: userGroup.name,
 						},
 					},
 					{
 						columnAlias: 'userGroupSections',
-						value: userGroup.sections || [],
+						value: userGroup.sections,
 					},
 					{
 						columnAlias: 'userGroupContentStartNode',
-						value: userGroup.documentStartNodeId || this.localize.term('content_contentRoot'),
+						value: userGroup.documentStartNode?.unique || this.localize.term('content_contentRoot'),
 					},
 					{
 						columnAlias: 'userGroupMediaStartNode',
-						value: userGroup.mediaStartNodeId || this.localize.term('media_mediaRoot'),
+						value: userGroup.mediaStartNode?.unique || this.localize.term('media_mediaRoot'),
 					},
 				],
 			};

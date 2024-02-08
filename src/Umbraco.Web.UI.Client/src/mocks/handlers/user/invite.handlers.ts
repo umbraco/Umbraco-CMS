@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
-import { umbUsersData } from '../../data/user/user.db.js';
+import { umbUserMockDb } from '../../data/user/user.db.js';
 import { UMB_SLUG } from './slug.js';
-import { InviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { InviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const inviteSlug = `${UMB_SLUG}/invite`;
@@ -11,7 +11,7 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		const { userId } = umbUsersData.invite(data);
+		const { userId } = umbUserMockDb.invite(data);
 
 		if (!userId) return res(ctx.status(400));
 

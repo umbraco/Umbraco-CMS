@@ -1,6 +1,6 @@
 import './workspace-view-relation-type-relation.element.js';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbWorkspaceViewRelationTypeRelationElement } from './workspace-view-relation-type-relation.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

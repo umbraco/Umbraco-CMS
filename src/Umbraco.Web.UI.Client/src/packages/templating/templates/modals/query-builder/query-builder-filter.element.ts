@@ -1,24 +1,17 @@
 import { localizeOperators, localizePropertyType } from './utils.js';
-import { type UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
-import {
-	PropertyValueMap,
-	css,
-	html,
-	customElement,
-	property,
-	state,
-	ifDefined,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
+import type {
 	OperatorModel,
 	TemplateQueryExecuteFilterPresentationModel,
-	TemplateQueryPropertyTypeModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { TemplateQueryPropertyTypeModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-query-builder-filter')
-export class UmbQueryBuilderFilterElement extends UmbLitElement {
+@customElement('umb-template-query-builder-filter')
+export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	filter: TemplateQueryExecuteFilterPresentationModel = <TemplateQueryExecuteFilterPresentationModel>{};
 
@@ -169,10 +162,10 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	];
 }
 
-export default UmbQueryBuilderFilterElement;
+export default UmbTemplateQueryBuilderFilterElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-query-builder-filter': UmbQueryBuilderFilterElement;
+		'umb-template-query-builder-filter': UmbTemplateQueryBuilderFilterElement;
 	}
 }

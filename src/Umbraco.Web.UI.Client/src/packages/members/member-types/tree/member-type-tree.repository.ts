@@ -1,10 +1,10 @@
 import { UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbMemberTypeTreeServerDataSource } from './member-type-tree.server.data-source.js';
-import { UmbMemberTypeTreeItemModel, UmbMemberTypeTreeRootModel } from './types.js';
+import type { UmbMemberTypeTreeItemModel, UmbMemberTypeTreeRootModel } from './types.js';
 import { UMB_MEMBER_TYPE_TREE_STORE_CONTEXT } from './member-type-tree.store.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbMemberTypeTreeRepository
 	extends UmbTreeRepositoryBase<UmbMemberTypeTreeItemModel, UmbMemberTypeTreeRootModel>
@@ -19,7 +19,6 @@ export class UmbMemberTypeTreeRepository
 			id: null,
 			entityType: UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Member Types',
-			icon: 'icon-folder',
 			hasChildren: true,
 			isContainer: false,
 			isFolder: true,

@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 import type { TemplateModelBaseModel } from './TemplateModelBaseModel';
 
 export type TemplateResponseModel = (TemplateModelBaseModel & {
-id: string;
-masterTemplateId?: string | null;
+    id: string;
+    masterTemplate?: ReferenceByIdModel | null;
 });
+

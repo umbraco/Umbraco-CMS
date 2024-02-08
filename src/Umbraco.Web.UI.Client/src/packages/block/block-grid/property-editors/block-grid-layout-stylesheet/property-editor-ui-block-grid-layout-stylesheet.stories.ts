@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIBlockGridLayoutStylesheetElement } from './property-editor-ui-block-grid-layout-stylesheet.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

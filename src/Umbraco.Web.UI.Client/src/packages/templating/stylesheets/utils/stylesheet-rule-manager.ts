@@ -1,4 +1,4 @@
-import { UmbStylesheetRule } from '../types.js';
+import type { UmbStylesheetRule } from '../types.js';
 
 export class UmbStylesheetRuleManager {
 	#umbRuleRegex = /\/\*\*\s*umb_name:\s*(?<name>[^*\r\n]*?)\s*\*\/\s*(?<selector>[^,{]*?)\s*{\s*(?<styles>.*?)\s*}/gis;

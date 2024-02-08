@@ -1,11 +1,13 @@
-import { UmbMediaTypeWorkspaceContext } from './media-type-workspace.context.js';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbMediaTypeWorkspaceContext } from './media-type-workspace.context.js';
+import type { UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_ICON_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
@@ -39,7 +41,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 			this.#observeMediaType();
 		});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}

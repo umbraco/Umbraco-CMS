@@ -1,17 +1,20 @@
 import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
+import type { UmbDataTypeTreeItemModel } from '../../tree/types.js';
 import { css, html, repeat, customElement, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
+import type {
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalValue,
-	UmbModalBaseElement,
 	UmbModalRouteBuilder,
+} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
+	UmbModalBaseElement,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/data-type';
 
 interface GroupedItems<T> {
@@ -28,7 +31,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	@state()
-	private _groupedDataTypes?: GroupedItems<UmbEntityTreeItemModel>;
+	private _groupedDataTypes?: GroupedItems<UmbDataTypeTreeItemModel>;
 
 	@state()
 	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUi> = {};
@@ -42,7 +45,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	private _createDataTypeModal: UmbModalRouteRegistrationController;
 
 	#treeRepository;
-	#dataTypes: Array<UmbEntityTreeItemModel> = [];
+	#dataTypes: Array<UmbDataTypeTreeItemModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
 
@@ -105,7 +108,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			'_repositoryItemsObserver',
 		);
 
-		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
+		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
 			this.#propertyEditorUIs = propertyEditorUIs.filter(
 				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
@@ -115,15 +118,15 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	private _handleDataTypeClick(dataType: UmbEntityTreeItemModel) {
-		if (dataType.id) {
-			this._select(dataType.id);
+	private _handleDataTypeClick(dataType: UmbDataTypeTreeItemModel) {
+		if (dataType.unique) {
+			this._select(dataType.unique);
 			this._submitModal();
 		}
 	}
 
-	private _select(id: string | undefined) {
-		this.value = { selection: id ? [id] : [] };
+	private _select(unique: string | undefined) {
+		this.value = { selection: unique ? [unique] : [] };
 	}
 
 	private _handleFilterInput(event: UUIInputEvent) {
@@ -267,13 +270,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		</ul>`;
 	}
 
-	private _renderGroupDataTypes(dataTypes: Array<UmbEntityTreeItemModel>) {
+	private _renderGroupDataTypes(dataTypes: Array<UmbDataTypeTreeItemModel>) {
 		return html` <ul id="item-grid">
 			${repeat(
 				dataTypes,
-				(dataType) => dataType.id,
+				(dataType) => dataType.unique,
 				(dataType) =>
-					html`<li class="item" ?selected=${this.value.selection.includes(dataType.id!)}>
+					html`<li class="item" ?selected=${this.value.selection.includes(dataType.unique)}>
 						<uui-button .label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
 							<div class="item-content">
 								<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>

@@ -1,28 +1,27 @@
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import { UmbDocumentTypeDetailModel } from '../../../types.js';
+import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import { encodeFolderName, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	DocumentTypePropertyTypeContainerResponseModel,
-	PropertyTypeContainerModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
+import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-	compareElementToModel: (element: HTMLElement, model: DocumentTypePropertyTypeContainerResponseModel) => {
-		return element.getAttribute('data-umb-tabs-id') === model.id;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-tabs-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: PropertyTypeContainerModelBaseModel) => {
-		return container.querySelector(`[data-umb-tabs-id='` + modelEntry.id + `']`);
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
 	},
 	identifier: 'content-type-tabs-sorter',
 	itemSelector: '[data-umb-tabs-id]',
@@ -64,6 +63,8 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	};
 
 	//private _hasRootProperties = false;
+
+	@state()
 	private _hasRootGroups = false;
 
 	@state()
@@ -88,7 +89,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbDocumentTypeDetailModel>(this);
 
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
+	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -116,7 +117,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 			this._observeRootGroups();
 		});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 			this._modalManagerContext = context;
 		});
 	}
@@ -214,7 +215,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		if (!tabId) return;
 		this._workspaceContext?.structure.removeContainer(null, tabId);
 		this._tabsStructureHelper?.isOwnerContainer(tabId)
-			? window.history.replaceState(null, '', this._routerPath + this._routes[0]?.path ?? '/root')
+			? window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'))
 			: '';
 	}
 	async #addTab() {

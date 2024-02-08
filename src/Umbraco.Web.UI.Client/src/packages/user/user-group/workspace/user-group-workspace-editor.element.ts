@@ -1,15 +1,16 @@
+import type { UmbUserGroupDetailModel } from '../index.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context.js';
-import { UmbUserInputElement } from '@umbraco-cms/backoffice/user';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbUserInputElement } from '@umbraco-cms/backoffice/user';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
-import { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
+import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 
 import './components/user-group-default-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
@@ -17,10 +18,10 @@ import './components/user-group-granular-permission-list.element.js';
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	@state()
-	private _userGroup?: UserGroupResponseModel;
+	private _userGroup?: UmbUserGroupDetailModel;
 
 	@state()
-	private _userIds?: Array<string>;
+	private _userUniques?: Array<string>;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -30,7 +31,11 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup), 'umbUserGroupObserver');
-			this.observe(this.#workspaceContext.userIds, (userIds) => (this._userIds = userIds), 'umbUserIdsObserver');
+			this.observe(
+				this.#workspaceContext.userUniques,
+				(userUniques) => (this._userUniques = userUniques),
+				'umbUserIdsObserver',
+			);
 		});
 	}
 
@@ -43,13 +48,13 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onDocumentStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputDocumentElement;
-		this.#workspaceContext?.updateProperty('documentStartNodeId', target.selectedIds[0]);
+		this.#workspaceContext?.updateProperty('documentStartNode', { unique: target.selectedIds[0] });
 	}
 
 	#onMediaStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputMediaElement;
-		this.#workspaceContext?.updateProperty('mediaStartNodeId', target.selectedIds[0]);
+		this.#workspaceContext?.updateProperty('mediaStartNode', { unique: target.selectedIds[0] });
 	}
 
 	#onUsersChange(event: UmbChangeEvent) {
@@ -117,7 +122,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<umb-input-document
 						slot="editor"
 						max="1"
-						.selectedIds=${this._userGroup.documentStartNodeId ? [this._userGroup.documentStartNodeId] : []}
+						.selectedIds=${this._userGroup.documentStartNode?.unique ? [this._userGroup.documentStartNode.unique] : []}
 						@change=${this.#onDocumentStartNodeChange}></umb-input-document>
 				</umb-property-layout>
 				<umb-property-layout
@@ -126,7 +131,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 					<umb-input-media
 						slot="editor"
 						max="1"
-						.selectedIds=${this._userGroup.mediaStartNodeId ? [this._userGroup.mediaStartNodeId] : []}
+						.selectedIds=${this._userGroup.mediaStartNode?.unique ? [this._userGroup.mediaStartNode.unique] : []}
 						@change=${this.#onMediaStartNodeChange}></umb-input-media>
 				</umb-property-layout>
 			</uui-box>
@@ -148,12 +153,12 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#renderRightColumn() {
 		return html`<uui-box>
 				<div slot="headline"><umb-localize key="sections_users"></umb-localize></div>
-				<umb-user-input @change=${this.#onUsersChange} .selectedIds=${this._userIds ?? []}></umb-user-input>
+				<umb-user-input @change=${this.#onUsersChange} .selectedIds=${this._userUniques ?? []}></umb-user-input>
 			</uui-box>
 			<uui-box headline="Actions">
 				<umb-entity-action-list
 					.entityType=${UMB_USER_GROUP_ENTITY_TYPE}
-					.unique=${this._userGroup?.id}></umb-entity-action-list
+					.unique=${this._userGroup?.unique}></umb-entity-action-list
 			></uui-box>`;
 	}
 

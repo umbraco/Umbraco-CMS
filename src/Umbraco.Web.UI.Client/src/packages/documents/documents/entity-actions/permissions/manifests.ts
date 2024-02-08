@@ -1,7 +1,7 @@
-import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../../repository/manifests.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbDocumentPermissionsEntityAction } from './permissions.action.js';
-import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -12,7 +12,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-vcard',
 			label: 'Permissions (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},

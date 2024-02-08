@@ -13,6 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+import { UMB_STORAGE_REDIRECT_URL, UMB_STORAGE_TOKEN_RESPONSE_NAME } from './auth.context.token.js';
+import type { LocationLike, StringMap } from '@umbraco-cms/backoffice/external/openid';
 import {
 	BaseTokenRequestHandler,
 	BasicQueryStringUtils,
@@ -27,13 +29,9 @@ import {
 	RevokeTokenRequest,
 	TokenRequest,
 	TokenResponse,
-	LocationLike,
-	StringMap,
 } from '@umbraco-cms/backoffice/external/openid';
 
 const requestor = new FetchRequestor();
-
-const TOKEN_RESPONSE_NAME = 'umb:userAuthTokenResponse';
 
 /**
  * This class is needed to prevent the hash from being parsed as part of the query string.
@@ -143,6 +141,15 @@ export class UmbAuthFlow {
 				await this.#makeRefreshTokenRequest(response.code, codeVerifier);
 				await this.performWithFreshTokens();
 				await this.#saveTokenState();
+
+				// Redirect to the saved state or root
+				let currentRoute = '/';
+				const savedRoute = sessionStorage.getItem(UMB_STORAGE_REDIRECT_URL);
+				if (savedRoute) {
+					sessionStorage.removeItem(UMB_STORAGE_REDIRECT_URL);
+					currentRoute = savedRoute;
+				}
+				history.replaceState(null, '', currentRoute);
 			}
 		});
 	}
@@ -151,17 +158,15 @@ export class UmbAuthFlow {
 	 * This method will initialize all the state needed for the auth flow.
 	 *
 	 * It will:
-	 * - Fetch the service configuration from the server
 	 * - Check if there is a token response in local storage
 	 * - If there is a token response, check if it is valid
 	 * - If it is not valid, check if there is a new authorization to be made
 	 * - If there is a new authorization to be made, complete it
 	 * - If there is no token response, check if there is a new authorization to be made
 	 * - If there is a new authorization to be made, complete it
-	 * - If there is no new authorization to be made, do nothing
 	 */
 	async setInitialState() {
-		const tokenResponseJson = await this.#storageBackend.getItem(TOKEN_RESPONSE_NAME);
+		const tokenResponseJson = await this.#storageBackend.getItem(UMB_STORAGE_TOKEN_RESPONSE_NAME);
 		if (tokenResponseJson) {
 			const response = new TokenResponse(JSON.parse(tokenResponseJson));
 			if (response.isValid()) {
@@ -169,9 +174,6 @@ export class UmbAuthFlow {
 				this.#refreshToken = this.#accessTokenResponse.refreshToken;
 			}
 		}
-
-		// If no token was found, or if it was invalid, check if there is a new authorization to be made
-		await this.completeAuthorizationIfPossible();
 	}
 
 	/**
@@ -227,7 +229,7 @@ export class UmbAuthFlow {
 	 * Forget all cached token state
 	 */
 	async clearTokenStorage() {
-		await this.#storageBackend.removeItem(TOKEN_RESPONSE_NAME);
+		await this.#storageBackend.removeItem(UMB_STORAGE_TOKEN_RESPONSE_NAME);
 
 		// clear the internal state
 		this.#accessTokenResponse = undefined;
@@ -312,7 +314,10 @@ export class UmbAuthFlow {
 	 */
 	async #saveTokenState() {
 		if (this.#accessTokenResponse) {
-			await this.#storageBackend.setItem(TOKEN_RESPONSE_NAME, JSON.stringify(this.#accessTokenResponse.toJson()));
+			await this.#storageBackend.setItem(
+				UMB_STORAGE_TOKEN_RESPONSE_NAME,
+				JSON.stringify(this.#accessTokenResponse.toJson()),
+			);
 		}
 	}
 

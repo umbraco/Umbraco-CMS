@@ -1,8 +1,9 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbExtensionSlotElement } from './extension-slot.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { ManifestDashboard, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-test-extension-slot-manifest-element')
 class UmbTestExtensionSlotManifestElement extends HTMLElement {}
@@ -27,7 +28,7 @@ describe('UmbExtensionSlotElement', () => {
 
 		/*
 		// This test fails offen on FireFox, there is no real need for this test. So i have chosen to skip it.
-		if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 			it('passes the a11y audit', async () => {
 				await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 			});

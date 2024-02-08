@@ -1,14 +1,12 @@
-import { UmbMediaTypeDetailModel } from '../../types.js';
+import type { UmbMediaTypeDetailModel } from '../../types.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import {
-	CreateMediaTypeRequestModel,
-	MediaTypeResource,
-	UpdateMediaTypeRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { CreateMediaTypeRequestModel, UpdateMediaTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { MediaTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Media Type that fetches data from the server
@@ -84,10 +82,34 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
-			properties: data.properties,
-			containers: data.containers,
-			allowedContentTypes: data.allowedContentTypes,
-			compositions: data.compositions,
+			properties: data.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { unique: property.dataType.id },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
+			containers: data.containers as UmbPropertyTypeContainerModel[],
+			allowedContentTypes: data.allowedMediaTypes.map((allowedMediaType) => {
+				return {
+					contentType: { unique: allowedMediaType.mediaType.id },
+					sortOrder: allowedMediaType.sortOrder,
+				};
+			}),
+			compositions: data.compositions.map((composition) => {
+				return {
+					contentType: { unique: composition.mediaType.id },
+					compositionType: composition.compositionType,
+				};
+			}),
 		};
 
 		return { data: mediaType };
@@ -113,12 +135,36 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			properties: model.properties,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: model.containers,
-			allowedContentTypes: model.allowedContentTypes,
-			compositions: model.compositions,
+			allowedMediaTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					mediaType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					mediaType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
 			id: model.unique,
-			containerId: model.parentUnique,
+			folder: model.parentUnique ? { id: model.parentUnique } : null,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -154,13 +200,37 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			properties: model.properties,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
 			containers: model.containers,
-			allowedContentTypes: model.allowedContentTypes,
-			compositions: model.compositions,
+			allowedMediaTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					mediaType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					mediaType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			MediaTypeResource.putMediaTypeById({
 				id: model.unique,
@@ -168,8 +238,8 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

@@ -8,10 +8,12 @@ import type { CreateDocumentTypeRequestModel } from '../models/CreateDocumentTyp
 import type { CreateFolderRequestModel } from '../models/CreateFolderRequestModel';
 import type { DocumentTypeCompositionRequestModel } from '../models/DocumentTypeCompositionRequestModel';
 import type { DocumentTypeCompositionResponseModel } from '../models/DocumentTypeCompositionResponseModel';
+import type { DocumentTypeConfigurationResponseModel } from '../models/DocumentTypeConfigurationResponseModel';
 import type { DocumentTypeItemResponseModel } from '../models/DocumentTypeItemResponseModel';
 import type { DocumentTypeResponseModel } from '../models/DocumentTypeResponseModel';
 import type { FolderResponseModel } from '../models/FolderResponseModel';
 import type { MoveDocumentTypeRequestModel } from '../models/MoveDocumentTypeRequestModel';
+import type { PagedAllowedDocumentTypeModel } from '../models/PagedAllowedDocumentTypeModel';
 import type { PagedDocumentTypeTreeItemResponseModel } from '../models/PagedDocumentTypeTreeItemResponseModel';
 import type { UpdateDocumentTypeRequestModel } from '../models/UpdateDocumentTypeRequestModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
@@ -117,6 +119,36 @@ export class DocumentTypeResource {
     }
 
     /**
+     * @returns PagedAllowedDocumentTypeModel Success
+     * @throws ApiError
+     */
+    public static getDocumentTypeByIdAllowedChildren({
+        id,
+        skip,
+        take = 100,
+    }: {
+        id: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedAllowedDocumentTypeModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document-type/{id}/allowed-children',
+            path: {
+                'id': id,
+            },
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -195,6 +227,30 @@ export class DocumentTypeResource {
     }
 
     /**
+     * @returns PagedAllowedDocumentTypeModel Success
+     * @throws ApiError
+     */
+    public static getDocumentTypeAllowedAtRoot({
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedAllowedDocumentTypeModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document-type/allowed-at-root',
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -208,6 +264,20 @@ export class DocumentTypeResource {
             url: '/umbraco/management/api/v1/document-type/available-compositions',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDocumentTypeConfiguration(): CancelablePromise<DocumentTypeConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document-type/configuration',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },
@@ -313,14 +383,14 @@ export class DocumentTypeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDocumentTypeItem({
+    public static getItemDocumentType({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<DocumentTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/document-type/item',
+            url: '/umbraco/management/api/v1/item/document-type',
             query: {
                 'id': id,
             },

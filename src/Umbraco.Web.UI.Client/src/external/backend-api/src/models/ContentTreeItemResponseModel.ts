@@ -3,10 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { EntityTreeItemResponseModel } from './EntityTreeItemResponseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type ContentTreeItemResponseModel = (EntityTreeItemResponseModel & {
-noAccess: boolean;
-isTrashed: boolean;
-id: string;
-});
+export type ContentTreeItemResponseModel = {
+    type: string;
+    hasChildren: boolean;
+    parent?: ReferenceByIdModel | null;
+    noAccess: boolean;
+    isTrashed: boolean;
+    id: string;
+};
+

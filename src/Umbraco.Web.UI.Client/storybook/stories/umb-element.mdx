@@ -27,9 +27,9 @@ this.consumeContext('requestThisContextAlias', (context) => {
 Or use the a Context Token to get a typed context:
 
 ```ts
-import { UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
-this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (context) => {
+this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
 	// Notice this is a subscription, as context might change or a new one appears, but the value is strongly typed
 	console.log("I've got the context", context);
 });
