@@ -179,7 +179,7 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async #selectVariants(): Promise<UmbVariantId[] | null> {
+	async #selectVariants(): Promise<UmbVariantId[]> {
 		const currentData = this.getData();
 		if (!currentData) throw new Error('Data is missing');
 
@@ -203,14 +203,18 @@ export class UmbDocumentWorkspaceContext
 		const modalContext = this.#modalManagerContext.open(UMB_LISTITEM_PICKER_MODAL, { data: modalData });
 
 		const result = await modalContext.onSubmit().catch(() => undefined);
+		debugger;
 
-		if (!result) return null;
+		if (!result) return [];
 
 		// Match the result to the available variants.
-		return availableVariants.filter((x) => result.includes(x.culture!)).map((x) => UmbVariantId.Create(x));
+		const variantIds = availableVariants
+			.filter((x) => result.selection.includes(x.culture!))
+			.map((x) => UmbVariantId.Create(x));
+		return variantIds;
 	}
 
-	async #createOrSave(): Promise<UmbVariantId[] | null> {
+	async #createOrSave(): Promise<UmbVariantId[]> {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		if (!data.unique) throw new Error('Unique is missing');
@@ -218,7 +222,7 @@ export class UmbDocumentWorkspaceContext
 		const selectedVariants = await this.#selectVariants();
 
 		// If no variants are selected, we don't save anything.
-		if (selectedVariants === null) return null;
+		if (!selectedVariants.length) return [];
 
 		// TODO: Use selected variants
 		console.log('Saving', selectedVariants?.map((x) => x.culture));
@@ -244,7 +248,7 @@ export class UmbDocumentWorkspaceContext
 	public async publish() {
 		const variantIds = await this.#createOrSave();
 		const unique = this.getEntityId();
-		if (variantIds?.length && unique) {
+		if (variantIds.length && unique) {
 			await this.publishingRepository.publish(unique, variantIds);
 		}
 	}
@@ -256,7 +260,7 @@ export class UmbDocumentWorkspaceContext
 	public async unpublish() {
 		const variantIds = await this.#selectVariants();
 		const unique = this.getEntityId();
-		if (variantIds && unique) {
+		if (variantIds.length && unique) {
 			await this.publishingRepository.unpublish(unique, variantIds);
 		}
 	}

@@ -2,23 +2,22 @@ import type {
 	UmbListitemPickerModalData,
 	UmbListitemPickerModalValue,
 } from '../../token/listitem-picker-modal.token.js';
-import type { UmbModalContext } from '../../modal.context.js';
-import { html, customElement, property, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalBaseElement } from '../../modal-element.element.js';
+import { html, customElement, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-listitem-picker-modal')
-export class UmbListitemPickerModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbListitemPickerModalData, UmbListitemPickerModalValue>;
-
-	@property({ type: Object, attribute: false })
-	data?: UmbListitemPickerModalData;
-
+export class UmbListitemPickerModalElement extends UmbModalBaseElement<
+	UmbListitemPickerModalData,
+	UmbListitemPickerModalValue
+> {
 	private _handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
-		debugger;
-		//this.modalContext?.submit();
+		const form = e.target as HTMLFormElement;
+		const formData = new FormData(form);
+		const selectedItems = formData.getAll('listitem').map((item) => item.toString());
+		this.modalContext?.setValue({ selection: selectedItems });
+		this.modalContext?.submit();
 	}
 
 	private _handleCancel() {
@@ -34,6 +33,7 @@ export class UmbListitemPickerModalElement extends UmbLitElement {
 					return html`<uui-checkbox
 						value=${item.key}
 						label=${item.name}
+						name="listitem"
 						.checked=${item.selected || false}></uui-checkbox>`;
 				},
 			)}

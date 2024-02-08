@@ -12,7 +12,9 @@ export interface UmbListitemPickerModalData {
 	confirmLabel?: string;
 }
 
-export type UmbListitemPickerModalValue = UmbListitemPickerItem['key'][] | undefined;
+export type UmbListitemPickerModalValue = {
+	selection: UmbListitemPickerItem['key'][];
+};
 
 export const UMB_LISTITEM_PICKER_MODAL = new UmbModalToken<UmbListitemPickerModalData, UmbListitemPickerModalValue>(
 	'Umb.Modal.ListitemPicker',
