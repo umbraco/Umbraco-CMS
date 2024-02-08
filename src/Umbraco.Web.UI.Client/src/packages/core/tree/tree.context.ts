@@ -122,7 +122,7 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 	#observeTreeManifest() {
 		if (this.#treeAlias) {
 			this.observe(
-				umbExtensionsRegistry.getByTypeAndAlias('tree', this.#treeAlias),
+				umbExtensionsRegistry.byTypeAndAlias('tree', this.#treeAlias),
 				async (treeManifest) => {
 					if (!treeManifest) return;
 					this.#observeRepository(treeManifest);

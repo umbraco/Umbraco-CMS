@@ -20,7 +20,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	#modalRouter: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
 	#listening = false;
 
-	@property()
+	@property({ attribute: false })
 	public get routes(): UmbRoute[] | undefined {
 		return this.#router.routes;
 	}
@@ -34,7 +34,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		}
 	}
 
-	@property()
+	@property({ attribute: false })
 	public get parent(): IRouterSlot | null | undefined {
 		return this.#router.parent;
 	}
@@ -103,6 +103,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 
 			const newActiveLocalPath = this.#router.match?.route.path;
 			if (this._activeLocalPath !== newActiveLocalPath) {
+				console.log('update', newActiveLocalPath);
 				this._activeLocalPath = newActiveLocalPath;
 				this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
 				this.dispatchEvent(new UmbRouterSlotChangeEvent());
@@ -116,6 +117,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 			this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
 			this.dispatchEvent(new UmbRouterSlotChangeEvent());
 		} else if (event.detail.slot === this.#modalRouter) {
+			console.log('modal navigation change', event.detail.match.route.path);
 			const newActiveModalLocalPath = event.detail.match.route.path;
 			this.#routeContext._internal_modalRouterChanged(newActiveModalLocalPath);
 		}

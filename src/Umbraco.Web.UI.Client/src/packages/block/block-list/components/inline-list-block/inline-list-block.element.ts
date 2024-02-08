@@ -37,7 +37,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				'observeContentUdi',
 			);
 		});
-		this.observe(umbExtensionsRegistry.getByTypeAndAlias('workspace', UMB_BLOCK_WORKSPACE_ALIAS), (manifest) => {
+		this.observe(umbExtensionsRegistry.byTypeAndAlias('workspace', UMB_BLOCK_WORKSPACE_ALIAS), (manifest) => {
 			if (manifest) {
 				createExtensionApi(manifest, [this, { manifest: manifest }]).then((context) => {
 					if (context) {
