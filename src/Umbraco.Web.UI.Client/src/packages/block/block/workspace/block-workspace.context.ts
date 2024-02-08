@@ -270,6 +270,8 @@ export class UmbBlockWorkspaceContext<
 				if (contentUdi) {
 					this.#blockEntries?.delete(contentUdi);
 				}
+			} else {
+				// TODO: Revert the layout, content & settings data to the original state.
 			}
 		}
 	};
