@@ -7,7 +7,6 @@ import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
-	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspace = {
@@ -58,25 +57,6 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			},
 		],
 	},
-];
-
-const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
-	/*
-	// TODO: Reenable this:
-	{
-		type: 'workspaceViewCollection',
-		alias: 'Umb.WorkspaceView.Document.Collection',
-		name: 'Document Workspace Collection View',
-		weight: 300,
-		meta: {
-			label: 'Documents',
-			pathname: 'collection',
-			icon: 'icon-grid',
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-		}
-	},
-	*/
 ];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [
@@ -152,4 +132,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	*/
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

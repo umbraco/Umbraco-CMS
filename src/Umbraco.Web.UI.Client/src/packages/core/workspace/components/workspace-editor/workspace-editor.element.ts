@@ -1,10 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
-import type {
-	ManifestWorkspaceView,
-	ManifestWorkspaceViewCollection,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
@@ -37,7 +34,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	public enforceNoFooter = false;
 
 	@state()
-	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
+	private _workspaceViews: Array<ManifestWorkspaceView> = [];
 
 	@state()
 	private _routes?: UmbRoute[];
@@ -50,16 +47,10 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		new UmbExtensionsManifestInitializer(
-			this,
-			umbExtensionsRegistry,
-			['workspaceView', 'workspaceViewCollection'],
-			null,
-			(workspaceViews) => {
-				this._workspaceViews = workspaceViews.map((view) => view.manifest);
-				this._createRoutes();
-			},
-		);
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, ['workspaceView'], null, (workspaceViews) => {
+			this._workspaceViews = workspaceViews.map((view) => view.manifest);
+			this._createRoutes();
+		});
 	}
 
 	private _createRoutes() {
@@ -69,14 +60,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			this._routes = this._workspaceViews.map((manifest) => {
 				return {
 					path: `view/${manifest.meta.pathname}`,
-					component: () => {
-						if (manifest.type === 'workspaceViewCollection') {
-							return import(
-								'../../workspace-content/views/collection/workspace-view-collection.element.js'
-							) as unknown as Promise<HTMLElement>;
-						}
-						return createExtensionElement(manifest);
-					},
+					component: () => createExtensionElement(manifest),
 					setup: (component) => {
 						if (component && componentHasManifestProperty(component)) {
 							component.manifest = manifest;
