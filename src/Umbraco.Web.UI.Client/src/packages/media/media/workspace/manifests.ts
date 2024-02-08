@@ -58,25 +58,25 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 ];
 
 const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
-	{
-		type: 'workspaceViewCollection',
-		alias: 'Umb.WorkspaceView.Media.Collection',
-		name: 'Media Workspace Collection View',
-		weight: 300,
-		meta: {
-			label: 'Media',
-			pathname: 'collection',
-			icon: 'icon-grid',
-			entityType: 'media',
-			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
+	// {
+	// 	type: 'workspaceViewCollection',
+	// 	alias: 'Umb.WorkspaceView.Media.Collection',
+	// 	name: 'Media Workspace Collection View',
+	// 	weight: 300,
+	// 	meta: {
+	// 		label: 'Media',
+	// 		pathname: 'collection',
+	// 		icon: 'icon-grid',
+	// 		entityType: 'media',
+	// 		repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
+	// 	},
+	// 	conditions: [
+	// 		{
+	// 			alias: 'Umb.Condition.WorkspaceAlias',
+	// 			match: workspace.alias,
+	// 		},
+	// 	],
+	// },
 ];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [
