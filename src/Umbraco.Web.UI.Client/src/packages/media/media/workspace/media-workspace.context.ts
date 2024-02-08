@@ -59,8 +59,7 @@ export class UmbMediaWorkspaceContext
 
 	async create(parentUnique: string | null, mediaTypeUnique: string) {
 		this.#getDataPromise = this.repository.createScaffold(parentUnique, {
-			mediaType: { unique: mediaTypeUnique },
-		});
+		this.#getDataPromise = this.repository.createScaffold(parentUnique, { unique: mediaTypeUnique });
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
