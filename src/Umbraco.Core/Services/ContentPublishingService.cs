@@ -32,6 +32,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {
+            scope.Complete();
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
         }
 
@@ -44,11 +45,13 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
             if (cultures.Any() is false)
             {
+                scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CultureMissing, new ContentPublishingResult());
             }
 
             if (cultures.Any(x=>x == "*"))
             {
+                scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
             }
         }
@@ -56,20 +59,31 @@ internal sealed class ContentPublishingService : IContentPublishingService
         {
             if (cultures.Length != 1 || cultures.Any(x=>x != "*"))
             {
+                scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
             }
         }
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
 
-        PublishResult result = _contentService.Publish(content, cultureAndSchedule.CulturesToPublishImmediately.ToArray(), userId);
-
-        if (result.Success)
+        PublishResult? result = null;
+        if (cultureAndSchedule.CulturesToPublishImmediately.Any())
         {
+            result = _contentService.Publish(content, cultureAndSchedule.CulturesToPublishImmediately.ToArray(), userId);
+        }
+        else if(cultureAndSchedule.Schedules.FullSchedule.Any())
+        {
+            // TODO can we somehow test that the content can be published without actually publishing it? - E.g. call validation from editing service?
             _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
+
         }
 
         scope.Complete();
+
+        if (result is null)
+        {
+            return Attempt.FailWithStatus(ContentPublishingOperationStatus.NothingToPublish, new ContentPublishingResult());
+        }
 
         ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
         return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success

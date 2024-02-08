@@ -123,7 +123,7 @@ internal sealed class DocumentPresentationFactory
         var culturesToPublishImmediately = new List<string>();
         foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in requestModel.PublishSchedules)
         {
-            if (cultureAndScheduleRequestModel.Schedule is null)
+            if (cultureAndScheduleRequestModel.Schedule is null || (cultureAndScheduleRequestModel.Schedule.PublishTime is null && cultureAndScheduleRequestModel.Schedule.UnpublishTime is null))
             {
                 culturesToPublishImmediately.Add(cultureAndScheduleRequestModel.Culture ?? "*"); // API have `null` for invariant, but service layer has "*".
                 continue;
@@ -132,7 +132,7 @@ internal sealed class DocumentPresentationFactory
             if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null)
             {
                 contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? string.Empty,
+                    cultureAndScheduleRequestModel.Culture ?? "*",
                     cultureAndScheduleRequestModel.Schedule.PublishTime.Value.UtcDateTime,
                     ContentScheduleAction.Release));
             }
@@ -148,7 +148,7 @@ internal sealed class DocumentPresentationFactory
                 }
 
                 contentScheduleCollection.Add(new ContentSchedule(
-                    cultureAndScheduleRequestModel.Culture ?? string.Empty,
+                    cultureAndScheduleRequestModel.Culture ?? "*",
                     cultureAndScheduleRequestModel.Schedule.UnpublishTime.Value.UtcDateTime,
                     ContentScheduleAction.Expire));
             }
