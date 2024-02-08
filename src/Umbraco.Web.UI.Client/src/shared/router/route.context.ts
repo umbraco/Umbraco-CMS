@@ -78,11 +78,9 @@ export class UmbRouteContext extends UmbBaseController {
 		This means if the same type of modal is opened multiple times, the url will be cleaned from the last opened modal.
 		This is okay for now as we do not have any situations where we close a parent modal before a child modal.
 		*/
-		const currentUrl = window.location.href;
-		const folderToRemove = info.match.fragments.consumed;
-		if (currentUrl.includes(folderToRemove)) {
-			const lastIndex = currentUrl.lastIndexOf(folderToRemove);
-			window.history.pushState({}, '', currentUrl.slice(0, lastIndex));
+		const folderToRemove = info.match.match.input;
+		if (folderToRemove && window.location.href.includes(folderToRemove)) {
+			window.history.pushState({}, '', this.#routerBasePath);
 		}
 	}
 
