@@ -138,7 +138,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
 
         if (memberGroup is null)
         {
-            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.CancelledByNotification, null);
+            return Attempt.FailWithStatus<IMemberGroup?, MemberGroupOperationStatus>(MemberGroupOperationStatus.NotFound, null);
         }
 
         var deletingNotification = new MemberGroupDeletingNotification(memberGroup, eventMessages);
