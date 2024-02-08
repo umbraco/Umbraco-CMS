@@ -81,8 +81,8 @@ export class UmbRouteContext extends UmbBaseController {
 		const currentUrl = window.location.href;
 		const folderToRemove = info.match.fragments.consumed;
 		if (currentUrl.includes(folderToRemove)) {
-			const split = currentUrl.split(folderToRemove);
-			window.history.pushState({}, '', split[split.length - 1]);
+			const lastIndex = currentUrl.lastIndexOf(folderToRemove);
+			window.history.pushState({}, '', currentUrl.slice(0, lastIndex));
 		}
 	}
 

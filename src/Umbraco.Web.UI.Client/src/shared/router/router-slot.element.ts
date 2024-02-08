@@ -116,7 +116,6 @@ export class UmbRouterSlotElement extends UmbLitElement {
 			this.#routeContext._internal_routerGotActiveLocalPath(this._activeLocalPath);
 			this.dispatchEvent(new UmbRouterSlotChangeEvent());
 		} else if (event.detail.slot === this.#modalRouter) {
-			console.log('modal navigation change', event.detail.match.route.path);
 			const newActiveModalLocalPath = event.detail.match.route.path;
 			this.#routeContext._internal_modalRouterChanged(newActiveModalLocalPath);
 		}
