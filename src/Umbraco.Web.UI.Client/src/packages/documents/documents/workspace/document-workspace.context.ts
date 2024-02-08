@@ -3,6 +3,11 @@ import { UmbDocumentPropertyDataContext } from '../property-dataset-context/docu
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type { UmbDocumentDetailModel } from '../types.js';
+import {
+	type UmbDocumentLanguagePickerModalData,
+	UMB_DOCUMENT_LANGUAGE_PICKER_MODAL_ALIAS,
+	UMB_LANGUAGE_PICKER_MODAL,
+} from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -15,11 +20,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UMB_LISTITEM_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-	type UmbListitemPickerModalData,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -183,27 +184,23 @@ export class UmbDocumentWorkspaceContext
 		const currentData = this.getData();
 		if (!currentData) throw new Error('Data is missing');
 
-		// TODO: Use the available cultures
 		const availableVariants = currentData.variants;
 
 		// If there is only one variant, we don't need to select anything.
 		if (availableVariants.length === 1) {
-			// TODO: Apply this when we have a way to get cultures
+			// TODO: Apply this when the server returns all variants
 			//return [UmbVariantId.Create(availableVariants[0])];
 		}
 
 		if (!this.#modalManagerContext) throw new Error('Modal manager context is missing');
 
-		const modalData: UmbListitemPickerModalData = {
+		const modalData: UmbDocumentLanguagePickerModalData = {
 			headline: 'Select variants',
-			// TODO: Match the available variants to the available cultures.
-			items: availableVariants.map((x) => ({ key: x.culture!, name: x.name })),
 		};
 
-		const modalContext = this.#modalManagerContext.open(UMB_LISTITEM_PICKER_MODAL, { data: modalData });
+		const modalContext = this.#modalManagerContext.open(UMB_LANGUAGE_PICKER_MODAL, { data: modalData });
 
 		const result = await modalContext.onSubmit().catch(() => undefined);
-		debugger;
 
 		if (!result) return [];
 
