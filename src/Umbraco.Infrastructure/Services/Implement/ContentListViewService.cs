@@ -70,7 +70,7 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
         Guid key,
         Guid? dataTypeKey,
         string orderBy,
-        string? orderByCulture,
+        string? orderCulture,
         Direction orderDirection,
         string? filter,
         int skip,
@@ -82,6 +82,6 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
             return Attempt.FailWithStatus<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotFound, null);
         }
 
-        return await GetListViewResultAsync(user, content, dataTypeKey, orderBy, orderByCulture, orderDirection, filter, skip, take);
+        return await GetListViewResultAsync(user, content, dataTypeKey, orderBy, orderCulture, orderDirection, filter, skip, take);
     }
 }

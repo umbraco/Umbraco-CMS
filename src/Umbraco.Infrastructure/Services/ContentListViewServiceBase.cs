@@ -43,7 +43,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         TContent? content,
         Guid? dataTypeKey,
         string orderBy,
-        string? orderByCulture,
+        string? orderCulture,
         Direction orderDirection,
         string? filter,
         int skip,
@@ -56,7 +56,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             return Attempt.FailWithStatus<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>(configurationAttempt.Status, null);
         }
 
-        Attempt<Ordering?, ContentCollectionOperationStatus> orderingAttempt = HandleListViewOrdering(configurationAttempt.Result, orderBy, orderByCulture, orderDirection);
+        Attempt<Ordering?, ContentCollectionOperationStatus> orderingAttempt = HandleListViewOrdering(configurationAttempt.Result, orderBy, orderCulture, orderDirection);
 
         if (orderingAttempt.Success == false)
         {
@@ -77,7 +77,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
     private Attempt<Ordering?, ContentCollectionOperationStatus> HandleListViewOrdering(
         ListViewConfiguration? listViewConfiguration,
         string orderBy,
-        string? orderByCulture,
+        string? orderCulture,
         Direction orderDirection)
     {
         var listViewProperties = listViewConfiguration?.IncludeProperties;
@@ -102,7 +102,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         var ordering = Ordering.By(
             orderBy,
             orderDirection,
-            orderByCulture,
+            orderCulture,
             orderByCustomField);
 
         return Attempt.SucceedWithStatus<Ordering?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.Success, ordering);
@@ -120,11 +120,22 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
     /// </remarks>
     private async Task<Attempt<ListViewConfiguration?, ContentCollectionOperationStatus>> GetListViewConfigurationAsync(Guid? contentTypeKey, Guid? dataTypeKey)
     {
+        TContentType? contentType = null;
+
+        if (contentTypeKey.HasValue)
+        {
+            contentType = await _contentTypeService.GetAsync(contentTypeKey.Value);
+            if (contentType == null)
+            {
+                return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentTypeNotFound, null);
+            }
+        }
+
         Attempt<ListViewConfiguration?, ContentCollectionOperationStatus> listViewConfigurationAttempt;
 
         if (dataTypeKey.HasValue && contentTypeKey.HasValue)
         {
-            listViewConfigurationAttempt = await GetListViewConfigurationFromDataTypeAsync(dataTypeKey.Value, contentTypeKey.Value);
+            listViewConfigurationAttempt = await GetListViewConfigurationFromDataTypeAsync(dataTypeKey.Value, contentType);
         }
         else
         {
@@ -148,12 +159,6 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         if (dataType.ConfigurationObject is not ListViewConfiguration listViewConfiguration)
         {
             return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.DataTypeNotCollection, null);
-        }
-
-        TContentType? contentType = await _contentTypeService.GetAsync(contentTypeKey);
-        if (contentType == null)
-        {
-            return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentTypeNotFound, null);
         }
 
         // Check if the list view data type is a content type property
