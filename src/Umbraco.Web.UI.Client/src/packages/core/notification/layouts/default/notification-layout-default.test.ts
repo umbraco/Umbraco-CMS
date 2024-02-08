@@ -3,6 +3,7 @@ import type { UmbNotificationDefaultData } from './notification-layout-default.e
 import { UmbNotificationLayoutDefaultElement } from './notification-layout-default.element.js';
 import type { UUIToastNotificationLayoutElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
+import type { UmbTestRunnerWindow } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbNotificationLayoutDefault', () => {
 	let element: UmbNotificationLayoutDefaultElement;
