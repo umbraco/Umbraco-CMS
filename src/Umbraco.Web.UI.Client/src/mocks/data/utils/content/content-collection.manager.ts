@@ -24,6 +24,8 @@ export class UmbMockContentCollectionManager<T extends { id: string }> {
 			filter: options.filter,
 		};
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		const filteredItems = allItems.filter((item) => contentQueryFilter(filterOptions, item));
 		const paginatedResult = pagedResult(filteredItems, filterOptions.skip, filterOptions.take);
 		const mappedItems = paginatedResult.items.map((item) => this.#collectionItemReadMapper(item));

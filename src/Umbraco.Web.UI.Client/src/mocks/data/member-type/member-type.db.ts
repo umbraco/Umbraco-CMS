@@ -37,6 +37,7 @@ const createDetailMockMapper = (request: CreateMemberTypeRequestModel): UmbMockM
 		compositions: request.compositions,
 		hasChildren: false,
 		parent: null,
+		hasListView: false,
 	};
 };
 

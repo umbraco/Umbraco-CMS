@@ -4,6 +4,7 @@ export type UmbMockMemberTypeModel = MemberTypeResponseModel &
 	MemberTypeItemResponseModel & {
 		hasChildren: boolean;
 		parent: { id: string } | null;
+		hasListView: boolean;
 	};
 
 export const data: Array<UmbMockMemberTypeModel> = [
@@ -22,5 +23,6 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		compositions: [],
 		parent: null,
 		hasChildren: false,
+		hasListView: false,
 	},
 ];

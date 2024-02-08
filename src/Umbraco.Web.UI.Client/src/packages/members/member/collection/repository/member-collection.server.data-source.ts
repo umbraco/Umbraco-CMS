@@ -40,7 +40,7 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 
 		if (data) {
 			const json = await data.json();
-			const items = json.items.map((item) => {
+			const items = json.items.map((item: any) => {
 				const model: UmbMemberCollectionModel = {
 					unique: item.id,
 					name: item.name,
