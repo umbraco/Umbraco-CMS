@@ -20,6 +20,27 @@ import { request as __request } from '../core/request';
 export class PartialViewResource {
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemPartialView({
+        path,
+    }: {
+        path?: Array<string>,
+    }): CancelablePromise<Array<PartialViewItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/partial-view',
+            query: {
+                'path': path,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns string Created
      * @throws ApiError
      */
@@ -206,27 +227,6 @@ export class PartialViewResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getPartialViewItem({
-        path,
-    }: {
-        path?: Array<string>,
-    }): CancelablePromise<Array<PartialViewItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/partial-view/item',
-            query: {
-                'path': path,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

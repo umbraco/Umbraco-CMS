@@ -39,7 +39,6 @@ const config = new UmbPropertyEditorConfigCollection([
 			'anchor',
 			'table',
 			'umbmediapicker',
-			'umbmacro',
 			'umbembeddialog',
 		],
 	},

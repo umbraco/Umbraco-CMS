@@ -1,11 +1,7 @@
-import { expect, fixture, html } from '@open-wc/testing';
-import { UmbSorterConfig, UmbSorterController } from './sorter.controller.js';
-import type UmbTestSorterControllerElement from './stories/test-sorter-controller.element.js';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { fixture, html } from '@open-wc/testing';
 
 describe('UmbContextConsumer', () => {
-	let hostElement: UmbTestSorterControllerElement;
+	let hostElement: any;
 
 	beforeEach(async () => {
 		hostElement = await fixture(html` <test-my-sorter-controller></test-my-sorter-controller> `);

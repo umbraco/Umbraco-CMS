@@ -15,17 +15,18 @@ import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/mod
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 
 export interface UmbBlockListValueModel extends UmbBlockValueType<UmbBlockListLayoutModel> {}
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbPropertyEditorUIBlockListBlockElement> = {
-	compareElementToModel: (element, model) => {
-		return element.getAttribute('data-udi') === model.contentUdi;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-udi');
 	},
-	querySelectModelToElement: (container, modelEntry) => {
-		return container.querySelector("umb-property-editor-ui-block-list-block[data-udi='" + modelEntry.contentUdi + "']");
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.contentUdi;
 	},
 	identifier: 'block-list-editor',
 	itemSelector: 'umb-property-editor-ui-block-list-block',
@@ -44,6 +45,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			this.#context.setLayouts(model);
 		},
 	});
+
+	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
 	private _value: UmbBlockListValueModel = {
 		layout: {},
@@ -67,9 +70,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.#context.setSettings(buildUpValue.settingsData);
 	}
 
+	@state()
+	private _createButtonLabel = this.localize.term('content_createEmpty');
+
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
+
 		const validationLimit = config.getValueByAlias<NumberRangeValueType>('validationLimit');
 
 		this._limitMin = validationLimit?.min;
@@ -77,6 +84,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
 		this.#context.setBlockTypes(blocks);
+
+		const customCreateButtonLabel = config.getValueByAlias<string>('createLabel');
+		if (customCreateButtonLabel) {
+			this._createButtonLabel = customCreateButtonLabel;
+		} else if (blocks.length === 1) {
+			this._createButtonLabel = `${this.localize.term('general_add')} ${blocks[0].label}`;
+		}
 
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
 		this.#context.setInlineEditingMode(useInlineEditingAsDefault);
@@ -97,15 +111,28 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	private _blocks?: Array<UmbBlockTypeBaseModel>;
 
 	@state()
-	_layouts: Array<UmbBlockLayoutBaseModel> = [];
+	private _layouts: Array<UmbBlockLayoutBaseModel> = [];
 
 	@state()
-	_catalogueRouteBuilder?: UmbModalRouteBuilder;
+	private _catalogueRouteBuilder?: UmbModalRouteBuilder;
+
+	@state()
+	private _directRoute?: string;
 
 	#context = new UmbBlockListManagerContext(this);
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
+			this.observe(
+				propertyContext?.alias,
+				(alias) => {
+					this.#catalogueModal.setUniquePathValue('propertyAlias', alias);
+				},
+				'observePropertyAlias',
+			);
+		});
 
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#context.layouts, (layouts) => {
@@ -133,7 +160,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			this._blocks = blockTypes;
 		});
 
-		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+			.addUniquePaths(['propertyAlias'])
 			.addAdditionalPath(':view/:index')
 			.onSetup((routingInfo) => {
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
@@ -151,6 +179,11 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	}
 
 	render() {
+		if (this._blocks?.length === 1) {
+			const elementKey = this._blocks[0].contentElementTypeKey;
+			this._directRoute =
+				this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) + 'modal/umb-modal-workspace/create/' + elementKey;
+		}
 		return html` ${repeat(
 				this._layouts,
 				(x) => x.contentUdi,
@@ -164,10 +197,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				<uui-button
 					id="add-button"
 					look="placeholder"
-					label=${this.localize.term('content_createEmpty')}
-					href=${this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) ?? ''}>
-					${this.localize.term('content_createEmpty')}
-				</uui-button>
+					label=${this._createButtonLabel}
+					href=${this._directRoute ?? this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) ?? ''}></uui-button>
 				<uui-button
 					label=${this.localize.term('content_createFromClipboard')}
 					look="placeholder"

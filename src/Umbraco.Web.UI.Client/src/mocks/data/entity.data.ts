@@ -1,18 +1,11 @@
-import { UmbData } from './data.js';
+import { UmbMockDBBase } from './utils/mock-db-base.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 
 // Temp mocked database
-export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
+export class UmbEntityData<T extends UmbEntityBase> extends UmbMockDBBase<T> {
 	constructor(data: Array<T>) {
 		super(data);
-	}
-
-	getAll() {
-		return {
-			total: this.data.length,
-			items: this.data,
-		};
 	}
 
 	getList(skip: number, take: number) {

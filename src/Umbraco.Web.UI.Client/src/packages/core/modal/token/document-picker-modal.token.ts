@@ -1,5 +1,5 @@
+import { UmbModalToken } from './modal-token.js';
 import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 
 export type UmbDocumentPickerModalData = UmbTreePickerModalData<UmbDocumentItemModel>;

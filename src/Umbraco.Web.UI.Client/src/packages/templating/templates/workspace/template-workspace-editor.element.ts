@@ -1,18 +1,14 @@
 import type { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
-import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/modal-tokens.js';
+import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/query-builder/index.js';
 import { getQuerySnippet } from '../../utils/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_TEMPLATE_PICKER_MODAL
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -39,7 +35,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#templateWorkspaceContext?: typeof UMB_TEMPLATE_WORKSPACE_CONTEXT.TYPE;
 	#isNew = false;
 
-	#masterTemplateId: string | null = null;
+	#masterTemplateUnique: string | null = null;
 
 	private inputQuery$ = new Subject<string>();
 
@@ -65,7 +61,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			});
 
 			this.observe(this.#templateWorkspaceContext.masterTemplate, (masterTemplate) => {
-				this.#masterTemplateId = masterTemplate?.id ?? null;
+				this.#masterTemplateUnique = masterTemplate?.unique ?? null;
 				this._masterTemplateName = masterTemplate?.name ?? null;
 			});
 
@@ -128,11 +124,11 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				pickableFilter: (item) => {
-					return item.id !== null && item.id !== this.#templateWorkspaceContext?.getEntityId();
+					return item.unique !== null && item.unique !== this.#templateWorkspaceContext?.getEntityId();
 				},
 			},
 			value: {
-				selection: [this.#masterTemplateId],
+				selection: [this.#masterTemplateUnique],
 			},
 		});
 

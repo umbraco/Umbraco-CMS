@@ -1,5 +1,5 @@
+import { UmbModalToken } from './modal-token.js';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbLinkPickerModalData {
 	config: UmbLinkPickerConfig;
@@ -15,9 +15,12 @@ export interface UmbLinkPickerLink {
 	queryString?: string | null;
 	target?: string | null;
 	trashed?: boolean | null;
-	udi?: string | null;
+	type?: UmbLinkPickerLinkType | null;
+	unique?: string | null;
 	url?: string | null;
 }
+
+export type UmbLinkPickerLinkType = 'document' | 'external' | 'media';
 
 // TODO: investigate: this looks more like a property editor configuration. Is this used in the correct way?
 export interface UmbLinkPickerConfig {

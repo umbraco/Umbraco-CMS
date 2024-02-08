@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCleanupModel } from './ContentTypeCleanupModel';
 import type { CreateContentTypeForDocumentTypeRequestModel } from './CreateContentTypeForDocumentTypeRequestModel';
+import type { DocumentTypeCleanupModel } from './DocumentTypeCleanupModel';
 import type { DocumentTypeCompositionModel } from './DocumentTypeCompositionModel';
 import type { DocumentTypeSortModel } from './DocumentTypeSortModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
@@ -12,7 +12,7 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type CreateDocumentTypeRequestModel = (CreateContentTypeForDocumentTypeRequestModel & {
     allowedTemplates: Array<ReferenceByIdModel>;
     defaultTemplate?: ReferenceByIdModel | null;
-    cleanup: ContentTypeCleanupModel;
+    cleanup: DocumentTypeCleanupModel;
     allowedDocumentTypes: Array<DocumentTypeSortModel>;
     compositions: Array<DocumentTypeCompositionModel>;
 });

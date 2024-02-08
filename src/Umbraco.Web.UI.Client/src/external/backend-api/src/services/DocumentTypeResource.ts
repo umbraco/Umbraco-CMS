@@ -383,14 +383,14 @@ export class DocumentTypeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDocumentTypeItem({
+    public static getItemDocumentType({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<DocumentTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/document-type/item',
+            url: '/umbraco/management/api/v1/item/document-type',
             query: {
                 'id': id,
             },

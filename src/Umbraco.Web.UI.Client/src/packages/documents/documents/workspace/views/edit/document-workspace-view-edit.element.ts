@@ -11,14 +11,17 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	//@state()
 	//private _hasRootProperties = false;
+
+	@state()
 	private _hasRootGroups = false;
 
 	@state()
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
+	private _tabs?: Array<PropertyTypeContainerModelBaseModel>;
 
 	@state()
 	private _routerPath?: string;

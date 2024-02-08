@@ -1,7 +1,9 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
 
 export interface UmbChangePasswordModalData {
-	userId: string;
+	user: {
+		unique: string;
+	};
 }
 
 export interface UmbChangePasswordModalValue {

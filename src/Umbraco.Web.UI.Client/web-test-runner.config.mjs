@@ -72,7 +72,6 @@ export default {
 						'@umbraco-cms/backoffice/server-file-system': './src/packages/core/server-file-system/index.ts',
 						'@umbraco-cms/backoffice/id': './src/packages/core/id/index.ts',
 						'@umbraco-cms/backoffice/localization': './src/packages/core/localization/index.ts',
-						'@umbraco-cms/backoffice/macro': './src/packages/core/macro/index.ts',
 						'@umbraco-cms/backoffice/menu': './src/packages/core/menu/index.ts',
 						'@umbraco-cms/backoffice/modal': './src/packages/core/modal/index.ts',
 						'@umbraco-cms/backoffice/notification': './src/packages/core/notification/index.ts',
@@ -106,8 +105,10 @@ export default {
 						'@umbraco-cms/backoffice/member-type': './src/packages/members/member-types/index.ts',
 						'@umbraco-cms/backoffice/package': './src/packages/packages/package/index.ts',
 
+						'@umbraco-cms/backoffice/language': './src/packages/language/index.ts',
+
 						'@umbraco-cms/backoffice/data-type': './src/packages/core/data-type/index.ts',
-						'@umbraco-cms/backoffice/language': './src/packages/settings/languages/index.ts',
+						'@umbraco-cms/backoffice/dynamic-root': './src/packages/dynamic-root/index.ts',
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
 						'@umbraco-cms/backoffice/relation-type': './src/packages/relations/relation-types/index.ts',
 						'@umbraco-cms/backoffice/relation': './src/packages/relations/relations/index.ts',

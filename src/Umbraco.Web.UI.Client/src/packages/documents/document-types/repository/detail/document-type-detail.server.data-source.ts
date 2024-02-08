@@ -9,6 +9,7 @@ import type {
 import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Document Type that fetches data from the server
@@ -109,7 +110,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 					appearance: property.appearance,
 				};
 			}),
-			containers: data.containers,
+			containers: data.containers as UmbPropertyTypeContainerModel[],
 			allowedContentTypes: data.allowedDocumentTypes.map((allowedDocumentType) => {
 				return {
 					contentType: { unique: allowedDocumentType.documentType.id },
@@ -250,7 +251,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			cleanup: model.cleanup,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeResource.putDocumentTypeById({
 				id: model.unique,
@@ -258,8 +259,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

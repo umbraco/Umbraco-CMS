@@ -17,7 +17,7 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 	async #onSubmitForm(e: Event) {
 		e.preventDefault();
 
-		if (!this.modalContext?.data.userId) throw new Error('User id is missing');
+		if (!this.modalContext?.data.user.unique) throw new Error('User unique is missing');
 
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
@@ -29,7 +29,9 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 		const message = formData.get('message') as string;
 
 		await this.#userInviteUserRepository.resendInvite({
-			userId: this.modalContext.data.userId,
+			user: {
+				unique: this.modalContext.data.user.unique,
+			},
 			message,
 		});
 

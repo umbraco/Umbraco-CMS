@@ -1,6 +1,6 @@
 import type { UmbDocumentEntityType, UmbDocumentRootEntityType } from '../entity.js';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
-import type { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbDocumentTreeItemModel extends UmbUniqueTreeItemModel {
 	entityType: UmbDocumentEntityType;
@@ -22,5 +22,5 @@ export interface UmbDocumentTreeRootModel extends UmbUniqueTreeRootModel {
 export interface UmbDocumentTreeItemVariantModel {
 	name: string;
 	culture: string | null;
-	state: ContentStateModel; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
+	state: DocumentVariantStateModel; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
 }

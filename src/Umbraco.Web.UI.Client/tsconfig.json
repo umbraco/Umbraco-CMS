@@ -72,7 +72,6 @@
 			"@umbraco-cms/backoffice/server-file-system": ["src/packages/core/server-file-system"],
 			"@umbraco-cms/backoffice/id": ["src/packages/core/id"],
 			"@umbraco-cms/backoffice/localization": ["src/packages/core/localization"],
-			"@umbraco-cms/backoffice/macro": ["src/packages/core/macro"],
 			"@umbraco-cms/backoffice/menu": ["src/packages/core/menu"],
 			"@umbraco-cms/backoffice/modal": ["src/packages/core/modal"],
 			"@umbraco-cms/backoffice/notification": ["src/packages/core/notification"],
@@ -92,7 +91,8 @@
 			"@umbraco-cms/backoffice/temporary-file": ["src/packages/core/temporary-file"],
 
 			"@umbraco-cms/backoffice/data-type": ["./src/packages/core/data-type/index.ts"],
-			"@umbraco-cms/backoffice/language": ["./src/packages/settings/languages/index.ts"],
+			"@umbraco-cms/backoffice/language": ["src/packages/language/index.ts"],
+			"@umbraco-cms/backoffice/dynamic-root": ["./src/packages/dynamic-root/index.ts"],
 			"@umbraco-cms/backoffice/logviewer": ["src/packages/log-viewer/index.ts"],
 			"@umbraco-cms/backoffice/relation-types": ["src/packages/relations/relation-types/index.ts"],
 			"@umbraco-cms/backoffice/relations": ["src/packages/relations/relations/index.ts"],
@@ -101,7 +101,7 @@
 
 			"@umbraco-cms/backoffice/block": ["./src/packages/block/index.ts"],
 			"@umbraco-cms/backoffice/audit-log": ["src/packages/audit-log/index.ts"],
-			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/dictionary/index.ts"],
+			"@umbraco-cms/backoffice/dictionary": ["src/packages/dictionary/index.ts"],
 
 			// DOCUMENT MANAGEMENT
 			"@umbraco-cms/backoffice/document": ["./src/packages/documents/documents/index.ts"],

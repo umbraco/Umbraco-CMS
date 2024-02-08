@@ -40,7 +40,7 @@ export class UmbUserActionConditionBase extends UmbBaseController implements Umb
 	 * @memberof UmbUserActionConditionBase
 	 */
 	protected async isCurrentUser() {
-		return this.userData?.id ? isCurrentUser(this._host, this.userData.id) : false;
+		return this.userData?.unique ? isCurrentUser(this._host, this.userData.unique) : false;
 	}
 
 	/**

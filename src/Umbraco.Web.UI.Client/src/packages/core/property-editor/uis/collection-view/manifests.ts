@@ -8,7 +8,7 @@ const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.CollectionView',
 	name: 'Collection View Property Editor UI',
-	js: () => import('./property-editor-ui-collection-view.element.js'),
+	element: () => import('./property-editor-ui-collection-view.element.js'),
 	meta: {
 		label: 'Collection View',
 		propertyEditorSchemaAlias: 'Umbraco.ListView',

@@ -1,5 +1,5 @@
 import type { MemberTypeDetails } from '../../packages/members/member-types/types.js';
-import { UmbData } from './data.js';
+import { UmbMockDBBase } from './utils/mock-db-base.js';
 import { createEntityTreeItem } from './utils.js';
 import type {
 	NamedEntityTreeItemResponseModel,
@@ -20,7 +20,7 @@ export const data: Array<MemberTypeDetails> = [
 ];
 
 // Temp mocked database
-class UmbMemberTypeData extends UmbData<MemberTypeDetails> {
+class UmbMemberTypeData extends UmbMockDBBase<MemberTypeDetails> {
 	constructor() {
 		super(data);
 	}
