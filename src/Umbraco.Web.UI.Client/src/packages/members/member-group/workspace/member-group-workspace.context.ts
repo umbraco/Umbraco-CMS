@@ -13,8 +13,7 @@ export class UmbMemberGroupWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberGroupDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	//
-	public readonly repository = new UmbMemberGroupDetailRepository(this);
+	public readonly detailRepository = new UmbMemberGroupDetailRepository(this);
 
 	#data = new UmbObjectState<UmbMemberGroupDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -26,7 +25,7 @@ export class UmbMemberGroupWorkspaceContext
 	}
 
 	async load(unique: string) {
-		const { data } = await this.repository.requestByUnique(unique);
+		const { data } = await this.detailRepository.requestByUnique(unique);
 
 		if (data) {
 			this.setIsNew(false);
@@ -35,7 +34,7 @@ export class UmbMemberGroupWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
-		const { data } = await this.repository.createScaffold(parentUnique);
+		const { data } = await this.detailRepository.createScaffold(parentUnique);
 
 		if (data) {
 			this.setIsNew(true);
@@ -50,9 +49,9 @@ export class UmbMemberGroupWorkspaceContext
 		if (!data) throw new Error('No data to save');
 
 		if (this.getIsNew()) {
-			await this.repository.create(data);
+			await this.detailRepository.create(data);
 		} else {
-			await this.repository.save(data);
+			await this.detailRepository.save(data);
 		}
 
 		this.saveComplete(data);

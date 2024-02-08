@@ -5,36 +5,55 @@ import {
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbMemberTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberTypeDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	//
-	public readonly repository = new UmbMemberTypeDetailRepository(this);
+	public readonly detailRepository = new UmbMemberTypeDetailRepository(this);
 
 	#data = new UmbObjectState<UmbMemberTypeDetailModel | undefined>(undefined);
-	name = this.#data.asObservablePart((data) => data?.name);
+	readonly data = this.#data.asObservable();
 
-	constructor(host: UmbControllerHost) {
+	readonly name = this.#data.asObservablePart((data) => data?.name);
+
+	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.MemberType');
 	}
 
 	async load(unique: string) {
-		const { data } = await this.repository.requestByUnique(unique);
+		const { data } = await this.detailRepository.requestByUnique(unique);
+
 		if (data) {
 			this.setIsNew(false);
-			this.#data.setValue(data);
+			this.#data.update(data);
 		}
 	}
 
-	async createScaffold() {
-		const { data } = await this.repository.createScaffold(null);
-		if (!data) return;
-		this.setIsNew(true);
-		this.#data.setValue(data);
+	async create(parentUnique: string | null) {
+		const { data } = await this.detailRepository.createScaffold(parentUnique);
+
+		if (data) {
+			this.setIsNew(true);
+			this.#data.setValue(data);
+		}
+
+		return { data };
+	}
+
+	async save() {
+		const data = this.getData();
+		if (!data) throw new Error('No data to save');
+
+		if (this.getIsNew()) {
+			await this.detailRepository.create(data);
+		} else {
+			await this.detailRepository.save(data);
+		}
+
+		this.saveComplete(data);
 	}
 
 	getData() {
@@ -42,40 +61,19 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.unique;
+		return this.getData()?.unique || '';
 	}
 
 	getEntityType() {
 		return 'member-type';
 	}
 
-	setName(name: string) {
+	getName() {
+		return this.#data.getValue()?.name;
+	}
+
+	setName(name: string | undefined) {
 		this.#data.update({ name });
-	}
-
-	setPropertyValue(alias: string, value: unknown) {
-		// Not implemented
-	}
-
-	async save() {
-		if (!this.#data.value) return;
-		if (!this.#data.value.unique) return;
-
-		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
-		} else {
-			await this.repository.save(this.#data.value);
-		}
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
-	}
-
-	async delete(unique: string) {
-		await this.repository.delete(unique);
-	}
-
-	public destroy(): void {
-		this.#data.destroy();
 	}
 }
 
