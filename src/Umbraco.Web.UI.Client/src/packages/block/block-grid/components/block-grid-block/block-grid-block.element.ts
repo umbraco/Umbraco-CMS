@@ -3,6 +3,7 @@ import { html, css, customElement, property, state } from '@umbraco-cms/backoffi
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
+import '../ref-grid-block/index.js';
 
 /**
  * @element umb-property-editor-ui-block-grid-block
