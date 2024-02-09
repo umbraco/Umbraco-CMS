@@ -11,6 +11,7 @@ public enum ContentCollectionOperationStatus
     DataTypeNotContentCollection,
     DataTypeNotContentProperty,
     DataTypeNotFound,
+    DataTypeWithoutContentType,
     MissingPropertiesInCollectionConfiguration,
     OrderByNotPartOfCollectionConfiguration
 }

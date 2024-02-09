@@ -26,7 +26,7 @@ public abstract class DocumentCollectionControllerBase : ManagementApiController
                 .WithDetail($"No collection data type was found for the corresponding {type} type. Ensure that the default and/or a custom collection data types exists")
                 .Build()),
             ContentCollectionOperationStatus.ContentNotCollection => new BadRequestObjectResult(new ProblemDetailsBuilder()
-                .WithTitle($"{type} is not configured as a collection")
+                .WithTitle($"The {type} item is not configured as a collection")
                 .WithDetail($"The specified {type} is not configured as a collection")
                 .Build()),
             ContentCollectionOperationStatus.ContentNotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
@@ -49,6 +49,10 @@ public abstract class DocumentCollectionControllerBase : ManagementApiController
                 .Build()),
             ContentCollectionOperationStatus.DataTypeNotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("The specified collection data type could not be found")
+                .Build()),
+            ContentCollectionOperationStatus.DataTypeWithoutContentType => new BadRequestObjectResult(new ProblemDetailsBuilder()
+                .WithTitle($"Missing {type} when specifying a collection data type")
+                .WithDetail($"The specified collection data type needs to be used in conjunction with a {type} item.")
                 .Build()),
             ContentCollectionOperationStatus.MissingPropertiesInCollectionConfiguration => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Missing properties in collection configuration")
