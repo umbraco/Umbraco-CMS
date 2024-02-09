@@ -97,8 +97,8 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		return this;
 	}
 
-	#appendTemplate(unique: string) {
-		this.selectedIds = [...this._selectedIds, unique];
+	#appendTemplates(unique: string[]) {
+		this.selectedIds = [...(this.selectedIds ?? []), ...unique];
 
 		// If there is no default, set the first picked template as default.
 		if (!this.defaultUnique && this.selectedIds.length) {
@@ -118,7 +118,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	async #openPicker() {
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
-				multiple: false,
+				multiple: true,
 				pickableFilter: (template) => template.unique !== null && !this._selectedIds.includes(template.unique),
 			},
 		});
@@ -131,8 +131,8 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 		if (!selectedIds.length) return;
 
-		// Add template to row of picked templates and dispatch change event
-		this.#appendTemplate(selectedIds[0]);
+		// Add templates to row of picked templates and dispatch change event
+		this.#appendTemplates(selectedIds);
 	}
 
 	#removeTemplate(unique: string) {
