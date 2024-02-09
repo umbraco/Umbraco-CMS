@@ -1,6 +1,5 @@
 import type { UmbUserDetailModel } from '../../../types.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { css, html, customElement, query, nothing, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -45,36 +44,20 @@ export class UmbUserAvatarElement extends UmbLitElement {
 		);
 	};
 
-	async #getAppContext() {
-		// TODO: remove this when we get absolute urls from the server
-		return this.consumeContext(UMB_APP_CONTEXT, (instance) => {}).asPromise();
-	}
-
 	#setUserAvatarUrls = async (user: UmbUserDetailModel | undefined) => {
 		if (!user || !user.avatarUrls || user.avatarUrls.length === 0) {
 			this._userAvatarUrls = [];
 			return;
 		}
 
-		// TODO: remove this when we get absolute urls from the server
-		// TODO: temp hack because we can't prefix local urls with the server url.
-		// these are preview urls for newly uploaded avatars
-		const serverUrl = (await this.#getAppContext()).getServerUrl();
-		if (!serverUrl) return;
-
-		// TODO: hack to only use size 3 and 4 from the array. The server should only return 1 url.
-		const isRelativeUrl = user.avatarUrls[3].startsWith('/');
-		const avatarScale1 = user.avatarUrls?.[3];
-		const avatarScale2 = user.avatarUrls?.[4];
-
 		this._userAvatarUrls = [
 			{
 				scale: '1x',
-				url: isRelativeUrl ? serverUrl + avatarScale1 : avatarScale1,
+				url: user.avatarUrls?.[3],
 			},
 			{
 				scale: '2x',
-				url: isRelativeUrl ? serverUrl + avatarScale2 : avatarScale2,
+				url: user.avatarUrls?.[4],
 			},
 		];
 	};

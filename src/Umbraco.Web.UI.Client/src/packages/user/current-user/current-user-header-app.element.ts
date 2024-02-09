@@ -6,7 +6,6 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
@@ -50,41 +49,24 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 		this.#modalManagerContext?.open(UMB_CURRENT_USER_MODAL);
 	}
 
-	async #getAppContext() {
-		// TODO: remove this when we get absolute urls from the server
-		return this.consumeContext(UMB_APP_CONTEXT, (instance) => {}).asPromise();
-	}
-
 	#setUserAvatarUrls = async (user: UmbCurrentUserModel | undefined) => {
 		if (!user || !user.avatarUrls || user.avatarUrls.length === 0) {
 			this._userAvatarUrls = [];
 			return;
 		}
 
-		// TODO: remove this when we get absolute urls from the server
-		// TODO: temp hack because we can't prefix local urls with the server url.
-		// these are preview urls for newly uploaded avatars
-		const serverUrl = (await this.#getAppContext()).getServerUrl();
-		if (!serverUrl) return;
-
-		// TODO: hack to only use size 3 and 4 from the array. The server should only return 1 url.
-		const isRelativeUrl = user.avatarUrls[0].startsWith('/');
-		const avatarScale1 = user.avatarUrls?.[0];
-		const avatarScale2 = user.avatarUrls?.[1];
-		const avatarScale3 = user.avatarUrls?.[2];
-
 		this._userAvatarUrls = [
 			{
 				scale: '1x',
-				url: isRelativeUrl ? serverUrl + avatarScale1 : avatarScale1,
+				url: user.avatarUrls?.[0],
 			},
 			{
 				scale: '2x',
-				url: isRelativeUrl ? serverUrl + avatarScale2 : avatarScale2,
+				url: user.avatarUrls?.[1],
 			},
 			{
 				scale: '3x',
-				url: isRelativeUrl ? serverUrl + avatarScale3 : avatarScale3,
+				url: user.avatarUrls?.[2],
 			},
 		];
 	};
