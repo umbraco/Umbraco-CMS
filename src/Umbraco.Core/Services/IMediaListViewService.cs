@@ -11,7 +11,6 @@ public interface IMediaListViewService
         Guid? key,
         Guid? dataTypeKey,
         string orderBy,
-        string? orderCulture,
         Direction orderDirection,
         string? filter,
         int skip,

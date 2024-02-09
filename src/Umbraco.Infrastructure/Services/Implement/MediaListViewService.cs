@@ -67,7 +67,6 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
         Guid? key,
         Guid? dataTypeKey,
         string orderBy,
-        string? orderCulture,
         Direction orderDirection,
         string? filter,
         int skip,
@@ -85,6 +84,6 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
             }
         }
 
-        return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, orderCulture, orderDirection, filter, skip, take);
+        return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
     }
 }
