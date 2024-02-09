@@ -13,55 +13,9 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-
-const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-	getUniqueOfElement: (element) => {
-		return element.getAttribute('data-umb-tabs-id');
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.id;
-	},
-	identifier: 'content-type-tabs-sorter',
-	itemSelector: '[data-umb-tabs-id]',
-	containerSelector: '#tabs-group',
-	disabledItemSelector: '[inherited]',
-	resolveVerticalDirection: () => {
-		return false;
-	},
-};
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	public sorter?: UmbSorterController<PropertyTypeContainerModelBaseModel>;
-
-	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-		...SORTER_CONFIG,
-		// TODO: Missing handlers to work properly: performItemMove and performItemRemove
-		performItemInsert: async (args) => {
-			if (!this._tabs) return false;
-			const oldIndex = this._tabs.findIndex((tab) => tab.id! === args.item.id);
-			if (args.newIndex === oldIndex) return true;
-
-			let sortOrder = 0;
-			//TODO the sortOrder set is not correct
-			if (this._tabs.length > 0) {
-				if (args.newIndex === 0) {
-					sortOrder = (this._tabs[0].sortOrder ?? 0) - 1;
-				} else {
-					sortOrder = (this._tabs[Math.min(args.newIndex, this._tabs.length - 1)].sortOrder ?? 0) + 1;
-				}
-
-				if (sortOrder !== args.item.sortOrder) {
-					await this._tabsStructureHelper.partialUpdateContainer(args.item.id!, { sortOrder });
-				}
-			}
-
-			return true;
-		},
-	};
-
 	//private _hasRootProperties = false;
 
 	@state()
@@ -93,7 +47,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 	constructor() {
 		super();
-		this.sorter = new UmbSorterController(this, this.config);
 
 		//TODO: We need to differentiate between local and composition tabs (and hybrids)
 
@@ -137,12 +90,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 	#changeMode() {
 		this._workspaceContext?.setIsSorting(!this.sortModeActive);
-
-		if (this.sortModeActive && this._tabs) {
-			this.sorter?.setModel(this._tabs);
-		} else {
-			this.sorter?.setModel([]);
-		}
 	}
 
 	private _createRoutes() {
@@ -274,7 +221,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="tabs-wrapper" class="flex">
+					<div id="container-list" class="flex">
 						${this._routerPath ? this.renderTabsNavigation() : ''} ${this.renderAddButton()}
 					</div>
 					${this.renderActions()}
@@ -444,9 +391,14 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				flex-wrap: nowrap;
 			}
 
+			#container-list {
+				flex: 1;
+			}
+
 			.flex {
 				display: flex;
 			}
+
 			uui-tab-group {
 				flex-wrap: nowrap;
 			}

@@ -1,60 +1,34 @@
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import './document-type-workspace-view-edit-property.element.js';
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
+import type { UmbDocumentTypeWorkspacePropertyElement } from './document-type-workspace-view-edit-property.element.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
-
-const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel> = {
-	getUniqueOfElement: (element) => {
-		return element.getAttribute('data-umb-property-id');
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.id;
-	},
-	identifier: 'content-type-property-sorter',
-	itemSelector: '[data-umb-property-id]',
-	disabledItemSelector: '[inherited]',
-	containerSelector: '#property-list',
-};
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	#propertySorter = new UmbSorterController(this, {
-		...SORTER_CONFIG,
-		performItemInsert: (args) => {
-			let sortOrder = 0;
-			if (this._propertyStructure.length > 0) {
-				if (args.newIndex === 0) {
-					sortOrder = (this._propertyStructure[0].sortOrder ?? 0) - 1;
-				} else {
-					sortOrder =
-						(this._propertyStructure[Math.min(args.newIndex, this._propertyStructure.length - 1)].sortOrder ?? 0) + 1;
-				}
-			}
-			return this._propertyStructureHelper.insertProperty(args.item, sortOrder);
+	#sorter = new UmbSorterController<UmbPropertyTypeModel, UmbDocumentTypeWorkspacePropertyElement>(this, {
+		getUniqueOfElement: (element) => {
+			return element.getAttribute('data-umb-property-id');
 		},
-		performItemRemove: (args) => {
-			return this._propertyStructureHelper.removeProperty(args.item.id!);
+		getUniqueOfModel: (modelEntry) => {
+			return modelEntry.id;
 		},
-		performItemMove: (args) => {
-			this._propertyStructureHelper.removeProperty(args.item.id!);
-			let sortOrder = 0;
-			if (this._propertyStructure.length > 0) {
-				if (args.newIndex === 0) {
-					sortOrder = (this._propertyStructure[0].sortOrder ?? 0) - 1;
-				} else {
-					sortOrder =
-						(this._propertyStructure[Math.min(args.newIndex, this._propertyStructure.length - 1)].sortOrder ?? 0) + 1;
-				}
+
+		identifier: 'document-type-property-sorter',
+		itemSelector: 'umb-document-type-workspace-view-edit-property',
+		containerSelector: '#property-list',
+		onChange: ({ item }) => {
+			const container = this.getAttribute('container-id');
+			if (container) {
+				this._propertyStructureHelper.partialUpdateProperty(item.id, { container: { id: container } });
 			}
-			return this._propertyStructureHelper.insertProperty(args.item, sortOrder);
 		},
 	});
 
@@ -112,7 +86,11 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				(workspaceContext as UmbDocumentTypeWorkspaceContext).isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
-					this.#setModel(isSorting);
+					if (isSorting) {
+						this.#sorter.setModel(this._propertyStructure);
+					} else {
+						this.#sorter.setModel([]);
+					}
 				},
 				'_observeIsSorting',
 			);
@@ -151,15 +129,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteNewProperty = routeBuilder(null);
 			});
-	}
-
-	#setModel(isSorting?: boolean) {
-		if (isSorting) {
-			this.#propertySorter.setModel(this._propertyStructure);
-		} else {
-			// TODO: Make a more proper way to disable sorting:
-			this.#propertySorter.setModel([]);
-		}
 	}
 
 	async #addProperty(propertyData: UmbPropertyTypeModel) {
@@ -213,6 +182,10 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		css`
 			#add {
 				width: 100%;
+			}
+			#property-list {
+				/* Some height so that the sorter can target the area if the group is empty*/
+				min-height: var(--uui-size-layout-1);
 			}
 		`,
 	];

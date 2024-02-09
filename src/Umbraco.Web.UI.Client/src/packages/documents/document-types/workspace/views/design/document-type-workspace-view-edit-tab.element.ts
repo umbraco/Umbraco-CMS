@@ -1,58 +1,33 @@
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import type { UmbDocumentTypeWorkspaceViewEditPropertiesElement } from './document-type-workspace-view-edit-properties.element.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 import './document-type-workspace-view-edit-properties.element.js';
-
-const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-	getUniqueOfElement: (element) => {
-		return element.getAttribute('data-umb-group-id');
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.id;
-	},
-	identifier: 'content-type-group-sorter',
-	itemSelector: '[data-umb-group-id]',
-	disabledItemSelector: '[inherited]',
-	containerSelector: '#group-list',
-};
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
-	public sorter?: UmbSorterController<PropertyTypeContainerModelBaseModel>;
-
-	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-		...SORTER_CONFIG,
-		// TODO: Missing handlers to work properly: performItemMove and performItemRemove
-		performItemInsert: async (args) => {
-			if (!this._groups) return false;
-			const oldIndex = this._groups.findIndex((group) => group.id! === args.item.id);
-			if (args.newIndex === oldIndex) return true;
-
-			let sortOrder = 0;
-			//TODO the sortOrder set is not correct
-			if (this._groups.length > 0) {
-				if (args.newIndex === 0) {
-					sortOrder = (this._groups[0].sortOrder ?? 0) - 1;
-				} else {
-					sortOrder = (this._groups[Math.min(args.newIndex, this._groups.length - 1)].sortOrder ?? 0) + 1;
-				}
-
-				if (sortOrder !== args.item.sortOrder) {
-					await this._groupStructureHelper.partialUpdateContainer(args.item.id!, { sortOrder });
-				}
-			}
-
-			return true;
+	#sorter = new UmbSorterController<
+		PropertyTypeContainerModelBaseModel,
+		UmbDocumentTypeWorkspaceViewEditPropertiesElement
+	>(this, {
+		getUniqueOfElement: (element) => element.getAttribute('container-id'),
+		getUniqueOfModel: (modelEntry) => modelEntry.id,
+		identifier: 'document-type-container-sorter',
+		itemSelector: '[data-umb-group-id]',
+		containerSelector: '#container-list',
+		onChange: ({ item, model }) => {
+			console.log('item', item);
+			console.log('model', model);
+			this._groups = model;
 		},
-	};
+	});
 
 	private _ownerTabId?: string | null;
 
@@ -109,8 +84,6 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.sorter = new UmbSorterController(this, this.config);
-
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this._groupStructureHelper.setStructureManager((context as UmbDocumentTypeWorkspaceContext).structure);
 			this.observe(
@@ -118,9 +91,9 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {
-						this.sorter?.setModel(this._groups);
+						this.#sorter.setModel(this._groups);
 					} else {
-						this.sorter?.setModel([]);
+						this.#sorter.setModel([]);
 					}
 				},
 				'_observeIsSorting',
@@ -153,7 +126,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						</uui-box>
 				  `
 				: ''}
-			<div id="group-list">
+			<div id="container-list">
 				${repeat(
 					this._groups,
 					(group) => group.id ?? '' + group.name,
