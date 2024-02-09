@@ -1,6 +1,6 @@
 import { UmbModalToken } from './modal-token.js';
 import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
-import { UMB_TEMPLATE_TREE_ALIAS, type UmbTemplateTreeItemModel } from '@umbraco-cms/backoffice/template';
+import type { UmbTemplateTreeItemModel } from '@umbraco-cms/backoffice/template';
 
 export type UmbTemplatePickerModalData = UmbTreePickerModalData<UmbTemplateTreeItemModel>;
 export type UmbTemplatePickerModalValue = UmbPickerModalValue;
@@ -13,7 +13,7 @@ export const UMB_TEMPLATE_PICKER_MODAL = new UmbModalToken<UmbTemplatePickerModa
 			size: 'small',
 		},
 		data: {
-			treeAlias: UMB_TEMPLATE_TREE_ALIAS,
+			treeAlias: 'Umb.Tree.Template',
 		},
 	},
 );
