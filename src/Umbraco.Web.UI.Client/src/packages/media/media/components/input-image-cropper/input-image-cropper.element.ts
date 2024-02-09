@@ -67,7 +67,6 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	}
 
 	render() {
-		console.log('render', this.value);
 		if (this.value.src || this.file) {
 			return this.#renderImageCropper();
 		}
@@ -83,8 +82,17 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		`;
 	}
 
+	#onChange(e: any) {
+		this.value = e.target.value;
+
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
 	#renderImageCropper() {
-		return html`<umb-image-cropper-field .value=${this.value} .file=${this.file}></umb-image-cropper-field>`;
+		return html`<umb-image-cropper-field
+			.value=${this.value}
+			.file=${this.file}
+			@change=${this.#onChange}></umb-image-cropper-field>`;
 	}
 
 	static styles = css``;

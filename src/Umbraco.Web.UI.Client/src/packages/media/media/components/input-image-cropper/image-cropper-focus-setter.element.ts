@@ -106,8 +106,8 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		this.dispatchEvent(
 			new CustomEvent('change', {
 				detail: { left, top },
-				bubbles: true,
-				composed: true,
+				bubbles: false,
+				composed: false,
 			}),
 		);
 	}

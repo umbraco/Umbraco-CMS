@@ -48,7 +48,6 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 	// }
 
 	#onChange(e: Event) {
-		console.log('change', e.target.value);
 		this.value = (e.target as any).value;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}

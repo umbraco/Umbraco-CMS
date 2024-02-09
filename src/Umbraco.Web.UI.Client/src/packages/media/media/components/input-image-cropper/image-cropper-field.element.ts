@@ -11,6 +11,7 @@ import type {
 } from './index.js';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-image-cropper-field')
 export class UmbInputImageCropperFieldElement extends UmbLitElement {
@@ -94,7 +95,7 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		this.currentCrop = { ...this.crops[index] };
 	}
 
-	#onCropChange(event: CustomEvent) {
+	#onCropChange = (event: CustomEvent) => {
 		const target = event.target as UmbImageCropperElement;
 		const value = target.value;
 
@@ -107,12 +108,12 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 		this.crops[index] = value;
 		this.currentCrop = undefined;
 		this.#updateValue();
-	}
+	};
 
-	#onFocalPointChange(event: CustomEvent) {
+	#onFocalPointChange = (event: CustomEvent) => {
 		this.focalPoint = event.detail;
 		this.#updateValue();
-	}
+	};
 
 	#updateValue() {
 		this.#value = {
@@ -121,13 +122,13 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 			src: this.src,
 		};
 
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#onResetFocalPoint() {
+	#onResetFocalPoint = () => {
 		this.focalPoint = { left: 0.5, top: 0.5 };
 		this.#updateValue();
-	}
+	};
 
 	render() {
 		return html`
