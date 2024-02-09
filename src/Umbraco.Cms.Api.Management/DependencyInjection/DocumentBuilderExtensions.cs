@@ -12,7 +12,7 @@ internal static class DocumentBuilderExtensions
     {
         builder.Services.AddTransient<IDocumentPresentationFactory, DocumentPresentationFactory>();
         builder.Services.AddTransient<IDocumentNotificationPresentationFactory, DocumentNotificationPresentationFactory>();
-        builder.Services.AddTransient<IContentUrlFactory, ContentUrlFactory>();
+        builder.Services.AddTransient<IDocumentUrlFactory, DocumentUrlFactory>();
         builder.Services.AddTransient<IDocumentEditingPresentationFactory, DocumentEditingPresentationFactory>();
         builder.Services.AddTransient<IPublicAccessPresentationFactory, PublicAccessPresentationFactory>();
 

@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
-public interface IHasCultureAndSegment
+internal interface IHasCultureAndSegment
 {
     public string? Culture { get; }
 

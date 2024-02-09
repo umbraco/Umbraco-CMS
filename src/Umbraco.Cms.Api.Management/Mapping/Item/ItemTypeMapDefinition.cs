@@ -30,7 +30,6 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<ITemplate, TemplateItemResponseModel>((_, _) => new TemplateItemResponseModel { Alias = string.Empty }, Map);
         mapper.Define<IMemberType, MemberTypeItemResponseModel>((_, _) => new MemberTypeItemResponseModel(), Map);
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
-        mapper.Define<IMember, MemberItemResponseModel>((_, _) => new MemberItemResponseModel(), Map);
         mapper.Define<IUser, UserItemResponseModel>((_, _) => new UserItemResponseModel(), Map);
         mapper.Define<IUserGroup, UserGroupItemResponseModel>((_, _) => new UserGroupItemResponseModel(), Map);
     }
@@ -102,14 +101,6 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
-    }
-
-    // Umbraco.Code.MapAll
-    private static void Map(IMember source, MemberItemResponseModel target, MapperContext context)
-    {
-        target.Icon = source.ContentType.Icon;
-        target.Id = source.Key;
-        target.Name = source.Name ?? source.Username;
     }
 
     // Umbraco.Code.MapAll

@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Tree;

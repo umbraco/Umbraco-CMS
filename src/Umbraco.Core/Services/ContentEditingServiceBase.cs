@@ -18,7 +18,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataTypeService _dataTypeService;
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
-    private readonly ITreeEntitySortingService _treeEntitySortingService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IContentValidationServiceBase<TContentType> _validationService;
 
@@ -30,14 +29,12 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
-        ITreeEntitySortingService treeEntitySortingService,
         IContentValidationServiceBase<TContentType> validationService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
         _logger = logger;
         _userIdKeyResolver = userIdKeyResolver;
-        _treeEntitySortingService = treeEntitySortingService;
         _validationService = validationService;
         CoreScopeProvider = scopeProvider;
         ContentService = contentService;
@@ -53,10 +50,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected abstract OperationResult? MoveToRecycleBin(TContent content, int userId);
 
     protected abstract OperationResult? Delete(TContent content, int userId);
-
-    protected abstract IEnumerable<TContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total);
-
-    protected abstract ContentEditingOperationStatus Sort(IEnumerable<TContent> items, int userId);
 
     protected ICoreScopeProvider CoreScopeProvider { get; }
 
@@ -239,48 +232,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return copy != null
             ? Attempt.SucceedWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, copy)
             : Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.CancelledByNotification, null);
-    }
-
-    protected async Task<ContentEditingOperationStatus> HandleSortAsync(
-        Guid? parentKey,
-        IEnumerable<SortingModel> sortingModels,
-        Guid userKey)
-    {
-        var contentId = parentKey.HasValue
-            ? ContentService.GetById(parentKey.Value)?.Id
-            : Constants.System.Root;
-
-        if (contentId.HasValue is false)
-        {
-            return await Task.FromResult(ContentEditingOperationStatus.NotFound);
-        }
-
-        const int pageSize = 500;
-        var pageNumber = 0;
-        IEnumerable<TContent> page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out var total);
-        var children = new List<TContent>((int)total);
-        children.AddRange(page);
-        while (pageNumber * pageSize < total)
-        {
-            page = GetPagedChildren(contentId.Value, pageNumber++, pageSize, out _);
-            children.AddRange(page);
-        }
-
-        try
-        {
-            TContent[] sortedChildren = _treeEntitySortingService
-                .SortEntities(children, sortingModels)
-                .ToArray();
-
-            var userId = await GetUserIdAsync(userKey);
-
-            return Sort(sortedChildren, userId);
-        }
-        catch (ArgumentException argumentException)
-        {
-            _logger.LogError(argumentException, "Invalid sorting instructions, see exception for details.");
-            return ContentEditingOperationStatus.SortingInvalid;
-        }
     }
 
     private Attempt<TContent?, ContentEditingOperationStatus> OperationResultToAttempt(TContent? content, OperationResult? operationResult)

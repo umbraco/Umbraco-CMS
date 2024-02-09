@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.MediaType;
 
 [ShortGenericSchemaName<CreateMediaTypePropertyTypeRequestModel, CreateMediaTypePropertyTypeContainerRequestModel>("CreateContentTypeForMediaTypeRequestModel")]
 public class CreateMediaTypeRequestModel
-    : CreateContentTypeRequestModelBase<CreateMediaTypePropertyTypeRequestModel, CreateMediaTypePropertyTypeContainerRequestModel>
+    : CreateContentTypeInFolderRequestModelBase<CreateMediaTypePropertyTypeRequestModel, CreateMediaTypePropertyTypeContainerRequestModel>
 {
     public IEnumerable<MediaTypeSort> AllowedMediaTypes { get; set; } = Enumerable.Empty<MediaTypeSort>();
 
