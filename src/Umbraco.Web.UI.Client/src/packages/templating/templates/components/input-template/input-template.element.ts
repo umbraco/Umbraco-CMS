@@ -27,7 +27,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	 * @default
 	 */
 	@property({ type: String, attribute: 'min-message' })
-	minMessage = 'This field need more items';
+	minMessage = 'This field needs more items';
 
 	/**
 	 * This is a maximum amount of selected items in this input.
@@ -172,7 +172,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 						?default="${template.unique === this.defaultUnique}">
 						<uui-button
 							slot="actions"
-							label="Remove Template ${template.name}"
+							label="${this.localize.term('general_remove') + ' ' + template.name}"
 							@click="${() => this.#removeTemplate(template.unique ?? '')}"
 							compact>
 							<uui-icon name="icon-trash"></uui-icon>
@@ -180,7 +180,11 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 					</umb-template-card>
 				`,
 			)}
-			<uui-button id="add-button" look="placeholder" label="open" @click="${this.#openPicker}">Add</uui-button>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				label="${this.localize.term('general_add')}"
+				@click="${this.#openPicker}"></uui-button>
 		`;
 	}
 

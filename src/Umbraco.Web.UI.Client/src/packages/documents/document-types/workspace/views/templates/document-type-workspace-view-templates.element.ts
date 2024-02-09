@@ -61,9 +61,9 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 	}
 
 	render() {
-		return html`<uui-box headline="Templates">
-			<umb-property-layout alias="Templates" label="Allowed Templates">
-				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
+		return html`<uui-box headline="${this.localize.term('treeHeaders_templates')}">
+			<umb-property-layout alias="Templates" label="${this.localize.term('contentTypeEditor_allowedTemplatesHeading')}">
+				<div slot="description">${this.localize.term('contentTypeEditor_allowedTemplatesDescription')}</div>
 				<div id="templates" slot="editor">
 					<umb-input-template
 						.defaultUnique=${this._defaultTemplateId ?? ''}
