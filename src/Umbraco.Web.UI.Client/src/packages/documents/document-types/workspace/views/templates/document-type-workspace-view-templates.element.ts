@@ -6,6 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
+import '@umbraco-cms/backoffice/template'; // TODO: This is needed to register the <umb-input-template> element, but it should be done in a better way without importing the whole module.
+
 @customElement('umb-document-type-workspace-view-templates')
 export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
