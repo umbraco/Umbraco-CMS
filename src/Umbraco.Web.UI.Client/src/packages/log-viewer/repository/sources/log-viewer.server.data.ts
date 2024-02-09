@@ -2,10 +2,9 @@ import type { LogMessagesDataSource, LogSearchDataSource } from './index.js';
 import type {
 	DirectionModel,
 	LogLevelModel,
-	SavedLogSearchResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	LogViewerResource
-} from '@umbraco-cms/backoffice/backend-api';
+	SavedLogSearchResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { LogViewerResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

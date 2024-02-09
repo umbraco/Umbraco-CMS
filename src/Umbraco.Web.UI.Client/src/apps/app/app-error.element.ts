@@ -1,5 +1,5 @@
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**

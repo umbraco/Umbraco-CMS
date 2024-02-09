@@ -8,8 +8,8 @@ import type {
 	DatabaseInstallRequestModel,
 	DatabaseSettingsPresentationModel,
 	ProblemDetails,
-} from '@umbraco-cms/backoffice/backend-api';
-import { ApiError, InstallResource } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { ApiError, InstallResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 

@@ -3,7 +3,7 @@ import type {
 	DictionaryItemResponseModel,
 	DictionaryOverviewResponseModel,
 	NamedEntityTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockDictionaryModelHack = DictionaryItemResponseModel &
 	NamedEntityTreeItemResponseModel &

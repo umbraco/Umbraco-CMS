@@ -12,7 +12,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
 import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
-import type { DocumentUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {

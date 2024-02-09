@@ -14,8 +14,8 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 // TODO: update to module imports when ready
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { PackageDefinitionResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
+import type { PackageDefinitionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';

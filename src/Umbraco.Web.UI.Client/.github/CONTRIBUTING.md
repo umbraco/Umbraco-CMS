@@ -72,7 +72,7 @@ To make the first button work, which simply just requests a new status from the 
 
 ```typescript
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PublishedCacheResource } from '@umbraco-cms/backoffice/backend-api';
+import { PublishedCacheResource } from '@umbraco-cms/backoffice/external/backend-api';
 
 private _getStatus() {
   const { data: status } = await tryExecuteAndNotify(this, PublishedCacheResource.getPublishedCacheStatus());

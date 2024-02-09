@@ -1,4 +1,4 @@
-import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
+import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
