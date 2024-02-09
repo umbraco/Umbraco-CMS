@@ -148,9 +148,13 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		*/
 		this.selectedIds = this._selectedIds.filter((x) => x !== unique);
 
-		// If the default template is removed, set the first picked template as default.
-		if (unique === this.defaultUnique && this.selectedIds.length) {
-			this.defaultUnique = this.selectedIds[0];
+		// If the default template is removed, set the first picked template as default or reset defaultUnique.
+		if (unique === this.defaultUnique) {
+			if (this.selectedIds.length) {
+				this.defaultUnique = this.selectedIds[0];
+			} else {
+				this.defaultUnique = '';
+			}
 		}
 
 		this.dispatchEvent(new UmbChangeEvent());
