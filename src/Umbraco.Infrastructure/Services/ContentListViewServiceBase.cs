@@ -67,7 +67,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         var result = new ListViewPagedModel<TContent>
         {
             Items = items,
-            ListViewConfiguration = configurationAttempt.Result!
+            ListViewConfiguration = configurationAttempt.Result!,
         };
 
         return Attempt.SucceedWithStatus<ListViewPagedModel<TContent>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.Success, result);
