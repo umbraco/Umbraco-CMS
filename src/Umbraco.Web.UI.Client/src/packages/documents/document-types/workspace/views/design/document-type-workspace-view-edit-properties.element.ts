@@ -20,14 +20,30 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		getUniqueOfModel: (modelEntry) => {
 			return modelEntry.id;
 		},
-
 		identifier: 'document-type-property-sorter',
-		itemSelector: 'umb-document-type-workspace-view-edit-property',
-		containerSelector: '#property-list',
-		onChange: ({ item }) => {
+		itemSelector: 'umb-document-type-workspace-view-edit-property:not([inherited])',
+		//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
+		// This is because we don't want to move local properties into an inherited group container.
+		containerSelector: '#property-list:not([inherited])',
+		onChange: ({ model, item }) => {
 			const container = this.getAttribute('container-id');
 			if (container) {
-				this._propertyStructureHelper.partialUpdateProperty(item.id, { container: { id: container } });
+				this._propertyStructure = model;
+
+				const modelIndex = model.findIndex((entry) => entry.id === item.id);
+				if (modelIndex === -1) return;
+				let sortOrder: number;
+
+				if (model.length) {
+					sortOrder = modelIndex > 0 ? model[modelIndex - 1].sortOrder + 1 : model[modelIndex + 1].sortOrder - 1;
+				} else {
+					sortOrder = 0;
+				}
+
+				this._propertyStructureHelper.partialUpdateProperty(item.id, {
+					sortOrder: sortOrder,
+					container: { id: container },
+				});
 			}
 		},
 	});
@@ -148,6 +164,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 						const inheritedFromDocument = this._ownerDocumentTypes?.find(
 							(types) => types.containers?.find((containers) => containers.id === property.container?.id),
 						);
+
+						console.log(property.name, property.container?.id, this.containerId);
 
 						return html`<umb-document-type-workspace-view-edit-property
 							data-umb-property-id=${property.id}
