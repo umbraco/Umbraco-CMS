@@ -64,12 +64,16 @@ export class UmbBlockWorkspaceContext<
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (context) => {
 			this.#blockManager = context;
-			this.#editorConfigPromise = this.observe(context.editorConfiguration, (editorConfigs) => {
-				if (editorConfigs) {
-					const value = editorConfigs.getValueByAlias<boolean>('useLiveEditing');
-					this.#liveEditingMode = value;
-				}
-			}).asPromise();
+			this.#editorConfigPromise = this.observe(
+				context.editorConfiguration,
+				(editorConfigs) => {
+					if (editorConfigs) {
+						const value = editorConfigs.getValueByAlias<boolean>('useLiveEditing');
+						this.#liveEditingMode = value;
+					}
+				},
+				'observeEditorConfig',
+			).asPromise();
 		}).asPromise();
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {

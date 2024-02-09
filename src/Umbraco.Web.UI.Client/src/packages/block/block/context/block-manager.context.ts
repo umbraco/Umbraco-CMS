@@ -11,6 +11,7 @@ import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -30,6 +31,9 @@ export abstract class UmbBlockManagerContext<
 
 	#propertyAlias = new UmbStringState(undefined);
 	propertyAlias = this.#propertyAlias.asObservable();
+
+	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
+	variantId = this.#variantId.asObservable();
 
 	#contentTypes = new UmbArrayState(<Array<UmbContentTypeModel>>[], (x) => x.unique);
 	public readonly contentTypes = this.#contentTypes.asObservable();
@@ -89,13 +93,15 @@ export abstract class UmbBlockManagerContext<
 				propertyContext?.alias,
 				(alias) => {
 					this.#propertyAlias.setValue(alias);
+					this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
 				},
 				'observePropertyAlias',
 			);
 			this.observe(
 				propertyContext?.variantId,
 				(variantId) => {
-					// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense.
+					this.#variantId.setValue(variantId);
+					// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
 					this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 				},
 				'observePropertyVariantId',
@@ -112,10 +118,6 @@ export abstract class UmbBlockManagerContext<
 				const newPath = routeBuilder({});
 				this.#workspacePath.setValue(newPath);
 			});
-
-		this.observe(this.propertyAlias, (alias) => {
-			this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
-		});
 	}
 
 	async ensureContentType(unique?: string) {

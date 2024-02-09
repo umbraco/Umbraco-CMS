@@ -34,7 +34,7 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT);
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
-			.addUniquePaths(['propertyAlias', 'parentUnique', 'areaKey'])
+			.addUniquePaths(['propertyAlias', 'variantId', 'parentUnique', 'areaKey'])
 			.addAdditionalPath(':view/:index')
 			.onSetup((routingInfo) => {
 				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
@@ -61,6 +61,16 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 			this._manager.propertyAlias,
 			(alias) => {
 				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
+			},
+			'observePropertyAlias',
+		);
+
+		this.observe(
+			this._manager.variantId,
+			(variantId) => {
+				if (variantId) {
+					this.#catalogueModal.setUniquePathValue('variantId', variantId.toString());
+				}
 			},
 			'observePropertyAlias',
 		);
