@@ -24,7 +24,9 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		itemSelector: 'umb-document-type-workspace-view-edit-property:not([inherited])',
 		//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
 		// This is because we don't want to move local properties into an inherited group container.
-		containerSelector: '#property-list:not([inherited])',
+		// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
+		// TODO: Fix bug where a local property turn into an inherited when moved to a new group container.
+		containerSelector: '#property-list',
 		onChange: ({ model, item }) => {
 			const container = this.getAttribute('container-id');
 			if (container) {
@@ -34,7 +36,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				if (modelIndex === -1) return;
 				let sortOrder: number;
 
-				if (model.length) {
+				if (model.length > 1) {
 					sortOrder = modelIndex > 0 ? model[modelIndex - 1].sortOrder + 1 : model[modelIndex + 1].sortOrder - 1;
 				} else {
 					sortOrder = 0;
@@ -155,7 +157,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	}
 
 	render() {
-		return html`<div id="property-list">
+		return html`<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
 				${repeat(
 					this._propertyStructure,
 					(property) => property.id ?? '' + property.container?.id ?? '' + property.sortOrder ?? '',
@@ -164,8 +166,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 						const inheritedFromDocument = this._ownerDocumentTypes?.find(
 							(types) => types.containers?.find((containers) => containers.id === property.container?.id),
 						);
-
-						console.log(property.name, property.container?.id, this.containerId);
 
 						return html`<umb-document-type-workspace-view-edit-property
 							data-umb-property-id=${property.id}
@@ -201,7 +201,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			#add {
 				width: 100%;
 			}
-			#property-list {
+
+			#property-list[sort-mode-active]:not(:has(umb-document-type-workspace-view-edit-property)) {
 				/* Some height so that the sorter can target the area if the group is empty*/
 				min-height: var(--uui-size-layout-1);
 			}
