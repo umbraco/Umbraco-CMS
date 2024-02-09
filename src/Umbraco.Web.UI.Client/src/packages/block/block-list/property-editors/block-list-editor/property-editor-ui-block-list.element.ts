@@ -1,6 +1,6 @@
 import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
-import '../../components/block-list-block/index.js';
-import type { UmbPropertyEditorUIBlockListBlockElement } from '../../components/block-list-block/index.js';
+import '../../components/block-list-entry/index.js';
+import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import { UmbBlockListEntriesContext } from '../../context/block-list-entries.context.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
@@ -19,7 +19,7 @@ import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
-const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbPropertyEditorUIBlockListBlockElement> = {
+const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
 		return element.getAttribute('data-udi');
 	},
@@ -27,7 +27,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbPropertyEditorU
 		return modelEntry.contentUdi;
 	},
 	//identifier: 'block-list-editor',
-	itemSelector: 'umb-property-editor-ui-block-list-block',
+	itemSelector: 'umb-block-list-entry',
 	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
 };
 
@@ -37,7 +37,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbPropertyEditorU
 @customElement('umb-property-editor-ui-block-list')
 export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
-	#sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbPropertyEditorUIBlockListBlockElement>(this, {
+	#sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbBlockListEntryElement>(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
 			//this.#entriesContext.setLayoutEntries(model);
@@ -194,8 +194,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				(layoutEntry, index) =>
 					html`<uui-button-inline-create
 							href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>
-						<umb-property-editor-ui-block-list-block data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
-						</umb-property-editor-ui-block-list-block> `,
+						<umb-block-list-entry data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}> </umb-block-list-entry> `,
 			)}
 			<uui-button-group>
 				<uui-button

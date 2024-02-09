@@ -336,6 +336,28 @@ export const data: Array<UmbMockDocumentModel> = [
 							{
 								contentUdi: '1234',
 								settingsUdi: '5678',
+								areas: [
+									{
+										key: 'area1',
+										items: [
+											{
+												contentUdi: 'a1234',
+												settingsUdi: 'a5678',
+												areas: [],
+											},
+										],
+									},
+									{
+										key: 'area2',
+										items: [
+											{
+												contentUdi: 'b1234',
+												settingsUdi: 'b5678',
+												areas: [],
+											},
+										],
+									},
+								],
 							},
 						],
 					},
@@ -345,12 +367,32 @@ export const data: Array<UmbMockDocumentModel> = [
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world',
 						},
+						{
+							udi: 'a1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world from area 1',
+						},
+						{
+							udi: 'b1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world from area 2',
+						},
 					],
 					settingsData: [
 						{
 							udi: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
 							elementProperty: 'Hello world',
+						},
+						{
+							udi: 'a5678',
+							contentTypeKey: 'all-property-editors-document-type-id',
+							elementProperty: 'Hello world from area 1 settings',
+						},
+						{
+							udi: 'b5678',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world from area 2 settings',
 						},
 					],
 				},

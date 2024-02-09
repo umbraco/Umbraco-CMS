@@ -1,6 +1,7 @@
 import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import '../block-grid-areas-container/index.js';
 
 /**
  * @element umb-ref-grid-block
@@ -30,7 +31,9 @@ export class UmbRefGridBlockElement extends UmbLitElement {
 
 	render() {
 		// href=${this._workspaceEditPath ?? '#'}
-		return html`<uui-ref-node standalone .name=${this.label ?? ''}></uui-ref-node>`;
+		return html`<uui-ref-node standalone .name=${this.label ?? ''}>
+			<umb-block-grid-area-container></umb-block-grid-area-container>
+		</uui-ref-node>`;
 	}
 
 	static styles = [

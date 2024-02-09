@@ -3,13 +3,13 @@ import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../components/block-grid-block/block-grid-block.element.js';
+import '../block-grid-entry/index.js';
 
 /**
- * @element umb-property-editor-ui-block-grid-entries
+ * @element umb-block-grid-entries
  */
-@customElement('umb-property-editor-ui-block-grid-entries')
-export class UmbPropertyEditorUIBlockGridEntriesElement extends UmbLitElement {
+@customElement('umb-block-grid-entries')
+export class UmbBlockGridEntriesElement extends UmbLitElement {
 	//
 	// TODO: Make sure Sorter callbacks handles columnSpan when retrieving a new entry.
 
@@ -38,14 +38,13 @@ export class UmbPropertyEditorUIBlockGridEntriesElement extends UmbLitElement {
 
 	render() {
 		// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.
-		return html` ${repeat(
+		return html`${repeat(
 				this._layoutEntries,
 				(x) => x.contentUdi,
 				(layoutEntry, index) =>
 					html`<uui-button-inline-create
 							href=${this.#context.getPathForCreateBlock(index) ?? ''}></uui-button-inline-create>
-						<umb-property-editor-ui-block-grid-block data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
-						</umb-property-editor-ui-block-grid-block>`,
+						<umb-block-grid-entry data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}> </umb-block-grid-entry>`,
 			)}
 			<uui-button-group>
 				<uui-button
@@ -85,10 +84,10 @@ export class UmbPropertyEditorUIBlockGridEntriesElement extends UmbLitElement {
 	];
 }
 
-export default UmbPropertyEditorUIBlockGridEntriesElement;
+export default UmbBlockGridEntriesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-block-grid-entries': UmbPropertyEditorUIBlockGridEntriesElement;
+		'umb-block-grid-entries': UmbBlockGridEntriesElement;
 	}
 }

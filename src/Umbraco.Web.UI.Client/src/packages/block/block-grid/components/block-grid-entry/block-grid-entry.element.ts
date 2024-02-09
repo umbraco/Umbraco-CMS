@@ -1,28 +1,27 @@
-import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
+import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
-import '../ref-list-block/index.js';
-import '../inline-list-block/index.js';
+import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
+import '../ref-grid-block/index.js';
 
 /**
- * @element umb-property-editor-ui-block-list-block
+ * @element umb-block-grid-entry
  */
-@customElement('umb-property-editor-ui-block-list-block')
-export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement('umb-block-grid-entry')
+export class UmbBlockGridBlockElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
 	@property({ attribute: false })
-	public get layout(): UmbBlockLayoutBaseModel | undefined {
+	public get layout(): UmbBlockGridLayoutModel | undefined {
 		return this._layout;
 	}
-	public set layout(value: UmbBlockLayoutBaseModel | undefined) {
+	public set layout(value: UmbBlockGridLayoutModel | undefined) {
 		this._layout = value;
 		this.#context.setLayout(value);
 	}
-	private _layout?: UmbBlockLayoutBaseModel | undefined;
+	private _layout?: UmbBlockGridLayoutModel | undefined;
 
-	#context = new UmbBlockListEntryContext(this);
+	#context = new UmbBlockGridEntryContext(this);
 
 	@state()
 	_contentUdi?: string;
@@ -61,26 +60,19 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 			this._blockViewProps.label = label;
 			this._label = label;
 		});
-		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
-			this._inlineEditingMode = inlineEditingMode;
-		});
 	}
 
 	#renderRefBlock() {
-		return html`<umb-ref-list-block .label=${this._label}></umb-ref-list-block>`;
-	}
-
-	#renderInlineBlock() {
-		return html`<umb-inline-list-block .label=${this._label}></umb-inline-list-block>`;
+		return html`<umb-ref-grid-block .label=${this._label}></umb-ref-grid-block>`;
 	}
 
 	#renderBlock() {
 		return html`
 			<umb-extension-slot
 				type="blockEditorCustomView"
-				default-element=${this._inlineEditingMode ? 'umb-inline-list-block' : 'umb-ref-list-block'}
+				default-element=${'umb-ref-grid-block'}
 				.props=${this._blockViewProps}
-				>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
+				>${this.#renderRefBlock()}</umb-extension-slot
 			>
 			<uui-action-bar>
 				${this._workspaceEditPath
@@ -123,10 +115,10 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	];
 }
 
-export default UmbPropertyEditorUIBlockListBlockElement;
+export default UmbBlockGridBlockElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-block-list-block': UmbPropertyEditorUIBlockListBlockElement;
+		'umb-block-grid-entry': UmbBlockGridBlockElement;
 	}
 }
