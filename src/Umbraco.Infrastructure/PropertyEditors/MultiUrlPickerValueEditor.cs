@@ -132,7 +132,9 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     Trashed = trashed,
                     Published = published,
                     QueryString = dto.QueryString,
-                    Udi = udi,
+                    Type = dto.Udi is null ? LinkDisplay.Types.External
+                    : dto.Udi.EntityType,
+                    Unique = dto.Udi?.Guid,
                     Url = url ?? string.Empty,
                 });
             }
@@ -176,8 +178,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     Name = link.Name,
                     QueryString = link.QueryString,
                     Target = link.Target,
-                    Udi = link.Udi,
-                    Url = link.Udi == null ? link.Url : null, // only save the URL for external links
+                    Udi = link.TypeIsUdiBased ? new GuidUdi(link.Type!,link.Unique!.Value) : null,
+                    Url = link.TypeIsExternal ? link.Url : null, // only save the URL for external links
                 }));
         }
         catch (Exception ex)
