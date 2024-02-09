@@ -55,12 +55,11 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
     public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         public MultiNodeTreePickerPropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
         }
 
@@ -78,23 +77,46 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             }
         }
 
+
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+            => editorValue.Value is IEnumerable<string> stringValues
+                ? string.Join(",", ParseGuidsToConfiguredUdis(stringValues, editorValue.DataTypeConfiguration))
+                : null;
+
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment);
             return value is string stringValue
-                ? ParseValidUdis(stringValue.Split(Constants.CharArrays.Comma))
-                : null;
+            ? ParseConfiguredUdisToGuids(stringValue.Split(Constants.CharArrays.Comma)).ToArray()
+            : null;
         }
 
-        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
-            => editorValue.Value is IEnumerable<string> stringValues
-                ? string.Join(",", ParseValidUdis(stringValues))
-                : null;
+        private IEnumerable<string> ParseConfiguredUdisToGuids(IEnumerable<string> stringUdis)
+        {
+            var configuredEntityType = (ConfigurationObject as MultiNodePickerConfiguration)?.Filter;
+            foreach (var stringUdi in stringUdis)
+            {
+                if (UdiParser.TryParse(stringUdi, out GuidUdi? guidUdi) is false)
+                {
+                    yield break;
+                }
 
-        private string[] ParseValidUdis(IEnumerable<string> stringValues)
-            => stringValues
-                .Select(s => UdiParser.TryParse(s, out Udi? udi) && udi is GuidUdi guidUdi ? guidUdi.ToString() : null)
-                .WhereNotNull()
-                .ToArray();
+                yield return guidUdi.Guid.ToString();
+            }
+        }
+
+        private IEnumerable<string> ParseGuidsToConfiguredUdis(IEnumerable<string> stringKeys, object? configuration)
+        {
+            var configuredEntityType = (configuration as MultiNodePickerConfiguration)?.Filter;
+            foreach (var stringKey in stringKeys)
+            {
+                if (Guid.TryParse(stringKey, out Guid guidValue) is false)
+                {
+                    yield break;
+                }
+
+                yield return Udi.Create(configuredEntityType, guidValue).ToString();
+            }
+        }
     }
 }
