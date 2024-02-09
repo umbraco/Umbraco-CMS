@@ -131,7 +131,8 @@
 		"test:watch": "web-test-runner --watch",
 		"test": "web-test-runner --coverage",
 		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist-cms/vscode-html-custom-data.json",
-		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json"
+		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json",
+		"generate:tsconfig": "node ./devops/tsconfig/index.js"
 	},
 	"engines": {
 		"node": ">=20.9 <21",
