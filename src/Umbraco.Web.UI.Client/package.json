@@ -52,7 +52,7 @@
 		"./temporary-file": "./dist-cms/packages/core/temporary-file/index.js",
 		"./block": "./dist-cms/packages/block/index.js",
 		"./audit-log": "./dist-cms/packages/audit-log/index.js",
-		"./dictionary": "./dist-cms/packages/dictionary/dictionary/index.js",
+		"./dictionary": "./dist-cms/packages/dictionary/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./document-blueprint": "./dist-cms/packages/documents/document-blueprints/index.js",
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",
