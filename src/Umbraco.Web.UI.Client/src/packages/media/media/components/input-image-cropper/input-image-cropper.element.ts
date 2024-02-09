@@ -9,6 +9,7 @@ import type { TemporaryFileQueueItem } from '../../../../core/temporary-file/tem
 import { UmbTemporaryFileManager } from '../../../../core/temporary-file/temporary-file-manager.class.js';
 import { UmbImageCropperCrops, UmbImageCropperFocalPoint, UmbImageCropperPropertyEditorValue } from './index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-image-cropper')
 export class UmbInputImageCropperElement extends UmbLitElement {
@@ -38,26 +39,26 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		this.observe(this.#manager.queue, this.#onQueueUpdate);
 	}
 
-	updated(changedProperties: Map<string | number | symbol, unknown>) {
-		super.updated(changedProperties);
-
-		console.log('changedProperties', this.value);
-	}
-
 	#onQueueUpdate = (value: TemporaryFileQueueItem[]) => {
 		if (value.length) {
-			this.file = value[0].file;
-			this.fileUnique = value[0].unique;
-			this.value.src = value[0].unique;
+			// this.file = value[0].file;
+			// this.fileUnique = value[0].unique;
+			// this.value.src = value[0].unique;
 		}
 	};
 
 	#onUpload(e: UUIFileDropzoneEvent) {
 		const file = e.detail.files[0];
-
 		if (!file) return;
+		const unique = UmbId.new();
 
-		this.#manager?.uploadOne(UmbId.new(), file, 'waiting');
+		this.file = file;
+		this.fileUnique = unique;
+		this.value.src = unique;
+
+		this.#manager?.uploadOne(unique, file, 'waiting');
+
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onBrowse() {
