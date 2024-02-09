@@ -1,12 +1,7 @@
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	TelemetryResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	TelemetryLevelModel,
-	TelemetryResource,
-	ApiError,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { TelemetryResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { TelemetryLevelModel, TelemetryResource, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

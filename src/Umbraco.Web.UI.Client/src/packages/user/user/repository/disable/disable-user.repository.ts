@@ -1,7 +1,7 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbDisableUserServerDataSource } from './disable-user.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDisableUserRepository extends UmbUserRepositoryBase {
 	#disableSource: UmbDisableUserServerDataSource;

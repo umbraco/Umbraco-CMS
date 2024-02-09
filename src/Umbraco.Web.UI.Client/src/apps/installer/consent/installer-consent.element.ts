@@ -1,14 +1,13 @@
-import type { UmbInstallerContext} from '../installer.context.js';
+import type { UmbInstallerContext } from '../installer.context.js';
 import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
-import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
 import type {
 	ConsentLevelPresentationModel,
-	TelemetryResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	TelemetryLevelModel,
-} from '@umbraco-cms/backoffice/backend-api';
+	TelemetryResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-installer-consent')

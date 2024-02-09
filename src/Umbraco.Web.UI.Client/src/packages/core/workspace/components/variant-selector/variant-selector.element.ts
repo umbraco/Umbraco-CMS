@@ -17,7 +17,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-variant-selector')

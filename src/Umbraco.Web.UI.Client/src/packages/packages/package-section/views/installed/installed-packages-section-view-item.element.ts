@@ -8,7 +8,7 @@ import type { ManifestPackageView } from '@umbraco-cms/backoffice/extension-regi
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
+import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 

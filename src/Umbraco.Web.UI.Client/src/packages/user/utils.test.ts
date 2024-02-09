@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { getDisplayStateFromUserStatus } from './utils.js';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 describe('UmbUserExtensions', () => {
 	it('returns correct look and color from a status string', () => {

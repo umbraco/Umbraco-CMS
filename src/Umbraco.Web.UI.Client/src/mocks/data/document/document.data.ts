@@ -2,8 +2,8 @@ import type {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockDocumentTypeModelHack = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
 

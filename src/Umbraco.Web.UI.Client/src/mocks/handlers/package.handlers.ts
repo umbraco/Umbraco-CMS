@@ -7,7 +7,7 @@ import type {
 	PagedPackageDefinitionResponseModel,
 	PagedPackageMigrationStatusResponseModel,
 	CreatePackageRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/package/migration-status'), (_req, res, ctx) => {

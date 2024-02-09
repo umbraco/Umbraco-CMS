@@ -1,7 +1,7 @@
 import type { UmbMediaTypeItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { MediaTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**

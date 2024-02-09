@@ -13,8 +13,8 @@ import {
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { DirectionModel } from '@umbraco-cms/backoffice/backend-api';
+import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {

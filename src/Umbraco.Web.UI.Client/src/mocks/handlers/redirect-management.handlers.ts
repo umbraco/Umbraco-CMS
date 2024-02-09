@@ -4,8 +4,8 @@ import type {
 	PagedRedirectUrlResponseModel,
 	RedirectUrlResponseModel,
 	RedirectUrlStatusResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { RedirectStatusModel } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/redirect-management'), (_req, res, ctx) => {

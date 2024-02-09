@@ -1,14 +1,8 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
-import type {
-	IndexResponseModel,
-	SearcherResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	HealthStatusModel,
-	IndexerResource,
-	SearcherResource,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { IndexResponseModel, SearcherResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthStatusModel, IndexerResource, SearcherResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

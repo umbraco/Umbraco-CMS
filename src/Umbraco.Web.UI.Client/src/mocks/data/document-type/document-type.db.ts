@@ -15,7 +15,7 @@ import type {
 	DocumentTypeSortModel,
 	DocumentTypeTreeItemResponseModel,
 	PagedAllowedDocumentTypeModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDocumentTypeModel>(this, documentTypeTreeItemMapper);

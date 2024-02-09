@@ -1,6 +1,6 @@
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UpgradeSettingsResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import { UpgradeResource, ApiError } from '@umbraco-cms/backoffice/backend-api';
+import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UpgradeResource, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

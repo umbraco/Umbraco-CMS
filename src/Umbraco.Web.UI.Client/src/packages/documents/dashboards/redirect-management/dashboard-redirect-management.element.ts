@@ -1,14 +1,10 @@
 import type { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type {
-	RedirectUrlResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	RedirectManagementResource,
-	RedirectStatusModel
-} from '@umbraco-cms/backoffice/backend-api';
+import type { RedirectUrlResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { RedirectManagementResource, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 

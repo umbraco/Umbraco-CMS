@@ -4,7 +4,7 @@ import { html, repeat, ifDefined, customElement, property, state } from '@umbrac
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { CultureReponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CultureReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-input-culture-select')
 export class UmbInputCultureSelectElement extends FormControlMixin(UmbLitElement) {

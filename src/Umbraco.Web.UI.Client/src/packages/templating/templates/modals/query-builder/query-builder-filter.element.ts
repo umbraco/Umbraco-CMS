@@ -7,8 +7,8 @@ import type {
 	OperatorModel,
 	TemplateQueryExecuteFilterPresentationModel,
 	TemplateQuerySettingsResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { TemplateQueryPropertyTypeModel } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { TemplateQueryPropertyTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-template-query-builder-filter')
 export class UmbTemplateQueryBuilderFilterElement extends UmbLitElement {
