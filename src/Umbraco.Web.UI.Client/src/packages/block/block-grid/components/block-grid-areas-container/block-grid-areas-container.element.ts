@@ -32,9 +32,7 @@ export class UmbBlockGridAreaContainerElement extends UmbLitElement {
 			? repeat(
 					this._areas,
 					(area) => area.key,
-					(area) =>
-						html` <property-editor-ui-block-grid-entries .areaKey=${area.key}>
-						</property-editor-ui-block-grid-entries>`,
+					(area) => html` <umb-block-grid-entries .areaKey=${area.key}> </umb-block-grid-entries>`,
 			  )
 			: '';
 	}
