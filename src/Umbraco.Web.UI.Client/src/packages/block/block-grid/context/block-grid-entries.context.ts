@@ -23,17 +23,21 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	#areaKey?: string | null;
 
 	setParentUnique(contentUdi: string | null) {
+		this._workspaceModal.setUniquePathValue('parentUnique', contentUdi ?? 'null');
 		this.#catalogueModal.setUniquePathValue('parentUnique', contentUdi ?? 'null');
 	}
 
 	setAreaKey(areaKey: string | null) {
 		this.#areaKey = areaKey;
+		this._workspaceModal.setUniquePathValue('areaKey', areaKey ?? 'null');
 		this.#catalogueModal.setUniquePathValue('areaKey', areaKey ?? 'null');
 		this.#gotAreaKey();
 	}
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT);
+
+		this._workspaceModal.addUniquePaths(['parentUnique', 'areaKey']);
 
 		this.#retrieveParentEntry = this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
 			this.#parentEntry = blockGridEntry;

@@ -21,7 +21,7 @@ export abstract class UmbBlockEntriesContext<
 	_manager?: BlockManagerContextType;
 	_retrieveManager;
 
-	#workspaceModal: UmbModalRouteRegistrationController;
+	_workspaceModal: UmbModalRouteRegistrationController;
 
 	#workspacePath = new UmbStringState(undefined);
 	workspacePath = this.#workspacePath.asObservable();
@@ -41,7 +41,7 @@ export abstract class UmbBlockEntriesContext<
 			this.observe(
 				this._manager.propertyAlias,
 				(alias) => {
-					this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
+					this._workspaceModal.setUniquePathValue('propertyAlias', alias);
 				},
 				'observePropertyAlias',
 			);
@@ -49,13 +49,13 @@ export abstract class UmbBlockEntriesContext<
 				this._manager.variantId,
 				(variantId) => {
 					// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
-					this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
+					this._workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 				},
 				'observePropertyVariantId',
 			);
 		}).asPromise();
 
-		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
+		this._workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
 			.addUniquePaths(['propertyAlias', 'variantId'])
 			.addAdditionalPath('block')
 			.onSetup(() => {
