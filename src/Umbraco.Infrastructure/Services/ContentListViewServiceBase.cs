@@ -28,13 +28,12 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
 
     protected abstract Guid DefaultListViewKey { get; }
 
-    protected abstract IEnumerable<TContent> GetPagedChildren(
+    protected abstract Task<PagedModel<TContent>> GetPagedChildrenAsync(
         int id,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
         IQuery<TContent>? filter,
-        Ordering? ordering);
+        Ordering? ordering,
+        int skip,
+        int take);
 
     protected abstract Task<bool> HasAccessToListViewItemAsync(IUser user, Guid key);
 
@@ -228,26 +227,23 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
 
     private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, int contentId, string? filter, Ordering? ordering, int skip, int take)
     {
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
         var queryFilter = ParseQueryFilter(filter);
 
-        IEnumerable<TContent> children = GetPagedChildren(
+        var pagedChildren = await GetPagedChildrenAsync(
             contentId,
-            pageNumber,
-            pageSize,
-            out var total,
             queryFilter,
-            ordering);
+            ordering,
+            skip,
+            take);
 
         // Filtering out child nodes after getting a paged result is an active choice here, even though the pagination might get off.
         // This has been the case with this functionality in Umbraco for a long time.
-        var items = await FilterItemsBasedOnAccessAsync(user, children);
+        var items = await FilterItemsBasedOnAccessAsync(user, pagedChildren.Items);
 
         var pagedResult = new PagedModel<TContent>
         {
             Items = items,
-            Total = total
+            Total = pagedChildren.Total,
         };
 
         return pagedResult;

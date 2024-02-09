@@ -29,20 +29,31 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
 
     protected override Guid DefaultListViewKey => Constants.DataTypes.Guids.ListViewContentGuid;
 
-    protected override IEnumerable<IContent> GetPagedChildren(
+    protected override async Task<PagedModel<IContent>> GetPagedChildrenAsync(
         int id,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
         IQuery<IContent>? filter,
-        Ordering? ordering) =>
-        _contentService.GetPagedChildren(
+        Ordering? ordering,
+        int skip,
+        int take)
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        var items = await Task.FromResult(_contentService.GetPagedChildren(
             id,
-            pageIndex,
+            pageNumber,
             pageSize,
-            out totalRecords,
+            out var total,
             filter,
-            ordering);
+            ordering));
+
+        var pagedResult = new PagedModel<IContent>
+        {
+            Items = items,
+            Total = total,
+        };
+
+        return pagedResult;
+    }
 
     // We can use an authorizer here, as it already handles all the necessary checks for this filtering.
     // However, we cannot pass in all the items; we want only the ones that comply, as opposed to

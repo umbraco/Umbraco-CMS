@@ -28,20 +28,26 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
 
     protected override Guid DefaultListViewKey => Constants.DataTypes.Guids.ListViewMediaGuid;
 
-    protected override IEnumerable<IMedia> GetPagedChildren(
-        int id,
-        long pageIndex,
-        int pageSize,
-        out long totalRecords,
-        IQuery<IMedia>? filter,
-        Ordering? ordering) =>
-        _mediaService.GetPagedChildren(
+    protected override async Task<PagedModel<IMedia>> GetPagedChildrenAsync(int id, IQuery<IMedia>? filter, Ordering? ordering, int skip, int take)
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        var items = await Task.FromResult(_mediaService.GetPagedChildren(
             id,
-            pageIndex,
+            pageNumber,
             pageSize,
-            out totalRecords,
+            out var total,
             filter,
-            ordering);
+            ordering));
+
+        var pagedResult = new PagedModel<IMedia>
+        {
+            Items = items,
+            Total = total,
+        };
+
+        return pagedResult;
+    }
 
     // We can use an authorizer here, as it already handles all the necessary checks for this filtering.
     // However, we cannot pass in all the items; we want only the ones that comply, as opposed to
