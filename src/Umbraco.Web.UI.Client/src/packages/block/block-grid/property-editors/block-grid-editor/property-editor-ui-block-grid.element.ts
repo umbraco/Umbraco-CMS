@@ -100,10 +100,6 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		});
 	}
 
-	/*
-			.layoutEntries=${this._rootLayouts}
-			.parentUnique=${null}
-	 */
 	render() {
 		return html`<umb-block-grid-entries .areaKey=${null}></umb-block-grid-entries>`;
 	}
