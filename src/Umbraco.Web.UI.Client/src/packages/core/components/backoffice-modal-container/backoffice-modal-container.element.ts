@@ -46,7 +46,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		});
 
 		if (this._modals.length === 0) {
-			this._modalElementMap.clear();
+			//this._modalElementMap.clear(); // should not make a difference now that we clean it above. [NL]
 			return;
 		}
 

@@ -149,7 +149,6 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 
 	#openPicker() {
 		// TODO: Configure the media picker, with `allowedContentTypeIds` and `ignoreUserStartNodes` [LK]
-		console.log('#openPicker', [this.allowedContentTypeIds, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			pickableFilter: this.#pickableFilter,
