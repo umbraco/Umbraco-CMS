@@ -131,7 +131,7 @@ export class UmbPropertyElement extends UmbLitElement {
 
 	private _observePropertyEditorUI() {
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
+			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
 			(manifest) => {
 				this._gotEditorUI(manifest);
 			},

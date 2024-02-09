@@ -150,7 +150,6 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	#openPicker() {
 		// TODO: Configure the content picker, with `startNodeId` and `ignoreUserStartNodes` [LK]
-		console.log('#openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
