@@ -28,16 +28,16 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	@state()
 	private _activeTabName?: string | null | undefined;
 
-	private _workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
+	#blockWorkspace?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
 
 	constructor() {
 		super();
 
-		this._tabsStructureHelper.setIsRoot(true);
-		this._tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this._tabsStructureHelper.containers, (tabs) => {
+		this.#tabsStructureHelper.setIsRoot(true);
+		this.#tabsStructureHelper.setContainerChildType('Tab');
+		this.observe(this.#tabsStructureHelper.containers, (tabs) => {
 			this._tabs = tabs;
 			this._checkDefaultTabName();
 		});
@@ -45,18 +45,18 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._workspaceContext = workspaceContext;
-			this._tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
+			this.#blockWorkspace = workspaceContext;
+			this.#tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
 			workspaceContext.content.createPropertyDatasetContext(this);
 			this._observeRootGroups();
 		});
 	}
 
 	private _observeRootGroups() {
-		if (!this._workspaceContext) return;
+		if (!this.#blockWorkspace) return;
 
 		this.observe(
-			this._workspaceContext.content.structure.hasRootContainers('Group'),
+			this.#blockWorkspace.content.structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
 				this._hasRootGroups = hasRootGroups;
 				this._checkDefaultTabName();
@@ -66,17 +66,16 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 	}
 
 	private _checkDefaultTabName() {
-		if (!this._tabs || !this._workspaceContext) return;
+		if (!this._tabs || !this.#blockWorkspace) return;
 
 		// Find the default tab to grab:
 		if (this._activeTabId === undefined) {
-			if (this._tabs.length > 0) {
-				this._activeTabName = this._tabs[0].name;
-				this._activeTabId = this._tabs[0].id;
-			}
 			if (this._hasRootGroups) {
 				this._activeTabName = null;
 				this._activeTabId = null;
+			} else if (this._tabs.length > 0) {
+				this._activeTabName = this._tabs[0].name;
+				this._activeTabId = this._tabs[0].id;
 			}
 		}
 	}
@@ -118,7 +117,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 			${this._activeTabId !== undefined
 				? html`<umb-block-workspace-view-edit-tab
 						.hideSingleGroup=${true}
-						.ownerTabId=${this._activeTabId && this._tabsStructureHelper.isOwnerContainer(this._activeTabId)
+						.ownerTabId=${this._activeTabId && this.#tabsStructureHelper.isOwnerContainer(this._activeTabId)
 							? this._activeTabId
 							: undefined}
 						.noTabName=${this._hasRootGroups && this._activeTabName === null}
