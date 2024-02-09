@@ -23,28 +23,7 @@ public class ContextualJsonSerializer : IJsonSerializer
 
     public T? DeserializeSubset<T>(string input, string key) => throw new NotSupportedException();
 
-    private IJsonSerializer ContextualizedSerializer()
-    {
-        try
-        {
-            var requestedPath = _requestAccessor.GetRequestUrl()?.AbsolutePath;
-            if (requestedPath != null)
-            {
-                // add white listed paths for the System.Text.Json config serializer here
-                // - always use it for the new management API
-                if (requestedPath.Contains("/umbraco/management/api/"))
-                {
-                    return _systemTextSerializer;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            // ignore - this whole thing is a temporary workaround, let's not make a fuss
-        }
-
-        return _jsonNetSerializer;
-    }
+    private IJsonSerializer ContextualizedSerializer() => _systemTextSerializer;
 }
 
 
