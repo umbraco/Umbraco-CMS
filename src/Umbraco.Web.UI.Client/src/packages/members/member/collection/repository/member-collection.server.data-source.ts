@@ -43,8 +43,8 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 			const items = json.items.map((item: any) => {
 				const model: UmbMemberCollectionModel = {
 					unique: item.id,
-					name: item.name,
 					entityType: UMB_MEMBER_ENTITY_TYPE,
+					variants: item.variants,
 				};
 
 				return model;

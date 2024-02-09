@@ -17,7 +17,15 @@ export const data: Array<UmbMockMemberModel> = [
 		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
 		username: 'member1',
 		values: [],
-		variants: [],
+		variants: [
+			{
+				name: 'Member 1',
+				culture: 'en-us',
+				segment: null,
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 	},
 	{
 		email: 'member2@member.com',
@@ -33,7 +41,15 @@ export const data: Array<UmbMockMemberModel> = [
 		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
 		username: 'member2',
 		values: [],
-		variants: [],
+		variants: [
+			{
+				name: 'Member 2',
+				culture: 'en-us',
+				segment: null,
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 	},
 	{
 		email: 'member3@member.com',
@@ -49,6 +65,14 @@ export const data: Array<UmbMockMemberModel> = [
 		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
 		username: 'member3',
 		values: [],
-		variants: [],
+		variants: [
+			{
+				name: 'Member 3',
+				culture: 'en-us',
+				segment: null,
+				createDate: '2023-02-06T15:31:46.876902',
+				updateDate: '2023-02-06T15:31:51.354764',
+			},
+		],
 	},
 ];

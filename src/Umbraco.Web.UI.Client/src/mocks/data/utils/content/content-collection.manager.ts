@@ -3,6 +3,7 @@ import type { UmbMockDBBase } from '../mock-db-base.js';
 import { pagedResult } from '../paged-result.js';
 
 const contentQueryFilter = (filterOptions: any, item: any) => {
+	return true;
 	console.log('implement filter logic for content items');
 	//queryFilter(filterOptions.filter, item.name);
 };

@@ -42,15 +42,16 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 
 	#createTableItems(members: Array<UmbMemberCollectionModel>) {
 		this._tableItems = members.map((member) => {
+			// TODO: get correct variant name
+			const name = member.variants[0].name;
+
 			return {
 				id: member.unique,
 				icon: 'icon-user',
 				data: [
 					{
 						columnAlias: 'memberName',
-						value: html`<a href=${'section/member-management/workspace/member/edit/' + member.unique}
-							>${member.name}</a
-						>`,
+						value: html`<a href=${'section/member-management/workspace/member/edit/' + member.unique}>${name}</a>`,
 					},
 				],
 			};

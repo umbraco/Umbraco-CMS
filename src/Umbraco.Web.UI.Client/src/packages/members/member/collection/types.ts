@@ -7,6 +7,6 @@ export interface UmbMemberCollectionFilterModel {
 
 export interface UmbMemberCollectionModel {
 	unique: string;
-	name: string;
 	entityType: UmbMemberEntityType;
+	variants: Array<any>;
 }

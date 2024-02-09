@@ -89,6 +89,7 @@ const collectionItemResponseMapper = (item: UmbMockMemberModel): any => {
 	return {
 		id: item.id,
 		email: item.email,
+		variants: item.variants,
 	};
 };
 
