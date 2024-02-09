@@ -30,8 +30,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		onChange: ({ model, item }) => {
 			const container = this.getAttribute('container-id');
 			if (container) {
-				this._propertyStructure = model;
-
 				const modelIndex = model.findIndex((entry) => entry.id === item.id);
 				if (modelIndex === -1) return;
 				let sortOrder: number;
@@ -47,6 +45,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 					container: { id: container },
 				});
 			}
+			this._propertyStructure = model;
 		},
 	});
 
@@ -160,7 +159,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		return html`<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
 				${repeat(
 					this._propertyStructure,
-					(property) => property.id ?? '' + property.container?.id ?? '' + property.sortOrder ?? '',
+					(property) => '' + property.container?.id + property.container?.id + '' + property.sortOrder,
 					(property) => {
 						// Note: This piece might be moved into the property component
 						const inheritedFromDocument = this._ownerDocumentTypes?.find(
