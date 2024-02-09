@@ -20,7 +20,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	#modalRouter: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
 	#listening = false;
 
-	@property()
+	@property({ attribute: false })
 	public get routes(): UmbRoute[] | undefined {
 		return this.#router.routes;
 	}
@@ -34,7 +34,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		}
 	}
 
-	@property()
+	@property({ attribute: false })
 	public get parent(): IRouterSlot | null | undefined {
 		return this.#router.parent;
 	}

@@ -100,7 +100,7 @@ export class UmbDataTypeWorkspaceContext
 
 	#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias: string) {
 		return this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias),
+			umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', propertyEditorSchemaAlias),
 			(manifest) => {
 				this._propertyEditorSchemaConfigProperties = manifest?.meta.settings?.properties || [];
 				this._propertyEditorSchemaConfigDefaultData = manifest?.meta.settings?.defaultData || [];
@@ -110,17 +110,14 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	#setPropertyEditorUIConfig(propertyEditorUIAlias: string) {
-		return this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('propertyEditorUi', propertyEditorUIAlias),
-			(manifest) => {
-				this.#propertyEditorUiIcon.setValue(manifest?.meta.icon || null);
-				this.#propertyEditorUiName.setValue(manifest?.name || null);
+		return this.observe(umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', propertyEditorUIAlias), (manifest) => {
+			this.#propertyEditorUiIcon.setValue(manifest?.meta.icon || null);
+			this.#propertyEditorUiName.setValue(manifest?.name || null);
 
-				this._propertyEditorUISettingsSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
-				this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
-				this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
-			},
-		).asPromise();
+			this._propertyEditorUISettingsSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
+			this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
+			this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
+		}).asPromise();
 	}
 
 	private _mergeConfigProperties() {
