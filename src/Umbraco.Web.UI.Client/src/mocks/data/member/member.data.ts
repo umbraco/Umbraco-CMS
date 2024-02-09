@@ -4,7 +4,6 @@ export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 
 export const data: Array<UmbMockMemberModel> = [
 	{
-		name: 'Member 1',
 		email: 'member1@member.com',
 		failedPasswordAttempts: 0,
 		groups: [],
@@ -21,7 +20,6 @@ export const data: Array<UmbMockMemberModel> = [
 		variants: [],
 	},
 	{
-		name: 'Member 2',
 		email: 'member2@member.com',
 		failedPasswordAttempts: 0,
 		groups: [],
@@ -38,7 +36,6 @@ export const data: Array<UmbMockMemberModel> = [
 		variants: [],
 	},
 	{
-		name: 'Member 3',
 		email: 'member3@member.com',
 		failedPasswordAttempts: 0,
 		groups: [],

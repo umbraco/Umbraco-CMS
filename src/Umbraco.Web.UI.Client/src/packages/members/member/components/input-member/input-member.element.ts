@@ -205,14 +205,16 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 
 	#renderItem(item: MemberItemResponseModel) {
 		if (!item.id) return;
+		// TODO: get the correct variant name
+		const name = item.variants[0].name;
 		return html`
-			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
+			<uui-ref-node name=${ifDefined(item.variants[0].name)} detail=${ifDefined(item.id)}>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
 					<uui-button
 						@click=${() => this._requestRemoveItem(item)}
-						label="${this.localize.term('general_remove')} ${item.name}">
+						label="${this.localize.term('general_remove')} ${name}">
 						${this.localize.term('general_remove')}
 					</uui-button>
 				</uui-action-bar>
@@ -222,11 +224,13 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 
 	#renderOpenButton(item: MemberItemResponseModel) {
 		if (!this.showOpenButton) return;
+		// TODO: get the correct variant name
+		const name = item.variants[0].name;
 		return html`
 			<uui-button
 				compact
 				href="${this._editMemberPath}edit/${item.id}"
-				label=${this.localize.term('general_edit') + ` ${item.name}`}>
+				label=${this.localize.term('general_edit') + ` ${name}`}>
 				<uui-icon name="icon-edit"></uui-icon>
 			</uui-button>
 		`;

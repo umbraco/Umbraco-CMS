@@ -1,10 +1,11 @@
-import type { UmbMockMemberModel } from '../../member/member.data.js';
 import { queryFilter } from '../../utils.js';
 import type { UmbMockDBBase } from '../mock-db-base.js';
 import { pagedResult } from '../paged-result.js';
 
-const contentQueryFilter = (filterOptions: any, item: UmbMockMemberModel) =>
-	queryFilter(filterOptions.filter, item.name);
+const contentQueryFilter = (filterOptions: any, item: any) => {
+	console.log('implement filter logic for content items');
+	//queryFilter(filterOptions.filter, item.name);
+};
 
 export class UmbMockContentCollectionManager<T extends { id: string }> {
 	#db: UmbMockDBBase<T>;
