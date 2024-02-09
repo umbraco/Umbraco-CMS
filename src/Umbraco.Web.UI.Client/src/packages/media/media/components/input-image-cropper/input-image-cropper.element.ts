@@ -1,167 +1,92 @@
-import { LitElement, css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { LitElement, css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
-import type { UmbImageCropperElement } from './image-cropper.element.js';
-import type {
-	UmbImageCropperCrop,
-	UmbImageCropperCrops,
-	UmbImageCropperFocalPoint,
-	UmbImageCropperPropertyEditorValue,
-} from './index.js';
+import './image-cropper-field.element.js';
+import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { TemporaryFileQueueItem } from '../../../../core/temporary-file/temporary-file-manager.class.js';
+import { UmbTemporaryFileManager } from '../../../../core/temporary-file/temporary-file-manager.class.js';
+import { UmbImageCropperCrops, UmbImageCropperFocalPoint, UmbImageCropperPropertyEditorValue } from './index.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 @customElement('umb-input-image-cropper')
-export class UmbInputImageCropperElement extends LitElement {
+export class UmbInputImageCropperElement extends UmbLitElement {
+	@query('#dropzone')
+	private _dropzone?: UUIFileDropzoneElement;
+
 	@property({ attribute: false })
-	get value() {
-		return this.#value;
+	value: UmbImageCropperPropertyEditorValue = {
+		src: '',
+		crops: [],
+		focalPoint: { left: 0.5, top: 0.5 },
+	};
+
+	@state()
+	file?: File;
+
+	@state()
+	fileUnique?: string;
+
+	#manager?: UmbTemporaryFileManager;
+
+	constructor() {
+		super();
+		this.#manager = new UmbTemporaryFileManager(this);
+
+		// this.observe(this.#manager.isReady, (value) => (this.error = !value));
+		this.observe(this.#manager.queue, this.#onQueueUpdate);
 	}
-	set value(value) {
-		if (!value) {
-			this.crops = [];
-			this.focalPoint = { left: 0.5, top: 0.5 };
-			this.src = '';
-			this.#value = undefined;
-		} else {
-			this.crops = [...value.crops];
-			// TODO: This is a temporary solution to make sure we have a focal point
-			this.focalPoint = value.focalPoint || { left: 0.5, top: 0.5 };
-			this.src = value.src;
-			this.#value = value;
+
+	updated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.updated(changedProperties);
+
+		console.log('changedProperties', this.value);
+	}
+
+	#onQueueUpdate = (value: TemporaryFileQueueItem[]) => {
+		if (value.length) {
+			this.file = value[0].file;
+			this.fileUnique = value[0].unique;
+			this.value.src = value[0].unique;
 		}
+	};
 
-		this.requestUpdate();
+	#onUpload(e: UUIFileDropzoneEvent) {
+		const file = e.detail.files[0];
+
+		if (!file) return;
+
+		this.#manager?.uploadOne(UmbId.new(), file, 'waiting');
 	}
 
-	#value?: UmbImageCropperPropertyEditorValue;
-
-	@state()
-	currentCrop?: UmbImageCropperCrop;
-
-	@state()
-	crops: UmbImageCropperCrops = [];
-
-	@state()
-	focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
-
-	@state()
-	src = '';
-
-	#onCropClick(crop: any) {
-		const index = this.crops.findIndex((c) => c.alias === crop.alias);
-
-		if (index === -1) return;
-
-		this.currentCrop = { ...this.crops[index] };
-	}
-
-	#onCropChange(event: CustomEvent) {
-		const target = event.target as UmbImageCropperElement;
-		const value = target.value;
-
-		if (!value) return;
-
-		const index = this.crops.findIndex((crop) => crop.alias === value.alias);
-
-		if (index === undefined) return;
-
-		this.crops[index] = value;
-		this.currentCrop = undefined;
-		this.#updateValue();
-	}
-
-	#onFocalPointChange(event: CustomEvent) {
-		this.focalPoint = event.detail;
-		this.#updateValue();
-	}
-
-	#updateValue() {
-		this.#value = {
-			crops: [...this.crops],
-			focalPoint: this.focalPoint,
-			src: this.src,
-		};
-
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
-	}
-
-	#onResetFocalPoint() {
-		this.focalPoint = { left: 0.5, top: 0.5 };
-		this.#updateValue();
+	#onBrowse() {
+		if (!this._dropzone) return;
+		this._dropzone.browse();
 	}
 
 	render() {
+		console.log('render', this.value);
+		if (this.value.src || this.file) {
+			return this.#renderImageCropper();
+		}
+
+		return this.#renderDropzone();
+	}
+
+	#renderDropzone() {
 		return html`
-			<div id="main">${this.#renderMain()}</div>
-			<div id="side">${this.#renderSide()}</div>
+			<uui-file-dropzone id="dropzone" label="dropzone" @change="${this.#onUpload}">
+				<uui-button label="upload" @click="${this.#onBrowse}">Upload file here</uui-button>
+			</uui-file-dropzone>
 		`;
 	}
 
-	#renderMain() {
-		return this.currentCrop
-			? html`<umb-image-cropper
-					@change=${this.#onCropChange}
-					.src=${this.src}
-					.focalPoint=${this.focalPoint}
-					.value=${this.currentCrop}></umb-image-cropper>`
-			: html`<umb-image-cropper-focus-setter
-						@change=${this.#onFocalPointChange}
-						.focalPoint=${this.focalPoint}
-						.src=${this.src}></umb-image-cropper-focus-setter>
-					<div id="actions">
-						<uui-button label="Remove files">Remove files (NOT IMPLEMENTED YET)</uui-button>
-						<uui-button label="Reset focal point" @click=${this.#onResetFocalPoint}>Reset focal point</uui-button>
-					</div> `;
+	#renderImageCropper() {
+		return html`<umb-image-cropper-field .value=${this.value} .file=${this.file}></umb-image-cropper-field>`;
 	}
 
-	#renderSide() {
-		if (!this.value || !this.crops) return;
-
-		return repeat(
-			this.crops,
-			(crop) => crop.alias + JSON.stringify(crop.coordinates),
-			(crop) =>
-				html` <umb-image-cropper-preview
-					@click=${() => this.#onCropClick(crop)}
-					.crop=${crop}
-					.focalPoint=${this.focalPoint}
-					.src=${this.src}></umb-image-cropper-preview>`,
-		);
-	}
-	static styles = css`
-		:host {
-			display: flex;
-			width: 100%;
-			box-sizing: border-box;
-			gap: var(--uui-size-space-3);
-			height: 400px;
-		}
-		#main {
-			max-width: 500px;
-			min-width: 300px;
-			width: 100%;
-			height: 100%;
-			display: flex;
-			gap: var(--uui-size-space-1);
-			flex-direction: column;
-		}
-		#actions {
-			display: flex;
-			justify-content: space-between;
-		}
-		umb-image-cropper-focus-setter {
-			height: calc(100% - 33px - var(--uui-size-space-1)); /* Temp solution to make room for actions */
-		}
-		#side {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-			gap: var(--uui-size-space-3);
-			flex-grow: 1;
-			overflow-y: auto;
-			height: fit-content;
-			max-height: 100%;
-		}
-	`;
+	static styles = css``;
 }
 
 declare global {

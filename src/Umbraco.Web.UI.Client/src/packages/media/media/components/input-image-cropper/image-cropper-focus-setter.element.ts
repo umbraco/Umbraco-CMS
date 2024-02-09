@@ -1,16 +1,7 @@
 import type { UmbImageCropperFocalPoint } from './index.js';
 import { clamp } from '@umbraco-cms/backoffice/utils';
-import type {
-	PropertyValueMap} from '@umbraco-cms/backoffice/external/lit';
-import {
-	LitElement,
-	css,
-	html,
-	nothing,
-	customElement,
-	property,
-	query,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { LitElement, css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-image-cropper-focus-setter')
 export class UmbImageCropperFocusSetterElement extends LitElement {
@@ -55,13 +46,14 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 			this.imageElement.onload = () => {
 				if (!this.imageElement || !this.wrapperElement) return;
 				const imageAspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
+				const hostRect = this.getBoundingClientRect();
+				const image = this.imageElement.getBoundingClientRect();
 
-				if (imageAspectRatio > 1) {
+				if (image.width > hostRect.width) {
 					this.imageElement.style.width = '100%';
-					this.wrapperElement.style.width = '100%';
-				} else {
+				}
+				if (image.height > hostRect.height) {
 					this.imageElement.style.height = '100%';
-					this.wrapperElement.style.height = '100%';
 				}
 
 				this.imageElement.style.aspectRatio = `${imageAspectRatio}`;

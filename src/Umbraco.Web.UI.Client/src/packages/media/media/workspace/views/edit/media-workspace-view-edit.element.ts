@@ -55,8 +55,6 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 	private _observeRootGroups() {
 		if (!this._workspaceContext) return;
 
-		console.log('whiio', this._workspaceContext.structure);
-
 		this.observe(
 			this._workspaceContext.structure.hasRootContainers('Group'),
 			(hasRootGroups) => {
