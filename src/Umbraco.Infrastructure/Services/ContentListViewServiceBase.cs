@@ -196,11 +196,12 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             : Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.CollectionNotFound, null);
     }
 
-    private async Task<IDataType?> GetConfiguredListViewDataTypeAsync(TContentType? contentType) // NB: before passed in string? listViewSuffix
+    private async Task<IDataType?> GetConfiguredListViewDataTypeAsync(TContentType? contentType)
     {
-        var defaultListViewDataType = await _dataTypeService.GetAsync(DefaultListViewKey);
+        string? listViewSuffix = null;
 
-        string? listViewSuffix = null; // TODO: different: content - alias; media - name
+        // FIXME: Remove. This is a workaround to construct the custom list view name (content type - alias; media type- name)
+        // until we have the concrete content type + list view binding.
         if (DefaultListViewKey == Constants.DataTypes.Guids.ListViewContentGuid)
         {
             listViewSuffix = contentType?.Alias;
@@ -214,7 +215,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         // So return the default one.
         if (string.IsNullOrEmpty(listViewSuffix))
         {
-            return defaultListViewDataType;
+            return await _dataTypeService.GetAsync(DefaultListViewKey);
         }
 
         // FIXME: Clean up! Get the configured list view from content type once the binding task AB#37205 is done.
@@ -222,7 +223,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
         // We can use the fact that when a custom list view is removed as the content type list view configuration, the corresponding list view data type gets deleted.
         var customListViewName = Constants.Conventions.DataTypes.ListViewPrefix + listViewSuffix;
 
-        return _dataTypeService.GetDataType(customListViewName) ?? defaultListViewDataType;
+        return _dataTypeService.GetDataType(customListViewName) ?? await _dataTypeService.GetAsync(DefaultListViewKey);
     }
 
     private async Task<PagedModel<TContent>> GetAllowedListViewItemsAsync(IUser user, int contentId, string? filter, Ordering? ordering, int skip, int take)
@@ -265,7 +266,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
     }
 
     // TODO: Optimize the way we filter out only the nodes the user is allowed to see - instead of checking one by one
-    private async Task<IEnumerable<TContent>> FilterItemsBasedOnAccessAsync( IUser user, IEnumerable<TContent> items)
+    private async Task<IEnumerable<TContent>> FilterItemsBasedOnAccessAsync(IUser user, IEnumerable<TContent> items)
     {
         var filteredItems = new List<TContent>();
 
