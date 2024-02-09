@@ -50,8 +50,12 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 				<uui-icon class="logo" name="icon-layout"></uui-icon>
 				<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
 			</button>
-			<uui-button id="bottom" label="Default template" ?disabled="${this.default}" @click="${this.#setSelection}">
-				${this.default ? '(Default template)' : 'Make default'}
+			<uui-button
+				id="bottom"
+				label="${this.localize.term('settings_defaulttemplate')}"
+				?disabled="${this.default}"
+				@click="${this.#setSelection}">
+				(${this.localize.term(this.default ? 'settings_defaulttemplate' : 'grid_setAsDefault')})
 			</uui-button>
 			<slot name="actions"></slot>
 		</div>`;
