@@ -1,7 +1,7 @@
 import type { UmbBlockTypeBaseModel } from '../../block-type/types.js';
-import type { UmbBlockLayoutBaseModel } from '../types.js';
+import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
 import type { UmbBlockWorkspaceData } from '../index.js';
-import type { UmbBlockManagerContext } from './block-manager.context.js';
+import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -56,9 +56,16 @@ export abstract class UmbBlockEntriesContext<
 	public abstract getPathForClipboard(index: number): string | undefined;
 
 	public abstract create(
-		modalData: UmbBlockWorkspaceData,
-		layoutEntry: BlockLayoutType,
 		contentElementTypeKey: string,
+		layoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		modalData?: UmbBlockWorkspaceData,
+	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
+
+	abstract insert(
+		layoutEntry: BlockLayoutType,
+		content: UmbBlockDataType,
+		settings: UmbBlockDataType | undefined,
+		modalData: UmbBlockWorkspaceData,
 	): Promise<boolean>;
 	//edit?
 	//editSettings

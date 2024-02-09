@@ -1,6 +1,7 @@
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
 import { UmbBlockManagerContext } from '../../block/context/block-manager.context.js';
 import type { UmbBlockListWorkspaceData } from '../index.js';
+import type { UmbBlockDataType } from '../../block/types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -18,18 +19,23 @@ export class UmbBlockListManagerContext<
 		this.#inlineEditingMode.setValue(inlineEditingMode ?? false);
 	}
 
-	create(modalData: UmbBlockListWorkspaceData, layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
-		return super.createBlock(modalData, layoutEntry, contentElementTypeKey, this.#createLayoutEntry);
+	create(
+		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		modalData?: UmbBlockListWorkspaceData,
+	) {
+		return super.createBlockData(contentElementTypeKey, partialLayoutEntry);
 	}
 
-	#createLayoutEntry(
-		modalData: UmbBlockListWorkspaceData,
+	insert(
 		layoutEntry: BlockLayoutType,
-		contentElementTypeKey: string,
+		content: UmbBlockDataType,
+		settings: UmbBlockDataType | undefined,
+		modalData: UmbBlockListWorkspaceData,
 	) {
-		// Here is room to append some extra layout properties if needed for this type.
-
 		this._layouts.appendOneAt(layoutEntry, modalData.originData.index ?? -1);
+
+		this.insertBlockData(layoutEntry, content, settings, modalData);
 
 		return true;
 	}

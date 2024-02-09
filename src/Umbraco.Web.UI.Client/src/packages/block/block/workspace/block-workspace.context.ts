@@ -1,16 +1,14 @@
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
+import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	UMB_BLOCK_ENTRIES_CONTEXT,
 	UMB_BLOCK_MANAGER_CONTEXT,
 	type UmbBlockWorkspaceData,
 } from '@umbraco-cms/backoffice/block';
-import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
@@ -36,6 +34,10 @@ export class UmbBlockWorkspaceContext<
 	readonly isNew = this.#isNew.asObservable();
 
 	#liveEditingMode?: boolean;
+
+	#initialLayout?: LayoutDataType;
+	#initialContent?: UmbBlockDataType;
+	#initialSettings?: UmbBlockDataType;
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
@@ -85,7 +87,15 @@ export class UmbBlockWorkspaceContext<
 		}
 
 		this.observe(
-			// TODO: Make a general concept of Block Entries Context, use it to retrieve the layout:
+			this.#blockEntries.layoutOf(unique),
+			(layoutData) => {
+				this.#initialLayout ??= layoutData as LayoutDataType;
+				this.removeControllerByAlias('observeLayoutInitially');
+			},
+			'observeLayoutInitially',
+		);
+
+		this.observe(
 			this.#blockEntries.layoutOf(unique),
 			(layoutData) => {
 				this.#layout.setValue(layoutData as LayoutDataType);
@@ -100,6 +110,16 @@ export class UmbBlockWorkspaceContext<
 						},
 						'observeContent',
 					);
+					if (!this.#initialContent) {
+						this.observe(
+							this.#blockManager!.contentOf(contentUdi),
+							(contentData) => {
+								this.#initialContent ??= contentData;
+								this.removeControllerByAlias('observeContentInitially');
+							},
+							'observeContentInitially',
+						);
+					}
 				}
 
 				// Settings:
@@ -112,6 +132,16 @@ export class UmbBlockWorkspaceContext<
 						},
 						'observeSettings',
 					);
+					if (!this.#initialSettings) {
+						this.observe(
+							this.#blockManager!.contentOf(settingsUdi),
+							(settingsData) => {
+								this.#initialSettings ??= settingsData;
+								this.removeControllerByAlias('observeSettingsInitially');
+							},
+							'observeSettingsInitially',
+						);
+					}
 				}
 			},
 			'observeLayout',
@@ -133,35 +163,37 @@ export class UmbBlockWorkspaceContext<
 			throw new Error('Modal Context not found');
 			return;
 		}
-		//
-		// TODO: Condense this into some kind of create method?
-		const key = UmbId.new();
-		const contentUdi = buildUdi('block', key);
-		const layoutData: UmbBlockLayoutBaseModel = {
-			contentUdi: contentUdi,
-		};
-		const contentData: UmbBlockDataType = {
-			udi: contentUdi,
-			contentTypeKey: contentElementTypeId,
-		};
-		this.content.setData(contentData);
 
-		// TODO: If we have Settings dedicated to this block type, we initiate them here:
+		// TODO: Missing some way to append more layout data... this could be part of modal data, (or context api?)
 
 		this.setIsNew(true);
-		this.#layout.setValue(layoutData as LayoutDataType);
+
+		const blockCreated = await this.#blockEntries.create(
+			contentElementTypeId,
+			{},
+			this.#modalContext.data as UmbBlockWorkspaceData,
+		);
+		if (!blockCreated) {
+			throw new Error('Block Entries could not create block');
+		}
+
+		this.#layout.setValue(blockCreated.layout as LayoutDataType);
+		this.content.setData(blockCreated.content);
+		if (blockCreated.settings) {
+			this.settings.setData(blockCreated.settings);
+		}
 
 		if (this.#liveEditingMode) {
-			const blockCreated = this.#blockEntries.create(
+			// Insert already, cause we are in live editing mode:
+			const blockInserted = await this.#blockEntries.insert(
+				blockCreated.layout,
+				blockCreated.content,
+				blockCreated.settings,
 				this.#modalContext.data as UmbBlockWorkspaceData,
-				layoutData,
-				contentElementTypeId,
 			);
-			if (!blockCreated) {
-				throw new Error('Block Entries could not create block');
-				return;
+			if (!blockInserted) {
+				throw new Error('Block Entries could not insert block');
 			}
-
 			this.#establishLiveSync();
 		}
 	}
@@ -232,28 +264,30 @@ export class UmbBlockWorkspaceContext<
 		const contentData = this.content.getData();
 		if (!layoutData || !this.#blockManager || !this.#blockEntries || !contentData || !this.#modalContext) return;
 
+		const settingsData = this.settings.getData();
+
 		if (!this.#liveEditingMode) {
 			if (this.getIsNew() === true) {
-				const blockCreated = this.#blockManager.create(
-					this.#modalContext.data as UmbBlockWorkspaceData,
+				// Insert (This means the layout entry will be inserted at the desired location):
+				const blockInserted = await this.#blockEntries.insert(
 					layoutData,
-					contentData.contentTypeKey,
+					contentData,
+					settingsData,
+					this.#modalContext.data as UmbBlockWorkspaceData,
 				);
-				if (!blockCreated) {
-					throw new Error('Block Manager could not create block');
-					return;
+				if (!blockInserted) {
+					throw new Error('Block Entries could not insert block');
 				}
-			}
+			} else {
+				// Update data:
 
-			// TODO: Save the block, but only in non-live-editing mode.
-			this.#blockEntries.setOneLayout(layoutData);
-
-			if (contentData) {
-				this.#blockManager.setOneContent(contentData);
-			}
-			const settingsData = this.settings.getData();
-			if (settingsData) {
-				this.#blockManager.setOneSettings(settingsData);
+				this.#blockEntries.setOneLayout(layoutData);
+				if (contentData) {
+					this.#blockManager.setOneContent(contentData);
+				}
+				if (settingsData) {
+					this.#blockManager.setOneSettings(settingsData);
+				}
 			}
 		}
 
@@ -272,6 +306,16 @@ export class UmbBlockWorkspaceContext<
 				}
 			} else {
 				// TODO: Revert the layout, content & settings data to the original state.
+				if (this.#initialLayout) {
+					console.log('reverted layout');
+					this.#blockEntries?.setOneLayout(this.#initialLayout);
+				}
+				if (this.#initialContent) {
+					this.#blockManager?.setOneContent(this.#initialContent);
+				}
+				if (this.#initialSettings) {
+					this.#blockManager?.setOneContent(this.#initialSettings);
+				}
 			}
 		}
 	};

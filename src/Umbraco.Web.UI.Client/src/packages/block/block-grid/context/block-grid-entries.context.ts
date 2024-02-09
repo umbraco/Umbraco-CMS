@@ -1,4 +1,4 @@
-import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
+import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockDataType, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
@@ -74,16 +74,25 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	async create(
-		modalData: UmbBlockGridWorkspaceData,
-		layoutEntry: UmbBlockGridLayoutModel,
 		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<UmbBlockGridLayoutModel, 'contentUdi'>,
+		modalData?: UmbBlockGridWorkspaceData,
 	) {
 		await this._retrieveManager;
-		// TODO: This must be implemented differently so the layout entry is created here..
-		return this._manager?.create(modalData, layoutEntry, contentElementTypeKey) ?? false;
+		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, modalData);
 	}
 
-	// create Block?
+	// insert Block?
+
+	async insert(
+		layoutEntry: UmbBlockGridLayoutModel,
+		content: UmbBlockDataType,
+		settings: UmbBlockDataType | undefined,
+		modalData: UmbBlockGridWorkspaceData,
+	) {
+		await this._retrieveManager;
+		return this._manager?.insert(layoutEntry, content, settings, modalData) ?? false;
+	}
 
 	// create Block?
 	async delete(contentUdi: string) {

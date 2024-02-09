@@ -1,4 +1,4 @@
-import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
+import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockDataType, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockListWorkspaceData } from '../index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context.js';
@@ -74,11 +74,29 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	async create(
-		modalData: UmbBlockListWorkspaceData,
-		layoutEntry: UmbBlockListLayoutModel,
 		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<UmbBlockListLayoutModel, 'contentUdi'>,
+		modalData?: UmbBlockListWorkspaceData,
 	) {
 		await this._retrieveManager;
-		return this._manager?.create(modalData, layoutEntry, contentElementTypeKey) ?? false;
+		return this._manager?.create(contentElementTypeKey, partialLayoutEntry, modalData);
+	}
+
+	// insert Block?
+
+	async insert(
+		layoutEntry: UmbBlockListLayoutModel,
+		content: UmbBlockDataType,
+		settings: UmbBlockDataType | undefined,
+		modalData: UmbBlockListWorkspaceData,
+	) {
+		await this._retrieveManager;
+		return this._manager?.insert(layoutEntry, content, settings, modalData) ?? false;
+	}
+
+	// create Block?
+	async delete(contentUdi: string) {
+		// TODO: Loop through children and delete them as well?
+		await super.delete(contentUdi);
 	}
 }

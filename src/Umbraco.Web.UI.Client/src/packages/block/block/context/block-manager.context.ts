@@ -12,6 +12,11 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
+export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
+	layout: LayoutEntryType;
+	content: UmbBlockDataType;
+	settings?: UmbBlockDataType;
+};
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
@@ -170,61 +175,72 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	abstract create(
-		modalData: UmbBlockWorkspaceData,
-		layoutEntry: BlockLayoutType,
 		contentElementTypeKey: string,
-	): boolean;
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		modalData?: UmbBlockWorkspaceData,
+	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
 
-	public createBlock<ModalDataType extends UmbBlockWorkspaceData>(
-		modalData: ModalDataType,
-		layoutEntry: Omit<BlockLayoutType, 'contentUdi'>,
+	protected createBlockData<ModalDataType extends UmbBlockWorkspaceData>(
 		contentElementTypeKey: string,
-		callback: (modalData: ModalDataType, layoutEntry: BlockLayoutType, contentElementTypeKey: string) => boolean,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
 	) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
 			throw new Error(`Cannot create block, missing block type for ${contentElementTypeKey}`);
-			return false;
 		}
 
 		// Create layout entry:
-		const fullLayoutEntry: BlockLayoutType = {
+		const layout: BlockLayoutType = {
 			contentUdi: buildUdi('element', UmbId.new()),
-			...(layoutEntry as Partial<BlockLayoutType>),
+			...(partialLayoutEntry as Partial<BlockLayoutType>),
 		} as BlockLayoutType;
+
+		const content = {
+			udi: layout.contentUdi,
+			contentTypeKey: contentElementTypeKey,
+		};
+		let settings: UmbBlockDataType | undefined = undefined;
+
 		if (blockType.settingsElementTypeKey) {
-			fullLayoutEntry.settingsUdi = buildUdi('element', UmbId.new());
+			layout.settingsUdi = buildUdi('element', UmbId.new());
+			settings = {
+				udi: layout.settingsUdi,
+				contentTypeKey: blockType.settingsElementTypeKey,
+			};
 		}
 
-		if (callback(modalData, fullLayoutEntry, contentElementTypeKey) === false) {
-			return false;
-		}
+		return {
+			layout,
+			content,
+			settings,
+		};
+	}
 
+	abstract insert(
+		layoutEntry: BlockLayoutType,
+		content: UmbBlockDataType,
+		settings: UmbBlockDataType | undefined,
+		modalData: UmbBlockWorkspaceData,
+	): boolean;
+
+	protected insertBlockData<ModalDataType extends UmbBlockWorkspaceData>(
+		layoutEntry: BlockLayoutType,
+		content: UmbBlockDataType,
+		settings: UmbBlockDataType | undefined,
+		modalData: ModalDataType,
+	) {
 		// Create content entry:
-		if (fullLayoutEntry.contentUdi) {
-			this.#contents.appendOne({
-				contentTypeKey: contentElementTypeKey,
-				udi: fullLayoutEntry.contentUdi,
-			});
+		if (layoutEntry.contentUdi) {
+			this.#contents.appendOne(content);
 		} else {
 			throw new Error('Cannot create block, missing contentUdi');
 			return false;
 		}
 
 		//Create settings entry:
-		if (blockType.settingsElementTypeKey) {
-			if (fullLayoutEntry.settingsUdi) {
-				this.#contents.appendOne({
-					contentTypeKey: blockType.settingsElementTypeKey,
-					udi: fullLayoutEntry.settingsUdi,
-				});
-			} else {
-				throw new Error('Cannot create block, missing settingsUdi');
-				return false;
-			}
+		if (settings && layoutEntry.settingsUdi) {
+			this.#settings.appendOne(settings);
 		}
-
-		return true;
 	}
 }
