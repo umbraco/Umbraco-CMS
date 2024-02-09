@@ -1,4 +1,5 @@
-import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockDataType, UmbBlockEntriesContext } from '../../block/index.js';
+import type { UmbBlockDataType} from '../../block/index.js';
+import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
