@@ -1,7 +1,7 @@
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-history-item')
 export class UmbHistoryItemElement extends UmbLitElement {

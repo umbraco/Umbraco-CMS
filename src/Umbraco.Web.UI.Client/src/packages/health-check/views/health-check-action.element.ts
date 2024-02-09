@@ -4,7 +4,7 @@ import { css, html, nothing, customElement, property, state, ifDefined } from '@
 
 import type { HealthCheckActionRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-health-check-action')

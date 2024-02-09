@@ -5,7 +5,7 @@ import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit
 import type { HealthCheckGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

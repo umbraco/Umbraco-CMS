@@ -2,7 +2,7 @@ import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
 import type { UUIScrollContainerElement, UUIPaginationElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 

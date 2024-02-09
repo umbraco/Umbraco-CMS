@@ -3,7 +3,7 @@ import { css, html, nothing, repeat, customElement, property, state } from '@umb
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 

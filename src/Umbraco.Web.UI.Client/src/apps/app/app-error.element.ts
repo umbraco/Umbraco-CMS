@@ -1,6 +1,6 @@
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * A full page error element that can be used either solo or for instance as the error 500 page and BootFailed

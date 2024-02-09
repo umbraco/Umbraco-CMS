@@ -11,7 +11,7 @@ import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';

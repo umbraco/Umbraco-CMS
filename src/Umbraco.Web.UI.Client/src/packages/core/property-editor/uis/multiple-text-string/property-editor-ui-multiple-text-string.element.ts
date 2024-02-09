@@ -3,7 +3,7 @@ import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { MultipleTextStringValue, UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
 
 /**

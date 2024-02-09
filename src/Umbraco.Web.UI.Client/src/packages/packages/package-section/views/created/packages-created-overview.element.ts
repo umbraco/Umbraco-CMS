@@ -2,7 +2,7 @@ import { html, css, nothing, ifDefined, customElement, state, repeat } from '@um
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { PackageDefinitionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';

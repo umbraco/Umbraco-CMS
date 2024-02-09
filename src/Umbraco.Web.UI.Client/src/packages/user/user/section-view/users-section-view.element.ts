@@ -2,7 +2,7 @@ import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-view-users')
 export class UmbSectionViewUsersElement extends UmbLitElement {

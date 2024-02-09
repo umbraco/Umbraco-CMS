@@ -13,7 +13,7 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 // TODO: update to module imports when ready
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { PackageDefinitionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

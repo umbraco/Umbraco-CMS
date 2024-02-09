@@ -4,7 +4,7 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
 import type { UmbModalManagerContext, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalToken, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';

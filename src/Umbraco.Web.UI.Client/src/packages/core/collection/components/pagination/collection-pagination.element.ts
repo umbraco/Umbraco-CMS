@@ -3,7 +3,7 @@ import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-pagination')
 export class UmbCollectionPaginationElement extends UmbLitElement {

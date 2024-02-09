@@ -8,7 +8,7 @@ import type {
 	TelemetryResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-installer-consent')
 export class UmbInstallerConsentElement extends UmbLitElement {

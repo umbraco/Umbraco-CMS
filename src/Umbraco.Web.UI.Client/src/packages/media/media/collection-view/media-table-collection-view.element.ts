@@ -10,9 +10,9 @@ import type {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import type { UmbDefaultCollectionContext} from '@umbraco-cms/backoffice/collection';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-media-table-collection-view')
 export class UmbMediaTableCollectionViewElement extends UmbLitElement {

@@ -11,7 +11,7 @@ import {
 	query,
 	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 

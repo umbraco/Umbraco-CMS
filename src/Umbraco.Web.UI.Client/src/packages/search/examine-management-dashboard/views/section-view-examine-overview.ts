@@ -3,7 +3,7 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 
 import type { IndexResponseModel, SearcherResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel, IndexerResource, SearcherResource } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-dashboard-examine-overview')

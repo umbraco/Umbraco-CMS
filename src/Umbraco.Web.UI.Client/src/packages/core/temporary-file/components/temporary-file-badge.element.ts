@@ -1,5 +1,5 @@
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { clamp } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-temporary-file-badge')

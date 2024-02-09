@@ -6,7 +6,7 @@ import { UMB_STORAGE_REDIRECT_URL, UmbAuthContext } from '@umbraco-cms/backoffic
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';

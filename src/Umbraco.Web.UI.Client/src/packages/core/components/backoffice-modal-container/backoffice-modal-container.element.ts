@@ -3,7 +3,7 @@ import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, repeat, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalElement } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-backoffice-modal-container')
 export class UmbBackofficeModalContainerElement extends UmbLitElement {

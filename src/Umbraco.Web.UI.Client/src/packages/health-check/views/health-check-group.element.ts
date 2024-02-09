@@ -11,7 +11,7 @@ import type {
 	HealthCheckWithResultPresentationModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckResource, StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import './health-check-action.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
