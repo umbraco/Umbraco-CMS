@@ -89,8 +89,6 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 
 	async #gotAreaKey() {
 		if (this.#areaKey === undefined) return;
-		//
-		console.log('gotAreaKey');
 
 		if (this.#areaKey === null) {
 			// Root entries:
