@@ -23,18 +23,18 @@ export class UmbPropertyEditorUIBlockGridEntriesElement extends UmbLitElement {
 	}
 
 	@property({ attribute: false })
-	public set parentUnique(value: string) {
+	public set parentUnique(value: string | null) {
 		this.#context.setParentKey(value);
 	}
-	public get parentUnique(): string {
+	public get parentUnique(): string | null {
 		return this.#context.getParentKey();
 	}
 
 	@property({ attribute: false })
-	public set areaKey(value: string) {
+	public set areaKey(value: string | null) {
 		this.#context.setAreaKey(value);
 	}
-	public get areaKey(): string {
+	public get areaKey(): string | null {
 		return this.#context.getAreaKey();
 	}
 
@@ -51,6 +51,16 @@ export class UmbPropertyEditorUIBlockGridEntriesElement extends UmbLitElement {
 		});
 	}
 
+	/**
+	 * TODO:
+	BLOCK     - element with entry(AreaS) context      areas observable
+		> AREA 1     - element med entries(Area) context      area/entries observable
+			> BLOCK A
+			> BLOCK B
+		> AREA 2
+			> BLOCK C
+			> BLOCK D
+	 */
 	render() {
 		// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.
 		return html` ${repeat(

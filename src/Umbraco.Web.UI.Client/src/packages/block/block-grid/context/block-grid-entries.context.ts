@@ -1,4 +1,4 @@
-import type { UmbBlockDataType} from '../../block/index.js';
+import type { UmbBlockDataType } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
@@ -16,15 +16,15 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 	#catalogueRouteBuilder?: UmbModalRouteBuilder;
 
-	setParentKey(contentUdi: string) {
-		this.#catalogueModal.setUniquePathValue('parentUnique', contentUdi);
+	setParentKey(contentUdi: string | null) {
+		this.#catalogueModal.setUniquePathValue('parentUnique', contentUdi ?? 'null');
 	}
 	getParentKey() {
 		return '';
 	}
 
-	setAreaKey(areaKey: string) {
-		this.#catalogueModal.setUniquePathValue('areaKey', areaKey);
+	setAreaKey(areaKey: string | null) {
+		this.#catalogueModal.setUniquePathValue('areaKey', areaKey ?? 'null');
 	}
 	getAreaKey() {
 		return '';
@@ -92,6 +92,7 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 		modalData: UmbBlockGridWorkspaceData,
 	) {
 		await this._retrieveManager;
+		// TODO: Insert layout entry at the right spot.
 		return this._manager?.insert(layoutEntry, content, settings, modalData) ?? false;
 	}
 

@@ -22,6 +22,7 @@ export abstract class UmbBlockEntriesContext<
 
 	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.contentUdi);
 	readonly layoutEntries = this._layoutEntries.asObservable();
+	readonly layoutEntriesLength = this._layoutEntries.asObservablePart((x) => x.length);
 
 	setLayoutEntries(layoutEntries: Array<BlockLayoutType>) {
 		this._layoutEntries.setValue(layoutEntries);

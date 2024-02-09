@@ -102,8 +102,8 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	render() {
 		return html`<umb-property-editor-ui-block-grid-entries
 			.layoutEntries=${this._rootLayouts}
-			.parentUnique=${'root'}
-			.areaKey=${'root'}></umb-property-editor-ui-block-grid-entries>`;
+			.parentUnique=${null}
+			.areaKey=${null}></umb-property-editor-ui-block-grid-entries>`;
 	}
 
 	static styles = [

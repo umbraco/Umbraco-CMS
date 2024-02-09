@@ -56,6 +56,8 @@ export abstract class UmbBlockEntryContext<
 	public readonly content = this.#content.asObservable();
 	public readonly contentTypeKey = this.#content.asObservablePart((x) => x?.contentTypeKey);
 
+	// TODO: Make sure changes to the Block Content / Settings are reflected back to Manager.
+
 	#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly settings = this.#settings.asObservable();
 

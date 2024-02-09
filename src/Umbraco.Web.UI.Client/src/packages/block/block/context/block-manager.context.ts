@@ -92,10 +92,18 @@ export abstract class UmbBlockManagerContext<
 				},
 				'observePropertyAlias',
 			);
+			this.observe(
+				propertyContext?.variantId,
+				(variantId) => {
+					// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense.
+					this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
+				},
+				'observePropertyVariantId',
+			);
 		});
 
 		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
-			.addUniquePaths(['propertyAlias'])
+			.addUniquePaths(['propertyAlias', 'variantId'])
 			.addAdditionalPath('block')
 			.onSetup(() => {
 				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };

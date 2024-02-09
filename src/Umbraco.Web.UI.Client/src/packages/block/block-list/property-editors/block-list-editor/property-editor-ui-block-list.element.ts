@@ -26,7 +26,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbPropertyEditorU
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.contentUdi;
 	},
-	identifier: 'block-list-editor',
+	//identifier: 'block-list-editor',
 	itemSelector: 'umb-property-editor-ui-block-list-block',
 	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
 };
@@ -63,9 +63,9 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		buildUpValue.settingsData ??= [];
 		this._value = buildUpValue as UmbBlockListValueModel;
 
-		this.#context.setLayouts(this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] ?? []);
-		this.#context.setContents(buildUpValue.contentData);
-		this.#context.setSettings(buildUpValue.settingsData);
+		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] ?? []);
+		this.#managerContext.setContents(buildUpValue.contentData);
+		this.#managerContext.setSettings(buildUpValue.settingsData);
 	}
 
 	@state()
@@ -81,7 +81,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this._limitMax = validationLimit?.max;
 
 		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
-		this.#context.setBlockTypes(blocks);
+		this.#managerContext.setBlockTypes(blocks);
 
 		const customCreateButtonLabel = config.getValueByAlias<string>('createLabel');
 		if (customCreateButtonLabel) {
@@ -91,12 +91,12 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		}
 
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
-		this.#context.setInlineEditingMode(useInlineEditingAsDefault);
+		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
 		// TODO:
 		//config.useSingleBlockMode, not done jey
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
-		this.#context.setEditorConfiguration(config);
+		this.#managerContext.setEditorConfiguration(config);
 	}
 
 	@state()
@@ -113,7 +113,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	@state()
 	private _catalogueRouteBuilder?: UmbModalRouteBuilder;
 
-	#context = new UmbBlockListManagerContext(this);
+	#managerContext = new UmbBlockListManagerContext(this);
 	#entriesContext = new UmbBlockListEntriesContext(this);
 
 	constructor() {
@@ -130,7 +130,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		});
 
 		// TODO: Prevent initial notification from these observes:
-		this.observe(this.#context.layouts, (layouts) => {
+		this.observe(this.#managerContext.layouts, (layouts) => {
 			this._value = { ...this._value, layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts } };
 			// Notify that the value has changed.
 			//console.log('layout changed', this._value);
@@ -143,21 +143,21 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			// Update sorter.
 			this.#sorter.setModel(layouts);
 			// Update manager:
-			this.#context.setLayouts(layouts);
+			this.#managerContext.setLayouts(layouts);
 		});
-		this.observe(this.#context.contents, (contents) => {
+		this.observe(this.#managerContext.contents, (contents) => {
 			this._value = { ...this._value, contentData: contents };
 			// Notify that the value has changed.
 			//console.log('content changed', this._value);
 			this.dispatchEvent(new UmbChangeEvent());
 		});
-		this.observe(this.#context.settings, (settings) => {
+		this.observe(this.#managerContext.settings, (settings) => {
 			this._value = { ...this._value, settingsData: settings };
 			// Notify that the value has changed.
 			//console.log('settings changed', this._value);
 			this.dispatchEvent(new UmbChangeEvent());
 		});
-		this.observe(this.#context.blockTypes, (blockTypes) => {
+		this.observe(this.#managerContext.blockTypes, (blockTypes) => {
 			this._blocks = blockTypes;
 		});
 
