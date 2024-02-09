@@ -43,7 +43,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 					if (context) {
 						this.#workspaceContext = context as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 						this.#load();
-						this.#workspaceContext.content.createPropertyDatasetContext(this);
 
 						new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
 							this,

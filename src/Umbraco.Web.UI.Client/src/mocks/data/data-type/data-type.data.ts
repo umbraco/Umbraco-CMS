@@ -559,7 +559,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'useInlineEditingAsDefault',
-				value: false,
+				value: true,
 			},
 			{
 				alias: 'useLiveEditing',
