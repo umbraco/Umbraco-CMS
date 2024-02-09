@@ -1,11 +1,12 @@
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element.js';
-import '../../../../../templating/templates/components/input-template/input-template.element.js';
+import type { UmbInputTemplateElement } from '@umbraco-cms/backoffice/template';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+
+import '@umbraco-cms/backoffice/template'; // TODO: This is needed to register the <umb-input-template> element, but it should be done in a better way without importing the whole module.
 
 @customElement('umb-document-type-workspace-view-templates')
 export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -61,12 +62,12 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 	}
 
 	render() {
-		return html`<uui-box headline="Templates">
-			<umb-property-layout alias="Templates" label="Allowed Templates">
-				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
+		return html`<uui-box headline="${this.localize.term('treeHeaders_templates')}">
+			<umb-property-layout alias="Templates" label="${this.localize.term('contentTypeEditor_allowedTemplatesHeading')}">
+				<div slot="description">${this.localize.term('contentTypeEditor_allowedTemplatesDescription')}</div>
 				<div id="templates" slot="editor">
 					<umb-input-template
-						.defaultId=${this._defaultTemplateId ?? ''}
+						.defaultUnique=${this._defaultTemplateId ?? ''}
 						.selectedIds=${this._allowedTemplateIds}
 						@change=${this.#templateInputChange}></umb-input-template>
 				</div>

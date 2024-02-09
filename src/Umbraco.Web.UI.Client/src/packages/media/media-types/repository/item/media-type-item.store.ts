@@ -6,7 +6,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbMediaTypeItemStore
- * @extends {UmbEntityItemStore}
+ * @extends {UmbItemStoreBase}
  * @description - Data Store for Media Type items
  */
 
