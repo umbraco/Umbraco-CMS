@@ -8,7 +8,7 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_FOLDER_CREATE_MODAL } from '@umbraco-cms/backoffice/tree';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-media-type-create-options-modal')
 export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {

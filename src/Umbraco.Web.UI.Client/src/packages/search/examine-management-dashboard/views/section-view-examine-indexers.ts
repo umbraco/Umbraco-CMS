@@ -4,7 +4,7 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { IndexResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthStatusModel, IndexerResource } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 import './section-view-examine-searchers.js';

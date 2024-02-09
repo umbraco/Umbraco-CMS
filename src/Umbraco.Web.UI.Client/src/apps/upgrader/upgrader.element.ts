@@ -2,7 +2,7 @@ import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit
 import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UpgradeResource, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import '../installer/shared/layout/installer-layout.element.js';
 import './upgrader-view.element.js';

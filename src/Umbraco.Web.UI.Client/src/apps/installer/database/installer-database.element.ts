@@ -10,7 +10,7 @@ import type {
 	ProblemDetails,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { ApiError, InstallResource } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')

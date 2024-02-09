@@ -4,7 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, toQueryString } from '@umbraco-cms/backoffice/router';
 
 //TODO: check how to display EventId field in the message properties

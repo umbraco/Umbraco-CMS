@@ -1,7 +1,7 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 

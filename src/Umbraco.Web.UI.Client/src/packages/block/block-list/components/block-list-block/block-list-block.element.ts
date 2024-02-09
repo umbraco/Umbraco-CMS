@@ -1,7 +1,7 @@
 import { UmbBlockListContext } from '../../context/block-list.context.js';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';

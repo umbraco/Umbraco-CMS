@@ -2,7 +2,7 @@ import type { UmbLogViewerWorkspaceContext } from '../../logviewer.context.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../logviewer.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 //TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
 @customElement('umb-log-viewer-overview-view')

@@ -11,7 +11,7 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';

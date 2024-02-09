@@ -1,12 +1,9 @@
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type {
-	UmbPropertyEditorConfigCollection} from '@umbraco-cms/backoffice/property-editor';
-import {
-	UmbPropertyValueChangeEvent,
-} from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**

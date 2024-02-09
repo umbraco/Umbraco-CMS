@@ -4,7 +4,7 @@ import { UMB_BLOCK_WORKSPACE_ALIAS } from '../../../block/index.js';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../../../block/workspace/views/edit/block-workspace-view-edit-no-router.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 

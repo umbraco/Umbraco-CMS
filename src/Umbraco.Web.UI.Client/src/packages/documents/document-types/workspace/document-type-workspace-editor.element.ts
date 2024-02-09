@@ -1,14 +1,10 @@
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from './document-type-workspace.context-token.js';
-import type { UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_ICON_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {

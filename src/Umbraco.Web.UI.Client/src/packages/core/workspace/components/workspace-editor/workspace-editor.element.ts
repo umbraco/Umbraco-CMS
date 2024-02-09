@@ -3,13 +3,12 @@ import { css, html, nothing, customElement, property, state, repeat } from '@umb
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type {
 	ManifestWorkspaceView,
-	ManifestWorkspaceViewCollection} from '@umbraco-cms/backoffice/extension-registry';
-import {
-	umbExtensionsRegistry,
+	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { componentHasManifestProperty } from '@umbraco-cms/backoffice/utils';
 
 /**
