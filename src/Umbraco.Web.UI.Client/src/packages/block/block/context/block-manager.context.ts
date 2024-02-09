@@ -49,7 +49,7 @@ export abstract class UmbBlockManagerContext<
 	#settings = new UmbArrayState(<Array<UmbBlockDataType>>[], (x) => x.udi);
 	public readonly settings = this.#settings.asObservable();
 
-	// TODO: maybe its bad to consume Property Context, and instead wire this up manually in the property editor? With these:
+	// TODO: maybe its bad to consume Property Context, and instead wire this up manually in the property editor? With these: (and one for variant-id..)
 	/*setPropertyAlias(alias: string) {
 		this.#propertyAlias.setValue(alias);
 		console.log('!!!!!manager got alias: ', alias);
