@@ -24593,6 +24593,27 @@
         },
         "additionalProperties": false
       },
+      "ContentTypeCollectionReferenceResponseModelBaseModel": {
+        "required": [
+          "alias",
+          "icon",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "ContentTypeCompositionRequestModelBaseModel": {
         "required": [
           "currentCompositeIds",
@@ -26624,24 +26645,12 @@
         "additionalProperties": false
       },
       "DocumentTypeCollectionReferenceResponseModel": {
-        "required": [
-          "alias",
-          "icon",
-          "id"
-        ],
         "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTypeCollectionReferenceResponseModelBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
       "DocumentTypeCompositionModel": {
@@ -28268,24 +28277,12 @@
         "additionalProperties": false
       },
       "MediaTypeCollectionReferenceResponseModel": {
-        "required": [
-          "alias",
-          "icon",
-          "id"
-        ],
         "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "alias": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentTypeCollectionReferenceResponseModelBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
       "MediaTypeCompositionModel": {
