@@ -40,8 +40,8 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
 
         var pageViewModel = new PagedViewModel<TCollectionResponseModel>
         {
+            Items = collectionResponseModels,
             Total = collectionItemsResult.Total,
-            Items = collectionResponseModels
         };
 
         return Ok(pageViewModel);
@@ -93,7 +93,7 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
                 .Build()),
             _ => new ObjectResult("Unknown content collection operation status")
             {
-                StatusCode = StatusCodes.Status500InternalServerError
-            }
+                StatusCode = StatusCodes.Status500InternalServerError,
+            },
         };
 }
