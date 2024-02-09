@@ -1,7 +1,7 @@
 import type { UmbCollectionContext } from './types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { ManifestCollection} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
@@ -25,7 +25,7 @@ export class UmbCollectionElement extends UmbLitElement {
 	#observeManifest() {
 		if (!this._alias) return;
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('collection', this._alias),
+			umbExtensionsRegistry.byTypeAndAlias('collection', this._alias),
 			async (manifest) => {
 				if (!manifest) return;
 				this.#manifest = manifest;

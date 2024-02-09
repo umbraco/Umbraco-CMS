@@ -45,7 +45,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 					if (!this._propertyEditorUiAlias && dataType?.editorAlias) {
 						//use 'dataType.editorAlias' to look up the extension in the registry:
 						this.observe(
-							umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', dataType.editorAlias),
+							umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', dataType.editorAlias),
 							(extension) => {
 								if (!extension) return;
 								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
