@@ -3,6 +3,7 @@ import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import '../../components/block-grid-block/block-grid-block.element.js';
 
 /**
  * @element umb-property-editor-ui-block-grid-entries
@@ -43,8 +44,8 @@ export class UmbPropertyEditorUIBlockGridEntriesElement extends UmbLitElement {
 				(layoutEntry, index) =>
 					html`<uui-button-inline-create
 							href=${this.#context.getPathForCreateBlock(index) ?? ''}></uui-button-inline-create>
-						<umb-property-editor-ui-block-list-block data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
-						</umb-property-editor-ui-block-list-block>`,
+						<umb-property-editor-ui-block-grid-block data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
+						</umb-property-editor-ui-block-grid-block>`,
 			)}
 			<uui-button-group>
 				<uui-button

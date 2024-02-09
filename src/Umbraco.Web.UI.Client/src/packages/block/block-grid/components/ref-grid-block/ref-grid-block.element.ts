@@ -3,10 +3,10 @@ import { css, customElement, html, property, state } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
- * @element umb-ref-list-block
+ * @element umb-ref-grid-block
  */
-@customElement('umb-ref-list-block')
-export class UmbRefListBlockElement extends UmbLitElement {
+@customElement('umb-ref-grid-block')
+export class UmbRefGridBlockElement extends UmbLitElement {
 	//
 	@property({ type: String })
 	label?: string;
@@ -17,7 +17,6 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		// UMB_BLOCK_LIST_ENTRY_CONTEXT
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.observe(
 				context.workspaceEditPath,
@@ -43,10 +42,10 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	];
 }
 
-export default UmbRefListBlockElement;
+export default UmbRefGridBlockElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-ref-list-block': UmbRefListBlockElement;
+		'umb-ref-grid-block': UmbRefGridBlockElement;
 	}
 }
