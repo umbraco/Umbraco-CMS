@@ -1,13 +1,13 @@
-import { LitElement, css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import type { TemporaryFileQueueItem } from '../../../../core/temporary-file/temporary-file-manager.class.js';
+import { UmbTemporaryFileManager } from '../../../../core/temporary-file/temporary-file-manager.class.js';
+import type { UmbImageCropperPropertyEditorValue } from './index.js';
+import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper-field.element.js';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { TemporaryFileQueueItem } from '../../../../core/temporary-file/temporary-file-manager.class.js';
-import { UmbTemporaryFileManager } from '../../../../core/temporary-file/temporary-file-manager.class.js';
-import { UmbImageCropperCrops, UmbImageCropperFocalPoint, UmbImageCropperPropertyEditorValue } from './index.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -91,7 +91,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	#renderImageCropper() {
 		return html`<umb-image-cropper-field
 			.value=${this.value}
-			.file=${this.file}
+			.file=${this.file as File}
 			@change=${this.#onChange}></umb-image-cropper-field>`;
 	}
 

@@ -1,10 +1,9 @@
-import { html, customElement, property, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
+import { html, customElement, property, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import '../../components/input-image-cropper/input-image-cropper.element.js';
-import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
 
 /**
  * @element umb-property-editor-ui-image-cropper
