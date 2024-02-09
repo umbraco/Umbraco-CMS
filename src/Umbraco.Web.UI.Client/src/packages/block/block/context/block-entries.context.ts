@@ -1,12 +1,13 @@
 import type { UmbBlockTypeBaseModel } from '../../block-type/types.js';
 import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
-import type { UmbBlockWorkspaceData } from '../index.js';
+import { UMB_BLOCK_WORKSPACE_MODAL } from '../workspace/block-workspace.modal-token.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 export abstract class UmbBlockEntriesContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
@@ -20,6 +21,11 @@ export abstract class UmbBlockEntriesContext<
 	_manager?: BlockManagerContextType;
 	_retrieveManager;
 
+	#workspaceModal: UmbModalRouteRegistrationController;
+
+	#workspacePath = new UmbStringState(undefined);
+	workspacePath = this.#workspacePath.asObservable();
+
 	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.contentUdi);
 	readonly layoutEntries = this._layoutEntries.asObservable();
 	readonly layoutEntriesLength = this._layoutEntries.asObservablePart((x) => x.length);
@@ -31,7 +37,34 @@ export abstract class UmbBlockEntriesContext<
 		this._retrieveManager = this.consumeContext(blockManagerContextToken, (blockGridManager) => {
 			this._manager = blockGridManager;
 			this._gotBlockManager();
+
+			this.observe(
+				this._manager.propertyAlias,
+				(alias) => {
+					this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
+				},
+				'observePropertyAlias',
+			);
+			this.observe(
+				this._manager.variantId,
+				(variantId) => {
+					// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
+					this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
+				},
+				'observePropertyVariantId',
+			);
 		}).asPromise();
+
+		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
+			.addUniquePaths(['propertyAlias', 'variantId'])
+			.addAdditionalPath('block')
+			.onSetup(() => {
+				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				const newPath = routeBuilder({});
+				this.#workspacePath.setValue(newPath);
+			});
 	}
 
 	protected abstract _gotBlockManager(): void;
@@ -52,14 +85,14 @@ export abstract class UmbBlockEntriesContext<
 	public abstract create(
 		contentElementTypeKey: string,
 		layoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
-		modalData?: UmbBlockWorkspaceData,
+		modalData?: typeof UMB_BLOCK_WORKSPACE_MODAL.DATA,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
 	abstract insert(
 		layoutEntry: BlockLayoutType,
 		content: UmbBlockDataType,
 		settings: UmbBlockDataType | undefined,
-		modalData: UmbBlockWorkspaceData,
+		modalData: typeof UMB_BLOCK_WORKSPACE_MODAL.DATA,
 	): Promise<boolean>;
 	//edit?
 	//editSettings

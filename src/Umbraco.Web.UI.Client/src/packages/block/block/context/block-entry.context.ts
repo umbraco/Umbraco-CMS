@@ -130,9 +130,16 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	#gotManager() {
-		if (this._manager) {
+		this.#observeBlockType();
+		this.#observeData();
+	}
+
+	abstract _gotManager(): void;
+
+	#gotEntries() {
+		if (this._entries) {
 			this.observe(
-				this._manager.workspacePath,
+				this._entries.workspacePath,
 				(workspacePath) => {
 					this.#workspacePath.setValue(workspacePath);
 				},
@@ -141,13 +148,7 @@ export abstract class UmbBlockEntryContext<
 		} else {
 			this.removeControllerByAlias('observeWorkspacePath');
 		}
-		this.#observeBlockType();
-		this.#observeData();
 	}
-
-	abstract _gotManager(): void;
-
-	#gotEntries() {}
 
 	abstract _gotEntries(): void;
 

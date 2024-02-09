@@ -5,8 +5,7 @@ import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backo
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 import type { UmbBlockTypeBaseModel, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
-import { UMB_BLOCK_MANAGER_CONTEXT, UMB_BLOCK_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/block';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -24,10 +23,6 @@ export abstract class UmbBlockManagerContext<
 > extends UmbContextBase<UmbBlockManagerContext> {
 	//
 	#contentTypeRepository = new UmbDocumentTypeDetailRepository(this);
-	#workspaceModal: UmbModalRouteRegistrationController;
-
-	#workspacePath = new UmbStringState(undefined);
-	workspacePath = this.#workspacePath.asObservable();
 
 	#propertyAlias = new UmbStringState(undefined);
 	propertyAlias = this.#propertyAlias.asObservable();
@@ -92,7 +87,6 @@ export abstract class UmbBlockManagerContext<
 				propertyContext?.alias,
 				(alias) => {
 					this.#propertyAlias.setValue(alias);
-					this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
 				},
 				'observePropertyAlias',
 			);
@@ -100,23 +94,10 @@ export abstract class UmbBlockManagerContext<
 				propertyContext?.variantId,
 				(variantId) => {
 					this.#variantId.setValue(variantId);
-					// TODO: This might not be the property variant ID, but the content variant ID. Check up on what makes most sense?
-					this.#workspaceModal.setUniquePathValue('variantId', variantId?.toString());
 				},
 				'observePropertyVariantId',
 			);
 		});
-
-		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
-			.addUniquePaths(['propertyAlias', 'variantId'])
-			.addAdditionalPath('block')
-			.onSetup(() => {
-				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				const newPath = routeBuilder({});
-				this.#workspacePath.setValue(newPath);
-			});
 	}
 
 	async ensureContentType(unique?: string) {

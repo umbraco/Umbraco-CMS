@@ -77,6 +77,7 @@ export class UmbBlockWorkspaceContext<
 		}).asPromise();
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
+			console.log('UMB_BLOCK_ENTRIES_CONTEXT', context);
 			this.#blockEntries = context;
 		}).asPromise();
 	}
