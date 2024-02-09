@@ -6,11 +6,9 @@ using Umbraco.Cms.Api.Management.ViewModels.Media.Collection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Collection;
 
@@ -19,16 +17,15 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
 {
     private readonly IMediaListViewService _mediaListViewService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IUmbracoMapper _mapper;
 
     public ByKeyMediaCollectionController(
         IMediaListViewService mediaListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUmbracoMapper mapper)
+        : base(mapper)
     {
         _mediaListViewService = mediaListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _mapper = mapper;
     }
 
     [HttpGet]
@@ -50,38 +47,13 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
             id,
             dataTypeId,
             orderBy,
-            null,
             orderDirection,
             filter,
             skip,
             take);
 
-        if (collectionAttempt.Success == false)
-        {
-            return CollectionOperationStatusResult(collectionAttempt.Status);
-        }
-
-        PagedModel<IMedia> collectionItemsResult = collectionAttempt.Result!.Items;
-        ListViewConfiguration collectionConfiguration = collectionAttempt.Result!.ListViewConfiguration;
-
-        var collectionPropertyAliases = collectionConfiguration
-            .IncludeProperties
-            .Select(p => p.Alias)
-            .WhereNotNull()
-            .ToArray();
-
-        List<MediaCollectionResponseModel> collectionResponseModels =
-            _mapper.MapEnumerable<IMedia, MediaCollectionResponseModel>(collectionItemsResult.Items, context =>
-            {
-                context.SetIncludedProperties(collectionPropertyAliases);
-            });
-
-        var pageViewModel = new PagedViewModel<MediaCollectionResponseModel>
-        {
-            Total = collectionItemsResult.Total,
-            Items = collectionResponseModels
-        };
-
-        return Ok(pageViewModel);
+        return collectionAttempt.Success
+            ? CollectionResult(collectionAttempt.Result!)
+            : CollectionOperationStatusResult(collectionAttempt.Status);
     }
 }

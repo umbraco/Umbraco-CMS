@@ -6,11 +6,9 @@ using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Collection;
 
@@ -19,16 +17,15 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
 {
     private readonly IContentListViewService _contentListViewService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IUmbracoMapper _mapper;
 
     public ByKeyDocumentCollectionController(
         IContentListViewService contentListViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUmbracoMapper mapper)
+        : base(mapper)
     {
         _contentListViewService = contentListViewService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _mapper = mapper;
     }
 
     [HttpGet("{id:guid}")]
@@ -57,32 +54,8 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
             skip,
             take);
 
-        if (collectionAttempt.Success == false)
-        {
-            return CollectionOperationStatusResult(collectionAttempt.Status);
-        }
-
-        PagedModel<IContent> collectionItemsResult = collectionAttempt.Result!.Items;
-        ListViewConfiguration collectionConfiguration = collectionAttempt.Result!.ListViewConfiguration;
-
-        var collectionPropertyAliases = collectionConfiguration
-            .IncludeProperties
-            .Select(p => p.Alias)
-            .WhereNotNull()
-            .ToArray();
-
-        List<DocumentCollectionResponseModel> collectionResponseModels =
-            _mapper.MapEnumerable<IContent, DocumentCollectionResponseModel>(collectionItemsResult.Items, context =>
-            {
-                context.SetIncludedProperties(collectionPropertyAliases);
-            });
-
-        var pageViewModel = new PagedViewModel<DocumentCollectionResponseModel>
-        {
-            Total = collectionItemsResult.Total,
-            Items = collectionResponseModels
-        };
-
-        return Ok(pageViewModel);
+        return collectionAttempt.Success
+            ? CollectionResult(collectionAttempt.Result!)
+            : CollectionOperationStatusResult(collectionAttempt.Status);
     }
 }
