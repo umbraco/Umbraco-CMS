@@ -330,7 +330,30 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'blockGrid',
 				culture: null,
 				segment: null,
-				value: null,
+				value: {
+					layout: {
+						'Umbraco.BlockGrid': [
+							{
+								contentUdi: '1234',
+								settingsUdi: '5678',
+							},
+						],
+					},
+					contentData: [
+						{
+							udi: '1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world',
+						},
+					],
+					settingsData: [
+						{
+							udi: '5678',
+							contentTypeKey: 'all-property-editors-document-type-id',
+							elementProperty: 'Hello world',
+						},
+					],
+				},
 			},
 			{
 				alias: 'blockGrid',

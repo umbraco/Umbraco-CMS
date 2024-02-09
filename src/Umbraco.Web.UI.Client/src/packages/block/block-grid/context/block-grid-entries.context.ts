@@ -1,6 +1,6 @@
 import type { UmbBlockDataType } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
-import type { UmbBlockGridWorkspaceData } from '../index.js';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridWorkspaceData } from '../index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -16,22 +16,29 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 	#catalogueRouteBuilder?: UmbModalRouteBuilder;
 
-	setParentKey(contentUdi: string | null) {
+	#parentEntry?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
+	#retrieveParentEntry;
+
+	//#parentUnique?: string;
+	#areaKey?: string | null;
+
+	setParentUnique(contentUdi: string | null) {
 		this.#catalogueModal.setUniquePathValue('parentUnique', contentUdi ?? 'null');
-	}
-	getParentKey() {
-		return '';
 	}
 
 	setAreaKey(areaKey: string | null) {
+		this.#areaKey = areaKey;
 		this.#catalogueModal.setUniquePathValue('areaKey', areaKey ?? 'null');
-	}
-	getAreaKey() {
-		return '';
+		this.#gotAreaKey();
 	}
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT);
+
+		this.#retrieveParentEntry = this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
+			this.#parentEntry = blockGridEntry;
+			this.#gotBlockParentEntry();
+		}).asPromise();
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addUniquePaths(['propertyAlias', 'variantId', 'parentUnique', 'areaKey'])
@@ -74,6 +81,47 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 			},
 			'observePropertyAlias',
 		);
+	}
+
+	#gotBlockParentEntry() {
+		if (!this.#parentEntry) return;
+	}
+
+	async #gotAreaKey() {
+		if (this.#areaKey === undefined) return;
+		//
+		console.log('gotAreaKey');
+
+		if (this.#areaKey === null) {
+			// Root entries:
+			await this._retrieveManager;
+			if (!this._manager) return;
+
+			this.setParentUnique(null);
+			this.observe(this._manager.layouts, (layouts) => {
+				this._layoutEntries.setValue(layouts);
+			});
+			this.observe(this.layoutEntries, (layouts) => {
+				this._manager?.setLayouts(layouts);
+			});
+		} else {
+			// entries of a area:
+			await this.#retrieveParentEntry;
+			if (!this.#parentEntry) return;
+
+			this.observe(this.#parentEntry.unique, (unique) => {
+				this.setParentUnique(unique ?? null);
+			});
+			this.observe(this.#parentEntry.layoutsOfArea(this.#areaKey), (layouts) => {
+				this._layoutEntries.setValue(layouts);
+			});
+
+			this.observe(this.layoutEntries, (layouts) => {
+				if (this.#areaKey) {
+					this.#parentEntry?.setLayoutsOfArea(this.#areaKey, layouts);
+				}
+			});
+		}
 	}
 
 	getPathForCreateBlock(index: number) {

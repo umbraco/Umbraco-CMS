@@ -13,6 +13,7 @@ import type {
 } from '@umbraco-cms/backoffice/block';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import './property-editor-ui-block-grid-entries.element.js';
 
 /**
  * @element umb-property-editor-ui-block-grid
@@ -99,10 +100,12 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		});
 	}
 
-	render() {
-		return html`<umb-property-editor-ui-block-grid-entries
+	/*
 			.layoutEntries=${this._rootLayouts}
 			.parentUnique=${null}
+	 */
+	render() {
+		return html`<umb-property-editor-ui-block-grid-entries
 			.areaKey=${null}></umb-property-editor-ui-block-grid-entries>`;
 	}
 

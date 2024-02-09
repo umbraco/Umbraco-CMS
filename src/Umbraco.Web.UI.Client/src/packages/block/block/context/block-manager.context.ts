@@ -77,7 +77,6 @@ export abstract class UmbBlockManagerContext<
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
-
 	setContents(contents: Array<UmbBlockDataType>) {
 		this.#contents.setValue(contents);
 	}
@@ -153,11 +152,9 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	/*
 	layoutOf(contentUdi: string) {
 		return this._layouts.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
 	}
-	*/
 	contentOf(udi: string) {
 		return this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi));
 	}
@@ -165,11 +162,9 @@ export abstract class UmbBlockManagerContext<
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
 	}
 
-	/*
-	setOneLayout(layoutData: BlockLayoutType) {
+	/*setOneLayout(layoutData: BlockLayoutType) {
 		return this._layouts.appendOne(layoutData);
-	}
-	*/
+	}*/
 	setOneContent(contentData: UmbBlockDataType) {
 		this.#contents.appendOne(contentData);
 	}

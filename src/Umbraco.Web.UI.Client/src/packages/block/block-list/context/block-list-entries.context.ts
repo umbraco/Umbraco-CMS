@@ -1,4 +1,4 @@
-import type { UmbBlockDataType} from '../../block/index.js';
+import type { UmbBlockDataType } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import type { UmbBlockListWorkspaceData } from '../index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
@@ -56,6 +56,14 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 
 	protected _gotBlockManager() {
 		if (!this._manager) return;
+
+		this.observe(this._manager.layouts, (layouts) => {
+			this._layoutEntries.setValue(layouts);
+		});
+
+		this.observe(this.layoutEntries, (layouts) => {
+			this._manager?.setLayouts(layouts);
+		});
 
 		this.observe(
 			this._manager.propertyAlias,

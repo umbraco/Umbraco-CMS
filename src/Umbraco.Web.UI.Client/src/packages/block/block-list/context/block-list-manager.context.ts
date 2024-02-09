@@ -13,7 +13,7 @@ export class UmbBlockListManagerContext<
 > extends UmbBlockManagerContext<UmbBlockListTypeModel, BlockLayoutType> {
 	//
 	#inlineEditingMode = new UmbBooleanState(undefined);
-	inlineEditingMode = this.#inlineEditingMode.asObservable();
+	readonly inlineEditingMode = this.#inlineEditingMode.asObservable();
 
 	setInlineEditingMode(inlineEditingMode: boolean | undefined) {
 		this.#inlineEditingMode.setValue(inlineEditingMode ?? false);

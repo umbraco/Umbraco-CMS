@@ -24,13 +24,6 @@ export abstract class UmbBlockEntriesContext<
 	readonly layoutEntries = this._layoutEntries.asObservable();
 	readonly layoutEntriesLength = this._layoutEntries.asObservablePart((x) => x.length);
 
-	setLayoutEntries(layoutEntries: Array<BlockLayoutType>) {
-		this._layoutEntries.setValue(layoutEntries);
-	}
-	getLayoutEntries() {
-		return this._layoutEntries.value;
-	}
-
 	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
 		super(host, UMB_BLOCK_ENTRIES_CONTEXT.toString());
 

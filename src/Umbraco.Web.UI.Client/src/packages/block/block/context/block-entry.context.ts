@@ -48,9 +48,13 @@ export abstract class UmbBlockEntryContext<
 	public readonly blockTypeContentElementTypeKey = this._blockType.asObservablePart((x) => x?.contentElementTypeKey);
 	public readonly blockTypeSettingsElementTypeKey = this._blockType.asObservablePart((x) => x?.settingsElementTypeKey);
 
-	#layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
-	public readonly layout = this.#layout.asObservable();
-	public readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
+	_layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
+	public readonly layout = this._layout.asObservable();
+	/**
+	 * @obsolete Use `unique` instead. Cause we will most likely rename this in the future.
+	 */
+	public readonly contentUdi = this._layout.asObservablePart((x) => x?.contentUdi);
+	public readonly unique = this._layout.asObservablePart((x) => x?.contentUdi);
 
 	#content = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly content = this.#content.asObservable();
@@ -68,7 +72,7 @@ export abstract class UmbBlockEntryContext<
 	 * @returns {void}
 	 */
 	setLayout(layout: BlockLayoutType | undefined) {
-		this.#layout.setValue(layout);
+		this._layout.setValue(layout);
 	}
 
 	/**
@@ -102,7 +106,7 @@ export abstract class UmbBlockEntryContext<
 		});
 
 		// Observe UDI:
-		this.observe(this.contentUdi, (contentUdi) => {
+		this.observe(this.unique, (contentUdi) => {
 			if (!contentUdi) return;
 			this.#observeData();
 		});
@@ -122,7 +126,7 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	getContentUdi() {
-		return this.#layout.value?.contentUdi;
+		return this._layout.value?.contentUdi;
 	}
 
 	#gotManager() {
@@ -149,7 +153,7 @@ export abstract class UmbBlockEntryContext<
 
 	#observeData() {
 		if (!this._manager) return;
-		const contentUdi = this.#layout.value?.contentUdi;
+		const contentUdi = this._layout.value?.contentUdi;
 		if (!contentUdi) return;
 
 		// observe content:
@@ -162,7 +166,7 @@ export abstract class UmbBlockEntryContext<
 		);
 
 		// observe settings:
-		const settingsUdi = this.#layout.value?.settingsUdi;
+		const settingsUdi = this._layout.value?.settingsUdi;
 		if (settingsUdi) {
 			this.observe(
 				this._manager.contentOf(settingsUdi),
@@ -249,7 +253,7 @@ export abstract class UmbBlockEntryContext<
 	}
 	public delete() {
 		if (!this._entries) return;
-		const contentUdi = this.#layout.value?.contentUdi;
+		const contentUdi = this._layout.value?.contentUdi;
 		if (!contentUdi) return;
 		this._entries.delete(contentUdi);
 	}

@@ -51,7 +51,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		this.observe(this.#context.workspaceEditPath, (workspaceEditPath) => {
 			this._workspaceEditPath = workspaceEditPath;
 		});
-		this.observe(this.#context.contentUdi, (contentUdi) => {
+		this.observe(this.#context.unique, (contentUdi) => {
 			this._contentUdi = contentUdi;
 		});
 		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {

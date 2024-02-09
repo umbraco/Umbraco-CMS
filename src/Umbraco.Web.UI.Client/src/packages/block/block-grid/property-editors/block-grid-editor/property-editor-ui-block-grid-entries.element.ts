@@ -15,27 +15,11 @@ export class UmbPropertyEditorUIBlockGridEntriesElement extends UmbLitElement {
 	#context = new UmbBlockGridEntriesContext(this);
 
 	@property({ attribute: false })
-	public set layoutEntries(value: Array<UmbBlockGridLayoutModel>) {
-		this.#context.setLayoutEntries(value);
-	}
-	public get layoutEntries(): Array<UmbBlockGridLayoutModel> {
-		return this.#context.getLayoutEntries();
-	}
-
-	@property({ attribute: false })
-	public set parentUnique(value: string | null) {
-		this.#context.setParentKey(value);
-	}
-	public get parentUnique(): string | null {
-		return this.#context.getParentKey();
-	}
-
-	@property({ attribute: false })
 	public set areaKey(value: string | null) {
 		this.#context.setAreaKey(value);
 	}
 	public get areaKey(): string | null {
-		return this.#context.getAreaKey();
+		return null; // Not implemented.
 	}
 
 	@state()
@@ -51,16 +35,6 @@ export class UmbPropertyEditorUIBlockGridEntriesElement extends UmbLitElement {
 		});
 	}
 
-	/**
-	 * TODO:
-	BLOCK     - element with entry(AreaS) context      areas observable
-		> AREA 1     - element med entries(Area) context      area/entries observable
-			> BLOCK A
-			> BLOCK B
-		> AREA 2
-			> BLOCK C
-			> BLOCK D
-	 */
 	render() {
 		// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.
 		return html` ${repeat(
@@ -70,7 +44,7 @@ export class UmbPropertyEditorUIBlockGridEntriesElement extends UmbLitElement {
 					html`<uui-button-inline-create
 							href=${this.#context.getPathForCreateBlock(index) ?? ''}></uui-button-inline-create>
 						<umb-property-editor-ui-block-list-block data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
-						</umb-property-editor-ui-block-list-block> `,
+						</umb-property-editor-ui-block-list-block>`,
 			)}
 			<uui-button-group>
 				<uui-button
