@@ -118,6 +118,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	async #openPicker() {
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
+				hideTreeRoot: true,
 				multiple: true,
 				pickableFilter: (template) => template.unique !== null && !this._selectedIds.includes(template.unique),
 			},
