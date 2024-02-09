@@ -1,3 +1,4 @@
+import type { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
