@@ -1,6 +1,5 @@
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import type { UmbInputTemplateElement } from '../../../../../templating/templates/components/input-template/input-template.element.js';
-import '../../../../../templating/templates/components/input-template/input-template.element.js';
+import type { UmbInputTemplateElement } from '@umbraco-cms/backoffice/template';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
