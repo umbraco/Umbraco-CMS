@@ -76,7 +76,7 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement
 
 	render() {
 		return html`<uui-toggle
-				?checked=${this.value.allowBulkUnpublish}
+				?checked=${this.value.allowBulkPublish}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkPublish')}
 				label="Allow bulk publish (content only)"></uui-toggle>
 			<uui-toggle
@@ -94,7 +94,7 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement
 			<uui-toggle
 				?checked=${this.value.allowBulkDelete}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkDelete')}
-				label="Allow bulk delete"></uui-toggle> `;
+				label="Allow bulk delete"></uui-toggle>`;
 	}
 
 	static styles = [
