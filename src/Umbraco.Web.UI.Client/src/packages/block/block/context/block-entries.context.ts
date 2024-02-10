@@ -74,7 +74,9 @@ export abstract class UmbBlockEntriesContext<
 	layoutOf(contentUdi: string) {
 		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
 	}
-
+	setLayouts(layouts: Array<BlockLayoutType>) {
+		return this._layoutEntries.setValue(layouts);
+	}
 	setOneLayout(layoutData: BlockLayoutType) {
 		return this._layoutEntries.appendOne(layoutData);
 	}

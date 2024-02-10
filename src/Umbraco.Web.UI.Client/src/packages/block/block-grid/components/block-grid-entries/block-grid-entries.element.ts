@@ -1,9 +1,23 @@
 import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
+import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import '../block-grid-entry/index.js';
+import { UmbSorterController, type UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+
+const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryElement> = {
+	getUniqueOfElement: (element) => {
+		return element.contentUdi!;
+	},
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.contentUdi;
+	},
+	identifier: 'block-grid-editor',
+	itemSelector: 'umb-block-grid-entry',
+	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
+};
 
 /**
  * @element umb-block-grid-entries
@@ -12,6 +26,14 @@ import '../block-grid-entry/index.js';
 export class UmbBlockGridEntriesElement extends UmbLitElement {
 	//
 	// TODO: Make sure Sorter callbacks handles columnSpan when retrieving a new entry.
+
+	//
+	#sorter = new UmbSorterController<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>(this, {
+		...SORTER_CONFIG,
+		onChange: ({ model }) => {
+			this.#context.setLayouts(model);
+		},
+	});
 
 	#context = new UmbBlockGridEntriesContext(this);
 
@@ -32,7 +54,10 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.observe(this.#context.layoutEntries, (layoutEntries) => {
+			const oldValue = this._layoutEntries;
 			this._layoutEntries = layoutEntries;
+			this.#sorter.setModel(layoutEntries);
+			this.requestUpdate('layoutEntries', oldValue);
 		});
 	}
 
@@ -44,7 +69,8 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 				(layoutEntry, index) =>
 					html`<uui-button-inline-create
 							href=${this.#context.getPathForCreateBlock(index) ?? ''}></uui-button-inline-create>
-						<umb-block-grid-entry data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}> </umb-block-grid-entry>`,
+						<umb-block-grid-entry .contentUdi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
+						</umb-block-grid-entry>`,
 			)}
 			<uui-button-group>
 				<uui-button

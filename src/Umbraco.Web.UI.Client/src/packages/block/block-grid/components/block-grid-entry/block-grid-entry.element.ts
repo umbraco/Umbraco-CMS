@@ -2,29 +2,27 @@ import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
 import '../ref-grid-block/index.js';
 
 /**
  * @element umb-block-grid-entry
  */
 @customElement('umb-block-grid-entry')
-export class UmbBlockGridBlockElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbBlockGridEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
 	@property({ attribute: false })
-	public get layout(): UmbBlockGridLayoutModel | undefined {
-		return this._layout;
+	public get contentUdi(): string | undefined {
+		return this._contentUdi;
 	}
-	public set layout(value: UmbBlockGridLayoutModel | undefined) {
-		this._layout = value;
-		this.#context.setLayout(value);
+	public set contentUdi(value: string | undefined) {
+		if (!value) return;
+		this._contentUdi = value;
+		this.#context.setContentUdi(value);
 	}
-	private _layout?: UmbBlockGridLayoutModel | undefined;
+	private _contentUdi?: string | undefined;
+	//
 
 	#context = new UmbBlockGridEntryContext(this);
-
-	@state()
-	_contentUdi?: string;
 
 	@state()
 	_hasSettings = false;
@@ -49,9 +47,6 @@ export class UmbBlockGridBlockElement extends UmbLitElement implements UmbProper
 
 		this.observe(this.#context.workspaceEditPath, (workspaceEditPath) => {
 			this._workspaceEditPath = workspaceEditPath;
-		});
-		this.observe(this.#context.unique, (contentUdi) => {
-			this._contentUdi = contentUdi;
 		});
 		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
 			this._hasSettings = !!blockTypeSettingsElementTypeKey;
@@ -85,7 +80,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement implements UmbProper
 							<uui-icon name="icon-settings"></uui-icon>
 					  </uui-button>`
 					: ''}
-				<uui-button label="delete" compact @click=${this.#context.requestDelete}>
+				<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
 					<uui-icon name="icon-remove"></uui-icon>
 				</uui-button>
 			</uui-action-bar>
@@ -93,7 +88,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement implements UmbProper
 	}
 
 	render() {
-		return this.layout && this._contentUdi ? this.#renderBlock() : '';
+		return this.#renderBlock();
 	}
 
 	static styles = [
@@ -115,10 +110,10 @@ export class UmbBlockGridBlockElement extends UmbLitElement implements UmbProper
 	];
 }
 
-export default UmbBlockGridBlockElement;
+export default UmbBlockGridEntryElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-grid-entry': UmbBlockGridBlockElement;
+		'umb-block-grid-entry': UmbBlockGridEntryElement;
 	}
 }

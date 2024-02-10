@@ -2,7 +2,6 @@ import { UmbBlockListEntryContext } from '../../context/block-list-entry.context
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
 
@@ -13,19 +12,17 @@ import '../inline-list-block/index.js';
 export class UmbBlockListEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
 	@property({ attribute: false })
-	public get layout(): UmbBlockLayoutBaseModel | undefined {
-		return this._layout;
+	public get contentUdi(): string | undefined {
+		return this._contentUdi;
 	}
-	public set layout(value: UmbBlockLayoutBaseModel | undefined) {
-		this._layout = value;
-		this.#context.setLayout(value);
+	public set contentUdi(value: string | undefined) {
+		if (!value) return;
+		this._contentUdi = value;
+		this.#context.setContentUdi(value);
 	}
-	private _layout?: UmbBlockLayoutBaseModel | undefined;
+	private _contentUdi?: string | undefined;
 
 	#context = new UmbBlockListEntryContext(this);
-
-	@state()
-	_contentUdi?: string;
 
 	@state()
 	_hasSettings = false;
@@ -50,9 +47,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 		this.observe(this.#context.workspaceEditPath, (workspaceEditPath) => {
 			this._workspaceEditPath = workspaceEditPath;
-		});
-		this.observe(this.#context.unique, (contentUdi) => {
-			this._contentUdi = contentUdi;
 		});
 		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
 			this._hasSettings = !!blockTypeSettingsElementTypeKey;
@@ -93,7 +87,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							<uui-icon name="icon-settings"></uui-icon>
 					  </uui-button>`
 					: ''}
-				<uui-button label="delete" compact @click=${this.#context.requestDelete}>
+				<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
 					<uui-icon name="icon-remove"></uui-icon>
 				</uui-button>
 			</uui-action-bar>
@@ -101,7 +95,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	render() {
-		return this.layout && this._contentUdi ? this.#renderBlock() : '';
+		return this.#renderBlock();
 	}
 
 	static styles = [

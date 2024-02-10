@@ -26,6 +26,8 @@ export abstract class UmbBlockEntryContext<
 	_manager?: BlockManagerContextType;
 	_entries?: BlockEntriesContextType;
 
+	#contentUdi?: string;
+
 	#blockTypeName = new UmbStringState(undefined);
 	public readonly blockTypeName = this.#blockTypeName.asObservable();
 
@@ -66,13 +68,14 @@ export abstract class UmbBlockEntryContext<
 	public readonly settings = this.#settings.asObservable();
 
 	/**
-	 * Set the layout entry object.
-	 * @method setLayout
-	 * @param {BlockLayoutType | undefined} layout entry object.
+	 * Set the contentUdi of this entry.
+	 * @method setContentUdi
+	 * @param {string} contentUdi the entry content UDI.
 	 * @returns {void}
 	 */
-	setLayout(layout: BlockLayoutType | undefined) {
-		this._layout.setValue(layout);
+	setContentUdi(contentUdi: string) {
+		this.#contentUdi = contentUdi;
+		this.#observeLayout();
 	}
 
 	/**
@@ -129,6 +132,27 @@ export abstract class UmbBlockEntryContext<
 		return this._layout.value?.contentUdi;
 	}
 
+	#observeLayout() {
+		if (!this._entries || !this.#contentUdi) return;
+
+		this.observe(
+			this._entries.layoutOf(this.#contentUdi),
+			(layout) => {
+				this._layout.setValue(layout);
+			},
+			'observeParentLayout',
+		);
+		this.observe(
+			this.layout,
+			(layout) => {
+				if (layout) {
+					this._entries?.setOneLayout(layout);
+				}
+			},
+			'observeThisLayout',
+		);
+	}
+
 	#gotManager() {
 		this.#observeBlockType();
 		this.#observeData();
@@ -137,6 +161,7 @@ export abstract class UmbBlockEntryContext<
 	abstract _gotManager(): void;
 
 	#gotEntries() {
+		this.#observeLayout();
 		if (this._entries) {
 			this.observe(
 				this._entries.workspacePath,

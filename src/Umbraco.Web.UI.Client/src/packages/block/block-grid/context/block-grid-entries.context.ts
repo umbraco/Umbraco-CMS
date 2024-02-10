@@ -100,29 +100,49 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 			if (!this._manager) return;
 
 			this.setParentUnique(null);
-			this.observe(this._manager.layouts, (layouts) => {
-				this._layoutEntries.setValue(layouts);
-			});
-			this.observe(this.layoutEntries, (layouts) => {
-				this._manager?.setLayouts(layouts);
-			});
+			this.observe(
+				this._manager.layouts,
+				(layouts) => {
+					this._layoutEntries.setValue(layouts);
+				},
+				'observeParentLayouts',
+			);
+			this.observe(
+				this.layoutEntries,
+				(layouts) => {
+					this._manager?.setLayouts(layouts);
+				},
+				'observeThisLayouts',
+			);
 		} else {
 			// entries of a area:
 			await this.#retrieveParentEntry;
 			if (!this.#parentEntry) return;
 
-			this.observe(this.#parentEntry.unique, (unique) => {
-				this.setParentUnique(unique ?? null);
-			});
-			this.observe(this.#parentEntry.layoutsOfArea(this.#areaKey), (layouts) => {
-				this._layoutEntries.setValue(layouts);
-			});
+			this.observe(
+				this.#parentEntry.unique,
+				(unique) => {
+					this.setParentUnique(unique ?? null);
+				},
+				'observeParentUnique',
+			);
+			this.observe(
+				this.#parentEntry.layoutsOfArea(this.#areaKey),
+				(layouts) => {
+					this._layoutEntries.setValue(layouts);
+				},
+				'observeParentLayouts',
+			);
 
-			this.observe(this.layoutEntries, (layouts) => {
-				if (this.#areaKey) {
-					this.#parentEntry?.setLayoutsOfArea(this.#areaKey, layouts);
-				}
-			});
+			this.observe(
+				this.layoutEntries,
+				(layouts) => {
+					if (this.#areaKey) {
+						this.#parentEntry?.setLayoutsOfArea(this.#areaKey, layouts);
+					}
+				},
+				'observeThisLayouts',
+			);
 		}
 	}
 
