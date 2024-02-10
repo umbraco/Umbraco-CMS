@@ -41,7 +41,7 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 
 		this.#retrieveParentEntry = this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
 			this.#parentEntry = blockGridEntry;
-			this.#gotBlockParentEntry();
+			//this.#gotBlockParentEntry();// is not used at this point.
 		}).asPromise();
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
@@ -87,9 +87,9 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 		);
 	}
 
-	#gotBlockParentEntry() {
+	/*#gotBlockParentEntry() {
 		if (!this.#parentEntry) return;
-	}
+	}*/
 
 	async #gotAreaKey() {
 		if (this.#areaKey === undefined) return;
