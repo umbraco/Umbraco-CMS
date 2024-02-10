@@ -16,25 +16,11 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 	#catalogueRouteBuilder?: UmbModalRouteBuilder;
 
-	setParentKey(contentUdi: string) {
-		this.#catalogueModal.setUniquePathValue('parentUnique', contentUdi);
-	}
-	getParentKey() {
-		return '';
-	}
-
-	setAreaKey(areaKey: string) {
-		this.#catalogueModal.setUniquePathValue('areaKey', areaKey);
-	}
-	getAreaKey() {
-		return '';
-	}
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT);
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
-			.addUniquePaths(['propertyAlias', 'parentUnique', 'areaKey'])
+			.addUniquePaths(['propertyAlias', 'variantId'])
 			.addAdditionalPath(':view/:index')
 			.onSetup((routingInfo) => {
 				// Idea: Maybe on setup should be async, so it can retrieve the values when needed? [NL]
@@ -57,18 +43,35 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	protected _gotBlockManager() {
 		if (!this._manager) return;
 
-		this.observe(this._manager.layouts, (layouts) => {
-			this._layoutEntries.setValue(layouts);
-		});
-
-		this.observe(this.layoutEntries, (layouts) => {
-			this._manager?.setLayouts(layouts);
-		});
+		this.observe(
+			this._manager.layouts,
+			(layouts) => {
+				this._layoutEntries.setValue(layouts);
+			},
+			'observeParentLayouts',
+		);
+		this.observe(
+			this.layoutEntries,
+			(layouts) => {
+				this._manager?.setLayouts(layouts);
+			},
+			'observeThisLayouts',
+		);
 
 		this.observe(
 			this._manager.propertyAlias,
 			(alias) => {
 				this.#catalogueModal.setUniquePathValue('propertyAlias', alias ?? 'null');
+			},
+			'observePropertyAlias',
+		);
+
+		this.observe(
+			this._manager.variantId,
+			(variantId) => {
+				if (variantId) {
+					this.#catalogueModal.setUniquePathValue('variantId', variantId.toString());
+				}
 			},
 			'observePropertyAlias',
 		);

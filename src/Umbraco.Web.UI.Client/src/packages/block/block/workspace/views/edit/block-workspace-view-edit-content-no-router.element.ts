@@ -45,7 +45,6 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
-			console.log('-- got workspace context', workspaceContext);
 			this.#blockWorkspace = workspaceContext;
 			this.#tabsStructureHelper.setStructureManager(workspaceContext.content.structure);
 			workspaceContext.content.createPropertyDatasetContext(this);
@@ -88,7 +87,6 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 
 	render() {
 		if (!this._tabs) return;
-		console.log('render', this._activeTabId, this._hasRootGroups);
 		return html`
 			${this._tabs.length > 1 || (this._tabs.length === 1 && this._hasRootGroups)
 				? html` <uui-tab-group slot="header">
