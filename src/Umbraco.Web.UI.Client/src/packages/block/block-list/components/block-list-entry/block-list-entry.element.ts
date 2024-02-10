@@ -52,8 +52,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this._hasSettings = !!blockTypeSettingsElementTypeKey;
 		});
 		this.observe(this.#context.label, (label) => {
+			const oldValue = this._label;
 			this._blockViewProps.label = label;
 			this._label = label;
+			this.requestUpdate('label', oldValue);
 		});
 		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
 			this._inlineEditingMode = inlineEditingMode;

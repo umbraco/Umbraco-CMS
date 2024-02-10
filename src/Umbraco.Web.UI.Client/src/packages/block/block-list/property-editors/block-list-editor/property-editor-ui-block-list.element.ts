@@ -21,7 +21,7 @@ import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.getAttribute('data-udi');
+		return element.contentUdi!;
 	},
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.contentUdi;
@@ -40,7 +40,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	#sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbBlockListEntryElement>(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
-			//this.#entriesContext.setLayoutEntries(model);
+			this.#entriesContext.setLayouts(model);
 		},
 	});
 
@@ -194,7 +194,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				(layoutEntry, index) =>
 					html`<uui-button-inline-create
 							href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>
-						<umb-block-list-entry data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}> </umb-block-list-entry> `,
+						<umb-block-list-entry .contentUdi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
+						</umb-block-list-entry> `,
 			)}
 			<uui-button-group>
 				<uui-button
