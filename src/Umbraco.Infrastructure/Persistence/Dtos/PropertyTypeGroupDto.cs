@@ -24,6 +24,7 @@ internal class PropertyTypeGroupDto
 
     [Column("contenttypeNodeId")]
     [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
+    [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyTypeGroup_contenttypeNodeId", ForColumns ="contenttypeNodeId,sortorder,id", IncludeColumns ="type,text,alias,uniqueID")]
     public int ContentTypeNodeId { get; set; }
 
     [Column("type")]

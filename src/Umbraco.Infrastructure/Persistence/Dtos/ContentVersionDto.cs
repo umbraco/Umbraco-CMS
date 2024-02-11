@@ -33,6 +33,7 @@ public class ContentVersionDto
 
     [Column("current")]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Current", IncludeColumns = "nodeId")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_current_versionDate_desc_nodeId", ForColumns = "current ASC,versionDate DESC,nodeId ASC", IncludeColumns ="id,userId,text,preventCleanup")]
     public bool Current { get; set; }
 
     // about current:

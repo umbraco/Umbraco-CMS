@@ -25,6 +25,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V13_3_0
             var twoFactorUserOrMemberKeyIdx = $"IX_{TwoFactorLoginDto.TableName}_userOrMemberKey";
             DeleteIndex<TwoFactorLoginDto>(twoFactorUserOrMemberKeyIdx);
             CreateIndex<TwoFactorLoginDto>(twoFactorUserOrMemberKeyIdx);
+
+            var contentTypeNodeIdx = $"IX_{PropertyTypeGroupDto.TableName}_contenttypeNodeId";
+            CreateIndex<PropertyTypeGroupDto>(contentTypeNodeIdx);
+
+            var contentVersionIdx = $"IX_{ContentVersionDto.TableName}_current_versionDate_desc_nodeId";
+            CreateIndex<PropertyTypeGroupDto>(contentVersionIdx);
         }
     }
 }
