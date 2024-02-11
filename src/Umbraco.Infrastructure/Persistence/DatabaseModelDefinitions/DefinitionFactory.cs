@@ -185,11 +185,11 @@ public static class DefinitionFactory
                 {
                     if ("DESC".Equals(sortDirectionSplit[1], StringComparison.InvariantCultureIgnoreCase))
                     {
-                        definition.Columns.Add(new IndexColumnDefinition { Name = column, Direction = Direction.Descending });
+                        definition.Columns.Add(new IndexColumnDefinition { Name = sortDirectionSplit[0], Direction = Direction.Descending });
                     }
                     else if ("ASC".Equals(sortDirectionSplit[1], StringComparison.InvariantCultureIgnoreCase))
                     {
-                        definition.Columns.Add(new IndexColumnDefinition { Name = column, Direction = Direction.Ascending });
+                        definition.Columns.Add(new IndexColumnDefinition { Name = sortDirectionSplit[0], Direction = Direction.Ascending });
                     }
                     else
                     {
