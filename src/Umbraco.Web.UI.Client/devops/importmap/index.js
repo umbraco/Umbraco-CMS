@@ -2,7 +2,7 @@ import { packageJsonExports, packageJsonName } from '../package/index.js';
 
 export const createImportMap = (args) => {
 	const imports = {
-		...args.defaultImports,
+		...args.additionalImports,
 	};
 
 	// Iterate over the exports in package.json
@@ -12,7 +12,7 @@ export const createImportMap = (args) => {
 			const moduleName = key.replace(/^\.\//, '');
 
 			// replace ./dist-cms with src and remove /index.js
-			const modulePath = value.replace(/^\.\/dist-cms/, './src').replace('.js', '.ts');
+			const modulePath = value.replace(/^\.\/dist-cms/, args.rootDir).replace('.js', '.ts');
 			const importAlias = `${packageJsonName}/${moduleName}`;
 
 			imports[importAlias] = modulePath;

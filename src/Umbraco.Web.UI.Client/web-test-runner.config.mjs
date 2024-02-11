@@ -26,7 +26,8 @@ export default {
 		importMapsPlugin({
 			inject: {
 				importMap: createImportMap({
-					defaultImports: {
+					rootDir: './src',
+					additionalImports: {
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},
 				}),
