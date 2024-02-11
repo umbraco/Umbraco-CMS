@@ -180,7 +180,26 @@ public static class DefinitionFactory
             IEnumerable<string> columns = attribute.ForColumns.Split(Constants.CharArrays.Comma).Select(p => p.Trim());
             foreach (var column in columns)
             {
-                definition.Columns.Add(new IndexColumnDefinition { Name = column, Direction = Direction.Ascending });
+                var sortDirectionSplit = column.Split(Constants.CharArrays.Space);
+                if(sortDirectionSplit.Length == 2)
+                {
+                    if ("DESC".Equals(sortDirectionSplit[1], StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        definition.Columns.Add(new IndexColumnDefinition { Name = column, Direction = Direction.Descending });
+                    }
+                    else if ("ASC".Equals(sortDirectionSplit[1], StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        definition.Columns.Add(new IndexColumnDefinition { Name = column, Direction = Direction.Ascending });
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Only ASC and DESC are supported as sort orders on For Columns");
+                    }
+                }
+                else
+                {
+                    definition.Columns.Add(new IndexColumnDefinition { Name = column, Direction = Direction.Ascending });
+                }
             }
         }
 
