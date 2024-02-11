@@ -8,6 +8,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class ContentType2ContentTypeDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.ElementTypeTree;
+
     [Column("parentContentTypeId")]
     [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentType2ContentType", OnColumns = "parentContentTypeId, childContentTypeId")]
     [ForeignKey(typeof(NodeDto), Name = "FK_cmsContentType2ContentType_umbracoNode_parent")]
@@ -15,5 +17,6 @@ internal class ContentType2ContentTypeDto
 
     [Column("childContentTypeId")]
     [ForeignKey(typeof(NodeDto), Name = "FK_cmsContentType2ContentType_umbracoNode_child")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_childContentTypeId", ForColumns = "childContentTypeId,parentContentTypeId")]
     public int ChildId { get; set; }
 }

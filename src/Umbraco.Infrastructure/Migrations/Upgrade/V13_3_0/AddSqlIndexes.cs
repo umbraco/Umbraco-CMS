@@ -47,8 +47,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V13_3_0
             var umbracoNodeObjectTypeLevelSortOrderIdx = $"IX_{NodeDto.TableName}_ObjectType_nodeObjectType_level_sortOrder";
             CreateIndex<NodeDto>(umbracoNodeObjectTypeLevelSortOrderIdx);
 
-            var umbracoDocmainSortOrderId = $"IX_{DomainDto.TableName}_sortOrder_id";
-            CreateIndex<DomainDto>(umbracoDocmainSortOrderId);
+            var umbracoDomainSortOrderId = $"IX_{DomainDto.TableName}_sortOrder_id";
+            CreateIndex<DomainDto>(umbracoDomainSortOrderId);
+
+            var umbracoUserNameIdx = $"IX_{UserDto.TableName}_userName";
+            CreateIndex<UserDto>(umbracoUserNameIdx);
+
+            var umbracoContentType2ContentTypeIdx = $"IX_{ContentType2ContentTypeDto.TableName}_childContentTypeId";
+            CreateIndex<ContentType2ContentTypeDto>(umbracoContentType2ContentTypeIdx);
         }
     }
 }
