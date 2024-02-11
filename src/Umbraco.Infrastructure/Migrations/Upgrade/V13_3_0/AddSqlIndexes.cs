@@ -31,6 +31,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V13_3_0
 
             var contentVersionIdx = $"IX_{ContentVersionDto.TableName}_current_versionDate_desc_nodeId";
             CreateIndex<PropertyTypeGroupDto>(contentVersionIdx);
+
+
+            var umbracoNodeLevelIdx = $"IX_{NodeDto.TableName}_Level";
+            DeleteIndex<NodeDto>(umbracoNodeLevelIdx);
+            CreateIndex<NodeDto>(umbracoNodeLevelIdx);
         }
     }
 }
