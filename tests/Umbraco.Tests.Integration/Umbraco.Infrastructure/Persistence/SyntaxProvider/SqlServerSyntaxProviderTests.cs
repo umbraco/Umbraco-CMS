@@ -182,11 +182,11 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
         var createExpression = new CreateIndexExpression(context) { Index = { Name = "IX_AB" } };
 
         new CreateIndexBuilder(createExpression)
-            .OnTable("TheTable").OnColumn("A").Descending().OnColumn("B").Ascending().WithOptions().Unique()
+            .OnTable("TheTable").OnColumn("A").Descending().OnColumn("B").Ascending().WithOptions().NonClustered()
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A] DESC,[B] ASC)", db.Operations[0].Sql);
+        Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A] DESC,[B] ASC)", db.Operations[0].Sql);
     }
 
     [Test]
