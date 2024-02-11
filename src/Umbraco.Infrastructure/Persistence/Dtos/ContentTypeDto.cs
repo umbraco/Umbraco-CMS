@@ -19,7 +19,7 @@ internal class ContentTypeDto
     [Column("nodeId")]
     [ForeignKey(typeof(NodeDto))]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsContentType")]
-    [Index(IndexTypes.NonClustered, Name = "IX_cmsContentType_nodeId", IncludeColumns = "nodeId", ForColumns = "alias,icon,thumbnail,isContainer,variations")]
+    [Index(IndexTypes.NonClustered, Name = "IX_cmsContentType_nodeId", IncludeColumns = "nodeId", ForColumns = "alias,icon,thumbnail,isContainer,variations,allowAtRoot,isElement")]
     public int NodeId { get; set; }
 
     [Column("alias")]
