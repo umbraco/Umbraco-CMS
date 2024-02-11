@@ -60,6 +60,7 @@ public class NodeDto
     [Column("nodeObjectType")] // TODO: db rename to 'objectType'
     [NullSetting(NullSetting = NullSettings.Null)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType", ForColumns = "nodeObjectType,trashed", IncludeColumns = "uniqueId,parentId,level,path,sortOrder,nodeUser,text,createDate")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_nodeObjectType_level_sortOrder", ForColumns = "nodeObjectType,level,sortOrder", IncludeColumns = "uniqueId,parentId,path,nodeUser,text,createDate,trashed")]
     public Guid? NodeObjectType { get; set; }
 
     [Column("createDate")]

@@ -10,6 +10,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class RelationDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.Relation;
+
     [Column("id")]
     [PrimaryKeyColumn]
     public int Id { get; set; }
@@ -25,6 +27,7 @@ internal class RelationDto
 
     [Column("relType")]
     [ForeignKey(typeof(RelationTypeDto))]
+    [Index(IndexTypes.NonClustered, Name = "IX_umbracoRelation_relType", ForColumns = "relType,id", IncludeColumns ="parentId,childId,dateTime,comment")]
     public int RelationType { get; set; }
 
     [Column("datetime")]

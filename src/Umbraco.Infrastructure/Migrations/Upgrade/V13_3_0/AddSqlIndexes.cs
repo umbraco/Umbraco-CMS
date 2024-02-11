@@ -40,6 +40,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V13_3_0
 
             var umbracoContentScheduleActionDateIdx = $"IX_{ContentScheduleDto.TableName}_action_date";
             CreateIndex<ContentScheduleDto>(umbracoContentScheduleActionDateIdx);
+
+            var umbracoRelationIdx = $"IX_{RelationDto.TableName}_reltype";
+            CreateIndex<RelationDto>(umbracoRelationIdx);
+
+            var umbracoNodeObjectTypeLevelSortOrderIdx = $"IX_{NodeDto.TableName}_ObjectType_nodeObjectType_level_sortOrder";
+            CreateIndex<NodeDto>(umbracoNodeObjectTypeLevelSortOrderIdx);
+
+            var umbracoDocmainSortOrderId = $"IX_{DomainDto.TableName}_sortOrder_id";
+            CreateIndex<DomainDto>(umbracoDocmainSortOrderId);
         }
     }
 }
