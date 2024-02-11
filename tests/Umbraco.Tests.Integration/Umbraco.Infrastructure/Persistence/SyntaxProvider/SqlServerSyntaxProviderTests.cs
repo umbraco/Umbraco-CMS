@@ -141,7 +141,7 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
+        Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A] ASC)", db.Operations[0].Sql);
     }
 
     [Test]
@@ -156,7 +156,7 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
+        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A] ASC)", db.Operations[0].Sql);
     }
 
     [Test]
@@ -171,7 +171,22 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A],[B])", db.Operations[0].Sql);
+        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A] ASC,[B] ASC)", db.Operations[0].Sql);
+    }
+
+    [Test]
+    public void CreateIndexBuilder_SqlServer_CreatesNonClusteredIndex_Multi_Columnn_Desc()
+    {
+        var context = GetMigrationContext(out var db);
+
+        var createExpression = new CreateIndexExpression(context) { Index = { Name = "IX_AB" } };
+
+        new CreateIndexBuilder(createExpression)
+            .OnTable("TheTable").OnColumn("A").Descending().OnColumn("B").Ascending().WithOptions().Unique()
+            .Do();
+
+        Assert.AreEqual(1, db.Operations.Count);
+        Assert.AreEqual("CREATE UNIQUE NONCLUSTERED INDEX [IX_AB] ON [TheTable] ([A] DESC,[B] ASC)", db.Operations[0].Sql);
     }
 
     [Test]
@@ -186,7 +201,7 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
             .Do();
 
         Assert.AreEqual(1, db.Operations.Count);
-        Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A])", db.Operations[0].Sql);
+        Assert.AreEqual("CREATE CLUSTERED INDEX [IX_A] ON [TheTable] ([A] ASC)", db.Operations[0].Sql);
     }
 
     private static IndexDefinition CreateIndexDefinition() =>
