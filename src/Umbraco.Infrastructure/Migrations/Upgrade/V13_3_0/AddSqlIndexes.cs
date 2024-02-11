@@ -15,8 +15,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V13_3_0
 
         protected override void Migrate()
         {
-            var dictionaryDtoIdParentIndex = $"IX_{DictionaryDto.TableName}_Id_Parent";
-            CreateIndex<DictionaryDto>(dictionaryDtoIdParentIndex);
+            var dictionaryDtoIdParentIdx = $"IX_{DictionaryDto.TableName}_Id_Parent";
+            CreateIndex<DictionaryDto>(dictionaryDtoIdParentIdx);
+
+
+            var contentTypeNodeIdIdx = $"IX_{ContentTypeDto.TableName}_nodeId";
+            CreateIndex<ContentTypeDto>(contentTypeNodeIdIdx);
         }
     }
 }
