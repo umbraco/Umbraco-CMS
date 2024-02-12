@@ -13,6 +13,7 @@ export const createImportMap = (args) => {
 
 			// replace ./dist-cms with src and remove /index.js
 			const modulePath = value.replace(/^\.\/dist-cms/, args.rootDir).replace('.js', '.ts');
+			console.log('replacing', value, 'with', modulePath)
 			const importAlias = `${packageJsonName}/${moduleName}`;
 
 			imports[importAlias] = modulePath;
