@@ -31,7 +31,7 @@ public class ColorPickerValueConverter : PropertyValueConverterBase
     {
         var useLabel = UseLabel(propertyType);
 
-        if (source == null)
+        if (source is null)
         {
             return useLabel ? null : string.Empty;
         }
@@ -43,7 +43,7 @@ public class ColorPickerValueConverter : PropertyValueConverterBase
             return useLabel ? convertedValue : convertedValue?.Color;
         }
 
-        // This seems to be some old old where it may not be json at all.
+        // This seems to be something old old where it may not be json at all.
         if (useLabel)
         {
             return new PickedColor(value, value);
