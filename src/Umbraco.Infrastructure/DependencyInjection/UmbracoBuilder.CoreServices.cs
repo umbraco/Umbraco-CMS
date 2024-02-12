@@ -252,7 +252,6 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
-        builder.Services.AddSingleton<INestedContentPropertyIndexValueFactory, NestedContentPropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
 
@@ -365,9 +364,6 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
-            .AddNotificationHandler<ContentSavingNotification, NestedContentPropertyHandler>()
-            .AddNotificationHandler<ContentCopyingNotification, NestedContentPropertyHandler>()
-            .AddNotificationHandler<ContentScaffoldedNotification, NestedContentPropertyHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, FileUploadPropertyEditor>()
