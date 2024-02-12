@@ -1,8 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using System.Text.Json;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -14,17 +14,17 @@ public class FlexibleDropdownPropertyValueConverter : PropertyValueConverterBase
 
     public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
-        if (source == null)
+        if (source is null)
         {
             return Array.Empty<string>();
         }
 
-        return JsonConvert.DeserializeObject<string[]>(source.ToString()!) ?? Array.Empty<string>();
+        return JsonSerializer.Deserialize<string[]>(source.ToString()!) ?? Array.Empty<string>();
     }
 
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        if (inter == null)
+        if (inter is null)
         {
             return null;
         }
