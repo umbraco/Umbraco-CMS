@@ -151,7 +151,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 				look="primary"
 				.state="${this._buttonState}"
 				@click="${this._onRebuildHandler}"
-				.disabled="${!this._indexData?.canRebuild ?? true}"
+				.disabled="${this._indexData?.canRebuild ? false : true}"
 				label="Rebuild index">
 				Rebuild
 			</uui-button>
