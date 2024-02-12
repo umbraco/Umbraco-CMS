@@ -6,6 +6,5 @@ import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 export class UmbDocumentTypeDetailRepository extends UmbDetailRepositoryBase<UmbDocumentTypeDetailModel> {
 	constructor(host: UmbControllerHost) {
 		super(host, UmbDocumentTypeDetailServerDataSource, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT);
-
 	}
 }
