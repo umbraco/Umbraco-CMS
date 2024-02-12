@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -11,15 +12,21 @@ internal sealed class ContentPublishingService : IContentPublishingService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IContentService _contentService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IContentValidationService _contentValidationService;
+    private readonly IContentTypeService _contentTypeService;
 
     public ContentPublishingService(
         ICoreScopeProvider coreScopeProvider,
         IContentService contentService,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IContentValidationService contentValidationService,
+        IContentTypeService contentTypeService)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
         _userIdKeyResolver = userIdKeyResolver;
+        _contentValidationService = contentValidationService;
+        _contentTypeService = contentTypeService;
     }
 
     /// <inheritdoc />
@@ -64,6 +71,15 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
         }
 
+        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content);
+
+        if (validationResult.ValidationErrors.Any())
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentInvalid, new ContentPublishingResult());
+        }
+
+
         var userId = await _userIdKeyResolver.GetAsync(userKey);
 
         PublishResult? result = null;
@@ -73,7 +89,8 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
         else if(cultureAndSchedule.Schedules.FullSchedule.Any())
         {
-            // TODO can we somehow test that the content can be published without actually publishing it? - E.g. call validation from editing service?
+
+
             _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
 
         }
@@ -96,6 +113,34 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 InvalidPropertyAliases = result.InvalidProperties?.Select(property => property.Alias).ToArray()
                                          ?? Enumerable.Empty<string>()
             });
+    }
+
+    private async Task<ContentValidationResult> ValidateCurrentContentAsync(IContent content)
+    {
+        // Would be better to be able to use a mapper/factory, but currently all that functionality is very much presentation logic.
+        var model = new ContentUpdateModel()
+        {
+            InvariantName = content.Name,
+            InvariantProperties = content.Properties.Where(x=>x.PropertyType.VariesByCulture() is false).Select(x=> new PropertyValueModel()
+            {
+                Alias = x.Alias,
+                Value = x.GetValue()
+            }),
+            Variants = content.PublishedCultures.Select(culture => new VariantModel()
+            {
+                Name = content.GetPublishName(culture) ?? string.Empty,
+                Culture = culture,
+                Segment = null,
+                Properties = content.Properties.Where(prop=>prop.PropertyType.VariesByCulture()).Select(prop=> new PropertyValueModel()
+                {
+                    Alias = prop.Alias,
+                    Value = prop.GetValue(culture: culture, segment:null, published:false)
+                })
+            })
+        };
+        IContentType? contentType = _contentTypeService.Get(content.ContentType.Key)!;
+        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType);
+        return validationResult;
     }
 
     /// <inheritdoc />

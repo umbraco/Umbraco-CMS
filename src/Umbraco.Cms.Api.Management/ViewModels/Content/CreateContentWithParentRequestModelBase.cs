@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Core.Models.ContentEditing;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
 public abstract class CreateContentWithParentRequestModelBase<TValueModel, TVariantModel>
     : CreateContentRequestModelBase<TValueModel, TVariantModel>
