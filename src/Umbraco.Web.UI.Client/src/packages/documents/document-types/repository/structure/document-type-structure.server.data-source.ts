@@ -1,6 +1,6 @@
 import type { UmbAllowedDocumentTypeModel } from './types.js';
-import type { AllowedDocumentTypeModel } from '@umbraco-cms/backoffice/backend-api';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { AllowedDocumentTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

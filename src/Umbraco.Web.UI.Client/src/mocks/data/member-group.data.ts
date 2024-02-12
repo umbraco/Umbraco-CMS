@@ -3,7 +3,7 @@ import { createEntityTreeItem } from './utils.js';
 import type {
 	EntityTreeItemResponseModel,
 	PagedNamedEntityTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbMemberGroupDetailModel } from '@umbraco-cms/backoffice/member-group';
 
 export const data: Array<any> = [

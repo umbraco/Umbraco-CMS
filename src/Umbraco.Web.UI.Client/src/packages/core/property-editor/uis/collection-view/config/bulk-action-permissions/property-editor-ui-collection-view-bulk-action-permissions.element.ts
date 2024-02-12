@@ -1,13 +1,10 @@
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbPropertyEditorConfigCollection} from '@umbraco-cms/backoffice/property-editor';
-import {
-	UmbPropertyValueChangeEvent,
-} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 type BulkActionPermissionType =
 	| 'allowBulkCopy'
@@ -76,7 +73,7 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement
 
 	render() {
 		return html`<uui-toggle
-				?checked=${this.value.allowBulkUnpublish}
+				?checked=${this.value.allowBulkPublish}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkPublish')}
 				label="Allow bulk publish (content only)"></uui-toggle>
 			<uui-toggle
@@ -94,7 +91,7 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement
 			<uui-toggle
 				?checked=${this.value.allowBulkDelete}
 				@change=${(e: UUIBooleanInputEvent) => this.#onChange(e, 'allowBulkDelete')}
-				label="Allow bulk delete"></uui-toggle> `;
+				label="Allow bulk delete"></uui-toggle>`;
 	}
 
 	static styles = [

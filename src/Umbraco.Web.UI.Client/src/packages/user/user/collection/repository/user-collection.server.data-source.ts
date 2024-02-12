@@ -2,8 +2,8 @@ import type { UmbUserDetailModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserCollectionFilterModel } from '../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
-import type { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UserResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UserResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

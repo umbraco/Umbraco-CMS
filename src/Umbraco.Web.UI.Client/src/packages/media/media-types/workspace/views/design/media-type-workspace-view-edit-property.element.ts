@@ -10,7 +10,7 @@ import {
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';

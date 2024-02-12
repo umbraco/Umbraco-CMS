@@ -1,6 +1,6 @@
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';

@@ -1,7 +1,10 @@
 const { rest } = window.MockServiceWorker;
 import { umbLanguageMockDb } from '../../data/language/language.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { CreateLanguageRequestModel, UpdateLanguageRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	CreateLanguageRequestModel,
+	UpdateLanguageRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [

@@ -3,7 +3,7 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { ManifestWorkspace, UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-created-packages-section-view')
 export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewElement {

@@ -1,10 +1,10 @@
+import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbAuthFlow } from './auth-flow.js';
 import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { OpenAPI } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbAuthContext extends UmbBaseController {
 	#isAuthorized = new UmbBooleanState<boolean>(false);

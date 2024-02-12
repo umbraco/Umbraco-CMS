@@ -3,7 +3,7 @@ import { UMB_DEFAULT_COLLECTION_CONTEXT } from '../default/collection-default.co
 import type { ManifestCollectionView } from '../../extension-registry/models/collection-view.model.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-view-bundle')
 export class UmbCollectionViewBundleElement extends UmbLitElement {
@@ -68,7 +68,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			<uui-button compact popovertarget="collection-view-bundle-popover" label="status">
 				${this.#renderItemDisplay(this._currentView)}
 			</uui-button>
-			<uui-popover-container id="collection-view-bundle-popover" placement="bottom">
+			<uui-popover-container id="collection-view-bundle-popover" placement="bottom-end">
 				<umb-popover-layout>
 					<div class="filter-dropdown">${this._views.map((view) => this.#renderItem(view))}</div>
 				</umb-popover-layout>

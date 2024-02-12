@@ -4,8 +4,11 @@ import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
-import type { CreatePartialViewRequestModel, UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	CreatePartialViewRequestModel,
+	UpdatePartialViewRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

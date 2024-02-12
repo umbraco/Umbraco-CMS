@@ -1,6 +1,6 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestDashboardCollection } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-dashboard-collection')
 export class UmbDashboardCollectionElement extends UmbLitElement {

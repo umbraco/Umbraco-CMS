@@ -6,7 +6,7 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, customElement, query, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, type UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_LINK_PICKER_MODAL,

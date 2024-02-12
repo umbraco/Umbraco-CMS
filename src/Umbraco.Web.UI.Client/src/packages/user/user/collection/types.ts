@@ -1,4 +1,4 @@
-import type { DirectionModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DirectionModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbUserCollectionFilterModel {
 	skip?: number;

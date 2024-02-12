@@ -1,7 +1,10 @@
 const { rest } = window.MockServiceWorker;
 import { umbDocumentMockDb } from '../../data/document/document.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { CreateDocumentRequestModel, UpdateDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	CreateDocumentRequestModel,
+	UpdateDocumentRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [

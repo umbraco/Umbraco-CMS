@@ -1,6 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-tiny-mce-dimensions-configuration

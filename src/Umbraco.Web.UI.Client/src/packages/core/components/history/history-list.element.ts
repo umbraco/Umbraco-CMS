@@ -1,6 +1,6 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-history-list')
 export class UmbHistoryListElement extends UmbLitElement {

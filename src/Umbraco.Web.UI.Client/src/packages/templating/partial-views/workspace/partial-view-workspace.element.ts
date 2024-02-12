@@ -2,7 +2,7 @@ import { UmbPartialViewWorkspaceContext } from './partial-view-workspace.context
 import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 

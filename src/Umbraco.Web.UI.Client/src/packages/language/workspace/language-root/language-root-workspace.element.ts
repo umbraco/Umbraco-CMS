@@ -1,6 +1,6 @@
 import { UMB_LANGUAGE_COLLECTION_ALIAS } from '../../collection/index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {

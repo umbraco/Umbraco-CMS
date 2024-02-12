@@ -17,7 +17,7 @@ import {
 import type {
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
 import './query-builder-filter.element.js';
 

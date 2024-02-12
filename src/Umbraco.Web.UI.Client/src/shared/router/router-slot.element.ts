@@ -4,7 +4,7 @@ import { UmbRouterSlotChangeEvent } from './router-slot-change.event.js';
 import type { UmbRoute } from './route.interface.js';
 import { UmbRouteContext } from './route.context.js';
 import { css, html, type PropertyValueMap, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 
 /**
@@ -20,7 +20,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 	#modalRouter: IRouterSlot = document.createElement('router-slot') as IRouterSlot;
 	#listening = false;
 
-	@property()
+	@property({ attribute: false })
 	public get routes(): UmbRoute[] | undefined {
 		return this.#router.routes;
 	}
@@ -34,7 +34,7 @@ export class UmbRouterSlotElement extends UmbLitElement {
 		}
 	}
 
-	@property()
+	@property({ attribute: false })
 	public get parent(): IRouterSlot | null | undefined {
 		return this.#router.parent;
 	}

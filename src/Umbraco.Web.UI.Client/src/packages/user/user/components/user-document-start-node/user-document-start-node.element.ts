@@ -1,5 +1,5 @@
 import { css, html, customElement, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';

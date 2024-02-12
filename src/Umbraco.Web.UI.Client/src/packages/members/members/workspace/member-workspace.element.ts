@@ -3,7 +3,7 @@ import { UmbMemberWorkspaceContext } from './member-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-member-workspace')
 export class UmbMemberWorkspaceElement extends UmbLitElement {
