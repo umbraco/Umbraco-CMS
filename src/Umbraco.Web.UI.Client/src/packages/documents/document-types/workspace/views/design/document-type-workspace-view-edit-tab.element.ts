@@ -17,26 +17,16 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		PropertyTypeContainerModelBaseModel,
 		UmbDocumentTypeWorkspaceViewEditPropertiesElement
 	>(this, {
-		getUniqueOfElement: (element) =>
-			element.querySelector('umb-document-type-workspace-view-edit-properties')?.containerId ?? '',
+		getUniqueOfElement: (element) => {
+			console.log('unique');
+			return element.querySelector('umb-document-type-workspace-view-edit-properties')?.containerId ?? '';
+		},
 		getUniqueOfModel: (modelEntry) => modelEntry.id,
 		identifier: 'document-type-container-sorter',
 		itemSelector: 'span',
-		containerSelector: '#container-list',
+		containerSelector: '.container-list',
 		onChange: ({ item, model }) => {
-			const modelIndex = model.findIndex((entry) => entry.id === item.id);
-			if (modelIndex === -1) return;
-			let sortOrder: number;
-
-			if (model.length > 1) {
-				sortOrder = modelIndex > 0 ? model[modelIndex - 1].sortOrder + 1 : model[modelIndex + 1].sortOrder - 1;
-			} else {
-				sortOrder = 0;
-			}
-
-			this._groupStructureHelper.partialUpdateContainer(item.id, {
-				sortOrder: sortOrder,
-			});
+			console.log(model, item);
 
 			this._groups = model;
 		},
@@ -129,6 +119,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	render() {
 		return html`
+			<div class="container-list"></div>
 			${!this._noTabName
 				? html`
 						<uui-box>
@@ -139,7 +130,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						</uui-box>
 				  `
 				: ''}
-			<div id="container-list">
+			<div class="container-list">
 				${repeat(
 					this._groups,
 					(group) => group.id ?? '' + group.name,
@@ -251,6 +242,11 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				position: absolute;
 				border-radius: var(--uui-border-radius);
 				border: 1px dashed var(--uui-color-divider-emphasis);
+			}
+
+			.container-list {
+				min-height: 50px;
+				border: 1px solid red;
 			}
 		`,
 	];

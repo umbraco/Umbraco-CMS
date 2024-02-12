@@ -35,7 +35,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				let sortOrder: number;
 
 				if (model.length > 1) {
-					sortOrder = modelIndex > 0 ? model[modelIndex - 1].sortOrder + 1 : model[modelIndex + 1].sortOrder - 1;
+					sortOrder =
+						modelIndex > 0 ? (model[modelIndex - 1].sortOrder ?? 0) + 1 : (model[modelIndex + 1].sortOrder ?? 0) - 1;
 				} else {
 					sortOrder = 0;
 				}
