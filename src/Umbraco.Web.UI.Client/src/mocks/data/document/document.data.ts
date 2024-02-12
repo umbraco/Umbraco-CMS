@@ -719,6 +719,12 @@ export const data: Array<UmbMockDocumentModel> = [
 				segment: null,
 				value: null,
 			},
+			{
+				alias: 'listView',
+				culture: null,
+				segment: null,
+				value: null,
+			},
 		],
 	},
 ];
