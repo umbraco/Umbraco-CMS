@@ -36,8 +36,8 @@ export abstract class UmbBlockManagerContext<
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
 	public readonly blockTypes = this.#blockTypes.asObservable();
 
-	#editorConfiguration = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
-	public readonly editorConfiguration = this.#editorConfiguration.asObservable();
+	protected _editorConfiguration = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
+	public readonly editorConfiguration = this._editorConfiguration.asObservable();
 
 	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentUdi);
 	public readonly layouts = this._layouts.asObservable();
@@ -59,7 +59,7 @@ export abstract class UmbBlockManagerContext<
 	}*/
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
-		this.#editorConfiguration.setValue(configs);
+		this._editorConfiguration.setValue(configs);
 	}
 
 	setBlockTypes(blockTypes: Array<BlockType>) {
