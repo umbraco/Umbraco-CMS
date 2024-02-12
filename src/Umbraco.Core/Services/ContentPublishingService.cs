@@ -76,7 +76,12 @@ internal sealed class ContentPublishingService : IContentPublishingService
         if (validationResult.ValidationErrors.Any())
         {
             scope.Complete();
-            return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentInvalid, new ContentPublishingResult());
+            return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentInvalid, new ContentPublishingResult
+            {
+                Content = content,
+                InvalidPropertyAliases = validationResult.ValidationErrors.Select(property => property.Alias).ToArray()
+                                         ?? Enumerable.Empty<string>()
+            });
         }
 
 
