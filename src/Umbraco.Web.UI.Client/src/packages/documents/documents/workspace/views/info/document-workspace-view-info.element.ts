@@ -1,6 +1,6 @@
 import { TimeOptions } from './utils.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UMB_MODAL_MANAGER_CONTEXT,
@@ -12,7 +12,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
 import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
-import type { DocumentUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {

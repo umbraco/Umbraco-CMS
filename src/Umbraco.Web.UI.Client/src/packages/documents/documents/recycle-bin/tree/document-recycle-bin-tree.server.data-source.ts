@@ -1,6 +1,6 @@
 import type { UmbDocumentRecycleBinTreeItemModel } from './types.js';
-import type { DocumentRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentRecycleBinItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 

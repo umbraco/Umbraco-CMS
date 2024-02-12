@@ -2,11 +2,10 @@ import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbNotificationColor,
 	UmbNotificationOptions,
-	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
-import {
-	UMB_NOTIFICATION_CONTEXT,
+	UmbNotificationContext,
 } from '@umbraco-cms/backoffice/notification';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-story-notification-default-example')
 export class UmbStoryNotificationDefaultExampleElement extends UmbLitElement {

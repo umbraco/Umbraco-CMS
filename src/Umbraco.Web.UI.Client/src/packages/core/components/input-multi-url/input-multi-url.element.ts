@@ -1,7 +1,7 @@
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_LINK_PICKER_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbModalRouteBuilder, UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';

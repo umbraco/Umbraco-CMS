@@ -9,7 +9,7 @@ import {
 	type UmbPublicAccessModalValue,
 } from '@umbraco-cms/backoffice/document';
 import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 

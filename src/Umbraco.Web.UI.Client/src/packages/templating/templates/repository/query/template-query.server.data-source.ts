@@ -1,6 +1,6 @@
 import type { UmbExecuteTemplateQueryRequestModel } from './types.js';
-import type { TemplateQueryExecuteModel } from '@umbraco-cms/backoffice/backend-api';
-import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import type { TemplateQueryExecuteModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { TemplateResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

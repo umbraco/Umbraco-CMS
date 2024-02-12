@@ -12,7 +12,7 @@ import {
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';

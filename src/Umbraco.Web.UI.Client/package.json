@@ -15,7 +15,8 @@
 		"./observable-api": "./dist-cms/libs/observable-api/index.js",
 		"./auth": "./dist-cms/shared/auth/index.js",
 		"./event": "./dist-cms/packages/core/event/index.js",
-		"./icon": "./dist-cms/shared/icon/index.js",
+		"./lit-element": "./dist-cms/packages/core/lit-element/index.js",
+		"./icon": "./dist-cms/shared/icon-registry/index.js",
 		"./models": "./dist-cms/shared/models/index.js",
 		"./resources": "./dist-cms/shared/resources/index.js",
 		"./router": "./dist-cms/shared/router/index.js",
@@ -131,7 +132,8 @@
 		"test:watch": "web-test-runner --watch",
 		"test": "web-test-runner --coverage",
 		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist-cms/vscode-html-custom-data.json",
-		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json"
+		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json",
+		"generate:tsconfig": "node ./devops/tsconfig/index.js"
 	},
 	"engines": {
 		"node": ">=20.9 <21",

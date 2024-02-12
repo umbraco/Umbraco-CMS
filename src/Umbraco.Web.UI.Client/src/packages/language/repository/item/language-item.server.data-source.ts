@@ -1,7 +1,7 @@
 import type { UmbLanguageItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { LanguageResource } from '@umbraco-cms/backoffice/backend-api';
+import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { LanguageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**

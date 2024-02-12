@@ -1,6 +1,6 @@
 import type { UmbDocumentEntityType } from './entity.js';
 import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
-import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbDocumentDetailModel {
 	documentType: { unique: string };

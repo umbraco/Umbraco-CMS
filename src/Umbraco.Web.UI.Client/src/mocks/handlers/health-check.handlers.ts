@@ -13,8 +13,8 @@ import type {
 	HealthCheckGroupWithResultResponseModel,
 	HealthCheckResultResponseModel,
 	PagedHealthCheckGroupResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
