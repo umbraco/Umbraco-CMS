@@ -101,7 +101,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	#renderImageCropper() {
 		return html`<umb-image-cropper-field .value=${this.value} .file=${this.file as File} @change=${this.#onChange}>
 			<uui-button slot="actions" @click=${this.#onRemove} label="Remove files">
-				<uui-icon name="icon-trash"></uui-icon> Remove file(s)
+				<uui-icon name="icon-trash"></uui-icon> Remove image
 			</uui-button>
 		</umb-image-cropper-field> `;
 	}
