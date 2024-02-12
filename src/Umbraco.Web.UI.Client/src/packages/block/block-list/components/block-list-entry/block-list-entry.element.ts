@@ -26,6 +26,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#context = new UmbBlockListEntryContext(this);
 
 	@state()
+	_showContentEdit = false;
+	@state()
 	_hasSettings = false;
 
 	@state()
@@ -47,8 +49,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	constructor() {
 		super();
 
-		this.observe(this.#context.workspaceEditContentPath, (workspaceEditPath) => {
-			this._workspaceEditPath = workspaceEditPath;
+		this.observe(this.#context.showContentEdit, (showContentEdit) => {
+			this._showContentEdit = showContentEdit;
 		});
 		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
 			this._hasSettings = !!blockTypeSettingsElementTypeKey;
@@ -98,7 +100,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
 			>
 			<uui-action-bar>
-				${this._workspaceEditContentPath
+				${this._showContentEdit && this._workspaceEditContentPath
 					? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
 							<uui-icon name="icon-edit"></uui-icon>
 					  </uui-button>`

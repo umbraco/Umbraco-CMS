@@ -27,6 +27,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#context = new UmbBlockGridEntryContext(this);
 
 	@state()
+	_showContentEdit = false;
+	@state()
 	_hasSettings = false;
 
 	@state()
@@ -48,6 +50,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	constructor() {
 		super();
 
+		this.observe(this.#context.showContentEdit, (showContentEdit) => {
+			this._showContentEdit = showContentEdit;
+		});
 		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
 			this._hasSettings = !!blockTypeSettingsElementTypeKey;
 		});
@@ -88,7 +93,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						>${this.#renderRefBlock()}</umb-extension-slot
 					>
 					<uui-action-bar>
-						${this._workspaceEditContentPath
+						${this._showContentEdit && this._workspaceEditContentPath
 							? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
 									<uui-icon name="icon-edit"></uui-icon>
 							  </uui-button>`

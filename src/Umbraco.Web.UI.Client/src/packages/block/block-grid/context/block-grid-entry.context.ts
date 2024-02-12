@@ -17,6 +17,8 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 > {
 	areas = this._layout.asObservablePart((x) => x?.areas ?? []);
 
+	readonly showContentEdit = this._blockType.asObservablePart((x) => !x?.forceHideContentEditorInOverlay);
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
 	}

@@ -8,6 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs/index.js';
 
 export abstract class UmbBlockEntryContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
@@ -67,6 +68,7 @@ export abstract class UmbBlockEntryContext<
 	#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly settings = this.#settings.asObservable();
 
+	abstract readonly showContentEdit: Observable<boolean>;
 	/**
 	 * Set the contentUdi of this entry.
 	 * @method setContentUdi
