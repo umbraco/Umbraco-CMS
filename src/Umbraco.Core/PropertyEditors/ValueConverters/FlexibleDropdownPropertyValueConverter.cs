@@ -2,13 +2,17 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.PublishedContent;
-using System.Text.Json;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
 public class FlexibleDropdownPropertyValueConverter : PropertyValueConverterBase
 {
+    private readonly IJsonSerializer _jsonSerializer;
+
+    public FlexibleDropdownPropertyValueConverter(IJsonSerializer jsonSerializer) => _jsonSerializer = jsonSerializer;
+
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
         propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.DropDownListFlexible);
 
@@ -19,7 +23,7 @@ public class FlexibleDropdownPropertyValueConverter : PropertyValueConverterBase
             return Array.Empty<string>();
         }
 
-        return JsonSerializer.Deserialize<string[]>(source.ToString()!) ?? Array.Empty<string>();
+        return _jsonSerializer.Deserialize<string[]>(source.ToString()!) ?? Array.Empty<string>();
     }
 
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)

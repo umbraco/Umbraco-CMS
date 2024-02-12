@@ -103,7 +103,7 @@ public class PropertyEditorValueConverterTests
             Mock.Of<IPublishedModelFactory>(),
             mockPublishedContentTypeFactory.Object);
 
-        var converter = new FlexibleDropdownPropertyValueConverter();
+        var converter = new FlexibleDropdownPropertyValueConverter(new JsonNetSerializer());
         var inter = converter.ConvertSourceToIntermediate(null, publishedPropType, value, false);
         var result =
             converter.ConvertIntermediateToObject(null, publishedPropType, PropertyCacheLevel.Unknown, inter, false);
