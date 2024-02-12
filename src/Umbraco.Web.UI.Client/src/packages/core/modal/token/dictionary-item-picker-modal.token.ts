@@ -1,6 +1,6 @@
 import type { UmbEntityTreeItemModel } from '../../tree/types.js';
+import { UmbModalToken } from './modal-token.js';
 import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export type UmbDictionaryItemPickerModalData = UmbTreePickerModalData<UmbEntityTreeItemModel>;
 export type UmbDictionaryItemPickerModalValue = UmbPickerModalValue;

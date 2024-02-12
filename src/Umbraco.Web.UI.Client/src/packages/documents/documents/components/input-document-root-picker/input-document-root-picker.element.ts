@@ -2,7 +2,7 @@ import { html, css, customElement, property, ifDefined, state, repeat } from '@u
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -224,7 +224,7 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 		if (!item.alias) return;
 		const step = this.#getQueryStepMeta(item);
 		return html`
-			<uui-ref-node border standalone id=${step.unique} name=${step.label} detail="${ifDefined(step.description)}">
+			<uui-ref-node standalone id=${step.unique} name=${step.label} detail="${ifDefined(step.description)}">
 				<uui-icon slot="icon" name=${step.icon}></uui-icon>
 				<uui-action-bar slot="actions">
 					<uui-button

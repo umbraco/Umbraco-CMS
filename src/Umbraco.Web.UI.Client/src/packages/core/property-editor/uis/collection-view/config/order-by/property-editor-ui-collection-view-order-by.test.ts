@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUICollectionViewOrderByElement } from './property-editor-ui-collection-view-order-by.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUICollectionViewOrderByElement', () => {
 	let element: UmbPropertyEditorUICollectionViewOrderByElement;
@@ -15,7 +15,7 @@ describe('UmbPropertyEditorUICollectionViewOrderByElement', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUICollectionViewOrderByElement);
 	});
 
-	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});

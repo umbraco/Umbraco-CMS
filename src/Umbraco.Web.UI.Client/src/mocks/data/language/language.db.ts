@@ -7,7 +7,7 @@ import type {
 	CreateLanguageRequestModel,
 	LanguageItemResponseModel,
 	LanguageResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbLanguageMockDB extends UmbCultureMockDbBase<UmbMockLanguageModel> {
 	item = new UmbMockCultureItemManager<UmbMockLanguageModel>(this, itemResponseMapper);

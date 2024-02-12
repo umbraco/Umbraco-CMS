@@ -1,7 +1,7 @@
 import { css, html, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-dropdown-list')
 export class UmbInputDropdownListElement extends FormControlMixin(UmbLitElement) {

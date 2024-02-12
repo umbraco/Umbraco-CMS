@@ -19,7 +19,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	#modalRegistration?: UmbModalRouteRegistration;
 
 	public get controllerAlias() {
-		return undefined;
+		return this.alias.toString();
 	}
 	protected getControllerHostElement() {
 		return this.#host.getHostElement();

@@ -1,12 +1,9 @@
-import type {
-	UmbHealthCheckDashboardContext} from '../health-check-dashboard.context.js';
-import {
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT,
-} from '../health-check-dashboard.context.js';
+import type { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context.js';
+import { UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from '../health-check-dashboard.context.js';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './health-check-group-box-overview.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

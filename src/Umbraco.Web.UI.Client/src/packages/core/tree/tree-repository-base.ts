@@ -2,8 +2,6 @@ import type { UmbTreeStore } from './tree-store.interface.js';
 import type {
 	UmbEntityTreeItemModel,
 	UmbEntityTreeRootModel,
-	UmbFileSystemTreeItemModel,
-	UmbFileSystemTreeRootModel,
 	UmbUniqueTreeItemModel,
 	UmbUniqueTreeRootModel,
 } from './types.js';
@@ -14,10 +12,21 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
+/**
+ * Base class for a tree repository.
+ * @export
+ * @abstract
+ * @class UmbTreeRepositoryBase
+ * @extends {UmbRepositoryBase}
+ * @implements {UmbTreeRepository<TreeItemType, TreeRootType>}
+ * @implements {UmbApi}
+ * @template TreeItemType
+ * @template TreeRootType
+ */
 export abstract class UmbTreeRepositoryBase<
-		// TODO: remove UmbEntityTreeItemModel and UmbFileSystemTreeItemModel when we have unique in place
-		TreeItemType extends UmbUniqueTreeItemModel | UmbEntityTreeItemModel | UmbFileSystemTreeItemModel,
-		TreeRootType extends UmbUniqueTreeRootModel | UmbEntityTreeRootModel | UmbFileSystemTreeRootModel,
+		// TODO: remove UmbEntityTreeItemModel when we have unique in place
+		TreeItemType extends UmbUniqueTreeItemModel | UmbEntityTreeItemModel,
+		TreeRootType extends UmbUniqueTreeRootModel | UmbEntityTreeRootModel,
 	>
 	extends UmbRepositoryBase
 	implements UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi
@@ -26,13 +35,20 @@ export abstract class UmbTreeRepositoryBase<
 	protected _treeStore?: UmbTreeStore<TreeItemType>;
 	#treeSource: UmbTreeDataSource<TreeItemType>;
 
+	/**
+	 * Creates an instance of UmbTreeRepositoryBase.
+	 * @param {UmbControllerHost} host
+	 * @param {UmbTreeDataSourceConstructor<TreeItemType>} treeSourceConstructor
+	 * @param {(string | UmbContextToken<any, any>)} treeStoreContextAlias
+	 * @memberof UmbTreeRepositoryBase
+	 */
 	constructor(
 		host: UmbControllerHost,
-		treeSource: UmbTreeDataSourceConstructor<TreeItemType>,
+		treeSourceConstructor: UmbTreeDataSourceConstructor<TreeItemType>,
 		treeStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);
-		this.#treeSource = new treeSource(this);
+		this.#treeSource = new treeSourceConstructor(this);
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
 			this._treeStore = instance;

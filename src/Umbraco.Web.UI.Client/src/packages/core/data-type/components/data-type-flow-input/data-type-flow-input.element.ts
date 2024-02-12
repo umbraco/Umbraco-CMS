@@ -1,7 +1,7 @@
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController, UMB_DATA_TYPE_PICKER_FLOW_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -76,7 +76,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 							// TODO: Could use something smarter for workspace modals, as I would like to avoid setting the rest of the URL here:
 							this.#editDataTypeModal?.open({}, 'edit/' + this._ids![0]);
 						}}
-						border>
+						standalone>
 						<!-- TODO: Get the icon from property editor UI -->
 						<uui-icon name="${'document'}" slot="icon"></uui-icon>
 						<uui-action-bar slot="actions">

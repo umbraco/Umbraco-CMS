@@ -11,7 +11,7 @@ import type {
 	DictionaryItemItemResponseModel,
 	PagedDictionaryOverviewResponseModel,
 	DictionaryOverviewResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbDictionaryMockDB extends UmbEntityMockDbBase<UmbMockDictionaryModel> {

@@ -7,7 +7,7 @@ import type {
 	CreateUserGroupRequestModel,
 	UserGroupItemResponseModel,
 	UserGroupResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupModel> {

@@ -10,7 +10,7 @@ import type {
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_ENTITY_USER_PERMISSION_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 type UmbUserGroupRefData = {
@@ -136,7 +136,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 									name=${ifDefined(userGroup.name)}
 									.userPermissionAliases=${userGroup.permissions}
 									@open=${() => this.#openUserPermissionsModal(userGroup.id)}
-									border>
+									standalone>
 									${userGroup.icon ? html`<uui-icon slot="icon" name=${userGroup.icon}></uui-icon>` : nothing}
 								</umb-user-group-ref>`,
 						)}

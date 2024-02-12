@@ -1,6 +1,6 @@
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { html, until, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 type FileItem = {
 	name: string;

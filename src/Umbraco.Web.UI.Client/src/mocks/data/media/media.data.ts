@@ -2,7 +2,7 @@ import type {
 	MediaItemResponseModel,
 	MediaResponseModel,
 	MediaTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockMediaModelHack = MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel;
 

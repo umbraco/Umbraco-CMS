@@ -1,5 +1,5 @@
-import type { DirectionModel, AuditTypeModel } from '@umbraco-cms/backoffice/backend-api';
-import { AuditLogResource } from '@umbraco-cms/backoffice/backend-api';
+import type { DirectionModel, AuditTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { AuditLogResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

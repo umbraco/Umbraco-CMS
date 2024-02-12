@@ -4,7 +4,7 @@ import type {
 	EntityTreeItemResponseModel,
 	NamedEntityTreeItemResponseModel,
 	RelationTypeResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<RelationTypeResponseModel> = [
 	{

@@ -4,7 +4,7 @@ import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 @customElement('umb-property-type-based-property')
@@ -45,7 +45,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 					if (!this._propertyEditorUiAlias && dataType?.editorAlias) {
 						//use 'dataType.editorAlias' to look up the extension in the registry:
 						this.observe(
-							umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', dataType.editorAlias),
+							umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', dataType.editorAlias),
 							(extension) => {
 								if (!extension) return;
 								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;

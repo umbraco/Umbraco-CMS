@@ -2,11 +2,11 @@ import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbPublishDocumentEntityAction } from './publish.action.js';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action.js';
-import { UmbDocumentPublicAccessEntityAction } from './public-access.action.js';
 import { UmbUnpublishDocumentEntityAction } from './unpublish.action.js';
 import { UmbRollbackDocumentEntityAction } from './rollback.action.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as permissionManifests } from './permissions/manifests.js';
+import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import {
 	UmbCopyEntityAction,
@@ -18,6 +18,7 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	...createManifests,
 	...permissionManifests,
+	...publicAccessManifests,
 	...cultureAndHostnamesManifests,
 	{
 		type: 'entityAction',
@@ -69,18 +70,6 @@ const entityActions: Array<ManifestTypes> = [
 			label: 'Sort (TBD)',
 			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.PublicAccess',
-		name: 'Document Permissions Entity Action',
-		api: UmbDocumentPublicAccessEntityAction,
-		meta: {
-			icon: 'icon-lock',
-			label: 'Public Access (TBD)',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{

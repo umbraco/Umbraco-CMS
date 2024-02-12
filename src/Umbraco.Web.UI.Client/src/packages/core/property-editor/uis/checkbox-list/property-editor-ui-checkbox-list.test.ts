@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUICheckboxListElement } from './property-editor-ui-checkbox-list.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUICheckboxListElement', () => {
 	let element: UmbPropertyEditorUICheckboxListElement;
@@ -13,7 +13,7 @@ describe('UmbPropertyEditorUICheckboxListElement', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUICheckboxListElement);
 	});
 
-	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});

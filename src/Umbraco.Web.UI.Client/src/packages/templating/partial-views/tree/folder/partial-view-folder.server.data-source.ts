@@ -1,7 +1,7 @@
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
-import type { CreatePartialViewFolderRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import { PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
+import type { CreatePartialViewFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

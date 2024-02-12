@@ -2,7 +2,7 @@ import type { UmbThemeContext } from '@umbraco-cms/backoffice/themes';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 

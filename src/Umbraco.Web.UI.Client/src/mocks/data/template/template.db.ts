@@ -6,7 +6,7 @@ import type { UmbMockTemplateModel } from './template.data.js';
 import { data } from './template.data.js';
 import { UmbMockTemplateDetailManager } from './template-detail.manager.js';
 import { UmbMockTemplateQueryManager } from './template-query.manager.js';
-import type { TemplateItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { TemplateItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbTemplateMockDB extends UmbEntityMockDbBase<UmbMockTemplateModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockTemplateModel>(this, folderTreeItemMapper);

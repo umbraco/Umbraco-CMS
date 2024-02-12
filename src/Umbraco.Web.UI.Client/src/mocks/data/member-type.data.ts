@@ -4,7 +4,7 @@ import { createEntityTreeItem } from './utils.js';
 import type {
 	NamedEntityTreeItemResponseModel,
 	PagedNamedEntityTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<MemberTypeDetails> = [
 	{
