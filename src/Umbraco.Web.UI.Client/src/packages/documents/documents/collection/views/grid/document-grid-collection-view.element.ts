@@ -1,7 +1,7 @@
 import type { UmbDocumentCollectionFilterModel } from '../../types.js';
 import type { UmbDocumentTreeItemModel } from '../../../tree/types.js';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
