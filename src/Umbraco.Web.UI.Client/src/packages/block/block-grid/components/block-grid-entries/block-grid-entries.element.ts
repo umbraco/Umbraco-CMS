@@ -3,7 +3,7 @@ import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../block-grid-entry/index.js';
 import { UmbSorterController, type UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 

@@ -1,6 +1,6 @@
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridLayoutAreaItemModel } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../block-grid-entries/index.js';
 
 /**

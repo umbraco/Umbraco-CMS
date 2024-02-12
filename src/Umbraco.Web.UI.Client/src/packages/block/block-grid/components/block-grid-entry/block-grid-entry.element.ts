@@ -1,7 +1,7 @@
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../ref-grid-block/index.js';
 
 /**
