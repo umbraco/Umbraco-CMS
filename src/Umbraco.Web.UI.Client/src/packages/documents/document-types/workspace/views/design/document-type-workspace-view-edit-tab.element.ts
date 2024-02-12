@@ -17,14 +17,27 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		PropertyTypeContainerModelBaseModel,
 		UmbDocumentTypeWorkspaceViewEditPropertiesElement
 	>(this, {
-		getUniqueOfElement: (element) => element.getAttribute('container-id'),
+		getUniqueOfElement: (element) =>
+			element.querySelector('umb-document-type-workspace-view-edit-properties')?.containerId ?? '',
 		getUniqueOfModel: (modelEntry) => modelEntry.id,
 		identifier: 'document-type-container-sorter',
-		itemSelector: '[data-umb-group-id]',
+		itemSelector: 'span',
 		containerSelector: '#container-list',
 		onChange: ({ item, model }) => {
-			console.log('item', item);
-			console.log('model', model);
+			const modelIndex = model.findIndex((entry) => entry.id === item.id);
+			if (modelIndex === -1) return;
+			let sortOrder: number;
+
+			if (model.length > 1) {
+				sortOrder = modelIndex > 0 ? model[modelIndex - 1].sortOrder + 1 : model[modelIndex + 1].sortOrder - 1;
+			} else {
+				sortOrder = 0;
+			}
+
+			this._groupStructureHelper.partialUpdateContainer(item.id, {
+				sortOrder: sortOrder,
+			});
+
 			this._groups = model;
 		},
 	});
