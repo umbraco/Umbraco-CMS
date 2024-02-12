@@ -144,7 +144,8 @@
 		"test": "web-test-runner --coverage",
 		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist-cms/vscode-html-custom-data.json",
 		"wc-analyze": "wca **/*.element.ts --outFile dist-cms/custom-elements.json",
-		"generate:tsconfig": "node ./devops/tsconfig/index.js"
+		"generate:tsconfig": "node ./devops/tsconfig/index.js",
+		"package:validate": "node ./devops/package/validate-exports.js"
 	},
 	"engines": {
 		"node": ">=20.9 <21",
@@ -203,6 +204,7 @@
 		"eslint-plugin-local-rules": "^2.0.1",
 		"eslint-plugin-storybook": "^0.6.15",
 		"eslint-plugin-wc": "^2.0.4",
+		"glob": "^10.3.10",
 		"lucide-static": "^0.290.0",
 		"msw": "^1.3.2",
 		"openapi-typescript-codegen": "^0.25.0",
