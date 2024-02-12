@@ -1,8 +1,8 @@
 import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
 import type { UmbTemplateTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { TemplateResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**

@@ -2,13 +2,9 @@ import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.conte
 import type { UmbDataTypeDetailModel } from '../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-data-type-details-workspace-view')
@@ -95,13 +91,12 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 			<umb-property-layout label="Property Editor" description="Select a property editor">
 				${this._propertyEditorUiAlias && this._propertyEditorSchemaAlias
 					? html`
-							<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
 							<umb-ref-property-editor-ui
 								slot="editor"
 								name=${this._propertyEditorUiName ?? ''}
 								alias=${this._propertyEditorUiAlias}
 								property-editor-schema-alias=${this._propertyEditorSchemaAlias}
-								border>
+								standalone>
 								${this._propertyEditorUiIcon
 									? html` <uui-icon name="${this._propertyEditorUiIcon}" slot="icon"></uui-icon> `
 									: ''}

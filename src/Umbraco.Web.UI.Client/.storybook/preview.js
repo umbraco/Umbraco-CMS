@@ -15,7 +15,7 @@ import { UmbDocumentDetailStore } from '../src/packages/documents/documents/repo
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/tree/document-tree.store';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
-import { UmbLitElement } from '../src/shared/lit-element';
+import { UmbLitElement } from '../src/packages/core/lit-element';
 import { umbLocalizationRegistry } from '../src/packages/core/localization';
 import customElementManifests from '../dist-cms/custom-elements.json';
 

@@ -1,7 +1,7 @@
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 

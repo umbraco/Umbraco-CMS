@@ -2,7 +2,7 @@ import type { UmbMediaItemModel } from '../../repository/index.js';
 import { UmbMediaPickerContext } from './input-media.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -149,7 +149,6 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 
 	#openPicker() {
 		// TODO: Configure the media picker, with `allowedContentTypeIds` and `ignoreUserStartNodes` [LK]
-		console.log('#openPicker', [this.allowedContentTypeIds, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			pickableFilter: this.#pickableFilter,

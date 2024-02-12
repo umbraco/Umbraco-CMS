@@ -1,5 +1,5 @@
 import type { UmbUserEntityType } from './entity.js';
-import type { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbUserDetailModel {
 	entityType: UmbUserEntityType;

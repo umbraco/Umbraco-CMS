@@ -4,8 +4,8 @@ import type { UmbUserDetailModel } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 

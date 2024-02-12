@@ -4,7 +4,6 @@ import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
-	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspace = {
@@ -19,6 +18,24 @@ const workspace: ManifestWorkspace = {
 };
 
 const workspaceViews: Array<ManifestWorkspaceView> = [
+	// {
+	// 	type: 'workspaceView',
+	// 	alias: 'Umb.WorkspaceView.Media.Collection',
+	// 	name: 'Media Workspace Collection View',
+	// 	element: () => import('./views/collection/media-collection-workspace-view.element.js'),
+	// 	weight: 300,
+	// 	meta: {
+	// 		label: 'Media',
+	// 		pathname: 'collection',
+	// 		icon: 'icon-grid',
+	// 	},
+	// 	conditions: [
+	// 		{
+	// 			alias: 'Umb.Condition.WorkspaceAlias',
+	// 			match: workspace.alias,
+	// 		},
+	// 	],
+	// },
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Media.Edit',
@@ -57,28 +74,6 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
-	{
-		type: 'workspaceViewCollection',
-		alias: 'Umb.WorkspaceView.Media.Collection',
-		name: 'Media Workspace Collection View',
-		weight: 300,
-		meta: {
-			label: 'Media',
-			pathname: 'collection',
-			icon: 'icon-grid',
-			entityType: 'media',
-			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
-];
-
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
@@ -99,4 +94,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

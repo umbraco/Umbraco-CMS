@@ -4,8 +4,8 @@ import type {
 	InstallSettingsResponseModel,
 	ProblemDetails,
 	InstallRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { TelemetryLevelModel } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [

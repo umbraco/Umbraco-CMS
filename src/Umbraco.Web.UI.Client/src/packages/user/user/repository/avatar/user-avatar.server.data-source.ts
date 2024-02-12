@@ -1,5 +1,5 @@
-import type { SetAvatarRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { UserResource } from '@umbraco-cms/backoffice/backend-api';
+import type { SetAvatarRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

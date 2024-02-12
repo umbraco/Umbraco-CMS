@@ -1,7 +1,10 @@
 import type { UmbMockDocumentModel } from './document.data.js';
 import type { UmbDocumentMockDB } from './document.db.js';
-import type { PublishDocumentRequestModel, UnpublishDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	PublishDocumentRequestModel,
+	UnpublishDocumentRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMockDocumentPublishingManager {
 	#documentDb: UmbDocumentMockDB;

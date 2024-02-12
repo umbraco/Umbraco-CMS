@@ -12,7 +12,7 @@ import type {
 	UmbTableOrderedEvent,
 } from '@umbraco-cms/backoffice/components';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbUserGroupItemModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupItemRepository } from '@umbraco-cms/backoffice/user-group';
 

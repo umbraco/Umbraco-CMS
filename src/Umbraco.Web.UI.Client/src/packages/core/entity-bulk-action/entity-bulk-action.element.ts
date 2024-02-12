@@ -2,7 +2,7 @@ import type { UmbEntityBulkActionBase } from './entity-bulk-action.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-bulk-action')

@@ -1,7 +1,7 @@
 import { html, css, nothing, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type { SearchResultResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { SearchResultResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-modal-element-fields-viewer')
 export class UmbModalElementFieldsViewerElement extends UmbModalBaseElement<

@@ -1,7 +1,7 @@
 import type { UmbDocumentTypeItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**

@@ -1,4 +1,4 @@
-import { AuditTypeModel } from '@umbraco-cms/backoffice/backend-api';
+import { AuditTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 interface HistoryStyleMap {
 	look: 'default' | 'primary' | 'secondary' | 'outline' | 'placeholder';

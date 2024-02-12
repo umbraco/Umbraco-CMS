@@ -6,7 +6,7 @@
 			"import { UmbTextStyles } from '@umbraco-ui/backoffice/style';",
 			"import { css, html } from 'lit';",
 			"import { customElement } from 'lit/decorators.js';",
-			"import { UmbLitElement } from '@umbraco-cms/internal/lit-element';",
+			"import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';",
 			"",
 			"@customElement('umb-${TM_FILENAME_BASE/(.*)\\..+$/$1/}')",
 			"export class Umb${TM_FILENAME_BASE/(.*)\\..+$/${1:/pascalcase}/}Element extends UmbLitElement {",
