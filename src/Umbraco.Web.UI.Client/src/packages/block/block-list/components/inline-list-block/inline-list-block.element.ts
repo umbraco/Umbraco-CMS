@@ -1,11 +1,11 @@
-import { UMB_BLOCK_LIST_CONTEXT } from '../../index.js';
+import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../index.js';
 import type { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../../block/index.js';
 import { UMB_BLOCK_WORKSPACE_ALIAS } from '../../../block/index.js';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import '../../../block/workspace/views/edit/block-workspace-view-edit-no-router.element.js';
+import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
@@ -13,7 +13,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  */
 @customElement('umb-inline-list-block')
 export class UmbInlineListBlockElement extends UmbLitElement {
-	#blockContext?: typeof UMB_BLOCK_LIST_CONTEXT.TYPE;
+	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentUdi?: string;
 
@@ -26,10 +26,10 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_BLOCK_LIST_CONTEXT, (blockContext) => {
+		this.consumeContext(UMB_BLOCK_LIST_ENTRY_CONTEXT, (blockContext) => {
 			this.#blockContext = blockContext;
 			this.observe(
-				this.#blockContext.contentUdi,
+				this.#blockContext.unique,
 				(contentUdi) => {
 					this.#contentUdi = contentUdi;
 					this.#load();
@@ -43,7 +43,6 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 					if (context) {
 						this.#workspaceContext = context as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 						this.#load();
-						this.#workspaceContext.content.createPropertyDatasetContext(this);
 
 						new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
 							this,
@@ -73,7 +72,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				<span>${this.label}</span>
 			</button>
 			${this._isOpen === true
-				? html`<umb-block-workspace-view-edit-no-router></umb-block-workspace-view-edit-no-router>`
+				? html`<umb-block-workspace-view-edit-content-no-router></umb-block-workspace-view-edit-content-no-router>`
 				: ''}
 		</uui-box>`;
 	}

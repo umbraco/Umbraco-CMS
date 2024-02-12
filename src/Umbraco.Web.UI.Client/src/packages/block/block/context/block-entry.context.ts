@@ -1,36 +1,48 @@
 import type { UmbBlockTypeBaseModel } from '../../block-type/types.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
-import type { UMB_BLOCK_MANAGER_CONTEXT, UmbBlockManagerContext } from '../manager/index.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbBlockManagerContext } from '../index.js';
+import type { UmbBlockEntriesContext } from './block-entries.context.js';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export abstract class UmbBlockContext<
-	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
+export abstract class UmbBlockEntryContext<
+	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType>,
 	BlockManagerContextType extends UmbBlockManagerContext<BlockType, BlockLayoutType>,
+	BlockEntriesContextTokenType extends UmbContextToken<BlockEntriesContextType>,
+	BlockEntriesContextType extends UmbBlockEntriesContext<
+		BlockManagerContextTokenType,
+		BlockManagerContextType,
+		BlockType,
+		BlockLayoutType
+	>,
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
-> extends UmbContextBase<
-	UmbBlockContext<BlockManagerContextTokenType, BlockManagerContextType, BlockType, BlockLayoutType>
-> {
+> extends UmbContextBase<any> {
 	//
 	_manager?: BlockManagerContextType;
+	_entries?: BlockEntriesContextType;
+
+	#contentUdi?: string;
 
 	#blockTypeName = new UmbStringState(undefined);
 	public readonly blockTypeName = this.#blockTypeName.asObservable();
+
+	// TODO: index state + observable?
 
 	#label = new UmbStringState('');
 	public readonly label = this.#label.asObservable();
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
-	public readonly workspaceEditPath = this.#workspacePath.asObservablePart(
-		(path) => path + 'edit/' + encodeFilePath(this.getContentUdi() ?? ''),
+	public readonly workspaceEditPath = this.#workspacePath.asObservablePart((path) =>
+		path ? path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') : '',
 	);
-	public readonly workspaceEditSettingsPath = this.#workspacePath.asObservablePart(
-		(path) => path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') + '/view/settings',
+	public readonly workspaceEditSettingsPath = this.#workspacePath.asObservablePart((path) =>
+		path ? path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') + '/view/settings' : '',
 	);
 
 	_blockType = new UmbObjectState<BlockType | undefined>(undefined);
@@ -38,38 +50,66 @@ export abstract class UmbBlockContext<
 	public readonly blockTypeContentElementTypeKey = this._blockType.asObservablePart((x) => x?.contentElementTypeKey);
 	public readonly blockTypeSettingsElementTypeKey = this._blockType.asObservablePart((x) => x?.settingsElementTypeKey);
 
-	#layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
-	public readonly layout = this.#layout.asObservable();
-	public readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
+	_layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
+	public readonly layout = this._layout.asObservable();
+	/**
+	 * @obsolete Use `unique` instead. Cause we will most likely rename this in the future.
+	 */
+	public readonly contentUdi = this._layout.asObservablePart((x) => x?.contentUdi);
+	public readonly unique = this._layout.asObservablePart((x) => x?.contentUdi);
 
 	#content = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly content = this.#content.asObservable();
 	public readonly contentTypeKey = this.#content.asObservablePart((x) => x?.contentTypeKey);
 
+	// TODO: Make sure changes to the Block Content / Settings are reflected back to Manager.
+
 	#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly settings = this.#settings.asObservable();
 
 	/**
-	 * Set the layout entry object.
-	 * @method setLayout
-	 * @param {BlockLayoutType | undefined} layout entry object.
+	 * Set the contentUdi of this entry.
+	 * @method setContentUdi
+	 * @param {string} contentUdi the entry content UDI.
 	 * @returns {void}
 	 */
-	setLayout(layout: BlockLayoutType | undefined) {
-		this.#layout.setValue(layout);
+	setContentUdi(contentUdi: string) {
+		this.#contentUdi = contentUdi;
+		this.#observeLayout();
 	}
 
-	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
-		super(host, UMB_BLOCK_ENTITY_CONTEXT.toString());
+	/**
+	 * Get the current value of this Blocks label.
+	 * @method getLabel
+	 * @returns {string}
+	 */
+	getLabel() {
+		return this.#label.value;
+	}
+
+	constructor(
+		host: UmbControllerHost,
+		blockManagerContextToken: BlockManagerContextTokenType,
+		blockEntriesContextToken: BlockEntriesContextTokenType,
+	) {
+		super(host, 'UmbBlockEntryContext');
 
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
 			this._manager = manager;
+			this.#gotManager();
 			this._gotManager();
 		});
 
+		// Consume block entries:
+		this.consumeContext(blockEntriesContextToken, (entries) => {
+			this._entries = entries;
+			this.#gotEntries();
+			this._gotEntries();
+		});
+
 		// Observe UDI:
-		this.observe(this.contentUdi, (contentUdi) => {
+		this.observe(this.unique, (contentUdi) => {
 			if (!contentUdi) return;
 			this.#observeData();
 		});
@@ -89,13 +129,42 @@ export abstract class UmbBlockContext<
 	}
 
 	getContentUdi() {
-		return this.#layout.value?.contentUdi;
+		return this._layout.value?.contentUdi;
 	}
 
-	_gotManager() {
-		if (this._manager) {
+	#observeLayout() {
+		if (!this._entries || !this.#contentUdi) return;
+
+		this.observe(
+			this._entries.layoutOf(this.#contentUdi),
+			(layout) => {
+				this._layout.setValue(layout);
+			},
+			'observeParentLayout',
+		);
+		this.observe(
+			this.layout,
+			(layout) => {
+				if (layout) {
+					this._entries?.setOneLayout(layout);
+				}
+			},
+			'observeThisLayout',
+		);
+	}
+
+	#gotManager() {
+		this.#observeBlockType();
+		this.#observeData();
+	}
+
+	abstract _gotManager(): void;
+
+	#gotEntries() {
+		this.#observeLayout();
+		if (this._entries) {
 			this.observe(
-				this._manager.workspacePath,
+				this._entries.workspacePath,
 				(workspacePath) => {
 					this.#workspacePath.setValue(workspacePath);
 				},
@@ -104,13 +173,13 @@ export abstract class UmbBlockContext<
 		} else {
 			this.removeControllerByAlias('observeWorkspacePath');
 		}
-		this.#observeBlockType();
-		this.#observeData();
 	}
+
+	abstract _gotEntries(): void;
 
 	#observeData() {
 		if (!this._manager) return;
-		const contentUdi = this.#layout.value?.contentUdi;
+		const contentUdi = this._layout.value?.contentUdi;
 		if (!contentUdi) return;
 
 		// observe content:
@@ -123,7 +192,7 @@ export abstract class UmbBlockContext<
 		);
 
 		// observe settings:
-		const settingsUdi = this.#layout.value?.settingsUdi;
+		const settingsUdi = this._layout.value?.settingsUdi;
 		if (settingsUdi) {
 			this.observe(
 				this._manager.contentOf(settingsUdi),
@@ -190,14 +259,30 @@ export abstract class UmbBlockContext<
 
 	// Public methods:
 
-	public delete() {
-		if (!this._manager) return;
-		const contentUdi = this.#layout.value?.contentUdi;
-		if (!contentUdi) return;
-		this._manager.deleteBlock(contentUdi);
-	}
-}
+	//activate
+	public edit() {}
+	//editSettings
 
-export const UMB_BLOCK_ENTITY_CONTEXT = new UmbContextToken<
-	UmbBlockContext<typeof UMB_BLOCK_MANAGER_CONTEXT, typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE>
->('UmbBlockContext');
+	requestDelete() {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
+			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
+				data: {
+					headline: `Delete ${this.getLabel()}`,
+					content: 'Are you sure you want to delete this [INSERT BLOCK TYPE NAME]?',
+					confirmLabel: 'Delete',
+					color: 'danger',
+				},
+			});
+			await modalContext.onSubmit();
+			this.delete();
+		});
+	}
+	public delete() {
+		if (!this._entries) return;
+		const contentUdi = this._layout.value?.contentUdi;
+		if (!contentUdi) return;
+		this._entries.delete(contentUdi);
+	}
+
+	//copy
+}

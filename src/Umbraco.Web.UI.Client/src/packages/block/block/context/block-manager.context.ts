@@ -5,15 +5,18 @@ import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backo
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 import type { UmbBlockTypeBaseModel, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
-import { UMB_BLOCK_MANAGER_CONTEXT, UMB_BLOCK_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/block';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-// TODO: We are using backend model here, I think we should get our own model:
-type ElementTypeModel = UmbContentTypeModel;
-
+export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
+	layout: LayoutEntryType;
+	content: UmbBlockDataType;
+	settings?: UmbBlockDataType;
+};
 export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
@@ -21,10 +24,13 @@ export abstract class UmbBlockManagerContext<
 	//
 	#contentTypeRepository = new UmbDocumentTypeDetailRepository(this);
 
-	#workspacePath = new UmbStringState(undefined);
-	workspacePath = this.#workspacePath.asObservable();
+	#propertyAlias = new UmbStringState(undefined);
+	propertyAlias = this.#propertyAlias.asObservable();
 
-	#contentTypes = new UmbArrayState(<Array<ElementTypeModel>>[], (x) => x.unique);
+	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
+	variantId = this.#variantId.asObservable();
+
+	#contentTypes = new UmbArrayState(<Array<UmbContentTypeModel>>[], (x) => x.unique);
 	public readonly contentTypes = this.#contentTypes.asObservable();
 
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
@@ -42,6 +48,16 @@ export abstract class UmbBlockManagerContext<
 	#settings = new UmbArrayState(<Array<UmbBlockDataType>>[], (x) => x.udi);
 	public readonly settings = this.#settings.asObservable();
 
+	// TODO: maybe its bad to consume Property Context, and instead wire this up manually in the property editor? With these: (and one for variant-id..)
+	/*setPropertyAlias(alias: string) {
+		this.#propertyAlias.setValue(alias);
+		console.log('!!!!!manager got alias: ', alias);
+		this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
+	}
+	getPropertyAlias() {
+		this.#propertyAlias.value;
+	}*/
+
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
 		this.#editorConfiguration.setValue(configs);
 	}
@@ -56,7 +72,6 @@ export abstract class UmbBlockManagerContext<
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this._layouts.setValue(layouts);
 	}
-
 	setContents(contents: Array<UmbBlockDataType>) {
 		this.#contents.setValue(contents);
 	}
@@ -67,17 +82,22 @@ export abstract class UmbBlockManagerContext<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
 
-		// TODO: This might will need the property alias as part of the URL, to avoid collision if multiple of these Editor on same Node.
-		// IDEA: Make a Workspace registration controller that can be used to register a workspace, which does both edit and create?.
-		new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
-			.addAdditionalPath('block')
-			.onSetup(() => {
-				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				const newPath = routeBuilder({});
-				this.#workspacePath.setValue(newPath);
-			});
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
+			this.observe(
+				propertyContext?.alias,
+				(alias) => {
+					this.#propertyAlias.setValue(alias);
+				},
+				'observePropertyAlias',
+			);
+			this.observe(
+				propertyContext?.variantId,
+				(variantId) => {
+					this.#variantId.setValue(variantId);
+				},
+				'observePropertyVariantId',
+			);
+		});
 	}
 
 	async ensureContentType(unique?: string) {
@@ -123,9 +143,9 @@ export abstract class UmbBlockManagerContext<
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
 	}
 
-	setOneLayout(layoutData: BlockLayoutType) {
+	/*setOneLayout(layoutData: BlockLayoutType) {
 		return this._layouts.appendOne(layoutData);
-	}
+	}*/
 	setOneContent(contentData: UmbBlockDataType) {
 		this.#contents.appendOne(contentData);
 	}
@@ -133,73 +153,80 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.appendOne(settingsData);
 	}
 
-	abstract _createBlock(
-		modalData: UmbBlockWorkspaceData,
-		layoutEntry: Omit<BlockLayoutType, 'contentUdi'>,
-		contentElementTypeKey: string,
-	): boolean;
+	removeOneContent(contentUdi: string) {
+		this.#contents.removeOne(contentUdi);
+	}
+	removeOneSettings(settingsUdi: string) {
+		this.#settings.removeOne(settingsUdi);
+	}
 
-	public createBlock(
-		modalData: UmbBlockWorkspaceData,
-		layoutEntry: Omit<BlockLayoutType, 'contentUdi'>,
+	abstract create(
 		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
+		modalData?: UmbBlockWorkspaceData,
+	): UmbBlockDataObjectModel<BlockLayoutType> | undefined;
+
+	protected createBlockData<ModalDataType extends UmbBlockWorkspaceData>(
+		contentElementTypeKey: string,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentUdi'>,
 	) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
 			throw new Error(`Cannot create block, missing block type for ${contentElementTypeKey}`);
-			return false;
 		}
 
 		// Create layout entry:
-		const fullLayoutEntry: BlockLayoutType = {
+		const layout: BlockLayoutType = {
 			contentUdi: buildUdi('element', UmbId.new()),
-			...(layoutEntry as Partial<BlockLayoutType>),
+			...(partialLayoutEntry as Partial<BlockLayoutType>),
 		} as BlockLayoutType;
+
+		const content = {
+			udi: layout.contentUdi,
+			contentTypeKey: contentElementTypeKey,
+		};
+		let settings: UmbBlockDataType | undefined = undefined;
+
 		if (blockType.settingsElementTypeKey) {
-			fullLayoutEntry.settingsUdi = buildUdi('element', UmbId.new());
+			layout.settingsUdi = buildUdi('element', UmbId.new());
+			settings = {
+				udi: layout.settingsUdi,
+				contentTypeKey: blockType.settingsElementTypeKey,
+			};
 		}
 
-		if (this._createBlock(modalData, fullLayoutEntry, contentElementTypeKey) === false) {
-			return false;
-		}
+		return {
+			layout,
+			content,
+			settings,
+		};
+	}
 
+	abstract insert(
+		layoutEntry: BlockLayoutType,
+		content: UmbBlockDataType,
+		settings: UmbBlockDataType | undefined,
+		modalData: UmbBlockWorkspaceData,
+	): boolean;
+
+	protected insertBlockData<ModalDataType extends UmbBlockWorkspaceData>(
+		layoutEntry: BlockLayoutType,
+		content: UmbBlockDataType,
+		settings: UmbBlockDataType | undefined,
+		modalData: ModalDataType,
+	) {
 		// Create content entry:
-		if (fullLayoutEntry.contentUdi) {
-			this.#contents.appendOne({
-				contentTypeKey: contentElementTypeKey,
-				udi: fullLayoutEntry.contentUdi,
-			});
+		if (layoutEntry.contentUdi) {
+			this.#contents.appendOne(content);
 		} else {
 			throw new Error('Cannot create block, missing contentUdi');
 			return false;
 		}
 
 		//Create settings entry:
-		if (blockType.settingsElementTypeKey) {
-			if (fullLayoutEntry.settingsUdi) {
-				this.#contents.appendOne({
-					contentTypeKey: blockType.settingsElementTypeKey,
-					udi: fullLayoutEntry.settingsUdi,
-				});
-			} else {
-				throw new Error('Cannot create block, missing settingsUdi');
-				return false;
-			}
+		if (settings && layoutEntry.settingsUdi) {
+			this.#settings.appendOne(settings);
 		}
-
-		return true;
-	}
-
-	deleteBlock(contentUdi: string) {
-		const layout = this._layouts.value.find((x) => x.contentUdi === contentUdi);
-		if (!layout) return;
-
-		if (layout.settingsUdi) {
-			this.#settings.removeOne(layout.settingsUdi);
-		}
-
-		this._layouts.removeOne(contentUdi);
-		this.#contents.removeOne(contentUdi);
 	}
 }

@@ -1,32 +1,28 @@
-import { UmbBlockListContext } from '../../context/block-list.context.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 /**
- * @element umb-property-editor-ui-block-list-block
+ * @element umb-block-list-entry
  */
-@customElement('umb-property-editor-ui-block-list-block')
-export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement('umb-block-list-entry')
+export class UmbBlockListEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
 	@property({ attribute: false })
-	public get layout(): UmbBlockLayoutBaseModel | undefined {
-		return this._layout;
+	public get contentUdi(): string | undefined {
+		return this._contentUdi;
 	}
-	public set layout(value: UmbBlockLayoutBaseModel | undefined) {
-		this._layout = value;
-		this.#context.setLayout(value);
+	public set contentUdi(value: string | undefined) {
+		if (!value) return;
+		this._contentUdi = value;
+		this.#context.setContentUdi(value);
 	}
-	private _layout?: UmbBlockLayoutBaseModel | undefined;
+	private _contentUdi?: string | undefined;
 
-	#context = new UmbBlockListContext(this);
-
-	@state()
-	_contentUdi?: string;
+	#context = new UmbBlockListEntryContext(this);
 
 	@state()
 	_hasSettings = false;
@@ -52,33 +48,17 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		this.observe(this.#context.workspaceEditPath, (workspaceEditPath) => {
 			this._workspaceEditPath = workspaceEditPath;
 		});
-		this.observe(this.#context.contentUdi, (contentUdi) => {
-			this._contentUdi = contentUdi;
-		});
 		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
 			this._hasSettings = !!blockTypeSettingsElementTypeKey;
 		});
 		this.observe(this.#context.label, (label) => {
+			const oldValue = this._label;
 			this._blockViewProps.label = label;
 			this._label = label;
+			this.requestUpdate('label', oldValue);
 		});
 		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
 			this._inlineEditingMode = inlineEditingMode;
-		});
-	}
-
-	#requestDelete() {
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
-			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
-				data: {
-					headline: `Delete ${this._label}`,
-					content: 'Are you sure you want to delete this [INSERT BLOCK TYPE NAME]?',
-					confirmLabel: 'Delete',
-					color: 'danger',
-				},
-			});
-			await modalContext.onSubmit();
-			this.#context.delete();
 		});
 	}
 
@@ -109,7 +89,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 							<uui-icon name="icon-settings"></uui-icon>
 					  </uui-button>`
 					: ''}
-				<uui-button label="delete" compact @click=${this.#requestDelete}>
+				<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
 					<uui-icon name="icon-remove"></uui-icon>
 				</uui-button>
 			</uui-action-bar>
@@ -117,7 +97,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	}
 
 	render() {
-		return this.layout && this._contentUdi ? this.#renderBlock() : '';
+		return this.#renderBlock();
 	}
 
 	static styles = [
@@ -139,10 +119,10 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	];
 }
 
-export default UmbPropertyEditorUIBlockListBlockElement;
+export default UmbBlockListEntryElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-block-list-block': UmbPropertyEditorUIBlockListBlockElement;
+		'umb-block-list-entry': UmbBlockListEntryElement;
 	}
 }
