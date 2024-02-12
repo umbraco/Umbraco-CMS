@@ -10,5 +10,7 @@ export class UmbDocumentCollectionContext extends UmbDefaultCollectionContext<
 > {
 	constructor(host: UmbControllerHostElement) {
 		super(host, { pageSize: 5, defaultViewAlias: UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS });
+
+		this.selection.setSelectable(true);
 	}
 }

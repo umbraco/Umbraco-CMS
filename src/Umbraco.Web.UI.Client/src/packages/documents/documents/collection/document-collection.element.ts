@@ -8,6 +8,12 @@ export class UmbDocumentCollectionElement extends UmbCollectionDefaultElement {
 	protected renderToolbar() {
 		return html`<umb-document-collection-toolbar slot="header"></umb-document-collection-toolbar>`;
 	}
+
+	// TODO: [LK] How to wire up the `bulkActionPermissions` config with the `entityBulkAction` extension type matches?
+
+	protected renderSelectionActions() {
+		return html`<umb-collection-selection-actions slot="footer-info"></umb-collection-selection-actions>`;
+	}
 }
 
 export default UmbDocumentCollectionElement;

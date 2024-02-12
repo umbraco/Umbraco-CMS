@@ -1,5 +1,4 @@
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbDocumentMoveEntityBulkAction } from './move/move.action.js';
 import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action.js';
@@ -7,6 +6,10 @@ import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
+
+	// TODO: [LK] Add bulk entity actions for Publish, Unpublish and Delete.
+	// TODO: [LK] Wondering how these actions could be wired up to the `bulkActionPermissions` config?
+
 	{
 		type: 'entityBulkAction',
 		alias: 'Umb.EntityBulkAction.Document.Move',
@@ -39,7 +42,7 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 			{
 				// TODO: this condition should be based on entity types in the selection
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: UMB_DOCUMENT_ENTITY_TYPE,
+				match: UMB_DOCUMENT_COLLECTION_ALIAS,
 			},
 		],
 	},
