@@ -31,5 +31,4 @@ export class UmbDocumentWorkspaceHasCollectionCondition extends UmbBaseControlle
 	}
 }
 
-export type DocumentWorkspaceHasCollectionConditionConfig =
-	UmbConditionConfigBase<'Umb.Condition.DocumentWorkspaceHasCollection'>;
+export type DocumentWorkspaceHasCollectionConditionConfig = UmbConditionConfigBase<string>;
