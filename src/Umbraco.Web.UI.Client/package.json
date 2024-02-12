@@ -114,7 +114,7 @@
 		"auth:test:e2e": "npx playwright test --config apps/auth/",
 		"backoffice:test:e2e": "npx playwright test",
 		"build-storybook": "npm run wc-analyze && storybook build",
-		"build:for:cms": "npm run build && node ./devops/build/copy-to-cms.js",
+		"build:for:cms": "npm run build && npm run package:validate && node ./devops/build/copy-to-cms.js",
 		"build:for:static": "vite build",
 		"build:vite": "tsc && vite build --mode staging",
 		"build": "tsc --project ./src/tsconfig.build.json && rollup -c ./src/rollup.config.js && node ./devops/build/create-module-list.js",
