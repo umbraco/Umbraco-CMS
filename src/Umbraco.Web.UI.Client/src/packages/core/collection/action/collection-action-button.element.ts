@@ -82,6 +82,6 @@ export default UmbCollectionActionButtonElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-action': UmbCollectionActionButtonElement;
+		'umb-collection-action-button': UmbCollectionActionButtonElement;
 	}
 }
