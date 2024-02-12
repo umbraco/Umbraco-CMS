@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -11,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDataValueReference, IDataValueTags
 {
-    private readonly IDataTypeService _dataTypeService;
+    private readonly IDataTypeReadCache _dataTypeReadCache;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly ILogger _logger;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactoryCollection;
@@ -19,7 +20,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
     protected BlockValuePropertyValueEditorBase(
         DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
+        IDataTypeReadCache dataTypeReadCache,
         ILocalizedTextService textService,
         ILogger logger,
         IShortStringHelper shortStringHelper,
@@ -29,7 +30,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
         : base(textService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _propertyEditors = propertyEditors;
-        _dataTypeService = dataTypeService;
+        _dataTypeReadCache = dataTypeReadCache;
         _logger = logger;
         _dataValueReferenceFactoryCollection = dataValueReferenceFactoryCollection;
     }
@@ -89,7 +90,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                     continue;
                 }
 
-                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
+                object? configuration = _dataTypeReadCache.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
 
                 result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
             }
@@ -134,7 +135,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                     continue;
                 }
 
-                IDataType? dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                IDataType? dataType = _dataTypeReadCache.GetDataType(prop.Value.PropertyType.DataTypeId);
                 if (dataType == null)
                 {
                     // deal with weird situations by ignoring them (no comment)
@@ -170,7 +171,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
             {
                 // Fetch the property types prevalue
-                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+                var propConfiguration = _dataTypeReadCache.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
 
                 // Lookup the property editor
                 IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];

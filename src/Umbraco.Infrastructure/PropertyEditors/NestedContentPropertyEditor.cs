@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -90,14 +91,14 @@ public class NestedContentPropertyEditor : DataEditor
 
     internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference, IDataValueTags
     {
-        private readonly IDataTypeService _dataTypeService;
+        private readonly IDataTypeReadCache _dataTypeReadCache;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
         private readonly ILogger<NestedContentPropertyEditor> _logger;
         private readonly NestedContentValues _nestedContentValues;
 
         public NestedContentPropertyValueEditor(
-            IDataTypeService dataTypeService,
+            IDataTypeReadCache dataTypeReadCache,
             ILocalizedTextService localizedTextService,
             IContentTypeService contentTypeService,
             IShortStringHelper shortStringHelper,
@@ -110,7 +111,7 @@ public class NestedContentPropertyEditor : DataEditor
             IPropertyValidationService propertyValidationService)
             : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
-            _dataTypeService = dataTypeService;
+            _dataTypeReadCache = dataTypeReadCache;
             _propertyEditors = propertyEditors;
             _dataValueReferenceFactories = dataValueReferenceFactories;
             _logger = logger;
@@ -173,7 +174,7 @@ public class NestedContentPropertyEditor : DataEditor
                     continue;
                 }
 
-                object? configuration = _dataTypeService.GetDataType(propertyValue.PropertyType.DataTypeKey)?.Configuration;
+                object? configuration = _dataTypeReadCache.GetDataType(propertyValue.PropertyType.DataTypeId)?.Configuration;
                 foreach (ITag tag in dataValueTags.GetTags(propertyValue.Value, configuration, languageId))
                 {
                     yield return tag;
@@ -210,7 +211,7 @@ public class NestedContentPropertyEditor : DataEditor
                             continue;
                         }
 
-                        var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)
+                        var tempConfig = _dataTypeReadCache.GetDataType(prop.Value.PropertyType.DataTypeId)
                             ?.Configuration;
                         IDataValueEditor valEditor = propEditor.GetValueEditor(tempConfig);
                         var convValue = valEditor.ConvertDbToString(prop.Value.PropertyType, prop.Value.Value);
@@ -281,7 +282,7 @@ public class NestedContentPropertyEditor : DataEditor
                         var dataTypeId = prop.Value.PropertyType.DataTypeId;
                         if (!valEditors.TryGetValue(dataTypeId, out IDataValueEditor? valEditor))
                         {
-                            var tempConfig = _dataTypeService.GetDataType(dataTypeId)?.Configuration;
+                            var tempConfig = _dataTypeReadCache.GetDataType(dataTypeId)?.Configuration;
                             valEditor = propEditor.GetValueEditor(tempConfig);
 
                             valEditors.Add(dataTypeId, valEditor);
@@ -333,7 +334,7 @@ public class NestedContentPropertyEditor : DataEditor
                 {
                     // Fetch the property types prevalue
                     var propConfiguration =
-                        _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+                        _dataTypeReadCache.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
 
                     // Lookup the property editor
                     IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];

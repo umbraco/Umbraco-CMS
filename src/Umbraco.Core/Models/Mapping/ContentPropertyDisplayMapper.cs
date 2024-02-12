@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -17,6 +18,7 @@ namespace Umbraco.Cms.Core.Models.Mapping;
 internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<ContentPropertyDisplay>
 {
     private readonly ICultureDictionary _cultureDictionary;
+    private readonly IDataTypeReadCache _dataTypeReadCache;
     private readonly ILocalizedTextService _textService;
 
     public ContentPropertyDisplayMapper(
@@ -25,10 +27,12 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         IEntityService entityService,
         ILocalizedTextService textService,
         ILogger<ContentPropertyDisplayMapper> logger,
-        PropertyEditorCollection propertyEditors)
+        PropertyEditorCollection propertyEditors,
+        IDataTypeReadCache dataTypeReadCache)
         : base(dataTypeService, entityService, logger, propertyEditors)
     {
         _cultureDictionary = cultureDictionary;
+        _dataTypeReadCache = dataTypeReadCache;
         _textService = textService;
     }
 
@@ -38,7 +42,7 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
 
         var config = originalProp.PropertyType is null
             ? null
-            : DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId)?.Configuration;
+            : _dataTypeReadCache.GetDataType(originalProp.PropertyType.DataTypeId)?.Configuration;
 
         // TODO: IDataValueEditor configuration - general issue
         // GetValueEditor() returns a non-configured IDataValueEditor

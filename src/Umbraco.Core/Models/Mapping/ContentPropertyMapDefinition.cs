@@ -1,4 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -24,6 +27,36 @@ public class ContentPropertyMapDefinition : IMapDefinition
         IEntityService entityService,
         ILocalizedTextService textService,
         ILoggerFactory loggerFactory,
+        PropertyEditorCollection propertyEditors,
+        IDataTypeReadCache dataTypeReadCache)
+    {
+        _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(
+            dataTypeService,
+            entityService,
+            loggerFactory.CreateLogger<ContentPropertyBasicMapper<ContentPropertyBasic>>(),
+            propertyEditors);
+        _contentPropertyDtoConverter = new ContentPropertyDtoMapper(
+            dataTypeService,
+            entityService,
+            loggerFactory.CreateLogger<ContentPropertyDtoMapper>(),
+            propertyEditors);
+        _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(
+            cultureDictionary,
+            dataTypeService,
+            entityService,
+            textService,
+            loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(),
+            propertyEditors,
+            dataTypeReadCache);
+    }
+
+    [Obsolete]
+    public ContentPropertyMapDefinition(
+        ICultureDictionary cultureDictionary,
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        ILocalizedTextService textService,
+        ILoggerFactory loggerFactory,
         PropertyEditorCollection propertyEditors)
     {
         _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(
@@ -42,7 +75,8 @@ public class ContentPropertyMapDefinition : IMapDefinition
             entityService,
             textService,
             loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(),
-            propertyEditors);
+            propertyEditors,
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeReadCache>());
     }
 
     public void DefineMaps(IUmbracoMapper mapper)
