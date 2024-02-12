@@ -48,8 +48,11 @@ export const manifests: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
+			{
+				alias: 'Umb.Condition.BlockEntryShowContentEdit',
+			},
 		],
-	} as any,
+	},
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Block.Settings',
@@ -71,5 +74,5 @@ export const manifests: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.BlockWorkspaceHasSettings',
 			},
 		],
-	} as any,
+	},
 ];
