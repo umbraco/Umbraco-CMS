@@ -1,12 +1,13 @@
 import type {
 	TemplateQueryExecuteSortModel,
 	TemplateQueryOperatorModel,
-	TemplateQueryPropertyPresentationModel} from '@umbraco-cms/backoffice/backend-api';
+	TemplateQueryPropertyPresentationModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	OperatorModel,
 	TemplateQueryPropertyTypeModel,
 	UserOrderModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 type TemplateOperatorModel = TemplateQueryOperatorModel & { localizeKey?: string };
 type TemplatePropertyModel = TemplateQueryPropertyPresentationModel & { localizeKey?: string };

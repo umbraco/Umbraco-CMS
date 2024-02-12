@@ -1,7 +1,7 @@
 import type { UmbLanguageDetailModel } from '../../../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-language-table-entity-actions-column-layout')
 export class UmbLanguageTableEntityActionsColumnLayoutElement extends UmbLitElement {

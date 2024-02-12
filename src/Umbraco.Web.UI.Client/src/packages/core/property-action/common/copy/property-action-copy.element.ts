@@ -1,13 +1,9 @@
 import type { UmbPropertyAction } from '../../shared/property-action/property-action.interface.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbNotificationDefaultData,
-	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
-import {
-	UMB_NOTIFICATION_CONTEXT,
-} from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationDefaultData, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 //import { UMB_WORKSPACE_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-property-action-copy')
 export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPropertyAction {

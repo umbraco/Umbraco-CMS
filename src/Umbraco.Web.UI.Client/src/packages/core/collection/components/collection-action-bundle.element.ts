@@ -2,7 +2,7 @@ import type { UmbDefaultCollectionContext } from '../default/collection-default.
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
 import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-action-bundle')
 export class UmbCollectionActionBundleElement extends UmbLitElement {

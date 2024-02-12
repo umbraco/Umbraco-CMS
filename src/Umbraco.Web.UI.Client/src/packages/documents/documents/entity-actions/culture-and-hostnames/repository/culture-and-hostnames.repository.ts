@@ -3,7 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentCultureAndHostnamesRepository extends UmbBaseController implements UmbApi {
 	#dataSource = new UmbDocumentCultureAndHostnamesServerDataSource(this);

@@ -1,4 +1,4 @@
-import type { LanguageItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LanguageItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
 

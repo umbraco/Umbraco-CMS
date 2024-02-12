@@ -1,9 +1,6 @@
 import type { UmbHealthCheckContext } from '../health-check.context.js';
-import type {
-	UmbHealthCheckDashboardContext} from '../health-check-dashboard.context.js';
-import {
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT,
-} from '../health-check-dashboard.context.js';
+import type { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context.js';
+import { UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from '../health-check-dashboard.context.js';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
@@ -11,12 +8,10 @@ import type {
 	HealthCheckActionRequestModel,
 	HealthCheckGroupPresentationModel,
 	HealthCheckModel,
-	HealthCheckWithResultPresentationModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	HealthCheckResource,
-	StatusResultTypeModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+	HealthCheckWithResultPresentationModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthCheckResource, StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import './health-check-action.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

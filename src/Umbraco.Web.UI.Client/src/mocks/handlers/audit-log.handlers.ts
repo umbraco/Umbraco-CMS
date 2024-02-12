@@ -4,7 +4,7 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type {
 	PagedAuditLogResponseModel,
 	PagedAuditLogWithUsernameResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/audit-log'), (_req, res, ctx) => {

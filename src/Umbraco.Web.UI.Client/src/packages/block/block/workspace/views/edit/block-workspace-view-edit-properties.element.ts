@@ -8,7 +8,7 @@ import type {
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {

@@ -1,9 +1,9 @@
-import { CompositionTypeModel } from '@umbraco-cms/backoffice/backend-api';
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	DocumentTypeItemResponseModel,
 	DocumentTypeResponseModel,
 	DocumentTypeTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockDocumentTypeModelHack = DocumentTypeResponseModel &
 	DocumentTypeTreeItemResponseModel &

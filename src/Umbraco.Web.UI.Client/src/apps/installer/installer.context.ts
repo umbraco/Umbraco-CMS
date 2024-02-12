@@ -3,8 +3,8 @@ import type {
 	InstallSettingsResponseModel,
 	ProblemDetails,
 	InstallRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { InstallResource, TelemetryLevelModel } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { InstallResource, TelemetryLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observable-api';

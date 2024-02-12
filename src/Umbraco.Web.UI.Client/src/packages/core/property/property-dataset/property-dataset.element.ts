@@ -1,6 +1,6 @@
 import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
 import { UmbPropertyDatasetBaseContext } from './property-dataset-base-context.js';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 

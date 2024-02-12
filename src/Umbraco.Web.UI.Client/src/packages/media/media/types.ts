@@ -1,6 +1,6 @@
 import type { UmbMediaEntityType } from './entity.js';
 import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
-import type { MediaUrlInfoModel, MediaValueModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaUrlInfoModel, MediaValueModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbMediaDetailModel {
 	mediaType: { unique: string };

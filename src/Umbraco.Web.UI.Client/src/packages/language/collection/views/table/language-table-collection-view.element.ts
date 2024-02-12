@@ -4,7 +4,7 @@ import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collecti
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './column-layouts/boolean/language-table-boolean-column-layout.element.js';
 import './column-layouts/name/language-table-name-column-layout.element.js';

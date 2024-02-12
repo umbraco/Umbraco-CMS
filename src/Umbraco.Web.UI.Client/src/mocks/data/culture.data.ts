@@ -1,4 +1,4 @@
-import type { CultureReponseModel, PagedCultureReponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CultureReponseModel, PagedCultureReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbCulturesData {
 	get(): PagedCultureReponseModel {

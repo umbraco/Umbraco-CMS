@@ -5,7 +5,7 @@ import { css, html, customElement, property, state } from '@umbraco-cms/backoffi
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_DOCUMENT_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';

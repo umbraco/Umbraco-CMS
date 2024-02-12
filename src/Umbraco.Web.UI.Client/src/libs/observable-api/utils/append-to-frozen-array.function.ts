@@ -1,11 +1,12 @@
 /**
  * @export
  * @method appendToFrozenArray
- * @param {Observable<T>} source - RxJS Subject to use for this Observable.
- * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
- * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
- * @description - Creates a RxJS Observable from RxJS Subject.
- * @example <caption>Example append new entry for a ArrayState or a part of UmbDeepState/UmbObjectState it which is an array. Where the key is unique and the item will be updated if matched with existing.</caption>
+ * @param {Array<T>} source - An Array which is frozen and should be updated.
+ * @param {T} entry - A new entry to append to the array.
+ * @param {(entry: T) => unknown} getUniqueMethod - Method to retrieve a value of an entry that is unique to it. This enables the method to replace existing value if it matches the unique value.
+ * @returns {Array<T>} - Returns a new array with the new entry appended.
+ * @description - Inserts or replaces an entry in a frozen array and returns a new array.
+ * @example <caption>Example append new entry for a UmbArrayState or a part of UmbObjectState/UmbDeepState which is an array. Where the key is unique and the item will be updated if matched with existing.</caption>
  * const entry = {id: 'myKey', value: 'myValue'};
  * const newDataSet = appendToFrozenArray(mySubject.getValue(), entry, x => x.id === id);
  * mySubject.next(newDataSet);

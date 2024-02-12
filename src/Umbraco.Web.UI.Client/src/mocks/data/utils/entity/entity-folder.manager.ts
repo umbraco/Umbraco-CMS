@@ -4,7 +4,7 @@ import type {
 	FolderResponseModel,
 	FolderTreeItemResponseModel,
 	UpdateFolderResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMockEntityFolderManager<MockItemType extends Omit<FolderTreeItemResponseModel, 'type'>> {
 	#db: UmbEntityMockDbBase<MockItemType>;

@@ -1,13 +1,10 @@
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, repeat, css, query, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbPropertyEditorConfigCollection} from '@umbraco-cms/backoffice/property-editor';
-import {
-	UmbPropertyValueChangeEvent,
-} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 interface ColumnConfig {
 	alias: string;

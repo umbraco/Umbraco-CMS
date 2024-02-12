@@ -1,7 +1,7 @@
 import type {
 	TemplateQueryExecuteFilterPresentationModel,
 	TemplateQueryExecuteSortModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbExecuteTemplateQueryRequestModel {
 	rootDocument: { unique: string } | null;

@@ -1,7 +1,7 @@
 import type { UmbPropertyEditorConfigCollection } from '../../config/index.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-collection-view
