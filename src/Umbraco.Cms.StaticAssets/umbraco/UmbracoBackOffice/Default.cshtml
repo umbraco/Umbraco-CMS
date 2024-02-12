@@ -33,6 +33,7 @@
             "imports": {
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/app", backofficeAssetsPath + "/apps/app/index.js")),
 
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/backend-api", backofficeAssetsPath + "/external/backend-api/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/lit", backofficeAssetsPath + "/external/lit/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/lodash", backofficeAssetsPath + "/external/lodash/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/monaco-editor", backofficeAssetsPath + "/external/monaco-editor/index.js")),
@@ -45,7 +46,6 @@
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/dompurify", backofficeAssetsPath + "/external/dompurify/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/marked", backofficeAssetsPath + "/external/marked/index.js")),
 
-                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/backend-api", backofficeAssetsPath + "/external/backend-api/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/class-api", backofficeAssetsPath + "/libs/class-api/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/context-api", backofficeAssetsPath + "/libs/context-api/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/controller-api", backofficeAssetsPath + "/libs/controller-api/index.js")),
@@ -136,7 +136,7 @@
 
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/code-editor", backofficeAssetsPath + "/packages/templating/code-editor/index.js")),
 
-                @Html.Raw(ImportMapValue("@umbraco-cms/internal/lit-element", backofficeAssetsPath + "/shared/lit-element/index.js"))
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/lit-element", backofficeAssetsPath + "/shared/lit-element/index.js"))
             }
         }
     </script>
