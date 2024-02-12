@@ -65,7 +65,7 @@
 		"./package": "./dist-cms/packages/packages/package/index.js",
 		"./language": "./dist-cms/packages/language/index.js",
 		"./dynamic-root": "./dist-cms/packages/dynamic-root/index.js",
-		"./logviewer": "./dist-cms/packages/settings/logviewer/index.js",
+		"./log-viewer": "./dist-cms/packages/log-viewer/index.js",
 		"./relation-type": "./dist-cms/packages/relations/relation-types/index.js",
 		"./relations": "./dist-cms/packages/relations/relations/index.js",
 		"./tags": "./dist-cms/packages/tags/index.js",
