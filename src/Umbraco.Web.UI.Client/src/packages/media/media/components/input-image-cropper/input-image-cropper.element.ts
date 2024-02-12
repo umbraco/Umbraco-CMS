@@ -7,9 +7,9 @@ import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper-field.element.js';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-image-cropper')
 export class UmbInputImageCropperElement extends UmbLitElement {

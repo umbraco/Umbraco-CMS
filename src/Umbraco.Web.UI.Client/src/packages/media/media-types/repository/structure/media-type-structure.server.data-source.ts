@@ -1,8 +1,8 @@
 import type { UmbAllowedMediaTypeModel } from './types.js';
-import type { AllowedMediaTypeModel } from '@umbraco-cms/backoffice/backend-api';
-import { MediaTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContentTypeStructureServerDataSourceBase } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { AllowedMediaTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  *

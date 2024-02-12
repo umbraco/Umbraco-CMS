@@ -2,7 +2,7 @@ import { UMB_MEDIA_WORKSPACE_CONTEXT } from './media-workspace.context-token.js'
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-media-workspace-split-view')
 export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {

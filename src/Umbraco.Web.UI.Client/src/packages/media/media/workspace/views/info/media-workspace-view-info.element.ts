@@ -7,7 +7,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import './media-workspace-view-info-history.element.js';
 import './media-workspace-view-info-reference.element.js';
 import type { UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
-import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-media-workspace-view-info')
 export class UmbMediaWorkspaceViewInfoElement extends UmbLitElement {
