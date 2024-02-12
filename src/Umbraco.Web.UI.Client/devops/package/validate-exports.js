@@ -1,9 +1,5 @@
-import { readFileSync } from 'fs';
 import { globSync } from 'glob';
-
-const packageJsonPath = 'package.json';
-const packageJsonData = JSON.parse(readFileSync(packageJsonPath).toString());
-const packageJsonExports = packageJsonData.exports;
+import { packageJsonExports } from './meta.js';
 
 const validateExports = async () => {
 	const errors = [];
