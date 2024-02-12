@@ -18,6 +18,8 @@ const validateExports = async () => {
 
 	if (errors.length > 0) {
 		throw new Error(errors.join('\n'));
+	} else {
+		console.log('--- Exports validated successfully. ---');
 	}
 };
 
