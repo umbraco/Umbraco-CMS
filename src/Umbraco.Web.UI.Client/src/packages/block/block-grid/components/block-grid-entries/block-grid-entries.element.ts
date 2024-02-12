@@ -1,9 +1,9 @@
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
 import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../block-grid-entry/index.js';
 import { UmbSorterController, type UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 
@@ -46,6 +46,9 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	}
 
 	@state()
+	private _styleElement?: HTMLLinkElement;
+
+	@state()
 	private _layoutEntries: Array<UmbBlockGridLayoutModel> = [];
 
 	@state()
@@ -59,32 +62,45 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 			this.#sorter.setModel(layoutEntries);
 			this.requestUpdate('layoutEntries', oldValue);
 		});
+
+		this.#context.getManager().then((manager) => {
+			this.observe(
+				manager.layoutStylesheet,
+				(stylesheet) => {
+					this._styleElement = document.createElement('link');
+					this._styleElement.setAttribute('rel', 'stylesheet');
+					this._styleElement.setAttribute('href', stylesheet);
+				},
+				'observeStylesheet',
+			);
+		});
 	}
 
+	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.
 	render() {
-		// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.
-		return html`${repeat(
-				this._layoutEntries,
-				(x) => x.contentUdi,
-				(layoutEntry, index) =>
-					html`<uui-button-inline-create
-							href=${this.#context.getPathForCreateBlock(index) ?? ''}></uui-button-inline-create>
-						<umb-block-grid-entry .contentUdi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
+		return html` ${this._styleElement}
+			<div class="umb-block-grid__layout-container">
+				${repeat(
+					this._layoutEntries,
+					(x) => x.contentUdi,
+					(layoutEntry, index) =>
+						html`<umb-block-grid-entry .index=${index} .contentUdi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
 						</umb-block-grid-entry>`,
-			)}
-			<uui-button-group>
-				<uui-button
-					id="add-button"
-					look="placeholder"
-					label=${this._createButtonLabel}
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
-				<uui-button
-					label=${this.localize.term('content_createFromClipboard')}
-					look="placeholder"
-					href=${this.#context.getPathForClipboard(-1) ?? ''}>
-					<uui-icon name="icon-paste-in"></uui-icon>
-				</uui-button>
-			</uui-button-group>`;
+				)}
+				<uui-button-group>
+					<uui-button
+						id="add-button"
+						look="placeholder"
+						label=${this._createButtonLabel}
+						href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
+					<uui-button
+						label=${this.localize.term('content_createFromClipboard')}
+						look="placeholder"
+						href=${this.#context.getPathForClipboard(-1) ?? ''}>
+						<uui-icon name="icon-paste-in"></uui-icon>
+					</uui-button>
+				</uui-button-group>
+			</div>`;
 		//
 	}
 

@@ -120,9 +120,8 @@ export abstract class UmbBlockManagerContext<
 		return data;
 	}
 
-	contentTypeOf(contentTypeUdi: string) {
-		const contentTypeUnique = getKeyFromUdi(contentTypeUdi);
-		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeUnique));
+	contentTypeOf(contentTypeKey: string) {
+		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey));
 	}
 	contentTypeNameOf(contentTypeKey: string) {
 		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey)?.name);

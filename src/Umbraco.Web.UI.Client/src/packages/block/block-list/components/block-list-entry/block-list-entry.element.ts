@@ -12,6 +12,14 @@ import type { UmbBlockListLayoutModel, UmbBlockViewPropsType } from '@umbraco-cm
 @customElement('umb-block-list-entry')
 export class UmbBlockListEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
+	@property({ type: Number })
+	public get index(): number | undefined {
+		return this.#context.getIndex();
+	}
+	public set index(value: number | undefined) {
+		this.#context.setIndex(value);
+	}
+
 	@property({ attribute: false })
 	public get contentUdi(): string | undefined {
 		return this._contentUdi;
@@ -52,8 +60,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.showContentEdit, (showContentEdit) => {
 			this._showContentEdit = showContentEdit;
 		});
-		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
-			this._hasSettings = !!blockTypeSettingsElementTypeKey;
+		this.observe(this.#context.settingsElementTypeKey, (settingsElementTypeKey) => {
+			this._hasSettings = !!settingsElementTypeKey;
 		});
 		this.observe(this.#context.label, (label) => {
 			const oldValue = this._label;

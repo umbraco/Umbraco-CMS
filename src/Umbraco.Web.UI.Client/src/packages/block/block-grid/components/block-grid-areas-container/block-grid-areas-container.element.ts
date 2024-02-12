@@ -43,11 +43,14 @@ export class UmbBlockGridAreaContainerElement extends UmbLitElement {
 	render() {
 		return this._areas
 			? html` ${this.#styleElement}
-					<div class="umb-block-grid__layout-container">
+					<div class="umb-block-grid__area-container">
 						${repeat(
 							this._areas,
 							(area) => area.key,
-							(area) => html`<umb-block-grid-entries .areaKey=${area.key}></umb-block-grid-entries>`,
+							(area) =>
+								html`<umb-block-grid-entries
+									class="umb-block-grid__area"
+									.areaKey=${area.key}></umb-block-grid-entries>`,
 						)}
 					</div>`
 			: '';

@@ -15,6 +15,9 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	UmbBlockGridTypeModel,
 	UmbBlockGridLayoutModel
 > {
+	//
+	columnSpan = this._layout.asObservablePart((x) => x?.columnSpan);
+	rowSpan = this._layout.asObservablePart((x) => x?.rowSpan ?? 1);
 	areas = this._layout.asObservablePart((x) => x?.areas ?? []);
 
 	readonly showContentEdit = this._blockType.asObservablePart((x) => !x?.forceHideContentEditorInOverlay);

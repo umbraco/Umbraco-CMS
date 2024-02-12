@@ -1,6 +1,6 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
-import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-grid-block/index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
@@ -11,6 +11,14 @@ import type { UmbBlockGridLayoutModel, UmbBlockViewPropsType } from '@umbraco-cm
 @customElement('umb-block-grid-entry')
 export class UmbBlockGridEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
+	@property({ type: Number })
+	public get index(): number | undefined {
+		return this.#context.getIndex();
+	}
+	public set index(value: number | undefined) {
+		this.#context.setIndex(value);
+	}
+
 	@property({ attribute: false })
 	public get contentUdi(): string | undefined {
 		return this._contentUdi;
@@ -27,9 +35,23 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#context = new UmbBlockGridEntryContext(this);
 
 	@state()
+	_contentElementTypeKey?: string;
+
+	@state()
+	_contentElementTypeAlias?: string;
+
+	@state()
+	_columnSpan?: number;
+
+	@state()
+	_rowSpan?: number;
+
+	@state()
 	_showContentEdit = false;
 	@state()
 	_hasSettings = false;
+	@state()
+	_createPath?: string;
 
 	@state()
 	_label = '';
@@ -50,11 +72,17 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	constructor() {
 		super();
 
+		this.observe(this.#context.createPath, (createPath) => {
+			const oldValue = this._createPath;
+			console.log('createPath', createPath);
+			this._createPath = createPath;
+			this.requestUpdate('_createPath', oldValue);
+		});
 		this.observe(this.#context.showContentEdit, (showContentEdit) => {
 			this._showContentEdit = showContentEdit;
 		});
-		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
-			this._hasSettings = !!blockTypeSettingsElementTypeKey;
+		this.observe(this.#context.settingsElementTypeKey, (settingsElementTypeKey) => {
+			this._hasSettings = !!settingsElementTypeKey;
 		});
 		this.observe(this.#context.label, (label) => {
 			this._blockViewProps.label = label;
@@ -82,34 +110,76 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 	}
 
+	createRenderRoot() {
+		return this;
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		// element styling:
+		this.observe(
+			this.#context.columnSpan,
+			(columnSpan) => {
+				this._columnSpan = columnSpan;
+			},
+			'columnSpan',
+		);
+		this.observe(
+			this.#context.rowSpan,
+			(rowSpan) => {
+				this._rowSpan = rowSpan;
+			},
+			'rowSpan',
+		);
+		this.observe(this.#context.contentElementTypeKey, (contentElementTypeKey) => {
+			this._contentElementTypeKey = contentElementTypeKey;
+		});
+		this.observe(this.#context.contentElementTypeAlias, (contentElementTypeAlias) => {
+			this._contentElementTypeAlias = contentElementTypeAlias;
+		});
+	}
+
 	#renderRefBlock() {
 		return html`<umb-ref-grid-block .contentUdi=${this.contentUdi} .label=${this._label}></umb-ref-grid-block>`;
 	}
 
 	#renderBlock() {
-		return this.contentUdi
+		return this.contentUdi && this._createPath
 			? html`
-					<umb-extension-slot
-						type="blockEditorCustomView"
-						default-element=${'umb-ref-grid-block'}
-						.props=${this._blockViewProps}
-						>${this.#renderRefBlock()}</umb-extension-slot
-					>
-					<uui-action-bar>
-						${this._showContentEdit && this._workspaceEditContentPath
-							? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
-									<uui-icon name="icon-edit"></uui-icon>
-							  </uui-button>`
-							: ''}
-						${this._hasSettings && this._workspaceEditSettingsPath
-							? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
-									<uui-icon name="icon-settings"></uui-icon>
-							  </uui-button>`
-							: ''}
-						<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
-							<uui-icon name="icon-remove"></uui-icon>
-						</uui-button>
-					</uui-action-bar>
+					<uui-button-inline-create href=${this._createPath}></uui-button-inline-create>
+					<div
+						class="umb-block-grid__layout-item"
+						data-element-udi=${ifDefined(this._contentUdi)}
+						data-content-element-type-key=${ifDefined(this._contentElementTypeKey)}
+						data-content-element-type-alias=${ifDefined(this._contentElementTypeAlias)}
+						data-col-span=${ifDefined(this._columnSpan ? this._columnSpan.toString() : '')}
+						data-row-span=${ifDefined(this._rowSpan ? this._rowSpan.toString() : '')}
+						style="
+							--umb-block-grid--item-column-span: ${ifDefined(this._columnSpan ? this._columnSpan.toString() : '')};
+							--umb-block-grid--item-row-span: ${ifDefined(this._rowSpan ? this._rowSpan.toString() : '')};
+						">
+						<umb-extension-slot
+							type="blockEditorCustomView"
+							default-element=${'umb-ref-grid-block'}
+							.props=${this._blockViewProps}
+							>${this.#renderRefBlock()}</umb-extension-slot
+						>
+						<uui-action-bar>
+							${this._showContentEdit && this._workspaceEditContentPath
+								? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
+										<uui-icon name="icon-edit"></uui-icon>
+								  </uui-button>`
+								: ''}
+							${this._hasSettings && this._workspaceEditSettingsPath
+								? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
+										<uui-icon name="icon-settings"></uui-icon>
+								  </uui-button>`
+								: ''}
+							<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
+								<uui-icon name="icon-remove"></uui-icon>
+							</uui-button>
+						</uui-action-bar>
+					</div>
 			  `
 			: '';
 	}
