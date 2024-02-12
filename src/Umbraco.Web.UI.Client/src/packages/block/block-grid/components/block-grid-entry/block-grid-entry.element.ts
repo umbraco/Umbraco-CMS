@@ -61,6 +61,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this._label = label;
 		});
 		// Data props:
+		this.observe(this.#context.layout, (layout) => {
+			this._blockViewProps.layout = layout;
+		});
 		this.observe(this.#context.content, (content) => {
 			this._blockViewProps.content = content;
 		});

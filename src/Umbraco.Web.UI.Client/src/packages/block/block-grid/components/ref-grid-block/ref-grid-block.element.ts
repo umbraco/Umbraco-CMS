@@ -1,6 +1,6 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockViewUrlsPropType } from '@umbraco-cms/backoffice/block';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import '../block-grid-areas-container/index.js';
 
 /**

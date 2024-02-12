@@ -65,6 +65,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this._inlineEditingMode = inlineEditingMode;
 		});
 		// Data props:
+		this.observe(this.#context.layout, (layout) => {
+			this._blockViewProps.layout = layout;
+		});
 		this.observe(this.#context.content, (content) => {
 			this._blockViewProps.content = content;
 		});
