@@ -16,6 +16,9 @@ export class UmbDocumentWorkspaceHasCollectionCondition extends UmbBaseControlle
 		this.config = args.config;
 		this.#onChange = args.onChange;
 
+		// TODO: Find out if/how the data-type configuration properties can amend the manifest's data. [LK:2024-02-12]
+		// Specifically, `tabName`, `icon` and `showContentFirst` (can it change the manifest's position/weighting?)
+
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.observe(context.structure.ownerContentType(), (contentType) => {
 				// TODO: [LK] Replace this check once the `.collection` is available from the Management API.
