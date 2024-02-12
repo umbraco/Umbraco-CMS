@@ -70,7 +70,7 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
                 .Build()),
             ContentCollectionOperationStatus.DataTypeNotContentCollection => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Data type id does not represent the configured collection")
-                .WithDetail($"The specified data type is not the configured collection for the given {type}")
+                .WithDetail($"The specified data type is not the configured collection for the given {type} item")
                 .Build()),
             ContentCollectionOperationStatus.DataTypeNotContentProperty => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle($"Data type id is not a {type} property")
