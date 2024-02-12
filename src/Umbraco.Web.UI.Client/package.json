@@ -89,9 +89,7 @@
 		"./external/rxjs": "./dist-cms/external/rxjs/index.js",
 		"./external/tinymce": "./dist-cms/external/tinymce/index.js",
 		"./external/uui": "./dist-cms/external/uui/index.js",
-		"./external/uuid": "./dist-cms/external/uuid/index.js",
-		"./examples/*": "./examples/*/index.js",
-		"./examples": "./examples/index.js"
+		"./external/uuid": "./dist-cms/external/uuid/index.js"
 	},
 	"files": [
 		"dist-cms",
