@@ -38,8 +38,8 @@ export abstract class UmbBlockEntryContext<
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
-	public readonly workspaceEditPath = this.#workspacePath.asObservablePart((path) =>
-		path ? path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') : '',
+	public readonly workspaceEditContentPath = this.#workspacePath.asObservablePart((path) =>
+		path ? path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') + '/view/content' : '',
 	);
 	public readonly workspaceEditSettingsPath = this.#workspacePath.asObservablePart((path) =>
 		path ? path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') + '/view/settings' : '',
@@ -190,6 +190,15 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeContent',
 		);
+		this.observe(
+			this.content,
+			(content) => {
+				if (content) {
+					this._manager?.setOneContent(content);
+				}
+			},
+			'observeInternalContent',
+		);
 
 		// observe settings:
 		const settingsUdi = this._layout.value?.settingsUdi;
@@ -200,6 +209,15 @@ export abstract class UmbBlockEntryContext<
 					this.#settings.setValue(content);
 				},
 				'observeSettings',
+			);
+			this.observe(
+				this.settings,
+				(settings) => {
+					if (settings) {
+						this._manager?.setOneSettings(settings);
+					}
+				},
+				'observeInternalSettings',
 			);
 		}
 	}

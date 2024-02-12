@@ -45,7 +45,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	constructor() {
 		super();
 
-		this.observe(this.#context.workspaceEditPath, (workspaceEditPath) => {
+		this.observe(this.#context.workspaceEditContentPath, (workspaceEditPath) => {
 			this._workspaceEditPath = workspaceEditPath;
 		});
 		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {

@@ -20,7 +20,7 @@ export class UmbRefListBlockElement extends UmbLitElement {
 		// UMB_BLOCK_LIST_ENTRY_CONTEXT
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.observe(
-				context.workspaceEditPath,
+				context.workspaceEditContentPath,
 				(workspaceEditPath) => {
 					this._workspaceEditPath = workspaceEditPath;
 				},

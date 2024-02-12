@@ -1,8 +1,9 @@
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../ref-grid-block/index.js';
+import type { UmbBlockGridLayoutModel, UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-block-grid-entry
@@ -17,6 +18,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	public set contentUdi(value: string | undefined) {
 		if (!value) return;
 		this._contentUdi = value;
+		this._blockViewProps.contentUdi = value;
 		this.#context.setContentUdi(value);
 	}
 	private _contentUdi?: string | undefined;
@@ -38,14 +40,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	// TODO: Move type for the Block Properties, and use it on the Element Interface for the Manifest.
 	@state()
-	_blockViewProps: {
-		label?: string;
-	} = {};
+	_blockViewProps: UmbBlockViewPropsType<UmbBlockGridLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
 
 	constructor() {
 		super();
 
-		this.observe(this.#context.workspaceEditPath, (workspaceEditPath) => {
+		this.observe(this.#context.workspaceEditContentPath, (workspaceEditPath) => {
 			this._workspaceEditPath = workspaceEditPath;
 		});
 		this.observe(this.#context.blockTypeSettingsElementTypeKey, (blockTypeSettingsElementTypeKey) => {
@@ -55,36 +55,52 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this._blockViewProps.label = label;
 			this._label = label;
 		});
+		this.observe(this.#context.content, (content) => {
+			this._blockViewProps.content = content;
+		});
+		this.observe(this.#context.settings, (settings) => {
+			this._blockViewProps.settings = settings;
+		});
+		this.observe(this.#context.workspaceEditContentPath, (path) => {
+			this._blockViewProps.urls.editContent = path;
+			this.requestUpdate('_blockViewProps');
+		});
+		this.observe(this.#context.workspaceEditSettingsPath, (path) => {
+			this._blockViewProps.urls.editSettings = path;
+			this.requestUpdate('_blockViewProps');
+		});
 	}
 
 	#renderRefBlock() {
-		return html`<umb-ref-grid-block .label=${this._label}></umb-ref-grid-block>`;
+		return html`<umb-ref-grid-block .contentUdi=${this.contentUdi} .label=${this._label}></umb-ref-grid-block>`;
 	}
 
 	#renderBlock() {
-		return html`
-			<umb-extension-slot
-				type="blockEditorCustomView"
-				default-element=${'umb-ref-grid-block'}
-				.props=${this._blockViewProps}
-				>${this.#renderRefBlock()}</umb-extension-slot
-			>
-			<uui-action-bar>
-				${this._workspaceEditPath
-					? html`<uui-button label="edit" compact href=${this._workspaceEditPath}>
-							<uui-icon name="icon-edit"></uui-icon>
-					  </uui-button>`
-					: ''}
-				${this._workspaceEditPath && this._hasSettings
-					? html`<uui-button label="Edit settings" compact href=${this._workspaceEditPath + '/view/settings'}>
-							<uui-icon name="icon-settings"></uui-icon>
-					  </uui-button>`
-					: ''}
-				<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
-					<uui-icon name="icon-remove"></uui-icon>
-				</uui-button>
-			</uui-action-bar>
-		`;
+		return this.contentUdi
+			? html`
+					<umb-extension-slot
+						type="blockEditorCustomView"
+						default-element=${'umb-ref-grid-block'}
+						.props=${this._blockViewProps}
+						>${this.#renderRefBlock()}</umb-extension-slot
+					>
+					<uui-action-bar>
+						${this._workspaceEditPath
+							? html`<uui-button label="edit" compact href=${this._workspaceEditPath}>
+									<uui-icon name="icon-edit"></uui-icon>
+							  </uui-button>`
+							: ''}
+						${this._workspaceEditPath && this._hasSettings
+							? html`<uui-button label="Edit settings" compact href=${this._workspaceEditPath + '/view/settings'}>
+									<uui-icon name="icon-settings"></uui-icon>
+							  </uui-button>`
+							: ''}
+						<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
+							<uui-icon name="icon-remove"></uui-icon>
+						</uui-button>
+					</uui-action-bar>
+			  `
+			: '';
 	}
 
 	render() {
