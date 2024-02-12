@@ -30,8 +30,7 @@ export class UmbRefGridBlockElement extends UmbLitElement {
 	}
 
 	render() {
-		// href=${this._workspaceEditPath ?? '#'}
-		return html`<uui-ref-node standalone .name=${this.label ?? ''}>
+		return html`<uui-ref-node standalone .name=${this.label ?? ''} href=${this._workspaceEditPath ?? '#'}>
 			<umb-block-grid-area-container></umb-block-grid-area-container>
 		</uui-ref-node>`;
 	}

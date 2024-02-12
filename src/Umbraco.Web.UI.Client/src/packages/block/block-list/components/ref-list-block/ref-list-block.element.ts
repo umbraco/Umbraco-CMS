@@ -30,8 +30,10 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	}
 
 	render() {
-		// href=${this._workspaceEditPath ?? '#'}
-		return html`<uui-ref-node standalone .name=${this.label ?? ''}></uui-ref-node>`;
+		return html`<uui-ref-node
+			standalone
+			.name=${this.label ?? ''}
+			href=${this._workspaceEditPath ?? '#'}></uui-ref-node>`;
 	}
 
 	static styles = [
