@@ -17,10 +17,14 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 	@state()
 	orderDirection = 'asc';
 
+	@state()
+	useInfiniteEditor = false;
+
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.pageSize = Number(config?.getValueByAlias('pageSize')) || 0;
 		this.orderDirection = config?.getValueByAlias('orderDirection') ?? 'asc';
+		this.useInfiniteEditor = config?.getValueByAlias('useInfiniteEditor') ?? false;
 	}
 
 	render() {
