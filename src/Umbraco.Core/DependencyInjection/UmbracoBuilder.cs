@@ -339,7 +339,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
 
             // Register per request caches
-            Services.AddUnique<IDataTypeReadCache, DataTypeReadCache>(ServiceLifetime.Scoped);
+            //Services.AddScoped<IDataTypeReadCache, DataTypeReadCache>(provider => provider.CreateInstance<DataTypeReadCache>());
+            Services.AddUnique<IDataTypeReadCache, DataTypeReadCache>();
         }
     }
 }

@@ -11,25 +11,28 @@ namespace Umbraco.Cms.Core.Cache;
 public class DataTypeReadCache : IDataTypeReadCache
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly IRequestCache _requestCache;
 
-    // does not need to be concurrent as it is all in one request and we (currently) do not run content processing logic in parallel.
-    private readonly Dictionary<int, IDataType?> _dataTypes = new();
+    // Does not need to be concurrent as it is all in one request and we (currently) do not run content processing logic in parallel.
+    // Should never be null since this should be the only place where we set it trough the factory method.
+    private Dictionary<int, IDataType?> DataTypes => (Dictionary<int, IDataType?>)_requestCache.Get("Umbraco_DataTypeReadCacheDictionary", () => new Dictionary<int, IDataType?>())!;
 
-    public DataTypeReadCache(IDataTypeService dataTypeService)
+    public DataTypeReadCache(IDataTypeService dataTypeService, IRequestCache requestCache)
     {
         _dataTypeService = dataTypeService;
+        _requestCache = requestCache;
     }
 
 
     /// <remarks>Do not use this to fetch a DataType that will be used in any non read part of any core services!</remarks>
     public IDataType? GetDataType(int id)
     {
-        if (_dataTypes.ContainsKey(id))
+        if (DataTypes.ContainsKey(id))
         {
-            return _dataTypes[id];
+            return DataTypes[id];
         }
 
-        _dataTypes[id] = _dataTypeService.GetDataType(id);
-        return _dataTypes[id];
+        DataTypes[id] = _dataTypeService.GetDataType(id);
+        return DataTypes[id];
     }
 }
