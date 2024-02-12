@@ -4,6 +4,7 @@ import { html, css, customElement, property, state } from '@umbraco-cms/backoffi
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
+import type { UmbBlockListLayoutModel, UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-block-list-entry
@@ -31,16 +32,17 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	_label = '';
 
 	@state()
-	_workspaceEditPath?: string;
+	_workspaceEditContentPath?: string;
+
+	@state()
+	_workspaceEditSettingsPath?: string;
 
 	@state()
 	_inlineEditingMode?: boolean;
 
-	// TODO: Move type for the Block Properties, and use it on the Element Interface for the Manifest.
+	// TODO: use this type on the Element Interface for the Manifest.
 	@state()
-	_blockViewProps: {
-		label?: string;
-	} = {};
+	_blockViewProps: UmbBlockViewPropsType<UmbBlockListLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
 
 	constructor() {
 		super();
@@ -59,6 +61,23 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		});
 		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
 			this._inlineEditingMode = inlineEditingMode;
+		});
+		// Data props:
+		this.observe(this.#context.content, (content) => {
+			this._blockViewProps.content = content;
+		});
+		this.observe(this.#context.settings, (settings) => {
+			this._blockViewProps.settings = settings;
+		});
+		this.observe(this.#context.workspaceEditContentPath, (path) => {
+			this._workspaceEditContentPath = path;
+			this._blockViewProps.urls.editContent = path;
+			this.requestUpdate('_blockViewProps');
+		});
+		this.observe(this.#context.workspaceEditSettingsPath, (path) => {
+			this._workspaceEditSettingsPath = path;
+			this._blockViewProps.urls.editSettings = path;
+			this.requestUpdate('_blockViewProps');
 		});
 	}
 
@@ -79,13 +98,13 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				>${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}</umb-extension-slot
 			>
 			<uui-action-bar>
-				${this._workspaceEditPath
-					? html`<uui-button label="edit" compact href=${this._workspaceEditPath}>
+				${this._workspaceEditContentPath
+					? html`<uui-button label="edit" compact href=${this._workspaceEditContentPath}>
 							<uui-icon name="icon-edit"></uui-icon>
 					  </uui-button>`
 					: ''}
-				${this._workspaceEditPath && this._hasSettings
-					? html`<uui-button label="Edit settings" compact href=${this._workspaceEditPath + '/view/settings'}>
+				${this._hasSettings && this._workspaceEditSettingsPath
+					? html`<uui-button label="Edit settings" compact href=${this._workspaceEditSettingsPath}>
 							<uui-icon name="icon-settings"></uui-icon>
 					  </uui-button>`
 					: ''}
