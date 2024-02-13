@@ -1,6 +1,6 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
-import { html, css, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-grid-block/index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
@@ -67,11 +67,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	constructor() {
 		super();
 
-		this.observe(this.#context.createPath, (createPath) => {
-			const oldValue = this._createPath;
-			this._createPath = createPath;
-			this.requestUpdate('_createPath', oldValue);
-		});
+		// Misc:
 		this.observe(this.#context.showContentEdit, (showContentEdit) => {
 			this._showContentEdit = showContentEdit;
 		});
@@ -82,7 +78,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this._blockViewProps.label = label;
 			this._label = label;
 		});
-		// Data props:
+
+		// Data:
 		this.observe(this.#context.layout, (layout) => {
 			this._blockViewProps.layout = layout;
 		});
@@ -91,6 +88,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 		this.observe(this.#context.settings, (settings) => {
 			this._blockViewProps.settings = settings;
+		});
+
+		// Paths:
+		this.observe(this.#context.createPath, (createPath) => {
+			const oldValue = this._createPath;
+			this._createPath = createPath;
+			this.requestUpdate('_createPath', oldValue);
 		});
 		this.observe(this.#context.workspaceEditContentPath, (path) => {
 			this._workspaceEditContentPath = path;

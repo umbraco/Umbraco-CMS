@@ -15,6 +15,9 @@ export class UmbBlockGridAreaContainerElement extends UmbLitElement {
 	@state()
 	_areas?: Array<UmbBlockGridLayoutAreaItemModel> = [];
 
+	@state()
+	_areaGridColumns?: number;
+
 	constructor() {
 		super();
 
@@ -25,6 +28,13 @@ export class UmbBlockGridAreaContainerElement extends UmbLitElement {
 					this._areas = areas;
 				},
 				'observeAreas',
+			);
+			this.observe(
+				context.areaGridColumns,
+				(areaGridColumns) => {
+					this._areaGridColumns = areaGridColumns;
+				},
+				'observeAreaGridColumns',
 			);
 		});
 		this.consumeContext(UMB_BLOCK_GRID_MANAGER_CONTEXT, (manager) => {
@@ -43,7 +53,9 @@ export class UmbBlockGridAreaContainerElement extends UmbLitElement {
 	render() {
 		return this._areas
 			? html` ${this.#styleElement}
-					<div class="umb-block-grid__area-container">
+					<div
+						class="umb-block-grid__area-container"
+						style="--umb-block-grid--area-grid-columns: ${this._areaGridColumns}">
 						${repeat(
 							this._areas,
 							(area) => area.key,

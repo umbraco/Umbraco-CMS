@@ -1,6 +1,6 @@
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-block-grid-type-workspace-view-areas')
@@ -10,7 +10,7 @@ export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement imp
 			<uui-box headline="Areas">
 				<umb-property
 					label=${this.localize.term('blockEditor_areasLayoutColumns')}
-					alias="areasLayoutColumns"
+					alias="areaGridColumns"
 					property-editor-ui-alias="Umb.PropertyEditorUi.Number"></umb-property>
 				<umb-property
 					label=${this.localize.term('blockEditor_areasConfigurations')}

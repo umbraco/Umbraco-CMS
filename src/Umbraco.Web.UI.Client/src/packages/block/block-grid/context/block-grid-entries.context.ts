@@ -40,7 +40,7 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 
 		this.#retrieveParentEntry = this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
 			this.#parentEntry = blockGridEntry;
-			//this.#gotBlockParentEntry();// is not used at this point.
+			this.#gotBlockParentEntry(); // is not used at this point.
 		}).asPromise();
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
@@ -89,7 +89,12 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 		if (!this.#parentEntry) return;
 	}*/
 
-	async #gotAreaKey() {
+	#gotAreaKey() {
+		if (this.#areaKey === undefined) return;
+		this.#gotBlockParentEntry();
+	}
+
+	async #gotBlockParentEntry() {
 		if (this.#areaKey === undefined) return;
 
 		if (this.#areaKey === null) {
@@ -112,9 +117,19 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 				},
 				'observeThisLayouts',
 			);
+
+			this.removeControllerByAlias('observeAreaType');
+
+			const hostEl = this.getHostElement() as HTMLElement | undefined;
+			if (hostEl) {
+				hostEl.removeAttribute('data-area-alias');
+				hostEl.removeAttribute('data-area-col-span');
+				hostEl.removeAttribute('data-area-row-span');
+				hostEl.style.removeProperty('--umb-block-grid--grid-columns');
+				hostEl.style.removeProperty('--umb-block-grid--area-column-span');
+				hostEl.style.removeProperty('--umb-block-grid--area-row-span');
+			}
 		} else {
-			// entries of a area:
-			await this.#retrieveParentEntry;
 			if (!this.#parentEntry) return;
 
 			this.observe(
@@ -140,6 +155,21 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 					}
 				},
 				'observeThisLayouts',
+			);
+
+			this.observe(
+				this.#parentEntry.areaType(this.#areaKey),
+				(areaType) => {
+					const hostEl = this.getHostElement() as HTMLElement | undefined;
+					if (!hostEl) return;
+					hostEl.setAttribute('data-area-alias', areaType?.alias ?? '');
+					hostEl.setAttribute('data-area-col-span', areaType?.colSpan ?? '');
+					hostEl.setAttribute('data-area-row-span', areaType?.rowSpan ?? '');
+					hostEl.style.setProperty('--umb-block-grid--grid-columns', areaType?.colSpan ?? '');
+					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.colSpan ?? '');
+					hostEl.style.setProperty('--umb-block-grid--area-row-span', areaType?.rowSpan ?? '');
+				},
+				'observeAreaType',
 			);
 		}
 	}
