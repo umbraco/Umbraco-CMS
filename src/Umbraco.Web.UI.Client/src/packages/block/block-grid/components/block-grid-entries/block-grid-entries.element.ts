@@ -78,7 +78,8 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 
 	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.
 	render() {
-		return html` ${this._styleElement}
+		return html`
+			${this._styleElement}
 			<div class="umb-block-grid__layout-container">
 				${repeat(
 					this._layoutEntries,
@@ -91,20 +92,21 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 							.layout=${layoutEntry}>
 						</umb-block-grid-entry>`,
 				)}
-				<uui-button-group>
-					<uui-button
-						id="add-button"
-						look="placeholder"
-						label=${this._createButtonLabel}
-						href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
-					<uui-button
-						label=${this.localize.term('content_createFromClipboard')}
-						look="placeholder"
-						href=${this.#context.getPathForClipboard(-1) ?? ''}>
-						<uui-icon name="icon-paste-in"></uui-icon>
-					</uui-button>
-				</uui-button-group>
-			</div>`;
+			</div>
+			<uui-button-group>
+				<uui-button
+					id="add-button"
+					look="placeholder"
+					label=${this._createButtonLabel}
+					href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
+				<uui-button
+					label=${this.localize.term('content_createFromClipboard')}
+					look="placeholder"
+					href=${this.#context.getPathForClipboard(-1) ?? ''}>
+					<uui-icon name="icon-paste-in"></uui-icon>
+				</uui-button>
+			</uui-button-group>
+		`;
 		//
 	}
 
