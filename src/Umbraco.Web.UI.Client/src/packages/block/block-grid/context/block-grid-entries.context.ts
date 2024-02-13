@@ -16,7 +16,6 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
 	#parentEntry?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
-	#retrieveParentEntry;
 
 	//#parentUnique?: string;
 	#areaKey?: string | null;
@@ -38,7 +37,7 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 
 		this._workspaceModal.addUniquePaths(['parentUnique', 'areaKey']);
 
-		this.#retrieveParentEntry = this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
+		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
 			this.#parentEntry = blockGridEntry;
 			this.#gotBlockParentEntry(); // is not used at this point.
 		}).asPromise();
@@ -162,13 +161,12 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 				(areaType) => {
 					const hostEl = this.getHostElement() as HTMLElement | undefined;
 					if (!hostEl) return;
-					console.log('area', areaType);
 					hostEl.setAttribute('data-area-alias', areaType?.alias ?? '');
-					hostEl.setAttribute('data-area-col-span', areaType?.colSpan ?? '');
-					hostEl.setAttribute('data-area-row-span', areaType?.rowSpan ?? '');
-					hostEl.style.setProperty('--umb-block-grid--grid-columns', areaType?.colSpan ?? '');
-					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.colSpan ?? '');
-					hostEl.style.setProperty('--umb-block-grid--area-row-span', areaType?.rowSpan ?? '');
+					hostEl.setAttribute('data-area-col-span', areaType?.colSpan?.toString() ?? '');
+					hostEl.setAttribute('data-area-row-span', areaType?.rowSpan?.toString() ?? '');
+					hostEl.style.setProperty('--umb-block-grid--grid-columns', areaType?.colSpan?.toString() ?? '');
+					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.colSpan?.toString() ?? '');
+					hostEl.style.setProperty('--umb-block-grid--area-row-span', areaType?.rowSpan?.toString() ?? '');
 				},
 				'observeAreaType',
 			);

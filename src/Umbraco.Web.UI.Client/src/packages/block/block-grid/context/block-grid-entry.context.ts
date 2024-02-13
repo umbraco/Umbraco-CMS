@@ -32,7 +32,6 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	}
 
 	areaType(areaKey: string) {
-		console.log('get area type', this._blockType.getValue());
 		return this._blockType.asObservablePart((x) => x?.areas?.find((x) => x.key === areaKey));
 	}
 
