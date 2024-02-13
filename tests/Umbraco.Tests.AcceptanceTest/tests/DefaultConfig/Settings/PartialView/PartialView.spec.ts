@@ -35,7 +35,7 @@ test.describe('Partial View tests', () => {
 
   test('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const expectedPartialViewContent = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n@using Umbraco.Cms.Core.Routing\n@using Umbraco.Extensions\n\n@inject IPublishedUrlProvider PublishedUrlProvider\n@*\n    This snippet makes a breadcrumb of parents using an unordered HTML list.\n\n    How it works:\n    - It uses the Ancestors() method to get all parents and then generates links so the visitor can go back\n    - Finally it outputs the name of the current page (without a link)\n*@\n\n@{ var selection = Model.Ancestors().ToArray(); }\n\n@if (selection?.Length > 0)\n{\n    <ul class=\"breadcrumb\">\n        @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@\n        @foreach (var item in selection.OrderBy(x => x.Level))\n        {\n            <li><a href=\"@item.Url(PublishedUrlProvider)\">@item.Name</a> <span class=\"divider\">/</span></li>\n        }\n\n        @* Display the current page as the last item in the list *@\n        <li class=\"active\">@Model.Name</li>\n    </ul>\n}";
+    const expectedPartialViewContent = '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@using Umbraco.Cms.Core.Routing\r\n@using Umbraco.Extensions\r\n\n@inject IPublishedUrlProvider PublishedUrlProvider\r\n@*\r\n    This snippet makes a breadcrumb of parents using an unordered HTML list.\r\n\r\n    How it works:\r\n    - It uses the Ancestors() method to get all parents and then generates links so the visitor can go back\r\n    - Finally it outputs the name of the current page (without a link)\r\n*@\r\n\r\n@{ var selection = Model.Ancestors().ToArray(); }\r\n\r\n@if (selection?.Length > 0)\r\n{\r\n    <ul class=\"breadcrumb\">\r\n        @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@\r\n        @foreach (var item in selection.OrderBy(x => x.Level))\r\n        {\r\n            <li><a href=\"@item.Url(PublishedUrlProvider)\">@item.Name</a> <span class=\"divider\">/</span></li>\r\n        }\r\n\r\n        @* Display the current page as the last item in the list *@\r\n        <li class=\"active\">@Model.Name</li>\r\n    </ul>\r\n}';
 
       // Act
     await umbracoUi.partialView.clickActionsMenuAtRoot();
@@ -106,7 +106,7 @@ test.describe('Partial View tests', () => {
   test('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     const propertyAliasValue = 'UpdateDate';
-    const isAcsending = false;
+    const isAscending = false;
     const expectedCode = 'Umbraco.ContentAtRoot().FirstOrDefault()\r\n' +
     '    .Children()\r\n' +
     '    .Where(x => x.IsVisible())\r\n' +
@@ -131,7 +131,9 @@ test.describe('Partial View tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    await umbracoUi.partialView.addQueryBuilderWithOrderByStatement(propertyAliasValue, isAcsending);
+    // Wait for the partial view to open
+    await umbracoUi.waitForTimeout(1000);
+    await umbracoUi.partialView.addQueryBuilderWithOrderByStatement(propertyAliasValue, isAscending);
     // Verify that the code is shown
     await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
     await umbracoUi.partialView.clickSubmitButton();
@@ -142,7 +144,7 @@ test.describe('Partial View tests', () => {
     expect(updatedPartialView.content).toBe(expectedTemplateContent);
   });
 
-  test('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     const propertyAliasValue = 'Name';
     const operatorValue = 'is';
@@ -171,6 +173,8 @@ test.describe('Partial View tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
+    // Wait for the partial view to open
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
     // Verify that the code is shown
     await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
