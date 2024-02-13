@@ -23,7 +23,7 @@ public class MediaMovedWebhookEvent : WebhookEventContentBase<MediaMovedNotifica
     {
     }
 
-    public override string Alias => "mediaMoved";
+    public override string Alias => Constants.WebhookEvents.Aliases.MediaMoved;
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedNotification notification) => notification.MoveInfoCollection.Select(x => x.Entity);
 

@@ -15,5 +15,8 @@ import './components/external-login-provider.element.js';
 import './components/layouts/new-password-layout.element.js';
 import './components/layouts/confirmation-layout.element.js';
 import './components/layouts/error-layout.element.js';
-
 import './components/login-input.element.js';
+
+import './external/icon.registry.js';
+import './external/custom-view.element.js';
+import './external/localization/localize.element.js';

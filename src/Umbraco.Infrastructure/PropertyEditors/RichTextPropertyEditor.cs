@@ -189,8 +189,9 @@ public class RichTextPropertyEditor : DataEditor
             IHtmlSanitizer htmlSanitizer,
             IHtmlMacroParameterParser macroParameterParser,
             IContentTypeService contentTypeService,
-            IPropertyValidationService propertyValidationService)
-            : base(attribute, propertyEditors, dataTypeService, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            IPropertyValidationService propertyValidationService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
+            : base(attribute, propertyEditors, dataTypeService, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _imageSourceParser = imageSourceParser;

@@ -50,19 +50,11 @@ angular.module("umbraco.directives")
 
                     scope.sliderOptions = {
                         "start": scope.dimensions.scale.current,
-                        "step": 0.001,
+                        "step": 0.01,
                         "tooltips": [false],
-                        "format": {
-                            to: function (value) {
-                                return parseFloat(parseFloat(value).toFixed(3));
-                            },
-                            from: function (value) {
-                                return parseFloat(parseFloat(value).toFixed(3));
-                            }
-                        },
                         "range": {
-                            "min": scope.dimensions.scale.min,
-                            "max": scope.dimensions.scale.max
+                            "min": 0,
+                            "max": 100
                         }
                     };
 

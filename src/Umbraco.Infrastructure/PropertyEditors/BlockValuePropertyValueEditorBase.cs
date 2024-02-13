@@ -14,6 +14,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly ILogger _logger;
+    private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactoryCollection;
 
     protected BlockValuePropertyValueEditorBase(
         DataEditorAttribute attribute,
@@ -23,12 +24,14 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
         ILogger logger,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
+        IIOHelper ioHelper,
+        DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
         : base(textService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
         _logger = logger;
+        _dataValueReferenceFactoryCollection = dataValueReferenceFactoryCollection;
     }
 
     /// <inheritdoc />
@@ -36,26 +39,31 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
 
     protected IEnumerable<UmbracoEntityReference> GetBlockValueReferences(BlockValue blockValue)
     {
-        var result = new List<UmbracoEntityReference>();
-
-        // loop through all content and settings data
-        foreach (BlockItemData row in blockValue.ContentData.Concat(blockValue.SettingsData))
+        var result = new HashSet<UmbracoEntityReference>();
+        BlockItemData.BlockPropertyValue[] propertyValues = blockValue.ContentData.Concat(blockValue.SettingsData)
+            .SelectMany(x => x.PropertyValues.Values).ToArray();
+        foreach (IGrouping<string, object?> valuesByPropertyEditorAlias in propertyValues.GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Value))
         {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
+            if (!_propertyEditors.TryGet(valuesByPropertyEditorAlias.Key, out IDataEditor? dataEditor))
             {
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                continue;
+            }
 
-                IDataValueEditor? valueEditor = propEditor?.GetValueEditor();
-                if (!(valueEditor is IDataValueReference reference))
+            var districtValues = valuesByPropertyEditorAlias.Distinct().ToArray();
+
+            if (dataEditor.GetValueEditor() is IDataValueReference reference)
+            {
+                foreach (UmbracoEntityReference value in districtValues.SelectMany(reference.GetReferences))
                 {
-                    continue;
+                    result.Add(value);
                 }
+            }
 
-                var val = prop.Value.Value?.ToString();
+            IEnumerable<UmbracoEntityReference> references = _dataValueReferenceFactoryCollection.GetReferences(dataEditor, districtValues);
 
-                IEnumerable<UmbracoEntityReference> refs = reference.GetReferences(val);
-
-                result.AddRange(refs);
+            foreach (UmbracoEntityReference value in references)
+            {
+                result.Add(value);
             }
         }
 

@@ -1051,7 +1051,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="2faMultipleText">Lütfen bir tane 2-aşamalı kimlik doğrulama hizmet sağlayıcı seçin</key>
     <key alias="2faCodeInput">Doğrulama kodu</key>
     <key alias="2faCodeInputHelp">Lütfen doğrulama kodunu girin</key>
-    <key alias="2faInvalidCode">Geçersiz kod girildi</key>    
+    <key alias="2faInvalidCode">Geçersiz kod girildi</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Gösterge Paneli</key>
