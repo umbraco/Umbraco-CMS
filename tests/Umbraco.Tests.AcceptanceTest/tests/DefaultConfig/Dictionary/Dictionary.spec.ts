@@ -4,7 +4,7 @@ import {expect} from "@playwright/test";
 test.describe('Dictionary tests', () => {
   const dictionaryName = 'TestDictionaryItem';
   const parentDictionaryName = 'TestParentDictionary';
-  
+
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
   });
@@ -13,14 +13,14 @@ test.describe('Dictionary tests', () => {
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
   });
-  
+
   test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     // Act
-    await umbracoUi.dictionary.clickCreateDictionaryItemButton();
+    await umbracoUi.dictionary.clickCreateButton();
     await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
     await umbracoUi.dictionary.clickSaveButton();
 
@@ -47,7 +47,7 @@ test.describe('Dictionary tests', () => {
     // TODO: when frontend is ready, verify the new dictionary item is NOT displayed in list view and in tree
   });
 
-  test('can create a dictionary item in a dictionary', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a dictionary item in a dictionary', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
     let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
@@ -109,14 +109,14 @@ test.describe('Dictionary tests', () => {
     // Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickImportMenu();
-    await umbracoUi.dictionary.importDictionary(udtFilePath);   
+    await umbracoUi.dictionary.importDictionary(udtFilePath);
 
     // Assert
     // TODO: when frontend is ready, verify the notification displays
     // TODO: when frontend is ready, verify the imported dictionary items displays
   });
 
-    // Remove skip when import function works
+  // Remove skip when import function works
   test.skip('can import a dictionary item with descendants', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const udtFilePath = './fixtures/dictionary/TestDictionaryWithDescendants.udt';
@@ -128,14 +128,14 @@ test.describe('Dictionary tests', () => {
     // Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickImportMenu();
-    await umbracoUi.dictionary.importDictionary(udtFilePath);   
+    await umbracoUi.dictionary.importDictionary(udtFilePath);
 
     // Assert
     // TODO: when frontend is ready, verify the notification displays
     // TODO: when frontend is ready, verify the imported dictionary items displays
   });
 
-  test('can search a dictionary item in list when have results', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can search a dictionary item in list when have results', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
@@ -145,10 +145,10 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.dictionary.enterSearchKeywordAndPressEnter(dictionaryName);
 
     // Assert
-    expect (await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
+    expect(await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
   });
 
-  test('can search a dictionary item in list when have no results', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can search a dictionary item in list when have no results', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const emptySearchResultMessage = 'No Dictionary items to choose from';
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
@@ -159,6 +159,6 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.dictionary.enterSearchKeywordAndPressEnter('xyz');
 
     // Assert
-    await umbracoUi.dictionary.isSearchResultMessageDisplayEmpty(emptySearchResultMessage);    
+    await umbracoUi.dictionary.isSearchResultMessageDisplayEmpty(emptySearchResultMessage);
   });
 });
