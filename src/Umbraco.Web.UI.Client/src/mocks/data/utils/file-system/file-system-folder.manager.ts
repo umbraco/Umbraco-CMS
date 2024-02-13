@@ -2,7 +2,7 @@ import type { UmbFileSystemMockDbBase } from './file-system-base.js';
 import type {
 	FileSystemCreateRequestModelBaseModel,
 	FileSystemResponseModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMockFileSystemFolderManager<
 	MockItemType extends FileSystemResponseModelBaseModel & { isFolder: boolean },

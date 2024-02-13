@@ -14,8 +14,8 @@ import type {
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
 	UserResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const userGroupFilter = (filterOptions: any, item: UmbMockUserModel) =>
 	arrayFilter(filterOptions.userGroupIds, item.userGroupIds);

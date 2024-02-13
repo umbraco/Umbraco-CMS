@@ -1,5 +1,5 @@
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-packages-market-place-section-view')

@@ -1,5 +1,5 @@
 import { UmbMockDBBase } from '../mock-db-base.js';
-import type { FileSystemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { FileSystemResponseModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export abstract class UmbFileSystemMockDbBase<
 	MockItemType extends FileSystemResponseModelBaseModel,

@@ -1,3 +1,4 @@
+import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
@@ -5,8 +6,11 @@ import { css, html, customElement, state, repeat, nothing, ifDefined } from '@um
 import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import {
+	CompositionTypeModel,
+	type PropertyTypeContainerModelBaseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -77,6 +81,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
+	@state()
+	private _compositionConfiguration?: UmbCompositionPickerModalData;
+
 	constructor() {
 		super();
 
@@ -106,6 +113,19 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				},
 				'_observeIsSorting',
 			);
+
+			const unique = this._workspaceContext.getEntityId();
+
+			//TODO Figure out the correct data that needs to be sent to the compositions modal. Do we really have to send isElement, currentPropertyAliases - isn't unique enough?
+			this.observe(this._workspaceContext.structure.contentTypes, (contentTypes) => {
+				this._compositionConfiguration = {
+					unique: unique ?? '',
+					selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
+					isElement: contentTypes.find((contentType) => contentType.unique === unique)?.isElement ?? false,
+					currentPropertyAliases: [],
+				};
+			});
+
 			this._observeRootGroups();
 		});
 
@@ -256,6 +276,21 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeFolderName(newName));
 	}
 
+	async #openCompositionModal() {
+		const modalContext = this._modalManagerContext?.open(UMB_COMPOSITION_PICKER_MODAL, {
+			data: this._compositionConfiguration,
+		});
+		await modalContext?.onSubmit();
+
+		if (!modalContext?.value) return;
+
+		const compositionIds = modalContext.getValue().selection;
+
+		this._workspaceContext?.setCompositions(
+			compositionIds.map((unique) => ({ contentType: { unique }, compositionType: CompositionTypeModel.COMPOSITION })),
+		);
+	}
+
 	render() {
 		return html`
 			<umb-body-layout header-fit-height>
@@ -292,7 +327,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 			: this.localize.term('general_reorder');
 
 		return html`<div class="tab-actions">
-			<uui-button look="outline" label=${this.localize.term('contentTypeEditor_compositions')} compact>
+			<uui-button
+				look="outline"
+				label=${this.localize.term('contentTypeEditor_compositions')}
+				compact
+				@click=${this.#openCompositionModal}>
 				<uui-icon name="icon-merge"></uui-icon>
 				${this.localize.term('contentTypeEditor_compositions')}
 			</uui-button>

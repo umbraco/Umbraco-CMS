@@ -1,4 +1,4 @@
-import type { ApiError, CancelError, CancelablePromise } from '@umbraco-cms/backoffice/backend-api';
+import type { ApiError, CancelError, CancelablePromise } from '@umbraco-cms/backoffice/external/backend-api';
 
 export function isApiError(error: unknown): error is ApiError {
 	return (error as ApiError).name === 'ApiError';

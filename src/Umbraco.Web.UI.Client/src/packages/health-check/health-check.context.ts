@@ -1,10 +1,9 @@
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	HealthCheckGroupPresentationModel,
-	HealthCheckGroupWithResultResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	HealthCheckResource,
-} from '@umbraco-cms/backoffice/backend-api';
+	HealthCheckGroupWithResultResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

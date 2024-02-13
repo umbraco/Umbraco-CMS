@@ -3,7 +3,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
-import type { DomainPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DomainPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	UmbDocumentCultureAndHostnamesRepository,
 	type UmbCultureAndHostnamesModalData,

@@ -1,8 +1,8 @@
 import { css, html, customElement, state, nothing, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { RelationItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { RelationItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbDocumentTrackedReferenceRepository } from '@umbraco-cms/backoffice/document';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 

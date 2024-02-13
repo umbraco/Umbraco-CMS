@@ -6,11 +6,9 @@ import type {
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
-	SavedLogSearchPresenationBaseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	DirectionModel,
-	LogLevelModel
-} from '@umbraco-cms/backoffice/backend-api';
+	SavedLogSearchPresenationBaseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DirectionModel, LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';

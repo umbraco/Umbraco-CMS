@@ -1,6 +1,6 @@
 const { rest } = window.MockServiceWorker;
 import { UMB_SLUG } from './slug.js';
-import type { ChangePasswordUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ChangePasswordUserRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
