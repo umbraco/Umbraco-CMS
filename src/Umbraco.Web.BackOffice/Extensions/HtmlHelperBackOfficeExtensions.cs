@@ -7,11 +7,33 @@ using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///    Extensions for <see cref="IHtmlHelper" /> to render scripts for the back office
+/// </summary>
 public static class HtmlHelperBackOfficeExtensions
 {
+    /// <summary>
+    ///     Outputs a script tag containing the import map for the BackOffice
+    /// </summary>
+    /// <returns>A <see cref="Task"/> containing the html content for the BackOffice import map</returns>
+    public static async Task<IHtmlContent> BackOfficeImportMapScriptAsync(
+        this IHtmlHelper html,
+        IStaticFilePathGenerator staticFilePathGenerator)
+    {
+        var importmap = await staticFilePathGenerator.GetBackofficePackageExportsAsync();
+
+        var sb = new StringBuilder();
+        sb.AppendLine("""<script type="importmap">""");
+        sb.AppendLine(importmap);
+        sb.AppendLine("</script>");
+
+        return html.Raw(sb.ToString());
+    }
+
     /// <summary>
     ///     Outputs a script tag containing the bare minimum (non secure) server vars for use with the angular app
     /// </summary>
@@ -23,6 +45,7 @@ public static class HtmlHelperBackOfficeExtensions
     ///     authenticated,
     ///     we will load the rest of the server vars after the user is authenticated.
     /// </remarks>
+    [Obsolete("This is deprecated and will be removed in V15")]
     public static async Task<IHtmlContent> BareMinimumServerVariablesScriptAsync(this IHtmlHelper html,
         BackOfficeServerVariables backOfficeServerVariables)
     {
@@ -132,6 +155,7 @@ public static class HtmlHelperBackOfficeExtensions
         return html.Raw(sb.ToString());
     }
 
+    [Obsolete("This is deprecated and will be removed in V15")]
     public static async Task<IHtmlContent> AngularValueTinyMceAssetsAsync(this IHtmlHelper html,
         IRuntimeMinifier runtimeMinifier)
     {
