@@ -18,7 +18,7 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	//
 	columnSpan = this._layout.asObservablePart((x) => x?.columnSpan);
 	rowSpan = this._layout.asObservablePart((x) => x?.rowSpan ?? 1);
-	areaGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns ?? '');
+	areaGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
 	areas = this._layout.asObservablePart((x) => x?.areas ?? []);
 
 	readonly showContentEdit = this._blockType.asObservablePart((x) => !x?.forceHideContentEditorInOverlay);

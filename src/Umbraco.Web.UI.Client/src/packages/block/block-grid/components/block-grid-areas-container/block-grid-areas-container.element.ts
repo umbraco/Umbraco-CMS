@@ -6,6 +6,8 @@ import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice
 import '../block-grid-entries/index.js';
 /**
  * @element umb-block-grid-areas-container
+ * @description
+ * This element is used to render the block grid areas.
  */
 @customElement('umb-block-grid-areas-container')
 export class UmbBlockGridAreasContainerElement extends UmbLitElement {
@@ -51,7 +53,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._areas
+		return this._areas && this._areas.length > 0
 			? html` ${this.#styleElement}
 					<div
 						class="umb-block-grid__area-container"
