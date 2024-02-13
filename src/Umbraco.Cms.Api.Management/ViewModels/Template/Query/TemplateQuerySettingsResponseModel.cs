@@ -2,7 +2,7 @@
 
 public class TemplateQuerySettingsResponseModel
 {
-    public required IEnumerable<string> ContentTypeAliases { get; init; }
+    public required IEnumerable<string> DocumentTypeAliases { get; init; }
 
     public required IEnumerable<TemplateQueryPropertyPresentationModel> Properties { get; init; }
 

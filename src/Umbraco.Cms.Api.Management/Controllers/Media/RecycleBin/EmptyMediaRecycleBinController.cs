@@ -24,8 +24,8 @@ public class EmptyMediaRecycleBinController : MediaRecycleBinControllerBase
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IMediaService mediaService,
-        IMediaPresentationModelFactory mediaPresentationModelFactory)
-        : base(entityService, mediaPresentationModelFactory)
+        IMediaPresentationFactory mediaPresentationFactory)
+        : base(entityService, mediaPresentationFactory)
     {
         _authorizationService = authorizationService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;

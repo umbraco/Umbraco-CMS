@@ -8,9 +8,8 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-// FIXME: add granular permissions check (for inspiration, check how the old MediaController utilizes IAuthorizationService)
 internal sealed class MediaEditingService
-    : ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
+    : ContentEditingServiceWithSortingBase<IMedia, IMediaType, IMediaService, IMediaTypeService>, IMediaEditingService
 {
     private readonly ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> _logger;
 
@@ -24,7 +23,7 @@ internal sealed class MediaEditingService
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService,
         IMediaValidationService mediaValidationService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService, mediaValidationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, mediaValidationService, treeEntitySortingService)
         => _logger = logger;
 
     public async Task<IMedia?> GetAsync(Guid key)
@@ -85,7 +84,10 @@ internal sealed class MediaEditingService
         => await HandleMoveToRecycleBinAsync(key, userKey);
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
-        => await HandleDeleteAsync(key, userKey);
+        => await HandleDeleteAsync(key, userKey,false);
+
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
+        => await HandleDeleteAsync(key, userKey, true);
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);

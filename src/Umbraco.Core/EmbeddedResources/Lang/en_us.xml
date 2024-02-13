@@ -2032,6 +2032,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="types">Types</key>
     <key alias="webhookKey">Webhook key</key>
     <key alias="retryCount">Retry count</key>
+    <key alias="toggleDebug">Toggle debug mode for more information.</key>
+    <key alias="statusNotOk">Not OK status code</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

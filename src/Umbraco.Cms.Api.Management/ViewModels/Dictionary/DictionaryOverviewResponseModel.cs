@@ -13,9 +13,9 @@ public class DictionaryOverviewResponseModel
     public Guid Id { get; set; }
 
     /// <summary>
-    ///     Gets or sets the parent key.
+    ///     Gets or sets the parent.
     /// </summary>
-    public Guid? ParentId { get; set; }
+    public ReferenceByIdModel? Parent { get; set; }
 
     /// <summary>
     ///     Sets the translations.

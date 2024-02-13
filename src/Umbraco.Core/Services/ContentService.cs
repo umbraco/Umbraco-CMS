@@ -1257,10 +1257,10 @@ public class ContentService : RepositoryService, IContentService
             // all cultures = unpublish whole
             if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
             {
-                // It's important to understand that when the document varies by culture but the "*" is used,
-                // we are just unpublishing the whole document but leaving all of the culture's as-is. This is expected
-                // because we don't want to actually unpublish every culture and then the document, we just want everything
-                // to be non-routable so that when it's re-published all variants were as they were.
+                // Unpublish the culture, this will change the document state to Publishing! ... which is expected because this will
+                // essentially be re-publishing the document with the requested culture removed
+                // We are however unpublishing all cultures, so we will set this to unpublishing.
+                content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
                 PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
                 scope.Complete();
