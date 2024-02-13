@@ -71,14 +71,15 @@
 
           switch ($scope.model.contentType) {
             case "content":
-              editor.entityType = "documentType";
+              editorService.contentPicker(editor);
               break;
             case "media":
-              editor.entityType = "mediaType";
+              editorService.mediaPicker(editor);
+              break;
+            case "member":
+              editorService.memberPicker(editor);
               break;
           }
-
-          editorService.contentTypePicker(editor);
         }
         
         function submit(model) {
