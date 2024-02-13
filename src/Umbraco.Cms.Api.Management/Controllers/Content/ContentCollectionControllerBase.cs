@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Mapping;
@@ -48,46 +47,46 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
     }
 
     protected IActionResult ContentCollectionOperationStatusResult(ContentCollectionOperationStatus status, string type) =>
-        status switch
+        OperationStatusResult(status, problemDetailsBuilder => status switch
         {
-            ContentCollectionOperationStatus.CollectionNotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.CollectionNotFound => new NotFoundObjectResult(problemDetailsBuilder
                 .WithTitle("Collection data type could not be found")
                 .WithDetail($"No collection data type was found for the corresponding {type} type. Ensure that the default and/or a custom collection data types exists")
                 .Build()),
-            ContentCollectionOperationStatus.ContentNotCollection => new BadRequestObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.ContentNotCollection => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle($"The {type} item is not configured as a collection")
                 .WithDetail($"The specified {type} is not configured as a collection")
                 .Build()),
-            ContentCollectionOperationStatus.ContentNotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.ContentNotFound => new NotFoundObjectResult(problemDetailsBuilder
                 .WithTitle($"The specified {type} could not be found")
                 .Build()),
-            ContentCollectionOperationStatus.ContentTypeNotFound => new BadRequestObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.ContentTypeNotFound => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle($"The related {type} type could not be found")
                 .Build()),
-            ContentCollectionOperationStatus.DataTypeNotCollection => new BadRequestObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.DataTypeNotCollection => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Data type id does not belong to a collection")
                 .WithDetail("The specified data type does not represent a collection")
                 .Build()),
-            ContentCollectionOperationStatus.DataTypeNotContentCollection => new BadRequestObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.DataTypeNotContentCollection => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Data type id does not represent the configured collection")
                 .WithDetail($"The specified data type is not the configured collection for the given {type} item")
                 .Build()),
-            ContentCollectionOperationStatus.DataTypeNotContentProperty => new BadRequestObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.DataTypeNotContentProperty => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle($"Data type id is not a {type} property")
                 .WithDetail($"The specified data type is not part of the {type} properties")
                 .Build()),
-            ContentCollectionOperationStatus.DataTypeNotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.DataTypeNotFound => new NotFoundObjectResult(problemDetailsBuilder
                 .WithTitle("The specified collection data type could not be found")
                 .Build()),
-            ContentCollectionOperationStatus.DataTypeWithoutContentType => new BadRequestObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.DataTypeWithoutContentType => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle($"Missing {type} when specifying a collection data type")
                 .WithDetail($"The specified collection data type needs to be used in conjunction with a {type} item.")
                 .Build()),
-            ContentCollectionOperationStatus.MissingPropertiesInCollectionConfiguration => new BadRequestObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.MissingPropertiesInCollectionConfiguration => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Missing properties in collection configuration")
                 .WithDetail("No properties are configured to display in the collection configuration")
                 .Build()),
-            ContentCollectionOperationStatus.OrderByNotPartOfCollectionConfiguration => new BadRequestObjectResult(new ProblemDetailsBuilder()
+            ContentCollectionOperationStatus.OrderByNotPartOfCollectionConfiguration => new BadRequestObjectResult(problemDetailsBuilder
                 .WithTitle("Order by value is not a property on the configured collection")
                 .WithDetail("The specified orderBy property is not part of the collection configuration")
                 .Build()),
@@ -95,5 +94,5 @@ public abstract class ContentCollectionControllerBase<TContent, TCollectionRespo
             {
                 StatusCode = StatusCodes.Status500InternalServerError,
             },
-        };
+        });
 }
