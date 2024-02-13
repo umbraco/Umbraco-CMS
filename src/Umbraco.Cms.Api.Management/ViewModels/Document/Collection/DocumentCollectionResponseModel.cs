@@ -7,5 +7,9 @@ public class DocumentCollectionResponseModel : ContentResponseModelBase<Document
 {
     public int SortOrder { get; set; }
 
+    public string? Owner { get; set; }
+
+    public string? Updater { get; set; }
+
     public DocumentTypeCollectionReferenceResponseModel DocumentType { get; set; } = new();
 }

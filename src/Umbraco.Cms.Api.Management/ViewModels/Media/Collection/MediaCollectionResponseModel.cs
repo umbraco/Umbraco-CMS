@@ -7,5 +7,7 @@ public class MediaCollectionResponseModel : ContentResponseModelBase<MediaValueM
 {
     public int SortOrder { get; set; }
 
+    public string? Owner { get; set; }
+
     public MediaTypeCollectionReferenceResponseModel MediaType { get; set; } = new();
 }
