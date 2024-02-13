@@ -36,7 +36,7 @@ public class ByKeyMediaCollectionController : MediaCollectionControllerBase
     public async Task<IActionResult> ByKey(
         Guid? id,
         Guid? dataTypeId = null,
-        string orderBy = "sortOrder",
+        string orderBy = "updateDate",
         Direction orderDirection = Direction.Ascending,
         string? filter = null,
         int skip = 0,

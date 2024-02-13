@@ -36,7 +36,7 @@ public class ByKeyDocumentCollectionController : DocumentCollectionControllerBas
     public async Task<IActionResult> ByKey(
         Guid id,
         Guid? dataTypeId = null,
-        string orderBy = "sortOrder",
+        string orderBy = "updateDate",
         string? orderCulture = null,
         Direction orderDirection = Direction.Ascending,
         string? filter = null,
