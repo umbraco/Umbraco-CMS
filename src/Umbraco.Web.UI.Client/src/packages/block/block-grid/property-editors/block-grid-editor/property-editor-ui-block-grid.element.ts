@@ -71,9 +71,6 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		this.#context.setSettings(buildUpValue.settingsData);
 	}
 
-	@state()
-	private _rootLayouts: Array<UmbBlockGridLayoutModel> = [];
-
 	constructor() {
 		super();
 
