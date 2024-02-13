@@ -4305,7 +4305,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "default": "sortOrder"
+              "default": "updateDate"
             }
           },
           {
@@ -10443,7 +10443,7 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "default": "sortOrder"
+              "default": "updateDate"
             }
           },
           {
