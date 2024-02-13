@@ -51,11 +51,12 @@ function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) 
 	});
 }
 function setupPreventEvent(element: Element) {
-	//(element as HTMLElement).draggable = false;
-	(element as HTMLElement).setAttribute('draggable', 'false');
+	(element as HTMLElement).draggable = false;
+	//(element as HTMLElement).setAttribute('draggable', 'false');
 }
 function destroyPreventEvent(element: Element) {
-	element.removeAttribute('draggable');
+	element.draggable = false;
+	//element.removeAttribute('draggable');
 }
 
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
@@ -277,10 +278,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			setupIgnorerElements(element, this.#config.ignorerSelector);
 		}
 
-		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
-			console.log('— setup', element);
-			//element.draggable = true;
-			(element as HTMLElement).setAttribute('draggable', 'true');
+		if (!this.#config.disabledItemSelector || !element.matches('> ' + this.#config.disabledItemSelector)) {
+			// Idea: to make sure on does not get initialized twice: if ((element as HTMLElement).draggable === true) return;
+			(element as HTMLElement).draggable = true;
 			element.addEventListener('dragstart', this.#handleDragStart);
 			element.addEventListener('dragend', this.#handleDragEnd);
 		}

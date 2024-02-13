@@ -17,7 +17,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
 	identifier: 'block-grid-editor',
 	itemSelector: 'umb-block-grid-entry',
 	//ignorerSelector: '', // No ignorerSelector, as we want to ignore nothing.
-	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
+	containerSelector: '.umb-block-grid__layout-container',
 };
 
 /**
@@ -59,8 +59,8 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 		super();
 		this.observe(this.#context.layoutEntries, (layoutEntries) => {
 			const oldValue = this._layoutEntries;
-			this._layoutEntries = layoutEntries;
 			this.#sorter.setModel(layoutEntries);
+			this._layoutEntries = layoutEntries;
 			this.requestUpdate('layoutEntries', oldValue);
 		});
 
@@ -68,6 +68,7 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 			this.observe(
 				manager.layoutStylesheet,
 				(stylesheet) => {
+					if (this._styleElement && this._styleElement.href === stylesheet) return;
 					this._styleElement = document.createElement('link');
 					this._styleElement.setAttribute('rel', 'stylesheet');
 					this._styleElement.setAttribute('href', stylesheet);
