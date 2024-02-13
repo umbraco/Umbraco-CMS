@@ -476,6 +476,10 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			a {
 				color: inherit;
 			}
+
+			:host([drag-placeholder]) {
+				opacity: 0.2;
+			}
 		`,
 	];
 }

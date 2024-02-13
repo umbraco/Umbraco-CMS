@@ -2,7 +2,7 @@ import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-worksp
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -13,9 +13,41 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	#sorter = new UmbSorterController<PropertyTypeContainerModelBaseModel, UUITabElement>(this, {
+		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
+		getUniqueOfModel: (modelEntry) => modelEntry.id,
+		identifier: 'document-type-tabs-sorter',
+		itemSelector: 'uui-tab',
+		containerSelector: 'uui-tab-group',
+		disabledItemSelector: '#root-tab',
+		resolveVerticalDirection: () => false,
+		onChange: ({ model, item }) => {
+			this._tabs = model;
+
+			const modelIndex = model.findIndex((entry) => entry.id === item.id);
+
+			if (modelIndex === -1) return;
+			let sortOrder: number;
+
+			// TODO: How to get the correct sortOrder number?
+			// Sometimes (lets say we have 2 tabs in the model) they both update when moving one - why?
+			if (model.length > 1) {
+				sortOrder =
+					modelIndex > 0 ? (model[modelIndex - 1].sortOrder ?? 0) + 1 : (model[modelIndex + 1].sortOrder ?? 0) - 1;
+			} else {
+				sortOrder = 0;
+			}
+
+			this._tabsStructureHelper.partialUpdateContainer(item.id, {
+				sortOrder: sortOrder,
+			});
+		},
+	});
+
 	//private _hasRootProperties = false;
 
 	@state()
@@ -34,7 +66,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	private _activePath = '';
 
 	@state()
-	private sortModeActive?: boolean;
+	private _sortModeActive?: boolean;
 
 	@state()
 	private _buttonDisabled: boolean = false;
@@ -64,7 +96,14 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 			this._tabsStructureHelper.setStructureManager((workspaceContext as UmbDocumentTypeWorkspaceContext).structure);
 			this.observe(
 				this._workspaceContext.isSorting,
-				(isSorting) => (this.sortModeActive = isSorting),
+				(isSorting) => {
+					this._sortModeActive = isSorting;
+					if (isSorting) {
+						this.#sorter.setModel(this._tabs!);
+					} else {
+						this.#sorter.setModel([]);
+					}
+				},
 				'_observeIsSorting',
 			);
 			this._observeRootGroups();
@@ -89,7 +128,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	#changeMode() {
-		this._workspaceContext?.setIsSorting(!this.sortModeActive);
+		this._workspaceContext?.setIsSorting(!this._sortModeActive);
 	}
 
 	private _createRoutes() {
@@ -240,7 +279,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	renderAddButton() {
-		if (this.sortModeActive) return;
+		if (this._sortModeActive) return;
 		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
 			<uui-icon name="icon-add"></uui-icon>
 			Add tab
@@ -248,7 +287,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	renderActions() {
-		const sortButtonText = this.sortModeActive
+		const sortButtonText = this._sortModeActive
 			? this.localize.term('general_reorderDone')
 			: this.localize.term('general_reorder');
 
@@ -283,6 +322,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		const rootTabPath = this._routerPath + '/root';
 		const rootTabActive = rootTabPath === this._activePath;
 		return html`<uui-tab
+			id="root-tab"
 			class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
 			label=${this.localize.term('general_content')}
 			.active=${rootTabActive}
@@ -306,7 +346,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, tabInherited: boolean) {
-		if (this.sortModeActive) {
+		if (this._sortModeActive) {
 			return html`<div class="no-edit">
 				${tabInherited
 					? html`<uui-icon class="external" name="icon-merge"></uui-icon>${tab.name!}`
@@ -316,7 +356,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
-								@keypress=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`}
+								@change=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`}
 			</div>`;
 		}
 
@@ -382,17 +422,18 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				--uui-tab-background: var(--uui-color-surface);
 			}
 
+			[drag-placeholder] {
+				opacity: 0.2;
+			}
+
 			/* TODO: This should be replaced with a general workspace bar — naming is hard */
+
 			#header {
 				width: 100%;
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
 				flex-wrap: nowrap;
-			}
-
-			#container-list {
-				flex: 1;
 			}
 
 			.flex {
@@ -447,15 +488,8 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				vertical-align: sub;
 			}
 
-			.--umb-sorter-placeholder > * {
-				visibility: hidden;
-			}
-
-			.--umb-sorter-placeholder::after {
-				content: '';
-				position: absolute;
-				inset: 2px;
-				border: 1px dashed var(--uui-color-divider-emphasis);
+			[drag-placeholder] {
+				opacity: 0.2;
 			}
 		`,
 	];
