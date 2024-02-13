@@ -33,41 +33,56 @@
           </umb-box-header>
 
           <umb-box-content>
-            <umb-control-group>
+            <div class="flex flex-column flx-gap-sm">
               <div ng-repeat="login in vm.externalLoginProviders">
 
-                <div ng-if="login.customView" ng-include="login.customView"></div>
+                <umb-custom-view
+                  ng-if="login.customView"
+                  ng-attr-custom-view="{{ ::login.customView }}"
+                  ng-attr-args='{{"{" +
+                  "\"providerName\": \"" + login.authType + "\"," +
+                  "\"displayName\": \"" + login.caption + "\"," +
+                  "\"externalLoginUrl\": \"" + vm.externalLinkLoginFormAction + "\"," +
+                  "\"userViewState\": \"loggedIn\"" +
+                  "}"
+                  | safe_html }}'>
+                </umb-custom-view>
 
-                <div ng-if="!login.customView && login.properties.AutoLinkOptions.AllowManualLinking">
-                  <form action="{{vm.externalLinkLoginFormAction}}" id="oauthloginform-{{login.authType}}" method="POST"
+                <div ng-if="!login.customView">
+                  <form action="{{ ::vm.externalLinkLoginFormAction }}" id="oauthloginform-{{ ::login.authType }}" method="POST"
                     name="oauthloginform" ng-if="login.linkedProviderKey == undefined"
                     ng-submit="vm.linkProvider($event)">
-                    <input name="provider" type="hidden" value="{{login.authType}}" />
-                    <button class="btn btn-block btn-social" id="{{login.authType}}"
-                      ng-class="login.properties.ButtonStyle" title="{{login.caption}}">
-
-                      <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
-                      <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize
-                        key="defaultdialogs_account">account
-                      </localize>
-                    </button>
+                    <input name="provider" type="hidden" value="{{ ::login.authType}}" />
+                    <uui-button
+                      type="submit"
+                      label="Link your {{ ::login.caption }} account"
+                      look="{{ ::login.options.buttonLook }}"
+                      color="{{ ::login.options.buttonColor }}">
+                      <uui-icon name="{{ ::login.options.icon }}"></uui-icon>
+                      <localize key="defaultdialogs_linkYour">Link your</localize>
+                      {{ ::login.caption}}
+                      <localize key="defaultdialogs_account">account</localize>
+                    </uui-button>
                   </form>
 
-                  <button class="btn btn-block btn-social" id="{{login.authType}}" name="provider"
-                    ng-class="login.properties.ButtonStyle"
+                  <uui-button
+                    ng-if="login.linkedProviderKey != undefined" value="{{login.authType}}"
                     ng-click="vm.unlink($event, login.authType, login.linkedProviderKey)"
-                    ng-if="login.linkedProviderKey != undefined" value="{{login.authType}}">
-                    <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
-                    <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;
-                    <localize key="defaultdialogs_account">account
-                    </localize>
-                  </button>
+                    name="provider"
+                    label="Un-Link your {{ ::login.caption }} account"
+                    look="{{ ::login.options.buttonLook }}"
+                    color="{{ ::login.options.buttonColor }}">
+                    <uui-icon name="{{ ::login.options.icon }}"></uui-icon>
+                    <localize key="defaultdialogs_unLinkYour">Un-link your</localize>
+                    {{ ::login.caption }}
+                    <localize key="defaultdialogs_account">account</localize>
+                  </uui-button>
 
                 </div>
 
               </div>
 
-            </umb-control-group>
+            </div>
 
           </umb-box-content>
 

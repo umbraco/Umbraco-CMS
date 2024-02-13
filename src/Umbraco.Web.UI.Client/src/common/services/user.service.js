@@ -156,7 +156,9 @@ angular.module('umbraco.services')
             lastServerTimeoutSet = null;
             currentUser = null;
 
-            openLoginDialog(isLogout === undefined ? true : !isLogout);
+            if (!isLogout) {
+              openLoginDialog(true);
+            }
         }
 
         // Register a handler for when an item is added to the retry queue
@@ -216,6 +218,8 @@ angular.module('umbraco.services')
                 //when it's successful, return the user data
                 setCurrentUser(data);
 
+                this._retryRequestQueue(true);
+
                 var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "credentials" };
 
                 //broadcast a global event
@@ -229,15 +233,11 @@ angular.module('umbraco.services')
 
                 return authResource.performLogout()
                     .then(function (data) {
-                        userAuthExpired();
+                        userAuthExpired(true);
 
-                        if (data && data.signOutRedirectUrl) {
-                            $window.location.replace(data.signOutRedirectUrl);
-                        }
-                        else {
-                            //done!
-                            return null;
-                        }
+                        const signOutRedirectUrl = data && data.signOutRedirectUrl ? data.signOutRedirectUrl : 'login?logout=true';
+
+                        $window.location.replace(signOutRedirectUrl);
                     });
             },
 
@@ -247,8 +247,6 @@ angular.module('umbraco.services')
 
                 authResource.getCurrentUser()
                     .then(function (data) {
-
-                        var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "implicit" };
 
                         setCurrentUser(data);
 

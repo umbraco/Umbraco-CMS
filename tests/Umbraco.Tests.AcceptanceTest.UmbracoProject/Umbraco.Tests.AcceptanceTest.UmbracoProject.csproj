@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <!-- All C# files in the root of this project will be copied to the E2E/Acceptance Test application during build -->
+    <OutputType>Library</OutputType>
+    <RootNamespace>UmbracoProject</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Cms\Umbraco.Cms.csproj" />
+  </ItemGroup>
+</Project>

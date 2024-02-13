@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 /// <summary>
 ///     Recurring hosted service that executes the content history cleanup.
 /// </summary>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.ContentVersionCleanupJob instead.  This class will be removed in Umbraco 14.")]
 public class ContentVersionCleanup : RecurringHostedServiceBase
 {
     private readonly ILogger<ContentVersionCleanup> _logger;

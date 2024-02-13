@@ -1,0 +1,31 @@
+<div ng-controller="Umbraco.Editors.Webhooks.WebhookLogController as vm">
+  <table class="table table-hover" ng-if="!vm.loading">
+    <thead>
+      <tr>
+        <th></th>
+        <th><localize key="webhooks_webhookKey">Webhook key</localize></th>
+        <th><localize key="general_date">Date</localize></th>
+        <th><localize key="webhooks_url">Url</localize></th>
+        <th><localize key="webhooks_event">Event</localize></th>
+        <th><localize key="webhooks_retryCount">Retry count</localize></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="log in vm.logs track by log.key" ng-click="vm.openLogOverlay(log)" style="cursor: pointer;">
+        <td style="width: 20px;">
+          <umb-checkmark
+            ng-if="vm.isChecked(log)"
+            checked="vm.isChecked(log)"
+            size="m">
+          </umb-checkmark>
+          <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="!vm.isChecked(log)"></umb-icon>
+        </td>
+        <td>{{ log.webhookKey }}</td>
+        <td>{{ log.formattedLogDate }}</td>
+        <td>{{ log.url }}</td>
+        <td>{{ log.eventAlias }}</td>
+        <td>{{ log.retryCount }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

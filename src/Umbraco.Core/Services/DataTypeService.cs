@@ -612,6 +612,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             return _dataTypeRepository.FindUsages(id);
         }
 
+        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            return _dataTypeRepository.FindListViewUsages(id);
+        }
+
         private void Audit(AuditType type, int userId, int objectId)
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));
