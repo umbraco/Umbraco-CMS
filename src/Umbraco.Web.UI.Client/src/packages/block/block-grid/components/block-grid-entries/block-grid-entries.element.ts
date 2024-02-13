@@ -84,7 +84,11 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 					this._layoutEntries,
 					(x) => x.contentUdi,
 					(layoutEntry, index) =>
-						html`<umb-block-grid-entry .index=${index} .contentUdi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
+						html`<umb-block-grid-entry
+							class="umb-block-grid__layout-item"
+							.index=${index}
+							.contentUdi=${layoutEntry.contentUdi}
+							.layout=${layoutEntry}>
 						</umb-block-grid-entry>`,
 				)}
 				<uui-button-group>

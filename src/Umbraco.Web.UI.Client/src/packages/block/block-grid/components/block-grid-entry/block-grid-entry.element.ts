@@ -27,18 +27,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		if (!value) return;
 		this._contentUdi = value;
 		this._blockViewProps.contentUdi = value;
+		this.setAttribute('data-element-udi', value);
 		this.#context.setContentUdi(value);
 	}
 	private _contentUdi?: string | undefined;
 	//
 
 	#context = new UmbBlockGridEntryContext(this);
-
-	@state()
-	_contentElementTypeKey?: string;
-
-	@state()
-	_contentElementTypeAlias?: string;
 
 	@state()
 	_columnSpan?: number;
@@ -74,7 +69,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 		this.observe(this.#context.createPath, (createPath) => {
 			const oldValue = this._createPath;
-			console.log('createPath', createPath);
 			this._createPath = createPath;
 			this.requestUpdate('_createPath', oldValue);
 		});
@@ -121,6 +115,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.columnSpan,
 			(columnSpan) => {
 				this._columnSpan = columnSpan;
+				this.setAttribute('data-col-span', columnSpan ? columnSpan.toString() : '');
+				this.style.setProperty('--umb-block-grid--item-column-span', columnSpan ? columnSpan.toString() : '');
 			},
 			'columnSpan',
 		);
@@ -128,14 +124,20 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.rowSpan,
 			(rowSpan) => {
 				this._rowSpan = rowSpan;
+				this.setAttribute('data-row-span', rowSpan ? rowSpan.toString() : '');
+				this.style.setProperty('--umb-block-grid--item-row-span', rowSpan ? rowSpan.toString() : '');
 			},
 			'rowSpan',
 		);
 		this.observe(this.#context.contentElementTypeKey, (contentElementTypeKey) => {
-			this._contentElementTypeKey = contentElementTypeKey;
+			if (contentElementTypeKey) {
+				this.setAttribute('data-content-element-type-key', contentElementTypeKey);
+			}
 		});
 		this.observe(this.#context.contentElementTypeAlias, (contentElementTypeAlias) => {
-			this._contentElementTypeAlias = contentElementTypeAlias;
+			if (contentElementTypeAlias) {
+				this.setAttribute('data-content-element-type-alias', contentElementTypeAlias);
+			}
 		});
 	}
 
@@ -147,17 +149,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return this.contentUdi && this._createPath
 			? html`
 					<uui-button-inline-create href=${this._createPath}></uui-button-inline-create>
-					<div
-						class="umb-block-grid__layout-item"
-						data-element-udi=${ifDefined(this._contentUdi)}
-						data-content-element-type-key=${ifDefined(this._contentElementTypeKey)}
-						data-content-element-type-alias=${ifDefined(this._contentElementTypeAlias)}
-						data-col-span=${ifDefined(this._columnSpan ? this._columnSpan.toString() : '')}
-						data-row-span=${ifDefined(this._rowSpan ? this._rowSpan.toString() : '')}
-						style="
-							--umb-block-grid--item-column-span: ${ifDefined(this._columnSpan ? this._columnSpan.toString() : '')};
-							--umb-block-grid--item-row-span: ${ifDefined(this._rowSpan ? this._rowSpan.toString() : '')};
-						">
+					<div class="umb-block-grid__block">
 						<umb-extension-slot
 							type="blockEditorCustomView"
 							default-element=${'umb-ref-grid-block'}
