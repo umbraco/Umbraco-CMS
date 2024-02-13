@@ -103,7 +103,7 @@ public abstract class DocumentControllerBase : ContentControllerBase
             ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime => BadRequest(problemDetailsBuilder
                 .WithTitle("Unpublish time needs to be after the publish time")
                 .WithDetail(
-                    "Cannot handle a unpublish time that is not after the specified publish time.")
+                    "Cannot handle an unpublish time that is not after the specified publish time.")
                 .Build()),
             ContentPublishingOperationStatus.FailedBranch => BadRequest(problemDetailsBuilder
                 .WithTitle("Failed branch operation")
