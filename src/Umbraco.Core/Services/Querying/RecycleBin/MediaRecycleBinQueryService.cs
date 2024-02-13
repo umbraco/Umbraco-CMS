@@ -20,11 +20,11 @@ public class MediaRecycleBinQueryService : IMediaRecycleBinQueryService
         _relationService = relationService;
     }
 
-    public Task<Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>> GetOriginalParentAsync(Guid trashedMediaFolderId)
+    public Task<Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>> GetOriginalParentAsync(Guid trashedMediaId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
-        if (_entityService.Get(trashedMediaFolderId, UmbracoObjectTypes.Media) is not IDocumentEntitySlim entity)
+        if (_entityService.Get(trashedMediaId, UmbracoObjectTypes.Media) is not IMediaEntitySlim entity)
         {
             return Task.FromResult(Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.NotFound));
         }

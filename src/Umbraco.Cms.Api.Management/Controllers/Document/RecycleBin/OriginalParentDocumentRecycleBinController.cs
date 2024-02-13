@@ -16,13 +16,13 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
 [ApiVersion("1.0")]
-public class OriginalParentDocumentRecycleBinControllerBase : DocumentRecycleBinControllerBase
+public class OriginalParentDocumentRecycleBinController : DocumentRecycleBinControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDocumentRecycleBinQueryService _documentRecycleBinQueryService;
 
-    public OriginalParentDocumentRecycleBinControllerBase(
+    public OriginalParentDocumentRecycleBinController(
         IEntityService entityService,
         IAuthorizationService authorizationService,
         IDocumentPresentationFactory documentPresentationFactory,
@@ -38,6 +38,7 @@ public class OriginalParentDocumentRecycleBinControllerBase : DocumentRecycleBin
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DocumentItemResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> OriginalParent(Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
@@ -58,25 +59,9 @@ public class OriginalParentDocumentRecycleBinControllerBase : DocumentRecycleBin
 
         return getParentAttempt.Result is not null
             ? Ok(_documentPresentationFactory.CreateItemResponseModel(getParentAttempt.Result))
-            : Ok(null); // map this
+            : NotFound();
     }
 
     private IActionResult MapAttemptFailure(RecycleBinQueryResultType status)
-        => OperationStatusResult(status, problemDetailsBuilder => status switch
-        {
-            RecycleBinQueryResultType.NotFound => NotFound(problemDetailsBuilder
-                .WithTitle("The document could not be found")
-                .Build()),
-            RecycleBinQueryResultType.NotTrashed => BadRequest(problemDetailsBuilder
-                .WithTitle("The document is not trashed")
-                .WithDetail("The document needs to be trashed for the parent-before-recycled relation to be created.")
-                .Build()),
-            RecycleBinQueryResultType.NoParentRecycleRelation => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
-                .WithTitle("The parent relation could not be found")
-                .WithDetail("The relation between the parent and the document that should have been created when the document was deleted could not be found.")
-                .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
-                .WithTitle("Unknown recycle bin query type.")
-                .Build()),
-        });
+        => MapRecycleBinQueryAttemptFailure(status, "document");
 }

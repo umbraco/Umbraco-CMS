@@ -15,13 +15,13 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 
 [ApiVersion("1.0")]
-public class OriginalParentMediaRecycleBinControllerBase : MediaRecycleBinControllerBase
+public class OriginalParentMediaRecycleBinController : MediaRecycleBinControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly IMediaRecycleBinQueryService _mediaRecycleBinQueryService;
 
-    public OriginalParentMediaRecycleBinControllerBase(
+    public OriginalParentMediaRecycleBinController(
         IEntityService entityService,
         IAuthorizationService authorizationService,
         IMediaPresentationFactory mediaPresentationFactory,
@@ -37,6 +37,7 @@ public class OriginalParentMediaRecycleBinControllerBase : MediaRecycleBinContro
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MediaItemResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> OriginalParent(Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
@@ -57,25 +58,9 @@ public class OriginalParentMediaRecycleBinControllerBase : MediaRecycleBinContro
 
         return getParentAttempt.Result is not null
             ? Ok(_mediaPresentationFactory.CreateItemResponseModel(getParentAttempt.Result))
-            : Ok(null); // map this
+            : NotFound();
     }
 
     private IActionResult MapAttemptFailure(RecycleBinQueryResultType status)
-        => OperationStatusResult(status, problemDetailsBuilder => status switch
-        {
-            RecycleBinQueryResultType.NotFound => NotFound(problemDetailsBuilder
-                .WithTitle("The media item could not be found")
-                .Build()),
-            RecycleBinQueryResultType.NotTrashed => BadRequest(problemDetailsBuilder
-                .WithTitle("The media item is not trashed")
-                .WithDetail("The media item needs to be trashed for the parent-before-recycled relation to be created.")
-                .Build()),
-            RecycleBinQueryResultType.NoParentRecycleRelation => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
-                .WithTitle("The parent relation could not be found")
-                .WithDetail("The relation between the parent and the media item that should have been created when the media item was deleted could not be found.")
-                .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
-                .WithTitle("Unknown recycle bin query type.")
-                .Build()),
-        });
+        => MapRecycleBinQueryAttemptFailure(status, "media item");
 }

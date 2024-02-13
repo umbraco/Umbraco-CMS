@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Core.Services.Querying.RecycleBin;
 
 public interface IMediaRecycleBinQueryService
 {
-    Task<Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>> GetOriginalParentAsync(Guid trashedMediaFolderId);
+    Task<Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>> GetOriginalParentAsync(Guid trashedMediaId);
 }
