@@ -150,10 +150,9 @@ stages:
           vmImage: 'windows-latest'
         steps:
           - task: UseDotNet@2
-            displayName: Use .NET $(dotnetVersion)
+            displayName: Use .NET SDK from global.json
             inputs:
-              version: $(dotnetVersion)
-              includePreviewVersions: $(dotnetIncludePreviewVersions)
+              useGlobalJson: true
           - task: PowerShell@2
             displayName: Install DocFX
             inputs:
