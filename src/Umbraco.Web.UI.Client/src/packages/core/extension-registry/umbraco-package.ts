@@ -51,6 +51,6 @@ export interface UmbracoPackage {
 		 * @title The scopes for the package
 		 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap#scopes
 		 */
-		scopes?: Record<string, object>;
-	}
+		scopes?: Record<string, Record<string, string>>;
+	};
 }
