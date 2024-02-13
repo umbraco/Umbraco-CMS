@@ -58,21 +58,64 @@ public class IndexInitializer
         _contentTypeService = contentTypeService;
     }
 
+    [Obsolete("Use ctor that is not obsolete. This will be removed in Umbraco 15.")]
     public IndexInitializer(
         IShortStringHelper shortStringHelper,
         PropertyEditorCollection propertyEditors,
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IScopeProvider scopeProvider,
         ILoggerFactory loggerFactory,
-        IOptions<ContentSettings> contentSettings, IContentTypeService contentTypeService)
+        IOptions<ContentSettings> contentSettings,
+        ILocalizationService localizationService)
         : this(
-        shortStringHelper,
-        propertyEditors,
-        mediaUrlGenerators,
-        scopeProvider,
-        loggerFactory,
-        contentSettings,
-        StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(), contentTypeService)
+            shortStringHelper,
+            propertyEditors,
+            mediaUrlGenerators,
+            scopeProvider,
+            loggerFactory,
+            contentSettings,
+            localizationService, StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
+    {
+
+    }
+
+    [Obsolete("Use ctor that is not obsolete. This will be removed in Umbraco 15.")]
+    public IndexInitializer(
+        IShortStringHelper shortStringHelper,
+        PropertyEditorCollection propertyEditors,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IScopeProvider scopeProvider,
+        ILoggerFactory loggerFactory,
+        IOptions<ContentSettings> contentSettings,
+        IContentTypeService contentTypeService)
+        : this(
+            shortStringHelper,
+            propertyEditors,
+            mediaUrlGenerators,
+            scopeProvider,
+            loggerFactory,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(), contentTypeService)
+    {
+    }
+
+    [Obsolete("Use ctor that is not obsolete. This will be removed in Umbraco 15.")]
+    public IndexInitializer(
+        IShortStringHelper shortStringHelper,
+        PropertyEditorCollection propertyEditors,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IScopeProvider scopeProvider,
+        ILoggerFactory loggerFactory,
+        IOptions<ContentSettings> contentSettings)
+        : this(
+            shortStringHelper,
+            propertyEditors,
+            mediaUrlGenerators,
+            scopeProvider,
+            loggerFactory,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
     {
     }
 

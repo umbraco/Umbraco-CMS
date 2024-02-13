@@ -1,6 +1,4 @@
 using Examine;
-using Examine.Lucene.Providers;
-using Examine.Lucene.Search;
 using Examine.Search;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -13,11 +11,15 @@ namespace Umbraco.Cms.Api.Delivery.Services.QueryBuilders;
 internal sealed class ApiContentQuerySelectorBuilder
 {
     private readonly DeliveryApiSettings _deliveryApiSettings;
+    private readonly IApiContentQueryFactory _queryFactory;
     private readonly string _fallbackGuidValue;
 
-    public ApiContentQuerySelectorBuilder(DeliveryApiSettings deliveryApiSettings)
+    public ApiContentQuerySelectorBuilder(
+        DeliveryApiSettings deliveryApiSettings,
+        IApiContentQueryFactory queryFactory)
     {
         _deliveryApiSettings = deliveryApiSettings;
+        _queryFactory = queryFactory;
 
         // A fallback value is needed for Examine queries in case we don't have a value - we can't pass null or empty string
         // It is set to a random guid since this would be highly unlikely to yield any results
@@ -26,14 +28,7 @@ internal sealed class ApiContentQuerySelectorBuilder
 
     public IBooleanOperation Build(SelectorOption selectorOption, IIndex index, string culture, ProtectedAccess protectedAccess, bool preview)
     {
-        // Needed for enabling leading wildcards searches
-        BaseLuceneSearcher searcher = index.Searcher as BaseLuceneSearcher ?? throw new InvalidOperationException($"Index searcher must be of type {nameof(BaseLuceneSearcher)}.");
-
-        IQuery query = searcher.CreateQuery(
-            IndexTypes.Content,
-            BooleanOperation.And,
-            searcher.LuceneAnalyzer,
-            new LuceneSearchOptions { AllowLeadingWildcard = true });
+        IQuery query = _queryFactory.CreateApiContentQuery(index);
 
         IBooleanOperation selectorOperation = selectorOption.Values.Length == 1
             ? query.Field(selectorOption.FieldName, selectorOption.Values.First())

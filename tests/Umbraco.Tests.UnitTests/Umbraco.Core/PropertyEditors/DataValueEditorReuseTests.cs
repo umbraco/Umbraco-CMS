@@ -1,4 +1,3 @@
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -16,6 +15,7 @@ public class DataValueEditorReuseTests
 {
     private Mock<IDataValueEditorFactory> _dataValueEditorFactoryMock;
     private PropertyEditorCollection _propertyEditorCollection;
+    private DataValueReferenceFactoryCollection _dataValueReferenceFactories;
 
     [SetUp]
     public void SetUp()
@@ -32,6 +32,7 @@ public class DataValueEditorReuseTests
                 Mock.Of<IIOHelper>()));
 
         _propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
+        _dataValueReferenceFactories = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
 
         _dataValueEditorFactoryMock
             .Setup(m =>
@@ -40,6 +41,7 @@ public class DataValueEditorReuseTests
                 new DataEditorAttribute("a", "b", "c"),
                 new BlockListEditorDataConverter(),
                 _propertyEditorCollection,
+                _dataValueReferenceFactories,
                 Mock.Of<IDataTypeService>(),
                 Mock.Of<IContentTypeService>(),
                 Mock.Of<ILocalizedTextService>(),
@@ -95,7 +97,7 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>)),
+            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>());
@@ -116,7 +118,7 @@ public class DataValueEditorReuseTests
     {
         var blockListPropertyEditor = new BlockListPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>)),
+            _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
             Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>());

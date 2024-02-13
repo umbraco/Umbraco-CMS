@@ -40,7 +40,7 @@ public abstract class JsonPropertyIndexValueFactoryBase<TSerialized> : IProperty
 
     }
 
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
+    public virtual IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
         IProperty property,
         string? culture,
         string? segment,

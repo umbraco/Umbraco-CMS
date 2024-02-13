@@ -26,8 +26,8 @@
                         <umb-box-content>
 
                           <umb-control-group
-                                label="Url"
-                                description="The url to call when the webhook is triggered."
+                                label="@webhooks_url"
+                                description="@webhooks_urlDescription"
                                 alias="webhookUrl"
                                 required="true">
 
@@ -45,8 +45,8 @@
                           </umb-control-group>
 
                           <umb-control-group
-                              label="Events"
-                              description="The events for which the webhook should be triggered."
+                              label="@webhooks_events"
+                              description="@webhooks_eventDescription"
                               alias="webhookEvents"
                               required="true">
 
@@ -70,8 +70,8 @@
                           </umb-control-group>
 
                           <umb-control-group
-                              label="Content Type"
-                              description="Only trigger the webhook for a specific content type."
+                              label="@webhooks_contentType"
+                              description="@webhooks_contentTypeDescription"
                               alias="webhookContentType">
 
                             <umb-node-preview
@@ -94,13 +94,13 @@
                                 <localize key="general_add">Add</localize>
                               </span>
                               <span ng-if="!vm.webhook.events || vm.webhook.events.length === 0">
-                                Please select an event first.
+                                  {{vm.labels.selectEventFirst}}
                               </span>
                             </button>
 
                           </umb-control-group>
 
-                          <umb-control-group label="Enabled" description="Is the webhook enabled?" alias="webhookEnabled">
+                          <umb-control-group label="@webhooks_enabled" description="@webhooks_enabledDescription" alias="webhookEnabled">
                             <umb-toggle
                                 checked="vm.webhook.enabled"
                                 on-click="vm.webhook.enabled = !vm.webhook.enabled">
@@ -108,16 +108,16 @@
                           </umb-control-group>
 
                           <umb-control-group
-                              label="Headers"
-                              description="Custom headers to include in the webhook request."
+                              label="@webhooks_headers"
+                              description="@webhooks_headersDescription"
                               alias="webhookHeaders">
 
                             <div class="umb-property-editor--limit-width">
                               <table class="table table-hover">
                                 <thead>
                                   <tr>
-                                    <th>Name</th>
-                                    <th>Value</th>
+                                    <th>{{vm.labels.headerName}}</th>
+                                    <th>{{vm.labels.headerValue}}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
