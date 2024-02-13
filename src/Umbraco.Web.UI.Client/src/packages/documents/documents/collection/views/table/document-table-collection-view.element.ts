@@ -47,7 +47,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	@state()
-	private _selection: Array<string | null> = [];
+	private _selection: Array<string> = [];
 
 	private _collectionContext?: UmbDefaultCollectionContext<UmbDocumentTreeItemModel, UmbDocumentCollectionFilterModel>;
 
@@ -134,7 +134,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			:host {
 				display: block;
 				box-sizing: border-box;
-				height: 100%;
+				height: auto;
 				width: 100%;
 				padding: var(--uui-size-space-3) 0;
 			}
