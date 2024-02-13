@@ -15,7 +15,8 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
 		return modelEntry.contentUdi;
 	},
 	identifier: 'block-grid-editor',
-	itemSelector: 'umb-block-grid-entry',
+	itemSelector: '.umb-block-grid__layout-item',
+	//ignorerSelector: '', // No ignorerSelector, as we want to ignore nothing.
 	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
 };
 

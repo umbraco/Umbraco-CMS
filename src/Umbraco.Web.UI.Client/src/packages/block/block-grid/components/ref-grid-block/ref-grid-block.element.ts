@@ -1,30 +1,30 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockViewUrlsPropType } from '@umbraco-cms/backoffice/block';
-import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
-import '../block-grid-areas-container/index.js';
+import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * @element umb-ref-grid-block
  */
 @customElement('umb-ref-grid-block')
-export class UmbRefGridBlockElement extends UmbLitElement {
-	//
-	@property({ attribute: false })
-	label?: string;
-
-	@property({ attribute: false })
-	urls?: UmbBlockViewUrlsPropType;
-
+export class UmbRefGridBlockElement extends UUIRefNodeElement {
 	render() {
-		return html`<uui-ref-node standalone .name=${this.label ?? ''} href=${this.urls?.editContent ?? ''}>
-			<umb-block-grid-areas-container></umb-block-grid-areas-container>
-		</uui-ref-node>`;
+		return html`
+			${super.render()}
+			<div class="break"></div>
+			<slot name="areas"></slot>
+		`;
 	}
 
 	static styles = [
+		...UUIRefNodeElement.styles,
 		css`
-			uui-ref-node {
+			:host {
 				min-height: var(--uui-size-16);
+				flex-flow: row wrap;
+			}
+
+			.break {
+				flex-basis: 100%;
+				height: 0;
 			}
 		`,
 	];

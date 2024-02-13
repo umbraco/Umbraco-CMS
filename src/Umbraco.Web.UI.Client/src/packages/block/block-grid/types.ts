@@ -12,7 +12,24 @@ export interface UmbBlockGridTypeModel extends UmbBlockTypeBaseModel {
 	rowMaxSpan: number;
 	thumbnail?: string;
 	areaGridColumns?: number;
-	areas: Array<any>;
+	areas: Array<UmbBlockGridTypeAreaType>;
+}
+
+export interface UmbBlockGridTypeAreaType {
+	key: string;
+	alias: string;
+	colSpan?: number;
+	rowSpan?: number;
+	minAllowed?: number;
+	maxAllowed?: number;
+	specifiedAllowance?: Array<UmbBlockGridTypeAreaTypePermission>;
+}
+
+export interface UmbBlockGridTypeAreaTypePermission {
+	elementTypeKey?: string;
+	groupKey?: string;
+	minAllowed?: number;
+	maxAllowed?: number;
 }
 
 export interface UmbBlockGridTypeGroupType {

@@ -162,6 +162,7 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 				(areaType) => {
 					const hostEl = this.getHostElement() as HTMLElement | undefined;
 					if (!hostEl) return;
+					console.log('area', areaType);
 					hostEl.setAttribute('data-area-alias', areaType?.alias ?? '');
 					hostEl.setAttribute('data-area-col-span', areaType?.colSpan ?? '');
 					hostEl.setAttribute('data-area-row-span', areaType?.rowSpan ?? '');

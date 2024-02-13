@@ -2,7 +2,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import '../ref-grid-block/index.js';
+import '../block-grid-block-view/index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
 
 /**
@@ -108,9 +108,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 	}
 
+	/*
 	createRenderRoot() {
 		return this;
 	}
+	*/
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -146,17 +148,17 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderRefBlock() {
-		return html`<umb-ref-grid-block .contentUdi=${this.contentUdi} .label=${this._label}></umb-ref-grid-block>`;
+		return html`<umb-block-grid-block .contentUdi=${this.contentUdi} .label=${this._label}></umb-block-grid-block>`;
 	}
 
 	#renderBlock() {
 		return this.contentUdi && this._createPath
 			? html`
 					<uui-button-inline-create href=${this._createPath}></uui-button-inline-create>
-					<div class="umb-block-grid__block">
+					<div class="umb-block-grid__block" part="umb-block-grid__block">
 						<umb-extension-slot
 							type="blockEditorCustomView"
-							default-element=${'umb-ref-grid-block'}
+							default-element=${'umb-block-grid-block'}
 							.props=${this._blockViewProps}
 							>${this.#renderRefBlock()}</umb-extension-slot
 						>

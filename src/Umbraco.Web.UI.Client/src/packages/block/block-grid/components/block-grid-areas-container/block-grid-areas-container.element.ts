@@ -1,6 +1,6 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../context/block-grid-manager.context.js';
-import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridLayoutAreaItemModel } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridTypeAreaType } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 
 import '../block-grid-entries/index.js';
@@ -15,7 +15,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 	#styleElement?: HTMLLinkElement;
 
 	@state()
-	_areas?: Array<UmbBlockGridLayoutAreaItemModel> = [];
+	_areas?: Array<UmbBlockGridTypeAreaType> = [];
 
 	@state()
 	_areaGridColumns?: number;
