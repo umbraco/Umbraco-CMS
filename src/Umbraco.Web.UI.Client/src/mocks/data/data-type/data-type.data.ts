@@ -649,12 +649,21 @@ export const data: Array<UmbMockDataTypeModel> = [
 						areas: [
 							{
 								key: 'area1_key',
-								alias: 'area1'
+								alias: 'area1_alias',
 								colSpan: 6,
 								rowSpan: 1,
-                minAllowed: 1,
-                maxAllowed: 2,
-                specifiedAllowance: []
+								minAllowed: 1,
+								maxAllowed: 2,
+								specifiedAllowance: [],
+							},
+							{
+								key: 'area2_key',
+								alias: 'area2_alias',
+								colSpan: 6,
+								rowSpan: 1,
+								minAllowed: 1,
+								maxAllowed: 2,
+								specifiedAllowance: [],
 							},
 						],
 					},
