@@ -129,7 +129,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 Alias = x.Alias,
                 Value = x.GetValue()
             }),
-            Variants = content.PublishedCultures.Select(culture => new VariantModel()
+            Variants = content.AvailableCultures.Select(culture => new VariantModel()
             {
                 Name = content.GetPublishName(culture) ?? string.Empty,
                 Culture = culture,
