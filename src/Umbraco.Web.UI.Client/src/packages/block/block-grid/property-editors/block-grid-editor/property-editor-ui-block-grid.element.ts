@@ -4,15 +4,12 @@ import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { html, customElement, property, state, css, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type {
-	UmbBlockGridLayoutModel,
-	UmbBlockGridTypeModel,
-	UmbBlockGridValueModel,
-	UmbBlockTypeGroup,
-} from '@umbraco-cms/backoffice/block';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbBlockGridTypeModel, UmbBlockGridValueModel, UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import '../../components/block-grid-entries/index.js';
 
 /**
@@ -77,23 +74,15 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#context.layouts, (layouts) => {
 			this._value = { ...this._value, layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS]: layouts } };
-			// Notify that the value has changed.
-			//console.log('layout changed', this._value);
-			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
-			this._rootLayouts = layouts;
-			this.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
 		});
 		this.observe(this.#context.contents, (contents) => {
 			this._value = { ...this._value, contentData: contents };
-			// Notify that the value has changed.
-			//console.log('content changed', this._value);
-			this.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
 		});
 		this.observe(this.#context.settings, (settings) => {
 			this._value = { ...this._value, settingsData: settings };
-			// Notify that the value has changed.
-			//console.log('settings changed', this._value);
-			this.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
 		});
 	}
 

@@ -55,7 +55,7 @@ function setupPreventEvent(element: Element) {
 	//(element as HTMLElement).setAttribute('draggable', 'false');
 }
 function destroyPreventEvent(element: Element) {
-	element.draggable = false;
+	(element as HTMLElement).draggable = false;
 	//element.removeAttribute('draggable');
 }
 
