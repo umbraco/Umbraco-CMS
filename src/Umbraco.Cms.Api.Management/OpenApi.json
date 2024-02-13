@@ -26433,6 +26433,14 @@
             "type": "integer",
             "format": "int32"
           },
+          "owner": {
+            "type": "string",
+            "nullable": true
+          },
+          "updater": {
+            "type": "string",
+            "nullable": true
+          },
           "documentType": {
             "oneOf": [
               {
@@ -28109,6 +28117,10 @@
           "sortOrder": {
             "type": "integer",
             "format": "int32"
+          },
+          "owner": {
+            "type": "string",
+            "nullable": true
           },
           "mediaType": {
             "oneOf": [
