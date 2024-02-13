@@ -20,7 +20,7 @@ test.describe('Created packages tests', () => {
     // Act
     await umbracoUi.package.clickCreatePackageButton();
     await umbracoUi.package.enterPackageName(packageName);
-    await umbracoUi.package.clickSaveButton();
+    await umbracoUi.package.clickSaveChangesToPackageButton();
 
     // Assert
     await umbracoUi.package.isPackageNameVisible(packageName);
@@ -36,7 +36,7 @@ test.describe('Created packages tests', () => {
     // Act
     await umbracoUi.package.clickExistingPackageName(wrongPackageName);
     await umbracoUi.package.enterPackageName(packageName);
-    await umbracoUi.package.clickSaveButton();
+    await umbracoUi.package.clickSaveChangesToPackageButton();
 
     // Assert
     await umbracoUi.package.isPackageNameVisible(packageName);
