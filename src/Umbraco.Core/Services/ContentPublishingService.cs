@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Scoping;
@@ -49,14 +50,13 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
         if (content.ContentType.VariesByCulture())
         {
-
             if (cultures.Any() is false)
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CultureMissing, new ContentPublishingResult());
             }
 
-            if (cultures.Any(x=>x == "*"))
+            if (cultures.Any(x => x == "*"))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
@@ -64,7 +64,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
         else
         {
-            if (cultures.Length != 1 || cultures.Any(x=>x != "*"))
+            if (cultures.Length != 1 || cultures.Any(x => x != "*"))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
@@ -94,10 +94,8 @@ internal sealed class ContentPublishingService : IContentPublishingService
         }
         else if(cultureAndSchedule.Schedules.FullSchedule.Any())
         {
-
-
             _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
-
+            result = new PublishResult(PublishResultType.SuccessPublish, new EventMessages(), content);
         }
 
         scope.Complete();
