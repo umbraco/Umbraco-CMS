@@ -14,6 +14,8 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
     private readonly IMediaService _mediaService;
     private readonly IMediaPermissionService _mediaPermissionService;
 
+    protected override Guid DefaultListViewKey => Constants.DataTypes.Guids.ListViewMediaGuid;
+
     public MediaListViewService(
         IMediaService mediaService,
         IMediaTypeService mediaTypeService,
@@ -26,13 +28,33 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
         _mediaPermissionService = mediaPermissionService;
     }
 
-    protected override Guid DefaultListViewKey => Constants.DataTypes.Guids.ListViewMediaGuid;
+    public async Task<Attempt<ListViewPagedModel<IMedia>?, ContentCollectionOperationStatus>> GetListViewItemsByKeyAsync(
+        IUser user,
+        Guid? key,
+        Guid? dataTypeKey,
+        string orderBy,
+        Direction orderDirection,
+        string? filter,
+        int skip,
+        int take)
+    {
+        IMedia? media = key.HasValue
+            ? _mediaService.GetById(key.Value)
+            : null;
+
+        if (key.HasValue && media is null)
+        {
+            return Attempt.FailWithStatus<ListViewPagedModel<IMedia>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotFound, null);
+        }
+
+        return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
+    }
 
     protected override async Task<PagedModel<IMedia>> GetPagedChildrenAsync(int id, IQuery<IMedia>? filter, Ordering? ordering, int skip, int take)
     {
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-        var items = await Task.FromResult(_mediaService.GetPagedChildren(
+        IEnumerable<IMedia> items = await Task.FromResult(_mediaService.GetPagedChildren(
             id,
             pageNumber,
             pageSize,
@@ -66,30 +88,5 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
         // return isAuthorized;
 
         return accessStatus == MediaAuthorizationStatus.Success;
-    }
-
-    public async Task<Attempt<ListViewPagedModel<IMedia>?, ContentCollectionOperationStatus>> GetListViewItemsByKeyAsync(
-        IUser user,
-        Guid? key,
-        Guid? dataTypeKey,
-        string orderBy,
-        Direction orderDirection,
-        string? filter,
-        int skip,
-        int take)
-    {
-        IMedia? media = null;
-
-        if (key.HasValue)
-        {
-            media = _mediaService.GetById(key.Value);
-
-            if (media == null)
-            {
-                return Attempt.FailWithStatus<ListViewPagedModel<IMedia>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotFound, null);
-            }
-        }
-
-        return await GetListViewResultAsync(user, media, dataTypeKey, orderBy, null, orderDirection, filter, skip, take);
     }
 }

@@ -15,6 +15,8 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
     private readonly IContentService _contentService;
     private readonly IContentPermissionService _contentPermissionService;
 
+    protected override Guid DefaultListViewKey => Constants.DataTypes.Guids.ListViewContentGuid;
+
     public ContentListViewService(
         IContentService contentService,
         IContentTypeService contentTypeService,
@@ -27,7 +29,25 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
         _contentPermissionService = contentPermissionService;
     }
 
-    protected override Guid DefaultListViewKey => Constants.DataTypes.Guids.ListViewContentGuid;
+    public async Task<Attempt<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>> GetListViewItemsByKeyAsync(
+        IUser user,
+        Guid key,
+        Guid? dataTypeKey,
+        string orderBy,
+        string? orderCulture,
+        Direction orderDirection,
+        string? filter,
+        int skip,
+        int take)
+    {
+        IContent? content = _contentService.GetById(key);
+        if (content == null)
+        {
+            return Attempt.FailWithStatus<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotFound, null);
+        }
+
+        return await GetListViewResultAsync(user, content, dataTypeKey, orderBy, orderCulture, orderDirection, filter, skip, take);
+    }
 
     protected override async Task<PagedModel<IContent>> GetPagedChildrenAsync(
         int id,
@@ -38,7 +58,7 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
     {
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
-        var items = await Task.FromResult(_contentService.GetPagedChildren(
+        IEnumerable<IContent> items = await Task.FromResult(_contentService.GetPagedChildren(
             id,
             pageNumber,
             pageSize,
@@ -74,25 +94,5 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
         // return isAuthorized;
 
         return accessStatus == ContentAuthorizationStatus.Success;
-    }
-
-    public async Task<Attempt<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>> GetListViewItemsByKeyAsync(
-        IUser user,
-        Guid key,
-        Guid? dataTypeKey,
-        string orderBy,
-        string? orderCulture,
-        Direction orderDirection,
-        string? filter,
-        int skip,
-        int take)
-    {
-        IContent? content = _contentService.GetById(key);
-        if (content == null)
-        {
-            return Attempt.FailWithStatus<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotFound, null);
-        }
-
-        return await GetListViewResultAsync(user, content, dataTypeKey, orderBy, orderCulture, orderDirection, filter, skip, take);
     }
 }
