@@ -72,7 +72,6 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
 
         private IEnumerable<string> ParseConfiguredUdisToGuids(IEnumerable<string> stringUdis)
         {
-            var configuredEntityType = (ConfigurationObject as MultiNodePickerConfiguration)?.Filter;
             foreach (var stringUdi in stringUdis)
             {
                 if (UdiParser.TryParse(stringUdi, out GuidUdi? guidUdi) is false)
