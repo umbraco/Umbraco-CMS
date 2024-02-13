@@ -64,6 +64,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	_blockViewProps: UmbBlockViewPropsType<UmbBlockGridLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
 
+	#updateBlockViewProps(incoming: Partial<UmbBlockViewPropsType<UmbBlockGridLayoutModel>>) {
+		this._blockViewProps = { ...this._blockViewProps, ...incoming };
+		this.requestUpdate('_blockViewProps');
+	}
+
 	constructor() {
 		super();
 
@@ -75,19 +80,19 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this._hasSettings = !!settingsElementTypeKey;
 		});
 		this.observe(this.#context.label, (label) => {
-			this._blockViewProps.label = label;
+			this.#updateBlockViewProps({ label });
 			this._label = label;
 		});
 
 		// Data:
 		this.observe(this.#context.layout, (layout) => {
-			this._blockViewProps.layout = layout;
+			this.#updateBlockViewProps({ layout });
 		});
 		this.observe(this.#context.content, (content) => {
-			this._blockViewProps.content = content;
+			this.#updateBlockViewProps({ content });
 		});
 		this.observe(this.#context.settings, (settings) => {
-			this._blockViewProps.settings = settings;
+			this.#updateBlockViewProps({ settings });
 		});
 
 		// Paths:
@@ -98,13 +103,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 		this.observe(this.#context.workspaceEditContentPath, (path) => {
 			this._workspaceEditContentPath = path;
-			this._blockViewProps.urls.editContent = path;
-			this.requestUpdate('_blockViewProps');
+			this.#updateBlockViewProps({ urls: { ...this._blockViewProps.urls, editContent: path } });
 		});
 		this.observe(this.#context.workspaceEditSettingsPath, (path) => {
 			this._workspaceEditSettingsPath = path;
-			this._blockViewProps.urls.editSettings = path;
-			this.requestUpdate('_blockViewProps');
+			this.#updateBlockViewProps({ urls: { ...this._blockViewProps.urls, editSettings: path } });
 		});
 	}
 

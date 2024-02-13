@@ -51,7 +51,8 @@ function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) 
 	});
 }
 function setupPreventEvent(element: Element) {
-	(element as HTMLElement).draggable = false;
+	//(element as HTMLElement).draggable = false;
+	(element as HTMLElement).setAttribute('draggable', 'false');
 }
 function destroyPreventEvent(element: Element) {
 	element.removeAttribute('draggable');
@@ -277,7 +278,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
-			element.draggable = true;
+			console.log('— setup', element);
+			//element.draggable = true;
+			(element as HTMLElement).setAttribute('draggable', 'true');
 			element.addEventListener('dragstart', this.#handleDragStart);
 			element.addEventListener('dragend', this.#handleDragEnd);
 		}
