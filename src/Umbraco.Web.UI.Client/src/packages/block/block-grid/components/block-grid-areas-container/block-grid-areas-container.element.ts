@@ -5,10 +5,10 @@ import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice
 
 import '../block-grid-entries/index.js';
 /**
- * @element umb-block-grid-area-container
+ * @element umb-block-grid-areas-container
  */
-@customElement('umb-block-grid-area-container')
-export class UmbBlockGridAreaContainerElement extends UmbLitElement {
+@customElement('umb-block-grid-areas-container')
+export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 	//
 	#styleElement?: HTMLLinkElement;
 
@@ -78,10 +78,10 @@ export class UmbBlockGridAreaContainerElement extends UmbLitElement {
 	];
 }
 
-export default UmbBlockGridAreaContainerElement;
+export default UmbBlockGridAreasContainerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-grid-area-container': UmbBlockGridAreaContainerElement;
+		'umb-block-grid-areas-container': UmbBlockGridAreasContainerElement;
 	}
 }

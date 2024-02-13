@@ -17,7 +17,7 @@ export class UmbRefGridBlockElement extends UmbLitElement {
 
 	render() {
 		return html`<uui-ref-node standalone .name=${this.label ?? ''} href=${this.urls?.editContent ?? ''}>
-			<umb-block-grid-area-container></umb-block-grid-area-container>
+			<umb-block-grid-areas-container></umb-block-grid-areas-container>
 		</uui-ref-node>`;
 	}
 
