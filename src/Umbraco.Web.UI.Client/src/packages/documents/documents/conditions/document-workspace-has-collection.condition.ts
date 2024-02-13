@@ -20,9 +20,8 @@ export class UmbDocumentWorkspaceHasCollectionCondition extends UmbBaseControlle
 		// Specifically, `tabName`, `icon` and `showContentFirst` (can it change the manifest's position/weighting?)
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-			this.observe(context.structure.ownerContentType(), (contentType) => {
-				// TODO: [LK] Replace this check once the `.collection` is available from the Management API.
-				if (contentType?.unique === 'simple-document-type-id') {
+			this.observe(context.contentTypeHasCollection, (hasCollection) => {
+				if (hasCollection) {
 					this.permitted = true;
 					this.#onChange();
 				}
