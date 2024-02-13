@@ -9,7 +9,7 @@ const importMap = createImportMap({ rootDir: '', additionalImports: {} });
 let moduleList = '';
 
 for (const [src, dest] of Object.entries(importMap.imports)) {
-	if (src === '.' || !dest || src.includes('examples')) continue;
+	if (src === '.' || !dest) continue;
 	moduleList += `${src} ${dest}\n`;
 }
 

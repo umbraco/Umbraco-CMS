@@ -159,8 +159,8 @@
       "@umbraco-cms/backoffice/dynamic-root": [
         "./src/packages/dynamic-root/index.ts"
       ],
-      "@umbraco-cms/backoffice/logviewer": [
-        "./src/packages/settings/logviewer/index.ts"
+      "@umbraco-cms/backoffice/log-viewer": [
+        "./src/packages/log-viewer/index.ts"
       ],
       "@umbraco-cms/backoffice/relation-type": [
         "./src/packages/relations/relation-types/index.ts"
@@ -221,9 +221,7 @@
         "./src/external/tinymce/index.ts"
       ],
       "@umbraco-cms/backoffice/external/uui": ["./src/external/uui/index.ts"],
-      "@umbraco-cms/backoffice/external/uuid": ["./src/external/uuid/index.ts"],
-      "@umbraco-cms/backoffice/examples/*": ["./examples/*/index.ts"],
-      "@umbraco-cms/backoffice/examples": ["./examples/index.ts"]
+      "@umbraco-cms/backoffice/external/uuid": ["./src/external/uuid/index.ts"]
     }
   },
   "include": [
