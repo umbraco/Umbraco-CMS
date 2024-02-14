@@ -30,7 +30,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 [DisableBrowserCache]
 [UmbracoRequireHttps]
-[CheckIfUserTicketDataIsStale]
 [MiddlewareFilter(typeof(UnhandledExceptionLoggerFilter))]
 public abstract class UmbracoAuthorizedApiController : UmbracoApiController
 {

@@ -74,6 +74,27 @@ public static class BackOfficeAuthBuilderExtensions
             {
                 options.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            })
+            // FIXME: Only use 1 type of cookie, both are no longer needed.
+            // Add our custom schemes which are cookie handlers
+            .AddCookie(Constants.Security.BackOfficeAuthenticationType)
+            .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
+            {
+                o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            })
+
+            // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
+            // they don't have to worry about manually adding this scheme or modifying the sign in manager
+            .AddCookie(Constants.Security.BackOfficeTwoFactorAuthenticationType, o =>
+            {
+                o.Cookie.Name = Constants.Security.BackOfficeTwoFactorAuthenticationType;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            })
+            .AddCookie(Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType, o =>
+            {
+                o.Cookie.Name = Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
 
         return builder;

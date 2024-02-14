@@ -13,8 +13,31 @@ using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
 
-public static class UmbracoBuilderExtensions
+public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Adds all required components to run the Umbraco back office
+    /// </summary>
+    private static IUmbracoBuilder
+        AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) => builder
+        .AddBackOfficeAuthentication();
+
+    // public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
+    // {
+    //     builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
+    //     return builder;
+    // }
+
+    // /// <summary>
+    // ///     Adds Umbraco preview support
+    // /// </summary>
+    // public static IUmbracoBuilder AddPreviewSupport(this IUmbracoBuilder builder)
+    // {
+    //     builder.Services.AddSignalR();
+    //
+    //     return builder;
+    // }
+
     public static IUmbracoBuilder AddUmbracoManagementApi(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
@@ -25,6 +48,7 @@ public static class UmbracoBuilderExtensions
         {
             ModelsBuilderBuilderExtensions.AddModelsBuilder(builder)
                 .AddJson()
+                // .AddBackOffice()
                 .AddNewInstaller()
                 .AddUpgrader()
                 .AddSearchManagement()

@@ -176,14 +176,6 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
 
                 await securityStampValidator.ValidateAsync(ctx);
 
-                // This might have been called from GetRemainingTimeoutSeconds, in this case we don't want to ensure valid session
-                // since that in it self will keep the session valid since we renew the lastVerified date.
-                // Similarly don't renew the token
-                if (IsRemainingSecondsRequest(ctx))
-                {
-                    return;
-                }
-
                 // This relies on IssuedUtc, so call it before updating it.
                 await EnsureValidSessionId(ctx);
 
@@ -317,21 +309,5 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 context.ShouldRenew = true;
             }
         }
-    }
-
-    private bool IsRemainingSecondsRequest(CookieValidatePrincipalContext context)
-    {
-        RouteValueDictionary routeValues = context.HttpContext.Request.RouteValues;
-        if (routeValues.TryGetValue("controller", out var controllerName) &&
-            routeValues.TryGetValue("action", out var action))
-        {
-            if (controllerName?.ToString() == ControllerExtensions.GetControllerName<AuthenticationController>()
-                && action?.ToString() == nameof(AuthenticationController.GetRemainingTimeoutSeconds))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

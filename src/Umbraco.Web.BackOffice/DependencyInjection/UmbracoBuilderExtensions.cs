@@ -38,10 +38,8 @@ public static partial class UmbracoBuilderExtensions
             .AddWebComponents()
             .AddRuntimeMinifier()
             .AddBackOfficeCore()
-            .AddBackOfficeAuthentication()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()
-            .AddBackOfficeAuthorizationPolicies()
             .AddUmbracoProfiler()
             .AddMvcAndRazor(configureMvc)
             .AddWebServer()
@@ -55,7 +53,6 @@ public static partial class UmbracoBuilderExtensions
             .AddLogViewer()
             .AddExamine()
             .AddExamineIndexes()
-            .AddControllersWithAmbiguousConstructors()
             .AddSupplemenataryLocalizedTextFileSources();
 
     public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
@@ -119,19 +116,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
         builder.Services.AddTransient<BlockGridSampleHelper>();
         builder.Services.AddUnique<IWebhookPresentationFactory, WebhookPresentationFactory>();
-
-        return builder;
-    }
-
-    /// <summary>
-    ///     Adds explicit registrations for controllers with ambiguous constructors to prevent downstream issues for
-    ///     users who wish to use <see cref="Microsoft.AspNetCore.Mvc.Controllers.ServiceBasedControllerActivator" />
-    /// </summary>
-    public static IUmbracoBuilder AddControllersWithAmbiguousConstructors(
-        this IUmbracoBuilder builder)
-    {
-        builder.Services.TryAddTransient(sp =>
-            ActivatorUtilities.CreateInstance<CurrentUserController>(sp));
 
         return builder;
     }

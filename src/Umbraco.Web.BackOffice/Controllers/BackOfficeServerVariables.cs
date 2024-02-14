@@ -420,16 +420,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.Create(string.Empty))
                         },
                         {
-                            "authenticationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
-                                controller => controller.PostLogin(new LoginModel()))
-                        },
-                        {
                             "twoFactorLoginApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TwoFactorLoginController>(
                                 controller => controller.SetupInfo(string.Empty))
-                        },
-                        {
-                            "currentUserApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
-                                controller => controller.PostSetAvatar(new List<IFormFile>()))
                         },
                         {
                             "entityApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<EntityController>(
@@ -438,10 +430,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             "dataTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<DataTypeController>(
                                 controller => controller.GetById(0))
-                        },
-                        {
-                            "dashboardApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<DashboardController>(
-                                controller => controller.GetDashboard(string.Empty))
                         },
                         {
                             "logApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<LogController>(
