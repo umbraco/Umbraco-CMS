@@ -118,6 +118,16 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		this.value = this.keys.join(',');
 
 		this.dispatchEvent(new UmbChangeEvent());
+
+		// Read files to get their paths and add them to the file paths array.
+		items.forEach((item) => {
+			const reader = new FileReader();
+			reader.onload = () => {
+				console.log(reader.result);
+				this._filePaths.push(reader.result as string);
+			};
+			reader.readAsDataURL(item.file);
+		});
 	}
 
 	#handleBrowse() {
@@ -126,6 +136,9 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	render() {
+		this.multiple = true;
+		console.log(this._filePaths, this._currentFiles);
+		// return html`<div id="wrapper">${this.#renderFiles()}</div>`;
 		return html`<div id="wrapper">${this.#renderFilesWithPath()} ${this.#renderFilesUploaded()}</div>
 			${this.#renderDropzone()}${this.#renderButtonRemove()}`;
 	}
@@ -144,6 +157,42 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				<uui-button label="upload" @click="${this.#handleBrowse}">Upload file here</uui-button>
 			</uui-file-dropzone>
 		`;
+	}
+
+	#renderFiles() {
+		return repeat(
+			this._filePaths,
+			(path) => path,
+			(path) => this.#renderFile(path),
+		);
+	}
+
+	#renderFile(path: string) {
+		const type = this.#getFileTypeFromPath(path);
+
+		switch (type) {
+			case 'audio':
+				return html`<umb-input-upload-field-audio .path=${path}></umb-input-upload-field-audio>`;
+			case 'video':
+				return html`<umb-input-upload-field-video .path=${path}></umb-input-upload-field-video>`;
+			case 'image':
+				return html`<umb-input-upload-field-image .path=${path}></umb-input-upload-field-image>`;
+			case 'svg':
+				return html`<umb-input-upload-field-svg .path=${path}></umb-input-upload-field-svg>`;
+			case 'file':
+				return html`<umb-input-upload-field-file .path=${path}></umb-input-upload-field-file>`;
+		}
+	}
+
+	#getFileTypeFromPath(path: string): 'audio' | 'video' | 'image' | 'svg' | 'file' {
+		const extension = path.split('.').pop();
+		if (!extension) return 'file';
+		if (['mp3', 'weba', 'oga', 'opus'].includes(extension)) return 'audio';
+		if (['mp4', 'mov', 'webm', 'ogv'].includes(extension)) return 'video';
+		if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) return 'image';
+		if (['svg'].includes(extension)) return 'svg';
+
+		return 'file';
 	}
 
 	#renderFilesWithPath() {
@@ -203,7 +252,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 			#wrapper {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, 200px);
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 				gap: var(--uui-size-space-4);
 			}
 
