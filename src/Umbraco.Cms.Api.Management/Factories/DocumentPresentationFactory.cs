@@ -24,13 +24,15 @@ internal sealed class DocumentPresentationFactory
     private readonly IFileService _fileService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IPublicAccessService _publicAccessService;
+    private readonly TimeProvider _timeProvider;
 
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IDocumentUrlFactory documentUrlFactory,
         IFileService fileService,
         IContentTypeService contentTypeService,
-        IPublicAccessService publicAccessService)
+        IPublicAccessService publicAccessService,
+        TimeProvider timeProvider)
         : base(contentTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
@@ -38,6 +40,7 @@ internal sealed class DocumentPresentationFactory
         _fileService = fileService;
         _contentTypeService = contentTypeService;
         _publicAccessService = publicAccessService;
+        _timeProvider = timeProvider;
     }
 
     public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content)
@@ -131,6 +134,15 @@ internal sealed class DocumentPresentationFactory
 
             if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null)
             {
+                if (cultureAndScheduleRequestModel.Schedule.PublishTime <= _timeProvider.GetUtcNow())
+                {
+                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture, new CultureAndScheduleModel()
+                    {
+                        Schedules = contentScheduleCollection,
+                        CulturesToPublishImmediately = culturesToPublishImmediately,
+                    });
+                }
+
                 contentScheduleCollection.Add(new ContentSchedule(
                     cultureAndScheduleRequestModel.Culture ?? "*",
                     cultureAndScheduleRequestModel.Schedule.PublishTime.Value.UtcDateTime,
@@ -141,6 +153,15 @@ internal sealed class DocumentPresentationFactory
                 if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
                 {
                     return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, new CultureAndScheduleModel()
+                    {
+                        Schedules = contentScheduleCollection,
+                        CulturesToPublishImmediately = culturesToPublishImmediately,
+                    });
+                }
+
+                if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= _timeProvider.GetUtcNow())
+                {
+                    return Attempt.FailWithStatus(ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture, new CultureAndScheduleModel()
                     {
                         Schedules = contentScheduleCollection,
                         CulturesToPublishImmediately = culturesToPublishImmediately,

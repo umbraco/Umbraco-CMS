@@ -105,6 +105,16 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithDetail(
                     "Cannot handle an unpublish time that is not after the specified publish time.")
                 .Build()),
+            ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture => BadRequest(problemDetailsBuilder
+                .WithTitle("Publish time needs to be higher then the current time.")
+                .WithDetail(
+                    "Cannot handle an publish time that is not after the current server time.")
+                .Build()),
+            ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture => BadRequest(problemDetailsBuilder
+                .WithTitle("Unpublish time needs to be higher then the current time.")
+                .WithDetail(
+                    "Cannot handle an unpublish time that is not after the current server time.")
+                .Build()),
             ContentPublishingOperationStatus.FailedBranch => BadRequest(problemDetailsBuilder
                 .WithTitle("Failed branch operation")
                 .WithDetail("One or more items in the branch could not complete the operation.")
