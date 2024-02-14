@@ -42,6 +42,6 @@ export class UmbUniqueTreeStore
 	 * @memberof UmbUniqueTreeStore
 	 */
 	items(uniques: Array<string | null>) {
-		return this._data.asObservablePart((items) => items.filter((item) => uniques.includes(item.unique ?? '')));
+		return this._data.asObservablePart((items) => items.filter((item) => uniques.includes(item.unique)));
 	}
 }

@@ -2,21 +2,17 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	UmbNotificationDefaultData,
-	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
-import {
-	UMB_NOTIFICATION_CONTEXT,
-} from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationDefaultData, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
-import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 // Extend entityType base type?, so we are sure to have parentId?
 // TODO: switch to use EntityDetailItem ? if we can have such type?
 export class UmbEntityWorkspaceManager<
 	StoreType extends UmbEntityDetailStore<EntityDetailsType>,
-	EntityDetailsType extends UmbEntityTreeItemModel = ReturnType<StoreType['getScaffold']>,
+	EntityDetailsType extends UmbUniqueTreeItemModel = ReturnType<StoreType['getScaffold']>,
 > {
 	private _host;
 
