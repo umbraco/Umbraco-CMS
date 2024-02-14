@@ -90,6 +90,13 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
             .Select(p => p.Alias)
             .WhereNotNull();
 
+        // Map "creator" to "owner"
+        // TODO: Won't be necessary when we migrate "owner" to "creator" in the list view configuration
+        if (orderBy.InvariantEquals("creator"))
+        {
+            orderBy = "owner";
+        }
+
         if (listViewPropertyAliases.Contains(orderBy) == false && orderBy.InvariantEquals("name") == false)
         {
             return Attempt.FailWithStatus<Ordering?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.OrderByNotPartOfCollectionConfiguration, null);
