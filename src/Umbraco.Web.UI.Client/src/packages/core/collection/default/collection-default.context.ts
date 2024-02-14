@@ -62,6 +62,22 @@ export class UmbDefaultCollectionContext<
 		}
 	}
 
+	#config: UmbCollectionConfiguration = { pageSize: 50 };
+
+	/**
+	 * Sets the configuration for the collection.
+	 * @param {UmbCollectionConfiguration} config
+	 * @memberof UmbCollectionContext
+	 */
+	public setConfig(config: UmbCollectionConfiguration) {
+		this.#config = config;
+		this.#configure();
+	}
+
+	public getConfig() {
+		return this.#config;
+	}
+
 	/**
 	 * Sets the manifest for the collection.
 	 * @param {ManifestCollection} manifest
@@ -113,10 +129,10 @@ export class UmbDefaultCollectionContext<
 		this.requestCollection();
 	}
 
-	#configure(configuration: UmbCollectionConfiguration) {
+	#configure() {
 		this.selection.setMultiple(true);
-		this.pagination.setPageSize(configuration.pageSize!);
-		this.#filter.setValue({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
+		this.pagination.setPageSize(this.#config.pageSize!);
+		this.#filter.setValue({ ...this.#filter.getValue(), skip: 0, take: this.#config.pageSize });
 	}
 
 	#onPageChange = (event: UmbChangeEvent) => {
