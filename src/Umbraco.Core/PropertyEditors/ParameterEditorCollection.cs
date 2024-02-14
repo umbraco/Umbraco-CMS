@@ -7,7 +7,6 @@ public class ParameterEditorCollection : BuilderCollectionBase<IDataEditor>
 {
     public ParameterEditorCollection(DataEditorCollection dataEditors, ILegacyManifestParser legacyManifestParser)
         : base(() => dataEditors
-            .Where(x => (x.Type & EditorType.MacroParameter) > 0)
             .Union(legacyManifestParser.CombinedManifest.PropertyEditors))
     {
     }

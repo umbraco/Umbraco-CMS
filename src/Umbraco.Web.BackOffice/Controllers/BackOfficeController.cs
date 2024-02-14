@@ -7,14 +7,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
@@ -48,7 +46,6 @@ public class BackOfficeController : UmbracoController
     private readonly BackOfficeServerVariables _backOfficeServerVariables;
     private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
     private readonly IBackOfficeExternalLoginProviders _externalLogins;
-    private readonly IGridConfig _gridConfig;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IJsonSerializer _jsonSerializer;
@@ -79,7 +76,6 @@ public class BackOfficeController : UmbracoController
         IOptionsSnapshot<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
         ILocalizedTextService textService,
-        IGridConfig gridConfig,
         BackOfficeServerVariables backOfficeServerVariables,
         AppCaches appCaches,
         IBackOfficeSignInManager signInManager,
@@ -99,7 +95,6 @@ public class BackOfficeController : UmbracoController
         _globalSettings = globalSettings.Value;
         _hostingEnvironment = hostingEnvironment;
         _textService = textService;
-        _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
         _backOfficeServerVariables = backOfficeServerVariables;
         _appCaches = appCaches;
         _signInManager = signInManager;
@@ -322,11 +317,6 @@ public class BackOfficeController : UmbracoController
 
         return nestedDictionary;
     }
-
-    [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
-    [AngularJsonOnlyConfiguration]
-    [HttpGet]
-    public IEnumerable<IGridEditorConfig> GetGridConfig() => _gridConfig.EditorsConfig.Editors;
 
     /// <summary>
     ///     Returns the JavaScript object representing the static server variables javascript object

@@ -94,7 +94,7 @@ public class DataTypeTreeController : TreeController, ISearchableTree
                 {
                     IDataType dataType = dataTypes[dt.Id];
                     TreeNode node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name,
-                        dataType.Editor?.Icon, false);
+                        icon: null, false);
                     node.Path = dt.Path;
                     return node;
                 })

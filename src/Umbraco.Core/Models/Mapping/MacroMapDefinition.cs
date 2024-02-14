@@ -57,7 +57,7 @@ public class MacroMapDefinition : IMapDefinition
         target.View = source.MacroSource;
     }
 
-    // Umbraco.Code.MapAll -Value
+    // Umbraco.Code.MapAll -Value -View
     private void Map(IMacroProperty source, MacroParameter target, MapperContext context)
     {
         target.Alias = source.Alias;
@@ -75,8 +75,6 @@ public class MacroMapDefinition : IMapDefinition
                 "Could not resolve a parameter editor with alias {PropertyEditorAlias}, a textbox will be rendered in it's place",
                 source.EditorAlias);
         }
-
-        target.View = paramEditor?.GetValueEditor().View;
 
         // sets the parameter configuration to be the default configuration editor's configuration,
         // ie configurationEditor.DefaultConfigurationObject, prepared for the value editor

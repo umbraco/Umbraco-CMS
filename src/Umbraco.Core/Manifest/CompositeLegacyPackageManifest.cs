@@ -10,7 +10,6 @@ public class CompositeLegacyPackageManifest
     public CompositeLegacyPackageManifest(
         IReadOnlyList<IDataEditor> propertyEditors,
         IReadOnlyList<IDataEditor> parameterEditors,
-        IReadOnlyList<GridEditor> gridEditors,
         IReadOnlyList<LegacyManifestContentAppDefinition> contentApps,
         IReadOnlyList<LegacyManifestDashboard> dashboards,
         IReadOnlyList<LegacyManifestSection> sections,
@@ -19,7 +18,6 @@ public class CompositeLegacyPackageManifest
     {
         PropertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
         ParameterEditors = parameterEditors ?? throw new ArgumentNullException(nameof(parameterEditors));
-        GridEditors = gridEditors ?? throw new ArgumentNullException(nameof(gridEditors));
         ContentApps = contentApps ?? throw new ArgumentNullException(nameof(contentApps));
         Dashboards = dashboards ?? throw new ArgumentNullException(nameof(dashboards));
         Sections = sections ?? throw new ArgumentNullException(nameof(sections));
@@ -36,11 +34,6 @@ public class CompositeLegacyPackageManifest
     ///     Gets or sets the parameter editors listed in the manifest.
     /// </summary>
     public IReadOnlyList<IDataEditor> ParameterEditors { get; }
-
-    /// <summary>
-    ///     Gets or sets the grid editors listed in the manifest.
-    /// </summary>
-    public IReadOnlyList<GridEditor> GridEditors { get; }
 
     /// <summary>
     ///     Gets or sets the content apps listed in the manifest.

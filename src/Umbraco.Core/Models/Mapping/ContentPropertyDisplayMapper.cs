@@ -44,15 +44,10 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         // - could configuration also determines ValueType, everywhere?
         // - does it make any sense to use a IDataValueEditor without configuring it?
 
-        // configure the editor for display with configuration
-        IDataValueEditor? valEditor = dest.PropertyEditor?.GetValueEditor(dataType?.ConfigurationObject);
-
         // set the display properties after mapping
         dest.Alias = originalProp.Alias;
         dest.Description = originalProp.PropertyType?.Description;
         dest.Label = originalProp.PropertyType?.Name;
-        dest.HideLabel = valEditor?.HideLabel ?? false;
-        dest.LabelOnTop = originalProp.PropertyType?.LabelOnTop;
 
         // Set variation, the frontend needs this to determine if the content varies by segment
         dest.Variations = originalProp.PropertyType?.Variations ?? ContentVariation.Nothing;
@@ -63,21 +58,13 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         dest.Validation.Pattern = originalProp.PropertyType?.ValidationRegExp;
         dest.Validation.PatternMessage = originalProp.PropertyType?.ValidationRegExpMessage;
 
-        if (dest.PropertyEditor == null)
-        {
-            // display.Config = PreValueCollection.AsDictionary(preVals);
-            // if there is no property editor it means that it is a legacy data type
-            // we cannot support editing with that so we'll just render the readonly value view.
-            dest.View = "views/propertyeditors/readonlyvalue/readonlyvalue.html";
-        }
-        else
+        if (dest.PropertyEditor != null)
         {
             // let the property editor format the pre-values
             if (dataType != null)
             {
                 dest.Config = dest.PropertyEditor.GetConfigurationEditor().ToValueEditor(dataType.ConfigurationData);
             }
-            dest.View = valEditor?.View;
         }
 
         // Translate

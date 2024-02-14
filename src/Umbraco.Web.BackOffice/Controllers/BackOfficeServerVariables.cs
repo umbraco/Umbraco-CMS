@@ -347,7 +347,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                         {"externalLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
                         {"externalLinkLoginsUrl", _linkGenerator.GetPathByAction(nameof(BackOfficeController.LinkLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
-                        {"gridConfig", _linkGenerator.GetPathByAction(nameof(BackOfficeController.GetGridConfig), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
                         // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
                         {"serverVarsJs", _linkGenerator.GetPathByAction(nameof(BackOfficeController.Application), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })},
                         {"marketplaceUrl",  GetMarketplaceUrl()},

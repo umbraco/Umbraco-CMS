@@ -259,9 +259,9 @@ public class MacrosController : BackOfficeNotificationsController
         IDataEditor[] parameterEditors = _parameterEditorCollection.ToArray();
 
         var grouped = parameterEditors
-            .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? string.Empty : x.Group.ToLower())
+            .GroupBy(x => string.Empty)
             .OrderBy(x => x.Key)
-            .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
+            .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Alias).AsEnumerable());
 
         return grouped;
     }

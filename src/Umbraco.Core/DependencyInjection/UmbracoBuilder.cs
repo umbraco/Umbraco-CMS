@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Diagnostics;
 using Umbraco.Cms.Core.Dictionary;
@@ -200,9 +199,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // will be injected in controllers when needed to invoke rest endpoints on Our
             Services.AddUnique<IInstallationService, InstallationService>();
             Services.AddUnique<IUpgradeService, UpgradeService>();
-
-            // Grid config is not a real config file as we know them
-            Services.AddUnique<IGridConfig, GridConfig>();
 
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
             Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
