@@ -24429,6 +24429,94 @@
         },
         "additionalProperties": false
       },
+      "ContentCollectionResponseModelBaseDocumentValueModelDocumentVariantResponseModel": {
+        "required": [
+          "id",
+          "sortOrder",
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentVariantResponseModel"
+                }
+              ]
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "creator": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentCollectionResponseModelBaseMediaValueModelMediaVariantResponseModel": {
+        "required": [
+          "id",
+          "sortOrder",
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaVariantResponseModel"
+                }
+              ]
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "creator": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ContentForDocumentResponseModel": {
         "required": [
           "id",
@@ -26419,24 +26507,15 @@
       },
       "DocumentCollectionResponseModel": {
         "required": [
-          "documentType",
-          "sortOrder"
+          "documentType"
         ],
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentForDocumentResponseModel"
+            "$ref": "#/components/schemas/ContentCollectionResponseModelBaseDocumentValueModelDocumentVariantResponseModel"
           }
         ],
         "properties": {
-          "sortOrder": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "owner": {
-            "type": "string",
-            "nullable": true
-          },
           "updater": {
             "type": "string",
             "nullable": true
@@ -28104,24 +28183,15 @@
       },
       "MediaCollectionResponseModel": {
         "required": [
-          "mediaType",
-          "sortOrder"
+          "mediaType"
         ],
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentForMediaResponseModel"
+            "$ref": "#/components/schemas/ContentCollectionResponseModelBaseMediaValueModelMediaVariantResponseModel"
           }
         ],
         "properties": {
-          "sortOrder": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "owner": {
-            "type": "string",
-            "nullable": true
-          },
           "mediaType": {
             "oneOf": [
               {
