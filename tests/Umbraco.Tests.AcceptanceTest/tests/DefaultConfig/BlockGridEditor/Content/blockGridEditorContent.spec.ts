@@ -346,7 +346,7 @@ test.describe('BlockGridEditorContent', () => {
 
     // Selects the created image for the block
     await page.locator('[data-content-element-type-key="' + element['key'] + '"]').click();
-    await page.locator('[data-element="property-image"]').locator('[key="' + ConstantHelper.buttons.add + '"]').click();
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
     await page.locator('[data-element="media-grid"] >> [title="' + imageName + '"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.select));
     await page.locator('[label="Submit"]').click();
@@ -390,7 +390,7 @@ test.describe('BlockGridEditorContent', () => {
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
 
       // Assert
-      await umbracoUi.getSuccessNotification();
+      await umbracoUi.isSuccessNotificationVisible();
       // Checks if there are two blocks in the area
       await expect(page.locator('[data-element="property-' + blockGridAlias + '"]').locator('umb-block-grid-entry')).toHaveCount(2);
 
@@ -458,10 +458,11 @@ test.describe('BlockGridEditorContent', () => {
       await page.locator('[title="Delete"]').nth(2).click();
       await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey('actions_delete'));
 
-      await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
+      await page.waitForTimeout(2000);
+      await page.getByRole('button', { name: 'Save and publish' }).click();
 
       // Assert
-      await umbracoUi.getSuccessNotification();
+      await umbracoUi.isSuccessNotificationVisible();
       // Checks if there are two blocks in the area
       await expect(page.locator('[data-element="property-' + blockGridAlias + '"]').locator('umb-block-grid-entry')).toHaveCount(2);
     });

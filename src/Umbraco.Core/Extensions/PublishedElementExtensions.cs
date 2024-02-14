@@ -134,27 +134,6 @@ public static class PublishedElementExtensions
 
     #endregion
 
-    #region CheckVariation
-    /// <summary>
-    /// Method to check if VariationContext culture differs from culture parameter, if so it will update the VariationContext for the PublishedValueFallback.
-    /// </summary>
-    /// <param name="publishedValueFallback">The requested PublishedValueFallback.</param>
-    /// <param name="culture">The requested culture.</param>
-    /// <param name="segment">The requested segment.</param>
-    /// <returns></returns>
-    private static void EventuallyUpdateVariationContext(IPublishedValueFallback publishedValueFallback, string? culture, string? segment)
-    {
-        IVariationContextAccessor? variationContextAccessor = publishedValueFallback.VariationContextAccessor;
-
-        //If there is a difference in requested culture and the culture that is set in the VariationContext, it will pick wrong localized content.
-        //This happens for example using links to localized content in a RichText Editor.
-        if (!string.IsNullOrEmpty(culture) && variationContextAccessor?.VariationContext?.Culture != culture)
-        {
-            variationContextAccessor!.VariationContext = new VariationContext(culture, segment);
-        }
-    }
-    #endregion
-
     #region Value<T>
 
     /// <summary>
@@ -194,8 +173,6 @@ public static class PublishedElementExtensions
         T? defaultValue = default)
     {
         IPublishedProperty? property = content.GetProperty(alias);
-
-        EventuallyUpdateVariationContext(publishedValueFallback, culture, segment);
 
         // if we have a property, and it has a value, return that value
         if (property != null && property.HasValue(culture, segment))

@@ -33,7 +33,7 @@ public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
 
         var theRest = new List<ContentVersionMeta>();
 
-        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             var policyOverrides = _documentVersionRepository.GetCleanupPolicies()?
                 .ToDictionary(x => x.ContentTypeId);
@@ -77,6 +77,8 @@ public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
                     yield return version;
                 }
             }
+
+            scope.Complete();
         }
     }
 

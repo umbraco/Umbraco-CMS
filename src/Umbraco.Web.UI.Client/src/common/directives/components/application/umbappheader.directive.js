@@ -12,9 +12,7 @@
             scope.authenticated = null;
             scope.user = null;
             scope.avatar = [
-                { value: "assets/img/application/logo.png" },
-                { value: "assets/img/application/logo@2x.png" },
-                { value: "assets/img/application/logo@3x.png" }
+                { value: "assets/img/application/logo.svg" }
             ];
             scope.hideBackofficeLogo = Umbraco.Sys.ServerVariables.umbracoSettings.hideBackofficeLogo;
 

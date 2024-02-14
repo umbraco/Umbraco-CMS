@@ -1,0 +1,35 @@
+name: Nightly_$(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+pr: none
+trigger: none
+
+schedules:
+- cron: '0 0 * * *'
+  displayName: Daily midnight build
+  branches:
+    include:
+    - v10/dev
+    - v12/dev
+    - v13/dev
+    - v14/dev
+
+steps:
+- checkout: none
+- task: TriggerBuild@4
+  inputs:
+    definitionIsInCurrentTeamProject: true
+    buildDefinition: '301'
+    queueBuildForUserThatTriggeredBuild: true
+    ignoreSslCertificateErrors: false
+    useSameSourceVersion: false
+    useCustomSourceVersion: false
+    useSameBranch: true
+    waitForQueuedBuildsToFinish: false
+    storeInEnvironmentVariable: false
+    templateParameters: 'sqlServerIntegrationTests: true, forceReleaseTestFilter: true, myGetDeploy: true, isNightly: true'
+    authenticationMethod: 'OAuth Token'
+    enableBuildInQueueCondition: false
+    dependentOnSuccessfulBuildCondition: false
+    dependentOnFailedBuildCondition: false
+    checkbuildsoncurrentbranch: false
+    failTaskIfConditionsAreNotFulfilled: false

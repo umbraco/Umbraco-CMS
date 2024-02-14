@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 /// <summary>
 ///     Hosted service implementation for recurring health check notifications.
 /// </summary>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.HealthCheckNotifierJob instead.  This class will be removed in Umbraco 14.")]
 public class HealthCheckNotifier : RecurringHostedServiceBase
 {
     private readonly HealthCheckCollection _healthChecks;

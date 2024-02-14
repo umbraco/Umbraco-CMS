@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -70,13 +70,13 @@ public sealed class UdiParser
     /// <param name="s">The string to convert.</param>
     /// <param name="udi">An Udi instance that contains the value that was parsed.</param>
     /// <returns>A boolean value indicating whether the string could be parsed.</returns>
-    public static bool TryParse<T>(string? s, [MaybeNullWhen(false)] out T udi)
-        where T : Udi?
+    public static bool TryParse<T>(string? s, [NotNullWhen(true)] out T? udi)
+        where T : Udi
     {
         var result = ParseInternal(s, true, false, out Udi? parsed);
-        if (result && parsed is T)
+        if (result && parsed is T t)
         {
-            udi = (T)parsed;
+            udi = t;
             return true;
         }
 
@@ -231,5 +231,6 @@ public sealed class UdiParser
             { Constants.UdiEntityType.PartialView, UdiType.StringUdi },
             { Constants.UdiEntityType.PartialViewMacro, UdiType.StringUdi },
             { Constants.UdiEntityType.Stylesheet, UdiType.StringUdi },
+            { Constants.UdiEntityType.Webhook, UdiType.GuidUdi },
         };
 }

@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Collections;
 
 namespace Umbraco.Extensions;
 

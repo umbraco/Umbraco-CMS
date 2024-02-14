@@ -1223,8 +1223,11 @@ AND umbracoNode.id <> @id",
     ///     If this is not done, then in some cases the "edited" value for a particular culture for a document will remain true
     ///     when it should be false
     ///     if the property was changed to invariant. In order to do this we need to recalculate this value based on the values
-    ///     stored for each
-    ///     property, culture and current/published version.
+    ///     stored for each property, culture and current/published version.
+    ///
+    ///     Some of the sql statements in this function have a tendency to take a lot of parameters (nodeIds)
+    ///     as the WhereIn Npoco method translates all the nodeIds being passed in as parameters when using the SqlClient provider.
+    ///     this results in to many parameters (>2100) error => We need to batch the calls
     /// </remarks>
     private void RenormalizeDocumentEditedFlags(
         IReadOnlyCollection<int> propertyTypeIds,
@@ -1380,15 +1383,23 @@ AND umbracoNode.id <> @id",
         // Now bulk update the table DocumentCultureVariationDto, once for edited = true, another for edited = false
         foreach (IGrouping<bool, DocumentCultureVariationDto> editValue in toUpdate.GroupBy(x => x.Edited))
         {
-            Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
-                .WhereIn<DocumentCultureVariationDto>(x => x.Id, editValue.Select(x => x.Id)));
+            // update in batches to account for maximum parameter count
+            foreach (IEnumerable<DocumentCultureVariationDto> batchedValues in editValue.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
+                    .WhereIn<DocumentCultureVariationDto>(x => x.Id, batchedValues.Select(x => x.Id)));
+            }
         }
 
         // Now bulk update the umbracoDocument table
-        foreach (IGrouping<bool, KeyValuePair<int, bool>> editValue in editedDocument.GroupBy(x => x.Value))
+        foreach (IGrouping<bool, KeyValuePair<int, bool>> groupByValue in editedDocument.GroupBy(x => x.Value))
         {
-            Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, editValue.Key))
-                .WhereIn<DocumentDto>(x => x.NodeId, editValue.Select(x => x.Key)));
+            // update in batches to account for maximum parameter count
+            foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, groupByValue.Key))
+                    .WhereIn<DocumentDto>(x => x.NodeId, batch.Select(x => x.Key)));
+            }
         }
     }
 

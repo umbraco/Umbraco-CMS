@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -24,6 +25,7 @@ public class ComponentRuntimeTests : UmbracoIntegrationTest
     ///     This will boot up umbraco with components enabled to show they initialize and shutdown
     /// </summary>
     [Test]
+    [LongRunning]
     public async Task Start_And_Stop_Umbraco_With_Components_Enabled()
     {
         var runtime = Services.GetRequiredService<IRuntime>();

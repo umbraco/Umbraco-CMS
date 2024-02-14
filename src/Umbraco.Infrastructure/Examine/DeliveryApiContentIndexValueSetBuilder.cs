@@ -1,8 +1,11 @@
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -16,7 +19,30 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
     private readonly IPublicAccessService _publicAccessService;
     private readonly ILogger<DeliveryApiContentIndexValueSetBuilder> _logger;
     private readonly IDeliveryApiContentIndexFieldDefinitionBuilder _deliveryApiContentIndexFieldDefinitionBuilder;
+    private readonly IMemberService _memberService;
+    private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
     private DeliveryApiSettings _deliveryApiSettings;
+
+    [Obsolete("Please use ctor that takes an IDeliveryApiCompositeIdHandler. Scheduled for removal in v15")]
+    public DeliveryApiContentIndexValueSetBuilder(
+        ContentIndexHandlerCollection contentIndexHandlerCollection,
+        IContentService contentService,
+        IPublicAccessService publicAccessService,
+        ILogger<DeliveryApiContentIndexValueSetBuilder> logger,
+        IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
+        IMemberService memberService)
+    : this(
+        contentIndexHandlerCollection,
+        contentService,
+        publicAccessService,
+        logger,
+        deliveryApiContentIndexFieldDefinitionBuilder,
+        deliveryApiSettings,
+        memberService,
+        StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiCompositeIdHandler>())
+    {
+    }
 
     public DeliveryApiContentIndexValueSetBuilder(
         ContentIndexHandlerCollection contentIndexHandlerCollection,
@@ -24,12 +50,16 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         IPublicAccessService publicAccessService,
         ILogger<DeliveryApiContentIndexValueSetBuilder> logger,
         IDeliveryApiContentIndexFieldDefinitionBuilder deliveryApiContentIndexFieldDefinitionBuilder,
-        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings)
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
+        IMemberService memberService,
+        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler)
     {
         _contentIndexHandlerCollection = contentIndexHandlerCollection;
         _publicAccessService = publicAccessService;
         _logger = logger;
         _deliveryApiContentIndexFieldDefinitionBuilder = deliveryApiContentIndexFieldDefinitionBuilder;
+        _memberService = memberService;
+        _deliveryApiCompositeIdHandler = deliveryApiCompositeIdHandler;
         _contentService = contentService;
         _deliveryApiSettings = deliveryApiSettings.CurrentValue;
         deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
@@ -60,9 +90,16 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
                     [UmbracoExamineFieldNames.NodeNameFieldName] = new object[] { content.GetPublishName(culture) ?? content.GetCultureName(culture) ?? string.Empty }, // primarily needed for backoffice index browsing
                 };
 
+                if (_deliveryApiSettings.MemberAuthorizationIsEnabled())
+                {
+                    var protectedAccessValue = ProtectedAccessValue(content, out var isProtected);
+                    indexValues[UmbracoExamineFieldNames.DeliveryApiContentIndex.Protected] = new object[] { isProtected ? "y" : "n" }; // required for querying protected content
+                    indexValues[UmbracoExamineFieldNames.DeliveryApiContentIndex.ProtectedAccess] = protectedAccessValue; // required for querying protected content
+                }
+
                 AddContentIndexHandlerFields(content, culture, fieldDefinitions, indexValues);
 
-                yield return new ValueSet(DeliveryApiContentIndexUtilites.IndexId(content, indexCulture), IndexTypes.Content, content.ContentType.Alias, indexValues);
+                yield return new ValueSet(_deliveryApiCompositeIdHandler.IndexId(content.Id, indexCulture), IndexTypes.Content, content.ContentType.Alias, indexValues);
             }
         }
     }
@@ -112,6 +149,38 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         return cultures;
     }
 
+    private string[] ProtectedAccessValue(IContent content, out bool isProtected)
+    {
+        PublicAccessEntry? publicAccessEntry = _publicAccessService.GetEntryForContent(content.Path);
+        isProtected = publicAccessEntry is not null;
+
+        if (publicAccessEntry is null)
+        {
+            return Array.Empty<string>();
+        }
+
+        return publicAccessEntry
+                .Rules
+                // prefix member roles with "r:" and member keys with "u:" for clarity
+                .Select(r =>
+                {
+                    if (r.RuleValue.IsNullOrWhiteSpace())
+                    {
+                        return null;
+                    }
+
+                    if (r.RuleType is Constants.Conventions.PublicAccess.MemberRoleRuleType)
+                    {
+                        return $"r:{r.RuleValue}";
+                    }
+
+                    IMember? member = _memberService.GetByUsername(r.RuleValue);
+                    return member is not null ? $"u:{member.Key}" : null;
+                })
+                .WhereNotNull()
+                .ToArray();
+    }
+
     private void AddContentIndexHandlerFields(IContent content, string? culture, FieldDefinitionCollection fieldDefinitions, Dictionary<string, IEnumerable<object>> indexValues)
     {
         foreach (IContentIndexHandler handler in _contentIndexHandlerCollection)
@@ -154,8 +223,8 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
             return false;
         }
 
-        // is the content protected?
-        if (_publicAccessService.IsProtected(content.Path).Success)
+        // is the content protected and Delivery API member authorization disabled?
+        if (_deliveryApiSettings.MemberAuthorizationIsEnabled() is false && _publicAccessService.IsProtected(content.Path).Success)
         {
             return false;
         }

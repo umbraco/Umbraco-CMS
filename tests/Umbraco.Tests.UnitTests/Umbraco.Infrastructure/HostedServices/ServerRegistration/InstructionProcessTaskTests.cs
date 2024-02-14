@@ -15,6 +15,7 @@ using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRegistration;
 
 [TestFixture]
+[Obsolete("Replaced by BackgroundJobs.Jobs.ServerRegistration.InstructionProcessJobTests")]
 public class InstructionProcessTaskTests
 {
     private Mock<IServerMessenger> _mockDatabaseServerMessenger;
