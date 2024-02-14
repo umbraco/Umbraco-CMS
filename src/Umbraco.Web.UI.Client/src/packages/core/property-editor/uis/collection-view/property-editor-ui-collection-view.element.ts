@@ -1,3 +1,7 @@
+import type {
+	UmbCollectionBulkActionPermissions,
+	UmbCollectionConfiguration,
+} from '../../../../core/collection/types.js';
 import type { UmbPropertyEditorConfigCollection } from '../../config/index.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -12,24 +16,27 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 	value?: string;
 
 	@state()
-	pageSize = 0;
-
-	@state()
-	orderDirection = 'asc';
-
-	@state()
-	useInfiniteEditor = false;
+	private _config?: UmbCollectionConfiguration;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this.pageSize = Number(config?.getValueByAlias('pageSize')) || 0;
-		this.orderDirection = config?.getValueByAlias('orderDirection') ?? 'asc';
-		this.useInfiniteEditor = config?.getValueByAlias('useInfiniteEditor') ?? false;
+		this._config = this.#mapDataTypeConfigToCollectionConfig(config);
+	}
+
+	#mapDataTypeConfigToCollectionConfig(
+		config: UmbPropertyEditorConfigCollection | undefined,
+	): UmbCollectionConfiguration {
+		return {
+			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
+			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
+			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
+			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
+			useInfiniteEditor: config?.getValueByAlias('useInfiniteEditor') ?? false,
+		};
 	}
 
 	render() {
-		// TODO: [LK] Figure out how to pass in the configuration to the collection view.
-		return html`<umb-collection alias="Umb.Collection.Document"></umb-collection>`;
+		return html`<umb-collection alias="Umb.Collection.Document" .config=${this._config}></umb-collection>`;
 	}
 }
 
