@@ -5,7 +5,7 @@ public abstract class ContentCollectionResponseModelBase<TValueResponseModelBase
     where TValueResponseModelBase : ValueModelBase
     where TVariantResponseModel : VariantResponseModelBase
 {
-    public int SortOrder { get; set; }
-
     public string? Creator { get; set; }
+
+    public int SortOrder { get; set; }
 }

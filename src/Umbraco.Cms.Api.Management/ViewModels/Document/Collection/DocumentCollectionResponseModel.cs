@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 
 public class DocumentCollectionResponseModel : ContentCollectionResponseModelBase<DocumentValueModel, DocumentVariantResponseModel>
 {
-    public string? Updater { get; set; }
-
     public DocumentTypeCollectionReferenceResponseModel DocumentType { get; set; } = new();
+
+    public string? Updater { get; set; }
 }

@@ -24462,13 +24462,13 @@
             "type": "string",
             "format": "uuid"
           },
-          "sortOrder": {
-            "type": "integer",
-            "format": "int32"
-          },
           "creator": {
             "type": "string",
             "nullable": true
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -24506,13 +24506,13 @@
             "type": "string",
             "format": "uuid"
           },
-          "sortOrder": {
-            "type": "integer",
-            "format": "int32"
-          },
           "creator": {
             "type": "string",
             "nullable": true
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -26516,16 +26516,16 @@
           }
         ],
         "properties": {
-          "updater": {
-            "type": "string",
-            "nullable": true
-          },
           "documentType": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/DocumentTypeCollectionReferenceResponseModel"
               }
             ]
+          },
+          "updater": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
