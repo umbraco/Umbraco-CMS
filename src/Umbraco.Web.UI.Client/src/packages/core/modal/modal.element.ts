@@ -1,3 +1,4 @@
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalContext } from './modal.context.js';
 import { UMB_MODAL_CONTEXT } from './modal.context.js';
 import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
@@ -5,7 +6,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -29,7 +29,7 @@ export class UmbModalElement extends UmbLitElement {
 		this.#modalContext = value;
 
 		if (!value) {
-			this.#destroy();
+			this.destroy();
 			return;
 		}
 
@@ -166,16 +166,16 @@ export class UmbModalElement extends UmbLitElement {
 		return html`${this.element}`;
 	}
 
-	#destroy() {
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.destroy();
+	}
+
+	destroy() {
 		this.#innerElement.complete();
 		this.#modalExtensionObserver?.destroy();
 		this.#modalExtensionObserver = undefined;
 		super.destroy();
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this.#destroy();
 	}
 
 	static styles: CSSResultGroup = [UmbTextStyles];
