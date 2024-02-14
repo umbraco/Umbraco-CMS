@@ -30,13 +30,13 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		// TODO: Fix bug where a local property turn into an inherited when moved to a new group container.
 		containerSelector: '#property-list',
 		onChange: ({ item, model }) => {
-			const isInNewContainer = model.find((entry) => entry.container.id !== this._containerId);
+			const isInNewContainer = model.find((entry) => entry?.container?.id !== this._containerId && this._containerId);
 			if (isInNewContainer) {
 				model.forEach((entry, index) => {
 					entry.id === item.id
 						? this._propertyStructureHelper.partialUpdateProperty(entry.id, {
 								sortOrder: index,
-								container: { id: this._containerId },
+								container: { id: this._containerId! },
 						  })
 						: this._propertyStructureHelper.partialUpdateProperty(entry.id, { sortOrder: index });
 				});
