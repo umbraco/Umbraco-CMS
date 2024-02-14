@@ -52,32 +52,12 @@ public static class BackOfficeAuthBuilderExtensions
     {
         builder.Services
             .AddAuthentication()
-            .AddCookie(Constants.Security.NewBackOfficeAuthenticationType, options =>
+            // Add our custom schemes which are cookie handlers
+            .AddCookie(Constants.Security.BackOfficeAuthenticationType, options =>
             {
                 options.LoginPath = "/umbraco/login";
-                options.Cookie.Name = Constants.Security.NewBackOfficeAuthenticationType;
+                options.Cookie.Name = Constants.Security.BackOfficeAuthenticationType;
             })
-            .AddCookie(Constants.Security.NewBackOfficeExternalAuthenticationType, options =>
-            {
-                options.Cookie.Name = Constants.Security.NewBackOfficeExternalAuthenticationType;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-            })
-
-            // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
-            // they don't have to worry about manually adding this scheme or modifying the sign in manager
-            .AddCookie(Constants.Security.NewBackOfficeTwoFactorAuthenticationType, options =>
-            {
-                options.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorAuthenticationType;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-            })
-            .AddCookie(Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType, options =>
-            {
-                options.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-            })
-            // FIXME: Only use 1 type of cookie, both are no longer needed.
-            // Add our custom schemes which are cookie handlers
-            .AddCookie(Constants.Security.BackOfficeAuthenticationType)
             .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
             {
                 o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
@@ -86,10 +66,10 @@ public static class BackOfficeAuthBuilderExtensions
 
             // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
             // they don't have to worry about manually adding this scheme or modifying the sign in manager
-            .AddCookie(Constants.Security.BackOfficeTwoFactorAuthenticationType, o =>
+            .AddCookie(Constants.Security.BackOfficeTwoFactorAuthenticationType, options =>
             {
-                o.Cookie.Name = Constants.Security.BackOfficeTwoFactorAuthenticationType;
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.Cookie.Name = Constants.Security.BackOfficeTwoFactorAuthenticationType;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             })
             .AddCookie(Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType, o =>
             {

@@ -174,7 +174,7 @@ public class BackOfficeController : SecurityControllerBase
 
         // Returning a SignOutResult will ask OpenIddict to redirect the user agent
         // to the post_logout_redirect_uri specified by the client application.
-        return SignOut(Constants.Security.NewBackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        return SignOut(Constants.Security.BackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
     [HttpGet]
@@ -220,7 +220,7 @@ public class BackOfficeController : SecurityControllerBase
     /// </summary>
     private async Task<string?> GetUserNameFromAuthCookie()
     {
-        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.NewBackOfficeAuthenticationType);
+        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
         return cookieAuthResult.Succeeded
             ? cookieAuthResult.Principal?.Identity?.Name
             : null;
@@ -301,5 +301,5 @@ public class BackOfficeController : SecurityControllerBase
         return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, backOfficePrincipal);
     }
 
-    private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.NewBackOfficeAuthenticationType);
+    private static IActionResult DefaultChallengeResult() => new ChallengeResult(Constants.Security.BackOfficeAuthenticationType);
 }
