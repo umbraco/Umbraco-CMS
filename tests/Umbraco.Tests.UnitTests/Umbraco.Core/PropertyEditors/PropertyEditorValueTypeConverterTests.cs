@@ -1,8 +1,7 @@
-﻿using System.Xml.Linq;
+﻿using System.Text.Json;
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -197,11 +196,11 @@ public class PropertyEditorValueTypeConverterTests
 
         Assert.IsTrue(converter.IsConverter(propertyType));
 
-        var result = converter.ConvertSourceToIntermediate(null, propertyType, source, false) as JToken;
+        var result = converter.ConvertSourceToIntermediate(null, propertyType, source, false) as JsonDocument;
         if (expectsSuccess)
         {
             Assert.IsNotNull(result);
-            Assert.AreEqual(source, result.ToString(Formatting.None));
+            Assert.AreEqual(source, result.RootElement.ToString());
         }
         else
         {
