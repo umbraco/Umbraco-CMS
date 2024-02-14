@@ -13,7 +13,7 @@ import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from
 
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	#onChangeModel: Array<UmbPropertyTypeModel> = [];
+	#model: Array<UmbPropertyTypeModel> = [];
 	#sorter = new UmbSorterController<UmbPropertyTypeModel, UmbDocumentTypeWorkspacePropertyElement>(this, {
 		getUniqueOfElement: (element) => {
 			return element.getAttribute('data-umb-property-id');
@@ -23,37 +23,26 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		},
 		identifier: 'document-type-property-sorter',
 		itemSelector: 'umb-document-type-workspace-view-edit-property',
-		disabledItemSelector: '[inherited]',
+		//disabledItemSelector: '[inherited]',
 		//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
 		// This is because we don't want to move local properties into an inherited group container.
 		// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
 		// TODO: Fix bug where a local property turn into an inherited when moved to a new group container.
 		containerSelector: '#property-list',
-		onChange: ({ model, item }) => {
+		onChange: ({ item, model }) => {
 			this._propertyStructure = model;
+			this.#model = model;
+		},
+		onEnd: ({ item, element }) => {
+			const container = element.parentElement?.getAttribute('data-umb-container-id');
 
-			const newContainerId = model.find((entry) => entry.id === item.id)?.container?.id;
-			if (newContainerId) {
-				this._propertyStructureHelper.partialUpdateProperty(item.id, { container: { id: newContainerId } });
+			if (container && container !== this.containerId) {
+				this._propertyStructureHelper.partialUpdateProperty(item.id, { container: { id: container } });
 			}
 
-			/*
-			this.#onChangeModel = model;
-
-			const modelIndex = model.findIndex((entry) => entry.id === item.id);
-			if (modelIndex === -1) return;
-
-			let sortOrder: number;
-
-			if (model.length > 1) {
-				sortOrder =
-					modelIndex > 0 ? (model[modelIndex - 1].sortOrder ?? 0) + 1 : (model[modelIndex + 1].sortOrder ?? 0) - 1;
-			} else {
-				sortOrder = 0;
-			}
-
-			this._propertyStructureHelper.partialUpdateProperty(item.id, { sortOrder: sortOrder });
-			*/
+			this.#model.forEach((property, index) => {
+				this._propertyStructureHelper.partialUpdateProperty(property.id, { sortOrder: index });
+			});
 		},
 	});
 
@@ -131,7 +120,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
-			console.log('property structure observer triggered');
 		});
 
 		// Note: Route for adding a new property
@@ -166,7 +154,10 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 
 	render() {
 		return html`
-			<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
+			<div
+				id="property-list"
+				?sort-mode-active=${this._sortModeActive}
+				data-umb-container-id=${ifDefined(this.containerId)}>
 				${repeat(
 					this._propertyStructure,
 					(property) => '' + property.container?.id + property.id + '' + property.sortOrder,

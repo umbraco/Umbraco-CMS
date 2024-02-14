@@ -1,7 +1,7 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditPropertiesElement } from './document-type-workspace-view-edit-properties.element.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -24,11 +24,10 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			identifier: 'document-type-container-sorter',
 			itemSelector: '.container-handle',
 			containerSelector: '.container-list',
-			onChange: ({ item, model }) => {
-				this._groups = model;
-			},
-			onContainerChange({ item, element }) {
-				console.log('container change', item, element);
+			onChange: ({ model }) => {
+				model.forEach((modelItem, index) => {
+					this._groupStructureHelper.partialUpdateContainer(modelItem.id, { sortOrder: index });
+				});
 			},
 		},
 	);
@@ -173,7 +172,12 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				<uui-input
 					type="number"
 					label=${this.localize.term('sort_sortOrder')}
-					.value=${group.sortOrder ?? 0}
+					@change=${(e: InputEvent) => {
+						this._groupStructureHelper.partialUpdateContainer(group.id!, {
+							sortOrder: parseInt((e.target as HTMLInputElement).value),
+						});
+					}}
+					.value=${group.sortOrder || 0}
 					?disabled=${inherited}></uui-input>
 			</div> `;
 		} else {

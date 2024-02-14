@@ -29,25 +29,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		containerSelector: 'uui-tab-group',
 		disabledItemSelector: '#root-tab',
 		resolveVerticalDirection: () => false,
-		onChange: ({ model, item }) => {
-			this._tabs = model;
-
-			const modelIndex = model.findIndex((entry) => entry.id === item.id);
-
-			if (modelIndex === -1) return;
-			let sortOrder: number;
-
-			// TODO: How to get the correct sortOrder number?
-			// Sometimes (lets say we have 2 tabs in the model) they both update when moving one - why?
-			if (model.length > 1) {
-				sortOrder =
-					modelIndex > 0 ? (model[modelIndex - 1].sortOrder ?? 0) + 1 : (model[modelIndex + 1].sortOrder ?? 0) - 1;
-			} else {
-				sortOrder = 0;
-			}
-
-			this._tabsStructureHelper.partialUpdateContainer(item.id, {
-				sortOrder: sortOrder,
+		onChange: ({ model }) => {
+			model.forEach((modelItem, index) => {
+				this._tabsStructureHelper.partialUpdateContainer(modelItem.id, { sortOrder: index });
 			});
 		},
 	});
