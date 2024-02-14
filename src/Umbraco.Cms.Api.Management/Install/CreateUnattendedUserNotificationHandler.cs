@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Install;
+namespace Umbraco.Cms.Api.Management.Install;
 
 public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler<UnattendedInstallNotification>
 {
@@ -18,8 +18,7 @@ public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler
     private readonly IOptions<UnattendedSettings> _unattendedSettings;
     private readonly IUserService _userService;
 
-    public CreateUnattendedUserNotificationHandler(IOptions<UnattendedSettings> unattendedSettings,
-        IUserService userService, IServiceScopeFactory serviceScopeFactory)
+    public CreateUnattendedUserNotificationHandler(IOptions<UnattendedSettings> unattendedSettings, IUserService userService, IServiceScopeFactory serviceScopeFactory)
     {
         _unattendedSettings = unattendedSettings;
         _userService = userService;

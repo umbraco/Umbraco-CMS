@@ -25,7 +25,6 @@ using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -247,7 +246,7 @@ public class BackOfficeController : UmbracoController
         if (result.Succeeded)
         {
             // Redirect to installer if we're already authorized
-            var installerUrl = Url.Action(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallController>(), new { area = Cms.Core.Constants.Web.Mvc.InstallArea }) ?? "/";
+            var installerUrl =  "/";
             return new LocalRedirectResult(installerUrl);
         }
 

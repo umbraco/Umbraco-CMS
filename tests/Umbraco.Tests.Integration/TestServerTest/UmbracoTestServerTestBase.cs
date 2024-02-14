@@ -309,7 +309,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 })
                 .WithEndpoints(u =>
                 {
-                    u.UseInstallerEndpoints();
                     u.UseBackOfficeEndpoints();
                     u.UseWebsiteEndpoints();
                 });

@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
@@ -12,7 +11,6 @@ using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Mapping;
 using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Cms.Web.BackOffice.Routing;
@@ -48,18 +46,11 @@ public static partial class UmbracoBuilderExtensions
             .AddNuCache()
             .AddDistributedCache()
             .TryAddModelsBuilderDashboard()
-            .AddUnattendedInstallInstallCreateUser()
             .AddCoreNotifications()
             .AddLogViewer()
             .AddExamine()
             .AddExamineIndexes()
             .AddSupplemenataryLocalizedTextFileSources();
-
-    public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
-    {
-        builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
-        return builder;
-    }
 
     /// <summary>
     ///     Adds Umbraco preview support
@@ -81,7 +72,6 @@ public static partial class UmbracoBuilderExtensions
     {
         builder.Services.AddUnique<IStaticFilePathGenerator, UmbracoStaticFilePathGenerator>();
         builder.Services.AddSingleton<ServerVariablesParser>();
-        builder.Services.AddSingleton<InstallAreaRoutes>();
         builder.Services.AddSingleton<PreviewRoutes>();
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
         builder.Services.AddSingleton<BackOfficeServerVariables>();
