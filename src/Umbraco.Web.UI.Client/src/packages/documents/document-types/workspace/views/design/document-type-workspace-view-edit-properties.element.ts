@@ -23,26 +23,28 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		},
 		identifier: 'document-type-property-sorter',
 		itemSelector: 'umb-document-type-workspace-view-edit-property',
-		//disabledItemSelector: '[inherited]',
+		disabledItemSelector: '[inherited]',
 		//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
 		// This is because we don't want to move local properties into an inherited group container.
 		// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
 		// TODO: Fix bug where a local property turn into an inherited when moved to a new group container.
 		containerSelector: '#property-list',
 		onChange: ({ item, model }) => {
-			this._propertyStructure = model;
-			this.#model = model;
-		},
-		onEnd: ({ item, element }) => {
-			const container = element.parentElement?.getAttribute('data-umb-container-id');
-
-			if (container && container !== this.containerId) {
-				this._propertyStructureHelper.partialUpdateProperty(item.id, { container: { id: container } });
+			const isInNewContainer = model.find((entry) => entry.container.id !== this._containerId);
+			if (isInNewContainer) {
+				model.forEach((entry, index) => {
+					entry.id === item.id
+						? this._propertyStructureHelper.partialUpdateProperty(entry.id, {
+								sortOrder: index,
+								container: { id: this._containerId },
+						  })
+						: this._propertyStructureHelper.partialUpdateProperty(entry.id, { sortOrder: index });
+				});
+			} else {
+				model.forEach((entry, index) => {
+					this._propertyStructureHelper.partialUpdateProperty(entry.id, { sortOrder: index });
+				});
 			}
-
-			this.#model.forEach((property, index) => {
-				this._propertyStructureHelper.partialUpdateProperty(property.id, { sortOrder: index });
-			});
 		},
 	});
 
@@ -154,10 +156,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 
 	render() {
 		return html`
-			<div
-				id="property-list"
-				?sort-mode-active=${this._sortModeActive}
-				data-umb-container-id=${ifDefined(this.containerId)}>
+			<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
 				${repeat(
 					this._propertyStructure,
 					(property) => '' + property.container?.id + property.id + '' + property.sortOrder,

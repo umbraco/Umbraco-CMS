@@ -174,7 +174,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 					label=${this.localize.term('sort_sortOrder')}
 					@change=${(e: InputEvent) => {
 						this._groupStructureHelper.partialUpdateContainer(group.id!, {
-							sortOrder: parseInt((e.target as HTMLInputElement).value),
+							sortOrder: parseInt(e.target.value),
 						});
 					}}
 					.value=${group.sortOrder || 0}
