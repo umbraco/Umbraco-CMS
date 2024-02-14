@@ -131,7 +131,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 Alias = x.Alias,
                 Value = x.GetValue()
             }) : Array.Empty<PropertyValueModel>(),
-            Variants = content.AvailableCultures.Where(cultures.Contains).Select(culture => new VariantModel()
+            Variants = cultures.Select(culture => new VariantModel()
             {
                 Name = content.GetPublishName(culture) ?? string.Empty,
                 Culture = culture,
