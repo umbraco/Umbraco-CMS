@@ -71,7 +71,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
         }
 
-        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content);
+        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
 
         if (validationResult.ValidationErrors.Any())
         {
@@ -118,18 +118,18 @@ internal sealed class ContentPublishingService : IContentPublishingService
             });
     }
 
-    private async Task<ContentValidationResult> ValidateCurrentContentAsync(IContent content)
+    private async Task<ContentValidationResult> ValidateCurrentContentAsync(IContent content, string[] cultures)
     {
         // Would be better to be able to use a mapper/factory, but currently all that functionality is very much presentation logic.
         var model = new ContentUpdateModel()
         {
             InvariantName = content.Name,
-            InvariantProperties = content.Properties.Where(x=>x.PropertyType.VariesByCulture() is false).Select(x=> new PropertyValueModel()
+            InvariantProperties = cultures.Contains("*") ? content.Properties.Where(x=>x.PropertyType.VariesByCulture() is false).Select(x=> new PropertyValueModel()
             {
                 Alias = x.Alias,
                 Value = x.GetValue()
-            }),
-            Variants = content.AvailableCultures.Select(culture => new VariantModel()
+            }) : Array.Empty<PropertyValueModel>(),
+            Variants = content.AvailableCultures.Where(cultures.Contains).Select(culture => new VariantModel()
             {
                 Name = content.GetPublishName(culture) ?? string.Empty,
                 Culture = culture,
