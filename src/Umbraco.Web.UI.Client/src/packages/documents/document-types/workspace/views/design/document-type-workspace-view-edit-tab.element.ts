@@ -24,7 +24,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			identifier: 'document-type-container-sorter',
 			itemSelector: '.container-handle',
 			containerSelector: '.container-list',
-			onChange: ({ model }) => {
+			onChange: ({ item, model }) => {
 				model.forEach((modelItem, index) => {
 					this._groupStructureHelper.partialUpdateContainer(modelItem.id, { sortOrder: index });
 				});
@@ -174,7 +174,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 					label=${this.localize.term('sort_sortOrder')}
 					@change=${(e: InputEvent) => {
 						this._groupStructureHelper.partialUpdateContainer(group.id!, {
-							sortOrder: parseInt(e.target.value),
+							sortOrder: parseInt(e.target.value as string) || 0,
 						});
 					}}
 					.value=${group.sortOrder || 0}

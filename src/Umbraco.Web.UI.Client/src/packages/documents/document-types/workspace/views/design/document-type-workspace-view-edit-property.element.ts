@@ -197,7 +197,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				type="number"
 				?readonly=${this.inherited}
 				label="sort order"
-				@change=${(e: UUIInputEvent) => this._partialUpdate({ sortOrder: parseInt(e.target.value) })}
+				@change=${(e: UUIInputEvent) => this._partialUpdate({ sortOrder: parseInt(e.target.value as string) || 0 })}
 				.value=${this.property.sortOrder ?? 0}></uui-input>
 		`;
 	}
