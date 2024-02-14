@@ -8,6 +8,7 @@
 		"esbenp.prettier-vscode",
 		"hbenl.vscode-test-explorer",
 		"vunguyentuan.vscode-css-variables",
-		"unifiedjs.vscode-mdx"
+		"unifiedjs.vscode-mdx",
+		"editorconfig.editorconfig"
 	]
 }
