@@ -51,8 +51,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
 
-        builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
-
         builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
         builder.Services.AddScoped<IBackOfficePasswordChanger, BackOfficePasswordChanger>();
 

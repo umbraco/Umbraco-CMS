@@ -14,7 +14,6 @@ using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Mapping;
-using Umbraco.Cms.Web.BackOffice.Middleware;
 using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
@@ -84,11 +83,8 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IStaticFilePathGenerator, UmbracoStaticFilePathGenerator>();
-        builder.Services.AddSingleton<KeepAliveMiddleware>();
-        builder.Services.ConfigureOptions<ConfigureGlobalOptionsForKeepAliveMiddlware>();
         builder.Services.AddSingleton<ServerVariablesParser>();
         builder.Services.AddSingleton<InstallAreaRoutes>();
-        builder.Services.AddSingleton<BackOfficeAreaRoutes>();
         builder.Services.AddSingleton<PreviewRoutes>();
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
         builder.Services.AddSingleton<BackOfficeServerVariables>();

@@ -3,6 +3,8 @@ using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
+using Umbraco.Cms.Api.Management.Middleware;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Core;
@@ -16,6 +18,8 @@ public static class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddUmbracoManagementApi(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
+        builder.Services.AddSingleton<BackOfficeAreaRoutes>();
+        builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
 
         if (!services.Any(x => x.ImplementationType == typeof(JsonPatchService)))
         {

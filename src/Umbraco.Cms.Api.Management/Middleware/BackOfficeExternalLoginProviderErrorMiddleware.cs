@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Middleware;
+namespace Umbraco.Cms.Api.Management.Middleware;
 
 /// <summary>
 ///     Used to handle errors registered by external login providers

@@ -1,19 +1,18 @@
 using System.Text;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Routing;
+namespace Umbraco.Cms.Api.Management.Routing;
 
 /// <summary>
 ///     Creates routes for the back office area
@@ -78,8 +77,6 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
             // routes like: /umbraco/channels/word.aspx, etc...
             // (Not that we have to worry about too many of those these days, there still might be a need for these constraints).
             new { action = @"[a-zA-Z]*", id = @"[a-zA-Z]*" });
-
-        endpoints.MapUmbracoApiRoute<AuthenticationController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeApiArea, true, string.Empty);
 
         endpoints.MapAreaControllerRoute(
             "catch-all-sections-to-client",
