@@ -68,7 +68,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 
 		this.observe(this._collectionContext.selection.selection, (selection) => {
-			this._selection = selection;
+			this._selection = selection as string[];
 		});
 	}
 
