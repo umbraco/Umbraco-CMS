@@ -186,11 +186,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			}
 		}
 	}
-
-	#onChangeSortOrder(event: UUIInputEvent) {
-		this._partialUpdate({ sortOrder: event.target.value });
-	}
-
 	renderSortableProperty() {
 		if (!this.property) return;
 		return html`
@@ -202,7 +197,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				type="number"
 				?readonly=${this.inherited}
 				label="sort order"
-				@change=${this.#onChangeSortOrder}
+				@change=${(e: UUIInputEvent) => this._partialUpdate({ sortOrder: e.target.value })}
 				.value=${this.property.sortOrder ?? 0}></uui-input>
 		`;
 	}
