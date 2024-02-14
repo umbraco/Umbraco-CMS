@@ -2,9 +2,21 @@ import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-regis
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
+export interface UmbCollectionBulkActionPermissions {
+	allowBulkCopy: boolean;
+	allowBulkDelete: boolean;
+	allowBulkMove: boolean;
+	allowBulkPublish: boolean;
+	allowBulkUnpublish: boolean;
+}
+
 export interface UmbCollectionConfiguration {
+	allowedEntityBulkActions?: UmbCollectionBulkActionPermissions;
+	includeProperties?: Array<any>;
+	orderBy?: string;
+	orderDirection?: string;
 	pageSize?: number;
-	defaultViewAlias?: string;
+	useInfiniteEditor?: boolean;
 }
 
 export interface UmbCollectionContext {
