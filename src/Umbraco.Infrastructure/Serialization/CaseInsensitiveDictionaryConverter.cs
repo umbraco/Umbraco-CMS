@@ -1,32 +1,24 @@
-using System.Collections;
-using Newtonsoft.Json.Converters;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
-/// <summary>
-///     Marks dictionaries so they are deserialized as case-insensitive.
-/// </summary>
-/// <example>
-///     [JsonConverter(typeof(CaseInsensitiveDictionaryConverter{PropertyData[]}))]
-///     public Dictionary{string, PropertyData[]} PropertyData {{ get; set; }}
-/// </example>
-public class CaseInsensitiveDictionaryConverter<T> : CustomCreationConverter<IDictionary>
+public class CaseInsensitiveDictionaryConverter<TValue> : JsonConverter<IDictionary<string, TValue>>
 {
-    private readonly StringComparer _comparer;
+    // This is a hacky workaround to creating a "read only converter", since System.Text.Json doesn't support it.
+    // Taken from https://github.com/dotnet/runtime/issues/46372#issuecomment-1660515178
+    private readonly JsonConverter<IDictionary<string, TValue>> _fallbackConverter = (JsonConverter<IDictionary<string, TValue>>)JsonSerializerOptions.Default.GetConverter(typeof(IDictionary<string, TValue>));
 
-    public CaseInsensitiveDictionaryConverter()
-        : this(StringComparer.OrdinalIgnoreCase)
+    public override IDictionary<string, TValue>? Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
     {
+        IDictionary<string, TValue>? defaultDictionary = JsonSerializer.Deserialize<IDictionary<string, TValue>>(ref reader, options);
+        return defaultDictionary is null
+            ? null
+            : new Dictionary<string, TValue>(defaultDictionary, StringComparer.OrdinalIgnoreCase);
     }
 
-    public CaseInsensitiveDictionaryConverter(StringComparer comparer) =>
-        _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
-
-    public override bool CanWrite => false;
-
-    public override bool CanRead => true;
-
-    public override bool CanConvert(Type objectType) => typeof(IDictionary<string, T>).IsAssignableFrom(objectType);
-
-    public override IDictionary Create(Type objectType) => new Dictionary<string, T>(_comparer);
+    public override void Write(Utf8JsonWriter writer, IDictionary<string, TValue> value, JsonSerializerOptions options) => _fallbackConverter.Write(writer, value, options);
 }
