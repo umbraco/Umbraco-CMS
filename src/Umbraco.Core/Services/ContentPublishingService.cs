@@ -73,13 +73,15 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
         ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
 
-        if (validationResult.ValidationErrors.Any())
+        var errors = validationResult.ValidationErrors.Where(err =>
+            cultures.Contains(err.Culture, StringComparer.InvariantCultureIgnoreCase));
+        if (errors.Any())
         {
             scope.Complete();
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentInvalid, new ContentPublishingResult
             {
                 Content = content,
-                InvalidPropertyAliases = validationResult.ValidationErrors.Select(property => property.Alias).ToArray()
+                InvalidPropertyAliases = errors.Select(property => property.Alias).ToArray()
                                          ?? Enumerable.Empty<string>()
             });
         }
