@@ -1,5 +1,5 @@
-import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
-import type { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

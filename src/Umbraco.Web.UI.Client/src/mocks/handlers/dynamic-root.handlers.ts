@@ -1,5 +1,5 @@
 import { umbDocumentMockDb } from '../data/document/document.db.js';
-import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const { rest } = window.MockServiceWorker;

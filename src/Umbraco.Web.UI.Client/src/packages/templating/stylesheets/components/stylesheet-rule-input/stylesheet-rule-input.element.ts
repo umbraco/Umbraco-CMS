@@ -5,7 +5,7 @@ import { css, html, customElement, repeat, property } from '@umbraco-cms/backoff
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // TODO: add sorting when we have a generic sorting component/functionality for ref lists
 

@@ -121,6 +121,10 @@ export class UmbDocumentWorkspaceContext
 		this.#currentData.update({ variants });
 	}
 
+	setTemplate(templateUnique: string) {
+		this.#currentData.update({ template: { unique: templateUnique } });
+	}
+
 	async propertyStructureById(propertyId: string) {
 		return this.structure.propertyStructureById(propertyId);
 	}

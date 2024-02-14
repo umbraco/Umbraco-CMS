@@ -5,8 +5,8 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentTypeRequestModel,
 	UpdateDocumentTypeRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
@@ -143,6 +143,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDocumentTypeRequestModel = {
+			folder: model.parentUnique ? { id: model.parentUnique } : null,
 			alias: model.alias,
 			name: model.name,
 			description: model.description,

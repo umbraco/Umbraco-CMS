@@ -1,7 +1,11 @@
 const { rest } = window.MockServiceWorker;
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { ProblemDetails, RuntimeLevelModel, ServerStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	ProblemDetails,
+	RuntimeLevelModel,
+	ServerStatusResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { expect, test } from './test.js';
 
 test.describe('installer tests', () => {
@@ -14,9 +18,9 @@ test.describe('installer tests', () => {
 					ctx.status(200),
 					ctx.json<ServerStatusResponseModel>({
 						serverStatus: RuntimeLevelModel.INSTALL,
-					})
+					}),
 				);
-			})
+			}),
 		);
 
 		await page.goto('/install');
@@ -69,9 +73,9 @@ test.describe('installer tests', () => {
 							errors: {
 								databaseName: ['The database name is required'],
 							},
-						})
+						}),
 					);
-				})
+				}),
 			);
 
 			await page.click('[aria-label="Install"]');

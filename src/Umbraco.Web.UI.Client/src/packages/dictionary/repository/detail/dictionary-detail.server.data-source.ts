@@ -5,8 +5,8 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDictionaryItemRequestModel,
 	DictionaryItemModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DictionaryResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

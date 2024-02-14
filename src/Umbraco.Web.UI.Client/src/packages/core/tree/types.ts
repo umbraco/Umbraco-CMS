@@ -25,17 +25,6 @@ export interface UmbEntityTreeItemModel extends UmbTreeItemModelBase {
 }
 
 // TODO: remove this when we have unique for everything
-export interface UmbFileSystemTreeItemModel extends UmbTreeItemModelBase {
-	path: string;
-	isFolder: boolean;
-}
-
-// TODO: remove this when we have unique for everything
 export interface UmbEntityTreeRootModel extends UmbTreeItemModelBase {
 	id: null;
-}
-
-// TODO: remove this when we have unique for everything
-export interface UmbFileSystemTreeRootModel extends UmbTreeItemModelBase {
-	path: null;
 }

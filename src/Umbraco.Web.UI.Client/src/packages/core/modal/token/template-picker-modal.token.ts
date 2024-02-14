@@ -13,7 +13,7 @@ export const UMB_TEMPLATE_PICKER_MODAL = new UmbModalToken<UmbTemplatePickerModa
 			size: 'small',
 		},
 		data: {
-			treeAlias: 'Umb.Tree.Templates',
+			treeAlias: 'Umb.Tree.Template',
 		},
 	},
 );

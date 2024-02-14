@@ -4,7 +4,7 @@ import type {
 	FileSystemFileResponseModelBaseModel,
 	FileSystemFileUpdateRequestModelBaseModel,
 	FileSystemResponseModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileResponseModelBaseModel> {
 	#db: UmbFileSystemMockDbBase<MockItemType>;

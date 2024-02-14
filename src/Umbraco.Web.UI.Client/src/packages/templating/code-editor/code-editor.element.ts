@@ -3,18 +3,9 @@ import type { CodeEditorLanguage, CodeEditorSearchOptions, UmbCodeEditorHost } f
 import { CodeEditorTheme } from './code-editor.model.js';
 import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import { monacoEditorStyles, monacoJumpingCursorHack } from '@umbraco-cms/backoffice/external/monaco-editor';
-import type {
-	PropertyValues,
-	Ref} from '@umbraco-cms/backoffice/external/lit';
-import {
-	css,
-	html,
-	createRef,
-	ref,
-	customElement,
-	property,
-} from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { PropertyValues, Ref } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, createRef, ref, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * A custom element that renders a code editor. Code editor is based on the Monaco Editor library.

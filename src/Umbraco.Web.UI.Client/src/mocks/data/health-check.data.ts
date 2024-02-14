@@ -1,9 +1,8 @@
 import type {
 	HealthCheckGroupPresentationModel,
-	HealthCheckGroupWithResultResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	StatusResultTypeModel,
-} from '@umbraco-cms/backoffice/backend-api';
+	HealthCheckGroupWithResultResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export function getGroupByName(name: string) {
 	return healthGroupsWithoutResult.find((group) => group.name?.toLowerCase() == name.toLowerCase());

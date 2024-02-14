@@ -3,7 +3,7 @@ import type { UmbStylesheetRule } from '../../../types.js';
 import type { UmbStylesheetRuleInputElement } from '../../../components/index.js';
 import { UmbStylesheetRuleManager } from '../../../utils/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';

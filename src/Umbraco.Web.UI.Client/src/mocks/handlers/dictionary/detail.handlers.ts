@@ -5,7 +5,7 @@ import type {
 	CreateDictionaryItemRequestModel,
 	PagedDictionaryOverviewResponseModel,
 	UpdateDictionaryItemRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [

@@ -3,7 +3,7 @@ import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-e
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
