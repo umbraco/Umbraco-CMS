@@ -1,6 +1,7 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../workspace/document-workspace.context-token.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type {
+	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
@@ -16,18 +17,24 @@ export class UmbDocumentWorkspaceHasCollectionCondition extends UmbBaseControlle
 		this.config = args.config;
 		this.#onChange = args.onChange;
 
-		// TODO: Find out if/how the data-type configuration properties can amend the manifest's data. [LK:2024-02-12]
-		// Specifically, `tabName`, `icon` and `showContentFirst` (can it change the manifest's position/weighting?)
-
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.observe(context.contentTypeHasCollection, (hasCollection) => {
-				if (hasCollection) {
-					this.permitted = true;
-					this.#onChange();
-				}
+				this.permitted = hasCollection === true;
+				this.#onChange();
 			});
 		});
 	}
 }
 
-export type DocumentWorkspaceHasCollectionConditionConfig = UmbConditionConfigBase<string>;
+export type DocumentWorkspaceHasCollectionConditionConfig = UmbConditionConfigBase<
+	typeof UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION
+>;
+
+export const UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION = 'Umb.Condition.DocumentWorkspaceHasCollection';
+
+export const manifest: ManifestCondition = {
+	type: 'condition',
+	name: 'Document Workspace Has Collection Condition',
+	alias: UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION,
+	api: UmbDocumentWorkspaceHasCollectionCondition,
+};
