@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Umbraco.Cms.Api.Management.ViewModels.Document;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
 public class PublishDocumentRequestModel
 {
@@ -10,7 +8,6 @@ public class PublishDocumentRequestModel
 
 public class CultureAndScheduleRequestModel
 {
-
     /// <summary>
     /// Gets or sets the culture. Null means invariant.
     /// </summary>
@@ -27,5 +24,6 @@ public class CultureAndScheduleRequestModel
 public class ScheduleRequestModel
 {
     public DateTimeOffset? PublishTime { get; set; }
+
     public DateTimeOffset? UnpublishTime { get; set; }
 }
