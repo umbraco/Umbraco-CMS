@@ -56,13 +56,10 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	multiple = false;
 
 	@state()
-	_currentFiles: Array<TemporaryFileQueueItem> = [];
-
-	@state()
 	_files: Array<{
 		path: string;
 		unique: string;
-		ready: boolean;
+		queueItem?: TemporaryFileQueueItem;
 		file?: File;
 	}> = [];
 
@@ -89,7 +86,16 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		}).asPromise();
 
 		this.observe(this.#manager.isReady, (value) => (this.error = !value));
-		this.observe(this.#manager.queue, (value) => (this._currentFiles = value));
+		this.observe(this.#manager.queue, (value) => {
+			this._files = this._files.map((file) => {
+				const queueItem = value.find((item) => item.unique === file.unique);
+				if (queueItem) {
+					file.queueItem = queueItem;
+				}
+				return file;
+			});
+			this._currentFiles = value;
+		});
 	}
 
 	connectedCallback(): void {
@@ -105,7 +111,6 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				this._files.push({
 					path: this.#serverUrl + key,
 					unique: UmbId.new(),
-					ready: true,
 				});
 				this.requestUpdate();
 			}
@@ -149,7 +154,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 			this._files.push({
 				path: '',
 				unique: item.unique,
-				ready: false,
+				queueItem: item,
 				file: item.file,
 			});
 			const reader = new FileReader();
@@ -157,7 +162,6 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				this._files = this._files.map((file) => {
 					if (file.unique === item.unique) {
 						file.path = reader.result as string;
-						file.ready = true;
 					}
 					return file;
 				});
@@ -177,8 +181,6 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 			<div id="wrapper">${this.#renderFiles()}</div>
 			${this.#renderDropzone()} ${this.#renderButtonRemove()}
 		`;
-		return html`<div id="wrapper">${this.#renderFilesWithPath()} ${this.#renderFilesUploaded()}</div>
-			${this.#renderDropzone()}${this.#renderButtonRemove()}`;
 	}
 
 	//TODO When the property editor gets saved, it seems that the property editor gets the file path from the server rather than key/id.
@@ -205,22 +207,31 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		);
 	}
 
-	#renderFile(file: { path: string; unique: string; ready: boolean; file?: File }) {
+	#renderFile(file: { path: string; unique: string; queueItem?: TemporaryFileQueueItem; file?: File }) {
 		const type = this.#getFileTypeFromPath(file.path);
 
-		switch (type) {
-			case 'audio':
-				return html`<umb-input-upload-field-audio .path=${file.path}></umb-input-upload-field-audio>`;
-			case 'video':
-				return html`<umb-input-upload-field-video .path=${file.path}></umb-input-upload-field-video>`;
-			case 'image':
-				return html`<umb-input-upload-field-image .path=${file.path}></umb-input-upload-field-image>`;
-			case 'svg':
-				return html`<umb-input-upload-field-svg .path=${file.path}></umb-input-upload-field-svg>`;
-			case 'file':
-				return file.file
-					? html`<umb-input-upload-field-file .file=${file.file}></umb-input-upload-field-file>`
-					: 'ERROR: NO FILE OR PATH PROVIDED';
+		console.log('file', file.queueItem?.status);
+
+		return html`
+			${getElementTemplate()}
+			${file.queueItem?.status === 'waiting' ? html`<umb-temporary-file-badge></umb-temporary-file-badge>` : nothing}
+		`;
+
+		function getElementTemplate() {
+			switch (type) {
+				case 'audio':
+					return html`<umb-input-upload-field-audio .path=${file.path}></umb-input-upload-field-audio>`;
+				case 'video':
+					return html`<umb-input-upload-field-video .path=${file.path}></umb-input-upload-field-video>`;
+				case 'image':
+					return html`<umb-input-upload-field-image .path=${file.path}></umb-input-upload-field-image>`;
+				case 'svg':
+					return html`<umb-input-upload-field-svg .path=${file.path}></umb-input-upload-field-svg>`;
+				case 'file':
+					return file.file
+						? html`<umb-input-upload-field-file .file=${file.file}></umb-input-upload-field-file>`
+						: 'ERROR: NO FILE OR PATH PROVIDED';
+			}
 		}
 	}
 
@@ -245,30 +256,8 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		return 'file';
 	}
 
-	#renderFilesWithPath() {
-		if (!this._files.length) return nothing;
-		return html`${this._files.map(
-			(file) => html`<umb-input-upload-field-file .path=${file.path}></umb-input-upload-field-file>`,
-		)}`;
-	}
-
-	#renderFilesUploaded() {
-		if (!this._currentFiles.length) return nothing;
-		return html`
-			${repeat(
-				this._currentFiles,
-				(item) => item.unique + item.status,
-				(item) =>
-					html`<div style="position:relative;">
-						<umb-input-upload-field-file .file=${item.file as any}></umb-input-upload-field-file>
-						${item.status === 'waiting' ? html`<umb-temporary-file-badge></umb-temporary-file-badge>` : nothing}
-					</div> `,
-			)}
-		</div>`;
-	}
-
 	#renderButtonRemove() {
-		if (!this._currentFiles.length && !this._files.length) return;
+		if (!this._files.length && !this._files.length) return;
 		return html`<uui-button compact @click=${this.#handleRemove} label="Remove files">
 			<uui-icon name="icon-trash"></uui-icon> Remove file(s)
 		</uui-button>`;
@@ -276,7 +265,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 	#handleRemove() {
 		this._files = [];
-		const uniques = this._currentFiles.map((item) => item.unique) as string[];
+		const uniques = this._files.map((file) => file.unique);
 		this.#manager.remove(uniques);
 
 		this.dispatchEvent(new UmbChangeEvent());
