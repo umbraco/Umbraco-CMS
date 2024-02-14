@@ -19,9 +19,12 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 		const { data, error } = await tryExecuteAndNotify(this.#host, DocumentResource.getTreeDocumentRoot(filter));
 
 		if (data) {
-			const items = data.items.map((item) => this.#mapper(item));
+			const skip = Number(filter.skip) ?? 0;
+			const take = Number(filter.take) ?? 100;
 
-			console.log('UmbDocumentCollectionServerDataSource.getCollection', [data, items]);
+			const items = data.items.slice(skip, skip + take).map((item) => this.#mapper(item));
+
+			//console.log('UmbDocumentCollectionServerDataSource.getCollection', [data, items]);
 
 			return { data: { items, total: data.total } };
 		}

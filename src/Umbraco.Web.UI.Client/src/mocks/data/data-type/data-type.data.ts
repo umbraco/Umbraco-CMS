@@ -706,7 +706,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		hasChildren: false,
 		isFolder: false,
 		values: [
-			{ alias: 'pageSize', value: 5 },
+			{ alias: 'pageSize', value: 2 },
 			{ alias: 'orderDirection', value: 'desc' },
 			{
 				alias: 'includeProperties',
