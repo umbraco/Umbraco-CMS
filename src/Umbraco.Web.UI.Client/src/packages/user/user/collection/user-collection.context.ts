@@ -10,7 +10,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	UmbUserCollectionFilterModel
 > {
 	constructor(host: UmbControllerHostElement) {
-		super(host, { pageSize: 50, defaultViewAlias: UMB_COLLECTION_VIEW_USER_GRID });
+		super(host, UMB_COLLECTION_VIEW_USER_GRID);
 	}
 
 	/**

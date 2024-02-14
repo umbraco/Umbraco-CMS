@@ -2,7 +2,7 @@ import type { UmbCollectionConfiguration, UmbCollectionContext } from '../types.
 import { UmbCollectionViewManager } from '../collection-view.manager.js';
 import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -44,14 +44,13 @@ export class UmbDefaultCollectionContext<
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly view;
 
-	constructor(host: UmbControllerHostElement, config: UmbCollectionConfiguration = { pageSize: 50 }) {
+	constructor(host: UmbControllerHost, defaultViewAlias: string) {
 		super(host, UMB_DEFAULT_COLLECTION_CONTEXT);
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 
-		this.view = new UmbCollectionViewManager(this, { defaultViewAlias: config.defaultViewAlias });
-		this.#configure(config);
+		this.view = new UmbCollectionViewManager(this, { defaultViewAlias: defaultViewAlias });
 	}
 
 	// TODO: find a generic way to do this
