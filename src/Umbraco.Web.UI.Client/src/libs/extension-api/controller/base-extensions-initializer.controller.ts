@@ -107,14 +107,15 @@ export abstract class UmbBaseExtensionsInitializer<
 
 	protected _extensionChanged = (isPermitted: boolean, controller: ControllerType) => {
 		let hasChanged = false;
-		const existingIndex = this.#permittedExts.indexOf(controller as unknown as MyPermittedControllerType);
+		// This might be called after this is destroyed, so we need to check if the _permittedExts is still available:
+		const existingIndex = this.#permittedExts?.indexOf(controller as unknown as MyPermittedControllerType);
 		if (isPermitted) {
 			if (existingIndex === -1) {
 				this.#permittedExts.push(controller as unknown as MyPermittedControllerType);
 				hasChanged = true;
 			}
 		} else {
-			if (existingIndex !== -1) {
+			if (existingIndex >= 0) {
 				this.#permittedExts.splice(existingIndex, 1);
 				hasChanged = true;
 			}
@@ -183,16 +184,18 @@ export abstract class UmbBaseExtensionsInitializer<
 		if (!this.#extensionRegistry) return;
 
 		const oldPermittedExtsLength = this.#exposedPermittedExts.length;
-		this._extensions.length = 0;
-		this.#permittedExts.length = 0;
+		(this._extensions as any) = undefined;
+		(this.#permittedExts as any) = undefined;
 		this.#exposedPermittedExts.length = 0;
+		if (this.#changeDebounce) {
+			cancelAnimationFrame(this.#changeDebounce);
+			this.#changeDebounce = undefined;
+		}
 		if (oldPermittedExtsLength > 0) {
-			if (this.#changeDebounce) {
-				cancelAnimationFrame(this.#changeDebounce);
-				this.#changeDebounce = undefined;
-			}
 			this.#onChange?.(this.#exposedPermittedExts);
 		}
+		this.#promiseResolvers.length = 0;
+		this.#filter = undefined;
 		this.#onChange = undefined;
 		(this.#extensionRegistry as any) = undefined;
 		super.destroy();

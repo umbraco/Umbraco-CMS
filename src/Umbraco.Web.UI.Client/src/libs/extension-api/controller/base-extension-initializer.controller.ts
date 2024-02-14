@@ -74,7 +74,7 @@ export abstract class UmbBaseExtensionInitializer<
 	protected _init() {
 		this.#manifestObserver = this.observe(
 			this.#extensionRegistry.byAlias<ManifestType>(this.#alias),
-			async (extensionManifest) => {
+			(extensionManifest) => {
 				this.#clearPermittedState();
 				this.#manifest = extensionManifest;
 				if (extensionManifest) {
@@ -102,14 +102,15 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 
 	#cleanConditions() {
-		if (this.#conditionControllers.length === 0) return;
+		if (this.#conditionControllers === undefined || this.#conditionControllers.length === 0) return;
 		this.#conditionControllers.forEach((controller) => controller.destroy());
 		this.#conditionControllers = [];
 		this.removeControllerByAlias('_observeConditions');
 	}
 
 	#gotManifest() {
-		const conditionConfigs = this.#manifest?.conditions ?? [];
+		if (!this.#manifest) return;
+		const conditionConfigs = this.#manifest.conditions ?? [];
 
 		// As conditionConfigs might have been configured as something else than an array, then we ignorer them.
 		if (conditionConfigs.length === 0) {
@@ -162,7 +163,8 @@ export abstract class UmbBaseExtensionInitializer<
 	};
 
 	#gotCondition = async (conditionManifest: ManifestCondition) => {
-		const conditionConfigs = this.#manifest?.conditions ?? [];
+		if (!this.#manifest) return;
+		const conditionConfigs = this.#manifest.conditions ?? [];
 		//
 		// Get just the conditions that uses this condition alias:
 		const configsOfThisType = conditionConfigs.filter(
@@ -310,6 +312,7 @@ export abstract class UmbBaseExtensionInitializer<
 
 	public destroy(): void {
 		if (!this.#extensionRegistry) return;
+		this.#manifest = undefined;
 		this.#promiseResolvers = [];
 		this.#clearPermittedState(); // This fires the callback as not permitted, if it was permitted before.
 		this.#isPermitted = undefined;
@@ -319,6 +322,6 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#onPermissionChanged = undefined;
 		(this.#extensionRegistry as any) = undefined;
 		super.destroy();
-		// Destroy the conditions controllers, are begin destroyed cause they are controllers.
+		// Destroy the conditions controllers, they are begin destroyed cause they are controllers...
 	}
 }

@@ -21,6 +21,7 @@ export class UmbClassState<T extends UmbClassStateData | undefined> extends UmbB
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
 	 */
 	setValue(data: T): void {
+		if (!this._subject) return;
 		const oldValue = this._subject.getValue();
 
 		if (data && oldValue?.equal(data)) return;

@@ -46,4 +46,9 @@ export class UmbExtensionsManifestInitializer<
 			this._extensionChanged,
 		) as ControllerType;
 	}
+
+	public destroy(): void {
+		super.destroy();
+		(this.#extensionRegistry as any) = undefined;
+	}
 }

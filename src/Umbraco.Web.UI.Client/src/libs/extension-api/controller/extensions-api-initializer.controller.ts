@@ -78,4 +78,10 @@ export class UmbExtensionsApiInitializer<
 
 		return extController;
 	}
+
+	public destroy(): void {
+		super.destroy();
+		this.#constructorArgs = undefined;
+		(this.#extensionRegistry as any) = undefined;
+	}
 }
