@@ -1,3 +1,4 @@
+import type { UmbCollectionBulkActionPermissions } from '../../../core/collection/types.js';
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action.js';
@@ -6,7 +7,10 @@ import { UmbDocumentMoveEntityBulkAction } from './move/move.action.js';
 import { UmbDocumentPublishEntityBulkAction } from './publish/publish.action.js';
 import { UmbDocumentUnpublishEntityBulkAction } from './unpublish/unpublish.action.js';
 import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import {
+	UMB_COLLECTION_ALIAS_CONDITION,
+	UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
+} from '@umbraco-cms/backoffice/collection';
 
 // TODO: [LK] Wondering how these actions could be wired up to the `bulkActionPermissions` config?
 export const manifests: Array<ManifestEntityBulkAction> = [
@@ -25,6 +29,10 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: UMB_DOCUMENT_COLLECTION_ALIAS,
 			},
+			{
+				alias: UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
+				match: (permissions: UmbCollectionBulkActionPermissions) => permissions.allowBulkPublish,
+			},
 		],
 	},
 	{
@@ -41,6 +49,10 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: UMB_DOCUMENT_COLLECTION_ALIAS,
+			},
+			{
+				alias: UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
+				match: (permissions: UmbCollectionBulkActionPermissions) => permissions.allowBulkUnpublish,
 			},
 		],
 	},
@@ -59,6 +71,10 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: UMB_DOCUMENT_COLLECTION_ALIAS,
 			},
+			{
+				alias: UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
+				match: (permissions: UmbCollectionBulkActionPermissions) => permissions.allowBulkCopy,
+			},
 		],
 	},
 	{
@@ -76,6 +92,10 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: UMB_DOCUMENT_COLLECTION_ALIAS,
 			},
+			{
+				alias: UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
+				match: (permissions: UmbCollectionBulkActionPermissions) => permissions.allowBulkMove,
+			},
 		],
 	},
 	{
@@ -92,6 +112,10 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: UMB_DOCUMENT_COLLECTION_ALIAS,
+			},
+			{
+				alias: UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
+				match: (permissions: UmbCollectionBulkActionPermissions) => permissions.allowBulkDelete,
 			},
 		],
 	},
