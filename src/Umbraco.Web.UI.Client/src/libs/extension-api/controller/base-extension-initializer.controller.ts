@@ -256,7 +256,7 @@ export abstract class UmbBaseExtensionInitializer<
 			await this._conditionsAreBad();
 
 			// Only continue if we are still negative, otherwise it means that something changed in the mean time.
-			if ((this.#isPermitted as boolean) === true || this._isConditionsPositive === true) {
+			if (this._isConditionsPositive === true) {
 				console.warn(
 					'If this happens then please inform Niels Lyngsø on CMS Team. We are still investigating wether this is a situation we should handle. Ref. No.: 2.',
 				);
@@ -283,10 +283,12 @@ export abstract class UmbBaseExtensionInitializer<
 		return otherClass?.manifest === this.manifest;
 	}
 
+	/*
 	public hostConnected(): void {
 		super.hostConnected();
 		//this.#onConditionsChangedCallback();
 	}
+	*/
 
 	public hostDisconnected(): void {
 		super.hostDisconnected();
