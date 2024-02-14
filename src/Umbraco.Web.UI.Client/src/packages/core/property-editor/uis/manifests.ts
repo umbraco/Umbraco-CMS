@@ -1,4 +1,5 @@
 import { manifest as checkboxList } from './checkbox-list/manifests.js';
+import { manifest as codeEditor } from './code-editor/manifests.js';
 import { manifest as colorEditor } from './color-swatches-editor/manifests.js';
 import { manifest as colorPicker } from './color-picker/manifests.js';
 import { manifest as datePicker } from './date-picker/manifests.js';
@@ -30,6 +31,7 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension
 
 export const manifests: Array<ManifestPropertyEditorUi> = [
 	checkboxList,
+	codeEditor,
 	colorEditor,
 	colorPicker,
 	datePicker,
