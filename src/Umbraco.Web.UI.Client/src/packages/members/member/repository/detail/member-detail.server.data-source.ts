@@ -2,8 +2,8 @@ import type { UmbMemberDetailModel } from '../../types.js';
 import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { MemberResource } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateMemberRequestModel, UpdateMemberRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

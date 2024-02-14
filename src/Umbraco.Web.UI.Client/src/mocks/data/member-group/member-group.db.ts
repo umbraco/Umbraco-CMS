@@ -6,7 +6,7 @@ import { pagedResult } from '../utils/paged-result.js';
 import type { UmbMockMemberGroupModel } from './member-group.data.js';
 import { data } from './member-group.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const memberGroupQueryFilter = (filterOptions: any, item: UmbMockMemberGroupModel) =>
 	queryFilter(filterOptions.filter, item.name);

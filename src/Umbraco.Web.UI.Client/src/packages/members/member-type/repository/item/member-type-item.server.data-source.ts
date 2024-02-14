@@ -1,7 +1,7 @@
 import type { UmbMemberTypeItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type { MemberTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { MemberTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { MemberTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../../entity.js';
 

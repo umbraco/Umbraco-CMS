@@ -1,7 +1,10 @@
 const { rest } = window.MockServiceWorker;
 import { umbMemberTypeMockDb } from '../../data/member-type/member-type.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { CreateMemberTypeRequestModel, UpdateMemberTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	CreateMemberTypeRequestModel,
+	UpdateMemberTypeRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [

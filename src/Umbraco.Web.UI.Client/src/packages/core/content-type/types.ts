@@ -1,4 +1,4 @@
-import type { CompositionTypeModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CompositionTypeModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbPropertyContainerTypes = 'Group' | 'Tab';
 export interface UmbPropertyTypeContainerModel {

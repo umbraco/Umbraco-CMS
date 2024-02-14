@@ -9,7 +9,7 @@ import type {
 	CreateMemberTypeRequestModel,
 	MemberTypeItemResponseModel,
 	MemberTypeResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMemberTypeMockDB extends UmbEntityMockDbBase<UmbMockMemberTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMemberTypeModel>(this, memberTypeTreeItemMapper);

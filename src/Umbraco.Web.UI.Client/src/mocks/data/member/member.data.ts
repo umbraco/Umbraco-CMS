@@ -1,4 +1,4 @@
-import type { MemberResponseModel, MemberItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MemberResponseModel, MemberItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 

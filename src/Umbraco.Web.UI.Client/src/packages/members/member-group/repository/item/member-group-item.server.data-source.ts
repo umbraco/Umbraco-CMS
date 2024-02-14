@@ -1,7 +1,7 @@
 import type { UmbMemberGroupItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { MemberGroupResource } from '@umbraco-cms/backoffice/backend-api';
+import type { MemberGroupItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 
