@@ -449,6 +449,10 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				opacity: 0.2;
 			}
 
+			[drag-placeholder] uui-input {
+				visibility: hidden;
+			}
+
 			/* TODO: This should be replaced with a general workspace bar — naming is hard */
 
 			#header {

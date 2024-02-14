@@ -24,10 +24,44 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			identifier: 'document-type-container-sorter',
 			itemSelector: '.container-handle',
 			containerSelector: '.container-list',
-			onChange: ({ item, model }) => {
-				model.forEach((modelItem, index) => {
-					this._groupStructureHelper.partialUpdateContainer(modelItem.id, { sortOrder: index });
-				});
+			onChange: ({ model }) => {
+				this._groups = model;
+			},
+			onEnd: ({ item }) => {
+				/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+				 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
+				 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
+				 */
+				const model = this._groups;
+				const newIndex = model.findIndex((entry) => entry.id === item.id);
+
+				// Doesn't exist in model
+				if (newIndex === -1) return;
+
+				// First in list
+				if (newIndex === 0 && model.length > 1) {
+					this._groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
+					return;
+				}
+
+				// Not first in list
+				if (newIndex > 0 && model.length > 1) {
+					const prevItemSortOrder = model[newIndex - 1].sortOrder;
+
+					let weight = 1;
+					this._groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
+
+					// Check for overlaps
+					model.some((entry, index) => {
+						if (index <= newIndex) return;
+						if (entry.sortOrder === prevItemSortOrder + weight) {
+							weight++;
+							this._groupStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
+						}
+						// Break the loop
+						return true;
+					});
+				}
 			},
 		},
 	);
@@ -214,6 +248,10 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		css`
 			[drag-placeholder] {
 				opacity: 0.2;
+			}
+
+			[drag-placeholder] uui-input {
+				visibility: hidden;
 			}
 
 			#add {

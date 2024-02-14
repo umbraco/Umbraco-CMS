@@ -480,6 +480,9 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			:host([drag-placeholder]) {
 				opacity: 0.2;
 			}
+			:host([drag-placeholder]) uui-input {
+				visibility: hidden;
+			}
 		`,
 	];
 }
