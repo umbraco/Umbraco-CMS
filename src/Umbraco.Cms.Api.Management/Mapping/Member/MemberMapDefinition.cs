@@ -22,7 +22,7 @@ public class MemberMapDefinition : ContentMapDefinition<IMember, MemberValueMode
     {
         target.Id = source.Key;
         target.MemberType = context.Map<MemberTypeReferenceResponseModel>(source.ContentType)!;
-        target.Values = MapValueViewModels(source);
+        target.Values = MapValueViewModels(source.Properties);
         target.Variants = MapVariantViewModels(source);
 
         target.IsApproved = source.IsApproved;
