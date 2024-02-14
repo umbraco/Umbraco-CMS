@@ -15,6 +15,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
+	#model: Array<UmbPropertyTypeContainerModel> = [];
 	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UmbDocumentTypeWorkspaceViewEditPropertiesElement>(
 		this,
 		{
@@ -26,13 +27,14 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			containerSelector: '.container-list',
 			onChange: ({ model }) => {
 				this._groups = model;
+				this.#model = model;
 			},
 			onEnd: ({ item }) => {
 				/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 				 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 				 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 				 */
-				const model = this._groups;
+				const model = this.#model;
 				const newIndex = model.findIndex((entry) => entry.id === item.id);
 
 				// Doesn't exist in model
@@ -139,6 +141,11 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		});
 		this.observe(this._groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
+			if (this._sortModeActive) {
+				this.#sorter.setModel(this._groups);
+			} else {
+				this.#sorter.setModel([]);
+			}
 			this.requestUpdate('_groups');
 		});
 		this.observe(this._groupStructureHelper.hasProperties, (hasProperties) => {
@@ -178,7 +185,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
 					${repeat(
 						this._groups,
-						(group) => group.id ?? '' + group.name,
+						(group) => group.id + '' + group.name + group.sortOrder,
 						(group) =>
 							html`<uui-box class="container-handle">
 								${this.#renderHeader(group)}
@@ -247,10 +254,10 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			[drag-placeholder] {
-				opacity: 0.2;
+				opacity: 0.5;
 			}
 
-			[drag-placeholder] uui-input {
+			[drag-placeholder] > * {
 				visibility: hidden;
 			}
 

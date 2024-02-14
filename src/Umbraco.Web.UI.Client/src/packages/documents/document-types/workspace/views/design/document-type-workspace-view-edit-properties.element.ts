@@ -23,26 +23,55 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		},
 		identifier: 'document-type-property-sorter',
 		itemSelector: 'umb-document-type-workspace-view-edit-property',
-		disabledItemSelector: '[inherited]',
+		//disabledItemSelector: '[inherited]',
 		//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
 		// This is because we don't want to move local properties into an inherited group container.
 		// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
 		// TODO: Fix bug where a local property turn into an inherited when moved to a new group container.
 		containerSelector: '#property-list',
 		onChange: ({ item, model }) => {
-			const isInNewContainer = model.find((entry) => entry.container.id !== this._containerId);
-			if (isInNewContainer) {
-				model.forEach((entry, index) => {
-					entry.id === item.id
-						? this._propertyStructureHelper.partialUpdateProperty(entry.id, {
-								sortOrder: index,
-								container: { id: this._containerId },
-						  })
-						: this._propertyStructureHelper.partialUpdateProperty(entry.id, { sortOrder: index });
+			this.#model = model;
+			this._propertyStructure = model;
+		},
+		onEnd: ({ item }) => {
+			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
+			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
+			 */
+			const model = this.#model;
+			const newIndex = model.findIndex((entry) => entry.id === item.id);
+
+			// Doesn't exist in model
+			if (newIndex === -1) return;
+
+			// First in list
+			if (newIndex === 0 && model.length > 1) {
+				this._propertyStructureHelper.partialUpdateProperty(item.id, {
+					sortOrder: model[1].sortOrder - 1,
+					container: this._containerId ? { id: this._containerId } : null,
 				});
-			} else {
-				model.forEach((entry, index) => {
-					this._propertyStructureHelper.partialUpdateProperty(entry.id, { sortOrder: index });
+				return;
+			}
+
+			// Not first in list
+			if (newIndex > 0 && model.length > 1) {
+				const prevItemSortOrder = model[newIndex - 1].sortOrder;
+
+				let weight = 1;
+				this._propertyStructureHelper.partialUpdateProperty(item.id, {
+					sortOrder: prevItemSortOrder + weight,
+					container: this._containerId ? { id: this._containerId } : null,
+				});
+
+				// Check for overlaps
+				model.some((entry, index) => {
+					if (index <= newIndex) return;
+					if (entry.sortOrder === prevItemSortOrder + weight) {
+						weight++;
+						this._propertyStructureHelper.partialUpdateProperty(entry.id, { sortOrder: prevItemSortOrder + weight });
+					}
+					// Break the loop
+					return true;
 				});
 			}
 		},
@@ -122,6 +151,11 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
+			if (this._sortModeActive) {
+				this.#sorter.setModel(this._propertyStructure);
+			} else {
+				this.#sorter.setModel([]);
+			}
 		});
 
 		// Note: Route for adding a new property
