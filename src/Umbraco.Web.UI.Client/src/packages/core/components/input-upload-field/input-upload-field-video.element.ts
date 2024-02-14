@@ -7,21 +7,12 @@ export class UmbInputUploadFieldVideoElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 
-	#serverUrl = '';
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.#serverUrl = instance.getServerUrl();
-		});
-	}
-
 	render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
 		return html`
 			<video controls>
-				<source src=${this.#serverUrl + this.path} />
+				<source src=${this.path} />
 				Video format not supported
 			</video>
 		`;

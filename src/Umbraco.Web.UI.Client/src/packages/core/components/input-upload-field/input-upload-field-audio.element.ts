@@ -7,19 +7,10 @@ export class UmbInputUploadFieldAudioElement extends UmbLitElement {
 	@property({ type: String })
 	path = '';
 
-	#serverUrl = '';
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.#serverUrl = instance.getServerUrl();
-		});
-	}
-
 	render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
 
-		return html`<audio controls src=${this.#serverUrl + this.path}></audio>`;
+		return html`<audio controls src=${this.path}></audio>`;
 	}
 
 	static styles = [

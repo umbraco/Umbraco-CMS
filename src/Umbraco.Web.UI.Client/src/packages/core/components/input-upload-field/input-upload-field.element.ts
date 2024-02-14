@@ -18,6 +18,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './input-upload-field-file.element.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
@@ -31,9 +32,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	public set keys(fileKeys: Array<string>) {
 		this._keys = fileKeys;
 		super.value = this._keys.join(',');
-		fileKeys.forEach((key) => {
-			if (!UmbId.validate(key) && key.startsWith('/')) this._filePaths.push(key);
-		});
+		this.#setFilePaths();
 	}
 	public get keys(): Array<string> {
 		return this._keys;
@@ -69,6 +68,8 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	private _dropzone?: UUIFileDropzoneElement;
 
 	#manager;
+	#serverUrl = '';
+	#serverUrlPromise;
 
 	protected getFormElement() {
 		return undefined;
@@ -78,6 +79,10 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		super();
 		this.#manager = new UmbTemporaryFileManager(this);
 
+		this.#serverUrlPromise = this.consumeContext(UMB_APP_CONTEXT, (instance) => {
+			this.#serverUrl = instance.getServerUrl();
+		}).asPromise();
+
 		this.observe(this.#manager.isReady, (value) => (this.error = !value));
 		this.observe(this.#manager.queue, (value) => (this._currentFiles = value));
 	}
@@ -85,6 +90,17 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.#setExtensions();
+	}
+
+	async #setFilePaths() {
+		await this.#serverUrlPromise;
+
+		this.keys.forEach((key) => {
+			if (!UmbId.validate(key) && key.startsWith('/')) {
+				this._filePaths.push(this.#serverUrl + key);
+				this.requestUpdate();
+			}
+		});
 	}
 
 	#setExtensions() {
@@ -123,7 +139,6 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		items.forEach((item) => {
 			const reader = new FileReader();
 			reader.onload = () => {
-				console.log(reader.result);
 				this._filePaths.push(reader.result as string);
 			};
 			reader.readAsDataURL(item.file);
@@ -136,9 +151,10 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	render() {
-		this.multiple = true;
-		console.log(this._filePaths, this._currentFiles);
-		// return html`<div id="wrapper">${this.#renderFiles()}</div>`;
+		return html`
+			<div id="wrapper">${this.#renderFiles()}</div>
+			${this.#renderDropzone()} ${this.#renderButtonRemove()}
+		`;
 		return html`<div id="wrapper">${this.#renderFilesWithPath()} ${this.#renderFilesUploaded()}</div>
 			${this.#renderDropzone()}${this.#renderButtonRemove()}`;
 	}
@@ -167,7 +183,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		);
 	}
 
-	#renderFile(path: string) {
+	#renderFile(path: string, dataUrl?: string) {
 		const type = this.#getFileTypeFromPath(path);
 
 		switch (type) {
@@ -185,7 +201,17 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#getFileTypeFromPath(path: string): 'audio' | 'video' | 'image' | 'svg' | 'file' {
-		const extension = path.split('.').pop();
+		// Extract the MIME type from the data URL
+		if (path.startsWith('data:')) {
+			const mimeType = path.substring(5, path.indexOf(';'));
+			if (mimeType.startsWith('image/')) return 'image';
+			if (mimeType.startsWith('audio/')) return 'audio';
+			if (mimeType.startsWith('video/')) return 'video';
+			if (mimeType === 'image/svg+xml') return 'svg';
+		}
+
+		// Extract the file extension from the path
+		const extension = path.split('.').pop()?.toLowerCase();
 		if (!extension) return 'file';
 		if (['mp3', 'weba', 'oga', 'opus'].includes(extension)) return 'audio';
 		if (['mp4', 'mov', 'webm', 'ogv'].includes(extension)) return 'video';
