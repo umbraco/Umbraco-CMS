@@ -1,7 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
@@ -24,6 +26,12 @@ public class ImageCropperValueConverter : PropertyValueConverterBase, IDeliveryA
     {
         _logger = logger;
         _jsonSerializer = jsonSerializer;
+    }
+
+    [Obsolete("Use the constructor specifying all dependencies, scheduled for removal in V16")]
+    public ImageCropperValueConverter(ILogger<ImageCropperValueConverter> logger)
+        : this(logger, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
+    {
     }
 
     /// <inheritdoc />
