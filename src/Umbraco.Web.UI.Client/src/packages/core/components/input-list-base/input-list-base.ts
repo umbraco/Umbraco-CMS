@@ -4,11 +4,10 @@ import type {
 	UmbModalManagerContext,
 	UmbModalToken,
 	UmbModalType,
-	UmbPickerModalValue} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT
+	UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
 export class UmbInputListBaseElement extends UmbLitElement {

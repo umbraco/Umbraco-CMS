@@ -1,6 +1,6 @@
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 

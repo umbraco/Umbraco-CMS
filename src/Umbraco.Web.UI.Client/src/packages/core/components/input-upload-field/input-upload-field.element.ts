@@ -1,4 +1,4 @@
-import type { TemporaryFileQueueItem} from '../../temporary-file/temporary-file-manager.class.js';
+import type { TemporaryFileQueueItem } from '../../temporary-file/temporary-file-manager.class.js';
 import { UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
@@ -14,7 +14,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './input-upload-field-file.element.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';

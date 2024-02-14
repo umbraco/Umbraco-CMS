@@ -17,7 +17,7 @@ import {
 import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -128,6 +128,10 @@ export class UmbDocumentWorkspaceContext
 			variantId ? (x) => variantId.compare(x) : () => true,
 		);
 		this.#currentData.update({ variants });
+	}
+
+	setTemplate(templateUnique: string) {
+		this.#currentData.update({ template: { unique: templateUnique } });
 	}
 
 	async propertyStructureById(propertyId: string) {

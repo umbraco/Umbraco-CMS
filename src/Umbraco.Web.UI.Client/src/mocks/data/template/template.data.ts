@@ -4,8 +4,8 @@ import type {
 	TemplateQuerySettingsResponseModel,
 	TemplateQueryResultResponseModel,
 	NamedEntityTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { TemplateQueryPropertyTypeModel, OperatorModel } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { TemplateQueryPropertyTypeModel, OperatorModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockTemplateModelHack = TemplateResponseModel & NamedEntityTreeItemResponseModel & TemplateItemResponseModel;
 

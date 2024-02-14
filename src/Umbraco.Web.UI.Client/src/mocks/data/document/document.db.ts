@@ -13,7 +13,7 @@ import {
 	type DocumentItemResponseModel,
 	type DocumentResponseModel,
 	type DocumentTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel> {

@@ -1,7 +1,7 @@
 import type { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UMB_STYLESHEET_WORKSPACE_CONTEXT } from '../../stylesheet-workspace.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 

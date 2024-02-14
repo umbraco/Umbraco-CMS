@@ -6,8 +6,7 @@ import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	//private _defaultVariant?: VariantViewModelBaseModel;

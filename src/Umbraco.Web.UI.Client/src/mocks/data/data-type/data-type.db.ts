@@ -12,7 +12,7 @@ import type {
 	CreateFolderRequestModel,
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbDataTypeMockDB extends UmbEntityMockDbBase<UmbMockDataTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDataTypeModel>(this, folderTreeItemMapper);

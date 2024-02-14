@@ -1,16 +1,13 @@
 import type { UmbHealthCheckContext } from '../health-check.context.js';
-import type {
-	UmbHealthCheckDashboardContext} from '../health-check-dashboard.context.js';
-import {
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT
-} from '../health-check-dashboard.context.js';
+import type { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context.js';
+import { UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from '../health-check-dashboard.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { ensureSlash, path } from '@umbraco-cms/backoffice/router';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
-import type { HealthCheckGroupWithResultResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import { StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { HealthCheckGroupWithResultResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-health-check-group-box-overview')
 export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {

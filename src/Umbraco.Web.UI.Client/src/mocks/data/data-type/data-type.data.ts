@@ -2,7 +2,7 @@ import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockDataTypeModelHack = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
 
@@ -559,7 +559,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'useInlineEditingAsDefault',
-				value: false,
+				value: true,
 			},
 			{
 				alias: 'useLiveEditing',

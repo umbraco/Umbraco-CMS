@@ -1,29 +1,12 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type {
-	TemplateResult} from '@umbraco-cms/backoffice/external/lit';
-import {
-	css,
-	html,
-	nothing,
-	customElement,
-	property,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 
-import type {
-	DebugContextData,
-	DebugContextItemData} from '@umbraco-cms/backoffice/context-api';
-import {
-	contextData,
-	UmbContextDebugRequest,
-} from '@umbraco-cms/backoffice/context-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_CONTEXT_DEBUGGER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-} from '@umbraco-cms/backoffice/modal';
+import type { DebugContextData, DebugContextItemData } from '@umbraco-cms/backoffice/context-api';
+import { contextData, UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONTEXT_DEBUGGER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-debug')
 export class UmbDebugElement extends UmbLitElement {

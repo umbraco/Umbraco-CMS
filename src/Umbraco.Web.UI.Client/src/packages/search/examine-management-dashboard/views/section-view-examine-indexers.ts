@@ -1,10 +1,10 @@
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
-import type { IndexResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import { HealthStatusModel, IndexerResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { IndexResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthStatusModel, IndexerResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 import './section-view-examine-searchers.js';
@@ -151,7 +151,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 				look="primary"
 				.state="${this._buttonState}"
 				@click="${this._onRebuildHandler}"
-				.disabled="${!this._indexData?.canRebuild ?? true}"
+				.disabled="${this._indexData?.canRebuild ? false : true}"
 				label="Rebuild index">
 				Rebuild
 			</uui-button>

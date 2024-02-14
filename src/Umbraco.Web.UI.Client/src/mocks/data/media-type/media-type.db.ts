@@ -12,7 +12,7 @@ import type {
 	MediaTypeItemResponseModel,
 	MediaTypeResponseModel,
 	MediaTypeTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMediaTypeModel>(this, mediaTypeTreeItemMapper);

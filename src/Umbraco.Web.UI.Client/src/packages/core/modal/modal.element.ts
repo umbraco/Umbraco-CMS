@@ -5,7 +5,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {

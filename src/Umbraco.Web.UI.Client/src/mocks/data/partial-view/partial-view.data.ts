@@ -3,7 +3,7 @@ import type {
 	PartialViewItemResponseModel,
 	PartialViewResponseModel,
 	PartialViewSnippetResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockPartialViewModelHack = PartialViewResponseModel &
 	FileSystemTreeItemPresentationModel &

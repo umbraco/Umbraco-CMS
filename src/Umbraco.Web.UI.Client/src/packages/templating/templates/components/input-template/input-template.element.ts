@@ -6,7 +6,7 @@ import { css, html, customElement, property, state } from '@umbraco-cms/backoffi
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_TEMPLATE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-template')

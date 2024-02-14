@@ -9,7 +9,7 @@ import type {
 	PagedPartialViewSnippetItemResponseModel,
 	PartialViewSnippetItemResponseModel,
 	PartialViewSnippetResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbPartialViewMockDB extends UmbFileSystemMockDbBase<UmbMockPartialViewModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockPartialViewModel>(this);

@@ -1,5 +1,5 @@
-import type { UserItemResponseModel, UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserItemResponseModel, UserResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbMockUserModel = UserResponseModel & UserItemResponseModel;
 

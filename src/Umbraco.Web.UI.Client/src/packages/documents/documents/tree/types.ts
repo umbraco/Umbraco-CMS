@@ -1,6 +1,6 @@
 import type { UmbDocumentEntityType, UmbDocumentRootEntityType } from '../entity.js';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
-import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbDocumentTreeItemModel extends UmbUniqueTreeItemModel {
 	entityType: UmbDocumentEntityType;
