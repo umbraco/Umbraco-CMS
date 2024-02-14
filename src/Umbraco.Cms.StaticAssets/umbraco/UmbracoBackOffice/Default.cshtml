@@ -16,7 +16,6 @@
 @inject IOptions<GlobalSettings> globalSettings
 @inject IRuntimeMinifier runtimeMinifier
 @inject IProfilerHtml profilerHtml
-@inject IBackOfficeExternalLoginProviders externalLogins
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out bool isDebug);
     var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
@@ -114,8 +113,6 @@
 
     <script>
         document.angularReady = function(app) {
-            @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors()!)
-            @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode]!)
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";

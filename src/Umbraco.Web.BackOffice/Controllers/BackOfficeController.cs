@@ -473,7 +473,7 @@ public class BackOfficeController : UmbracoController
                 _httpContextAccessor.HttpContext,
                 ViewDataExtensions.TokenExternalSignInError,
                 _jsonSerializer) ||
-            ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) || ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
+            ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError))
         {
             // Return early to let the client side handle the messaging
             return defaultResponse();
