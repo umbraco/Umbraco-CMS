@@ -59,8 +59,9 @@ export class UmbExtensionsApiInitializer<
 		constructorArguments: Array<unknown> | undefined,
 		filter?: undefined | null | ((manifest: ManifestTypeAsApi) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
+		controllerAlias?: string,
 	) {
-		super(host, extensionRegistry, type, filter, onChange);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
 		this.#extensionRegistry = extensionRegistry;
 		this.#constructorArgs = constructorArguments;
 		this._init();

@@ -237,11 +237,14 @@ export abstract class UmbBaseExtensionInitializer<
 
 		this._isConditionsPositive = isPositive;
 
-		if (isPositive) {
+		if (isPositive === true) {
 			if (this.#isPermitted !== true) {
 				const newPermission = await this._conditionsAreGood();
 				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time.
-				if (newPermission === false) {
+				if (newPermission === false || this._isConditionsPositive === false) {
+					console.warn(
+						'If this happens then please inform Niels Lyngsø on CMS Team. We are still investigating wether this is a situation we should handle. Ref. No.: 1.',
+					);
 					return;
 				}
 				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
@@ -250,11 +253,21 @@ export abstract class UmbBaseExtensionInitializer<
 			}
 		} else if (this.#isPermitted !== false) {
 			// Clean up:
-			this.#isPermitted = false;
 			await this._conditionsAreBad();
+
+			// Only continue if we are still negative, otherwise it means that something changed in the mean time.
+			if ((this.#isPermitted as boolean) === true || this._isConditionsPositive === true) {
+				console.warn(
+					'If this happens then please inform Niels Lyngsø on CMS Team. We are still investigating wether this is a situation we should handle. Ref. No.: 2.',
+				);
+				return;
+			}
+			// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
+			oldValue = this.#isPermitted ?? false;
+			this.#isPermitted = false;
 		}
 		if (oldValue !== this.#isPermitted && this.#isPermitted !== undefined) {
-			if (this.#isPermitted) {
+			if (this.#isPermitted === true) {
 				this.#promiseResolvers.forEach((x) => x());
 				this.#promiseResolvers = [];
 			}
@@ -270,7 +283,6 @@ export abstract class UmbBaseExtensionInitializer<
 		return otherClass?.manifest === this.manifest;
 	}
 
-	/*
 	public hostConnected(): void {
 		super.hostConnected();
 		//this.#onConditionsChangedCallback();
@@ -278,14 +290,13 @@ export abstract class UmbBaseExtensionInitializer<
 
 	public hostDisconnected(): void {
 		super.hostDisconnected();
-		this._runtimePositive = false;
+		this._isConditionsPositive = false;
 		if (this.#isPermitted === true) {
-			this.#isPermitted = false;
 			this._conditionsAreBad();
+			this.#isPermitted = false;
 			this.#onPermissionChanged?.(false, this as any);
 		}
 	}
-	*/
 
 	#clearPermittedState() {
 		if (this.#isPermitted === true) {

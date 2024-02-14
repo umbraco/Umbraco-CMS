@@ -115,6 +115,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				(extensionControllers) => {
 					this._permittedExts = extensionControllers;
 				},
+				'extensionsInitializer',
 				this.defaultElement,
 			);
 			this.#extensionsController.properties = this.#props;

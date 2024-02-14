@@ -170,6 +170,7 @@ export class UmbModalElement extends UmbLitElement {
 		this.#innerElement.complete();
 		this.#modalExtensionObserver?.destroy();
 		this.#modalExtensionObserver = undefined;
+		super.destroy();
 	}
 
 	disconnectedCallback(): void {
