@@ -1,11 +1,6 @@
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { html, until, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-type FileItem = {
-	name: string;
-	src: string;
-};
 
 @customElement('umb-input-upload-field-audio')
 export class UmbInputUploadFieldAudioElement extends UmbLitElement {
