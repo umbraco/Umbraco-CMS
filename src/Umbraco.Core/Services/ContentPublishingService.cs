@@ -79,7 +79,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
 
         var errors = validationResult.ValidationErrors.Where(err =>
-            cultures.Contains(err.Culture, StringComparer.InvariantCultureIgnoreCase));
+            cultures.Contains(err.Culture ?? "*", StringComparer.InvariantCultureIgnoreCase));
         if (errors.Any())
         {
             scope.Complete();

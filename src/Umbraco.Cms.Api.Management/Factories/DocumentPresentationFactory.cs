@@ -123,7 +123,7 @@ internal sealed class DocumentPresentationFactory
     public Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel)
     {
         var contentScheduleCollection = new ContentScheduleCollection();
-        var culturesToPublishImmediately = new List<string>();
+        var culturesToPublishImmediately = new HashSet<string>();
         foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in requestModel.PublishSchedules)
         {
             if (cultureAndScheduleRequestModel.Schedule is null || (cultureAndScheduleRequestModel.Schedule.PublishTime is null && cultureAndScheduleRequestModel.Schedule.UnpublishTime is null))

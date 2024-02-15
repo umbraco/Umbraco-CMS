@@ -110,7 +110,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
@@ -135,7 +135,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var publishResult = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var publishResult = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishResult.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, publishResult.Status);
@@ -153,7 +153,7 @@ public partial class ContentPublishingServiceTests
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
 
-        publishResult = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langDa.IsoCode }), Constants.Security.SuperUserKey);
+        publishResult = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langDa.IsoCode }), Constants.Security.SuperUserKey);
 
         Assert.IsTrue(publishResult.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, publishResult.Status);
@@ -216,7 +216,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", null, culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode }), Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
 
@@ -315,7 +315,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Status);
 
@@ -394,7 +394,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", null, culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.ContentInvalid, result.Status);
 
@@ -416,7 +416,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
 
-        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langDa.IsoCode }), Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langDa.IsoCode }), Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.MandatoryCultureMissing, result.Status);
 

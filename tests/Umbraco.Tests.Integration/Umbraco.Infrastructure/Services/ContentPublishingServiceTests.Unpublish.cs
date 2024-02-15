@@ -104,7 +104,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
-        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, langEn.IsoCode, Constants.Security.SuperUserKey);
@@ -130,7 +130,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
-        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
         var result = await ContentPublishingService.UnpublishAsync(content.Key, null, Constants.Security.SuperUserKey);
@@ -155,7 +155,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
-        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
@@ -185,7 +185,7 @@ public partial class ContentPublishingServiceTests
         content.SetValue("title", "EN title", culture: langEn.IsoCode);
         content.SetValue("title", "DA title", culture: langDa.IsoCode);
         ContentService.Save(content);
-        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new[] { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
