@@ -1,5 +1,6 @@
 import type { TemporaryFileQueueItem } from '../../temporary-file/temporary-file-manager.class.js';
 import { UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '../../property/property-dataset/property-dataset-context.token.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	css,
@@ -19,7 +20,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import './input-upload-field-file.element.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { UMB_PROPERTY_DATASET_CONTEXT } from '../../property/property-dataset/property-dataset-context.token.js';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
@@ -208,6 +208,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderFiles() {
+		console.log('files', this._files);
 		return repeat(
 			this._files,
 			(path) => path,
@@ -248,19 +249,20 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		// Extract the MIME type from the data URL
 		if (path.startsWith('data:')) {
 			const mimeType = path.substring(5, path.indexOf(';'));
+			if (mimeType === 'image/svg+xml') return 'svg';
 			if (mimeType.startsWith('image/')) return 'image';
 			if (mimeType.startsWith('audio/')) return 'audio';
 			if (mimeType.startsWith('video/')) return 'video';
-			if (mimeType === 'image/svg+xml') return 'svg';
 		}
 
 		// Extract the file extension from the path
 		const extension = path.split('.').pop()?.toLowerCase();
+		console.log('extension', extension, path);
 		if (!extension) return 'file';
+		if (['svg'].includes(extension)) return 'svg';
 		if (['mp3', 'weba', 'oga', 'opus'].includes(extension)) return 'audio';
 		if (['mp4', 'mov', 'webm', 'ogv'].includes(extension)) return 'video';
 		if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) return 'image';
-		if (['svg'].includes(extension)) return 'svg';
 
 		return 'file';
 	}
