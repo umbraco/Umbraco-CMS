@@ -36,7 +36,8 @@ export class UmbBlockGridAreaConfigEntryContext extends UmbContextBase<UmbBlockG
 			this.#propertyContext.value,
 			(value: Array<UmbBlockGridTypeAreaType> | undefined) => {
 				if (value) {
-					this.#area.setValue(value.find((x) => x.key === this.#areaKey));
+					const areaType = value.find((x) => x.key === this.#areaKey);
+					this.#area.setValue(areaType);
 				}
 			},
 			'observeAreaKey',

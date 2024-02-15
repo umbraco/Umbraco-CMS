@@ -14,11 +14,11 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 	public get areaKey(): string | undefined {
 		return this._areaKey;
 	}
-	public set areaKey(value: string | undefined) {
-		if (!value) return;
-		this._areaKey = value;
-		this.setAttribute('data-area-key', value);
-		this.#context.setAreaKey(value);
+	public set areaKey(areaKey: string | undefined) {
+		if (!areaKey) return;
+		this._areaKey = areaKey;
+		this.setAttribute('data-area-key', areaKey);
+		this.#context.setAreaKey(areaKey);
 	}
 	private _areaKey?: string | undefined;
 	//
@@ -69,17 +69,15 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 	#renderBlock() {
 		return this._areaKey
 			? html`
-					<div class="umb-block-grid-area-editor__area">
-						<div>${this._alias}</div>
-						<uui-action-bar>
-							<uui-button label="edit" compact href=${'#edit_area_path_missing'}>
-								<uui-icon name="icon-edit"></uui-icon>
-							</uui-button>
-							<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
-								<uui-icon name="icon-remove"></uui-icon>
-							</uui-button>
-						</uui-action-bar>
-					</div>
+					<span>${this._alias}</span>
+					<uui-action-bar>
+						<uui-button label="edit" compact href=${'#edit_area_path_missing'}>
+							<uui-icon name="icon-edit"></uui-icon>
+						</uui-button>
+						<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
+							<uui-icon name="icon-remove"></uui-icon>
+						</uui-button>
+					</uui-action-bar>
 			  `
 			: '';
 	}
@@ -88,12 +86,23 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 		return this.#renderBlock();
 	}
 
+	// TODO: Update UUI, as it is missing proper colors to be used for this case:
 	static styles = [
 		css`
 			:host {
 				position: relative;
 				display: block;
+				box-sizing: border-box;
+				background-color: var(--uui-color-disabled);
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				transition: background-color 120ms;
 			}
+
+			:host(:hover) {
+				background-color: var(--uui-color-disabled-standalone);
+			}
+
 			uui-action-bar {
 				position: absolute;
 				top: var(--uui-size-2);
