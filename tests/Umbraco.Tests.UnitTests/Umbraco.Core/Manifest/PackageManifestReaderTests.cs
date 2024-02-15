@@ -131,9 +131,9 @@ public class PackageManifestReaderTests
     }
 
     [Test]
-    public async Task Cannot_Read_PackageManifest_Without_Name()
+    public void Cannot_Read_PackageManifest_Without_Name()
     {
-        var content = @"{
+        const string content = @"{
     ""version"": ""1.2.3"",
     ""allowTelemetry"": true,
     ""extensions"": [{
@@ -152,9 +152,9 @@ public class PackageManifestReaderTests
     }
 
     [Test]
-    public async Task Cannot_Read_PackageManifest_Without_Extensions()
+    public void Cannot_Read_PackageManifest_Without_Extensions()
     {
-        var content = @"{
+        const string content = @"{
     ""name"": ""Something"",
     ""version"": ""1.2.3"",
     ""allowTelemetry"": true
@@ -167,9 +167,31 @@ public class PackageManifestReaderTests
         EnsureLogErrorWasCalled();
     }
 
+    [Test]
+    public void Cannot_Read_PackageManifest_Without_Importmap_Imports()
+    {
+        const string content = @"{
+    ""name"": ""Something"",
+    ""extensions"": [],
+    ""importmap"": {
+        ""scopes"": {
+            ""/modules/customshapes"": {
+                ""square"": ""https://example.com/modules/shapes/square.js""
+            }
+        }
+    }
+}";
+        _rootDirectoryContentsMock
+            .Setup(f => f.GetEnumerator())
+            .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
+
+        Assert.ThrowsAsync<JsonException>(() => _reader.ReadPackageManifestsAsync());
+        EnsureLogErrorWasCalled();
+    }
+
     [TestCase("This is not JSON")]
     [TestCase(@"{""name"": ""invalid-json"", ""version"": ")]
-    public async Task Cannot_Read_Invalid_PackageManifest(string content)
+    public void Cannot_Read_Invalid_PackageManifest(string content)
     {
         _rootDirectoryContentsMock
             .Setup(f => f.GetEnumerator())
