@@ -66,6 +66,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddStylesheets()
                 .AddServer()
                 .AddCorsPolicy()
+                .AddWebhooks()
                 .AddBackOfficeAuthentication()
                 .AddPasswordConfiguration();
 

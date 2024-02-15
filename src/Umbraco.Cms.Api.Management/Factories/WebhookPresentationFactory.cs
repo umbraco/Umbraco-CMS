@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.Common.Models;
 
-namespace Umbraco.Cms.Web.BackOffice.Services;
+namespace Umbraco.Cms.Api.Management.Factories;
 
 internal class WebhookPresentationFactory : IWebhookPresentationFactory
 {
