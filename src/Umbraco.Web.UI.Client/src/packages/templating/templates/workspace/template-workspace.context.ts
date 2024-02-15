@@ -129,15 +129,14 @@ ${currentContent}`;
 		this.setContent(string);
 	};
 
-	async create(parentUnique: string | null) {
-		const { data } = await this.detailRepository.createScaffold(parentUnique);
+	async create(parentUnique: string | null, preset?: Partial<UmbTemplateDetailModel>) {
+		const { data } = await this.detailRepository.createScaffold(parentUnique, preset);
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.setValue(data);
-		/*
+
 		if (!parentUnique) return;
 		await this.setMasterTemplate(parentUnique);
-		*/
 	}
 
 	async save() {
