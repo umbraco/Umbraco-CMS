@@ -44,6 +44,8 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 
 		if (_changedProperties.has('path')) {
 			if (this.#serverUrl) {
+				if (this.file) return;
+
 				this.extension = this.path.split('.').pop() || '';
 				this.label = this.#serverUrl ? this.path.substring(this.#serverUrl.length) : 'loading...';
 			}
@@ -51,9 +53,9 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 	}
 
 	#renderLabel() {
-		if (this.path) return html`<a href=${this.path}>${this.label}</a>`;
+		if (this.path) return html`<a id="label" href=${this.path}>${this.label}</a>`;
 
-		return html`<span>${this.label}</span>`;
+		return html`<span id="label">${this.label}</span>`;
 	}
 
 	render() {
@@ -80,6 +82,21 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 				margin: auto;
 				max-width: 100%;
 				max-height: 100%;
+			}
+			#label {
+				text-align: center;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				color: var(--uui-color-text);
+			}
+			a#label {
+				text-decoration: none;
+				color: var(--uui-color-interactive);
+			}
+			a#label:hover {
+				text-decoration: underline;
+				color: var(--uui-color-interactive-emphasis);
 			}
 		`,
 	];

@@ -221,7 +221,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		const type = this.#getFileTypeFromPath(file.path);
 
 		return html`
-			<div style="position:relative; display: flex">
+			<div style="position:relative; display: flex; width: fit-content; max-width: 100%">
 				${getElementTemplate()}
 				${file.queueItem?.status === 'waiting' ? html`<umb-temporary-file-badge></umb-temporary-file-badge>` : nothing}
 			</div>
@@ -270,7 +270,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	#renderButtonRemove() {
 		if (!this._files.length && !this._files.length) return;
 		return html`<uui-button compact @click=${this.#handleRemove} label="Remove files">
-			<uui-icon name="icon-trash"></uui-icon> Remove file(s)
+			<uui-icon name="icon-trash"></uui-icon> Remove file ${this._files.length > 1 ? 's' : ''}
 		</uui-button>`;
 	}
 
@@ -299,10 +299,6 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				padding: var(--uui-size-space-4);
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
-				justify-items: center;
-			}
-			#wrapper:has(* + *) {
-				justify-items: unset;
 			}
 
 			uui-file-dropzone {
