@@ -1,4 +1,4 @@
-import { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbDocumentRecycleBinTreeItemModel extends UmbUniqueTreeItemModel {}
 
