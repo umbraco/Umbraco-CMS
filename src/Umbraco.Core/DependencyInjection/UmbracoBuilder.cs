@@ -241,7 +241,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<MediaPermissions>();
 
             Services.AddSingleton<PropertyEditorCollection>();
-            Services.AddSingleton<ParameterEditorCollection>();
 
             // register a server registrar, by default it's the db registrar
             Services.AddUnique<IServerRoleAccessor>(f =>

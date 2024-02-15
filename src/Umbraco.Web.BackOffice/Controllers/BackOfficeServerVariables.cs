@@ -415,10 +415,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.GetMacroParameters(0))
                         },
                         {
-                            "macroApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MacrosController>(
-                                controller => controller.Create(string.Empty))
-                        },
-                        {
                             "authenticationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
                                 controller => controller.PostLogin(new LoginModel()))
                         },
