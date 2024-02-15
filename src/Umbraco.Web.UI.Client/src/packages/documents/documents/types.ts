@@ -11,7 +11,6 @@ export interface UmbDocumentDetailModel {
 	isTrashed: boolean;
 	template: { unique: string } | null;
 	unique: string;
-	parentUnique: string | null;
 	urls: Array<UmbDocumentUrlInfoModel>;
 	values: Array<UmbDocumentValueModel>;
 	variants: Array<UmbDocumentVariantModel>;
