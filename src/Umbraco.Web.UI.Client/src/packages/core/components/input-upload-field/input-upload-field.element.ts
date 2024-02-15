@@ -127,6 +127,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	#setExtensions() {
 		if (!this.fileExtensions?.length) return;
 
+		// TODO: The dropzone uui component does not support file extensions without a dot. Remove this when it does.
 		this.extensions = this.fileExtensions.map((extension) => {
 			return `.${extension}`;
 		});
@@ -240,7 +241,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				case 'file':
 					return html`<umb-input-upload-field-file
 						.path=${file.path}
-						.file=${file.file}></umb-input-upload-field-file>`;
+						.file=${file.file as any}></umb-input-upload-field-file>`;
 			}
 		}
 	}
