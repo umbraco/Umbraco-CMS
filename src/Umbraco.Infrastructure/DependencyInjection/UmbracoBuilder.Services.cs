@@ -60,6 +60,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<ISystemTroubleshootingInformationService, SystemTroubleshootingInformationTelemetryProvider>();
         builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
         builder.Services.AddTransient<IPartialViewPopulator, PartialViewPopulator>();
+        builder.Services.AddUnique<IContentListViewService, ContentListViewService>();
+        builder.Services.AddUnique<IMediaListViewService, MediaListViewService>();
 
         return builder;
     }
