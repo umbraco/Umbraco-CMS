@@ -191,7 +191,7 @@ public static class ApplicationBuilderExtensions
     /// </summary>
     public static IApplicationBuilder UseUmbracoBackOfficeRewrites(this IApplicationBuilder builder)
     {
-        IStaticFilePathGenerator staticFilePathGenerator = builder.ApplicationServices.GetRequiredService<IStaticFilePathGenerator>();
+        IBackOfficePathGenerator staticFilePathGenerator = builder.ApplicationServices.GetRequiredService<IBackOfficePathGenerator>();
         var backofficeAssetsPath = staticFilePathGenerator.BackofficeAssetsPath.TrimStart("/").EnsureEndsWith("/");
 
         builder.UseRewriter(new RewriteOptions()

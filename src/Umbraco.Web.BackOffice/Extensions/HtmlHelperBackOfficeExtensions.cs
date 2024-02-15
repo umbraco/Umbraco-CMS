@@ -25,7 +25,7 @@ public static class HtmlHelperBackOfficeExtensions
     public static async Task<IHtmlContent> BackOfficeImportMapScriptAsync(
         this IHtmlHelper html,
         IJsonSerializer jsonSerializer,
-        IStaticFilePathGenerator staticFilePathGenerator,
+        IBackOfficePathGenerator backOfficePathGenerator,
         IPackageManifestService packageManifestService)
     {
         try
@@ -49,7 +49,7 @@ public static class HtmlHelperBackOfficeExtensions
 
             // Inject the BackOffice cache buster into the import string to handle BackOffice assets
             var importmap = sb.ToString()
-                .Replace("/umbraco/backoffice", staticFilePathGenerator.BackofficeAssetsPath);
+                .Replace("/umbraco/backoffice", backOfficePathGenerator.BackofficeAssetsPath);
             return html.Raw(importmap);
         }
         catch (NotSupportedException ex)
