@@ -15,13 +15,12 @@ public class UmbracoBackOfficePathGenerator(
     IOptions<GlobalSettings> globalSettings)
     : IBackOfficePathGenerator
 {
-    private string? _backofficePath;
     private string? _backofficeAssetsPath;
 
     /// <summary>
     ///     Gets the virtual path for the Backoffice through the GlobalSettings.
     /// </summary>
-    public string BackofficePath => _backofficePath ??= globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    public string BackofficePath { get; } = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
 
     /// <summary>
     ///     Gets the virtual path for the Backoffice assets coming from the Umbraco.Cms.StaticAssets RCL.
