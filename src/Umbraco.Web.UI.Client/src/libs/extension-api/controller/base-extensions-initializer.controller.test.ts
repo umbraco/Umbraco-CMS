@@ -2,10 +2,10 @@ import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
-import type { PermittedControllerType} from './index.js';
+import type { PermittedControllerType } from './index.js';
 import { UmbBaseExtensionInitializer, UmbBaseExtensionsInitializer } from './index.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost} from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
@@ -92,11 +92,13 @@ describe('UmbBaseExtensionsController', () => {
 				type: 'extension-type',
 				name: 'test-extension-a',
 				alias: 'Umb.Test.Extension.A',
+				weight: 100,
 			};
 			const manifestB = {
 				type: 'extension-type',
 				name: 'test-extension-b',
 				alias: 'Umb.Test.Extension.B',
+				weight: 10,
 			};
 			testExtensionRegistry.register(manifestA);
 			testExtensionRegistry.register(manifestB);
@@ -117,12 +119,9 @@ describe('UmbBaseExtensionsController', () => {
 				(permitted) => {
 					count++;
 					if (count === 1) {
-						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
-						expect(permitted.length).to.eq(1);
-					} else if (count === 2) {
 						expect(permitted.length).to.eq(2);
 						extensionController.destroy();
-					} else if (count === 3) {
+					} else if (count === 2) {
 						done();
 					}
 				},
@@ -134,6 +133,7 @@ describe('UmbBaseExtensionsController', () => {
 				type: 'extension-type-extra',
 				name: 'test-extension-extra',
 				alias: 'Umb.Test.Extension.Extra',
+				weight: 0,
 			};
 			testExtensionRegistry.register(manifestExtra);
 
@@ -146,18 +146,13 @@ describe('UmbBaseExtensionsController', () => {
 				(permitted) => {
 					count++;
 					if (count === 1) {
-						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
-						expect(permitted.length).to.eq(1);
-					} else if (count === 2) {
-						expect(permitted.length).to.eq(2);
-					} else if (count === 3) {
 						expect(permitted.length).to.eq(3);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
 						expect(permitted[1].alias).to.eq('Umb.Test.Extension.B');
 						expect(permitted[2].alias).to.eq('Umb.Test.Extension.Extra');
 
 						extensionController.destroy();
-					} else if (count === 4) {
+					} else if (count === 2) {
 						// Cause we destroyed there will be a last call to reset permitted controllers:
 						expect(permitted.length).to.eq(0);
 						done();
@@ -202,17 +197,13 @@ describe('UmbBaseExtensionsController', () => {
 				(permitted) => {
 					count++;
 					if (count === 1) {
-						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
-						expect(permitted.length).to.eq(1);
-						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
-					} else if (count === 2) {
 						// Still just equal one, as the second one overwrites the first one.
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.B');
 
 						// lets remove the overwriting extension to see the original coming back.
 						testExtensionRegistry.unregister('Umb.Test.Extension.B');
-					} else if (count === 3) {
+					} else if (count === 2) {
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
 						done();
@@ -272,25 +263,21 @@ describe('UmbBaseExtensionsController', () => {
 				(permitted) => {
 					count++;
 					if (count === 1) {
-						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
-						expect(permitted.length).to.eq(1);
-						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
-					} else if (count === 2) {
 						// Still just equal one, as the second one overwrites the first one.
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.B');
 
 						// lets remove the overwriting extension to see the original coming back.
 						testExtensionRegistry.unregister('Umb.Test.Extension.B');
-					} else if (count === 3) {
+					} else if (count === 2) {
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
 						extensionController.destroy();
-					} else if (count === 4) {
+					} else if (count === 3) {
 						// Expect that destroy will only result in one last callback with no permitted controllers.
 						expect(permitted.length).to.eq(0);
 						Promise.resolve().then(() => done()); // This wrap is to enable the test to detect if more callbacks are fired.
-					} else if (count === 5) {
+					} else if (count === 4) {
 						// This should not happen, we do only want one last callback when destroyed.
 						expect(false).to.eq(true);
 					}

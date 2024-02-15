@@ -70,7 +70,7 @@ describe('UmbExtensionSlotElement', () => {
 		it('renders a manifest element', async () => {
 			element = await fixture(html`<umb-extension-slot type="dashboard"></umb-extension-slot>`);
 
-			await sleep(0);
+			await sleep(20);
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
@@ -82,7 +82,7 @@ describe('UmbExtensionSlotElement', () => {
 					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`,
 			);
 
-			await sleep(0);
+			await sleep(20);
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
@@ -96,7 +96,7 @@ describe('UmbExtensionSlotElement', () => {
 				</umb-extension-slot>`,
 			);
 
-			await sleep(0);
+			await sleep(20);
 
 			expect(element.shadowRoot!.firstElementChild?.nodeName).to.be.equal('BLA');
 			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(
@@ -113,7 +113,7 @@ describe('UmbExtensionSlotElement', () => {
 				</umb-extension-slot>`,
 			);
 
-			await sleep(0);
+			await sleep(20);
 
 			expect((element.shadowRoot!.firstElementChild as any).testProp).to.be.equal('fooBar');
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);

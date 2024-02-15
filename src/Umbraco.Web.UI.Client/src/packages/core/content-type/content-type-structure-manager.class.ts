@@ -504,5 +504,6 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		this._reset();
 		this.#contentTypes.destroy();
 		this.#containers.destroy();
+		super.destroy();
 	}
 }
