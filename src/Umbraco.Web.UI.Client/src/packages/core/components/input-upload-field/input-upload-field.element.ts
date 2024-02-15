@@ -19,6 +19,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import './input-upload-field-file.element.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '../../property/property-dataset/property-dataset-context.token.js';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
@@ -81,6 +82,13 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		super();
 		this.#manager = new UmbTemporaryFileManager(this);
 
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
+			this.observe(await context.propertyValueByAlias('umbracoExtension'), (value) => {
+				const test = value;
+				console.log('test', test);
+			});
+		});
+
 		this.#serverUrlPromise = this.consumeContext(UMB_APP_CONTEXT, (instance) => {
 			this.#serverUrl = instance.getServerUrl();
 		}).asPromise();
@@ -94,7 +102,6 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				}
 				return file;
 			});
-			this._currentFiles = value;
 		});
 	}
 
@@ -186,7 +193,8 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	//TODO When the property editor gets saved, it seems that the property editor gets the file path from the server rather than key/id.
 	// This however does not work when there is multiple files. Can the server not handle multiple files uploaded into one property editor?
 	#renderDropzone() {
-		if (!this.multiple && (this._currentFiles.length || this._files.length)) return nothing;
+		if (!this.multiple && this._files.length) return nothing;
+
 		return html`
 			<uui-file-dropzone
 				id="dropzone"
@@ -208,13 +216,14 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderFile(file: { path: string; unique: string; queueItem?: TemporaryFileQueueItem; file?: File }) {
+		// TODO: Get the mime type from the server and use that to determine the file type.
 		const type = this.#getFileTypeFromPath(file.path);
 
-		console.log('file', file.queueItem?.status);
-
 		return html`
-			${getElementTemplate()}
-			${file.queueItem?.status === 'waiting' ? html`<umb-temporary-file-badge></umb-temporary-file-badge>` : nothing}
+			<div style="position:relative; display: flex">
+				${getElementTemplate()}
+				${file.queueItem?.status === 'waiting' ? html`<umb-temporary-file-badge></umb-temporary-file-badge>` : nothing}
+			</div>
 		`;
 
 		function getElementTemplate() {
@@ -228,9 +237,9 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				case 'svg':
 					return html`<umb-input-upload-field-svg .path=${file.path}></umb-input-upload-field-svg>`;
 				case 'file':
-					return file.file
-						? html`<umb-input-upload-field-file .file=${file.file}></umb-input-upload-field-file>`
-						: 'ERROR: NO FILE OR PATH PROVIDED';
+					return html`<umb-input-upload-field-file
+						.path=${file.path}
+						.file=${file.file}></umb-input-upload-field-file>`;
 			}
 		}
 	}
@@ -278,21 +287,20 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				margin-right: var(--uui-size-space-4);
 			}
 
-			umb-input-upload-field-file {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				width: 200px;
-				height: 200px;
-				box-sizing: border-box;
-				padding: var(--uui-size-space-4);
-				border: 1px solid var(--uui-color-border);
-			}
-
 			#wrapper {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 				gap: var(--uui-size-space-4);
+				box-sizing: border-box;
+			}
+			#wrapper:has(umb-input-upload-field-file) {
+				padding: var(--uui-size-space-4);
+				border: 1px solid var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
+				justify-items: center;
+			}
+			#wrapper:has(* + *) {
+				justify-items: unset;
 			}
 
 			uui-file-dropzone {

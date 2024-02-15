@@ -20,6 +20,9 @@ export class UmbInputUploadFieldVideoElement extends UmbLitElement {
 
 	static styles = [
 		css`
+			:host {
+				display: flex;
+			}
 			video {
 				width: 100%;
 				max-width: 800px;

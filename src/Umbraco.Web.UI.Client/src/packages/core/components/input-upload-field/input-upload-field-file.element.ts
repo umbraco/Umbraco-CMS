@@ -1,16 +1,12 @@
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { html, until, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-type FileItem = {
-	name: string;
-	src: string;
-};
 
 @customElement('umb-input-upload-field-file')
 export class UmbInputUploadFieldFileElement extends UmbLitElement {
 	@property({ type: String })
-	path = '';
+	path: string = '';
 
 	/**
 	 * @description The file to be rendered.
@@ -18,62 +14,75 @@ export class UmbInputUploadFieldFileElement extends UmbLitElement {
 	 * @required
 	 */
 	@property({ attribute: false })
-	set file(value: File) {
-		this.#fileItem = new Promise((resolve) => {
-			/**
-			 * If the mimetype of the file is an image, we want to render a thumbnail of the image.
-			 */
-			if (value.type && /image\/.*/.test(value.type)) {
-				const reader = new FileReader();
+	file?: File;
 
-				reader.readAsDataURL(value);
+	@state()
+	extension = '';
 
-				reader.onload = (event) => {
-					resolve({
-						name: value.name,
-						src: event.target?.result as string,
-					});
-				};
-			} else {
-				resolve({
-					name: value.name,
-					src: '',
-				});
-			}
-		});
-	}
+	@state()
+	label = '';
 
-	#fileItem!: Promise<FileItem>;
 	#serverUrl = '';
+	#serverUrlPromise;
 
+	/**
+	 *
+	 */
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
+		this.#serverUrlPromise = this.consumeContext(UMB_APP_CONTEXT, (instance) => {
 			this.#serverUrl = instance.getServerUrl();
-		});
+		}).asPromise();
 	}
 
-	// TODO Better way to do this....
-	render = () => {
-		if (this.path) {
-			return html`<uui-symbol-file-thumbnail
-				src=${this.#serverUrl + this.path}
-				title=${this.path}
-				alt=${this.path}></uui-symbol-file-thumbnail>`;
-		} else {
-			return until(this.#renderFileItem(), html`<uui-loader></uui-loader>`);
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('file')) {
+			this.extension = this.file?.name.split('.').pop() || '';
+			this.label = this.file?.name || 'loading...';
 		}
-	};
 
-	// render = () => until(this.#renderFileItem(), html`<uui-loader></uui-loader>`);
-
-	async #renderFileItem() {
-		const fileItem = await this.#fileItem;
-		return html`<uui-symbol-file-thumbnail
-			src=${fileItem.src}
-			title=${fileItem.name}
-			alt=${fileItem.name}></uui-symbol-file-thumbnail> `;
+		if (_changedProperties.has('path')) {
+			if (this.#serverUrl) {
+				this.extension = this.path.split('.').pop() || '';
+				this.label = this.#serverUrl ? this.path.substring(this.#serverUrl.length) : 'loading...';
+			}
+		}
 	}
+
+	#renderLabel() {
+		if (this.path) return html`<a href=${this.path}>${this.label}</a>`;
+
+		return html`<span>${this.label}</span>`;
+	}
+
+	render() {
+		if (!this.label && !this.extension) return html`<uui-loader></uui-loader>`;
+
+		return html`
+			<div id="main">
+				<uui-symbol-file id="file-symbol" .type=${this.extension}></uui-symbol-file>
+				${this.#renderLabel()}
+			</div>
+		`;
+	}
+
+	static styles = [
+		css`
+			#main {
+				display: grid;
+				grid-template-rows: 150px auto;
+				box-sizing: border-box;
+				color: var(--uui-color-text);
+			}
+			#file-symbol {
+				aspect-ratio: 1 / 1;
+				margin: auto;
+				max-width: 100%;
+				max-height: 100%;
+			}
+		`,
+	];
 }
 
 declare global {
