@@ -3,21 +3,15 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Infrastructure.WebAssets;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Cms.Web.BackOffice.Mapping;
-using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.BackOffice.SignalR;
-using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Extensions;
@@ -45,7 +39,6 @@ public static partial class UmbracoBuilderExtensions
             .AddRecurringBackgroundJobs()
             .AddNuCache()
             .AddDistributedCache()
-            .TryAddModelsBuilderDashboard()
             .AddCoreNotifications()
             .AddLogViewer()
             .AddExamine()
@@ -62,31 +55,14 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    /// <summary>
-    ///     Gets the back office tree collection builder
-    /// </summary>
-    public static TreeCollectionBuilder? Trees(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<TreeCollectionBuilder>();
-
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IStaticFilePathGenerator, UmbracoStaticFilePathGenerator>();
         builder.Services.AddSingleton<ServerVariablesParser>();
         builder.Services.AddSingleton<PreviewRoutes>();
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
-        builder.Services.AddSingleton<BackOfficeServerVariables>();
         builder.Services.AddScoped<BackOfficeSessionIdValidator>();
         builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<WebhookMapDefinition>();
-
-        // register back office trees
-        // the collection builder only accepts types inheriting from TreeControllerBase
-        // and will filter out those that are not attributed with TreeAttribute
-        var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-        builder.Trees()?
-            .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
-
-        builder.AddWebMappingProfiles();
 
         builder.Services.AddUnique<IPhysicalFileSystem>(factory =>
         {
@@ -103,8 +79,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IIconService, IconService>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
-        builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
-        builder.Services.AddTransient<BlockGridSampleHelper>();
         builder.Services.AddUnique<IWebhookPresentationFactory, WebhookPresentationFactory>();
 
         return builder;

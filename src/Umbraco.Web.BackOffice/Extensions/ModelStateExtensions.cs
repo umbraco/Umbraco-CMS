@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation;
 
 namespace Umbraco.Extensions;
 
@@ -27,20 +26,6 @@ public static class ModelStateExtensions
             culture.IsNullOrWhiteSpace() ? "invariant" : culture,
             // if the segment is null, we'll add the term 'null' as part of the key
             segment.IsNullOrWhiteSpace() ? "null" : segment);
-
-    /// <summary>
-    ///     Adds an <see cref="ContentPropertyValidationResult" /> error to model state for a property so we can use it on the
-    ///     client side.
-    /// </summary>
-    /// <param name="modelState"></param>
-    /// <param name="result"></param>
-    /// <param name="propertyAlias"></param>
-    /// <param name="culture">The culture for the property, if the property is invariant than this is empty</param>
-    /// <param name="segment"></param>
-    internal static void AddPropertyError(this ModelStateDictionary modelState,
-        ValidationResult result, string propertyAlias, string culture = "", string segment = "") =>
-        modelState.AddPropertyValidationError(new ContentPropertyValidationResult(result, culture, segment),
-            propertyAlias, culture, segment);
 
     /// <summary>
     ///     Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs

@@ -24,7 +24,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.ActionResults;
-using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -37,14 +36,12 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
 [DisableBrowserCache]
-[UmbracoRequireHttps]
 [PluginController(Constants.Web.Mvc.BackOfficeArea)]
 [IsBackOffice]
 public class BackOfficeController : UmbracoController
 {
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-    private readonly BackOfficeServerVariables _backOfficeServerVariables;
     private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
     private readonly IBackOfficeExternalLoginProviders _externalLogins;
     private readonly IGridConfig _gridConfig;
@@ -79,7 +76,6 @@ public class BackOfficeController : UmbracoController
         IHostingEnvironment hostingEnvironment,
         ILocalizedTextService textService,
         IGridConfig gridConfig,
-        BackOfficeServerVariables backOfficeServerVariables,
         AppCaches appCaches,
         IBackOfficeSignInManager signInManager,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
@@ -99,7 +95,6 @@ public class BackOfficeController : UmbracoController
         _hostingEnvironment = hostingEnvironment;
         _textService = textService;
         _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
-        _backOfficeServerVariables = backOfficeServerVariables;
         _appCaches = appCaches;
         _signInManager = signInManager;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -262,7 +257,6 @@ public class BackOfficeController : UmbracoController
     ///     Returns the JavaScript main file including all references found in manifests
     /// </summary>
     /// <returns></returns>
-    [MinifyJavaScriptResult(Order = 0)]
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> Application()
@@ -331,19 +325,10 @@ public class BackOfficeController : UmbracoController
     ///     Returns the JavaScript object representing the static server variables javascript object
     /// </summary>
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
-    [MinifyJavaScriptResult(Order = 1)]
     public async Task<JavaScriptResult> ServerVariables()
     {
-        // cache the result if debugging is disabled
-        var serverVars = await _serverVariables.ParseAsync(await _backOfficeServerVariables.GetServerVariablesAsync());
-        var result = _hostingEnvironment.IsDebugMode
-            ? serverVars
-            : _appCaches.RuntimeCache.GetCacheItem(
-                typeof(BackOfficeController) + "ServerVariables",
-                () => serverVars,
-                new TimeSpan(0, 10, 0));
 
-        return new JavaScriptResult(result);
+        return new JavaScriptResult(null);
     }
 
     [HttpPost]

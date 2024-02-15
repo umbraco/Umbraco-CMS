@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization;
 public class UserGroupHandler : MustSatisfyRequirementAuthorizationHandler<UserGroupRequirement>
 {
     private readonly AppCaches _appCaches;
+    private readonly IUserGroupPermissionService _userGroupPermissionService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IContentService _contentService;
     private readonly IEntityService _entityService;
@@ -44,7 +45,8 @@ public class UserGroupHandler : MustSatisfyRequirementAuthorizationHandler<UserG
         IMediaService mediaService,
         IEntityService entityService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        IUserGroupPermissionService userGroupPermissionService)
     {
         _httpContextAccessor = httpContextAccessor;
         _userService = userService;
@@ -53,6 +55,7 @@ public class UserGroupHandler : MustSatisfyRequirementAuthorizationHandler<UserG
         _entityService = entityService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _appCaches = appCaches;
+        _userGroupPermissionService = userGroupPermissionService;
     }
 
     /// <inheritdoc />

@@ -17,7 +17,6 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.ActionResults;
-using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
@@ -109,7 +108,6 @@ public class PreviewController : Controller
     ///     Returns the JavaScript file for preview
     /// </summary>
     /// <returns></returns>
-    [MinifyJavaScriptResult(Order = 0)]
     // TODO: Replace this with response caching https://docs.microsoft.com/en-us/aspnet/core/performance/caching/response?view=aspnetcore-3.1
     //[OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
     public async Task<JavaScriptResult> Application()

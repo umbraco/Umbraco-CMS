@@ -221,7 +221,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            Services.AddUnique<ITreeService, TreeService>();
             Services.AddUnique<ISectionService, SectionService>();
 
             Services.AddUnique<ISmsSender, NotImplementedSmsSender>();

@@ -8,7 +8,6 @@
 @using Umbraco.Cms.Web.BackOffice.Controllers
 @using Umbraco.Cms.Web.BackOffice.Security
 @using Umbraco.Extensions
-@inject BackOfficeServerVariables backOfficeServerVariables
 @inject IUmbracoVersion umbracoVersion
 @inject IHostingEnvironment hostingEnvironment
 @inject IOptions<GlobalSettings> globalSettings
@@ -53,8 +52,6 @@
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-
-    @await Html.BareMinimumServerVariablesScriptAsync(backOfficeServerVariables)
 
     <script type="text/javascript">
     document.angularReady = function (app) {

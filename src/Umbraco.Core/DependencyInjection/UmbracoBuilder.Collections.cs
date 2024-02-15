@@ -138,7 +138,6 @@ public static partial class UmbracoBuilderExtensions
             .Append<Hulu>()
             .Append<Giphy>()
             .Append<LottieFiles>();
-        builder.SearchableTrees().Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
         builder.BackOfficeAssets();
         builder.SelectorHandlers().Add(() => builder.TypeLoader.GetTypes<ISelectorHandler>());
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
@@ -313,12 +312,6 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static EmbedProvidersCollectionBuilder EmbedProviders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the back office searchable tree collection builder
-    /// </summary>
-    public static SearchableTreeCollectionBuilder SearchableTrees(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
 
     /// <summary>
     /// Gets the back office custom assets collection builder

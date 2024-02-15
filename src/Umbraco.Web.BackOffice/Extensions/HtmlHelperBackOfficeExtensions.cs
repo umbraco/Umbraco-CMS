@@ -12,30 +12,6 @@ namespace Umbraco.Extensions;
 
 public static class HtmlHelperBackOfficeExtensions
 {
-    /// <summary>
-    ///     Outputs a script tag containing the bare minimum (non secure) server vars for use with the angular app
-    /// </summary>
-    /// <param name="html"></param>
-    /// <param name="backOfficeServerVariables"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     These are the bare minimal server variables that are required for the application to start without being
-    ///     authenticated,
-    ///     we will load the rest of the server vars after the user is authenticated.
-    /// </remarks>
-    public static async Task<IHtmlContent> BareMinimumServerVariablesScriptAsync(this IHtmlHelper html,
-        BackOfficeServerVariables backOfficeServerVariables)
-    {
-        Dictionary<string, object> minVars = await backOfficeServerVariables.BareMinimumServerVariablesAsync();
-
-        var str = @"<script type=""text/javascript"">
-                var Umbraco = {};
-                Umbraco.Sys = {};
-                Umbraco.Sys.ServerVariables = " + JsonConvert.SerializeObject(minVars) + @";
-            </script>";
-
-        return html.Raw(str);
-    }
 
     /// <summary>
     ///     Used to render the script that will pass in the angular "externalLoginInfo" service/value on page load
