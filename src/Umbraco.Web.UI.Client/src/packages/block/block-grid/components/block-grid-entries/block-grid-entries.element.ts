@@ -5,10 +5,14 @@ import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
-import { UmbSorterController, type UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import {
+	UmbSorterController,
+	type UmbSorterConfig,
+	type resolveVerticalDirectionArgs,
+} from '@umbraco-cms/backoffice/sorter';
 
 // Utils:
-// TODO: Maybe move these into their own files..
+// TODO: Move these methods into their own files:
 
 function getInterpolatedIndexOfPositionInWeightMap(target: number, weights: Array<number>) {
 	const map = [0];
@@ -49,7 +53,9 @@ function getAccumulatedValueOfIndex(index: number, weights: Array<number>) {
 	return calc;
 }
 
-function resolveVerticalDirection(args) {
+function resolveVerticalDirectionAsGrid(
+	args: resolveVerticalDirectionArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>,
+) {
 	/** We need some data about the grid to figure out if there is room to be placed next to the found element */
 	const approvedContainerComputedStyles = getComputedStyle(args.containerElement);
 	const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split('px')[0]) || 0;
@@ -106,6 +112,10 @@ function resolveVerticalDirection(args) {
 	return relatedStartCol + (args.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber;
 }
 
+// --------------------------
+// End of utils.
+// --------------------------
+
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryElement> = {
 	getUniqueOfElement: (element) => {
 		return element.contentUdi!;
@@ -113,7 +123,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.contentUdi;
 	},
-	resolveVerticalDirection: resolveVerticalDirection,
+	resolveVerticalDirection: resolveVerticalDirectionAsGrid,
 	identifier: 'block-grid-editor',
 	itemSelector: 'umb-block-grid-entry',
 	containerSelector: '.umb-block-grid__layout-container',
