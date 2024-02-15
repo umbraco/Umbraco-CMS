@@ -44,9 +44,10 @@ export class UmbExtensionsElementInitializer<
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
+		controllerAlias?: string,
 		defaultElement?: string,
 	) {
-		super(host, extensionRegistry, type, filter, onChange);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
 		this.#extensionRegistry = extensionRegistry;
 		this.#defaultElement = defaultElement;
 		this._init();
@@ -64,5 +65,11 @@ export class UmbExtensionsElementInitializer<
 		extController.properties = this.#props;
 
 		return extController;
+	}
+
+	public destroy(): void {
+		super.destroy();
+		this.#props = undefined;
+		(this.#extensionRegistry as any) = undefined;
 	}
 }
