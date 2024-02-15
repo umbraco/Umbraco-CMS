@@ -42,6 +42,7 @@ const importmap = createImportMap({
 	additionalImports: {
 		'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 	},
+	replaceModuleExtensions: true,
 });
 
 const paths = {};

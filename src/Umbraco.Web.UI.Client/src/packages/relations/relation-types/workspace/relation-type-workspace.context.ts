@@ -89,6 +89,7 @@ export class UmbRelationTypeWorkspaceContext
 
 	public destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }
 
