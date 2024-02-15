@@ -37,27 +37,17 @@ public static class HtmlHelperBackOfficeExtensions
         {
             PackageManifestImportmap packageImports = await packageManifestService.GetPackageManifestImportmapAsync();
 
-            Dictionary<string, dynamic> importMap = new()
-            {
-                { "imports", packageImports.Imports },
-            };
-
-            if (packageImports.Scopes is not null && packageImports.Scopes.Count != 0)
-            {
-                importMap.Add("scopes", packageImports.Scopes);
-            }
-
             var sb = new StringBuilder();
             sb.AppendLine("""<script type="importmap">""");
-            sb.AppendLine(jsonSerializer.Serialize(importMap));
+            sb.AppendLine(jsonSerializer.Serialize(packageImports));
             sb.AppendLine("</script>");
 
             // Inject the BackOffice cache buster into the import string to handle BackOffice assets
-            var importmap = sb.ToString()
+            var importmapScript = sb.ToString()
                 .Replace(backOfficePathGenerator.BackOfficeVirtualDirectory, backOfficePathGenerator.BackOfficeAssetsPath)
                 .Replace(Constants.Web.CacheBusterToken, backOfficePathGenerator.BackOfficeCacheBustHash);
 
-            return html.Raw(importmap);
+            return html.Raw(importmapScript);
         }
         catch (NotSupportedException ex)
         {

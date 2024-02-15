@@ -3,5 +3,6 @@
 public interface IPackageManifestService
 {
     Task<IEnumerable<PackageManifest>> GetPackageManifestsAsync();
+
     Task<PackageManifestImportmap> GetPackageManifestImportmapAsync();
 }
