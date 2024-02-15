@@ -77,7 +77,6 @@ public static partial class UmbracoBuilderExtensions
             );
         });
 
-        builder.Services.AddUnique<IIconService, IconService>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         return builder;
     }
