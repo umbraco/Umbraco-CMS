@@ -12,6 +12,7 @@ import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import './document-type-workspace-view-edit-properties.element.js';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
@@ -213,11 +214,10 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				<uui-input
 					type="number"
 					label=${this.localize.term('sort_sortOrder')}
-					@change=${(e: InputEvent) => {
+					@change=${(e: UUIInputEvent) =>
 						this._groupStructureHelper.partialUpdateContainer(group.id!, {
 							sortOrder: parseInt(e.target.value as string) || 0,
-						});
-					}}
+						})}
 					.value=${group.sortOrder || 0}
 					?disabled=${inherited}></uui-input>
 			</div> `;
