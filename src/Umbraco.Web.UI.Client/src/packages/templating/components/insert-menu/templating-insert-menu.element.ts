@@ -98,6 +98,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	#openInsertDictionaryItemModal() {
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
 			data: {
+				hideTreeRoot: true,
 				pickableFilter: (item) => item.id !== null,
 			},
 		});
@@ -118,32 +119,33 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-button-group>
-				<uui-button look="secondary" @click=${this.#openChooseTypeModal} label="Choose value to insert">
-					<uui-icon name="icon-add"></uui-icon>Insert
+				<uui-button look="secondary" @click=${this.#openChooseTypeModal} label=${this.localize.term('template_insert')}>
+					<uui-icon name="icon-add"></uui-icon>${this.localize.term('template_insert')}
 				</uui-button>
-				<umb-dropdown look="secondary" compact placement="bottom-end" id="insert-button" label="open insert menu">
+				<umb-dropdown
+					look="secondary"
+					compact
+					placement="bottom-end"
+					id="insert-button"
+					label=${this.localize.term('template_insert')}>
 					<uui-menu-item
 						class="insert-menu-item"
-						label="Dictionary item"
-						title="Dictionary item"
+						label=${this.localize.term('template_insertDictionaryItem')}
+						title=${this.localize.term('template_insertDictionaryItem')}
 						@click=${this.#openInsertDictionaryItemModal}>
 					</uui-menu-item>
+					${!this.hidePartialView
+						? html`<uui-menu-item
+								class="insert-menu-item"
+								label=${this.localize.term('template_insertPartialView')}
+								title=${this.localize.term('template_insertPartialView')}
+								@click=${this.#openInsertPartialViewSidebar}>
+						  </uui-menu-item>`
+						: ''}
 				</umb-dropdown>
 			</uui-button-group>
 		`;
 	}
-
-	//TODO: put this back in when partial view is implemented
-	// ${this.hidePartialView
-	// 		? ''
-	// 		: html` <li>
-	// 				<uui-menu-item
-	// 					class="insert-menu-item"
-	// 					label="Partial view"
-	// 					title="Partial view"
-	// 					@click=${this.#openInsertPartialViewSidebar}>
-	// 				</uui-menu-item>
-	// 		  </li>`}
 
 	static styles = [
 		UmbTextStyles,
