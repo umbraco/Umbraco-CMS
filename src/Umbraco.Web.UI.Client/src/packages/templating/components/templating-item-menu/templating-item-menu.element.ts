@@ -1,7 +1,13 @@
-import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests.js';
+import {
+	UMB_PARTIAL_VIEW_PICKER_MODAL,
+	type UmbPartialViewPickerModalValue,
+} from '../../modals/partial-view-picker/partial-view-picker-modal.token.js';
+import { CodeSnippetType } from '../../types.js';
+import {
+	UMB_TEMPLATING_ITEM_PICKER_MODAL,
+	type UmbTemplatingItemPickerModalValue,
+} from '../../modals/templating-item-picker/templating-item-picker-modal.token.js';
 import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils/index.js';
-import type { UmbChooseInsertTypeModalValue } from '../../modals/insert-choose-type-sidebar.element.js';
-import { CodeSnippetType } from '../../modals/insert-choose-type-sidebar.element.js';
 import { UmbDictionaryDetailRepository } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -9,25 +15,9 @@ import type {
 	UmbDictionaryItemPickerModalValue,
 	UmbModalManagerContext,
 	UmbModalContext,
-	UmbPartialViewPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_DICTIONARY_ITEM_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_PARTIAL_VIEW_PICKER_MODAL,
-	UmbModalToken,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_DICTIONARY_ITEM_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-
-export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
-	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
-	{
-		modal: {
-			type: 'sidebar',
-			size: 'small',
-		},
-	},
-);
 
 @customElement('umb-templating-insert-menu')
 export class UmbTemplatingInsertMenuElement extends UmbLitElement {
@@ -47,7 +37,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		});
 	}
 
-	async determineInsertValue(modalValue: UmbChooseInsertTypeModalValue) {
+	async determineInsertValue(modalValue: UmbTemplatingItemPickerModalValue) {
 		const { type, value } = modalValue;
 
 		switch (type) {
@@ -76,15 +66,19 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	};
 
 	#openChooseTypeModal = () => {
-		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL, {
+		this.#openModal = this._modalContext?.open(UMB_TEMPLATING_ITEM_PICKER_MODAL, {
 			data: {
-				hidePartialView: this.hidePartialView,
+				hidePartialViews: this.hidePartialView,
 			},
 		});
-		this.#openModal?.onSubmit().then((closedModal: UmbChooseInsertTypeModalValue) => {
+		this.#openModal?.onSubmit().then((closedModal: UmbTemplatingItemPickerModalValue) => {
 			this.determineInsertValue(closedModal);
 		});
 	};
+
+	#openInsertPageFieldSidebar() {
+		//this.#openModel = this._modalContext?.open();
+	}
 
 	#openInsertPartialViewSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
@@ -130,18 +124,21 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 					label=${this.localize.term('template_insert')}>
 					<uui-menu-item
 						class="insert-menu-item"
+						label=${this.localize.term('template_insertPageField')}
+						title=${this.localize.term('template_insertPageField')}
+						@click=${this.#openInsertPageFieldSidebar}></uui-menu-item>
+					<uui-menu-item
+						class="insert-menu-item"
+						label=${this.localize.term('template_insertPartialView')}
+						title=${this.localize.term('template_insertPartialView')}
+						@click=${this.#openInsertPartialViewSidebar}>
+					</uui-menu-item>
+					<uui-menu-item
+						class="insert-menu-item"
 						label=${this.localize.term('template_insertDictionaryItem')}
 						title=${this.localize.term('template_insertDictionaryItem')}
 						@click=${this.#openInsertDictionaryItemModal}>
 					</uui-menu-item>
-					${!this.hidePartialView
-						? html`<uui-menu-item
-								class="insert-menu-item"
-								label=${this.localize.term('template_insertPartialView')}
-								title=${this.localize.term('template_insertPartialView')}
-								@click=${this.#openInsertPartialViewSidebar}>
-						  </uui-menu-item>`
-						: ''}
 				</umb-dropdown>
 			</uui-button-group>
 		`;

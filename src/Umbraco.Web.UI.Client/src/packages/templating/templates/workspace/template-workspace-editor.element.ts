@@ -1,5 +1,5 @@
-import type { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
-import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
+import { UMB_TEMPLATING_SECTION_PICKER_MODAL } from '../../modals/templating-section-picker/templating-section-picker-modal.token.js';
+import type { UmbTemplatingInsertMenuElement } from '../../components/templating-item-menu/templating-item-menu.element.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/query-builder/index.js';
 import { getQuerySnippet } from '../../utils/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js';
@@ -108,7 +108,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	private _modalContext?: UmbModalManagerContext;
 
 	#openInsertSectionModal() {
-		const sectionModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL);
+		const sectionModal = this._modalContext?.open(UMB_TEMPLATING_SECTION_PICKER_MODAL);
 		sectionModal?.onSubmit().then((insertSectionModalValue) => {
 			if (insertSectionModalValue?.value) {
 				this._codeEditor?.insert(insertSectionModalValue.value);
