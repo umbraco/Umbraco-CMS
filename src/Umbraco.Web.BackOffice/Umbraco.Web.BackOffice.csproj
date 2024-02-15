@@ -31,9 +31,4 @@
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\**\*" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Routing" />
-    <Folder Include="SignalR" />
-  </ItemGroup>
 </Project>
