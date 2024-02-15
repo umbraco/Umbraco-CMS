@@ -6,12 +6,17 @@ namespace Umbraco.Cms.Web.Common.Hosting;
 public interface IBackOfficePathGenerator
 {
     /// <summary>
-    ///     The virtual path of the Backoffice.
+    ///     Gets the virtual path of the BackOffice.
     /// </summary>
     string BackofficePath { get; }
 
     /// <summary>
-    ///     The virtual path of the static assets used in the Backoffice.
+    ///     Gets the cache bust hash for the BackOffice.
+    /// </summary>
+    string BackOfficeCacheBustHash { get; }
+
+    /// <summary>
+    ///     Gets the virtual path of the static assets used in the BackOffice.
     /// </summary>
     string BackofficeAssetsPath { get; }
 }
