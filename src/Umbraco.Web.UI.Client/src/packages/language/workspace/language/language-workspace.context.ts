@@ -105,6 +105,7 @@ export class UmbLanguageWorkspaceContext
 
 	destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }
 
