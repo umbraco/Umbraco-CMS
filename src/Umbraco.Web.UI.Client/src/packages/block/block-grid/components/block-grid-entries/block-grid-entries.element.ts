@@ -49,88 +49,17 @@ function getAccumulatedValueOfIndex(index: number, weights: Array<number>) {
 	return calc;
 }
 
-const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryElement> = {
-	getUniqueOfElement: (element) => {
-		return element.contentUdi!;
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentUdi;
-	},
-	resolveVerticalDirection: (args) => {
-		/** We need some data about the grid to figure out if there is room to be placed next to the found element */
-		const approvedContainerComputedStyles = getComputedStyle(args.containerElement);
-		const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split('px')[0]) || 0;
-		const gridColumnNumber = parseInt(
-			approvedContainerComputedStyles.getPropertyValue('--umb-block-grid--grid-columns'),
-			10,
-		);
-
-		const foundElColumns = parseInt(args.relatedElement.dataset.colSpan ?? '', 10);
-		const currentElementColumns = args.item.columnSpan;
-
-		if (currentElementColumns >= gridColumnNumber) {
-			return true;
-		}
-
-		// Get grid template:
-		const approvedContainerGridColumns = approvedContainerComputedStyles.gridTemplateColumns
-			.trim()
-			.split('px')
-			.map((x) => Number(x))
-			.filter((n) => n > 0)
-			.map((n, i, list) => (list.length === i ? n : n + gridColumnGap));
-
-		// ensure all columns are there.
-		// This will also ensure handling non-css-grid mode,
-		// use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-		let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
-		const amountOfUnknownColumns = gridColumnNumber - amountOfColumnsInWeightMap;
-		if (amountOfUnknownColumns > 0) {
-			const accumulatedValue =
-				getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
-			const missingColumnWidth = (args.containerRect.width - accumulatedValue) / amountOfUnknownColumns;
-			if (missingColumnWidth > 0) {
-				while (amountOfColumnsInWeightMap++ < gridColumnNumber) {
-					approvedContainerGridColumns.push(missingColumnWidth);
-				}
-			}
-		}
-
-		let offsetPlacement = 0;
-		/* If placeholder is in this same line, we want to assume that it will offset the placement of the found element,
-		which provides more potential space for the item to drop at.
-		This is relevant in this calculation where we look at the space to determine if its a vertical or horizontal drop in relation to the found element.
-		*/
-		if (args.placeholderIsInThisRow && args.elementRect.left < args.relatedRect.left) {
-			offsetPlacement = -(args.elementRect.width + gridColumnGap);
-		}
-
-		const relatedStartX = Math.max(args.relatedRect.left - args.containerRect.left + offsetPlacement, 0);
-		const relatedStartCol = Math.round(
-			getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns),
-		);
-
-		// If the found related element does not have enough room after which for the current element, then we go vertical mode:
-		return (
-			relatedStartCol + (args.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber
-		);
-	},
-	identifier: 'block-grid-editor',
-	itemSelector: 'umb-block-grid-entry',
-	//ignorerSelector: '', // No ignorerSelector, as we want to ignore nothing.
-	containerSelector: '.umb-block-grid__layout-container',
-};
-
-function resolveVerticalDirection(data) {
+function resolveVerticalDirection(args) {
 	/** We need some data about the grid to figure out if there is room to be placed next to the found element */
-	const approvedContainerComputedStyles = getComputedStyle(data.containerElement);
+	const approvedContainerComputedStyles = getComputedStyle(args.containerElement);
 	const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split('px')[0]) || 0;
 	const gridColumnNumber = parseInt(
 		approvedContainerComputedStyles.getPropertyValue('--umb-block-grid--grid-columns'),
 		10,
 	);
-	const foundElColumns = parseInt(data.relatedElement.dataset.colSpan, 10);
-	const currentElementColumns = data.item.columnSpan;
+
+	const foundElColumns = parseInt(args.relatedElement.dataset.colSpan ?? '', 10);
+	const currentElementColumns = args.item.columnSpan;
 
 	if (currentElementColumns >= gridColumnNumber) {
 		return true;
@@ -150,9 +79,8 @@ function resolveVerticalDirection(data) {
 	let amountOfColumnsInWeightMap = approvedContainerGridColumns.length;
 	const amountOfUnknownColumns = gridColumnNumber - amountOfColumnsInWeightMap;
 	if (amountOfUnknownColumns > 0) {
-		let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
-		const layoutWidth = data.containerRect.width;
-		const missingColumnWidth = (layoutWidth - accumulatedValue) / amountOfUnknownColumns;
+		const accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, approvedContainerGridColumns) || 0;
+		const missingColumnWidth = (args.containerRect.width - accumulatedValue) / amountOfUnknownColumns;
 		if (missingColumnWidth > 0) {
 			while (amountOfColumnsInWeightMap++ < gridColumnNumber) {
 				approvedContainerGridColumns.push(missingColumnWidth);
@@ -165,18 +93,31 @@ function resolveVerticalDirection(data) {
 	which provides more potential space for the item to drop at.
 	This is relevant in this calculation where we look at the space to determine if its a vertical or horizontal drop in relation to the found element.
 	*/
-	if (data.placeholderIsInThisRow && data.elementRect.left < data.relatedRect.left) {
-		offsetPlacement = -(data.elementRect.width + gridColumnGap);
+	if (args.placeholderIsInThisRow && args.elementRect.left < args.relatedRect.left) {
+		offsetPlacement = -(args.elementRect.width + gridColumnGap);
 	}
 
-	const relatedStartX = Math.max(data.relatedRect.left - data.containerRect.left + offsetPlacement, 0);
+	const relatedStartX = Math.max(args.relatedRect.left - args.containerRect.left + offsetPlacement, 0);
 	const relatedStartCol = Math.round(
 		getInterpolatedIndexOfPositionInWeightMap(relatedStartX, approvedContainerGridColumns),
 	);
 
 	// If the found related element does not have enough room after which for the current element, then we go vertical mode:
-	return relatedStartCol + (data.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber;
+	return relatedStartCol + (args.horizontalPlaceAfter ? foundElColumns : 0) + currentElementColumns > gridColumnNumber;
 }
+
+const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryElement> = {
+	getUniqueOfElement: (element) => {
+		return element.contentUdi!;
+	},
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.contentUdi;
+	},
+	resolveVerticalDirection: resolveVerticalDirection,
+	identifier: 'block-grid-editor',
+	itemSelector: 'umb-block-grid-entry',
+	containerSelector: '.umb-block-grid__layout-container',
+};
 
 /**
  * @element umb-block-grid-entries
