@@ -18,7 +18,7 @@ export interface UmbBlockGridTypeModel extends UmbBlockTypeBaseModel {
 export interface UmbBlockGridTypeAreaType {
 	key: string;
 	alias: string;
-	colSpan?: number;
+	columnSpan?: number;
 	rowSpan?: number;
 	minAllowed?: number;
 	maxAllowed?: number;
