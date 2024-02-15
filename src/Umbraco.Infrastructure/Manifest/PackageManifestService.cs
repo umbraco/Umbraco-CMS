@@ -36,4 +36,23 @@ internal sealed class PackageManifestService : IPackageManifestService
                },
                _packageManifestSettings.CacheTimeout)
            ?? Array.Empty<PackageManifest>();
+
+    public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
+    {
+        IEnumerable<PackageManifest> packageManifests = await GetPackageManifestsAsync();
+        var manifests = packageManifests.Select(x => x.Importmap).WhereNotNull().ToList();
+
+        var importDict = manifests
+            .SelectMany(x => x.Imports)
+            .ToDictionary(x => x.Key, x => x.Value);
+        var scopesDict = manifests
+            .SelectMany(x => x.Scopes ?? new Dictionary<string, Dictionary<string, string>>())
+            .ToDictionary(x => x.Key, x => x.Value);
+
+        return new PackageManifestImportmap
+        {
+            Imports = importDict,
+            Scopes = scopesDict,
+        };
+    }
 }

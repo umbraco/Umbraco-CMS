@@ -9,4 +9,6 @@ public class PackageManifest
     public bool AllowTelemetry { get; set; } = true;
 
     public required object[] Extensions { get; set; }
+
+    public PackageManifestImportmap? Importmap { get; set; }
 }

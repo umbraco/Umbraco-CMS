@@ -44,6 +44,11 @@ public static partial class Constants
         /// </summary>
         public const string TwoFactorRememberBrowserCookie = "TwoFactorRememberBrowser";
 
+        /// <summary>
+        ///     The token used to replace the cache buster hash in web assets.
+        /// </summary>
+        public const string CacheBusterToken = "%CACHE_BUSTER%";
+
         public static class Mvc
         {
             public const string InstallArea = "UmbracoInstall";
