@@ -10,7 +10,6 @@ import type { TemplateQueryExecuteModel } from '../models/TemplateQueryExecuteMo
 import type { TemplateQueryResultResponseModel } from '../models/TemplateQueryResultResponseModel';
 import type { TemplateQuerySettingsResponseModel } from '../models/TemplateQuerySettingsResponseModel';
 import type { TemplateResponseModel } from '../models/TemplateResponseModel';
-import type { TemplateScaffoldResponseModel } from '../models/TemplateScaffoldResponseModel';
 import type { UpdateTemplateRequestModel } from '../models/UpdateTemplateRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -24,10 +23,10 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static getItemTemplate({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<TemplateItemResponseModel>> {
+id,
+}: {
+id?: Array<string>,
+}): CancelablePromise<Array<TemplateItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/item/template',
@@ -45,10 +44,10 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static postTemplate({
-        requestBody,
-    }: {
-        requestBody?: CreateTemplateRequestModel,
-    }): CancelablePromise<string> {
+requestBody,
+}: {
+requestBody?: CreateTemplateRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/template',
@@ -68,10 +67,10 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static getTemplateById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<TemplateResponseModel> {
+id,
+}: {
+id: string,
+}): CancelablePromise<TemplateResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/{id}',
@@ -90,10 +89,10 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static deleteTemplateById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
+id,
+}: {
+id: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/template/{id}',
@@ -113,12 +112,12 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static putTemplateById({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UpdateTemplateRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: UpdateTemplateRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/template/{id}',
@@ -154,10 +153,10 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static postTemplateQueryExecute({
-        requestBody,
-    }: {
-        requestBody?: TemplateQueryExecuteModel,
-    }): CancelablePromise<TemplateQueryResultResponseModel> {
+requestBody,
+}: {
+requestBody?: TemplateQueryExecuteModel,
+}): CancelablePromise<TemplateQueryResultResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/template/query/execute',
@@ -184,40 +183,18 @@ export class TemplateResource {
     }
 
     /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTemplateScaffold({
-        masterTemplateId,
-    }: {
-        masterTemplateId?: string,
-    }): CancelablePromise<TemplateScaffoldResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/template/scaffold',
-            query: {
-                'masterTemplateId': masterTemplateId,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeTemplateChildren({
-        parentId,
-        skip,
-        take = 100,
-    }: {
-        parentId?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
+parentId,
+skip,
+take = 100,
+}: {
+parentId?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/children',
@@ -237,12 +214,12 @@ export class TemplateResource {
      * @throws ApiError
      */
     public static getTreeTemplateRoot({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/root',
