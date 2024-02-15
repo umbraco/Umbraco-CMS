@@ -59,6 +59,18 @@ function destroyPreventEvent(element: Element) {
 	//element.removeAttribute('draggable');
 }
 
+export type resolveVerticalDirectionArgs<T, ElementType extends HTMLElement> = {
+	containerElement: Element;
+	containerRect: DOMRect;
+	item: T;
+	element: ElementType;
+	elementRect: DOMRect;
+	relatedElement: ElementType;
+	relatedRect: DOMRect;
+	placeholderIsInThisRow: boolean;
+	horizontalPlaceAfter: boolean;
+};
+
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	getUniqueOfElement: (element: ElementType) => string | null | symbol | number;
 	getUniqueOfModel: (modeEntry: T) => string | null | symbol | number;
@@ -80,17 +92,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	onDisallowed?: () => void;
 	onAllowed?: () => void;
 	onRequestDrop?: (argument: { item: T }) => boolean | void;
-	resolveVerticalDirection?: (argument: {
-		containerElement: Element;
-		containerRect: DOMRect;
-		item: T;
-		element: ElementType;
-		elementRect: DOMRect;
-		relatedElement: ElementType;
-		relatedRect: DOMRect;
-		placeholderIsInThisRow: boolean;
-		horizontalPlaceAfter: boolean;
-	}) => void;
+	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => void;
 	performItemMove?: (argument: { item: T; newIndex: number; oldIndex: number }) => Promise<boolean> | boolean;
 	performItemInsert?: (argument: { item: T; newIndex: number }) => Promise<boolean> | boolean;
 	performItemRemove?: (argument: { item: T }) => Promise<boolean> | boolean;
