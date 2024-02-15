@@ -109,6 +109,7 @@ export class UmbUserWorkspaceContext
 
 	destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }
 

@@ -37,6 +37,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
 	 */
 	setValue(data: T): void {
+		if (!this._subject) return;
 		const frozenData = deepFreeze(data);
 		// Only update data if its different than current data.
 		if (!naiveObjectComparison(frozenData, this._subject.getValue())) {

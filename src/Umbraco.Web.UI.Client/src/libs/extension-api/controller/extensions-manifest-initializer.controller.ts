@@ -31,8 +31,9 @@ export class UmbExtensionsManifestInitializer<
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
+		controllerAlias?: string,
 	) {
-		super(host, extensionRegistry, type, filter, onChange);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
 		this.#extensionRegistry = extensionRegistry;
 		this._init();
 	}
@@ -44,5 +45,10 @@ export class UmbExtensionsManifestInitializer<
 			manifest.alias,
 			this._extensionChanged,
 		) as ControllerType;
+	}
+
+	public destroy(): void {
+		super.destroy();
+		(this.#extensionRegistry as any) = undefined;
 	}
 }

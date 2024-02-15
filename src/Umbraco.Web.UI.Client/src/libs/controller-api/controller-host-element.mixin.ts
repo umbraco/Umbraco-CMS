@@ -11,6 +11,8 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
 	removeControllerByAlias(alias: UmbControllerAlias): void;
 	removeController(controller: UmbController): void;
 	getHostElement(): Element;
+
+	destroy(): void;
 }
 
 /**

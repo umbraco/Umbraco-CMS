@@ -113,9 +113,18 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 
 		destroy() {
 			let ctrl: UmbController | undefined;
+			//let prev = null;
 			// Note: A very important way of doing this loop, as foreach will skip over the next item if the current item is removed.
 			while ((ctrl = this.#controllers[0])) {
 				ctrl.destroy();
+				/*
+				//This code can help debug if there is some controller that does not destroy properly: (When a controller is destroyed it should remove it self)
+				if (ctrl === prev) {
+					console.log('WUPS, we have a controller that does not destroy it self');
+					debugger;
+				}
+				prev = ctrl;
+				*/
 			}
 			this.#controllers.length = 0;
 		}
