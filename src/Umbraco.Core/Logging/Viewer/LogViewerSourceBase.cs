@@ -98,7 +98,7 @@ namespace Umbraco.Core.Logging.Viewer
         /// <returns></returns>
         public string GetLogLevel()
         {
-            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(Log.Logger.IsEnabled)?.Min() ?? null;
+            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(Log.Logger.IsEnabled).DefaultIfEmpty(LogEventLevel.Information)?.Min() ?? null;
             return logLevel?.ToString() ?? "";
         }
 
