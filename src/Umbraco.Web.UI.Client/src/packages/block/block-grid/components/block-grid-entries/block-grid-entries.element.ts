@@ -148,21 +148,22 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	#context = new UmbBlockGridEntriesContext(this);
 
 	@property({ attribute: false })
-	public set areaKey(value: string | null) {
-		this.#context.setAreaKey(value);
+	public set areaKey(value: string | null | undefined) {
+		this._areaKey = value;
+		this.#context.setAreaKey(value ?? null);
 	}
-	public get areaKey(): string | null {
-		return null; // Not implemented.
+	public get areaKey(): string | null | undefined {
+		return this._areaKey;
 	}
+
+	@state()
+	private _areaKey?: string | null;
 
 	@state()
 	private _styleElement?: HTMLLinkElement;
 
 	@state()
 	private _layoutEntries: Array<UmbBlockGridLayoutModel> = [];
-
-	@state()
-	private _createButtonLabel = this.localize.term('blockEditor_addBlock');
 
 	constructor() {
 		super();
@@ -204,19 +205,27 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 						</umb-block-grid-entry>`,
 				)}
 			</div>
-			<uui-button-group>
-				<uui-button
-					id="add-button"
-					look="placeholder"
-					label=${this._createButtonLabel}
-					href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
-				<uui-button
-					label=${this.localize.term('content_createFromClipboard')}
-					look="placeholder"
-					href=${this.#context.getPathForClipboard(-1) ?? ''}>
-					<uui-icon name="icon-paste-in"></uui-icon>
-				</uui-button>
-			</uui-button-group>
+			${this._areaKey === null || this._layoutEntries.length === 0
+				? html` <uui-button-group>
+						<uui-button
+							id="add-button"
+							look="placeholder"
+							label=${this.localize.term('blockEditor_addBlock')}
+							href=${this.#context.getPathForCreateBlock(-1) ?? ''}></uui-button>
+						${this._areaKey === null
+							? html` <uui-button
+									label=${this.localize.term('content_createFromClipboard')}
+									look="placeholder"
+									href=${this.#context.getPathForClipboard(-1) ?? ''}>
+									<uui-icon name="icon-paste-in"></uui-icon>
+							  </uui-button>`
+							: ''}
+				  </uui-button-group>`
+				: html`
+						<uui-button-inline-create
+							href=${this.#context.getPathForCreateBlock(-1) ?? ''}
+							label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
+				  `}
 		`;
 		//
 	}
