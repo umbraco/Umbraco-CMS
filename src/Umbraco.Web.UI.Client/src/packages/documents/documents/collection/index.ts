@@ -1,1 +1,1 @@
-export { UMB_DOCUMENT_COLLECTION_ALIAS } from './manifests.js';
+export const UMB_DOCUMENT_COLLECTION_ALIAS = 'Umb.Collection.Document';

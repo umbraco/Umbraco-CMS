@@ -86,6 +86,7 @@ export class UmbMediaWorkspaceContext
 
 	public destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }
 export const api = UmbMediaWorkspaceContext;

@@ -10,7 +10,7 @@ export interface UmbDocumentTreeItemModel extends UmbUniqueTreeItemModel {
 	documentType: {
 		unique: string;
 		icon: string;
-		hasListView: boolean;
+		hasCollection: boolean;
 	};
 	variants: Array<UmbDocumentTreeItemVariantModel>;
 }
