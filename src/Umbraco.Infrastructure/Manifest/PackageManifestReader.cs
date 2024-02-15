@@ -40,24 +40,22 @@ internal class PackageManifestReader : IPackageManifestReader
         return await ParsePackageManifestFiles(files);
     }
 
-    private static IEnumerable<IFileInfo> GetAllPackageManifestFiles(IFileProvider fileProvider, string path, int depth = 0)
+    private static IEnumerable<IFileInfo> GetAllPackageManifestFiles(IFileProvider fileProvider, string path)
     {
-        if (depth > 1)
-        {
-            yield break;
-        }
-
         const string extensionFileName = "umbraco-package.json";
+
         foreach (IFileInfo fileInfo in fileProvider.GetDirectoryContents(path))
         {
             if (fileInfo.IsDirectory)
             {
+                // find all extension package configuration files one level deep
                 var virtualPath = WebPath.Combine(path, fileInfo.Name);
-
-                // find all extension package configuration files recursively
-                foreach (IFileInfo nested in GetAllPackageManifestFiles(fileProvider, virtualPath, depth++))
+                IDirectoryContents subDirectoryContents = fileProvider.GetDirectoryContents(virtualPath);
+                IFileInfo? subManifest = subDirectoryContents
+                    .FirstOrDefault(x => !x.IsDirectory && x.Name.InvariantEquals(extensionFileName));
+                if (subManifest != null)
                 {
-                    yield return nested;
+                    yield return subManifest;
                 }
             }
             else if (fileInfo.Name.InvariantEquals(extensionFileName))
