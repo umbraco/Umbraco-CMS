@@ -48,6 +48,38 @@ export const data: Array<UmbMockDocumentModel> = [
 				},
 			},
 			{
+				alias: 'codeEditor',
+				culture: null,
+				segment: null,
+				value: `
+					<h1>Lorem ipsum dolor sit amet consectetuer adipiscing elit</h1>
+					<ul>
+						<li>Lorem ipsum dolor sit amet consectetuer.</li>
+						<li>Aenean commodo ligula eget dolor.</li>
+						<li>Aenean massa cum sociis natoque penatibus.</li>
+					</ul>
+					<p>
+						Lorem ipsum dolor sit amet, consectetuer adipiscing 
+						elit. Aenean commodo ligula eget dolor.
+					</p>
+					<p>
+						<blockquote>
+							Lorem ipsum dolor sit amet, consectetuer 
+							adipiscing elit. Aenean commodo ligula eget dolor. 
+							Aenean massa <strong>strong</strong>. Cum sociis 
+							natoque penatibus et magnis dis parturient montes, 
+							nascetur ridiculus mus. Donec quam felis, ultricies 
+							nec, pellentesque eu, pretium quis, sem. Nulla consequat 
+							massa quis enim. Donec pede justo, fringilla vel, 
+							aliquet nec, vulputate eget, arcu. In <em>em</em> 
+							enim justo, rhoncus ut, imperdiet a, venenatis vitae, 
+							justo. Nullam <a class="external ext" href="#">link</a>
+							dictum felis eu pede mollis pretium.
+						</blockquote>
+					</p>
+				`,
+			},
+			{
 				alias: 'email',
 				culture: null,
 				segment: null,

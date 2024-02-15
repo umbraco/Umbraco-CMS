@@ -1,5 +1,6 @@
 import { css, html, customElement, property, state, ifDefined, styleMap } from '@umbraco-cms/backoffice/external/lit';
-//import type { UUICodeEditorElement } from '@umbraco-cms/backoffice/external/uui';
+import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
+import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -9,8 +10,11 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	@property()
 	value = '';
 
+	//@query('umb-code-editor')
+	_codeEditor?: UmbCodeEditorElement;
+
 	@state()
-	private _language?: string;
+	private _language?: string = 'HTML';
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -18,7 +22,8 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	}
 	
 	#onInput(event: Event) {
-		//this.value = (event.target as UmbCodeEditorElement).code as string;
+		this.value = (event.target as UmbCodeEditorElement).code as string;
+		//this.value = this.#editor?.monacoEditor?.getValue() ?? '';
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
