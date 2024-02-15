@@ -35,7 +35,7 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 	#createTreeItemMapper = (item: UmbScriptDetailModel) => {
 		const treeItem: UmbScriptTreeItemModel = {
 			unique: item.unique,
-			parentUnique: item.parentUnique,
+			parentUnique: null,
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			name: item.name,
 			hasChildren: false,

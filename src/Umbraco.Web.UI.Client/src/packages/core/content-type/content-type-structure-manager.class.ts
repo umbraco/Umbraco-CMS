@@ -70,7 +70,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		if (parentUnique === undefined) return {};
 
-		const { data } = await this.#contentTypeRepository.createScaffold(parentUnique);
+		const { data } = await this.#contentTypeRepository.createScaffold();
 		if (!data) return {};
 
 		this.#ownerContentTypeUnique = data.unique;

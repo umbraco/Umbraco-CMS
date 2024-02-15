@@ -57,7 +57,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
-		const { data } = await this.repository.createScaffold(parentUnique);
+		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.

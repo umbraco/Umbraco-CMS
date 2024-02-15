@@ -30,19 +30,19 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 	/**
 	 * Creates a new Template scaffold
-	 * @param {(string | null)} parentUnique
+	 * @param {Partial<UmbTemplateDetailModel>} [preset]
 	 * @return { CreateTemplateRequestModel }
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbTemplateDetailModel> = {}) {
 		const data: UmbTemplateDetailModel = {
 			entityType: UMB_TEMPLATE_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
 			name: '',
 			alias: '',
 			content: '',
 			masterTemplate: null,
+			...preset,
 		};
 
 		return { data };
@@ -67,7 +67,6 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		const template: UmbTemplateDetailModel = {
 			entityType: UMB_TEMPLATE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: null,
 			name: data.name,
 			content: data.content || null,
 			alias: data.alias,

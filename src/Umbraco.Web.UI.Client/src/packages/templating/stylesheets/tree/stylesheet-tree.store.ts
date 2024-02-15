@@ -35,7 +35,7 @@ export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 	#createTreeItemMapper = (item: UmbStylesheetDetailModel) => {
 		const treeItem: UmbStylesheetTreeItemModel = {
 			unique: item.unique,
-			parentUnique: item.parentUnique,
+			parentUnique: null,
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
 			name: item.name,
 			hasChildren: false,

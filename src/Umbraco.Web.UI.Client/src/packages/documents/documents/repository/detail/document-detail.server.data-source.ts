@@ -30,15 +30,13 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 	/**
 	 * Creates a new Document scaffold
-	 * @param {(string | null)} parentUnique
 	 * @return { UmbDocumentDetailModel }
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null, preset: Partial<UmbDocumentDetailModel> = {}) {
+	async createScaffold(preset: Partial<UmbDocumentDetailModel> = {}) {
 		const data: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique: parentUnique,
 			urls: [],
 			template: null,
 			documentType: {
@@ -83,7 +81,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 		const document: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: null, // TODO: this is not correct. It will be solved when we know where to get the parent from
 			values: data.values.map((value) => {
 				return {
 					alias: value.alias,
@@ -126,14 +123,14 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async create(model: UmbDocumentDetailModel) {
+	async create(model: UmbDocumentDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDocumentRequestModel = {
 			id: model.unique,
-			parent: model.parentUnique ? { id: model.parentUnique } : null,
+			parent: parentUnique ? { id: parentUnique } : null,
 			documentType: { id: model.documentType.unique },
 			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,

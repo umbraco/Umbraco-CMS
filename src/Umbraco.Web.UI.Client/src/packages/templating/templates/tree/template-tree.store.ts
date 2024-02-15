@@ -35,8 +35,8 @@ export class UmbTemplateTreeStore extends UmbUniqueTreeStore {
 	#createTreeItemMapper = (item: UmbTemplateDetailModel) => {
 		const treeItem: UmbTemplateTreeItemModel = {
 			unique: item.unique,
-			parentUnique: item.parentUnique,
 			entityType: UMB_TEMPLATE_ENTITY_TYPE,
+			parentUnique: null,
 			name: item.name,
 			hasChildren: false,
 			isFolder: false,

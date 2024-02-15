@@ -130,7 +130,7 @@ ${currentContent}`;
 	};
 
 	async create(parentUnique: string | null) {
-		const { data } = await this.detailRepository.createScaffold(parentUnique);
+		const { data } = await this.detailRepository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.setValue(data);

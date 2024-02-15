@@ -77,7 +77,7 @@ export class UmbPartialViewWorkspaceContext
 			snippetContent = snippet?.content || '';
 		}
 
-		const { data } = await this.repository.createScaffold(parentUnique, { content: snippetContent });
+		const { data } = await this.repository.createScaffold({ content: snippetContent });
 
 		if (data) {
 			this.setIsNew(true);

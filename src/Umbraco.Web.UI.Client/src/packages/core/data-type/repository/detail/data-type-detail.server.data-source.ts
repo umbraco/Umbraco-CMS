@@ -6,6 +6,7 @@ import type { CreateDataTypeRequestModel, DataTypeModelBaseModel } from '@umbrac
 import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { Part } from 'lit-html';
 
 /**
  * A data source for the Data Type that fetches data from the server
@@ -31,15 +32,15 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 * @return { CreateDataTypeRequestModel }
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbDataTypeDetailModel> = {}) {
 		const data: UmbDataTypeDetailModel = {
 			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
 			name: '',
 			editorAlias: undefined,
 			editorUiAlias: null,
 			values: [],
+			...preset,
 		};
 
 		return { data };
@@ -64,7 +65,6 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		const dataType: UmbDataTypeDetailModel = {
 			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: data.parent ? data.parent.id : null,
 			name: data.name,
 			editorAlias: data.editorAlias,
 			editorUiAlias: data.editorUiAlias || null,
@@ -80,7 +80,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async create(model: UmbDataTypeDetailModel) {
+	async create(model: UmbDataTypeDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Data Type is missing');
 		if (!model.unique) throw new Error('Data Type unique is missing');
 		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
@@ -88,7 +88,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDataTypeRequestModel = {
 			id: model.unique,
-			parent: model.parentUnique ? { id: model.parentUnique } : null,
+			parent: parentUnique ? { id: parentUnique } : null,
 			name: model.name,
 			editorAlias: model.editorAlias,
 			editorUiAlias: model.editorUiAlias,

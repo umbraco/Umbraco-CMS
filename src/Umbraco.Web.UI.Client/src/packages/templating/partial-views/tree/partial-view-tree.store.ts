@@ -35,7 +35,7 @@ export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 	#createTreeItemMapper = (item: UmbPartialViewDetailModel) => {
 		const treeItem: UmbPartialViewTreeItemModel = {
 			unique: item.unique,
-			parentUnique: item.parentUnique,
+			parentUnique: null,
 			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
 			name: item.name,
 			hasChildren: false,

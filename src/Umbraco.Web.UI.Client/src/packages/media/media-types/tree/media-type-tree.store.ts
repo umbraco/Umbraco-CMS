@@ -34,7 +34,7 @@ export class UmbMediaTypeTreeStore extends UmbUniqueTreeStore {
 	#createTreeItemMapper = (item: UmbMediaTypeDetailModel) => {
 		const treeItem: UmbMediaTypeTreeItemModel = {
 			unique: item.unique,
-			parentUnique: item.parentUnique,
+			parentUnique: null,
 			name: item.name,
 			entityType: item.entityType,
 			isFolder: false,

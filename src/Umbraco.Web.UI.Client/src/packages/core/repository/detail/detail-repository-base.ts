@@ -8,9 +8,7 @@ import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export abstract class UmbDetailRepositoryBase<
-		DetailModelType extends { unique: string; entityType: string; parentUnique?: string | null },
-	>
+export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: string; entityType: string }>
 	extends UmbRepositoryBase
 	implements UmbDetailRepository<DetailModelType>, UmbApi
 {
@@ -42,13 +40,12 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Creates a scaffold
-	 * @param {(string | null)} parentUnique
+	 * @param {Partial<DetailModelType>} [preset]
 	 * @return {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async createScaffold(parentUnique: string | null, preset?: Partial<DetailModelType>) {
-		if (parentUnique === undefined) throw new Error('Parent unique is missing');
-		return this.#detailSource.createScaffold(parentUnique, preset);
+	async createScaffold(preset?: Partial<DetailModelType>) {
+		return this.#detailSource.createScaffold(preset);
 	}
 
 	/**
@@ -72,15 +69,16 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Returns a promise with an observable of the detail for the given unique
-	 * @param {string} unique
+	 * @param {DetailModelType} model
+	 * @param {string | null} [parentUnique=null]
 	 * @return {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async create(data: DetailModelType) {
-		if (!data) throw new Error('Data is missing');
+	async create(model: DetailModelType, parentUnique: string | null = null) {
+		if (!model) throw new Error('Data is missing');
 		await this.#init;
 
-		const { data: createdData, error } = await this.#detailSource.create(data);
+		const { data: createdData, error } = await this.#detailSource.create(model, parentUnique);
 
 		if (createdData) {
 			this.#detailStore?.append(createdData);
@@ -95,26 +93,26 @@ export abstract class UmbDetailRepositoryBase<
 
 	/**
 	 * Saves the given data
-	 * @param {DetailModelType} data
+	 * @param {DetailModelType} model
 	 * @return {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async save(data: DetailModelType) {
-		if (!data) throw new Error('Data is missing');
-		if (!data.unique) throw new Error('Unique is missing');
+	async save(model: DetailModelType) {
+		if (!model) throw new Error('Data is missing');
+		if (!model.unique) throw new Error('Unique is missing');
 		await this.#init;
 
-		const { data: updatedData, error } = await this.#detailSource.update(data);
+		const { data: updatedData, error } = await this.#detailSource.update(model);
 
 		if (updatedData) {
-			this.#detailStore!.updateItem(data.unique, updatedData);
+			this.#detailStore!.updateItem(model.unique, updatedData);
 
 			// TODO: how do we handle generic notifications? Is this the correct place to do it?
 			const notification = { data: { message: `Saved` } };
 			this.#notificationContext!.peek('positive', notification);
 		}
 
-		return { data, error };
+		return { data: model, error };
 	}
 
 	/**

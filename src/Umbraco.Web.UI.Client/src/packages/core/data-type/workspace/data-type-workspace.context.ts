@@ -199,7 +199,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
-		this.#getDataPromise = this.repository.createScaffold(parentUnique);
+		this.#getDataPromise = this.repository.createScaffold();
 		let { data } = await this.#getDataPromise;
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };

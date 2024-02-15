@@ -68,7 +68,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async create(parentUnique: string | null, documentTypeUnique: string) {
-		this.#getDataPromise = this.repository.createScaffold(parentUnique, {
+		this.#getDataPromise = this.repository.createScaffold({
 			documentType: {
 				unique: documentTypeUnique,
 				hasCollection: false,
