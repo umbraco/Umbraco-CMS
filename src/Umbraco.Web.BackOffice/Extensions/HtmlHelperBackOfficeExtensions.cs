@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -14,14 +15,18 @@ using Umbraco.Cms.Web.Common.Hosting;
 namespace Umbraco.Extensions;
 
 /// <summary>
-///    Extensions for <see cref="IHtmlHelper" /> to render scripts for the back office
+///    Extensions for <see cref="IHtmlHelper" /> to render scripts for the BackOffice.
 /// </summary>
 public static class HtmlHelperBackOfficeExtensions
 {
     /// <summary>
-    ///     Outputs a script tag containing the import map for the BackOffice
+    ///     Outputs a script tag containing the import map for the BackOffice.
     /// </summary>
-    /// <returns>A <see cref="Task"/> containing the html content for the BackOffice import map</returns>
+    /// <remarks>
+    ///     It will replace the token %CACHE_BUSTER% with the cache buster hash.
+    ///     It will also replace the /umbraco/backoffice path with the correct path for the BackOffice assets.
+    /// </remarks>
+    /// <returns>A <see cref="Task"/> containing the html content for the BackOffice import map.</returns>
     public static async Task<IHtmlContent> BackOfficeImportMapScriptAsync(
         this IHtmlHelper html,
         IJsonSerializer jsonSerializer,
@@ -49,7 +54,9 @@ public static class HtmlHelperBackOfficeExtensions
 
             // Inject the BackOffice cache buster into the import string to handle BackOffice assets
             var importmap = sb.ToString()
-                .Replace("/umbraco/backoffice", backOfficePathGenerator.BackOfficeAssetsPath);
+                .Replace(backOfficePathGenerator.BackOfficeVirtualDirectory, backOfficePathGenerator.BackOfficeAssetsPath)
+                .Replace(Constants.Web.CacheBusterToken, backOfficePathGenerator.BackOfficeCacheBustHash);
+
             return html.Raw(importmap);
         }
         catch (NotSupportedException ex)

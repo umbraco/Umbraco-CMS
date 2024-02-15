@@ -16,6 +16,11 @@ public interface IBackOfficePathGenerator
     string BackOfficeCacheBustHash { get; }
 
     /// <summary>
+    ///     Gets the virtual directory of the BackOffice.
+    /// </summary>
+    string BackOfficeVirtualDirectory { get; }
+
+    /// <summary>
     ///     Gets the virtual path of the static assets used in the BackOffice.
     /// </summary>
     string BackOfficeAssetsPath { get; }

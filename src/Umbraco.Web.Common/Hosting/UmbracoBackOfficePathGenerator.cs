@@ -16,12 +16,16 @@ public class UmbracoBackOfficePathGenerator(
     : IBackOfficePathGenerator
 {
     private string? _backofficeAssetsPath;
+    private string? _backOfficeVirtualDirectory;
 
     /// <inheritdoc />
     public string BackOfficePath { get; } = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
 
     /// <inheritdoc />
     public string BackOfficeCacheBustHash { get; } = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion, runtimeMinifier);
+
+    /// <inheritdoc />
+    public string BackOfficeVirtualDirectory => _backOfficeVirtualDirectory ??= BackOfficePath.EnsureEndsWith('/') + "backoffice";
 
     /// <summary>
     ///     Gets the virtual path for the Backoffice assets coming from the Umbraco.Cms.StaticAssets RCL.
@@ -30,5 +34,5 @@ public class UmbracoBackOfficePathGenerator(
     /// <example>/umbraco/backoffice/addf120b430021c36c232c99ef8d926aea2acd6b</example>
     /// <see cref="UrlHelperExtensions.GetCacheBustHash"/>
     public string BackOfficeAssetsPath =>
-        _backofficeAssetsPath ??= BackOfficePath.EnsureEndsWith('/') + "backoffice/" + BackOfficeCacheBustHash;
+        _backofficeAssetsPath ??= BackOfficeVirtualDirectory.EnsureEndsWith('/') + BackOfficeCacheBustHash;
 }
