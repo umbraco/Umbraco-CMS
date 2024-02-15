@@ -15,13 +15,6 @@ namespace Umbraco.Extensions;
 
 public static partial class UmbracoBuilderExtensions
 {
-    /// <summary>
-    /// Adds all required components to run the Umbraco back office
-    /// </summary>
-    private static IUmbracoBuilder
-        AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) => builder
-        .AddBackOfficeAuthentication();
-
     public static IUmbracoBuilder AddUmbracoManagementApi(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
@@ -32,7 +25,6 @@ public static partial class UmbracoBuilderExtensions
         {
             ModelsBuilderBuilderExtensions.AddModelsBuilder(builder)
                 .AddJson()
-                // .AddBackOffice()
                 .AddInstaller()
                 .AddUpgrader()
                 .AddSearchManagement()
