@@ -8,21 +8,26 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Web.Common.Hosting;
 
 /// <inheritdoc />
-public class UmbracoBackOfficePathGenerator(
-    IHostingEnvironment hostingEnvironment,
-    IUmbracoVersion umbracoVersion,
-    IRuntimeMinifier runtimeMinifier,
-    IOptions<GlobalSettings> globalSettings)
-    : IBackOfficePathGenerator
+public class UmbracoBackOfficePathGenerator : IBackOfficePathGenerator
 {
     private string? _backofficeAssetsPath;
     private string? _backOfficeVirtualDirectory;
 
-    /// <inheritdoc />
-    public string BackOfficePath { get; } = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    public UmbracoBackOfficePathGenerator(
+        IHostingEnvironment hostingEnvironment,
+        IUmbracoVersion umbracoVersion,
+        IRuntimeMinifier runtimeMinifier,
+        IOptions<GlobalSettings> globalSettings)
+    {
+        BackOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+        BackOfficeCacheBustHash = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion, runtimeMinifier);
+    }
 
     /// <inheritdoc />
-    public string BackOfficeCacheBustHash { get; } = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion, runtimeMinifier);
+    public string BackOfficePath { get; }
+
+    /// <inheritdoc />
+    public string BackOfficeCacheBustHash { get; }
 
     /// <inheritdoc />
     public string BackOfficeVirtualDirectory => _backOfficeVirtualDirectory ??= BackOfficePath.EnsureEndsWith('/') + "backoffice";
