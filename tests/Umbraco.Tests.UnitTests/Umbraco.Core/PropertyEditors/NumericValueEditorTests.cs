@@ -87,11 +87,10 @@ public class NumericValueEditorTests
     private static IntegerPropertyEditor.IntegerPropertyValueEditor CreateValueEditor()
     {
         var valueEditor = new IntegerPropertyEditor.IntegerPropertyValueEditor(
-            Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias", "name", "view"));
+            new DataEditorAttribute("alias"));
         return valueEditor;
     }
 }

@@ -32,8 +32,6 @@ public class ContentModelSerializationTests
                     Value = "value" + propertyIndex,
                     Config = new Dictionary<string, object> { { propertyIndex.ToInvariantString(), "value" } },
                     Description = "Description " + propertyIndex,
-                    View = "~/Views/View" + propertyIndex,
-                    HideLabel = false,
                 });
             }
 
@@ -73,7 +71,6 @@ public class ContentModelSerializationTests
                 Assert.AreEqual("value" + prop, jsonTabs[tab]["properties"][prop]["value"].ToString());
                 Assert.AreEqual("{\"" + prop + "\":\"value\"}", jsonTabs[tab]["properties"][prop]["config"].ToString(Formatting.None));
                 Assert.AreEqual("Description " + prop, jsonTabs[tab]["properties"][prop]["description"].ToString());
-                Assert.AreEqual(false, jsonTabs[tab]["properties"][prop]["hideLabel"].Value<bool>());
             }
         }
     }

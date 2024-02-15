@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -14,9 +13,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.Decimal,
-    EditorType.PropertyValue | EditorType.MacroParameter,
-    "Decimal",
-    "decimal",
     ValueType = ValueTypes.Decimal,
     ValueEditorIsReusable = true)]
 public class DecimalPropertyEditor : DataEditor
@@ -39,12 +35,11 @@ public class DecimalPropertyEditor : DataEditor
     internal class DecimalPropertyValueEditor : DataValueEditor
     {
         public DecimalPropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute) =>
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute) =>
             Validators.Add(new DecimalValidator());
 
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
