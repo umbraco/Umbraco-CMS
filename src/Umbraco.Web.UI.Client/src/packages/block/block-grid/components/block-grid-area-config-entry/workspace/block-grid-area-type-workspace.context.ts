@@ -1,4 +1,4 @@
-import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../types.js';
+import type { UmbBlockGridTypeAreaType } from '../../../types.js';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type {
@@ -14,20 +14,20 @@ import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/b
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
-	extends UmbEditableWorkspaceContextBase<BlockTypeData>
+export class UmbBlockGridAreaTypeWorkspaceContext
+	extends UmbEditableWorkspaceContextBase<UmbBlockGridTypeAreaType>
 	implements UmbInvariantableWorkspaceContextInterface
 {
 	// Just for context token safety:
-	public readonly IS_BLOCK_TYPE_WORKSPACE_CONTEXT = true;
+	public readonly IS_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = true;
 
 	#entityType: string;
-	#data = new UmbObjectState<BlockTypeData | undefined>(undefined);
+	#data = new UmbObjectState<UmbBlockGridTypeAreaType | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
 	// TODO: Get the name of the contentElementType..
-	readonly name = this.#data.asObservablePart((data) => 'block');
-	readonly unique = this.#data.asObservablePart((data) => data?.contentElementTypeKey);
+	readonly name = this.#data.asObservablePart((data) => data?.alias);
+	readonly unique = this.#data.asObservablePart((data) => data?.key);
 
 	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
@@ -45,7 +45,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.value, (value) => {
 				if (value) {
-					const blockTypeData = value.find((x: UmbBlockTypeBaseModel) => x.contentElementTypeKey === unique);
+					const blockTypeData = value.find((x: UmbBlockGridTypeAreaType) => x.key === unique);
 					if (blockTypeData) {
 						this.#data.setValue(blockTypeData);
 						return;
@@ -57,16 +57,18 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		});
 	}
 
-	async create(contentElementTypeId: string, groupKey?: string | null) {
+	async create() {
+		throw new Error('Method not implemented.');
+		/*
 		//Only set groupKey property if it exists
-		const data: BlockTypeData = {
-			contentElementTypeKey: contentElementTypeId,
-			...(groupKey && { groupKey: groupKey }),
-		} as BlockTypeData;
+		const data: UmbBlockGridTypeAreaType = {
+
+		}
 
 		this.setIsNew(true);
 		this.#data.setValue(data);
 		return { data };
+		*/
 	}
 
 	getData() {
@@ -74,7 +76,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	}
 
 	getEntityId() {
-		return this.getData()!.contentElementTypeKey;
+		return this.getData()!.key;
 	}
 
 	getEntityType() {
@@ -88,12 +90,12 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		alert('You cannot set a name of a block-type.');
 	}
 
-	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this.#data.asObservablePart((data) => data?.[propertyAlias as keyof BlockTypeData] as ReturnType);
+	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: keyof UmbBlockGridTypeAreaType) {
+		return this.#data.asObservablePart((data) => data?.[propertyAlias as keyof UmbBlockGridTypeAreaType] as ReturnType);
 	}
 
-	getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
-		return this.#data.getValue()?.[propertyAlias as keyof BlockTypeData] as ReturnType;
+	getPropertyValue<ReturnType = unknown>(propertyAlias: keyof UmbBlockGridTypeAreaType) {
+		return this.#data.getValue()?.[propertyAlias as keyof UmbBlockGridTypeAreaType] as ReturnType;
 	}
 
 	async setPropertyValue(alias: string, value: unknown) {
@@ -108,9 +110,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			// TODO: We should most likely consume already, in this way I avoid having the reset this consumption.
-			context.setValue(
-				appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.contentElementTypeKey),
-			);
+			context.setValue(appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.key));
 		});
 
 		this.saveComplete(this.#data.value);
@@ -122,13 +122,14 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	}
 }
 
-export default UmbBlockTypeWorkspaceContext;
+export default UmbBlockGridAreaTypeWorkspaceContext;
 
-export const UMB_BLOCK_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
+export const UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbWorkspaceContextInterface,
-	UmbBlockTypeWorkspaceContext
+	UmbBlockGridAreaTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
 	undefined,
-	(context): context is UmbBlockTypeWorkspaceContext => (context as any).IS_BLOCK_TYPE_WORKSPACE_CONTEXT,
+	(context): context is UmbBlockGridAreaTypeWorkspaceContext =>
+		(context as any).IS_BLOCK_GRID_AREA_TYPE_WORKSPACE_CONTEXT,
 );

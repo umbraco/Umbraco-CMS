@@ -11,17 +11,20 @@ import '../block-grid-block-view/index.js';
 export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
 	@property({ attribute: false })
-	public get areaKey(): string | undefined {
-		return this._areaKey;
+	public get key(): string | undefined {
+		return this._key;
 	}
-	public set areaKey(areaKey: string | undefined) {
-		if (!areaKey) return;
-		this._areaKey = areaKey;
-		this.setAttribute('data-area-key', areaKey);
-		this.#context.setAreaKey(areaKey);
+	public set key(key: string | undefined) {
+		if (!key) return;
+		this._key = key;
+		this.setAttribute('data-area-key', key);
+		this.#context.setAreaKey(key);
 	}
-	private _areaKey?: string | undefined;
+	private _key?: string | undefined;
 	//
+
+	@property()
+	workspacePath?: string;
 
 	#context = new UmbBlockGridAreaConfigEntryContext(this);
 
@@ -67,11 +70,11 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 	}
 
 	#renderBlock() {
-		return this._areaKey
+		return this._key
 			? html`
 					<span>${this._alias}</span>
 					<uui-action-bar>
-						<uui-button label="edit" compact href=${'#edit_area_path_missing'}>
+						<uui-button label="edit" compact href=${this.workspacePath + '/edit/' + this._key}>
 							<uui-icon name="icon-edit"></uui-icon>
 						</uui-button>
 						<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>

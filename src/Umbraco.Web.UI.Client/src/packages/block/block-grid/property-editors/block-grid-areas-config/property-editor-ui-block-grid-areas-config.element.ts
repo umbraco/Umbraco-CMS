@@ -1,5 +1,6 @@
 import type { UmbBlockGridTypeAreaType } from '../../index.js';
 import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from '../../context/block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/index.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, css, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -10,7 +11,7 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import '../../components/block-grid-area-config-entry/index.js';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-property-editor-ui-block-grid-areas-config')
 export class UmbPropertyEditorUIBlockGridAreasConfigElement
@@ -20,6 +21,8 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	// local vars:
 	#defaultAreaGridColumns: number = 12;
 	#valueOfAreaGridColumns?: number | null;
+
+	#workspaceModal: UmbModalRouteRegistrationController;
 
 	@property({ type: Array })
 	public get value(): Array<UmbBlockGridTypeAreaType> {
@@ -43,13 +46,25 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	}
 
 	@state()
+	private _workspacePath?: string;
+
+	@state()
 	private _styleElement?: HTMLLinkElement;
 
 	@state()
-	_areaGridColumns?: number;
+	private _areaGridColumns?: number;
 
 	constructor() {
 		super();
+
+		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL)
+			.addAdditionalPath('block-grid-area-type')
+			.onSetup(() => {
+				return { data: { entityType: 'block-grid-area-type', preset: {} }, modal: { size: 'large' } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._workspacePath = routeBuilder({});
+			});
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.observe(
@@ -116,7 +131,8 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 							(area) =>
 								html`<umb-block-area-config-entry
 									class="umb-block-grid__area"
-									.areaKey=${area.key}></umb-block-area-config-entry>`,
+									.workspacePath=${this._workspacePath}
+									.key=${area.key}></umb-block-area-config-entry>`,
 						)}
 					</div>
 					<uui-button id="add-button" look="placeholder" label=${'Add area'} @click=${this.#addNewArea}></uui-button>`

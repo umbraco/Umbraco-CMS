@@ -162,10 +162,10 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 					const hostEl = this.getHostElement() as HTMLElement | undefined;
 					if (!hostEl) return;
 					hostEl.setAttribute('data-area-alias', areaType?.alias ?? '');
-					hostEl.setAttribute('data-area-col-span', areaType?.colSpan?.toString() ?? '');
+					hostEl.setAttribute('data-area-col-span', areaType?.columnSpan?.toString() ?? '');
 					hostEl.setAttribute('data-area-row-span', areaType?.rowSpan?.toString() ?? '');
-					hostEl.style.setProperty('--umb-block-grid--grid-columns', areaType?.colSpan?.toString() ?? '');
-					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.colSpan?.toString() ?? '');
+					hostEl.style.setProperty('--umb-block-grid--grid-columns', areaType?.columnSpan?.toString() ?? '');
+					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.columnSpan?.toString() ?? '');
 					hostEl.style.setProperty('--umb-block-grid--area-row-span', areaType?.rowSpan?.toString() ?? '');
 				},
 				'observeAreaType',
