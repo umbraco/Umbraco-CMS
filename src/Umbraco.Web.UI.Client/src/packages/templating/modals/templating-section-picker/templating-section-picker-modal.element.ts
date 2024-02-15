@@ -9,8 +9,6 @@ import { css, html, customElement, queryAll, state } from '@umbraco-cms/backoffi
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import './templating-section-picker-input.element.js';
 
-const codeblockcss = `style="background-color: var(--uui-color-surface-alt); border: 1px solid var(--uui-color-border); border-radius: var(--uui-border-radius);"`;
-
 @customElement('umb-templating-section-picker-modal')
 export default class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 	UmbTemplatingSectionPickerModalData,
