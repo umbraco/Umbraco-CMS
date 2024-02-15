@@ -55,7 +55,6 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IStaticFilePathGenerator, UmbracoStaticFilePathGenerator>();
-        builder.Services.AddSingleton<ServerVariablesParser>();
         builder.Services.AddScoped<BackOfficeSessionIdValidator>();
         builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
 

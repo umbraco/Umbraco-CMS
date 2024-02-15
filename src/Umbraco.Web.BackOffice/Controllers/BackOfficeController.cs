@@ -52,7 +52,6 @@ public class BackOfficeController : UmbracoController
     private readonly IRuntimeMinifier _runtimeMinifier;
     private readonly IRuntimeState _runtimeState;
     private readonly IOptions<SecuritySettings> _securitySettings;
-    private readonly ServerVariablesParser _serverVariables;
     private readonly IBackOfficeSignInManager _signInManager;
 
     private readonly ILocalizedTextService _textService;
@@ -84,7 +83,6 @@ public class BackOfficeController : UmbracoController
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
         ILegacyManifestParser legacyManifestParser,
-        ServerVariablesParser serverVariables,
         IOptions<SecuritySettings> securitySettings)
     {
         _userManager = userManager;
@@ -103,7 +101,6 @@ public class BackOfficeController : UmbracoController
         _httpContextAccessor = httpContextAccessor;
         _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
         _legacyManifestParser = legacyManifestParser;
-        _serverVariables = serverVariables;
         _securitySettings = securitySettings;
     }
 
