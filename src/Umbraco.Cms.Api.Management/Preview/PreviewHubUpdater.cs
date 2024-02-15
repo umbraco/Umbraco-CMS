@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Web.BackOffice.SignalR;
+namespace Umbraco.Cms.Api.Management.Preview;
 
 public class PreviewHubUpdater : INotificationAsyncHandler<ContentCacheRefresherNotification>
 {

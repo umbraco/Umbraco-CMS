@@ -3,15 +3,12 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Infrastructure.WebAssets;
-using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
-using Umbraco.Cms.Web.BackOffice.SignalR;
 using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Extensions;
@@ -59,8 +56,6 @@ public static partial class UmbracoBuilderExtensions
     {
         builder.Services.AddUnique<IStaticFilePathGenerator, UmbracoStaticFilePathGenerator>();
         builder.Services.AddSingleton<ServerVariablesParser>();
-        builder.Services.AddSingleton<PreviewRoutes>();
-        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
         builder.Services.AddScoped<BackOfficeSessionIdValidator>();
         builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
 

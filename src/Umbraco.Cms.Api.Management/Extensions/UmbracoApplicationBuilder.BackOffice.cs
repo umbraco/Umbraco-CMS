@@ -39,6 +39,7 @@ public static partial class UmbracoApplicationBuilderExtensions
         backOfficeRoutes.CreateRoutes(app.EndpointRouteBuilder);
 
         app.UseUmbracoRuntimeMinificationEndpoints();
+        app.UseUmbracoPreviewEndpoints();
 
         return app;
     }

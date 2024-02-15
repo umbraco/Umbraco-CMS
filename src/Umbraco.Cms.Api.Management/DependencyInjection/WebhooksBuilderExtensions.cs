@@ -4,7 +4,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
-public static class WebhooksBuilderExtensions
+internal static class WebhooksBuilderExtensions
 {
     internal static IUmbracoBuilder AddWebhooks(this IUmbracoBuilder builder)
     {

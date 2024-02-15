@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Preview;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.BackOffice.SignalR;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Routing;
+namespace Umbraco.Cms.Api.Management.Routing;
 
 /// <summary>
 ///     Creates routes for the preview hub
@@ -37,8 +36,6 @@ public sealed class PreviewRoutes : IAreaRoutes
             case RuntimeLevel.Upgrade:
             case RuntimeLevel.Run:
                 endpoints.MapHub<PreviewHub>(GetPreviewHubRoute());
-                endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea,
-                    null);
                 break;
             case RuntimeLevel.BootFailed:
             case RuntimeLevel.Unknown:
