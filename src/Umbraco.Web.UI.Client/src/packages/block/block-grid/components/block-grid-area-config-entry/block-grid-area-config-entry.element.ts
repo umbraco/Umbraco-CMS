@@ -37,7 +37,6 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 	constructor() {
 		super();
 
-		// Misc:
 		this.observe(this.#context.alias, (alias) => {
 			this._alias = alias ?? '';
 		});
