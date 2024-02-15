@@ -79,7 +79,7 @@ export class UmbTemplateWorkspaceContext
 		const { data } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			//this.setMasterTemplate(data.masterTemplateId ?? null);
+			this.setMasterTemplate(data.masterTemplate?.unique ?? null);
 			this.#data.setValue(data);
 		}
 	}

@@ -123,6 +123,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#openMasterTemplatePicker() {
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
+				hideTreeRoot: true,
 				pickableFilter: (item) => {
 					return item.unique !== null && item.unique !== this.#templateWorkspaceContext?.getEntityId();
 				},
@@ -155,15 +156,13 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					@click=${this.#openMasterTemplatePicker}
 					look="secondary"
 					id="master-template-button"
-					label="Change Master template"
-					>${this._masterTemplateName
-						? `Master template: ${this._masterTemplateName}`
-						: 'Set master template'}</uui-button
-				>
+					label="${this.localize.term('template_mastertemplate')}: ${this._masterTemplateName
+						? this._masterTemplateName
+						: this.localize.term('template_noMaster')}"></uui-button>
 				${this._masterTemplateName
-					? html` <uui-button look="secondary" id="save-button" label="Remove master template" compact
-							><uui-icon name="icon-delete" @click=${this.#resetMasterTemplate}></uui-icon
-					  ></uui-button>`
+					? html`<uui-button look="secondary" label=${this.localize.term('actions_remove')} compact>
+							<uui-icon name="icon-delete" @click=${this.#resetMasterTemplate}></uui-icon>
+					  </uui-button>`
 					: nothing}
 			</uui-button-group>
 		`;
@@ -181,35 +180,34 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		// TODO: add correct UI elements
 		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
 			<uui-input
-				placeholder="Enter name..."
+				placeholder=${this.localize.term('placeholders_entername')}
 				slot="header"
 				.value=${this._name}
 				@input=${this.#onNameInput}
-				label="template name">
+				label=${this.localize.term('template_template')}>
 				<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @input=${this.#onAliasInput}></uui-input-lock>
 			</uui-input>
 
 			<uui-box>
-				<div slot="header" id="code-editor-menu-container">
-					${this.#renderMasterTemplatePicker()}
-					<div>
-						<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
-						<uui-button
-							look="secondary"
-							id="query-builder-button"
-							label="Query builder"
-							@click=${this.#openQueryBuilder}>
-							<uui-icon name="icon-wand"></uui-icon>Query builder
-						</uui-button>
-						<uui-button
-							look="secondary"
-							id="sections-button"
-							label="Query builder"
-							@click=${this.#openInsertSectionModal}>
-							<uui-icon name="icon-indent"></uui-icon>Sections
-						</uui-button>
-					</div>
+				<div slot="header" id="code-editor-menu-container">${this.#renderMasterTemplatePicker()}</div>
+				<div slot="header-actions">
+					<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
+					<uui-button
+						look="secondary"
+						id="query-builder-button"
+						label=${this.localize.term('template_queryBuilder')}
+						@click=${this.#openQueryBuilder}>
+						<uui-icon name="icon-wand"></uui-icon>${this.localize.term('template_queryBuilder')}
+					</uui-button>
+					<uui-button
+						look="secondary"
+						id="sections-button"
+						label=${this.localize.term('template_insertSections')}
+						@click=${this.#openInsertSectionModal}>
+						<uui-icon name="icon-indent"></uui-icon>${this.localize.term('template_insertSections')}
+					</uui-button>
 				</div>
+
 				${this._ready
 					? this.#renderCodeEditor()
 					: html`<div id="loader-container">
