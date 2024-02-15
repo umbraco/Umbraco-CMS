@@ -16,12 +16,11 @@ export class UmbInputUploadFieldAudioElement extends UmbLitElement {
 		css`
 			:host {
 				display: flex;
-				flex-grow: 1;
+				width: 999px;
+				max-width: 100%;
 			}
 			audio {
 				width: 100%;
-				max-width: 600px;
-				display: block;
 			}
 		`,
 	];
