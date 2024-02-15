@@ -18,7 +18,7 @@ public class UmbracoBackOfficePathGenerator(
     private string? _backofficeAssetsPath;
 
     /// <inheritdoc />
-    public string BackofficePath { get; } = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
+    public string BackOfficePath { get; } = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
 
     /// <inheritdoc />
     public string BackOfficeCacheBustHash { get; } = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion, runtimeMinifier);
@@ -29,6 +29,6 @@ public class UmbracoBackOfficePathGenerator(
     /// </summary>
     /// <example>/umbraco/backoffice/addf120b430021c36c232c99ef8d926aea2acd6b</example>
     /// <see cref="UrlHelperExtensions.GetCacheBustHash"/>
-    public string BackofficeAssetsPath =>
-        _backofficeAssetsPath ??= BackofficePath.EnsureEndsWith('/') + "backoffice/" + BackOfficeCacheBustHash;
+    public string BackOfficeAssetsPath =>
+        _backofficeAssetsPath ??= BackOfficePath.EnsureEndsWith('/') + "backoffice/" + BackOfficeCacheBustHash;
 }

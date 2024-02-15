@@ -8,7 +8,7 @@ public interface IBackOfficePathGenerator
     /// <summary>
     ///     Gets the virtual path of the BackOffice.
     /// </summary>
-    string BackofficePath { get; }
+    string BackOfficePath { get; }
 
     /// <summary>
     ///     Gets the cache bust hash for the BackOffice.
@@ -18,5 +18,5 @@ public interface IBackOfficePathGenerator
     /// <summary>
     ///     Gets the virtual path of the static assets used in the BackOffice.
     /// </summary>
-    string BackofficeAssetsPath { get; }
+    string BackOfficeAssetsPath { get; }
 }

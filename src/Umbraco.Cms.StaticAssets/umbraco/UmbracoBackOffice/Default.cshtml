@@ -8,23 +8,23 @@
 @inject IJsonSerializer JsonSerializer
 
 @{
-    var backofficePath = BackOfficePathGenerator.BackofficePath;
-    var backofficeAssetsPath = BackOfficePathGenerator.BackofficeAssetsPath;
+    var backOfficePath = BackOfficePathGenerator.BackOfficePath;
+    var backOfficeAssetsPath = BackOfficePathGenerator.BackOfficeAssetsPath;
 }
 
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentCulture.Name">
 
 <head>
-    <base href="@backofficePath.EnsureEndsWith('/')" />
+    <base href="@backOfficePath.EnsureEndsWith('/')" />
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="@backofficeAssetsPath/assets/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="@backOfficeAssetsPath/assets/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Umbraco</title>
-    <link rel="stylesheet" href="@backofficeAssetsPath/css/umb-css.css" />
-    <link rel="stylesheet" href="@backofficeAssetsPath/css/uui-css.css" />
+    <link rel="stylesheet" href="@backOfficeAssetsPath/css/umb-css.css" />
+    <link rel="stylesheet" href="@backOfficeAssetsPath/css/uui-css.css" />
     @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService)
-    <script type="module" src="@backofficeAssetsPath/apps/app/app.element.js"></script>
+    <script type="module" src="@backOfficeAssetsPath/apps/app/app.element.js"></script>
 </head>
 
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">

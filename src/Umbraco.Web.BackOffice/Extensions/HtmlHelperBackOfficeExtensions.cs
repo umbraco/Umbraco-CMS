@@ -49,7 +49,7 @@ public static class HtmlHelperBackOfficeExtensions
 
             // Inject the BackOffice cache buster into the import string to handle BackOffice assets
             var importmap = sb.ToString()
-                .Replace("/umbraco/backoffice", backOfficePathGenerator.BackofficeAssetsPath);
+                .Replace("/umbraco/backoffice", backOfficePathGenerator.BackOfficeAssetsPath);
             return html.Raw(importmap);
         }
         catch (NotSupportedException ex)
