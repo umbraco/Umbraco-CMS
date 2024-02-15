@@ -23,7 +23,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
-using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -261,12 +260,7 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public async Task<IActionResult> Application()
     {
-        var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(
-            _globalSettings,
-            _hostingEnvironment,
-            _legacyManifestParser);
-
-        return new JavaScriptResult(result);
+        return Ok();
     }
 
     /// <summary>
@@ -325,10 +319,10 @@ public class BackOfficeController : UmbracoController
     ///     Returns the JavaScript object representing the static server variables javascript object
     /// </summary>
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
-    public async Task<JavaScriptResult> ServerVariables()
+    public async Task<IActionResult> ServerVariables()
     {
 
-        return new JavaScriptResult(null);
+        return Ok();
     }
 
     [HttpPost]

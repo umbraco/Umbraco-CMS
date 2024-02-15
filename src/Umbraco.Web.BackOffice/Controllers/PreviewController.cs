@@ -16,7 +16,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
-using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
@@ -110,7 +109,7 @@ public class PreviewController : Controller
     /// <returns></returns>
     // TODO: Replace this with response caching https://docs.microsoft.com/en-us/aspnet/core/performance/caching/response?view=aspnetcore-3.1
     //[OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
-    public async Task<JavaScriptResult> Application()
+    public async Task<IActionResult> Application()
     {
         IEnumerable<string> files =
             await _runtimeMinifier.GetJsAssetPathsAsync(BackOfficeWebAssets.UmbracoPreviewJsBundleName);
@@ -118,7 +117,7 @@ public class PreviewController : Controller
             BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco.preview", _globalSettings,
                 _hostingEnvironment);
 
-        return new JavaScriptResult(result);
+        return Ok();
     }
 
     /// <summary>
