@@ -227,7 +227,6 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 							label=${this.localize.term('blockEditor_addBlock')}></uui-button-inline-create>
 				  `}
 		`;
-		//
 	}
 
 	static styles = [
