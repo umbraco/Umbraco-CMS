@@ -15,19 +15,22 @@ internal sealed class ContentPublishingService : IContentPublishingService
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IContentValidationService _contentValidationService;
     private readonly IContentTypeService _contentTypeService;
+    private readonly ILanguageService _languageService;
 
     public ContentPublishingService(
         ICoreScopeProvider coreScopeProvider,
         IContentService contentService,
         IUserIdKeyResolver userIdKeyResolver,
         IContentValidationService contentValidationService,
-        IContentTypeService contentTypeService)
+        IContentTypeService contentTypeService,
+        ILanguageService languageService)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
         _userIdKeyResolver = userIdKeyResolver;
         _contentValidationService = contentValidationService;
         _contentTypeService = contentTypeService;
+        _languageService = languageService;
     }
 
     /// <inheritdoc />
@@ -44,6 +47,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
         }
 
+
         var cultures =
             cultureAndSchedule.CulturesToPublishImmediately.Union(
                 cultureAndSchedule.Schedules.FullSchedule.Select(x => x.Culture)).ToArray();
@@ -56,7 +60,8 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.CultureMissing, new ContentPublishingResult());
             }
 
-            if (cultures.Any(x => x == "*"))
+            var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
+            if (cultures.Any(x => x == "*") || cultures.All(x=> validCultures.Contains(x, StringComparer.InvariantCultureIgnoreCase) is false))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
