@@ -1,4 +1,5 @@
 import { manifests as collectionManifests } from './collection/manifests.js';
+import { manifests as conditionManifests } from './conditions/manifests.js';
 import { manifests as menuItemManifests } from './menu-item/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
@@ -12,6 +13,7 @@ import { manifests as trackedReferenceManifests } from './tracked-reference/mani
 
 export const manifests = [
 	...collectionManifests,
+	...conditionManifests,
 	...menuItemManifests,
 	...treeManifests,
 	...repositoryManifests,

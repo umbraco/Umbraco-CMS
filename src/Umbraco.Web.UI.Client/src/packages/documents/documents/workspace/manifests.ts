@@ -1,4 +1,5 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/document-workspace-has-collection.condition.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
 //import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
 //import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
@@ -23,9 +24,26 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Document.Collection',
+		name: 'Document Workspace Collection View',
+		element: () => import('./views/collection/document-workspace-view-collection.element.js'),
+		weight: 300,
+		meta: {
+			label: 'Documents',
+			pathname: 'collection',
+			icon: 'icon-grid',
+		},
+		conditions: [
+			{
+				alias: UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION,
+			},
+		],
+	},
+	{
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
-		js: () => import('./views/edit/document-workspace-view-edit.element.js'),
+		element: () => import('./views/edit/document-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Content',
@@ -43,7 +61,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Info',
 		name: 'Document Workspace Info View',
-		js: () => import('./views/info/document-workspace-view-info.element.js'),
+		element: () => import('./views/info/document-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Info',
