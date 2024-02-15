@@ -289,5 +289,6 @@ export class UmbDataTypeWorkspaceContext
 
 	public destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }

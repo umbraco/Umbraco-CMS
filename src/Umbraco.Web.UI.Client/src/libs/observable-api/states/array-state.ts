@@ -244,4 +244,10 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 		this.setValue(partialUpdateFrozenArray(this.getValue(), entry, (x) => unique === this.getUniqueMethod!(x)));
 		return this;
 	}
+
+	destroy() {
+		super.destroy();
+		this.#sortMethod = undefined;
+		(this.getUniqueMethod as any) = undefined;
+	}
 }
