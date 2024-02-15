@@ -14,12 +14,4 @@ public interface IStaticFilePathGenerator
     ///     The virtual path of the static assets used in the Backoffice.
     /// </summary>
     string BackofficeAssetsPath { get; }
-
-
-    /// <summary>
-    ///     Returns the exports for the BackOffice package.
-    /// </summary>
-    /// <remarks>It will read the umbraco-package.json files to calculate the list of files.</remarks>
-    /// <returns>A list of file paths that is required for the BackOffice to run.</returns>
-    Task<string> GetBackofficePackageExportsAsync();
 }

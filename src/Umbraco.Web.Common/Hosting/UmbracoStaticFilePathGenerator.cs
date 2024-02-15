@@ -60,27 +60,4 @@ public class UmbracoStaticFilePathGenerator : IStaticFilePathGenerator
             return _backofficeAssetsPath;
         }
     }
-
-    /// <inheritdoc cref="IStaticFilePathGenerator.GetBackofficePackageExportsAsync"/>
-    public async Task<string> GetBackofficePackageExportsAsync()
-    {
-        PackageManifestImportmap packageImports = await _packageManifestService.GetPackageManifestImportmapAsync();
-
-        var sb = new StringBuilder();
-        sb.AppendLine(@"{ ""imports"": ");
-        sb.AppendLine(_jsonSerializer.Serialize(packageImports.Imports));
-
-        if (packageImports.Scopes is null == false && packageImports.Scopes.Count != 0)
-        {
-            sb.AppendLine(@", ""scopes"": ");
-            sb.AppendLine(_jsonSerializer.Serialize(packageImports.Scopes));
-        }
-
-        sb.AppendLine(@"}");
-
-        var importString = sb.ToString();
-
-        // Inject the BackOffice cache buster into the import string
-        return importString.Replace("/umbraco/backoffice", BackofficeAssetsPath);
-    }
 }

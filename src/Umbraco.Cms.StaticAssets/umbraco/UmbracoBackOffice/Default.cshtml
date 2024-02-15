@@ -1,7 +1,11 @@
 @using System.Globalization
+@using Umbraco.Cms.Core.Manifest
+@using Umbraco.Cms.Core.Serialization
 @using Umbraco.Cms.Web.Common.Hosting
 @using Umbraco.Extensions
 @inject IStaticFilePathGenerator StaticFilePathGenerator
+@inject IPackageManifestService PackageManifestService
+@inject IJsonSerializer JsonSerializer
 
 @{
     var backofficePath = StaticFilePathGenerator.BackofficePath;
@@ -19,7 +23,7 @@
     <title>Umbraco</title>
     <link rel="stylesheet" href="@backofficeAssetsPath/css/umb-css.css" />
     <link rel="stylesheet" href="@backofficeAssetsPath/css/uui-css.css" />
-    @await Html.BackOfficeImportMapScriptAsync(StaticFilePathGenerator)
+    @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, StaticFilePathGenerator, PackageManifestService)
     <script type="module" src="@backofficeAssetsPath/apps/app/app.element.js"></script>
 </head>
 

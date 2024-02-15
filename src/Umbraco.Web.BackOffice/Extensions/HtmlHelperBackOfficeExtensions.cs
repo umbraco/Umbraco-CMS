@@ -2,7 +2,9 @@ using System.Text;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
@@ -22,16 +24,42 @@ public static class HtmlHelperBackOfficeExtensions
     /// <returns>A <see cref="Task"/> containing the html content for the BackOffice import map</returns>
     public static async Task<IHtmlContent> BackOfficeImportMapScriptAsync(
         this IHtmlHelper html,
-        IStaticFilePathGenerator staticFilePathGenerator)
+        IJsonSerializer jsonSerializer,
+        IStaticFilePathGenerator staticFilePathGenerator,
+        IPackageManifestService packageManifestService)
     {
-        var importmap = await staticFilePathGenerator.GetBackofficePackageExportsAsync();
+        try
+        {
+            PackageManifestImportmap packageImports = await packageManifestService.GetPackageManifestImportmapAsync();
 
-        var sb = new StringBuilder();
-        sb.AppendLine("""<script type="importmap">""");
-        sb.AppendLine(importmap);
-        sb.AppendLine("</script>");
+            Dictionary<string, dynamic> importMap = new()
+            {
+                { "imports", packageImports.Imports },
+            };
 
-        return html.Raw(sb.ToString());
+            if (packageImports.Scopes is not null && packageImports.Scopes.Count != 0)
+            {
+                importMap.Add("scopes", packageImports.Scopes);
+            }
+
+            var sb = new StringBuilder();
+            sb.AppendLine("""<script type="importmap">""");
+            sb.AppendLine(jsonSerializer.Serialize(importMap));
+            sb.AppendLine("</script>");
+
+            // Inject the BackOffice cache buster into the import string to handle BackOffice assets
+            var importmap = sb.ToString()
+                .Replace("/umbraco/backoffice", staticFilePathGenerator.BackofficeAssetsPath);
+            return html.Raw(importmap);
+        }
+        catch (NotSupportedException ex)
+        {
+            throw new NotSupportedException("Failed to serialize the BackOffice import map", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to generate the BackOffice import map", ex);
+        }
     }
 
     /// <summary>
