@@ -383,8 +383,11 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
     internal PublishedElementPropertyBase CreateMediaPickerProperty(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
     {
-        MediaPickerValueConverter mediaPickerValueConverter = new MediaPickerValueConverter(PublishedSnapshotAccessor, Mock.Of<IPublishedModelFactory>(), mediaBuilder);
-        var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker, new MediaPickerConfiguration());
+        var publishedValueFallback = Mock.Of<IPublishedValueFallback>();
+        var apiMediaWithCropsBuilder = new ApiMediaWithCropsBuilder(mediaBuilder, publishedValueFallback);
+
+        MediaPickerWithCropsValueConverter mediaPickerValueConverter = new MediaPickerWithCropsValueConverter(PublishedSnapshotAccessor, PublishedUrlProvider, publishedValueFallback, new JsonNetSerializer(), apiMediaWithCropsBuilder);
+        var mediaPickerPropertyType = SetupPublishedPropertyType(mediaPickerValueConverter, propertyTypeAlias, Constants.PropertyEditors.Aliases.MediaPicker3, new MediaPicker3Configuration());
 
         return new PublishedElementPropertyBase(mediaPickerPropertyType, parent, false, PropertyCacheLevel.None, new GuidUdi(Constants.UdiEntityType.Media, pickedMediaKey).ToString());
     }

@@ -19,9 +19,8 @@ public abstract class ContentMapDefinition<TContent, TValueViewModel, TVariantVi
 
     protected delegate void VariantViewModelMapping(string? culture, string? segment, TVariantViewModel variantViewModel);
 
-    protected IEnumerable<TValueViewModel> MapValueViewModels(TContent source, ValueViewModelMapping? additionalPropertyMapping = null) =>
-        source
-            .Properties
+    protected IEnumerable<TValueViewModel> MapValueViewModels(IEnumerable<IProperty> properties, ValueViewModelMapping? additionalPropertyMapping = null) =>
+        properties
             .SelectMany(property => property
                 .Values
                 .Select(propertyValue =>

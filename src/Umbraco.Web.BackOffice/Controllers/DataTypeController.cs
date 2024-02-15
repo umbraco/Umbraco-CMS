@@ -530,7 +530,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var grouped = dataTypes?.WhereNotNull()
-                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group!.ToLower())
+                .GroupBy(x => string.Empty)
                 .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
             return grouped;
@@ -563,7 +563,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var grouped = Enumerable.ToDictionary(datatypes
-                    .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group!.ToLower()), group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
+                    .GroupBy(x => string.Empty), group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
             return grouped;
         }
@@ -580,7 +580,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
         {
             return _propertyEditorCollection
-                .OrderBy(x => x.Name)
+                .OrderBy(x => x.Alias)
                 .Select(_umbracoMapper.Map<PropertyEditorBasic>).WhereNotNull();
         }
         #endregion

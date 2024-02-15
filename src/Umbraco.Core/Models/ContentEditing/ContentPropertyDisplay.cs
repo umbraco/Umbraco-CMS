@@ -25,18 +25,8 @@ public class ContentPropertyDisplay : ContentPropertyBasic
     [DataMember(Name = "description")]
     public string? Description { get; set; }
 
-    [DataMember(Name = "view", IsRequired = true)]
-    [Required(AllowEmptyStrings = false)]
-    public string? View { get; set; }
-
     [DataMember(Name = "config")]
     public IDictionary<string, object>? Config { get; set; }
-
-    [DataMember(Name = "hideLabel")]
-    public bool HideLabel { get; set; }
-
-    [DataMember(Name = "labelOnTop")]
-    public bool? LabelOnTop { get; set; }
 
     [DataMember(Name = "validation")]
     public PropertyTypeValidation Validation { get; set; }

@@ -35,8 +35,6 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
         GetRequiredService<IConfigurationEditorJsonSerializer>();
 
-    private IEditorConfigurationParser EditorConfigurationParser => GetRequiredService<IEditorConfigurationParser>();
-
     [Test]
     public async Task Can_Create_New_DataTypeDefinition()
     {
@@ -85,7 +83,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         async Task<IDataType> CreateTextBoxDataType()
         {
             IDataType dataType =
-                new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper, EditorConfigurationParser), ConfigurationEditorJsonSerializer)
+                new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
                 {
                     Name = Guid.NewGuid().ToString(),
                     DatabaseType = ValueStorageType.Nvarchar

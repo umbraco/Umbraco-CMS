@@ -71,20 +71,7 @@ public class DataValueEditor : IDataValueEditor
         _shortStringHelper = shortStringHelper;
         _jsonSerializer = jsonSerializer;
 
-        var view = attribute.View;
-        if (string.IsNullOrWhiteSpace(view))
-        {
-            throw new ArgumentException("The attribute does not specify a view.", nameof(attribute));
-        }
-
-        if (view.StartsWith("~/"))
-        {
-            view = ioHelper.ResolveRelativeOrVirtualUrl(view);
-        }
-
-        View = view;
         ValueType = attribute.ValueType;
-        HideLabel = attribute.HideLabel;
     }
 
     /// <summary>
@@ -104,19 +91,6 @@ public class DataValueEditor : IDataValueEditor
     ///     Gets the validator used to validate the special property type -level "format".
     /// </summary>
     public virtual IValueFormatValidator FormatValidator => new RegexValidator();
-
-    /// <summary>
-    ///     Gets or sets the editor view.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The view can be three things: (1) the full virtual path, or (2) the relative path to the current Umbraco
-    ///         folder, or (3) a view name which maps to views/propertyeditors/{view}/{view}.html.
-    ///     </para>
-    /// </remarks>
-    [Required]
-    [DataMember(Name = "view")]
-    public string? View { get; set; }
 
     /// <summary>
     ///     The value type which reflects how it is validated and stored in the database
@@ -178,13 +152,6 @@ public class DataValueEditor : IDataValueEditor
 
         return results ?? Enumerable.Empty<ValidationResult>();
     }
-
-    /// <summary>
-    ///     If this is true than the editor will be displayed full width without a label
-    /// </summary>
-    [DataMember(Name = "hideLabel")]
-    public bool HideLabel { get; set; }
-
     /// <summary>
     ///     Set this to true if the property editor is for display purposes only
     /// </summary>

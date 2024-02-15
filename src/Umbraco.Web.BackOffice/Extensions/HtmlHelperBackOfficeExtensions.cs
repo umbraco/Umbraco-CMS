@@ -2,16 +2,63 @@ using System.Text;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+///    Extensions for <see cref="IHtmlHelper" /> to render scripts for the BackOffice.
+/// </summary>
 public static class HtmlHelperBackOfficeExtensions
 {
+    /// <summary>
+    ///     Outputs a script tag containing the import map for the BackOffice.
+    /// </summary>
+    /// <remarks>
+    ///     It will replace the token %CACHE_BUSTER% with the cache buster hash.
+    ///     It will also replace the /umbraco/backoffice path with the correct path for the BackOffice assets.
+    /// </remarks>
+    /// <returns>A <see cref="Task"/> containing the html content for the BackOffice import map.</returns>
+    public static async Task<IHtmlContent> BackOfficeImportMapScriptAsync(
+        this IHtmlHelper html,
+        IJsonSerializer jsonSerializer,
+        IBackOfficePathGenerator backOfficePathGenerator,
+        IPackageManifestService packageManifestService)
+    {
+        try
+        {
+            PackageManifestImportmap packageImports = await packageManifestService.GetPackageManifestImportmapAsync();
+
+            var sb = new StringBuilder();
+            sb.AppendLine("""<script type="importmap">""");
+            sb.AppendLine(jsonSerializer.Serialize(packageImports));
+            sb.AppendLine("</script>");
+
+            // Inject the BackOffice cache buster into the import string to handle BackOffice assets
+            var importmapScript = sb.ToString()
+                .Replace(backOfficePathGenerator.BackOfficeVirtualDirectory, backOfficePathGenerator.BackOfficeAssetsPath)
+                .Replace(Constants.Web.CacheBusterToken, backOfficePathGenerator.BackOfficeCacheBustHash);
+
+            return html.Raw(importmapScript);
+        }
+        catch (NotSupportedException ex)
+        {
+            throw new NotSupportedException("Failed to serialize the BackOffice import map", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to generate the BackOffice import map", ex);
+        }
+    }
+
     /// <summary>
     ///     Outputs a script tag containing the bare minimum (non secure) server vars for use with the angular app
     /// </summary>
@@ -23,6 +70,7 @@ public static class HtmlHelperBackOfficeExtensions
     ///     authenticated,
     ///     we will load the rest of the server vars after the user is authenticated.
     /// </remarks>
+    [Obsolete("This is deprecated and will be removed in V15")]
     public static async Task<IHtmlContent> BareMinimumServerVariablesScriptAsync(this IHtmlHelper html,
         BackOfficeServerVariables backOfficeServerVariables)
     {
@@ -132,6 +180,7 @@ public static class HtmlHelperBackOfficeExtensions
         return html.Raw(sb.ToString());
     }
 
+    [Obsolete("This is deprecated and will be removed in V15")]
     public static async Task<IHtmlContent> AngularValueTinyMceAssetsAsync(this IHtmlHelper html,
         IRuntimeMinifier runtimeMinifier)
     {
