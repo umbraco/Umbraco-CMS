@@ -1,5 +1,5 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from '../../context/block-grid-manager.context.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridTypeAreaType } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 
