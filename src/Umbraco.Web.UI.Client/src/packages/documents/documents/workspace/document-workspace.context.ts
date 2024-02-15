@@ -24,6 +24,8 @@ export class UmbDocumentWorkspaceContext
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
+	#parentUnique: string | null = null;
+
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
@@ -68,6 +70,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async create(parentUnique: string | null, documentTypeUnique: string) {
+		this.#parentUnique = parentUnique;
 		this.#getDataPromise = this.repository.createScaffold({
 			documentType: {
 				unique: documentTypeUnique,
@@ -183,7 +186,7 @@ export class UmbDocumentWorkspaceContext
 		if (this.getIsNew()) {
 			const value = this.#currentData.value;
 
-			if ((await this.repository.create(value)).data !== undefined) {
+			if ((await this.repository.create(value, this.#parentUnique)).data !== undefined) {
 				this.setIsNew(false);
 			}
 		} else {

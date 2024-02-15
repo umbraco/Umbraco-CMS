@@ -22,6 +22,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	#init!: Promise<unknown>;
 
 	#contentTypeRepository: UmbDetailRepository<T>;
+	#parentUnique: string | null = null;
 
 	#ownerContentTypeUnique?: string;
 	#contentTypeObservers = new Array<UmbController>();
@@ -105,7 +106,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) return false;
 
-		const { data } = await this.#contentTypeRepository.create(contentType);
+		const { data } = await this.#contentTypeRepository.create(contentType, this.#parentUnique);
 		if (!data) return false;
 
 		// Update state with latest version:

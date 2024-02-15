@@ -15,6 +15,8 @@ export class UmbLanguageWorkspaceContext
 {
 	public readonly repository: UmbLanguageDetailRepository = new UmbLanguageDetailRepository(this);
 
+	#parentUnique: string | null = null;
+
 	#data = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 

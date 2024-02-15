@@ -16,6 +16,8 @@ export class UmbTemplateWorkspaceContext
 	public readonly detailRepository = new UmbTemplateDetailRepository(this);
 	public readonly itemRepository = new UmbTemplateItemRepository(this);
 
+	#parentUnique: string | null = null;
+
 	#data = new UmbObjectState<UmbTemplateDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	#masterTemplate = new UmbObjectState<UmbTemplateItemModel | null>(null);
@@ -130,6 +132,7 @@ ${currentContent}`;
 	};
 
 	async create(parentUnique: string | null) {
+		this.#parentUnique = parentUnique;
 		const { data } = await this.detailRepository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
@@ -146,7 +149,7 @@ ${currentContent}`;
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.detailRepository.create(this.#data.value);
+			const { data } = await this.detailRepository.create(this.#data.value, this.#parentUnique);
 			newData = data;
 		} else {
 			const { data } = await this.detailRepository.save(this.#data.value);

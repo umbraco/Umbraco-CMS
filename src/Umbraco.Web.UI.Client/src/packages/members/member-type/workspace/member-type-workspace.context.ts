@@ -14,6 +14,8 @@ export class UmbMemberTypeWorkspaceContext
 {
 	public readonly detailRepository = new UmbMemberTypeDetailRepository(this);
 
+	#parentUnique: string | null = null;
+
 	#data = new UmbObjectState<UmbMemberTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
@@ -33,6 +35,7 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.#parentUnique = parentUnique;
 		const { data } = await this.detailRepository.createScaffold();
 
 		if (data) {
@@ -48,7 +51,7 @@ export class UmbMemberTypeWorkspaceContext
 		if (!data) throw new Error('No data to save');
 
 		if (this.getIsNew()) {
-			await this.detailRepository.create(data);
+			await this.detailRepository.create(data, this.#parentUnique);
 		} else {
 			await this.detailRepository.save(data);
 		}

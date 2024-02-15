@@ -31,7 +31,7 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null, memberTypeUnique: string) {
+	async create(memberTypeUnique: string) {
 		const { data } = await this.repository.createScaffold({
 			memberType: { unique: memberTypeUnique },
 		});

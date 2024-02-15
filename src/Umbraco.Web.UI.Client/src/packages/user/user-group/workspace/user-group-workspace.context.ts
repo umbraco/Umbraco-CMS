@@ -28,7 +28,7 @@ export class UmbUserGroupWorkspaceContext
 		this.#userRepository = new UmbUserRepository(host);
 	}
 
-	async create() {
+	async createScaffold() {
 		const { data } = await this.repository.createScaffold();
 		this.setIsNew(true);
 		this.#data.setValue(data);

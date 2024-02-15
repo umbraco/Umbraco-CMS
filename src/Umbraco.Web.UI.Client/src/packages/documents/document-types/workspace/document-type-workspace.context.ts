@@ -16,6 +16,8 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly repository = new UmbDocumentTypeDetailRepository(this);
 	// Data/Draft is located in structure manager
 
+	#parentUnique: string | null = null;
+
 	// General for content types:
 	readonly data;
 	readonly name;
@@ -125,6 +127,7 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.#parentUnique = parentUnique;
 		const { data } = await this.structure.createScaffold(parentUnique);
 		if (!data) return undefined;
 

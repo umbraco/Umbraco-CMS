@@ -15,6 +15,8 @@ export class UmbDictionaryWorkspaceContext
 	//
 	public readonly detailRepository = new UmbDictionaryDetailRepository(this);
 
+	#parentUnique: string | null = null;
+
 	#data = new UmbObjectState<UmbDictionaryDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
@@ -71,6 +73,7 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.#parentUnique = parentUnique;
 		const { data } = await this.detailRepository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
@@ -82,7 +85,7 @@ export class UmbDictionaryWorkspaceContext
 		if (!this.#data.value.unique) return;
 
 		if (this.getIsNew()) {
-			const { error } = await this.detailRepository.create(this.#data.value);
+			const { error } = await this.detailRepository.create(this.#data.value, this.#parentUnique);
 			if (error) {
 				return;
 			}

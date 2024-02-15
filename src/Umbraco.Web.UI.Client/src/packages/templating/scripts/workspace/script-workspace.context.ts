@@ -10,6 +10,8 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<UmbScriptDetailModel> {
 	public readonly repository = new UmbScriptDetailRepository(this);
 
+	#parentUnique: string | null = null;
+
 	#data = new UmbObjectState<UmbScriptDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -64,6 +66,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 	}
 
 	async create(parentUnique: string | null) {
+		this.#parentUnique = parentUnique;
 		const { data } = await this.repository.createScaffold();
 
 		if (data) {
@@ -78,7 +81,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(this.#data.value);
+			const { data } = await this.repository.create(this.#data.value, this.#parentUnique);
 			newData = data;
 		} else {
 			const { data } = await this.repository.save(this.#data.value);

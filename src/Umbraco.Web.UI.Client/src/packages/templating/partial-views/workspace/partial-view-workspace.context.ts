@@ -16,6 +16,8 @@ export class UmbPartialViewWorkspaceContext
 {
 	public readonly repository = new UmbPartialViewDetailRepository(this);
 
+	#parentUnique: string | null = null;
+
 	#data = new UmbObjectState<UmbPartialViewDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -70,6 +72,7 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	async create(parentUnique: string | null, snippetId?: string) {
+		this.#parentUnique = parentUnique;
 		let snippetContent = '';
 
 		if (snippetId) {
@@ -91,7 +94,7 @@ export class UmbPartialViewWorkspaceContext
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(this.#data.value);
+			const { data } = await this.repository.create(this.#data.value, this.#parentUnique);
 			newData = data;
 		} else {
 			const { data } = await this.repository.save(this.#data.value);

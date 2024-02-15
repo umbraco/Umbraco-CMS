@@ -1,11 +1,8 @@
 import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../index.js';
 import type { UmbMediaTypeDetailModel } from '../types.js';
-import type {
-	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbEditableWorkspaceContextBase,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -19,6 +16,8 @@ export class UmbMediaTypeWorkspaceContext
 	//
 	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
+
+	#parentUnique: string | null = null;
 
 	// General for content types:
 	readonly data;
@@ -74,8 +73,8 @@ export class UmbMediaTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ [propertyName]: value });
 	}
 
-	async create(parentId: string | null) {
-		const { data } = await this.structure.createScaffold(parentId);
+	async create(parentUnique: string | null) {
+		const { data } = await this.structure.createScaffold(parentUnique);
 		if (!data) return undefined;
 
 		this.setIsNew(true);

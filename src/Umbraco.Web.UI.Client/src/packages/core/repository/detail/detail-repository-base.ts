@@ -74,7 +74,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	 * @return {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async create(model: DetailModelType, parentUnique: string | null = null) {
+	async create(model: DetailModelType, parentUnique: string | null) {
 		if (!model) throw new Error('Data is missing');
 		await this.#init;
 

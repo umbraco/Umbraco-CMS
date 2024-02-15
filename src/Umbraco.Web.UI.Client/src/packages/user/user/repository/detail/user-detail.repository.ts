@@ -8,4 +8,8 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 	constructor(host: UmbControllerHost) {
 		super(host, UmbUserServerDataSource, UMB_USER_DETAIL_STORE_CONTEXT);
 	}
+
+	async create(model: UmbUserDetailModel) {
+		return super.create(model, null);
+	}
 }

@@ -17,6 +17,8 @@ export class UmbStylesheetWorkspaceContext
 {
 	public readonly repository = new UmbStylesheetDetailRepository(this);
 
+	#parentUnique: string | null = null;
+
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -72,6 +74,7 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.#parentUnique = parentUnique;
 		const { data } = await this.repository.createScaffold();
 
 		if (data) {
@@ -86,7 +89,7 @@ export class UmbStylesheetWorkspaceContext
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(this.#data.value);
+			const { data } = await this.repository.create(this.#data.value, this.#parentUnique);
 			newData = data;
 		} else {
 			const { data } = await this.repository.save(this.#data.value);

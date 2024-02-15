@@ -15,6 +15,8 @@ export class UmbMediaWorkspaceContext
 	//
 	public readonly repository = new UmbMediaDetailRepository(this);
 
+	#parentUnique: string | null = null;
+
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
 	// TODO: get correct variant name
@@ -57,6 +59,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.#parentUnique = parentUnique;
 		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
@@ -70,7 +73,7 @@ export class UmbMediaWorkspaceContext
 		if (this.isNew) {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			await this.repository.create(this.#data.value);
+			await this.repository.create(this.#data.value, this.#parentUnique);
 		} else {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
