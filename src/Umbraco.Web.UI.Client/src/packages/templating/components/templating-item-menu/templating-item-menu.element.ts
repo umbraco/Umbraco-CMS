@@ -9,7 +9,7 @@ import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils
 import { UmbDictionaryDetailRepository } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbModalManagerContext, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_DICTIONARY_ITEM_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -19,8 +19,6 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	value = '';
 
 	private _modalContext?: UmbModalManagerContext;
-
-	#openModal?: UmbModalContext;
 
 	#dictionaryDetailRepository = new UmbDictionaryDetailRepository(this);
 

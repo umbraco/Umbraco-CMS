@@ -1,3 +1,4 @@
+import { getUmbracoFieldSnippet } from '../../utils/index.js';
 import type {
 	UmbTemplatingPageFieldBuilderModalData,
 	UmbTemplatingPageFieldBuilderModalValue,
@@ -16,7 +17,8 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 	}
 
 	private _submit() {
-		this.value = { output: this.#generateOutput() };
+		if (!this._field) return;
+		this.value = { output: getUmbracoFieldSnippet(this._field, this._default, this._recursive) };
 		this.modalContext?.submit();
 	}
 
@@ -31,19 +33,6 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 
 	@state()
 	private _recursive: boolean = false;
-
-	#generateOutput() {
-		if (!this._field) return '';
-		if (this._default && !this._recursive) {
-			return `@Model.Value("${this._field}", fallback: Fallback.ToDefaultValue, defaultValue: new HtmlString("${this._default}"))`;
-		} else if (this._default && this._recursive) {
-			return `@Model.Value("${this._field}", fallback: Fallback.To(Fallback.Ancestors, Fallback.DefaultValue), defaultValue: new HtmlString("${this._default}"))`;
-		} else if (!this._default && this._recursive) {
-			return `@Model.Value("${this._field}", fallback: Fallback.ToAncestors)`;
-		} else {
-			return `@Model.Value("${this._field}")`;
-		}
-	}
 
 	render() {
 		return html`
@@ -74,7 +63,9 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 							?disabled=${this._field ? false : true}></uui-checkbox>
 
 						<uui-label><umb-localize key="templateEditor_outputSample">Output sample</umb-localize></uui-label>
-						<umb-code-block language="C#" copy>${this.#generateOutput()}</umb-code-block>
+						<umb-code-block language="C#" copy
+							>${this._field ? getUmbracoFieldSnippet(this._field, this._default, this._recursive) : ''}</umb-code-block
+						>
 					</div>
 				</uui-box>
 				<uui-button
