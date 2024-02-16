@@ -99,6 +99,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
 			data: {
 				pickableFilter: (item) => item.id !== null,
+				hideTreeRoot: true,
 			},
 		});
 		this.#openModal?.onSubmit().then((value) => {
@@ -118,14 +119,17 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-button-group>
-				<uui-button look="secondary" @click=${this.#openChooseTypeModal} label="Choose value to insert">
-					<uui-icon name="icon-add"></uui-icon>Insert
+				<uui-button
+					look="secondary"
+					@click=${this.#openChooseTypeModal}
+					label=${this.localize.term('template_insertDesc')}>
+					<uui-icon name="icon-add"></uui-icon> ${this.localize.term('template_insert')}
 				</uui-button>
 				<umb-dropdown look="secondary" compact placement="bottom-end" id="insert-button" label="open insert menu">
 					<uui-menu-item
 						class="insert-menu-item"
-						label="Dictionary item"
-						title="Dictionary item"
+						label=${this.localize.term('template_insertDictionaryItem')}
+						title=${this.localize.term('template_insertDictionaryItem')}
 						@click=${this.#openInsertDictionaryItemModal}>
 					</uui-menu-item>
 				</umb-dropdown>
