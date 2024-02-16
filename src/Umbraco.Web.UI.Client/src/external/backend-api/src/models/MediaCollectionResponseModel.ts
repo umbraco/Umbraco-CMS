@@ -7,5 +7,6 @@ import type { ContentCollectionResponseModelBaseMediaValueModelMediaVariantRespo
 import type { MediaTypeCollectionReferenceResponseModel } from './MediaTypeCollectionReferenceResponseModel';
 
 export type MediaCollectionResponseModel = (ContentCollectionResponseModelBaseMediaValueModelMediaVariantResponseModel & {
-mediaType: MediaTypeCollectionReferenceResponseModel;
+    mediaType: MediaTypeCollectionReferenceResponseModel;
 });
+

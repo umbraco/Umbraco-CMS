@@ -6,3 +6,4 @@
 import type { ContentTypeCollectionReferenceResponseModelBaseModel } from './ContentTypeCollectionReferenceResponseModelBaseModel';
 
 export type DocumentTypeCollectionReferenceResponseModel = ContentTypeCollectionReferenceResponseModelBaseModel;
+

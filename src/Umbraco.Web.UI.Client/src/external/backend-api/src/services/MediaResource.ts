@@ -25,22 +25,22 @@ export class MediaResource {
      * @throws ApiError
      */
     public static getCollectionMedia({
-id,
-dataTypeId,
-orderBy = 'updateDate',
-orderDirection,
-filter,
-skip,
-take = 100,
-}: {
-id?: string,
-dataTypeId?: string,
-orderBy?: string,
-orderDirection?: DirectionModel,
-filter?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedMediaCollectionResponseModel> {
+        id,
+        dataTypeId,
+        orderBy = 'updateDate',
+        orderDirection,
+        filter,
+        skip,
+        take = 100,
+    }: {
+        id?: string,
+        dataTypeId?: string,
+        orderBy?: string,
+        orderDirection?: DirectionModel,
+        filter?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedMediaCollectionResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/collection/media',
@@ -66,10 +66,10 @@ take?: number,
      * @throws ApiError
      */
     public static getItemMedia({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<MediaItemResponseModel>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<MediaItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/item/media',
@@ -87,10 +87,10 @@ id?: Array<string>,
      * @throws ApiError
      */
     public static postMedia({
-requestBody,
-}: {
-requestBody?: CreateMediaRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateMediaRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/media',
@@ -111,10 +111,10 @@ requestBody?: CreateMediaRequestModel,
      * @throws ApiError
      */
     public static getMediaById({
-id,
-}: {
-id: string,
-}): CancelablePromise<MediaResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<MediaResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/media/{id}',
@@ -134,10 +134,10 @@ id: string,
      * @throws ApiError
      */
     public static deleteMediaById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/media/{id}',
@@ -158,12 +158,12 @@ id: string,
      * @throws ApiError
      */
     public static putMediaById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateMediaRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateMediaRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/{id}',
@@ -186,12 +186,12 @@ requestBody?: UpdateMediaRequestModel,
      * @throws ApiError
      */
     public static putMediaByIdMove({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: MoveMediaRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveMediaRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/{id}/move',
@@ -213,10 +213,10 @@ requestBody?: MoveMediaRequestModel,
      * @throws ApiError
      */
     public static putMediaByIdMoveToRecycleBin({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/{id}/move-to-recycle-bin',
@@ -237,12 +237,12 @@ id: string,
      * @throws ApiError
      */
     public static putMediaByIdValidate({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateMediaRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateMediaRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/{id}/validate',
@@ -279,10 +279,10 @@ requestBody?: UpdateMediaRequestModel,
      * @throws ApiError
      */
     public static putMediaSort({
-requestBody,
-}: {
-requestBody?: SortingRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: SortingRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/sort',
@@ -302,10 +302,10 @@ requestBody?: SortingRequestModel,
      * @throws ApiError
      */
     public static postMediaValidate({
-requestBody,
-}: {
-requestBody?: CreateMediaRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: CreateMediaRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/media/validate',
@@ -341,10 +341,10 @@ requestBody?: CreateMediaRequestModel,
      * @throws ApiError
      */
     public static deleteRecycleBinMediaById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/recycle-bin/media/{id}',
@@ -365,14 +365,14 @@ id: string,
      * @throws ApiError
      */
     public static getRecycleBinMediaChildren({
-parentId,
-skip,
-take = 100,
-}: {
-parentId?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedMediaRecycleBinItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedMediaRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/media/children',
@@ -392,12 +392,12 @@ take?: number,
      * @throws ApiError
      */
     public static getRecycleBinMediaRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedMediaRecycleBinItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedMediaRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/media/root',
@@ -416,16 +416,16 @@ take?: number,
      * @throws ApiError
      */
     public static getTreeMediaChildren({
-parentId,
-skip,
-take = 100,
-dataTypeId,
-}: {
-parentId?: string,
-skip?: number,
-take?: number,
-dataTypeId?: string,
-}): CancelablePromise<PagedMediaTreeItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+        dataTypeId,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+        dataTypeId?: string,
+    }): CancelablePromise<PagedMediaTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media/children',
@@ -446,14 +446,14 @@ dataTypeId?: string,
      * @throws ApiError
      */
     public static getTreeMediaRoot({
-skip,
-take = 100,
-dataTypeId,
-}: {
-skip?: number,
-take?: number,
-dataTypeId?: string,
-}): CancelablePromise<PagedMediaTreeItemResponseModel> {
+        skip,
+        take = 100,
+        dataTypeId,
+    }: {
+        skip?: number,
+        take?: number,
+        dataTypeId?: string,
+    }): CancelablePromise<PagedMediaTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media/root',

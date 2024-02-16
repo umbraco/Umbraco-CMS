@@ -9,3 +9,4 @@ export type PagedMediaCollectionResponseModel = {
     total: number;
     items: Array<MediaCollectionResponseModel>;
 };
+

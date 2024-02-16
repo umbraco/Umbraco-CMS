@@ -9,3 +9,4 @@ export type PagedDocumentCollectionResponseModel = {
     total: number;
     items: Array<DocumentCollectionResponseModel>;
 };
+

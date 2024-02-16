@@ -13,3 +13,4 @@ export type ContentCollectionResponseModelBaseDocumentValueModelDocumentVariantR
     creator?: string | null;
     sortOrder: number;
 };
+

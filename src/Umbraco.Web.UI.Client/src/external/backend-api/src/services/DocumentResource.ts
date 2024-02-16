@@ -34,24 +34,24 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getCollectionDocumentById({
-id,
-dataTypeId,
-orderBy = 'updateDate',
-orderCulture,
-orderDirection,
-filter,
-skip,
-take = 100,
-}: {
-id: string,
-dataTypeId?: string,
-orderBy?: string,
-orderCulture?: string,
-orderDirection?: DirectionModel,
-filter?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedDocumentCollectionResponseModel> {
+        id,
+        dataTypeId,
+        orderBy = 'updateDate',
+        orderCulture,
+        orderDirection,
+        filter,
+        skip,
+        take = 100,
+    }: {
+        id: string,
+        dataTypeId?: string,
+        orderBy?: string,
+        orderCulture?: string,
+        orderDirection?: DirectionModel,
+        filter?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedDocumentCollectionResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/collection/document/{id}',
@@ -80,10 +80,10 @@ take?: number,
      * @throws ApiError
      */
     public static postDocument({
-requestBody,
-}: {
-requestBody?: CreateDocumentRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateDocumentRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document',
@@ -104,10 +104,10 @@ requestBody?: CreateDocumentRequestModel,
      * @throws ApiError
      */
     public static getDocumentById({
-id,
-}: {
-id: string,
-}): CancelablePromise<DocumentResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<DocumentResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}',
@@ -127,10 +127,10 @@ id: string,
      * @throws ApiError
      */
     public static deleteDocumentById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/document/{id}',
@@ -151,12 +151,12 @@ id: string,
      * @throws ApiError
      */
     public static putDocumentById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateDocumentRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDocumentRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}',
@@ -179,12 +179,12 @@ requestBody?: UpdateDocumentRequestModel,
      * @throws ApiError
      */
     public static postDocumentByIdCopy({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: CopyDocumentRequestModel,
-}): CancelablePromise<string> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: CopyDocumentRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document/{id}/copy',
@@ -207,10 +207,10 @@ requestBody?: CopyDocumentRequestModel,
      * @throws ApiError
      */
     public static getDocumentByIdDomains({
-id,
-}: {
-id: string,
-}): CancelablePromise<DomainsResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<DomainsResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}/domains',
@@ -229,12 +229,12 @@ id: string,
      * @throws ApiError
      */
     public static putDocumentByIdDomains({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateDomainsRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDomainsRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/domains',
@@ -254,12 +254,12 @@ requestBody?: UpdateDomainsRequestModel,
      * @throws ApiError
      */
     public static putDocumentByIdMove({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: MoveDocumentRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveDocumentRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/move',
@@ -281,10 +281,10 @@ requestBody?: MoveDocumentRequestModel,
      * @throws ApiError
      */
     public static putDocumentByIdMoveToRecycleBin({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/move-to-recycle-bin',
@@ -305,10 +305,10 @@ id: string,
      * @throws ApiError
      */
     public static getDocumentByIdNotifications({
-id,
-}: {
-id: string,
-}): CancelablePromise<Array<DocumentNotificationResponseModel>> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<Array<DocumentNotificationResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}/notifications',
@@ -328,12 +328,12 @@ id: string,
      * @throws ApiError
      */
     public static putDocumentByIdNotifications({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateDocumentNotificationsRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDocumentNotificationsRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/notifications',
@@ -354,12 +354,12 @@ requestBody?: UpdateDocumentNotificationsRequestModel,
      * @throws ApiError
      */
     public static postDocumentByIdPublicAccess({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: PublicAccessRequestModel,
-}): CancelablePromise<string> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: PublicAccessRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
@@ -382,10 +382,10 @@ requestBody?: PublicAccessRequestModel,
      * @throws ApiError
      */
     public static deleteDocumentByIdPublicAccess({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
@@ -401,14 +401,14 @@ id: string,
     }
 
     /**
-     * @returns void 
+     * @returns void
      * @throws ApiError
      */
     public static getDocumentByIdPublicAccess({
-id,
-}: {
-id: string,
-}): CancelablePromise<void> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
@@ -428,12 +428,12 @@ id: string,
      * @throws ApiError
      */
     public static putDocumentByIdPublicAccess({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: PublicAccessRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: PublicAccessRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
@@ -455,12 +455,12 @@ requestBody?: PublicAccessRequestModel,
      * @throws ApiError
      */
     public static putDocumentByIdPublish({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: (PublishDocumentRequestModel | PublishDocumentWithDescendantsRequestModel),
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: (PublishDocumentRequestModel | PublishDocumentWithDescendantsRequestModel),
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/publish',
@@ -483,12 +483,12 @@ requestBody?: (PublishDocumentRequestModel | PublishDocumentWithDescendantsReque
      * @throws ApiError
      */
     public static putDocumentByIdPublishWithDescendants({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: PublishDocumentWithDescendantsRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: PublishDocumentWithDescendantsRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/publish-with-descendants',
@@ -511,12 +511,12 @@ requestBody?: PublishDocumentWithDescendantsRequestModel,
      * @throws ApiError
      */
     public static putDocumentByIdUnpublish({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UnpublishDocumentRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UnpublishDocumentRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/unpublish',
@@ -539,12 +539,12 @@ requestBody?: UnpublishDocumentRequestModel,
      * @throws ApiError
      */
     public static putDocumentByIdValidate({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateDocumentRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDocumentRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/validate',
@@ -581,10 +581,10 @@ requestBody?: UpdateDocumentRequestModel,
      * @throws ApiError
      */
     public static putDocumentSort({
-requestBody,
-}: {
-requestBody?: SortingRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: SortingRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/sort',
@@ -604,10 +604,10 @@ requestBody?: SortingRequestModel,
      * @throws ApiError
      */
     public static postDocumentValidate({
-requestBody,
-}: {
-requestBody?: CreateDocumentRequestModel,
-}): CancelablePromise<any> {
+        requestBody,
+    }: {
+        requestBody?: CreateDocumentRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document/validate',
@@ -627,10 +627,10 @@ requestBody?: CreateDocumentRequestModel,
      * @throws ApiError
      */
     public static getItemDocument({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<DocumentItemResponseModel>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<DocumentItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/item/document',
@@ -664,10 +664,10 @@ id?: Array<string>,
      * @throws ApiError
      */
     public static deleteRecycleBinDocumentById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/recycle-bin/document/{id}',
@@ -688,14 +688,14 @@ id: string,
      * @throws ApiError
      */
     public static getRecycleBinDocumentChildren({
-parentId,
-skip,
-take = 100,
-}: {
-parentId?: string,
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedDocumentRecycleBinItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedDocumentRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/children',
@@ -715,12 +715,12 @@ take?: number,
      * @throws ApiError
      */
     public static getRecycleBinDocumentRoot({
-skip,
-take = 100,
-}: {
-skip?: number,
-take?: number,
-}): CancelablePromise<PagedDocumentRecycleBinItemResponseModel> {
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedDocumentRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/root',
@@ -739,16 +739,16 @@ take?: number,
      * @throws ApiError
      */
     public static getTreeDocumentChildren({
-parentId,
-skip,
-take = 100,
-dataTypeId,
-}: {
-parentId?: string,
-skip?: number,
-take?: number,
-dataTypeId?: string,
-}): CancelablePromise<PagedDocumentTreeItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+        dataTypeId,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+        dataTypeId?: string,
+    }): CancelablePromise<PagedDocumentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/children',
@@ -769,14 +769,14 @@ dataTypeId?: string,
      * @throws ApiError
      */
     public static getTreeDocumentRoot({
-skip,
-take = 100,
-dataTypeId,
-}: {
-skip?: number,
-take?: number,
-dataTypeId?: string,
-}): CancelablePromise<PagedDocumentTreeItemResponseModel> {
+        skip,
+        take = 100,
+        dataTypeId,
+    }: {
+        skip?: number,
+        take?: number,
+        dataTypeId?: string,
+    }): CancelablePromise<PagedDocumentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/root',

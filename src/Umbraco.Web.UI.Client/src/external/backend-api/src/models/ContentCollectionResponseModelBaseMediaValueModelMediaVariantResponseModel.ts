@@ -13,3 +13,4 @@ export type ContentCollectionResponseModelBaseMediaValueModelMediaVariantRespons
     creator?: string | null;
     sortOrder: number;
 };
+
