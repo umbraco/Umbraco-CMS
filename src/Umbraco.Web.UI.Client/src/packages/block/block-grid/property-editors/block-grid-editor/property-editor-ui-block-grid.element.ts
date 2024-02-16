@@ -1,6 +1,6 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, css, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -51,6 +51,8 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	private _limitMin?: number;
 	@state()
 	private _limitMax?: number;
+	@state()
+	private _layoutColumns?: number;
 
 	@property({ attribute: false })
 	public get value(): UmbBlockGridValueModel {
@@ -91,13 +93,16 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 
 		this.observe(this.#context.gridColumns, (gridColumns) => {
 			if (gridColumns) {
+				this._layoutColumns = gridColumns;
 				this.style.setProperty('--umb-block-grid--grid-columns', gridColumns.toString());
 			}
 		});
 	}
 
 	render() {
-		return html`<umb-block-grid-entries .areaKey=${null}></umb-block-grid-entries>`;
+		return html`<umb-block-grid-entries
+			.areaKey=${null}
+			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;
 	}
 
 	static styles = [

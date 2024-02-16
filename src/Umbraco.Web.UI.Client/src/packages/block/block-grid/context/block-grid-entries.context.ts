@@ -3,6 +3,7 @@ import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/i
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridWorkspaceData } from '../index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
+import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
@@ -17,6 +18,9 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 
 	#parentEntry?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
 
+	#layoutColumns = new UmbNumberState(undefined);
+	readonly layoutColumns = this.#layoutColumns.asObservable();
+
 	//#parentUnique?: string;
 	#areaKey?: string | null;
 
@@ -30,6 +34,13 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 		this._workspaceModal.setUniquePathValue('areaKey', areaKey ?? 'null');
 		this.#catalogueModal.setUniquePathValue('areaKey', areaKey ?? 'null');
 		this.#gotAreaKey();
+	}
+
+	setLayoutColumns(columns: number | undefined) {
+		this.#layoutColumns.setValue(columns);
+	}
+	getLayoutColumns() {
+		return this.#layoutColumns.getValue();
 	}
 
 	constructor(host: UmbControllerHost) {

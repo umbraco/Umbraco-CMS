@@ -156,6 +156,14 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 		return this._areaKey;
 	}
 
+	@property({ attribute: false })
+	public set layoutColumns(value: number | undefined) {
+		this.#context.setLayoutColumns(value);
+	}
+	public get layoutColumns(): number | undefined {
+		return this.#context.getLayoutColumns();
+	}
+
 	@state()
 	private _areaKey?: string | null;
 

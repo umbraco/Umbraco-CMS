@@ -64,7 +64,8 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 							(area) =>
 								html`<umb-block-grid-entries
 									class="umb-block-grid__area"
-									.areaKey=${area.key}></umb-block-grid-entries>`,
+									.areaKey=${area.key}
+									.layoutColumns=${area.columnSpan}></umb-block-grid-entries>`,
 						)}
 					</div>`
 			: '';
