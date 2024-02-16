@@ -1,6 +1,4 @@
 using System.Text.Json.Nodes;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -20,41 +18,19 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.MediaPicker3,
-    EditorType.PropertyValue,
-    "Media Picker",
-    "mediapicker3",
     ValueType = ValueTypes.Json,
-    Group = Constants.PropertyEditors.Groups.Media,
-    Icon = Constants.Icons.MediaImage,
     ValueEditorIsReusable = true)]
 public class MediaPicker3PropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
-
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public MediaPicker3PropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        EditorType type = EditorType.PropertyValue)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
-    {
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaPicker3PropertyEditor" /> class.
     /// </summary>
-    public MediaPicker3PropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser,
-        EditorType type = EditorType.PropertyValue)
-        : base(dataValueEditorFactory, type)
+    public MediaPicker3PropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
+        : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
@@ -62,7 +38,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new MediaPicker3ConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new MediaPicker3ConfigurationEditor(_ioHelper);
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor() =>
@@ -81,7 +57,6 @@ public class MediaPicker3PropertyEditor : DataEditor
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
         public MediaPicker3PropertyValueEditor(
-            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
@@ -92,7 +67,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             ITemporaryFileService temporaryFileService,
             IScopeProvider scopeProvider,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
             _dataTypeService = dataTypeService;

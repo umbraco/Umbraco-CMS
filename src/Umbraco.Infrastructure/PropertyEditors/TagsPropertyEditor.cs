@@ -20,38 +20,20 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [TagsPropertyEditor]
 [DataEditor(
     Constants.PropertyEditors.Aliases.Tags,
-    "Tags",
-    "tags",
-    Icon = "icon-tags",
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.Text)]
 public class TagsPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly ITagPropertyIndexValueFactory _tagPropertyIndexValueFactory;
     private readonly IIOHelper _ioHelper;
 
-    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
-    public TagsPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        ManifestValueValidatorCollection validators,
-        IIOHelper ioHelper,
-        ILocalizedTextService localizedTextService,
-        IEditorConfigurationParser editorConfigurationParser,
-        ITagPropertyIndexValueFactory tagPropertyIndexValueFactory)
-        : this(dataValueEditorFactory, ioHelper, editorConfigurationParser, tagPropertyIndexValueFactory)
-    {
-    }
-
     public TagsPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser,
         ITagPropertyIndexValueFactory tagPropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
         _tagPropertyIndexValueFactory = tagPropertyIndexValueFactory;
     }
 
@@ -62,7 +44,7 @@ public class TagsPropertyEditor : DataEditor
         DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute!);
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new TagConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new TagConfigurationEditor(_ioHelper);
 
     internal class TagPropertyValueEditor : DataValueEditor, IDataValueTags
     {

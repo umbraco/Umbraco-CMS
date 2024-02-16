@@ -51,7 +51,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
         return HasPermissionAccess(user, contentItems.Select(c => c.Path), permissionsToCheck)
             ? ContentAuthorizationStatus.Success
-            : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
+            : ContentAuthorizationStatus.UnauthorizedMissingPermissionAccess;
     }
 
     /// <inheritdoc/>
@@ -115,7 +115,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
         // In this case, we have to use the Root id as path (i.e. -1) since we don't have a content item
         return HasPermissionAccess(user, new[] { Constants.System.RootString }, permissionsToCheck)
             ? ContentAuthorizationStatus.Success
-            : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
+            : ContentAuthorizationStatus.UnauthorizedMissingPermissionAccess;
     }
 
     /// <inheritdoc/>
@@ -131,7 +131,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
         // In this case, we have to use the Recycle Bin id as path (i.e. -20) since we don't have a content item
         return HasPermissionAccess(user, new[] { Constants.System.RecycleBinContentString }, permissionsToCheck)
             ? ContentAuthorizationStatus.Success
-            : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
+            : ContentAuthorizationStatus.UnauthorizedMissingPermissionAccess;
     }
 
     /// <inheritdoc/>

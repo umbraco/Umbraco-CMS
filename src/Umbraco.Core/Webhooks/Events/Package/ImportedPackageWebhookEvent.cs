@@ -18,5 +18,5 @@ public class ImportedPackageWebhookEvent : WebhookEventBase<ImportedPackageNotif
     {
     }
 
-    public override string Alias => "packageImported";
+    public override string Alias => Constants.WebhookEvents.Aliases.PackageImported;
 }

@@ -1,13 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -18,39 +15,21 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.ContentPicker,
-    EditorType.PropertyValue | EditorType.MacroParameter,
-    "Content Picker",
-    "contentpicker",
     ValueType = ValueTypes.String,
-    Group = Constants.PropertyEditors.Groups.Pickers,
     ValueEditorIsReusable = true)]
 public class ContentPickerPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
 
-    // Scheduled for removal in v12
-    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public ContentPickerPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
-
-    public ContentPickerPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser)
+    public ContentPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new ContentPickerConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new ContentPickerConfigurationEditor(_ioHelper);
 
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<ContentPickerPropertyValueEditor>(Attribute!);

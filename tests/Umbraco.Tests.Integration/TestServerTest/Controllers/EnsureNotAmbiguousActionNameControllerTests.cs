@@ -78,10 +78,6 @@ public class EnsureNotAmbiguousActionNameControllerTests : UmbracoTestServerTest
 
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<IconController>(x => x.GetIcon(string.Empty)));
 
-            EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MacrosController>(x => x.GetById(intId)));
-            EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MacrosController>(x => x.GetById(guidId)));
-            EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MacrosController>(x => x.GetById(udiId)));
-
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetById(intId)));
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetById(guidId)));
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<MediaController>(x => x.GetById(udiId)));

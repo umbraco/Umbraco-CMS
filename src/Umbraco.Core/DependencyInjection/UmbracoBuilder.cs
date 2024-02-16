@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Diagnostics;
 using Umbraco.Cms.Core.Dictionary;
@@ -201,9 +200,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IInstallationService, InstallationService>();
             Services.AddUnique<IUpgradeService, UpgradeService>();
 
-            // Grid config is not a real config file as we know them
-            Services.AddUnique<IGridConfig, GridConfig>();
-
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
             Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
 
@@ -245,7 +241,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<MediaPermissions>();
 
             Services.AddSingleton<PropertyEditorCollection>();
-            Services.AddSingleton<ParameterEditorCollection>();
 
             // register a server registrar, by default it's the db registrar
             Services.AddUnique<IServerRoleAccessor>(f =>

@@ -133,7 +133,7 @@ public class MultipleTextStringValueEditorTests
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias", "name", "view"));
+            new DataEditorAttribute("alias"));
         return valueEditor;
     }
 }
