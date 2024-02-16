@@ -32,7 +32,6 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoProfiler()
             .AddMvcAndRazor(configureMvc)
             .AddWebServer()
-            .AddPreviewSupport()
             .AddRecurringBackgroundJobs()
             .AddNuCache()
             .AddDistributedCache()
@@ -41,16 +40,6 @@ public static partial class UmbracoBuilderExtensions
             .AddExamine()
             .AddExamineIndexes()
             .AddSupplemenataryLocalizedTextFileSources();
-
-    /// <summary>
-    ///     Adds Umbraco preview support
-    /// </summary>
-    public static IUmbracoBuilder AddPreviewSupport(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSignalR();
-
-        return builder;
-    }
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {

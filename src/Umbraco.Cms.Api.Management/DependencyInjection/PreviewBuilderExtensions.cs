@@ -10,6 +10,7 @@ internal static class PreviewBuilderExtensions
 {
     internal static IUmbracoBuilder AddPreview(this IUmbracoBuilder builder)
     {
+        builder.Services.AddSignalR();
         builder.Services.AddSingleton<PreviewRoutes>();
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
 
