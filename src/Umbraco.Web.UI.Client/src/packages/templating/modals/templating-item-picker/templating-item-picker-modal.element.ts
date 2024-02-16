@@ -1,12 +1,13 @@
 import { CodeSnippetType } from '../../types.js';
 import { UMB_PARTIAL_VIEW_PICKER_MODAL } from '../partial-view-picker/partial-view-picker-modal.token.js';
+import { UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL } from '../templating-page-field-builder/templating-page-field-builder-modal.token.js';
 import type {
 	UmbTemplatingItemPickerModalData,
 	UmbTemplatingItemPickerModalValue,
 } from './templating-item-picker-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
@@ -22,43 +23,58 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	private _modalContext?: UmbModalManagerContext;
+	private _itemModalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
+			this._itemModalContext = instance;
 		});
 	}
 
-	#openModal?: UmbModalContext;
+	async #openTemplatingPageFieldModal() {
+		const pageFieldBuilderContext = this._itemModalContext?.open(UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
+		await pageFieldBuilderContext?.onSubmit();
 
-	#openInsertPartialViewSidebar() {
-		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
-		this.#openModal?.onSubmit().then((partialViewPickerModalValue) => {
-			if (partialViewPickerModalValue) {
-				this.value = {
-					type: CodeSnippetType.partialView,
-					value: partialViewPickerModalValue.selection[0],
-				};
-				this.modalContext?.submit();
-			}
-		});
+		const output = pageFieldBuilderContext?.getValue().output;
+
+		if (output) {
+			this.value = { value: output, type: CodeSnippetType.pageField };
+			this.modalContext?.submit();
+		}
 	}
 
-	#openInsertDictionaryItemModal() {
-		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
+	async #openPartialViewPickerModal() {
+		const partialViewPickerContext = this._itemModalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+		await partialViewPickerContext?.onSubmit();
+
+		const path = partialViewPickerContext?.getValue().selection[0];
+
+		if (path) {
+			const regex = /^%2F|%25dot%25cshtml$/g;
+			const prettyPath = path.replace(regex, '').replace(/%2F/g, '/');
+			this.value = {
+				value: prettyPath,
+				type: CodeSnippetType.partialView,
+			};
+			this.modalContext?.submit();
+		}
+	}
+
+	async #openDictionaryItemPickerModal() {
+		const dictionaryItemPickerModal = this._itemModalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
 			data: {
-				hideTreeRoot: true,
 				pickableFilter: (item) => item.id !== null,
 			},
 		});
-		this.#openModal?.onSubmit().then((dictionaryItemPickerModalValue) => {
-			if (dictionaryItemPickerModalValue) {
-				this.value = { value: dictionaryItemPickerModalValue, type: CodeSnippetType.dictionaryItem };
-				this.modalContext?.submit();
-			}
-		});
+		await dictionaryItemPickerModal?.onSubmit();
+
+		const dictionaryItem = dictionaryItemPickerModal?.getValue().selection[0];
+
+		if (dictionaryItem) {
+			this.value = { value: dictionaryItem, type: CodeSnippetType.dictionaryItem };
+			this.modalContext?.submit();
+		}
 	}
 
 	render() {
@@ -77,7 +93,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 	#renderItems() {
 		return html`<div id="main">
 			<uui-button
-				@click=${() => console.log('to be continued')}
+				@click=${this.#openTemplatingPageFieldModal}
 				look="placeholder"
 				label=${this.localize.term('template_insert')}>
 				<h3><umb-localize key="template_insertPageField">Value</umb-localize> (Not implemented)</h3>
@@ -89,7 +105,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				</p>
 			</uui-button>
 			<uui-button
-				@click=${this.#openInsertPartialViewSidebar}
+				@click=${this.#openPartialViewPickerModal}
 				look="placeholder"
 				label=${this.localize.term('template_insert')}>
 				<h3><umb-localize key="template_insertPartialView">Partial view</umb-localize></h3>
@@ -101,7 +117,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				</p>
 			</uui-button>
 			<uui-button
-				@click=${this.#openInsertDictionaryItemModal}
+				@click=${this.#openDictionaryItemPickerModal}
 				look="placeholder"
 				label=${this.localize.term('template_insertDictionaryItem')}>
 				<h3><umb-localize key="template_insertDictionaryItem">Dictionary Item</umb-localize></h3>
