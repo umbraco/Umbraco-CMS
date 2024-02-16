@@ -35,12 +35,6 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 	 * @memberof UmbTemplateServerDataSource
 	 */
 	async createScaffold(parentUnique: string | null, preset?: Partial<UmbTemplateDetailModel>) {
-		// TODO: API throws "Not found". Making snippet hardcoded for now.
-		/*const scaffold = await tryExecuteAndNotify(
-			this.#host,
-			TemplateResource.getTemplateScaffold({ masterTemplateId: parentUnique ?? undefined }),
-		);*/
-
 		const scaffold =
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n@{\n\tLayout = null;\n}';
 
