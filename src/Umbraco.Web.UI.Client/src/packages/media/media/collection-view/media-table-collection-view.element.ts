@@ -104,7 +104,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				.config=${this._tableConfig}
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
-				.selection=${this._selection}
+				.selection=${this._selection as string[]}
 				@selected="${this._handleSelect}"
 				@deselected="${this._handleDeselect}"
 				@ordered="${this._handleOrdering}"></umb-table>
