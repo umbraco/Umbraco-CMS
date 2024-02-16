@@ -1440,31 +1440,30 @@ export default {
 		insertDesc: 'Choose what to insert into your template',
 		insertDictionaryItem: 'Dictionary item',
 		insertDictionaryItemDesc:
-			'A dictionary item is a placeholder for a translatable piece of text, which\n      makes it easy to create designs for multilingual websites.\n    ',
+			'A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create designs for multilingual websites.',
 		insertMacro: 'Macro',
 		insertMacroDesc:
-			'\n      A Macro is a configurable component which is great for\n      reusable parts of your design, where you need the option to provide parameters,\n      such as galleries, forms and lists.\n    ',
+			'A Macro is a configurable component which is great for reusable parts of your design, where you need the option to provide parameters, such as galleries, forms and lists.',
 		insertPageField: 'Value',
 		insertPageFieldDesc:
-			'Displays the value of a named field from the current page, with options to modify\n      the value or fallback to alternative values.\n    ',
+			'Displays the value of a named field from the current page, with options to modify the value or fallback to alternative values.',
 		insertPartialView: 'Partial view',
 		insertPartialViewDesc:
-			"\n      A partial view is a separate template file which can be rendered inside another\n      template, it's great for reusing markup or for separating complex templates into separate files.\n    ",
+			"A partial view is a separate template file which can be rendered inside another template, it's great for reusing markup or for separating complex templates into separate files.",
 		mastertemplate: 'Master template',
 		noMaster: 'No master',
 		renderBody: 'Render child template',
-		renderBodyDesc:
-			'\n     Renders the contents of a child template, by inserting a\n     <code>@RenderBody()</code> placeholder.\n      ',
+		renderBodyDesc: 'Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.',
 		defineSection: 'Define a named section',
 		defineSectionDesc:
-			'\n         Defines a part of your template as a named section by wrapping it in\n          <code>@section { ... }</code>. This can be rendered in a\n          specific area of the parent of this template, by using <code>@RenderSection</code>.\n      ',
+			'Defines a part of your template as a named section by wrapping it in <code>@section { ... }</code>. This can be rendered in a specific area of the parent of this template, by using <code>@RenderSection</code>.',
 		renderSection: 'Render a named section',
 		renderSectionDesc:
-			'\n      Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder.\n      This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.\n      ',
+			'Renders a named area of a child template, by inserting a <code>@RenderSection(name)</code> placeholder. This renders an area of a child template which is wrapped in a corresponding <code>@section [name]{ ... }</code> definition.',
 		sectionName: 'Section Name',
 		sectionMandatory: 'Section is mandatory',
 		sectionMandatoryDesc:
-			'\n            If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.\n    ',
+			'If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.',
 		queryBuilder: 'Query builder',
 		itemsReturned: 'items returned, in',
 		iWant: 'I want',
