@@ -1,8 +1,8 @@
 import { UmbModalToken } from '../../../core/modal/token/modal-token.js';
+import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
-import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
-export type UmbMemberTypePickerModalData = UmbTreePickerModalData<UmbEntityTreeItemModel>;
+export type UmbMemberTypePickerModalData = UmbTreePickerModalData<UmbUniqueTreeItemModel>;
 export type UmbMemberTypePickerModalValue = UmbPickerModalValue;
 
 export const UMB_MEMBER_TYPE_PICKER_MODAL = new UmbModalToken<

@@ -92,8 +92,8 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	#openInsertDictionaryItemModal() {
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
 			data: {
+				pickableFilter: (item) => item.unique !== null,
 				hideTreeRoot: true,
-				pickableFilter: (item) => item.id !== null,
 			},
 		});
 		this.#openModal?.onSubmit().then((value) => {
