@@ -62,6 +62,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
 			data: {
 				pickableFilter: (item) => item.id !== null,
+				hideTreeRoot: true,
 			},
 		});
 		this.#openModal?.onSubmit().then((dictionaryItemPickerModalValue) => {
@@ -76,12 +77,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	#renderInsertPartialViewButton() {
 		return html`${this.data?.hidePartialViews
 			? ''
-			: html`<uui-button @click=${this.#openInsertPartialViewSidebar} look="placeholder" label="Insert value"
-					><h3>Partial view</h3>
-					<p>
-						A partial view is a separate template file which can be rendered inside another template, it's great for
-						reusing markup or for separating complex templates into separate files.
-					</p></uui-button
+			: html`<uui-button @click=${this.#openInsertPartialViewSidebar} look="placeholder" label="Insert value">
+					<h3>${this.localize.term('template_insertPartialView')}</h3>
+					<p>${this.localize.term('template_insertPartialViewDesc')}</p></uui-button
 			  >`}`;
 	}
 
@@ -90,17 +88,14 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			<umb-body-layout headline="Insert">
 				<div id="main">
 					<uui-box>
-						<uui-button @click=${this.#openInsertDictionaryItemModal} look="placeholder" label="Insert Dictionary item"
-							><h3>Dictionary item</h3>
-							<p>
-								A dictionary item is a placeholder for a translatable piece of text, which makes it easy to create
-								designs for multilingual websites.
-							</p></uui-button
-						>
+						<uui-button @click=${this.#openInsertDictionaryItemModal} look="placeholder" label="Insert Dictionary item">
+							<h3>${this.localize.term('template_insertDictionaryItem')}</h3>
+							<p>${this.localize.term('template_insertDictionaryItemDesc')}</p>
+						</uui-button>
 					</uui-box>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary" label="Close">Close</uui-button>
+					<uui-button @click=${this._close} look="secondary" label=${this.localize.term('general_close')}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;

@@ -126,6 +126,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				pickableFilter: (item) => {
 					return item.unique !== null && item.unique !== this.#templateWorkspaceContext?.getEntityId();
 				},
+				hideTreeRoot: true,
 			},
 			value: {
 				selection: [this.#masterTemplateUnique],
@@ -155,15 +156,15 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 					@click=${this.#openMasterTemplatePicker}
 					look="secondary"
 					id="master-template-button"
-					label="Change Master template"
-					>${this._masterTemplateName
-						? `Master template: ${this._masterTemplateName}`
-						: 'Set master template'}</uui-button
-				>
+					label=${this.localize.term('template_mastertemplate')}>
+					${this._masterTemplateName
+						? `${this.localize.term('template_mastertemplate')}: ${this._masterTemplateName}`
+						: this.localize.term('template_noMaster')}
+				</uui-button>
 				${this._masterTemplateName
-					? html` <uui-button look="secondary" id="save-button" label="Remove master template" compact
-							><uui-icon name="icon-delete" @click=${this.#resetMasterTemplate}></uui-icon
-					  ></uui-button>`
+					? html` <uui-button look="secondary" id="save-button" label=${this.localize.term('actions_remove')} compact>
+							<uui-icon name="icon-delete" @click=${this.#resetMasterTemplate}></uui-icon>
+					  </uui-button>`
 					: nothing}
 			</uui-button-group>
 		`;
@@ -197,16 +198,16 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 						<uui-button
 							look="secondary"
 							id="query-builder-button"
-							label="Query builder"
+							label=${this.localize.term('template_queryBuilder')}
 							@click=${this.#openQueryBuilder}>
-							<uui-icon name="icon-wand"></uui-icon>Query builder
+							<uui-icon name="icon-wand"></uui-icon> ${this.localize.term('template_queryBuilder')}
 						</uui-button>
 						<uui-button
 							look="secondary"
 							id="sections-button"
-							label="Query builder"
+							label=${this.localize.term('template_insertSections')}
 							@click=${this.#openInsertSectionModal}>
-							<uui-icon name="icon-indent"></uui-icon>Sections
+							<uui-icon name="icon-indent"></uui-icon> ${this.localize.term('template_insertSections')}
 						</uui-button>
 					</div>
 				</div>
