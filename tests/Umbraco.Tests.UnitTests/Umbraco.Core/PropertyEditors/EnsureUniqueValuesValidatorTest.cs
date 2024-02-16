@@ -1,15 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using NUnit.Framework;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
@@ -17,83 +12,73 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 [TestFixture]
 public class EnsureUniqueValuesValidatorTest
 {
-    private readonly ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
-
-    private ColorPickerPropertyEditor ColorPickerPropertyEditor => new(
-        Mock.Of<IDataValueEditorFactory>(),
-        Mock.Of<IIOHelper>(),
-        new JsonNetSerializer(),
-        Mock.Of<IEditorConfigurationParser>());
+    private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer()
+        => new SystemTextConfigurationEditorJsonSerializer();
 
     [Test]
-    public void Only_Tests_On_JArray()
+    public void Expects_Array_Of_ValueListItems_Not_Single_String()
     {
-        var validator = new ValueListUniqueValueValidator();
-        var result =
-            validator.Validate(
-                "hello",
-                null,
-                new ColorPickerPropertyEditor(
-                    Mock.Of<IDataValueEditorFactory>(),
-                    Mock.Of<IIOHelper>(),
-                    new JsonNetSerializer(),
-                    Mock.Of<IEditorConfigurationParser>()));
-        Assert.AreEqual(0, result.Count());
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
+        var result = validator.Validate(
+            "hello",
+            null,
+            null);
+        Assert.AreEqual(1, result.Count());
     }
 
     [Test]
-    public void Only_Tests_On_JArray_Of_Item_JObject()
+    public void Expects_Array_Of_ValueListItems_Not_Array_Of_String()
     {
-        var validator = new ValueListUniqueValueValidator();
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
         var result =
             validator.Validate(
-                new JArray("hello", "world"),
+                new JsonArray("hello", "world"),
                 null,
-                ColorPickerPropertyEditor);
-        Assert.AreEqual(0, result.Count());
+                null);
+        Assert.AreEqual(1, result.Count());
     }
 
     [Test]
     public void Allows_Unique_Values()
     {
-        var validator = new ValueListUniqueValueValidator();
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
         var result =
             validator.Validate(
-                new JArray(
-                    JObject.FromObject(new { value = "hello" }),
-                    JObject.FromObject(new { value = "world" })),
+                new JsonArray(
+                    JsonNode.Parse("""{"value": "hello"}"""),
+                    JsonNode.Parse("""{"value": "world"}""")),
                 null,
-                ColorPickerPropertyEditor);
+                null);
         Assert.AreEqual(0, result.Count());
     }
 
     [Test]
     public void Does_Not_Allow_Multiple_Values()
     {
-        var validator = new ValueListUniqueValueValidator();
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
         var result =
             validator.Validate(
-                new JArray(
-                    JObject.FromObject(new { value = "hello" }),
-                    JObject.FromObject(new { value = "hello" })),
+                new JsonArray(
+                    JsonNode.Parse("""{"value": "hello"}"""),
+                    JsonNode.Parse("""{"value": "hello"}""")),
                 null,
-                ColorPickerPropertyEditor);
+                null);
         Assert.AreEqual(1, result.Count());
     }
 
     [Test]
     public void Validates_Multiple_Duplicate_Values()
     {
-        var validator = new ValueListUniqueValueValidator();
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
         var result =
             validator.Validate(
-                new JArray(
-                    JObject.FromObject(new { value = "hello" }),
-                    JObject.FromObject(new { value = "hello" }),
-                    JObject.FromObject(new { value = "world" }),
-                    JObject.FromObject(new { value = "world" })),
+                new JsonArray(
+                    JsonNode.Parse("""{"value": "hello"}"""),
+                    JsonNode.Parse("""{"value": "hello"}"""),
+                    JsonNode.Parse("""{"value": "world"}"""),
+                    JsonNode.Parse("""{"value": "world"}""")),
                 null,
-                ColorPickerPropertyEditor);
+                null);
         Assert.AreEqual(2, result.Count());
     }
 }

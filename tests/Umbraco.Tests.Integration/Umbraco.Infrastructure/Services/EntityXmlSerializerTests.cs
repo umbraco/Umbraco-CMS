@@ -176,14 +176,12 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             scheme,
             loggerFactory.CreateLogger<MediaFileManager>(),
             ShortStringHelper,
-            Services,
-            Options.Create(new ContentSettings()));
+            Services);
 
         var ignored = new FileUploadPropertyEditor(
             DataValueEditorFactory,
             mediaFileManager,
             Mock.Of<IOptionsMonitor<ContentSettings>>(x => x.CurrentValue == contentSettings),
-            TextService,
             Services.GetRequiredService<UploadAutoFillProperties>(),
             ContentService,
             IOHelper);

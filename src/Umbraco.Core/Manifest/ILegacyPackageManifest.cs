@@ -41,12 +41,6 @@ public interface ILegacyPackageManifest
     IDataEditor[] ParameterEditors { get; set; }
 
     /// <summary>
-    ///     Gets or sets the grid editors listed in the manifest.
-    /// </summary>
-    [DataMember(Name = "gridEditors")]
-    GridEditor[] GridEditors { get; set; }
-
-    /// <summary>
     ///     Gets or sets the content apps listed in the manifest.
     /// </summary>
     [DataMember(Name = "contentApps")]

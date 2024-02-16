@@ -549,10 +549,9 @@ public class MemberControllerUnitTests
         var mockPasswordConfig = new Mock<IOptions<MemberPasswordConfigurationSettings>>();
         mockPasswordConfig.Setup(x => x.Value).Returns(() => new MemberPasswordConfigurationSettings());
         var dataEditor = Mock.Of<IDataEditor>(
-            x => x.Type == EditorType.PropertyValue
-                 && x.Alias == Constants.PropertyEditors.Aliases.Label);
+            x => x.Alias == Constants.PropertyEditors.Aliases.Label);
         Mock.Get(dataEditor).Setup(x => x.GetValueEditor()).Returns(new TextOnlyValueEditor(
-            new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),
+            new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>()));

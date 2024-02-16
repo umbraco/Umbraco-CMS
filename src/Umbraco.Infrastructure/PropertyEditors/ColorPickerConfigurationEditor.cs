@@ -2,66 +2,58 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
 {
-    private readonly IJsonSerializer _jsonSerializer;
-
-    public ColorPickerConfigurationEditor(IIOHelper ioHelper, IJsonSerializer jsonSerializer,
-        IEditorConfigurationParser editorConfigurationParser)
-        : base(ioHelper, editorConfigurationParser)
+    public ColorPickerConfigurationEditor(IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        : base(ioHelper)
     {
-        _jsonSerializer = jsonSerializer;
         ConfigurationField items = Fields.First(x => x.Key == "items");
-
-        // customize the items field
-        items.View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
-        items.Description = "Add, remove or sort colors";
-        items.Name = "Colors";
-        items.Validators.Add(new ColorListValidator());
+        items.Validators.Add(new ColorListValidator(configurationEditorJsonSerializer));
     }
 
     internal class ColorListValidator : IValueValidator
     {
+        private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
+
+        public ColorListValidator(IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+            => _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+
         public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
-            if (!(value is JArray json))
+            var stringValue = value?.ToString();
+            if (stringValue.IsNullOrWhiteSpace())
             {
                 yield break;
             }
 
-            // validate each item which is a json object
-            for (var index = 0; index < json.Count; index++)
+            ColorPickerConfiguration.ColorPickerItem[]? items = null;
+            try
             {
-                JToken i = json[index];
-                if (!(i is JObject jItem) || jItem["value"] == null)
-                {
-                    continue;
-                }
+                items = _configurationEditorJsonSerializer.Deserialize<ColorPickerConfiguration.ColorPickerItem[]>(stringValue);
+            }
+            catch
+            {
+                // swallow and report error below
+            }
 
-                // NOTE: we will be removing empty values when persisting so no need to validate
-                var asString = jItem["value"]?.ToString();
-                if (asString.IsNullOrWhiteSpace())
-                {
-                    continue;
-                }
+            if (items is null)
+            {
+                yield return new ValidationResult($"The configuration value {stringValue} is not a valid color picker configuration", new[] { "items" });
+                yield break;
+            }
 
-                if (Regex.IsMatch(asString!, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
+            foreach (ColorPickerConfiguration.ColorPickerItem item in items)
+            {
+                if (Regex.IsMatch(item.Value, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
                 {
-                    yield return new ValidationResult("The value " + asString + " is not a valid hex color", new[]
-                    {
-                        // we'll make the server field the index number of the value so it can be wired up to the view
-                        "item_" + index.ToInvariantString(),
-                    });
+                    yield return new ValidationResult($"The value {item.Value} is not a valid hex color", new[] { "items" });
                 }
             }
         }

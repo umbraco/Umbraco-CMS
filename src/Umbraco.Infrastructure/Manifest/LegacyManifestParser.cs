@@ -216,20 +216,6 @@ public class LegacyManifestParser : ILegacyManifestParser
             dashboard.View = _ioHelper.ResolveRelativeOrVirtualUrl(dashboard.View);
         }
 
-        foreach (GridEditor gridEditor in manifest.GridEditors)
-        {
-            gridEditor.View = _ioHelper.ResolveRelativeOrVirtualUrl(gridEditor.View);
-            gridEditor.Render = _ioHelper.ResolveRelativeOrVirtualUrl(gridEditor.Render);
-        }
-
-        // add property editors that are also parameter editors, to the parameter editors list
-        // (the manifest format is kinda legacy)
-        var ppEditors = manifest.PropertyEditors.Where(x => (x.Type & EditorType.MacroParameter) > 0).ToList();
-        if (ppEditors.Count > 0)
-        {
-            manifest.ParameterEditors = manifest.ParameterEditors.Union(ppEditors).ToArray();
-        }
-
         return manifest;
     }
 
@@ -258,7 +244,6 @@ public class LegacyManifestParser : ILegacyManifestParser
         var stylesheets = new Dictionary<BundleOptions, List<LegacyManifestAssets>>();
         var propertyEditors = new List<IDataEditor>();
         var parameterEditors = new List<IDataEditor>();
-        var gridEditors = new List<GridEditor>();
         var contentApps = new List<LegacyManifestContentAppDefinition>();
         var dashboards = new List<LegacyManifestDashboard>();
         var sections = new List<LegacyManifestSection>();
@@ -285,8 +270,6 @@ public class LegacyManifestParser : ILegacyManifestParser
 
             parameterEditors.AddRange(manifest.ParameterEditors);
 
-            gridEditors.AddRange(manifest.GridEditors);
-
             contentApps.AddRange(manifest.ContentApps);
 
             dashboards.AddRange(manifest.Dashboards);
@@ -297,7 +280,6 @@ public class LegacyManifestParser : ILegacyManifestParser
         return new CompositeLegacyPackageManifest(
             propertyEditors,
             parameterEditors,
-            gridEditors,
             contentApps,
             dashboards,
             sections,
