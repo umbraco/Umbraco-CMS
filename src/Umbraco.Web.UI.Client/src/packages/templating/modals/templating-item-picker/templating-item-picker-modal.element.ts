@@ -14,7 +14,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-templating-item-picker-modal')
-export default class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
+export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 	UmbTemplatingItemPickerModalData,
 	UmbTemplatingItemPickerModalValue
 > {
@@ -130,6 +130,8 @@ export default class UmbTemplatingItemPickerModalElement extends UmbModalBaseEle
 		`,
 	];
 }
+
+export default UmbTemplatingItemPickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

@@ -10,7 +10,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import './templating-section-picker-input.element.js';
 
 @customElement('umb-templating-section-picker-modal')
-export default class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
+export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 	UmbTemplatingSectionPickerModalData,
 	UmbTemplatingSectionPickerModalValue
 > {
@@ -141,6 +141,8 @@ export default class UmbTemplatingSectionPickerModalElement extends UmbModalBase
 		`,
 	];
 }
+
+export default UmbTemplatingSectionPickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
