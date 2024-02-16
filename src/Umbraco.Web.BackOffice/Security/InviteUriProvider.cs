@@ -43,10 +43,11 @@ public class InviteUriProvider : IInviteUriProvider
         string inviteToken = $"{invitee.Key}{WebUtility.UrlEncode("|")}{tokenAttempt.Result.ToUrlBase64()}";
 
         // FIXME: This will need to change.
-        string? action = _linkGenerator.GetPathByAction(
-            nameof(BackOfficeController.VerifyInvite),
-            ControllerExtensions.GetControllerName<BackOfficeController>(),
-            new { area = Constants.Web.Mvc.BackOfficeArea, invite = inviteToken });
+        // string? action = _linkGenerator.GetPathByAction(
+        //     nameof(BackOfficeController.VerifyInvite),
+        //     ControllerExtensions.GetControllerName<BackOfficeController>(),
+        //     new { area = Constants.Web.Mvc.BackOfficeArea, invite = inviteToken });
+        string action = string.Empty;
 
         Uri applicationUri = _httpContextAccessor
             .GetRequiredHttpContext()

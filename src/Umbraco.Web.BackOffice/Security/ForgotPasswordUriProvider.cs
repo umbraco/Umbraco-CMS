@@ -43,10 +43,11 @@ public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
         string forgotPasswordToken = $"{user.Key}{WebUtility.UrlEncode("|")}{tokenAttempt.Result.ToUrlBase64()}";
 
         // FIXME: This will need to change.
-        string? action = _linkGenerator.GetPathByAction(
-            nameof(BackOfficeController.ValidatePasswordResetCode),
-            ControllerExtensions.GetControllerName<BackOfficeController>(),
-            new { area = Constants.Web.Mvc.BackOfficeArea, invite = forgotPasswordToken });
+        // string? action = _linkGenerator.GetPathByAction(
+        //     nameof(BackOfficeController.ValidatePasswordResetCode),
+        //     ControllerExtensions.GetControllerName<BackOfficeController>(),
+        //     new { area = Constants.Web.Mvc.BackOfficeArea, invite = forgotPasswordToken });
+        string action = string.Empty;
 
         Uri applicationUri = _httpContextAccessor
             .GetRequiredHttpContext()

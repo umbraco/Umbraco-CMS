@@ -67,25 +67,24 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
     /// </summary>
     private void MapMinimalBackOffice(IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapUmbracoRoute<BackOfficeController>(
+        endpoints.MapUmbracoRoute<BackOfficeDefaultController>(
             _umbracoPathSegment,
-            Constants.Web.Mvc.BackOfficeArea,
+            null!,
             string.Empty,
-            "Default",
+            "Index",
             false,
             // Limit the action/id to only allow characters - this is so this route doesn't hog all other
             // routes like: /umbraco/channels/word.aspx, etc...
             // (Not that we have to worry about too many of those these days, there still might be a need for these constraints).
             new { action = @"[a-zA-Z]*", id = @"[a-zA-Z]*" });
 
-        endpoints.MapAreaControllerRoute(
+        endpoints.MapControllerRoute(
             "catch-all-sections-to-client",
-            Constants.Web.Mvc.BackOfficeArea,
             new StringBuilder(_umbracoPathSegment).Append("/section/{**slug}").ToString(),
             new
             {
-                Controller = ControllerExtensions.GetControllerName<BackOfficeController>(),
-                Action = nameof(BackOfficeController.Default)
+                Controller = ControllerExtensions.GetControllerName<BackOfficeDefaultController>(),
+                Action = nameof(BackOfficeDefaultController.Index)
             });
     }
 
