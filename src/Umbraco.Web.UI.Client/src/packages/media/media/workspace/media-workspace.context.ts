@@ -118,7 +118,7 @@ export class UmbMediaWorkspaceContext
 	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
 		return this.#currentData.asObservablePart(
 			(data) =>
-				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
+				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x as any) : true))
 					?.value as PropertyValueType,
 		);
 	}
@@ -133,7 +133,7 @@ export class UmbMediaWorkspaceContext
 		const currentData = this.#currentData.value;
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
-				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
+				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
 			);
 			return newDataSet?.value as ReturnType;
 		}
@@ -152,7 +152,7 @@ export class UmbMediaWorkspaceContext
 			const values = appendToFrozenArray(
 				currentData.values || [],
 				entry,
-				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
+				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
 			);
 			this.#currentData.update({ values });
 		}

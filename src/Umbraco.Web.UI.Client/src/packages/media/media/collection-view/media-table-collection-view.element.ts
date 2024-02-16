@@ -1,4 +1,4 @@
-import type { UmbMediaDetailModel } from '../index.js';
+import type { UmbMediaDetailModel } from '../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
