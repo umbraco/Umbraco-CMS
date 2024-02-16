@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type TemplateScaffoldResponseModel = {
-    content: string;
+export type ContentTypeCollectionReferenceResponseModelBaseModel = {
+    id: string;
+    alias: string;
+    icon: string;
 };
-

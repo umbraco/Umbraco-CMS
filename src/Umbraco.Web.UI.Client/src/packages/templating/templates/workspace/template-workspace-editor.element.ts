@@ -127,6 +127,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				pickableFilter: (item) => {
 					return item.unique !== null && item.unique !== this.#templateWorkspaceContext?.getEntityId();
 				},
+				hideTreeRoot: true,
 			},
 			value: {
 				selection: [this.#masterTemplateUnique],
@@ -197,14 +198,14 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 						id="query-builder-button"
 						label=${this.localize.term('template_queryBuilder')}
 						@click=${this.#openQueryBuilder}>
-						<uui-icon name="icon-wand"></uui-icon>${this.localize.term('template_queryBuilder')}
+						<uui-icon name="icon-wand"></uui-icon> ${this.localize.term('template_queryBuilder')}
 					</uui-button>
 					<uui-button
 						look="secondary"
 						id="sections-button"
 						label=${this.localize.term('template_insertSections')}
 						@click=${this.#openInsertSectionModal}>
-						<uui-icon name="icon-indent"></uui-icon>${this.localize.term('template_insertSections')}
+						<uui-icon name="icon-indent"></uui-icon> ${this.localize.term('template_insertSections')}
 					</uui-button>
 				</div>
 
