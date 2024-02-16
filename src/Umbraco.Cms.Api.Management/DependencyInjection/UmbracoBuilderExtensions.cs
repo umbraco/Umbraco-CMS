@@ -9,6 +9,8 @@ using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
@@ -20,6 +22,7 @@ public static partial class UmbracoBuilderExtensions
         IServiceCollection services = builder.Services;
         builder.Services.AddSingleton<BackOfficeAreaRoutes>();
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
+        builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
 
         if (!services.Any(x => x.ImplementationType == typeof(JsonPatchService)))
         {
