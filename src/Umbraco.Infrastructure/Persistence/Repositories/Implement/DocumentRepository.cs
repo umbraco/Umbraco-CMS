@@ -1419,7 +1419,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// <param name="entity"></param>
     /// <param name="permission"></param>
     /// <param name="groupIds"></param>
-    public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds) =>
+    public void AssignEntityPermission(IContent entity, string permission, IEnumerable<int> groupIds) =>
         PermissionRepository.AssignEntityPermission(entity, permission, groupIds);
 
     public EntityPermissionCollection GetPermissionsForEntity(int entityId) =>

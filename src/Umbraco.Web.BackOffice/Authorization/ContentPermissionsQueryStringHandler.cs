@@ -64,7 +64,7 @@ public class
             nodeId,
             BackOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
             out IContent? contentItem,
-            new[] { requirement.PermissionToCheck });
+            new[] { requirement.PermissionToCheck }.ToHashSet());
 
         if (HttpContextAccessor.HttpContext is not null && contentItem is not null)
         {

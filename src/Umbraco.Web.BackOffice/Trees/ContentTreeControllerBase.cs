@@ -572,7 +572,7 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
         IEnumerable<string> permissionsForPath = _userService
             .GetPermissionsForPath(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, dd.Path)
             .GetAllPermissions();
-        return _actionCollection.GetByLetters(permissionsForPath).Select(x => new MenuItem(x));
+        return _actionCollection.GetByVerb(permissionsForPath).Select(x => new MenuItem(x));
     }
 
     /// <summary>

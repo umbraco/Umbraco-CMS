@@ -15,7 +15,7 @@ internal static class UserGroupFactory
             dto.UserCount,
             dto.Alias,
             dto.Name,
-            dto.DefaultPermissions.IsNullOrWhiteSpace() ? Enumerable.Empty<string>() : dto.DefaultPermissions!.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)).ToList(),
+            dto.DefaultPermissions.IsNullOrWhiteSpace() ? new HashSet<string>() : dto.DefaultPermissions!.ToCharArray().Select(x => x.ToString()).ToHashSet(),
             dto.Icon);
 
         try
@@ -57,7 +57,6 @@ internal static class UserGroupFactory
         {
             Key = entity.Key,
             Alias = entity.Alias,
-            DefaultPermissions = entity.Permissions == null ? string.Empty : string.Join(string.Empty, entity.Permissions),
             Name = entity.Name,
             UserGroup2AppDtos = new List<UserGroup2AppDto>(),
             CreateDate = entity.CreateDate,
@@ -77,6 +76,17 @@ internal static class UserGroupFactory
             }
 
             dto.UserGroup2AppDtos.Add(appDto);
+        }
+
+        foreach (var permission in entity.PermissionNames)
+        {
+            var permissionDto = new UserGroup2PermissionDto { Permission = permission };
+            if (entity.HasIdentity)
+            {
+                permissionDto.UserGroupId = entity.Id;
+            }
+
+            dto.UserGroup2PermissionDtos.Add(permissionDto);
         }
 
         if (entity.HasIdentity)

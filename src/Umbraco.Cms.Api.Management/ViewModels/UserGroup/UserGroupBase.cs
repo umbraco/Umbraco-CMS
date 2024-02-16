@@ -71,4 +71,11 @@ public class UserGroupBase
     /// Ad-hoc list of permissions provided, and maintained by the front-end. The server has no concept of what these mean.
     /// </summary>
     public required ISet<string> Permissions { get; init; }
+    public required ISet<PermissionViewModel> GranularPermissions { get; init; }
+}
+
+public class PermissionViewModel
+{
+    public required string Verb { get; set; }
+    public required ReferenceByIdModel Content { get; set; }
 }

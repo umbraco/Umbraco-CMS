@@ -15,9 +15,9 @@ public class ContentPermissionsResource
     /// </summary>
     /// <param name="content">The content.</param>
     /// <param name="permissionToCheck">The permission to authorize.</param>
-    public ContentPermissionsResource(IContent? content, char permissionToCheck)
+    public ContentPermissionsResource(IContent? content, string permissionToCheck)
     {
-        PermissionsToCheck = new List<char> { permissionToCheck };
+        PermissionsToCheck = new HashSet<string> { permissionToCheck };
         Content = content;
     }
 
@@ -26,7 +26,7 @@ public class ContentPermissionsResource
     /// </summary>
     /// <param name="content">The content.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
-    public ContentPermissionsResource(IContent content, IReadOnlyList<char> permissionsToCheck)
+    public ContentPermissionsResource(IContent content, IReadOnlySet<string> permissionsToCheck)
     {
         Content = content;
         PermissionsToCheck = permissionsToCheck;
@@ -38,7 +38,7 @@ public class ContentPermissionsResource
     /// <param name="content">The content.</param>
     /// <param name="nodeId">The node Id.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
-    public ContentPermissionsResource(IContent? content, int nodeId, IReadOnlyList<char> permissionsToCheck)
+    public ContentPermissionsResource(IContent? content, int nodeId, IReadOnlySet<string> permissionsToCheck)
     {
         Content = content;
         NodeId = nodeId;
@@ -53,7 +53,7 @@ public class ContentPermissionsResource
     /// <summary>
     ///     Gets the collection of permissions to authorize.
     /// </summary>
-    public IReadOnlyList<char> PermissionsToCheck { get; }
+    public IReadOnlySet<string> PermissionsToCheck { get; }
 
     /// <summary>
     ///     Gets the content.

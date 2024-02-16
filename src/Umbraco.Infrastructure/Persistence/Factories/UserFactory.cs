@@ -117,10 +117,6 @@ internal static class UserFactory
 
     private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group)
     {
-        IEnumerable<string> permissions = group.DefaultPermissions is null
-            ? Enumerable.Empty<string>()
-            : group.DefaultPermissions.ToCharArray().Select(x => x.ToString());
-
         return new ReadOnlyUserGroup(
             group.Id,
             group.Key,
@@ -131,7 +127,6 @@ internal static class UserFactory
             group.Alias,
             group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
             group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
-            permissions,
             group.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet(),
             group.HasAccessToAllLanguages);
     }

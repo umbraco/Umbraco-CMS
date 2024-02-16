@@ -74,13 +74,13 @@ public class ContentPermissions
     public ContentAccess CheckPermissions(
         IContent content,
         IUser user,
-        char permissionToCheck) => CheckPermissions(content, user, new[] { permissionToCheck });
+        string permissionToCheck) => CheckPermissions(content, user, new[] { permissionToCheck }.ToHashSet());
 
     [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
         IContent? content,
         IUser? user,
-        IReadOnlyList<char> permissionsToCheck)
+        IReadOnlySet<string> permissionsToCheck)
     {
         if (user == null)
         {
@@ -114,13 +114,13 @@ public class ContentPermissions
     public ContentAccess CheckPermissions(
         IUmbracoEntity entity,
         IUser? user,
-        char permissionToCheck) => CheckPermissions(entity, user, new[] { permissionToCheck });
+        string permissionToCheck) => CheckPermissions(entity, user, new[] { permissionToCheck }.ToHashSet());
 
     [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
         IUmbracoEntity entity,
         IUser? user,
-        IReadOnlyList<char> permissionsToCheck)
+        IReadOnlySet<string> permissionsToCheck)
     {
         if (user == null)
         {
@@ -163,7 +163,7 @@ public class ContentPermissions
         int nodeId,
         IUser user,
         out IUmbracoEntity? entity,
-        IReadOnlyList<char>? permissionsToCheck = null)
+        IReadOnlySet<string>? permissionsToCheck = null)
     {
         if (user == null)
         {
@@ -223,7 +223,7 @@ public class ContentPermissions
         int nodeId,
         IUser? user,
         out IContent? contentItem,
-        IReadOnlyList<char>? permissionsToCheck = null)
+        IReadOnlySet<string>? permissionsToCheck = null)
     {
         if (user == null)
         {
@@ -271,11 +271,11 @@ public class ContentPermissions
     }
 
     [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
-    private bool CheckPermissionsPath(string? path, IUser user, IReadOnlyList<char>? permissionsToCheck = null)
+    private bool CheckPermissionsPath(string? path, IUser user, IReadOnlySet<string>? permissionsToCheck = null)
     {
         if (permissionsToCheck == null)
         {
-            permissionsToCheck = Array.Empty<char>();
+            permissionsToCheck = new HashSet<string>();
         }
 
         // get the implicit/inherited permissions for the user for this path

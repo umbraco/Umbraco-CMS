@@ -257,7 +257,7 @@ public class ContentController : ContentControllerBase
                 if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id]
                         .AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
                 {
-                    _userService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
+                    _userService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0].ToString()).ToHashSet(), content.Id);
                 }
             }
         }

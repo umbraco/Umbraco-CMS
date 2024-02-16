@@ -9,13 +9,13 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionCreateBlueprintFromContent : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const char ActionLetter = 'ï';
+    public const string ActionLetter = "ï";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
     public const string ActionAlias = "createblueprint";
 
     /// <inheritdoc/>
-    public char Letter => ActionLetter;
+    public string Letter => ActionLetter;
 
     /// <inheritdoc/>
     public string Alias => ActionAlias;

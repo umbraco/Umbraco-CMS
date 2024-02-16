@@ -24,7 +24,6 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private string? _icon;
     private string _name;
     private bool _hasAccessToAllLanguages;
-    private IEnumerable<string>? _permissions;
     private ISet<string> _permissionNames = new HashSet<string>();
     private List<string> _sectionCollection;
     private List<int> _languageCollection;
@@ -57,14 +56,14 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         int userCount,
         string? alias,
         string? name,
-        IEnumerable<string> permissions,
+        ISet<string> permissionNames,
         string? icon)
         : this(shortStringHelper)
     {
         UserCount = userCount;
         _alias = alias ?? string.Empty;
         _name = name ?? string.Empty;
-        _permissions = permissions;
+        _permissionNames = permissionNames;
         _icon = icon;
     }
 
@@ -110,20 +109,6 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _hasAccessToAllLanguages;
         set => SetPropertyValueAndDetectChanges(value, ref _hasAccessToAllLanguages, nameof(HasAccessToAllLanguages));
-    }
-
-    /// <summary>
-    ///     The set of default permissions for the user group
-    /// </summary>
-    /// <remarks>
-    ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
-    ///     flexible permissions structure in the future.
-    /// </remarks>
-    [DataMember]
-    public IEnumerable<string>? Permissions
-    {
-        get => _permissions;
-        set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), _stringEnumerableComparer);
     }
 
     /// <inheritdoc />

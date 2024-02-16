@@ -27,7 +27,7 @@ public class ContentPermissionsResourceHandlerTests
     public async Task Resource_With_Node_Id_With_Permission_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext(NodeId, true);
-        var sut = CreateHandler(NodeId, new[] { "A" });
+        var sut = CreateHandler(NodeId, new[] { "A" }.ToHashSet());
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -38,7 +38,7 @@ public class ContentPermissionsResourceHandlerTests
     public async Task Resource_With_Content_With_Permission_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-        var sut = CreateHandler(NodeId, new[] { "A" });
+        var sut = CreateHandler(NodeId, new[] { "A" }.ToHashSet());
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -49,7 +49,7 @@ public class ContentPermissionsResourceHandlerTests
     public async Task Resource_With_Node_Id_Withou_Permission_Is_Not_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext(NodeId, true);
-        var sut = CreateHandler(NodeId, new[] { "B" });
+        var sut = CreateHandler(NodeId, new[] { "B" }.ToHashSet());
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -60,7 +60,7 @@ public class ContentPermissionsResourceHandlerTests
     public async Task Resource_With_Content_Without_Permission_Is_Not_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
-        var sut = CreateHandler(NodeId, new[] { "B" });
+        var sut = CreateHandler(NodeId, new[] { "B" }.ToHashSet());
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -74,7 +74,7 @@ public class ContentPermissionsResourceHandlerTests
         var requirement = new ContentPermissionsResourceRequirement();
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var content = CreateContent(nodeId);
-        var permissions = new List<char> { 'A' }.AsReadOnly();
+        var permissions = new [] { "A" }.ToHashSet();
         var resource = createWithNodeId
             ? new ContentPermissionsResource(content, nodeId, permissions)
             : new ContentPermissionsResource(content, permissions);
@@ -87,7 +87,7 @@ public class ContentPermissionsResourceHandlerTests
         return ContentBuilder.CreateBasicContent(contentType, nodeId);
     }
 
-    private ContentPermissionsResourceHandler CreateHandler(int nodeId, string[] permissionsForPath)
+    private ContentPermissionsResourceHandler CreateHandler(int nodeId, ISet<string> permissionsForPath)
     {
         var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor();
         var contentPermissions = CreateContentPermissions(nodeId, permissionsForPath);
@@ -108,7 +108,7 @@ public class ContentPermissionsResourceHandlerTests
         new UserBuilder()
             .Build();
 
-    private static ContentPermissions CreateContentPermissions(int nodeId, string[] permissionsForPath)
+    private static ContentPermissions CreateContentPermissions(int nodeId, ISet<string> permissionsForPath)
     {
         var mockUserService = new Mock<IUserService>();
 

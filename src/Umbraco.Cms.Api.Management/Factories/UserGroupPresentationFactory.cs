@@ -56,6 +56,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
             Permissions = userGroup.PermissionNames,
+            GranularPermissions = new HashSet<PermissionViewModel>(), //TODO
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
             IsSystemGroup = userGroup.IsSystemUserGroup()
         };
@@ -84,6 +85,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
             Permissions = userGroup.PermissionNames,
+            GranularPermissions = new HashSet<PermissionViewModel>(), //TODO
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
         };
     }

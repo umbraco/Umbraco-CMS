@@ -12,7 +12,6 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         string? alias,
         IEnumerable<int> allowedLanguages,
         IEnumerable<string> allowedSections,
-        IEnumerable<string>? permissions,
         ISet<string> permissionNames,
         bool hasAccessToAllLanguages)
     {
@@ -23,7 +22,6 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         Alias = alias ?? string.Empty;
         AllowedLanguages = allowedLanguages.ToArray();
         AllowedSections = allowedSections.ToArray();
-        Permissions = permissions?.ToArray();
 
         // Zero is invalid and will be treated as Null
         StartContentId = startContentId == 0 ? null : startContentId;
@@ -62,15 +60,6 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public string Alias { get; }
 
     public bool HasAccessToAllLanguages { get; set; }
-
-    /// <summary>
-    ///     The set of default permissions
-    /// </summary>
-    /// <remarks>
-    ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
-    ///     flexible permissions structure in the future.
-    /// </remarks>
-    public IEnumerable<string>? Permissions { get; set; }
 
     public IEnumerable<int> AllowedLanguages { get; private set; }
     public ISet<string> PermissionNames { get; private set; }

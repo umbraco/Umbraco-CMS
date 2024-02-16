@@ -294,7 +294,7 @@ public interface IUserService : IMembershipUserService
     ///     removed.
     /// </param>
     /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified group.</remarks>
-    void ReplaceUserGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds);
+    void ReplaceUserGroupPermissions(int groupId, ISet<string>? permissions, params int[] entityIds);
 
     /// <summary>
     ///     Assigns the same permission set for a single user group to any number of entities
@@ -302,7 +302,7 @@ public interface IUserService : IMembershipUserService
     /// <param name="groupId">Id of the group</param>
     /// <param name="permission"></param>
     /// <param name="entityIds">Specify the nodes to replace permissions for</param>
-    void AssignUserGroupPermission(int groupId, char permission, params int[] entityIds);
+    void AssignUserGroupPermission(int groupId, string permission, params int[] entityIds);
 
     /// <summary>
     ///     Gets a list of <see cref="IUser" /> objects associated with a given group

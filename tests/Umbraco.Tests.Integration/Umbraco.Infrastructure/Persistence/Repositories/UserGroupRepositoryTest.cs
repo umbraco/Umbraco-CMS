@@ -103,7 +103,7 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
             // Act
             var resolved = repository.Get(userGroup.Id);
             resolved.Name = "New Name";
-            resolved.Permissions = new[] { "Z", "Y", "X" };
+            resolved.PermissionNames = new[] { "Z", "Y", "X" }.ToHashSet();
             repository.Save(resolved);
             scope.Complete();
             var updatedItem = repository.Get(userGroup.Id);
@@ -111,7 +111,7 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
             Assert.That(updatedItem.Name, Is.EqualTo(resolved.Name));
-            Assert.That(updatedItem.Permissions, Is.EqualTo(resolved.Permissions));
+            Assert.That(updatedItem.PermissionNames, Is.EqualTo(resolved.PermissionNames));
         }
     }
 
@@ -163,7 +163,7 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
             //// Assert.That(resolved.UpdateDate, Is.GreaterThan(DateTime.MinValue));
             Assert.That(resolved.Name, Is.EqualTo(userGroup.Name));
             Assert.That(resolved.Alias, Is.EqualTo(userGroup.Alias));
-            Assert.That(resolved.Permissions, Is.EqualTo(userGroup.Permissions));
+            Assert.That(resolved.PermissionNames, Is.EqualTo(userGroup.PermissionNames));
         }
     }
 

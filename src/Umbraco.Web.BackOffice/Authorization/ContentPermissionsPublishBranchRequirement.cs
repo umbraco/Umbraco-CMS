@@ -14,10 +14,10 @@ public class ContentPermissionsPublishBranchRequirement : IAuthorizationRequirem
     ///     Initializes a new instance of the <see cref="ContentPermissionsPublishBranchRequirement" /> class.
     /// </summary>
     /// <param name="permission">Permission to check.</param>
-    public ContentPermissionsPublishBranchRequirement(char permission) => Permission = permission;
+    public ContentPermissionsPublishBranchRequirement(string permission) => Permission = permission;
 
     /// <summary>
     ///     Gets a value for the permission to check.
     /// </summary>
-    public char Permission { get; }
+    public string Permission { get; }
 }

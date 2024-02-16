@@ -16,7 +16,7 @@ public class ContentPermissionsQueryStringRequirement : IAuthorizationRequiremen
     /// </summary>
     /// <param name="nodeId">The node Id.</param>
     /// <param name="permissionToCheck">The permission to authorize the current user against.</param>
-    public ContentPermissionsQueryStringRequirement(int nodeId, char permissionToCheck)
+    public ContentPermissionsQueryStringRequirement(int nodeId, string permissionToCheck)
     {
         NodeId = nodeId;
         PermissionToCheck = permissionToCheck;
@@ -28,7 +28,7 @@ public class ContentPermissionsQueryStringRequirement : IAuthorizationRequiremen
     /// </summary>
     /// <param name="paramName">The querystring parameter name.</param>
     /// <param name="permissionToCheck">The permission to authorize the current user against.</param>
-    public ContentPermissionsQueryStringRequirement(char permissionToCheck, string paramName = "id")
+    public ContentPermissionsQueryStringRequirement(string permissionToCheck, string paramName = "id")
     {
         QueryStringName = paramName;
         PermissionToCheck = permissionToCheck;
@@ -47,5 +47,5 @@ public class ContentPermissionsQueryStringRequirement : IAuthorizationRequiremen
     /// <summary>
     ///     Gets the permission to authorize the current user against.
     /// </summary>
-    public char PermissionToCheck { get; }
+    public string PermissionToCheck { get; }
 }

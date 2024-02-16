@@ -141,7 +141,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                     // TODO: We could/should change the EntityPermissionsCollection into a KeyedCollection and they key could be
                     // a struct of the nodeid + groupid so then we don't actually allocate this class just to check if it's not
                     // going to be included in the result!
-                    var defaultPermission = new EntityPermission(group.Id, nodeId, group.Permissions?.ToArray() ?? Array.Empty<string>(), true);
+                    var defaultPermission = new EntityPermission(group.Id, nodeId, group.PermissionNames ?? new HashSet<string>(), true);
 
                     // Since this is a hashset, this will not add anything that already exists by group/node combination
                     result.Add(defaultPermission);
@@ -161,7 +161,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     ///     are removed.
     /// </param>
     /// <param name="entityIds">Specify the nodes to replace permissions for. </param>
-    public void ReplaceGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds) =>
+    public void ReplaceGroupPermissions(int groupId, ISet<string>? permissions, params int[] entityIds) =>
         _permissionRepository.ReplacePermissions(groupId, permissions, entityIds);
 
     /// <summary>
@@ -170,7 +170,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     /// <param name="groupId">Id of group</param>
     /// <param name="permission">Permissions as enumerable list of <see cref="char" /></param>
     /// <param name="entityIds">Specify the nodes to replace permissions for</param>
-    public void AssignGroupPermission(int groupId, char permission, params int[] entityIds) =>
+    public void AssignGroupPermission(int groupId, string permission, params int[] entityIds) =>
         _permissionRepository.AssignPermission(groupId, permission, entityIds);
 
     public static string GetByAliasCacheKey(string alias) => CacheKeys.UserGroupGetByAliasCacheKeyPrefix + alias;

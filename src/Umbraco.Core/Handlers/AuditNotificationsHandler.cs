@@ -123,7 +123,7 @@ public sealed class AuditNotificationsHandler :
         foreach (EntityPermission perm in perms)
         {
             IUserGroup? group = _userGroupService.GetAsync(perm.UserGroupId).Result;
-            var assigned = string.Join(", ", perm.AssignedPermissions ?? Array.Empty<string>());
+            var assigned = string.Join(", ", perm.AssignedPermissions);
             IEntitySlim? entity = _entityService.Get(perm.EntityId);
 
             _auditService.Write(
@@ -241,8 +241,8 @@ public sealed class AuditNotificationsHandler :
             var sections = ((UserGroup)group).WasPropertyDirty("AllowedSections")
                 ? string.Join(", ", group.AllowedSections)
                 : null;
-            var perms = ((UserGroup)group).WasPropertyDirty("Permissions") && group.Permissions is not null
-                ? string.Join(", ", group.Permissions)
+            var perms = ((UserGroup)group).WasPropertyDirty("PermissionNames") && group.PermissionNames is not null
+                ? string.Join(", ", group.PermissionNames)
                 : null;
 
             var sb = new StringBuilder();

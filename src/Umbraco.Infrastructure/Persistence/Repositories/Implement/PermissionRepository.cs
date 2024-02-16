@@ -138,7 +138,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     /// <remarks>
     ///     This will first clear the permissions for this user and entities and recreate them
     /// </remarks>
-    public void ReplacePermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds)
+    public void ReplacePermissions(int groupId, ISet<string>? permissions, params int[] entityIds)
     {
         if (entityIds.Length == 0)
         {
@@ -182,7 +182,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     /// <param name="groupId"></param>
     /// <param name="permission"></param>
     /// <param name="entityIds"></param>
-    public void AssignPermission(int groupId, char permission, params int[] entityIds)
+    public void AssignPermission(int groupId, string permission, params int[] entityIds)
     {
         IUmbracoDatabase db = AmbientScope.Database;
 
@@ -209,7 +209,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     /// <param name="entity"></param>
     /// <param name="permission"></param>
     /// <param name="groupIds"></param>
-    public void AssignEntityPermission(TEntity entity, char permission, IEnumerable<int> groupIds)
+    public void AssignEntityPermission(TEntity entity, string permission, IEnumerable<int> groupIds)
     {
         IUmbracoDatabase db = AmbientScope.Database;
         var groupIdsA = groupIds.ToArray();
@@ -311,10 +311,10 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
                 np.GroupBy(x => x.UserGroupId);
             foreach (IGrouping<int, UserGroup2NodePermissionDto> permission in userGroupPermissions)
             {
-                var perms = permission.Select(x => x.Permission).Distinct().ToArray();
+                var perms = permission.Select(x => x.Permission).Distinct().WhereNotNull().ToHashSet();
 
                 // perms can contain null if there are no permissions assigned, but the node is chosen in the UI.
-                permissions.Add(new EntityPermission(permission.Key, np.Key, perms.WhereNotNull().ToArray()));
+                permissions.Add(new EntityPermission(permission.Key, np.Key, perms));
             }
         }
 

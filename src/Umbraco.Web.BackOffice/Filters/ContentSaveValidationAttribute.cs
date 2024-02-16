@@ -145,7 +145,7 @@ public sealed class ContentSaveValidationAttribute : TypeFilterAttribute
             // Based on the action we need to check different permissions.
             // Then if it is new, we need to lookup those permissions on the parent!
 
-            var permissionToCheck = new List<char>();
+            var permissionToCheck = new HashSet<string>();
             IContent? contentToCheck = null;
             int contentIdToCheck;
 

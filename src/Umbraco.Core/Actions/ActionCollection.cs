@@ -31,12 +31,11 @@ public class ActionCollection : BuilderCollectionBase<IAction>
     /// <summary>
     ///     Gets the actions by the specified letters
     /// </summary>
-    public IEnumerable<IAction> GetByLetters(IEnumerable<string> letters)
+    public IEnumerable<IAction> GetByVerb(IEnumerable<string> verbs)
     {
         IAction[] actions = this.ToArray(); // no worry: internally, it's already an array
-        return letters
-            .Where(x => x.Length == 1)
-            .Select(x => actions.FirstOrDefault(y => y.Letter == x[0]))
+        return verbs
+            .Select(x => actions.FirstOrDefault(y => y.Letter == x))
             .WhereNotNull()
             .ToList();
     }
@@ -48,8 +47,7 @@ public class ActionCollection : BuilderCollectionBase<IAction>
     {
         IAction[] actions = this.ToArray(); // no worry: internally, it's already an array
         return entityPermission.AssignedPermissions
-            .Where(x => x.Length == 1)
-            .SelectMany(x => actions.Where(y => y.Letter == x[0]))
+            .SelectMany(x => actions.Where(y => y.Letter == x))
             .WhereNotNull()
             .ToList();
     }

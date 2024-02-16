@@ -22,11 +22,6 @@ internal sealed class FilterAllowedOutgoingContentAttribute : TypeFilterAttribut
     {
     }
 
-    internal FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck)
-        : this(outgoingType, null, permissionToCheck)
-    {
-    }
-
     internal FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName)
         : this(outgoingType, propertyName, ActionBrowse.ActionLetter)
     {
@@ -37,7 +32,7 @@ internal sealed class FilterAllowedOutgoingContentAttribute : TypeFilterAttribut
     {
     }
 
-    public FilterAllowedOutgoingContentAttribute(Type outgoingType, string? propertyName, char permissionToCheck)
+    public FilterAllowedOutgoingContentAttribute(Type outgoingType, string? propertyName, string permissionToCheck)
         : base(typeof(FilterAllowedOutgoingContentFilter)) =>
         Arguments = new object[] { outgoingType, propertyName ?? string.Empty, permissionToCheck };
 }
@@ -46,13 +41,13 @@ internal sealed class FilterAllowedOutgoingContentFilter : FilterAllowedOutgoing
 {
     private readonly AppCaches _appCaches;
     private readonly IEntityService _entityService;
-    private readonly char _permissionToCheck;
+    private readonly string _permissionToCheck;
     private readonly IUserService _userService;
 
     public FilterAllowedOutgoingContentFilter(
         Type outgoingType,
         string propertyName,
-        char permissionToCheck,
+        string permissionToCheck,
         IUserService userService,
         IEntityService entityService,
         AppCaches appCaches,

@@ -126,7 +126,7 @@ public class UserGroupsController : BackOfficeNotificationsController
             {
                 _userService.ReplaceUserGroupPermissions(
                     userGroupSave.PersistedUserGroup?.Id ?? default,
-                    assignedPermission.Value.Select(x => x[0]),
+                    assignedPermission.Value.Select(x => x[0].ToString()).ToHashSet(),
                     assignedPermission.Key);
             }
         }

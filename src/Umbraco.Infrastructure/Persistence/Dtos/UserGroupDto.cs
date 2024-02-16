@@ -40,6 +40,7 @@ public class UserGroupDto
     [Column("userGroupDefaultPermissions")]
     [Length(50)]
     [NullSetting(NullSetting = NullSettings.Null)]
+    [Obsolete]
     public string? DefaultPermissions { get; set; }
 
     [Column("createDate")]

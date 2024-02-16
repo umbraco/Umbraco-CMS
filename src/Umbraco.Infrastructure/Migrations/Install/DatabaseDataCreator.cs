@@ -130,6 +130,11 @@ internal class DatabaseDataCreator
             CreateUserGroupData();
         }
 
+        if (tableName.Equals(Constants.DatabaseSchema.Tables.UserGroup2Permission))
+        {
+            CreateUserGroup2PermissionData();
+        }
+
         if (tableName.Equals(Constants.DatabaseSchema.Tables.User2UserGroup))
         {
             CreateUser2UserGroupData();
@@ -181,6 +186,35 @@ internal class DatabaseDataCreator
         }
 
         _logger.LogInformation("Completed creating data in {TableName}", tableName);
+    }
+
+    private void CreateUserGroup2PermissionData()
+    {
+        var userGroupIdToPermissions = new Dictionary<int, IEnumerable<string>>()
+        {
+            [1] = "CADMOSKTPIURZ:5F7ïN".ToCharArray().Select(x=>x.ToString()),
+            [2] = "CAH:FN".ToCharArray().Select(x=>x.ToString()),
+            [3] = "CADMOSKTPUZ:5FïN".ToCharArray().Select(x=>x.ToString()),
+            [4] = "AF".ToCharArray().Select(x=>x.ToString()),
+        };
+
+        var i = 1;
+        foreach (var (userGroupId, permissions) in userGroupIdToPermissions)
+        {
+            foreach (var permission in permissions)
+            {
+                _database.Insert(
+                    Constants.DatabaseSchema.Tables.UserGroup2Permission,
+                    "id",
+                    false,
+                    new UserGroup2PermissionDto
+                    {
+                        Id = i++,
+                        UserGroupId = userGroupId,
+                        Permission = permission,
+                    });
+            }
+        }
     }
 
     internal static Guid CreateUniqueRelationTypeId(string alias, string name) => (alias + "____" + name).ToGuid();
@@ -1221,7 +1255,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
-                DefaultPermissions = "CADMOSKTPIURZ:5F7ïN",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-medal",
@@ -1239,7 +1272,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.WriterGroupAlias,
                 Name = "Writers",
-                DefaultPermissions = "CAH:FN",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-edit",
@@ -1257,7 +1289,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.EditorGroupAlias,
                 Name = "Editors",
-                DefaultPermissions = "CADMOSKTPUZ:5FïN",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-tools",
@@ -1275,7 +1306,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.TranslatorGroupAlias,
                 Name = "Translators",
-                DefaultPermissions = "AF",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-globe",
@@ -1291,7 +1321,6 @@ internal class DatabaseDataCreator
                 Key = Constants.Security.SensitiveDataGroupKey,
                 Alias = Constants.Security.SensitiveDataGroupAlias,
                 Name = "Sensitive data",
-                DefaultPermissions = string.Empty,
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-lock",

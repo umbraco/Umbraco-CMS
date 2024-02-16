@@ -33,7 +33,7 @@ public class ContentPermissionsPublishBranchHandlerTests
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockUserService = CreateMockUserService(
             NodeId,
-            new Dictionary<int, string[]> { { DescendentNodeId1, new[] { "A" } }, { DescendentNodeId2, new[] { "A" } } });
+            new Dictionary<int, ISet<string>> { { DescendentNodeId1, new[] { "A" }.ToHashSet() }, { DescendentNodeId2, new[] { "A" }.ToHashSet() } });
         var sut = CreateHandler(mockUserService.Object, NodeId);
 
         await sut.HandleAsync(authHandlerContext);
@@ -48,7 +48,7 @@ public class ContentPermissionsPublishBranchHandlerTests
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockUserService = CreateMockUserService(
             NodeId,
-            new Dictionary<int, string[]> { { DescendentNodeId1, new[] { "A" } }, { DescendentNodeId2, new[] { "B" } } });
+            new Dictionary<int, ISet<string>> { { DescendentNodeId1, new[] { "A" }.ToHashSet() }, { DescendentNodeId2, new[] { "B" }.ToHashSet() } });
         var sut = CreateHandler(mockUserService.Object, NodeId);
 
         await sut.HandleAsync(authHandlerContext);
@@ -63,7 +63,7 @@ public class ContentPermissionsPublishBranchHandlerTests
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockUserService = CreateMockUserService(
             NodeId,
-            new Dictionary<int, string[]> { { DescendentNodeId1, new[] { "B" } }, { DescendentNodeId2, new[] { "A" } } });
+            new Dictionary<int, ISet<string>> { { DescendentNodeId1, new[] { "B" }.ToHashSet() }, { DescendentNodeId2, new[] { "A" }.ToHashSet() } });
         var sut = CreateHandler(mockUserService.Object, NodeId);
 
         await sut.HandleAsync(authHandlerContext);
@@ -74,7 +74,7 @@ public class ContentPermissionsPublishBranchHandlerTests
 
     private static AuthorizationHandlerContext CreateAuthorizationHandlerContext()
     {
-        var requirement = new ContentPermissionsPublishBranchRequirement('A');
+        var requirement = new ContentPermissionsPublishBranchRequirement("A");
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = CreateContent(NodeId);
         return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
@@ -82,7 +82,7 @@ public class ContentPermissionsPublishBranchHandlerTests
 
     private static Mock<IUserService> CreateMockUserService(
         int parentNodeId,
-        Dictionary<int, string[]> descendendNodePermissionsForPath)
+        Dictionary<int, ISet<string>> descendendNodePermissionsForPath)
     {
         var mockUserService = new Mock<IUserService>();
 

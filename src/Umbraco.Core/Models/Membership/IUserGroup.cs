@@ -32,15 +32,6 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     }
 
     /// <summary>
-    ///     The set of default permissions
-    /// </summary>
-    /// <remarks>
-    ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
-    ///     flexible permissions structure in the future.
-    /// </remarks>
-    IEnumerable<string>? Permissions { get; set; }
-
-    /// <summary>
     /// The set of permissions provided by the frontend.
     /// </summary>
     /// <remarks>
@@ -49,6 +40,7 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// when we know more about how we want to handle permissions, potentially those will be migrated in the these "soft" permissions.
     /// </remarks>
     ISet<string> PermissionNames { get; set; }
+   // ISet<IPermission> GranularPermission { get; set; }
 
     IEnumerable<string> AllowedSections { get; }
 
