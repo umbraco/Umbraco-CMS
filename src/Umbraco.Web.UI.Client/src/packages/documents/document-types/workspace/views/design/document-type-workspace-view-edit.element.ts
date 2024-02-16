@@ -21,6 +21,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	#model: Array<PropertyTypeContainerModelBaseModel> = [];
 	#sorter = new UmbSorterController<PropertyTypeContainerModelBaseModel, UUITabElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
 		getUniqueOfModel: (modelEntry) => modelEntry.id,
@@ -30,9 +31,44 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		disabledItemSelector: '#root-tab',
 		resolveVerticalDirection: () => false,
 		onChange: ({ model }) => {
-			model.forEach((modelItem, index) => {
-				this._tabsStructureHelper.partialUpdateContainer(modelItem.id, { sortOrder: index });
-			});
+			this.#model = model;
+			this._tabs = model;
+		},
+		onEnd: ({ item }) => {
+			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
+			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
+			 */
+			const model = this.#model;
+			const newIndex = model.findIndex((entry) => entry.id === item.id);
+
+			// Doesn't exist in model
+			if (newIndex === -1) return;
+
+			// First in list
+			if (newIndex === 0 && model.length > 1) {
+				this._tabsStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
+				return;
+			}
+
+			// Not first in list
+			if (newIndex > 0 && model.length > 1) {
+				const prevItemSortOrder = model[newIndex - 1].sortOrder;
+
+				let weight = 1;
+				this._tabsStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
+
+				// Check for overlaps
+				model.some((entry, index) => {
+					if (index <= newIndex) return;
+					if (entry.sortOrder === prevItemSortOrder + weight) {
+						weight++;
+						this._tabsStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
+					}
+					// Break the loop
+					return true;
+				});
+			}
 		},
 	});
 
@@ -77,6 +113,12 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this._tabsStructureHelper.containers, (tabs) => {
 			this._tabs = tabs;
+			if (this._sortModeActive) {
+				this.#sorter.setModel(tabs);
+			} else {
+				this.#sorter.setModel([]);
+			}
+
 			this._createRoutes();
 		});
 
@@ -446,7 +488,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 			}
 
 			[drag-placeholder] {
-				opacity: 0.2;
+				opacity: 0.5;
+			}
+
+			[drag-placeholder] uui-input {
+				visibility: hidden;
 			}
 
 			/* TODO: This should be replaced with a general workspace bar — naming is hard */
