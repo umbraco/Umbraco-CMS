@@ -23,7 +23,11 @@ public class FlexibleDropdownPropertyValueConverter : PropertyValueConverterBase
             return Array.Empty<string>();
         }
 
-        return _jsonSerializer.Deserialize<string[]>(source.ToString()!) ?? Array.Empty<string>();
+        var sourceString = source.ToString();
+
+        return string.IsNullOrWhiteSpace(sourceString)
+            ? Array.Empty<string>()
+            : _jsonSerializer.Deserialize<string[]>(source.ToString()!) ?? Array.Empty<string>();
     }
 
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
