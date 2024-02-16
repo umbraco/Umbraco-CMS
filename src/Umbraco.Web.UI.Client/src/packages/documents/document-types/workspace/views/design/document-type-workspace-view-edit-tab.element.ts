@@ -1,7 +1,6 @@
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeWorkspaceViewEditPropertiesElement } from './document-type-workspace-view-edit-properties.element.js';
-
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -17,6 +16,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
+	#model: Array<UmbPropertyTypeContainerModel> = [];
 	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UmbDocumentTypeWorkspaceViewEditPropertiesElement>(
 		this,
 		{
@@ -27,9 +27,44 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			itemSelector: '.container-handle',
 			containerSelector: '.container-list',
 			onChange: ({ model }) => {
-				model.forEach((modelItem, index) => {
-					this._groupStructureHelper.partialUpdateContainer(modelItem.id, { sortOrder: index });
-				});
+				this._groups = model;
+				this.#model = model;
+			},
+			onEnd: ({ item }) => {
+				/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+				 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
+				 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
+				 */
+				const model = this.#model;
+				const newIndex = model.findIndex((entry) => entry.id === item.id);
+
+				// Doesn't exist in model
+				if (newIndex === -1) return;
+
+				// First in list
+				if (newIndex === 0 && model.length > 1) {
+					this._groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
+					return;
+				}
+
+				// Not first in list
+				if (newIndex > 0 && model.length > 1) {
+					const prevItemSortOrder = model[newIndex - 1].sortOrder;
+
+					let weight = 1;
+					this._groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
+
+					// Check for overlaps
+					model.some((entry, index) => {
+						if (index <= newIndex) return;
+						if (entry.sortOrder === prevItemSortOrder + weight) {
+							weight++;
+							this._groupStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
+						}
+						// Break the loop
+						return true;
+					});
+				}
 			},
 		},
 	);
@@ -107,6 +142,11 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		});
 		this.observe(this._groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
+			if (this._sortModeActive) {
+				this.#sorter.setModel(this._groups);
+			} else {
+				this.#sorter.setModel([]);
+			}
 			this.requestUpdate('_groups');
 		});
 		this.observe(this._groupStructureHelper.hasProperties, (hasProperties) => {
@@ -146,7 +186,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
 					${repeat(
 						this._groups,
-						(group) => group.id ?? '' + group.name,
+						(group) => group.id + '' + group.name + group.sortOrder,
 						(group) =>
 							html`<uui-box class="container-handle">
 								${this.#renderHeader(group)}
@@ -174,11 +214,10 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				<uui-input
 					type="number"
 					label=${this.localize.term('sort_sortOrder')}
-					@change=${(e: UUIInputEvent) => {
+					@change=${(e: UUIInputEvent) =>
 						this._groupStructureHelper.partialUpdateContainer(group.id!, {
 							sortOrder: parseInt(e.target.value as string) || 0,
-						});
-					}}
+						})}
 					.value=${group.sortOrder || 0}
 					?disabled=${inherited}></uui-input>
 			</div> `;
@@ -215,7 +254,11 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			[drag-placeholder] {
-				opacity: 0.2;
+				opacity: 0.5;
+			}
+
+			[drag-placeholder] > * {
+				visibility: hidden;
 			}
 
 			#add {
