@@ -630,7 +630,7 @@ public class VariationTests
             => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(
                 attribute,
                 Mock.Of<IShortStringHelper>(),
-                new JsonNetSerializer(),
+                new SystemTextJsonSerializer(),
                 Mock.Of<IIOHelper>()));
 
         var textBoxEditor = new TextboxPropertyEditor(

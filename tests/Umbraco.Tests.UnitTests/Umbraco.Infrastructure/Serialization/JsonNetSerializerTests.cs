@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization;
 [TestFixture]
 public class JsonNetSerializerTests
 {
-    private IJsonSerializer Sut => new JsonNetSerializer();
+    private IJsonSerializer Sut => new SystemTextJsonSerializer();
 
     [Test]
     public void DeserializeSubset__Subset_as_integer()

@@ -32,7 +32,7 @@ public class ImageCropperValueConverterTests : PropertyValueConverterTests
         var valueConverter = new ImageCropperValueConverter(Mock.Of<ILogger<ImageCropperValueConverter>>(), new SystemTextJsonSerializer());
         Assert.AreEqual(typeof(ApiImageCropperValue), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
 
-        var serializer = new JsonNetSerializer();
+        var serializer = new SystemTextJsonSerializer();
         var source = serializer.Serialize(new ImageCropperValue
             {
                 Src = "/some/file.jpg",
