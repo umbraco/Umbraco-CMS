@@ -15,6 +15,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         mapper.Define<IContentType, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
         mapper.Define<ISimpleContentType, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
         mapper.Define<IContentType, AllowedDocumentType>((_, _) => new AllowedDocumentType(), Map);
+        mapper.Define<ISimpleContentType, DocumentTypeCollectionReferenceResponseModel>((_, _) => new DocumentTypeCollectionReferenceResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -80,6 +81,14 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
         target.Description = source.Description;
+        target.Icon = source.Icon ?? string.Empty;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(ISimpleContentType source, DocumentTypeCollectionReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Alias = source.Alias;
         target.Icon = source.Icon ?? string.Empty;
     }
 }

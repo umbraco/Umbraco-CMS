@@ -49,32 +49,7 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
 
     /// <inheritdoc />
     protected override IDataEditor Create(Type objectType, string path, JObject jobject)
-    {
-        // in PackageManifest, property editors are IConfiguredDataEditor[] whereas
-        // parameter editors are IDataEditor[] - both will end up here because we handle
-        // IDataEditor and IConfiguredDataEditor implements it, but we can check the
-        // type to figure out what to create
-        EditorType type = EditorType.PropertyValue;
-
-        var isPropertyEditor = path.StartsWith("propertyEditors[");
-
-        if (isPropertyEditor)
-        {
-            // property editor
-            jobject["isPropertyEditor"] = JToken.FromObject(true);
-            if (jobject["isParameterEditor"] is JToken jToken && jToken.Value<bool>())
-            {
-                type |= EditorType.MacroParameter;
-            }
-        }
-        else
-        {
-            // parameter editor
-            type = EditorType.MacroParameter;
-        }
-
-        return new DataEditor(_dataValueEditorFactory, type);
-    }
+        => new DataEditor(_dataValueEditorFactory);
 
     /// <inheritdoc />
     protected override void Deserialize(JObject jobject, IDataEditor target, JsonSerializer serializer)

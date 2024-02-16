@@ -16,10 +16,6 @@ public class DataTypeBasic : EntityBasic
     [ReadOnly(true)]
     public bool IsSystemDataType { get; set; }
 
-    [DataMember(Name = "group")]
-    [ReadOnly(true)]
-    public string? Group { get; set; }
-
     [DataMember(Name = "hasPrevalues")]
     [ReadOnly(true)]
     public bool HasPrevalues { get; set; }
