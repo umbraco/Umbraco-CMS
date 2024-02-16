@@ -1,6 +1,6 @@
 import { UmbDocumentPickerContext } from '../../documents/documents/components/input-document/input-document.context.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { css, html, customElement, map, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestDynamicRootOrigin } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreePickerDynamicRoot } from '@umbraco-cms/backoffice/components';
@@ -63,8 +63,9 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 			<umb-body-layout headline="${this.localize.term('dynamicRoot_pickDynamicRootOriginTitle')}">
 				<div id="main">
 					<uui-box>
-						${map(
+						${repeat(
 							this._origins,
+							(item) => item.alias,
 							(item) => html`
 								<uui-button @click=${() => this.#choose(item)} look="placeholder" label="${ifDefined(item.meta.label)}">
 									<h3>${item.meta.label}</h3>

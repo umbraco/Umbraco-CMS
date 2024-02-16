@@ -8,3 +8,4 @@ export type ContentTypeCollectionReferenceResponseModelBaseModel = {
     alias: string;
     icon: string;
 };
+

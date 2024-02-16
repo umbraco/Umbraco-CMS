@@ -7,6 +7,7 @@ import type { ContentCollectionResponseModelBaseDocumentValueModelDocumentVarian
 import type { DocumentTypeCollectionReferenceResponseModel } from './DocumentTypeCollectionReferenceResponseModel';
 
 export type DocumentCollectionResponseModel = (ContentCollectionResponseModelBaseDocumentValueModelDocumentVariantResponseModel & {
-documentType: DocumentTypeCollectionReferenceResponseModel;
-updater?: string | null;
+    documentType: DocumentTypeCollectionReferenceResponseModel;
+    updater?: string | null;
 });
+
