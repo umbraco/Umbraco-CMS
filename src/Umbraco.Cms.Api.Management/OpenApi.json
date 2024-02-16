@@ -28573,7 +28573,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
+            "$ref": "#/components/schemas/ItemResponseModelBaseModel"
           }
         ],
         "properties": {

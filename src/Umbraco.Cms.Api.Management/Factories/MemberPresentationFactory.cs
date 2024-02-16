@@ -53,7 +53,6 @@ internal sealed class MemberPresentationFactory
             responseModel.MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(memberType)!;
         }
 
-        // TODO: does this make sense?
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
         return responseModel;
