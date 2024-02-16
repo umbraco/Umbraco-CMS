@@ -51,7 +51,7 @@ public class TrueFalsePropertyValueEditorTests
     {
         foreach (var (value, expected) in _valuesAndExpectedResults)
         {
-            // FromEditor returns 1 or 0, not true or false 
+            // FromEditor returns 1 or 0, not true or false
             var actuallyExpected = expected ? 1 : 0;
             var fromEditor = FromEditor(value);
             Assert.AreEqual(actuallyExpected, fromEditor, message: $"Failed for: {value}");
@@ -98,11 +98,10 @@ public class TrueFalsePropertyValueEditorTests
     private static TrueFalsePropertyEditor.TrueFalsePropertyValueEditor CreateValueEditor()
     {
         var valueEditor = new TrueFalsePropertyEditor.TrueFalsePropertyValueEditor(
-            Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>(),
-            new DataEditorAttribute("alias", "name", "view"));
+            new DataEditorAttribute("alias"));
         return valueEditor;
     }
 }

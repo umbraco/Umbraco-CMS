@@ -43,6 +43,7 @@ public class WebhookMapDefinition : IMapDefinition
         target.Events = source.Events.Select(x => x.Alias).ToArray();
         target.Url = source.Url;
         target.Enabled = source.Enabled;
+        target.Id = source.Id;
         target.Key = source.Key ?? Guid.NewGuid();
         target.Headers = source.Headers;
     }

@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -18,28 +17,19 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.MultipleTextstring,
-    "Repeatable textstrings",
-    "multipletextbox",
     ValueType = ValueTypes.Text,
-    Group = Constants.PropertyEditors.Groups.Lists,
-    Icon = "icon-ordered-list",
     ValueEditorIsReusable = true)]
 public class MultipleTextStringPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor" /> class.
     /// </summary>
-    public MultipleTextStringPropertyEditor(
-        IIOHelper ioHelper,
-        IDataValueEditorFactory dataValueEditorFactory,
-        IEditorConfigurationParser editorConfigurationParser)
+    public MultipleTextStringPropertyEditor(IIOHelper ioHelper, IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
-        _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
@@ -49,7 +39,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
     /// <inheritdoc />
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new MultipleTextStringConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new MultipleTextStringConfigurationEditor(_ioHelper);
 
     /// <summary>
     ///     Custom value editor so we can format the value for the editor and the database

@@ -173,7 +173,7 @@ public class TypeLoaderTests
     public void GetDataEditors()
     {
         var types = _typeLoader.GetDataEditors();
-        Assert.AreEqual(48, types.Count());
+        Assert.AreEqual(36, types.Count());
     }
 
     /// <summary>
