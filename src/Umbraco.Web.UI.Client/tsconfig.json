@@ -144,13 +144,13 @@
         "./src/packages/media/media-types/index.ts"
       ],
       "@umbraco-cms/backoffice/member": [
-        "./src/packages/members/members/index.ts"
+        "./src/packages/members/member/index.ts"
       ],
       "@umbraco-cms/backoffice/member-group": [
-        "./src/packages/members/member-groups/index.ts"
+        "./src/packages/members/member-group/index.ts"
       ],
       "@umbraco-cms/backoffice/member-type": [
-        "./src/packages/members/member-types/index.ts"
+        "./src/packages/members/member-type/index.ts"
       ],
       "@umbraco-cms/backoffice/package": [
         "./src/packages/packages/package/index.ts"
