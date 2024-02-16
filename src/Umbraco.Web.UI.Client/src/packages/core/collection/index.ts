@@ -10,4 +10,6 @@ export * from './default/collection-default.context.js';
 export * from './collection-filter-model.interface.js';
 
 export { UMB_COLLECTION_ALIAS_CONDITION } from './collection-alias.condition.js';
+export { UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION } from './collection-bulk-action-permission.condition.js';
+
 export { UmbCollectionActionElement, UmbCollectionActionBase } from './action/index.js';

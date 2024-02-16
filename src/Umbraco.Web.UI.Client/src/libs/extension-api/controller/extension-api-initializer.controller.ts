@@ -115,4 +115,9 @@ export class UmbExtensionApiInitializer<
 			this.#api = undefined;
 		}
 	}
+
+	public destroy(): void {
+		super.destroy();
+		this.#constructorArguments = undefined;
+	}
 }

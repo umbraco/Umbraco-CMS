@@ -35,6 +35,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			(ctrls) => {
 				this._actions = ctrls;
 			},
+			'extensionsInitializer',
 		);
 	}
 	@state()

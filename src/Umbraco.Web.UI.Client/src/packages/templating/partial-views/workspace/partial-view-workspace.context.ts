@@ -106,6 +106,7 @@ export class UmbPartialViewWorkspaceContext
 
 	public destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 
 	#getSnippet(snippetId: string) {
