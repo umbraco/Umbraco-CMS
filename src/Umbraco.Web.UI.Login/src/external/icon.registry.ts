@@ -18,7 +18,7 @@ class UmbIconRegistry extends UUIIconRegistry {
 
 		this.#getIcons().subscribe((icons) => {
 			if (icons[iconName]) {
-				icon.svg = icons[iconName];
+				icon.svg = icons[iconName].replace('<svg', `<svg fill="currentColor"`);
 			} else {
 				// If we can't load the icon, we will not provide it.
 				console.warn(`Icon ${iconName} not found`);

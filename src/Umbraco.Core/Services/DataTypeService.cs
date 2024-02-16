@@ -11,9 +11,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -662,6 +660,12 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             IReadOnlyDictionary<Udi, IEnumerable<string>> usages = _dataTypeRepository.FindUsages(dataType.Id);
             return await Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
+        }
+
+        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            return _dataTypeRepository.FindListViewUsages(id);
         }
 
         /// <inheritdoc />
