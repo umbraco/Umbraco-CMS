@@ -53,7 +53,8 @@ export class UmbBasicState<T> {
 	 * @description - Destroys this state and completes all observations made to it.
 	 */
 	public destroy(): void {
-		this._subject.complete();
+		this._subject?.complete();
+		(this._subject as any) = undefined;
 	}
 
 	/**
@@ -67,7 +68,7 @@ export class UmbBasicState<T> {
 	 * // myState.value is equal 'Goodnight'.
 	 */
 	setValue(data: T): void {
-		if (data !== this._subject.getValue()) {
+		if (this._subject && data !== this._subject.getValue()) {
 			this._subject.next(data);
 		}
 	}
