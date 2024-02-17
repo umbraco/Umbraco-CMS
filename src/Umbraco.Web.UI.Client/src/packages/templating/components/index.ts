@@ -1,1 +1,1 @@
-export * from './insert-menu/templating-insert-menu.element.js';
+export * from './templating-item-menu/index.js';

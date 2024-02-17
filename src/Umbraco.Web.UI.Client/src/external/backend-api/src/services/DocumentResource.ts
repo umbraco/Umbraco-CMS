@@ -4,12 +4,14 @@
 /* eslint-disable */
 import type { CopyDocumentRequestModel } from '../models/CopyDocumentRequestModel';
 import type { CreateDocumentRequestModel } from '../models/CreateDocumentRequestModel';
+import type { DirectionModel } from '../models/DirectionModel';
 import type { DocumentConfigurationResponseModel } from '../models/DocumentConfigurationResponseModel';
 import type { DocumentItemResponseModel } from '../models/DocumentItemResponseModel';
 import type { DocumentNotificationResponseModel } from '../models/DocumentNotificationResponseModel';
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
 import type { DomainsResponseModel } from '../models/DomainsResponseModel';
 import type { MoveDocumentRequestModel } from '../models/MoveDocumentRequestModel';
+import type { PagedDocumentCollectionResponseModel } from '../models/PagedDocumentCollectionResponseModel';
 import type { PagedDocumentRecycleBinItemResponseModel } from '../models/PagedDocumentRecycleBinItemResponseModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
 import type { PublicAccessRequestModel } from '../models/PublicAccessRequestModel';
@@ -26,6 +28,52 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class DocumentResource {
+
+    /**
+     * @returns PagedDocumentCollectionResponseModel Success
+     * @throws ApiError
+     */
+    public static getCollectionDocumentById({
+        id,
+        dataTypeId,
+        orderBy = 'updateDate',
+        orderCulture,
+        orderDirection,
+        filter,
+        skip,
+        take = 100,
+    }: {
+        id: string,
+        dataTypeId?: string,
+        orderBy?: string,
+        orderCulture?: string,
+        orderDirection?: DirectionModel,
+        filter?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedDocumentCollectionResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/collection/document/{id}',
+            path: {
+                'id': id,
+            },
+            query: {
+                'dataTypeId': dataTypeId,
+                'orderBy': orderBy,
+                'orderCulture': orderCulture,
+                'orderDirection': orderDirection,
+                'filter': filter,
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
 
     /**
      * @returns string Created

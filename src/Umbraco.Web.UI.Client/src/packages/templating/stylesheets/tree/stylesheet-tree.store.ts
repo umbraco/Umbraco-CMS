@@ -10,7 +10,7 @@ import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbStylesheetTreeStore
- * @extends {UmbEntityTreeStore}
+ * @extends {UmbUniqueTreeStore}
  * @description - Tree Data Store for Stylesheets
  */
 export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {

@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
-import '../../components/insert-menu/templating-insert-menu.element.js';
+import '../../components/templating-item-menu/templating-item-menu.element.js';
 
 @customElement('umb-partial-view-workspace')
 export class UmbPartialViewWorkspaceElement extends UmbLitElement {

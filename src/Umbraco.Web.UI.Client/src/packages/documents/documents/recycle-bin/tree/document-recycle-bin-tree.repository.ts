@@ -16,7 +16,7 @@ export class UmbDocumentRecycleBinTreeRepository
 
 	async requestTreeRoot() {
 		const data = {
-			id: null,
+			unique: null,
 			entityType: UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 			name: 'Recycle Bin',
 			icon: 'icon-trash',
