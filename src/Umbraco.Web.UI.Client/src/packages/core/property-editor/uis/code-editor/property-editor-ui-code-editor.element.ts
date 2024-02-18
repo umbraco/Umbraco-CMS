@@ -28,11 +28,11 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	}
 
 	render() {
-		return html`<umb-code-editor
-			language="${this._language}"
+		return html`<umb-input-code-editor
+			.language="${this._language}"
 			id="content"
-			.code=${this.value ?? ''}
-			@input=${this.#onInput}></umb-code-editor>`;
+			.value=${this.value ?? ''}
+			@input=${this.#onInput}></umb-input-code-editor>`;
 	}
 }
 

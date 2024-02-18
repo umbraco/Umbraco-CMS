@@ -32,6 +32,9 @@ export class UmbInputCodeEditorElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Boolean })
 	preview: boolean = false;
 
+	@property({ type: String })
+	language: string = '';
+
 	@property()
 	overlaySize?: UUIModalSidebarSize;
 
