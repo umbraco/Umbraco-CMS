@@ -30,28 +30,15 @@ export class UmbInputCodeEditorElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String })
 	language: string = 'HTML';
 
-	@property()
-	overlaySize?: UUIModalSidebarSize;
-
 	#isCodeEditorReady = new UmbBooleanState(false);
 	#editor?: UmbCodeEditorController;
 
 	@query('umb-code-editor')
 	_codeEditor?: UmbCodeEditorElement;
 
-	private _modalContext?: UmbModalManagerContext;
-
-	private serverUrl?: string;
-
 	constructor() {
 		super();
 		this.#loadCodeEditor();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.serverUrl = instance.getServerUrl();
-		});
 	}
 
 	async #loadCodeEditor() {
