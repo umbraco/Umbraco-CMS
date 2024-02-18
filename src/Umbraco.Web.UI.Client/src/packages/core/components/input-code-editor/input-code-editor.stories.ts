@@ -6,7 +6,7 @@ const meta: Meta<UmbInputCodeEditorElement> = {
 	title: 'Components/Inputs/Code Editor',
 	component: 'umb-input-code-editor',
 	args: {
-		preview: false,
+		language: 'HTML',
 	},
 };
 
