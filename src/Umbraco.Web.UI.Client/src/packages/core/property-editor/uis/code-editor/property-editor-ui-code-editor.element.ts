@@ -15,7 +15,8 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._language = config?.getValueByAlias('language');
+		//this._language = config?.getValueByAlias('language');
+		console.log("language", config?.getValueByAlias('language'))
 	}
 	
 	#onChange(e: Event) {
@@ -25,7 +26,7 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 
 	render() {
 		return html`<umb-input-code-editor
-			.language="${this._language}"
+			.language=${this._language?.toLowerCase()}
 			.value=${this.value ?? ''}
 			@change=${this.#onChange}></umb-input-code-editor>`;
 	}
