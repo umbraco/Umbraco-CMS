@@ -40,6 +40,17 @@ internal sealed class MemberPresentationFactory
         return responseModel;
     }
 
+    public async Task<IEnumerable<MemberResponseModel>> CreateMultipleAsync(IEnumerable<IMember> members)
+    {
+        var memberResponseModels = new List<MemberResponseModel>();
+        foreach (IMember member in members)
+        {
+            memberResponseModels.Add(await CreateResponseModelAsync(member));
+        }
+
+        return memberResponseModels;
+    }
+
     public MemberItemResponseModel CreateItemResponseModel(IMemberEntitySlim entity)
     {
         var responseModel = new MemberItemResponseModel
