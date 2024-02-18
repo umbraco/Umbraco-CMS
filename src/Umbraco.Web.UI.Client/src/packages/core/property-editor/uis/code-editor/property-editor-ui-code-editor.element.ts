@@ -1,6 +1,6 @@
-import { css, html, customElement, property, state, ifDefined, styleMap } from '@umbraco-cms/backoffice/external/lit';
-import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
-import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import type { UmbInputCodeEditorElement } from '../../../components/input-code-editor/index.js';
+import '../../../components/input-code-editor/index.js';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
