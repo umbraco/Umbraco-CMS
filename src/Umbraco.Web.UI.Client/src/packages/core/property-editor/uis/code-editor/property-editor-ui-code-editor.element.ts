@@ -10,9 +10,6 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 	@property()
 	value = '';
 
-	//@query('umb-code-editor')
-	_codeEditor?: UmbCodeEditorElement;
-
 	@state()
 	private _language?: string = 'HTML';
 
@@ -21,18 +18,16 @@ export class UmbPropertyEditorUICodeEditorElement extends UmbLitElement implemen
 		this._language = config?.getValueByAlias('language');
 	}
 	
-	#onInput(event: Event) {
-		this.value = (event.target as UmbCodeEditorElement).code as string;
-		//this.value = this.#editor?.monacoEditor?.getValue() ?? '';
+	#onChange(e: Event) {
+		this.value = (e.target as UmbInputCodeEditorElement).value as string;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
 		return html`<umb-input-code-editor
 			.language="${this._language}"
-			id="content"
 			.value=${this.value ?? ''}
-			@input=${this.#onInput}></umb-input-code-editor>`;
+			@change=${this.#onChange}></umb-input-code-editor>`;
 	}
 }
 
