@@ -34,6 +34,8 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 	@state()
 	private _recursive: boolean = false;
 
+	/** TODO: Implement "Choose field" */
+
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
