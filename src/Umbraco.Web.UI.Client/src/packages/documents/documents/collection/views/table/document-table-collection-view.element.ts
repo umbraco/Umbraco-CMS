@@ -1,5 +1,4 @@
-import type { UmbDocumentCollectionFilterModel } from '../../types.js';
-import type { UmbDocumentTreeItemModel } from '../../../tree/types.js';
+import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -20,7 +19,10 @@ import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collec
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
-	private _items?: Array<UmbDocumentTreeItemModel>;
+	private _busy = false;
+
+	@state()
+	private _items?: Array<UmbDocumentCollectionItemModel>;
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -49,7 +51,10 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	private _collectionContext?: UmbDefaultCollectionContext<UmbDocumentTreeItemModel, UmbDocumentCollectionFilterModel>;
+	private _collectionContext?: UmbDefaultCollectionContext<
+		UmbDocumentCollectionItemModel,
+		UmbDocumentCollectionFilterModel
+	>;
 
 	constructor() {
 		super();
@@ -64,7 +69,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 		this.observe(this._collectionContext.items, (items) => {
 			this._items = items;
-			this._createTableItems(this._items);
+			this.#createTableItems(this._items);
 		});
 
 		this.observe(this._collectionContext.selection.selection, (selection) => {
@@ -72,12 +77,11 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(items: Array<UmbDocumentTreeItemModel>) {
+	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
 		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
 			return {
 				id: item.unique,
-				icon: item.documentType.icon,
 				data: [
 					{
 						columnAlias: 'entityName',
@@ -90,6 +94,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 					// 	},
 					// },
 				],
+				icon: item.icon,
 			};
 		});
 	}
@@ -116,6 +121,11 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	render() {
+		if (this._busy) return html`<div class="container"><uui-loader></uui-loader></div>`;
+
+		if (this._tableItems.length === 0)
+			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
+
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
@@ -142,6 +152,12 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			/* TODO: Should we have embedded padding in the table component? */
 			umb-table {
 				padding: 0; /* To fix the embedded padding in the table component. */
+			}
+
+			.container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		`,
 	];
