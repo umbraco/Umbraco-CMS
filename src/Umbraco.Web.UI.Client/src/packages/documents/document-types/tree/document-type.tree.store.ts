@@ -49,6 +49,7 @@ export class UmbDocumentTypeTreeStore extends UmbUniqueTreeStore {
 	#updateTreeItemMapper = (item: UmbDocumentTypeDetailModel) => {
 		return {
 			name: item.name,
+			icon: item.icon,
 		};
 	};
 }

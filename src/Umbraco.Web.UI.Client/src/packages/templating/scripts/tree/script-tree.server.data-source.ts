@@ -56,5 +56,6 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemMod
 		name: item.name,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
+		icon: 'icon-diploma',
 	};
 };
