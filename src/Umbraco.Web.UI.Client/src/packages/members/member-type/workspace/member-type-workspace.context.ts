@@ -58,41 +58,48 @@ export class UmbMemberTypeWorkspaceContext
 		this.#isSorting.setValue(isSorting);
 	}
 
-	setProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
+	set<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
 		this.structure.updateOwnerContentType({ [propertyName]: value });
 	}
 
 	async load(unique: string) {
-		const { data } = await this.repository.requestByUnique(unique);
+		const { data } = await this.structure.loadType(unique);
+		if (!data) return undefined;
 
-		if (data) {
-			this.setIsNew(false);
-			this.#data.update(data);
-		}
+		this.setIsNew(false);
+		this.setIsSorting(false);
+		//this.#draft.next(data);
+		return { data } || undefined;
 	}
 
 	async create(parentUnique: string | null) {
-		const { data } = await this.repository.createScaffold(parentUnique);
+		const { data } = await this.structure.createScaffold(parentUnique);
+		if (!data) return undefined;
 
-		if (data) {
-			this.setIsNew(true);
-			this.#data.setValue(data);
-		}
-
-		return { data };
+		this.setIsNew(true);
+		this.setIsSorting(false);
+		//this.#draft.next(data);
+		return { data } || undefined;
 	}
 
 	async save() {
 		const data = this.getData();
-		if (!data) throw new Error('No data to save');
+		if (data === undefined) throw new Error('Cannot save, no data');
 
 		if (this.getIsNew()) {
-			await this.repository.create(data);
+			if ((await this.structure.create()) === true) {
+				this.setIsNew(false);
+			}
 		} else {
-			await this.repository.save(data);
+			await this.structure.save();
 		}
 
 		this.saveComplete(data);
+	}
+
+	public destroy(): void {
+		this.structure.destroy();
+		super.destroy();
 	}
 
 	getData() {
