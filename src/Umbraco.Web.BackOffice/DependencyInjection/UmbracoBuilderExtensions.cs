@@ -18,25 +18,25 @@ public static partial class UmbracoBuilderExtensions
     /// <summary>
     /// Adds all required components to run the Umbraco back office
     /// </summary>
-    public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) => builder
-            .AddConfiguration()
-            .AddUmbracoCore()
-            .AddWebComponents()
-            .AddRuntimeMinifier()
-            .AddBackOfficeCore()
-            .AddBackOfficeIdentity()
-            .AddMembersIdentity()
-            .AddUmbracoProfiler()
-            .AddMvcAndRazor(configureMvc)
-            .AddWebServer()
-            .AddRecurringBackgroundJobs()
-            .AddNuCache()
-            .AddDistributedCache()
-            .AddCoreNotifications()
-            .AddLogViewer()
-            .AddExamine()
-            .AddExamineIndexes()
-            .AddSupplemenataryLocalizedTextFileSources();
+    public static IUmbracoBuilder
+        AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) => builder
+        .AddConfiguration()
+        .AddUmbracoCore()
+        .AddWebComponents()
+        .AddRuntimeMinifier()
+        .AddBackOfficeCore()
+        .AddBackOfficeIdentity()
+        .AddMembersIdentity()
+        .AddUmbracoProfiler()
+        .AddMvcAndRazor(configureMvc)
+        .AddWebServer()
+        .AddRecurringBackgroundJobs()
+        .AddNuCache()
+        .AddDistributedCache()
+        .AddCoreNotifications()
+        .AddLogViewer()
+        .AddExamine()
+        .AddExamineIndexes();
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {

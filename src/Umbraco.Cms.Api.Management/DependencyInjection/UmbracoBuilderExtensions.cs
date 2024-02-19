@@ -64,7 +64,8 @@ public static partial class UmbracoBuilderExtensions
                 .AddWebhooks()
                 .AddPreview()
                 .AddBackOfficeAuthentication()
-                .AddPasswordConfiguration();
+                .AddPasswordConfiguration()
+                .AddSupplemenataryLocalizedTextFileSources();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()
