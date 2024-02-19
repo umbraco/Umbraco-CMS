@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     Service to return <see cref="BackOfficeExternalLoginProvider" /> instances

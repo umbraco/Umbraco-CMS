@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     Used to configure <see cref="BackOfficeIdentityOptions" /> for the Umbraco Back office
@@ -16,12 +16,6 @@ public sealed class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackO
 {
     private readonly UserPasswordConfigurationSettings _userPasswordConfiguration;
     private readonly SecuritySettings _securitySettings;
-
-    [Obsolete("Use the constructor that accepts SecuritySettings. Will be removed in V13.")]
-    public ConfigureBackOfficeIdentityOptions(IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration)
-        : this(userPasswordConfiguration, StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
-    {
-    }
 
     public ConfigureBackOfficeIdentityOptions(
         IOptions<UserPasswordConfigurationSettings> userPasswordConfiguration,

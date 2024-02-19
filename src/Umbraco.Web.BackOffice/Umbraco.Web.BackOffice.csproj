@@ -31,4 +31,9 @@
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\**\*" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DependencyInjection" />
+    <Folder Include="Security" />
+  </ItemGroup>
 </Project>

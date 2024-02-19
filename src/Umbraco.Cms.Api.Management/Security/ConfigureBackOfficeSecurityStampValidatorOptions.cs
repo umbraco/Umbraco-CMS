@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.Security;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     Configures the back office security stamp options.

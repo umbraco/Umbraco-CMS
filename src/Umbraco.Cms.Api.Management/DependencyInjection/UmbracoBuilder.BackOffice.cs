@@ -1,11 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
-using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.Hosting;
 
 namespace Umbraco.Extensions;
@@ -34,9 +34,7 @@ public static partial class UmbracoBuilderExtensions
         .AddNuCache()
         .AddDistributedCache()
         .AddCoreNotifications()
-        .AddLogViewer()
-        .AddExamine()
-        .AddExamineIndexes();
+        .AddExamine();
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {

@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using ICookieManager = Microsoft.AspNetCore.Authentication.Cookies.ICookieManager;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     A custom cookie manager that is used to read the cookie from the request.

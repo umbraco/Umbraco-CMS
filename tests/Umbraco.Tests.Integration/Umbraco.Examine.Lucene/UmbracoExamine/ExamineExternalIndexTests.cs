@@ -20,7 +20,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
-using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 

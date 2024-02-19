@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -14,9 +13,10 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     Used to configure <see cref="CookieAuthenticationOptions" /> for the back office authentication type

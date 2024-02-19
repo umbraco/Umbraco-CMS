@@ -1,13 +1,14 @@
-﻿using Umbraco.Cms.Core;
+﻿using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
-using Umbraco.Cms.Web.BackOffice.Security;
 
-namespace Umbraco.Cms.Web.BackOffice.Telemetry;
+namespace Umbraco.Cms.Api.Management.Telemetry;
 
 public class ExternalLoginTelemetryProvider : IDetailedTelemetryProvider
 {
-    private readonly IBackOfficeExternalLoginProviders _externalLoginProviders;
+    private readonly
+        IBackOfficeExternalLoginProviders _externalLoginProviders;
 
     public ExternalLoginTelemetryProvider(IBackOfficeExternalLoginProviders externalLoginProviders)
     {

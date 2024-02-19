@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     Result returned from signing in when external logins are used.

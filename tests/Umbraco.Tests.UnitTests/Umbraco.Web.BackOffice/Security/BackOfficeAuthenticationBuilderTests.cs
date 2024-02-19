@@ -3,8 +3,8 @@
 
 using Microsoft.AspNetCore.Authentication;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Web.BackOffice.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security;
 

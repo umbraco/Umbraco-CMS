@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using SecurityConstants = Umbraco.Cms.Core.Constants.Security;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     Options used to configure auto-linking external OAuth providers

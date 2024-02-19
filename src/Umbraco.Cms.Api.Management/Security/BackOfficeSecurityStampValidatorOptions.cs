@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     Custom <see cref="SecurityStampValidatorOptions" /> for the back office

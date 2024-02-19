@@ -1,6 +1,6 @@
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     Options used to configure back office external login providers

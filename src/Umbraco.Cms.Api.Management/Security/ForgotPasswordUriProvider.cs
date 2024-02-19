@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
 {

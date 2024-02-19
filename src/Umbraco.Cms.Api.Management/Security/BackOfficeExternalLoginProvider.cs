@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 
-namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Api.Management.Security;
 
 /// <summary>
 ///     An external login (OAuth) provider for the back office

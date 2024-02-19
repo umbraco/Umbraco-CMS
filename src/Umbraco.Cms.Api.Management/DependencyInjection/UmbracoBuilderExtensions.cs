@@ -31,6 +31,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddInstaller()
                 .AddUpgrader()
                 .AddSearchManagement()
+                .AddBackOffice()
                 .AddTrees()
                 .AddAuditLogs()
                 .AddDocuments()

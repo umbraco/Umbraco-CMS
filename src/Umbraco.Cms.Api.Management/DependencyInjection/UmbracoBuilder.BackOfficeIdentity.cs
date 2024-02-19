@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.Telemetry;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -15,8 +17,6 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
-using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Cms.Web.BackOffice.Telemetry;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -73,8 +73,7 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    //TODO change this to private when the legacy backoffice is removed
-    public static BackOfficeIdentityBuilder BuildUmbracoBackOfficeIdentity(this IUmbracoBuilder builder)
+    private static BackOfficeIdentityBuilder BuildUmbracoBackOfficeIdentity(this IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
 
