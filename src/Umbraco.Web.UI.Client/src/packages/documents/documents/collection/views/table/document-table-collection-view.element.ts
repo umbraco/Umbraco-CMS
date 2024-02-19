@@ -33,7 +33,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	};
 
 	@state()
-	private _tableColumns: Array<UmbTableColumn> = [
+	private _tableColumns: Array<UmbTableColumn> = [];
+
+	#systemColumns: Array<UmbTableColumn> = [
 		{
 			name: 'Name',
 			alias: 'entityName',

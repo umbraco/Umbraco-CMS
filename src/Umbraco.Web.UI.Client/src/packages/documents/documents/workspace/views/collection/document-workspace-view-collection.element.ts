@@ -46,11 +46,11 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 								if (!dataType) return;
 								this._config = this.#mapDataTypeConfigToCollectionConfig(dataType);
 							},
-							'#observeConfig.dataType',
+							'_observeConfigDataType',
 						);
 					}
 				},
-				'#observeConfig.documentType',
+				'_observeConfigDocumentType',
 			);
 		});
 	}

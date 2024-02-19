@@ -103,7 +103,7 @@ export class UmbTableElement extends LitElement {
 	@property({ type: String, attribute: false })
 	public orderingColumn = '';
 
-	@property({ type: String, attribute: false })
+	@property({ type: Boolean, attribute: false })
 	public orderingDesc = false;
 
 	@state()
