@@ -736,8 +736,8 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             // get the media file path and store that separately in the XML.
             // the media file path is different from the URL and is specifically
             // extracted using the property editor for this media file and the current media file system.
-            Stream mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
-            if (mediaFilePath is not null)
+            Stream? mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
+            if (mediaStream != null && mediaFilePath is not null)
             {
                 xmlMedia.Add(new XAttribute("mediaFilePath", mediaFilePath));
 
@@ -746,7 +746,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             }
         }
 
-        IEnumerable<IMedia> medias = _mediaService.GetByIds(definition.MediaUdis);
+        IEnumerable<IMedia> medias = _mediaService.GetByIds(definition.MediaUdis)!;
 
         var mediaXml = new XElement(
             "MediaItems",
