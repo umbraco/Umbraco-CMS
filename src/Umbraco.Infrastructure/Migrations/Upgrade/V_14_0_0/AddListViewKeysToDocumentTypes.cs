@@ -43,7 +43,7 @@ public class AddListViewKeysToDocumentTypes : UnscopedMigrationBase
     {
         if (ColumnExists(Constants.DatabaseSchema.Tables.ContentType, NewColumnName) is false)
         {
-            IEnumerable<ContentTypeDto> contentTypeDtos = GetContentTypeDtos();
+            IEnumerable<ContentTypeDto> contentTypeDtos = GetContentTypeDtos().Where(x => x.ListView is not null);
 
             Delete.Column("isContainer").FromTable(Constants.DatabaseSchema.Tables.ContentType).Do();
             Create.Column(NewColumnName)
