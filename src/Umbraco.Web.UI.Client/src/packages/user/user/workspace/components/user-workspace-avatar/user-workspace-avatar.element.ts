@@ -1,7 +1,7 @@
 import type { UmbUserDetailModel } from '../../../types.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
 import { css, html, customElement, query, nothing, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-user-workspace-avatar')
 export class UmbUserAvatarElement extends UmbLitElement {
