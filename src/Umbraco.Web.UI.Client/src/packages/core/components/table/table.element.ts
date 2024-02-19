@@ -275,9 +275,7 @@ export class UmbTableElement extends LitElement {
 			uui-table-head {
 				position: sticky;
 				top: 0;
-				background: white;
 				z-index: 1;
-				background-color: var(--uui-color-surface);
 			}
 
 			uui-table-row uui-checkbox {
