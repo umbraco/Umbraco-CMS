@@ -137,7 +137,7 @@ export class UmbMemberTypeWorkspaceViewEditPropertiesElement extends UmbLitEleme
 				},
 				'_observeIsSorting',
 			);
-			const docTypesObservable = await this._propertyStructureHelper.ownerMemberTypes();
+			const docTypesObservable = await this._propertyStructureHelper.ownerDocumentTypes();
 			if (!docTypesObservable) return;
 			this.observe(
 				docTypesObservable,
@@ -166,7 +166,7 @@ export class UmbMemberTypeWorkspaceViewEditPropertiesElement extends UmbLitEleme
 				if (memberTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
-				return { data: { memberTypeId }, value: propertyData };
+				return { data: { documentTypeId: memberTypeId }, value: propertyData };
 			})
 			.onSubmit((value) => {
 				if (!value.dataType) {
