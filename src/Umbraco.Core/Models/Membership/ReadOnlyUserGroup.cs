@@ -12,7 +12,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         string? alias,
         IEnumerable<int> allowedLanguages,
         IEnumerable<string> allowedSections,
-        ISet<string> permissionNames,
+        ISet<string> permissions,
+        ISet<IGranularPermission> granularPermissions,
         bool hasAccessToAllLanguages)
     {
         Name = name ?? string.Empty;
@@ -27,7 +28,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         StartContentId = startContentId == 0 ? null : startContentId;
         StartMediaId = startMediaId == 0 ? null : startMediaId;
         HasAccessToAllLanguages = hasAccessToAllLanguages;
-        PermissionNames = permissionNames;
+        Permissions = permissions;
+        GranularPermissions = granularPermissions;
     }
 
     public int Id { get; }
@@ -62,7 +64,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public bool HasAccessToAllLanguages { get; set; }
 
     public IEnumerable<int> AllowedLanguages { get; private set; }
-    public ISet<string> PermissionNames { get; private set; }
+    public ISet<string> Permissions { get; private set; }
+    public ISet<IGranularPermission> GranularPermissions { get; private set; }
     public IEnumerable<string> AllowedSections { get; private set; }
 
     public static bool operator ==(ReadOnlyUserGroup left, ReadOnlyUserGroup right) => Equals(left, right);

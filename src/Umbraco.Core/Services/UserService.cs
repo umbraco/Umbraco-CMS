@@ -1801,7 +1801,7 @@ internal class UserService : RepositoryService, IUserService
     ///     are removed.
     /// </param>
     /// <param name="entityIds">Specify the nodes to replace permissions for. </param>
-    public void ReplaceUserGroupPermissions(int groupId, ISet<string>? permissions, params int[] entityIds)
+    public void ReplaceUserGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds)
     {
         if (entityIds.Length == 0)
         {
@@ -1814,7 +1814,7 @@ internal class UserService : RepositoryService, IUserService
         {
             _userGroupRepository.ReplaceGroupPermissions(groupId, permissions, entityIds);
             scope.Complete();
-            
+
             if (permissions is not null)
             {
                 EntityPermission[] entityPermissions =

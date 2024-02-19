@@ -110,7 +110,7 @@ public class UserGroupBuilder<TParent>
 
     public IReadOnlyUserGroup BuildReadOnly(IUserGroup userGroup) =>
         Mock.Of<IReadOnlyUserGroup>(x =>
-            x.PermissionNames == userGroup.PermissionNames &&
+            x.Permissions == userGroup.Permissions &&
             x.Alias == userGroup.Alias &&
             x.Icon == userGroup.Icon &&
             x.Name == userGroup.Name &&
@@ -131,12 +131,14 @@ public class UserGroupBuilder<TParent>
 
         var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-        var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, _permissions, icon)
+        var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, icon)
         {
             Id = id,
             StartContentId = startContentId,
             StartMediaId = startMediaId
         };
+
+        userGroup.Permissions = _permissions;
 
         foreach (var section in _allowedSections)
         {

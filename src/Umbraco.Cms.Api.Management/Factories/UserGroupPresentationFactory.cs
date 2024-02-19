@@ -55,8 +55,15 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = userGroup.PermissionNames,
-            GranularPermissions = new HashSet<PermissionViewModel>(), //TODO
+            Permissions = userGroup.Permissions,
+            GranularPermissions = new HashSet<PermissionViewModel>(userGroup.GranularPermissions.Select(x=>new PermissionViewModel()
+            {
+                Content = new ReferenceByIdModel()
+                {
+                    Id = x.Key,
+                },
+                Verb = x.Permission
+            })),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
             IsSystemGroup = userGroup.IsSystemUserGroup()
         };
@@ -84,7 +91,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = userGroup.PermissionNames,
+            Permissions = userGroup.Permissions,
             GranularPermissions = new HashSet<PermissionViewModel>(), //TODO
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
         };
@@ -124,7 +131,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Alias = cleanedName,
             Icon = requestModel.Icon,
             HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
-            PermissionNames = requestModel.Permissions,
+            Permissions = requestModel.Permissions,
         };
 
         Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(requestModel, group);
@@ -182,7 +189,14 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         current.Name = request.Name.CleanForXss('[', ']', '(', ')', ':');
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
-        current.PermissionNames = request.Permissions;
+        current.Permissions = request.Permissions;
+        current.GranularPermissions = new HashSet<IGranularPermission>(
+            request.GranularPermissions.Select(
+                x=> new GranularPermission()
+            {
+                Key = x.Content.Id,
+                Permission = x.Verb
+            }));
 
 
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);

@@ -15,7 +15,6 @@ internal static class UserGroupFactory
             dto.UserCount,
             dto.Alias,
             dto.Name,
-            dto.DefaultPermissions.IsNullOrWhiteSpace() ? new HashSet<string>() : dto.DefaultPermissions!.ToCharArray().Select(x => x.ToString()).ToHashSet(),
             dto.Icon);
 
         try
@@ -27,7 +26,7 @@ internal static class UserGroupFactory
             userGroup.UpdateDate = dto.UpdateDate;
             userGroup.StartContentId = dto.StartContentId;
             userGroup.StartMediaId = dto.StartMediaId;
-            userGroup.PermissionNames = dto.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet();
+            userGroup.Permissions = dto.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet();
             userGroup.HasAccessToAllLanguages = dto.HasAccessToAllLanguages;
             if (dto.UserGroup2AppDtos != null)
             {
@@ -40,6 +39,20 @@ internal static class UserGroupFactory
             foreach (UserGroup2LanguageDto language in dto.UserGroup2LanguageDtos)
             {
                 userGroup.AddAllowedLanguage(language.LanguageId);
+            }
+
+            foreach (UserGroup2PermissionDto permission in dto.UserGroup2PermissionDtos)
+            {
+                userGroup.Permissions.Add(permission.Permission);
+            }
+
+            foreach (UserGroup2GranularPermissionDto granularPermission in dto.UserGroup2GranularPermissionDtos)
+            {
+                userGroup.GranularPermissions.Add(new GranularPermission()
+                {
+                    Key = granularPermission.UniqueId,
+                    Permission = granularPermission.Permission
+                });
             }
 
             userGroup.ResetDirtyProperties(false);
@@ -78,12 +91,12 @@ internal static class UserGroupFactory
             dto.UserGroup2AppDtos.Add(appDto);
         }
 
-        foreach (var permission in entity.PermissionNames)
+        foreach (var permission in entity.Permissions)
         {
             var permissionDto = new UserGroup2PermissionDto { Permission = permission };
             if (entity.HasIdentity)
             {
-                permissionDto.UserGroupId = entity.Id;
+                permissionDto.UserGroupKey = entity.Key;
             }
 
             dto.UserGroup2PermissionDtos.Add(permissionDto);

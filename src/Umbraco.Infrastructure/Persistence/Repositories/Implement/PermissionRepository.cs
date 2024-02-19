@@ -33,7 +33,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     /// <summary>
     ///     Returns explicitly defined permissions for a user group for any number of nodes
     /// </summary>
-    /// <param name="groupIds">
+    /// <param name="userGroupIds">
     ///     The group ids to lookup permissions for
     /// </param>
     /// <param name="entityIds"></param>
@@ -41,23 +41,25 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     /// <remarks>
     ///     This method will not support passing in more than 2000 group IDs when also passing in entity IDs.
     /// </remarks>
-    public EntityPermissionCollection GetPermissionsForEntities(int[] groupIds, params int[] entityIds)
+    public EntityPermissionCollection GetPermissionsForEntities(int[] userGroupIds, params int[] entityIds)
     {
         var result = new EntityPermissionCollection();
 
         if (entityIds.Length == 0)
         {
-            foreach (IEnumerable<int> group in groupIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+            foreach (IEnumerable<int> group in userGroupIds.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
                 Sql<ISqlContext> sql = Sql()
-                    .SelectAll()
-                    .From<UserGroup2NodeDto>()
-                    .LeftJoin<UserGroup2NodePermissionDto>().On<UserGroup2NodeDto, UserGroup2NodePermissionDto>(
-                        (left, right) => left.NodeId == right.NodeId && left.UserGroupId == right.UserGroupId)
-                    .Where<UserGroup2NodeDto>(dto => group.Contains(dto.UserGroupId));
+                    .Select<UserGroup2GranularPermissionDto>("gp").AndSelect("ug.id as userGroupId, en.id as entityId")
+                    .From<UserGroupDto>("ug")
+                    .InnerJoin<UserGroup2GranularPermissionDto>("gp")
+                    .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key && userGroupIds.Contains(right.Id), "gp", "ug")
+                    .InnerJoin<NodeDto>("en")
+                    .On<UserGroup2GranularPermissionDto, NodeDto>((left, right) => left.UniqueId == right.UniqueId, "gp", "en");
 
-                List<UserGroup2NodePermissionDto> permissions =
-                    AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+                List<UserGroup2GranularPermissionWithIdsDto> permissions =
+                    AmbientScope.Database.Fetch<UserGroup2GranularPermissionWithIdsDto>(sql);
+
                 foreach (EntityPermission permission in ConvertToPermissionList(permissions))
                 {
                     result.Add(permission);
@@ -66,19 +68,21 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
         }
         else
         {
-            foreach (IEnumerable<int> group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount -
-                                                                    groupIds.Length))
+            foreach (IEnumerable<int> entityGroup in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount -
+                                                                    userGroupIds.Length))
             {
                 Sql<ISqlContext> sql = Sql()
-                    .SelectAll()
-                    .From<UserGroup2NodeDto>()
-                    .LeftJoin<UserGroup2NodePermissionDto>().On<UserGroup2NodeDto, UserGroup2NodePermissionDto>(
-                        (left, right) => left.NodeId == right.NodeId && left.UserGroupId == right.UserGroupId)
-                    .Where<UserGroup2NodeDto>(dto =>
-                        groupIds.Contains(dto.UserGroupId) && group.Contains(dto.NodeId));
+                    .Select<UserGroup2GranularPermissionDto>("gp").AndSelect("ug.id as userGroupId, en.id as entityId")
+                    .From<UserGroupDto>("ug")
+                    .InnerJoin<UserGroup2GranularPermissionDto>("gp")
+                    .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key && userGroupIds.Contains(right.Id), "gp", "ug")
+                    .InnerJoin<NodeDto>("en")
+                    .On<UserGroup2GranularPermissionDto, NodeDto>((left, right) => left.UniqueId == right.UniqueId, "gp", "en")
+                    .Where<NodeDto>(en =>  entityGroup.Contains(en.NodeId), "en");
 
-                List<UserGroup2NodePermissionDto> permissions =
-                    AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+                List<UserGroup2GranularPermissionWithIdsDto> permissions =
+                    AmbientScope.Database.Fetch<UserGroup2GranularPermissionWithIdsDto>(sql);
+
                 foreach (EntityPermission permission in ConvertToPermissionList(permissions))
                 {
                     result.Add(permission);
@@ -97,16 +101,18 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     public IEnumerable<EntityPermission> GetPermissionsForEntities(int[] entityIds)
     {
         Sql<ISqlContext> sql = Sql()
-            .SelectAll()
-            .From<UserGroup2NodeDto>()
-            .LeftJoin<UserGroup2NodePermissionDto>()
-            .On<UserGroup2NodeDto, UserGroup2NodePermissionDto>((left, right) =>
-                left.NodeId == right.NodeId && left.UserGroupId == right.UserGroupId)
-            .Where<UserGroup2NodeDto>(dto => entityIds.Contains(dto.NodeId))
-            .OrderBy<UserGroup2NodeDto>(dto => dto.NodeId);
+            .Select<UserGroup2GranularPermissionDto>("gp").AndSelect("ug.id as userGroupId, en.id as entityId")
+            .From<UserGroupDto>("ug")
+            .InnerJoin<UserGroup2GranularPermissionDto>("gp")
+            .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key, "gp", "ug")
+            .InnerJoin<NodeDto>("en")
+            .On<UserGroup2GranularPermissionDto, NodeDto>((left, right) => left.UniqueId == right.UniqueId, "gp", "en")
+            .Where<NodeDto>(en =>  entityIds.Contains(en.NodeId), "en");
 
-        List<UserGroup2NodePermissionDto> result = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
-        return ConvertToPermissionList(result);
+        List<UserGroup2GranularPermissionWithIdsDto> permissions =
+            AmbientScope.Database.Fetch<UserGroup2GranularPermissionWithIdsDto>(sql);
+
+        return ConvertToPermissionList(permissions);
     }
 
     /// <summary>
@@ -117,16 +123,18 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     public EntityPermissionCollection GetPermissionsForEntity(int entityId)
     {
         Sql<ISqlContext> sql = Sql()
-            .SelectAll()
-            .From<UserGroup2NodeDto>()
-            .LeftJoin<UserGroup2NodePermissionDto>()
-            .On<UserGroup2NodeDto, UserGroup2NodePermissionDto>((left, right) =>
-                left.NodeId == right.NodeId && left.UserGroupId == right.UserGroupId)
-            .Where<UserGroup2NodeDto>(dto => dto.NodeId == entityId)
-            .OrderBy<UserGroup2NodeDto>(dto => dto.NodeId);
+            .Select<UserGroup2GranularPermissionDto>("gp").AndSelect("ug.id as userGroupId, en.id as entityId")
+            .From<UserGroupDto>("ug")
+            .InnerJoin<UserGroup2GranularPermissionDto>("gp")
+            .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key, "gp", "ug")
+            .InnerJoin<NodeDto>("en")
+            .On<UserGroup2GranularPermissionDto, NodeDto>((left, right) => left.UniqueId == right.UniqueId, "gp", "en")
+            .Where<NodeDto>(en =>  entityId == en.NodeId, "en");
 
-        List<UserGroup2NodePermissionDto> result = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
-        return ConvertToPermissionList(result);
+        List<UserGroup2GranularPermissionWithIdsDto> permissions =
+            AmbientScope.Database.Fetch<UserGroup2GranularPermissionWithIdsDto>(sql);
+
+        return ConvertToPermissionList(permissions);
     }
 
     /// <summary>
@@ -138,7 +146,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     /// <remarks>
     ///     This will first clear the permissions for this user and entities and recreate them
     /// </remarks>
-    public void ReplacePermissions(int groupId, ISet<string>? permissions, params int[] entityIds)
+    public void ReplacePermissions(int groupId, ISet<string> permissions, params int[] entityIds)
     {
         if (entityIds.Length == 0)
         {
@@ -147,33 +155,37 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
 
         IUmbracoDatabase db = AmbientScope.Database;
 
-        foreach (IEnumerable<int> group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount))
-        {
-            db.Execute("DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@nodeIds)", new { groupId, nodeIds = group });
+        db.Execute(
+            Sql()
+                .Delete<UserGroup2GranularPermissionDto>()
+                .WhereIn<UserGroup2GranularPermissionDto>(
+                    x => x.UniqueId,
+                    Sql()
+                        .Select<NodeDto>()
+                        .From<NodeDto>()
+                        .Where<NodeDto>(x => entityIds.Contains(x.NodeId)))
+                .WhereIn<UserGroup2GranularPermissionDto>(
+                    x => x.UserGroupKey,
+                    Sql()
+                        .Select<UserGroupDto>(x=>x.Key)
+                        .From<UserGroupDto>()
+                        .Where<UserGroupDto>(x => x.Id == groupId)));
 
-            db.Execute("DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)", new { groupId, nodeIds = group });
-        }
+        // This is a poor man's solution to avoid breaking changes.. Sooner or later we should obsolete this method and take Guids as input.
+        Guid userGroupKey = db.Fetch<Guid>(Sql().Select<UserGroupDto>(x => x.Key).From<UserGroupDto>()
+            .Where<UserGroupDto>(x => x.Id == groupId)).SingleOrDefault();
+        var idToKey = db.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>()
+            .Where<NodeDto>(x => entityIds.Contains(x.NodeId))).ToDictionary(x=>x.NodeId, x=>x.UniqueId);
 
-        if (permissions is not null)
-        {
-            var toInsert = new List<UserGroup2NodeDto>();
-            var toInsertPermissions = new List<UserGroup2NodePermissionDto>();
-
-            foreach (var e in entityIds)
+        IEnumerable<UserGroup2GranularPermissionDto> toInsert =
+            from entityId in entityIds
+            from permission in permissions
+            select new UserGroup2GranularPermissionDto()
             {
-                toInsert.Add(new UserGroup2NodeDto { NodeId = e, UserGroupId = groupId });
-                foreach (var p in permissions)
-                {
-                    toInsertPermissions.Add(new UserGroup2NodePermissionDto
-                    {
-                        NodeId = e, Permission = p.ToString(CultureInfo.InvariantCulture), UserGroupId = groupId,
-                    });
-                }
-            }
+                Permission = permission, UniqueId = idToKey[entityId], UserGroupKey = userGroupKey
+            };
 
-            db.BulkInsertRecords(toInsert);
-            db.BulkInsertRecords(toInsertPermissions);
-        }
+        db.InsertBulk(toInsert);
     }
 
     /// <summary>
@@ -186,21 +198,37 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     {
         IUmbracoDatabase db = AmbientScope.Database;
 
-        db.Execute("DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@entityIds)", new { groupId, entityIds });
         db.Execute(
-            "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds)",
-            new { groupId, permission = permission.ToString(CultureInfo.InvariantCulture), entityIds });
+            Sql()
+                .Delete<UserGroup2GranularPermissionDto>()
+                .Where<UserGroup2GranularPermissionDto>(x => x.Permission == permission)
+                .WhereIn<UserGroup2GranularPermissionDto>(
+                    x => x.UniqueId,
+                    Sql()
+                        .Select<NodeDto>()
+                        .From<NodeDto>()
+                        .Where<NodeDto>(x => entityIds.Contains(x.NodeId)))
+                .WhereIn<UserGroup2GranularPermissionDto>(
+                    x => x.UserGroupKey,
+                    Sql()
+                        .Select<UserGroupDto>(x=>x.Key)
+                        .From<UserGroupDto>()
+                        .Where<UserGroupDto>(x => x.Id == groupId)));
 
-        UserGroup2NodeDto[] actionsPermissions =
-            entityIds.Select(id => new UserGroup2NodeDto { NodeId = id, UserGroupId = groupId }).ToArray();
+        // This is a poor man's solution to avoid breaking changes.. Sooner or later we should obsolete this method and take Guids as input.
+        var userGroupKey = db.Fetch<Guid>(Sql().Select<UserGroupDto>(x => x.Key).From<UserGroupDto>()
+            .Where<UserGroupDto>(x => x.Id == groupId)).SingleOrDefault();
+        var idToKey = db.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>()
+            .Where<NodeDto>(x => entityIds.Contains(x.NodeId))).ToDictionary(x=>x.NodeId, x=>x.UniqueId);
 
-        UserGroup2NodePermissionDto[] actions = entityIds.Select(id => new UserGroup2NodePermissionDto
-        {
-            NodeId = id, Permission = permission.ToString(CultureInfo.InvariantCulture), UserGroupId = groupId,
-        }).ToArray();
+        var toInsert = entityIds.Select(e => new UserGroup2GranularPermissionDto()
+                {
+                    Permission = permission,
+                    UniqueId = idToKey[e],
+                    UserGroupKey = userGroupKey
+                });
 
-        db.BulkInsertRecords(actions);
-        db.BulkInsertRecords(actionsPermissions);
+        db.InsertBulk(toInsert);
     }
 
     /// <summary>
@@ -212,30 +240,29 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     public void AssignEntityPermission(TEntity entity, string permission, IEnumerable<int> groupIds)
     {
         IUmbracoDatabase db = AmbientScope.Database;
-        var groupIdsA = groupIds.ToArray();
 
-        db.Execute("DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId AND userGroupId in (@groupIds)", new { nodeId = entity.Id, groupIds = groupIdsA });
         db.Execute(
-            "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId AND permission = @permission AND userGroupId in (@groupIds)",
-            new
-            {
-                nodeId = entity.Id,
-                permission = permission.ToString(CultureInfo.InvariantCulture),
-                groupIds = groupIdsA,
-            });
+            Sql()
+                .Delete<UserGroup2GranularPermissionDto>()
+                .Where<UserGroup2GranularPermissionDto>(x => x.Permission == permission && x.UniqueId == entity.Key)
+                .WhereIn<UserGroup2GranularPermissionDto>(
+                    x => x.UserGroupKey,
+                    Sql()
+                        .Select<UserGroupDto>(x=>x.Key)
+                        .From<UserGroupDto>()
+                        .Where<UserGroupDto>(x => groupIds.Contains(x.Id))));
 
-        UserGroup2NodePermissionDto[] actionsPermissions = groupIdsA.Select(id => new UserGroup2NodePermissionDto
+        // This is a poor man's solution to avoid breaking changes.. Sooner or later we should obsolete this method and take Guids as input.
+        var idToKey = db.Fetch<UserGroupDto>(Sql().Select<UserGroupDto>().From<UserGroupDto>()
+            .Where<UserGroupDto>(x => groupIds.Contains(x.Id))).ToDictionary(x=>x.Id, x=>x.Key);
+
+        var toInsert = groupIds.Select(x => new UserGroup2GranularPermissionDto()
         {
-            NodeId = entity.Id, Permission = permission.ToString(CultureInfo.InvariantCulture), UserGroupId = id,
-        }).ToArray();
+            Permission = permission, UniqueId = entity.Key, UserGroupKey = idToKey[x]
+        });
 
-        UserGroup2NodeDto[] actions = groupIdsA.Select(id => new UserGroup2NodeDto
-        {
-            NodeId = entity.Id, UserGroupId = id,
-        }).ToArray();
+        db.InsertBulk(toInsert);
 
-        db.BulkInsertRecords(actions);
-        db.BulkInsertRecords(actionsPermissions);
     }
 
     /// <summary>
@@ -250,30 +277,34 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     {
         IUmbracoDatabase db = AmbientScope.Database;
 
-        db.Execute("DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId", new { nodeId = permissionSet.EntityId });
-        db.Execute("DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId", new { nodeId = permissionSet.EntityId });
+        db.Execute(
+            Sql()
+                .Delete<UserGroup2GranularPermissionDto>()
+                .WhereIn<UserGroup2GranularPermissionDto>(
+                    x => x.UniqueId,
+                    Sql()
+                        .Select<NodeDto>(x => x.UniqueId)
+                        .From<NodeDto>()
+                        .Where<NodeDto>(x => x.NodeId == permissionSet.EntityId)));
 
-        var toInsert = new List<UserGroup2NodeDto>();
-        var toInsertPermissions = new List<UserGroup2NodePermissionDto>();
-        foreach (EntityPermission entityPermission in permissionSet.PermissionsSet)
-        {
-            toInsert.Add(new UserGroup2NodeDto
-            {
-                NodeId = permissionSet.EntityId, UserGroupId = entityPermission.UserGroupId,
-            });
-            foreach (var permission in entityPermission.AssignedPermissions)
-            {
-                toInsertPermissions.Add(new UserGroup2NodePermissionDto
+        // This is a poor man's solution to avoid breaking changes.. Sooner or later we should obsolete this method and take Guids as input.
+        var userGroupIds = permissionSet.PermissionsSet.Select(x => x.UserGroupId);
+        var entityKey = db.Fetch<Guid>(Sql().Select<NodeDto>(x => x.UniqueId).From<NodeDto>()
+            .Where<NodeDto>(x => x.NodeId == permissionSet.EntityId)).SingleOrDefault();
+        var idToKey = db.Fetch<UserGroupDto>(Sql().Select<UserGroupDto>().From<UserGroupDto>()
+            .Where<UserGroupDto>(x => userGroupIds.Contains(x.Id))).ToDictionary(x=>x.Id, x=>x.Key);
+
+
+        var toInsert = permissionSet.PermissionsSet
+            .SelectMany(x => x.AssignedPermissions
+                .Select(p => new UserGroup2GranularPermissionDto()
                 {
-                    NodeId = permissionSet.EntityId,
-                    Permission = permission,
-                    UserGroupId = entityPermission.UserGroupId,
-                });
-            }
-        }
+                    Permission = p,
+                    UniqueId = entityKey,
+                    UserGroupKey = idToKey[x.UserGroupId]
+                }));
 
-        db.BulkInsertRecords(toInsert);
-        db.BulkInsertRecords(toInsertPermissions);
+        db.InsertBulk(toInsert);
     }
 
     /// <summary>
@@ -301,15 +332,15 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     }
 
     private static EntityPermissionCollection ConvertToPermissionList(
-        IEnumerable<UserGroup2NodePermissionDto> result)
+        IEnumerable<UserGroup2GranularPermissionWithIdsDto> result)
     {
         var permissions = new EntityPermissionCollection();
-        IEnumerable<IGrouping<int, UserGroup2NodePermissionDto>> nodePermissions = result.GroupBy(x => x.NodeId);
-        foreach (IGrouping<int, UserGroup2NodePermissionDto> np in nodePermissions)
+        IEnumerable<IGrouping<int, UserGroup2GranularPermissionWithIdsDto>> nodePermissions = result.GroupBy(x => x.EntityId);
+        foreach (IGrouping<int, UserGroup2GranularPermissionWithIdsDto> np in nodePermissions)
         {
-            IEnumerable<IGrouping<int, UserGroup2NodePermissionDto>> userGroupPermissions =
+            IEnumerable<IGrouping<int, UserGroup2GranularPermissionWithIdsDto>> userGroupPermissions =
                 np.GroupBy(x => x.UserGroupId);
-            foreach (IGrouping<int, UserGroup2NodePermissionDto> permission in userGroupPermissions)
+            foreach (IGrouping<int, UserGroup2GranularPermissionWithIdsDto> permission in userGroupPermissions)
             {
                 var perms = permission.Select(x => x.Permission).Distinct().WhereNotNull().ToHashSet();
 

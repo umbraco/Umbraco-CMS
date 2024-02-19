@@ -294,7 +294,7 @@ public interface IUserService : IMembershipUserService
     ///     removed.
     /// </param>
     /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified group.</remarks>
-    void ReplaceUserGroupPermissions(int groupId, ISet<string>? permissions, params int[] entityIds);
+    void ReplaceUserGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds);
 
     /// <summary>
     ///     Assigns the same permission set for a single user group to any number of entities

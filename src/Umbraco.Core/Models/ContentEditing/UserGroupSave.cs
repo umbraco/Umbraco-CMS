@@ -47,11 +47,7 @@ public class UserGroupSave : EntityBasic, IValidatableObject
     /// </remarks>
     public ISet<string>? Permissions { get; set; }
 
-    /// <summary>
-    ///     The list of letters (permission codes) to assign as the default for the user group
-    /// </summary>
-    [DataMember(Name = "defaultPermissions")]
-    public IEnumerable<string>? DefaultPermissions { get; set; }
+    public ISet<IGranularPermission>? GranularPermissions { get; set; }
 
     /// <summary>
     ///     The assigned permissions for content
@@ -76,7 +72,7 @@ public class UserGroupSave : EntityBasic, IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (DefaultPermissions?.Any(x => x.IsNullOrWhiteSpace()) ?? false)
+        if (Permissions?.Any(x => x.IsNullOrWhiteSpace()) ?? false)
         {
             yield return new ValidationResult("A permission value cannot be null or empty", new[] { "Permissions" });
         }

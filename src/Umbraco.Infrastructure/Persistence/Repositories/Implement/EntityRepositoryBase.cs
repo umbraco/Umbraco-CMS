@@ -240,7 +240,16 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         IEnumerable<string> deletes = GetDeleteClauses();
         foreach (var delete in deletes)
         {
-            Database.Execute(delete, new { id = GetEntityId(entity) });
+            try
+            {
+                Database.Execute(delete, new { id = GetEntityId(entity) });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
         }
 
         entity.DeleteDate = DateTime.Now;

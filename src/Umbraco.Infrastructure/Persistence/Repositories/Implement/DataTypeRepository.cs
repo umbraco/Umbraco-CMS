@@ -403,7 +403,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @Id", new { entity.Id });
 
         // Remove Permissions
-        Database.Delete<UserGroup2NodePermissionDto>("WHERE nodeId = @Id", new { entity.Id });
+        Database.Delete<UserGroup2GranularPermissionDto>("WHERE uniqueId = @Key", new { Key = entity.Key });
 
         // Remove associated tags
         Database.Delete<TagRelationshipDto>("WHERE nodeId = @Id", new { entity.Id });

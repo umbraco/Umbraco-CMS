@@ -51,7 +51,7 @@ public interface IUserGroupRepository : IReadWriteQueryRepository<int, IUserGrou
     ///     Specify the nodes to replace permissions for. If nothing is specified all permissions are
     ///     removed.
     /// </param>
-    void ReplaceGroupPermissions(int groupId, ISet<string>? permissions, params int[] entityIds);
+    void ReplaceGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds);
 
     /// <summary>
     ///     Assigns the same permission set for a single group to any number of entities

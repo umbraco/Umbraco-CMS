@@ -30256,6 +30256,26 @@
         },
         "additionalProperties": false
       },
+      "PermissionModel": {
+        "required": [
+          "content",
+          "verb"
+        ],
+        "type": "object",
+        "properties": {
+          "verb": {
+            "type": "string"
+          },
+          "content": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -32472,6 +32492,7 @@
       "UserGroupBaseModel": {
         "required": [
           "documentRootAccess",
+          "granularPermissions",
           "hasAccessToAllLanguages",
           "languages",
           "mediaRootAccess",
@@ -32530,6 +32551,17 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          },
+          "granularPermissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/PermissionModel"
+                }
+              ]
             }
           }
         },

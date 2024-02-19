@@ -190,16 +190,16 @@ internal class DatabaseDataCreator
 
     private void CreateUserGroup2PermissionData()
     {
-        var userGroupIdToPermissions = new Dictionary<int, IEnumerable<string>>()
+        var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
         {
-            [1] = "CADMOSKTPIURZ:5F7ïN".ToCharArray().Select(x=>x.ToString()),
-            [2] = "CAH:FN".ToCharArray().Select(x=>x.ToString()),
-            [3] = "CADMOSKTPUZ:5FïN".ToCharArray().Select(x=>x.ToString()),
-            [4] = "AF".ToCharArray().Select(x=>x.ToString()),
+            [Constants.Security.AdminGroupKey] = "CADMOSKTPIURZ:5F7ïN".ToCharArray().Select(x=>x.ToString()),
+            [Constants.Security.WriterGroupKey] = "CAH:FN".ToCharArray().Select(x=>x.ToString()),
+            [Constants.Security.EditorGroupKey] = "CADMOSKTPUZ:5FïN".ToCharArray().Select(x=>x.ToString()),
+            [Constants.Security.TranslatorGroupKey] = "AF".ToCharArray().Select(x=>x.ToString()),
         };
 
         var i = 1;
-        foreach (var (userGroupId, permissions) in userGroupIdToPermissions)
+        foreach (var (userGroupKey, permissions) in userGroupKeyToPermissions)
         {
             foreach (var permission in permissions)
             {
@@ -210,7 +210,7 @@ internal class DatabaseDataCreator
                     new UserGroup2PermissionDto
                     {
                         Id = i++,
-                        UserGroupId = userGroupId,
+                        UserGroupKey = userGroupKey,
                         Permission = permission,
                     });
             }
