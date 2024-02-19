@@ -68,7 +68,7 @@ export class UmbCollectionViewManager extends UmbBaseController {
 	#createRoutes(views: ManifestCollectionView[] | null) {
 		let routes: Array<UmbRoute> = [];
 
-		if (views && views.length > 0) {
+		if (views?.length) {
 			// find the default view from the config. If it doesn't exist, use the first view
 			const defaultView = views.find((view) => view.alias === this.#defaultViewAlias);
 			const fallbackView = defaultView?.meta.pathName || views[0].meta.pathName;
