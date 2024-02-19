@@ -2,9 +2,9 @@
 
 namespace Umbraco.Cms.Api.Management.Extensions;
 
-public static class ListViewExtensions
+internal static class ListViewExtensions
 {
-    public static ReferenceByIdModel? ToReferenceByIdModel(this Guid? guid)
+    internal static ReferenceByIdModel? ToReferenceByIdModel(this Guid? guid)
     {
         if (guid is not null)
         {
