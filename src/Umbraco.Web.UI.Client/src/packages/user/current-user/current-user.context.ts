@@ -35,10 +35,12 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 	 * Loads the current user
 	 */
 	async load() {
-		const { data } = await this.#currentUserRepository.requestCurrentUser();
+		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
-		if (data) {
-			this.#currentUser?.setValue(data);
+		if (asObservable) {
+			this.observe(asObservable(), (currentUser) => {
+				this.#currentUser?.setValue(currentUser);
+			});
 		}
 	}
 
