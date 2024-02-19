@@ -1,14 +1,15 @@
 import { UmbCurrentUserContext } from './current-user.context.js';
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as userProfileAppsManifests } from './user-profile-apps/manifests.js';
+import { manifests as repositoryManifests } from './repository/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const headerApps: Array<ManifestTypes> = [
 	{
 		type: 'store',
-		alias: 'Umb.Store.CurrentUser',
-		name: 'Current User Store',
-		js: () => import('./current-user-history.store.js'),
+		alias: 'Umb.Store.CurrentUser.History',
+		name: 'Current User History Store',
+		api: () => import('./current-user-history.store.js'),
 	},
 	{
 		type: 'globalContext',
@@ -20,7 +21,7 @@ export const headerApps: Array<ManifestTypes> = [
 		type: 'headerApp',
 		alias: 'Umb.HeaderApp.CurrentUser',
 		name: 'Current User',
-		js: () => import('./current-user-header-app.element.js'),
+		element: () => import('./current-user-header-app.element.js'),
 		weight: 0,
 		meta: {
 			label: 'TODO: how should we enable this to not be set.',
@@ -30,4 +31,4 @@ export const headerApps: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...headerApps, ...modalManifests, ...userProfileAppsManifests];
+export const manifests = [...headerApps, ...modalManifests, ...repositoryManifests, ...userProfileAppsManifests];
