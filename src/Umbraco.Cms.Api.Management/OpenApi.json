@@ -12779,6 +12779,114 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/filter/member": {
+      "get": {
+        "tags": [
+          "Member"
+        ],
+        "operationId": "GetFilterMember",
+        "parameters": [
+          {
+            "name": "memberTypeId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "username"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedMemberResponseModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedMemberResponseModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedMemberResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/member": {
       "get": {
         "tags": [
@@ -13264,134 +13372,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/member/filter": {
-      "get": {
-        "tags": [
-          "Member"
-        ],
-        "operationId": "GetMemberFilter",
-        "parameters": [
-          {
-            "name": "memberTypeId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "orderBy",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "default": "username"
-            }
-          },
-          {
-            "name": "orderDirection",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/DirectionModel"
-            }
-          },
-          {
-            "name": "filter",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedMemberResponseModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedMemberResponseModel"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedMemberResponseModel"
-                }
-              }
-            }
           },
           "400": {
             "description": "Bad Request",
@@ -20478,12 +20458,12 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/temporaryfile": {
+    "/umbraco/management/api/v1/temporary-file": {
       "post": {
         "tags": [
           "Temporary File"
         ],
-        "operationId": "PostTemporaryfile",
+        "operationId": "PostTemporaryFile",
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -20563,12 +20543,12 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/temporaryfile/{id}": {
+    "/umbraco/management/api/v1/temporary-file/{id}": {
       "get": {
         "tags": [
           "Temporary File"
         ],
-        "operationId": "GetTemporaryfileById",
+        "operationId": "GetTemporaryFileById",
         "parameters": [
           {
             "name": "id",
@@ -20667,7 +20647,7 @@
         "tags": [
           "Temporary File"
         ],
-        "operationId": "DeleteTemporaryfileById",
+        "operationId": "DeleteTemporaryFileById",
         "parameters": [
           {
             "name": "id",
@@ -20734,12 +20714,12 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/temporaryfile/configuration": {
+    "/umbraco/management/api/v1/temporary-file/configuration": {
       "get": {
         "tags": [
           "Temporary File"
         ],
-        "operationId": "GetTemporaryfileConfiguration",
+        "operationId": "GetTemporaryFileConfiguration",
         "responses": {
           "200": {
             "description": "Success"
@@ -21884,6 +21864,149 @@
           },
           "403": {
             "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/filter/user": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetFilterUser",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/UserOrderModel"
+            }
+          },
+          {
+            "name": "orderDirection",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DirectionModel"
+            }
+          },
+          {
+            "name": "userGroupIds",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          },
+          {
+            "name": "userStates",
+            "in": "query",
+            "schema": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/UserStateModel"
+              }
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedUserResponseModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedUserResponseModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedUserResponseModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
           }
         },
         "security": [
@@ -23775,149 +23898,6 @@
           },
           "403": {
             "description": "The authenticated user do not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/user/filter": {
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "GetUserFilter",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          },
-          {
-            "name": "orderBy",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/UserOrderModel"
-            }
-          },
-          {
-            "name": "orderDirection",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/DirectionModel"
-            }
-          },
-          {
-            "name": "userGroupIds",
-            "in": "query",
-            "schema": {
-              "uniqueItems": true,
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uuid"
-              }
-            }
-          },
-          {
-            "name": "userStates",
-            "in": "query",
-            "schema": {
-              "uniqueItems": true,
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/UserStateModel"
-              }
-            }
-          },
-          {
-            "name": "filter",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "default": ""
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedUserResponseModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedUserResponseModel"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedUserResponseModel"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
           }
         },
         "security": [
