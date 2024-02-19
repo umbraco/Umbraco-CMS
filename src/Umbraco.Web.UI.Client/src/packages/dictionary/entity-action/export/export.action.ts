@@ -20,6 +20,7 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 	}
 
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.#modalContext) return;
 
 		const modalContext = this.#modalContext?.open(UMB_EXPORT_DICTIONARY_MODAL, { data: { unique: this.unique } });

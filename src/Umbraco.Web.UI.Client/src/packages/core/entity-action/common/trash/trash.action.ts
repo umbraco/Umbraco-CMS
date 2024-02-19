@@ -1,7 +1,7 @@
 import { UmbEntityActionBase } from '../../entity-action.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
@@ -19,6 +19,7 @@ export class UmbTrashEntityAction<
 	}
 
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) return;
 
 		const { data } = await this.repository.requestItems([this.unique]);
@@ -35,9 +36,8 @@ export class UmbTrashEntityAction<
 				},
 			});
 
-			modalContext?.onSubmit().then(() => {
-				this.repository?.trash(this.unique);
-			});
+			await modalContext?.onSubmit();
+			this.repository?.trash(this.unique);
 		}
 	}
 }

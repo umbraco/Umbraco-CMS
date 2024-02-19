@@ -23,6 +23,7 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<UmbDisableUs
 	}
 
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository || !this.#modalManager) return;
 
 		const { data } = await this.#itemRepository.requestItems([this.unique]);

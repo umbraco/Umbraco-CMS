@@ -16,6 +16,7 @@ export class UmbDocumentPermissionsEntityAction extends UmbEntityActionBase<UmbD
 	}
 
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) return;
 		if (!this.#modalManagerContext) return;
 

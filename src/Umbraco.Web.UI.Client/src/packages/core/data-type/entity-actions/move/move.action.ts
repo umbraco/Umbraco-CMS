@@ -1,12 +1,8 @@
 import type { UmbMoveDataTypeRepository } from '../../repository/move/data-type-move.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_DATA_TYPE_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_DATA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
 // TODO: investigate what we need to make a generic move action
 export class UmbMoveDataTypeEntityAction extends UmbEntityActionBase<UmbMoveDataTypeRepository> {
@@ -21,6 +17,7 @@ export class UmbMoveDataTypeEntityAction extends UmbEntityActionBase<UmbMoveData
 	}
 
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.#modalManagerContext) throw new Error('Modal manager context is not available');
 		if (!this.repository) throw new Error('Repository is not available');
 

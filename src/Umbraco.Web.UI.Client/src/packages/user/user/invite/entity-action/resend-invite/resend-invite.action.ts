@@ -16,6 +16,7 @@ export class UmbResendInviteToUserEntityAction extends UmbEntityActionBase<UmbEn
 	}
 
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository || !this.#modalManager) return;
 
 		const modalContext = this.#modalManager.open(UMB_RESEND_INVITE_TO_USER_MODAL, {

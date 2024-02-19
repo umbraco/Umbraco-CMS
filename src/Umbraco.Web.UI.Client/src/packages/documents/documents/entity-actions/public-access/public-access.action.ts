@@ -15,6 +15,7 @@ export class UmbDocumentPublicAccessEntityAction extends UmbEntityActionBase<Umb
 	}
 
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		this.#modalContext?.open(UMB_PUBLIC_ACCESS_MODAL, { data: { unique: this.unique } });
 	}
 }

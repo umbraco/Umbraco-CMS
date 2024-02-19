@@ -19,6 +19,7 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<UmbCh
 	}
 
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository || !this.#modalManager) return;
 
 		const modalContext = this.#modalManager.open(UMB_CHANGE_PASSWORD_MODAL, {

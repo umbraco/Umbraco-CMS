@@ -1,7 +1,7 @@
 import { UmbEntityActionBase } from '../../../../entity-action/entity-action.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { UmbFolderRepository } from '@umbraco-cms/backoffice/tree';
 
@@ -17,6 +17,7 @@ export class UmbDeleteFolderEntityAction<T extends UmbFolderRepository> extends 
 	}
 
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository || !this.#modalContext) return;
 
 		const { data: folder } = await this.repository.request(this.unique);
