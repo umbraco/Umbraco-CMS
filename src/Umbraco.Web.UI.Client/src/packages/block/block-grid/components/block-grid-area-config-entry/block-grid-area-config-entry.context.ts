@@ -47,7 +47,7 @@ export class UmbBlockGridAreaConfigEntryContext
 	}
 	public getRelevantColumnSpanOptions() {
 		const layoutColumns = this.#entriesContext?.getLayoutColumns();
-		if (!layoutColumns) return [this.getColumnSpan() ?? 1]; // Just some fallback option, for this case, not sure if the case is even relevant. [NL]
+		if (!layoutColumns) return;
 		// Makes an array based of the given length, with number entries starting from 1. ex.: length 4 => [1, 2, 3, 4]
 		return Array.from({ length: layoutColumns }, (_, i) => i + 1);
 	}

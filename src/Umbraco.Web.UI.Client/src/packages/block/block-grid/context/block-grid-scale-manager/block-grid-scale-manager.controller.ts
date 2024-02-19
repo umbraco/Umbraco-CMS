@@ -72,7 +72,7 @@ export interface UmbBlockGridScalableContext extends UmbControllerHost {
 	getColumnSpan: () => number | undefined;
 	getRowSpan: () => number | undefined;
 	getMinMaxRowSpan: () => [number, number];
-	getRelevantColumnSpanOptions: () => Array<number>;
+	getRelevantColumnSpanOptions: () => Array<number> | undefined;
 }
 
 // This might be more generic than Block Grid, but this is where it belongs currently:
@@ -190,12 +190,11 @@ export class UmbBlockGridScaleManager extends UmbBaseController {
 
 		let newColumnSpan = Math.max(blockEndCol - blockStartCol, 1);
 
+		const spanOptions = this._host.getRelevantColumnSpanOptions();
+		if (!spanOptions) return;
+
 		// Find nearest allowed Column:
-		const bestColumnSpanOption = closestColumnSpanOption(
-			newColumnSpan,
-			this._host.getRelevantColumnSpanOptions(),
-			layoutColumns - blockStartCol,
-		);
+		const bestColumnSpanOption = closestColumnSpanOption(newColumnSpan, spanOptions, layoutColumns - blockStartCol);
 		newColumnSpan = bestColumnSpanOption ?? layoutColumns;
 
 		const [rowMinSpan, rowMaxSpan] = this._host.getMinMaxRowSpan();
