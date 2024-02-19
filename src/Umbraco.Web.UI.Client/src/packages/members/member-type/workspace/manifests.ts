@@ -5,6 +5,8 @@ import type {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
+export const UMB_MEMBER_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MemberType';
+
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.MemberType',
@@ -15,7 +17,26 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [];
+const workspaceViews: Array<ManifestWorkspaceView> = [
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.MemberType.Design',
+		name: 'Member Type Workspace Design View',
+		js: () => import('./views/design/member-type-workspace-view-edit.element.js'),
+		weight: 1000,
+		meta: {
+			label: 'Design',
+			pathname: 'design',
+			icon: 'icon-member-dashed-line',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
+			},
+		],
+	},
+];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
