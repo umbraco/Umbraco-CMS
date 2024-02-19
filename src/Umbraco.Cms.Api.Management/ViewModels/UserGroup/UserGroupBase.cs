@@ -77,5 +77,5 @@ public class UserGroupBase
 public class PermissionViewModel
 {
     public required string Verb { get; set; }
-    public required ReferenceByIdModel Content { get; set; }
+    public required ReferenceByIdModel Document { get; set; }
 }

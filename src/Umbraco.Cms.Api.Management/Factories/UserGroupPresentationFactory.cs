@@ -58,7 +58,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Permissions = userGroup.Permissions,
             GranularPermissions = new HashSet<PermissionViewModel>(userGroup.GranularPermissions.Select(x=>new PermissionViewModel()
             {
-                Content = new ReferenceByIdModel()
+                Document = new ReferenceByIdModel()
                 {
                     Id = x.Key,
                 },
@@ -194,7 +194,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             request.GranularPermissions.Select(
                 x=> new GranularPermission()
             {
-                Key = x.Content.Id,
+                Key = x.Document.Id,
                 Permission = x.Verb
             }));
 

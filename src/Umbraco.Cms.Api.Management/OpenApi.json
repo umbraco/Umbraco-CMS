@@ -30467,7 +30467,7 @@
       },
       "PermissionModel": {
         "required": [
-          "content",
+          "document",
           "verb"
         ],
         "type": "object",
@@ -30475,7 +30475,7 @@
           "verb": {
             "type": "string"
           },
-          "content": {
+          "document": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ReferenceByIdModel"
