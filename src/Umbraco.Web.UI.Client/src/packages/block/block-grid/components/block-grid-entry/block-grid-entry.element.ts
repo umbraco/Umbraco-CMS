@@ -84,7 +84,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this._hasSettings = !!settingsElementTypeKey;
 		});
 		this.observe(this.#context.canScale, (canScale) => {
-			console.log('canScale', canScale);
 			this._canScale = canScale;
 		});
 		this.observe(this.#context.label, (label) => {
@@ -191,6 +190,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 						${this._canScale
 							? html` <umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.onScaleMouseDown(e)}>
+									${this._columnSpan}x${this._rowSpan}
 							  </umb-block-scale-handler>`
 							: ''}
 					</div>
@@ -239,6 +239,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				//display: var(--umb-block-grid--block-ui-display, block);
 				display: block;
 				border-color: var(--uui-color-interactive);
+			}
+
+			uui-action-bar {
+				background-color: var(--uui-color-surface);
+			}
+
+			.umb-block-grid__block {
+				height: 100%;
 			}
 		`,
 	];

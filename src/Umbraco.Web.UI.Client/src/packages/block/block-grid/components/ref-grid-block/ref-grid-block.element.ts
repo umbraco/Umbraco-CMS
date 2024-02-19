@@ -21,11 +21,18 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 				min-width: 20px; // Set to something, to overwrite UUI min width.
 				min-height: var(--uui-size-16);
 				flex-flow: row wrap;
+				background-color: var(--uui-color-surface);
 			}
 
 			.break {
 				flex-basis: 100%;
 				height: 0;
+			}
+
+			#open-part {
+				min-height: var(
+					--uui-size-layout-2
+				); // We should not do this, but it is a quick fix for now to ensure that the top part of a block gets a minimum height.
 			}
 		`,
 	];

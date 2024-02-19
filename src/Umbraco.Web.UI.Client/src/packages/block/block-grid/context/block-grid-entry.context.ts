@@ -114,8 +114,10 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	}
 
 	protected _gotLayout(layout: UmbBlockGridLayoutModel | undefined) {
-		// TODO: Implement size correction to fit with configurations. both for columnSpan and rowSpan.
-		//layout?.columnSpan
+		if (layout) {
+			// TODO: Implement size correction to fit with configurations. both for columnSpan and rowSpan.
+			layout.columnSpan ??= 999;
+		}
 		return layout;
 	}
 
@@ -232,12 +234,14 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 					const newColumnSpan =
 						closestColumnSpanOption(columnSpan, relevantColumnSpanOptions, layoutColumns) ?? layoutColumns;
 					if (newColumnSpan !== columnSpan) {
-						this.setColumnSpan(newColumnSpan);
+						//this.setColumnSpan(newColumnSpan);
+						this._layout.update({ columnSpan: newColumnSpan });
 					}
 				} else {
 					// Reset to the layoutColumns.
 					if (layoutColumns !== columnSpan) {
-						this.setColumnSpan(layoutColumns);
+						//this.setColumnSpan(layoutColumns);
+						this._layout.update({ columnSpan: layoutColumns });
 					}
 				}
 			},

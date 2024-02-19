@@ -1,5 +1,5 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../block-grid-block-view/index.js';
 
@@ -21,7 +21,7 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 	render() {
 		return html`
 			<button aria-label="TODO: Some introduction to keyboard scaling" id="handler"></button>
-			<div id="label">TODO: Label content [NL]</div>
+			<slot id="label"></slot>
 		`;
 	}
 
