@@ -147,8 +147,8 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
                 return new RouteValueDictionary()
                 {
                     //TODO figure out constants
-                    [ControllerToken] = "BackOfficeView",
-                    [ActionToken] = "Default"
+                    [ControllerToken] = "BackOfficeDefault",
+                    [ActionToken] = "Index"
                 };
             }
 

@@ -15,17 +15,11 @@ public class BackOfficeDefaultController : Controller
         // force authentication to occur since this is not an authorized endpoint
         AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
 
-        /*
-         TODO: Remove authentication check & clean controller in V14
-         This is crossed out in V14 to allow the Backoffice to handle authentication itself whilst still allowing
-         the old Umbraco.Web.UI executable now using the updated login screen from V13 to work with the old Backoffice.
-
         // if we are not authenticated then we need to redirect to the login page
         if (!result.Succeeded)
         {
-            return RedirectToLogin(null);
+            RedirectToAction("Login", "Backoffice");
         }
-        */
 
         ViewResult defaultView = DefaultView();
 
