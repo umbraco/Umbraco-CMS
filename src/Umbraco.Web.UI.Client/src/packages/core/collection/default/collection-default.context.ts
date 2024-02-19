@@ -31,6 +31,9 @@ export class UmbDefaultCollectionContext<
 	#filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this.#filter.asObservable();
 
+	#userDefinedProperties = new UmbArrayState<any>([], (x) => x);
+	public readonly userDefinedProperties = this.#userDefinedProperties.asObservable();
+
 	repository?: UmbCollectionRepository;
 
 	#initResolver?: () => void;
@@ -131,7 +134,13 @@ export class UmbDefaultCollectionContext<
 	#configure() {
 		this.selection.setMultiple(true);
 		this.pagination.setPageSize(this.#config.pageSize!);
-		this.#filter.setValue({ ...this.#filter.getValue(), skip: 0, take: this.#config.pageSize });
+		this.#filter.setValue({
+			...this.#config,
+			...this.#filter.getValue(),
+			skip: 0,
+			take: this.#config.pageSize,
+		});
+		this.#userDefinedProperties.setValue(this.#config.userDefinedProperties ?? []);
 	}
 
 	#onPageChange = (event: UmbChangeEvent) => {

@@ -11,12 +11,14 @@ export interface UmbCollectionBulkActionPermissions {
 }
 
 export interface UmbCollectionConfiguration {
+	unique?: string;
+	dataTypeId?: string;
 	allowedEntityBulkActions?: UmbCollectionBulkActionPermissions;
-	includeProperties?: Array<any>;
 	orderBy?: string;
 	orderDirection?: string;
 	pageSize?: number;
 	useInfiniteEditor?: boolean;
+	userDefinedProperties?: Array<any>;
 }
 
 export interface UmbCollectionContext {

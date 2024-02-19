@@ -10,8 +10,8 @@ export class UmbDocumentCollectionRepository implements UmbCollectionRepository 
 		this.#collectionSource = new UmbDocumentCollectionServerDataSource(host);
 	}
 
-	async requestCollection(filter: UmbDocumentCollectionFilterModel) {
-		return this.#collectionSource.getCollection(filter);
+	async requestCollection(query: UmbDocumentCollectionFilterModel) {
+		return this.#collectionSource.getCollection(query);
 	}
 
 	destroy(): void {}

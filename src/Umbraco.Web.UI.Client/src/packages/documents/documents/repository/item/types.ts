@@ -8,7 +8,7 @@ export interface UmbDocumentItemModel {
 	documentType: {
 		unique: string;
 		icon: string;
-		hasListView: boolean;
+		hasCollection: boolean;
 	};
 	variants: Array<UmbDocumentItemVariantModel>;
 }
