@@ -116,7 +116,9 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	protected _gotLayout(layout: UmbBlockGridLayoutModel | undefined) {
 		if (layout) {
 			// TODO: Implement size correction to fit with configurations. both for columnSpan and rowSpan.
+			layout = { ...layout };
 			layout.columnSpan ??= 999;
+			layout.areas ??= [];
 		}
 		return layout;
 	}
@@ -258,6 +260,7 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 		updateRowTemplate: boolean,
 	) {
 		if (!this._entries) return;
+		const layoutColumns = this._entries.getLayoutColumns() ?? 0;
 
 		const computedStyles = window.getComputedStyle(layoutContainer);
 
@@ -293,7 +296,6 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 		// This will also ensure handling non-css-grid mode,
 		// use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
 		let amountOfColumnsInWeightMap = gridColumns.length;
-		const layoutColumns = this._entries.getLayoutColumns() ?? 0;
 		const amountOfUnknownColumns = layoutColumns - amountOfColumnsInWeightMap;
 		if (amountOfUnknownColumns > 0) {
 			const accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, gridColumns) || 0;
@@ -380,6 +382,7 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 		*/
 	}
 
+	#updateLayoutRaf = 0;
 	onScaleMouseMove = (e: MouseEvent) => {
 		const layoutContainer = this._entries?.getLayoutContainerElement() as HTMLElement;
 		if (!layoutContainer) {
@@ -396,19 +399,16 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 		const newSpans = this.#getNewSpans(startX, startY, endX, endY);
 		if (!newSpans) return;
 
-		console.log('newSpans', newSpans);
-
 		const updateRowTemplate = this.getColumnSpan() !== newSpans.columnSpan;
-
 		if (updateRowTemplate) {
 			// If we like to update we need to first remove the lock, make the browser render onces and then update.
 			(layoutContainer as HTMLElement).style.gridTemplateRows = '';
 		}
-		//cancelAnimationFrame(raf);
-		//raf = requestAnimationFrame(() => {
-		// As mentioned above we need to wait until the browser has rendered DOM without the lock of gridTemplateRows.
-		this.#updateGridData(layoutContainer, layoutContainerRect, layoutItemRect, updateRowTemplate);
-		//});
+		cancelAnimationFrame(this.#updateLayoutRaf);
+		this.#updateLayoutRaf = requestAnimationFrame(() => {
+			// As mentioned above we need to wait until the browser has rendered DOM without the lock of gridTemplateRows.
+			this.#updateGridData(layoutContainer, layoutContainerRect, layoutItemRect, updateRowTemplate);
+		});
 
 		// update as we go:
 		this.setColumnSpan(newSpans.columnSpan);
@@ -420,7 +420,7 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 		if (!layoutContainer) {
 			return;
 		}
-		//cancelAnimationFrame(raf);
+		cancelAnimationFrame(this.#updateLayoutRaf);
 
 		// Remove listeners:
 		window.removeEventListener('mousemove', this.onScaleMouseMove);
