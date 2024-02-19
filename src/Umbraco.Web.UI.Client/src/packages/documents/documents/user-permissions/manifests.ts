@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import type {
 	ManifestUserGranularPermission,
@@ -27,7 +28,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_READ,
 		name: 'Read Document User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_browse',
 			descriptionKey: 'actionDescriptions_browse',
 		},
@@ -37,7 +38,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
 		name: 'Create Document Blueprint User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_createblueprint',
 			descriptionKey: 'actionDescriptions_createblueprint',
 		},
@@ -47,7 +48,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_DELETE,
 		name: 'Delete Document User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_delete',
 			descriptionKey: 'actionDescriptions_delete',
 		},
@@ -57,7 +58,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE,
 		name: 'Create Document User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_create',
 			descriptionKey: 'actionDescriptions_create',
 		},
@@ -67,7 +68,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
 		name: 'Document Notifications User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_notify',
 			descriptionKey: 'actionDescriptions_notify',
 		},
@@ -77,7 +78,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 		name: 'Publish Document User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_publish',
 			descriptionKey: 'actionDescriptions_publish',
 		},
@@ -87,7 +88,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 		name: 'Document Permissions User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_setPermissions',
 			descriptionKey: 'actionDescriptions_rights',
 		},
@@ -97,7 +98,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_SEND_FOR_APPROVAL,
 		name: 'Send Document For Approval User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_sendtopublish',
 			descriptionKey: 'actionDescriptions_sendtopublish',
 		},
@@ -107,7 +108,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 		name: 'Unpublish Document User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_unpublish',
 			descriptionKey: 'actionDescriptions_unpublish',
 		},
@@ -117,7 +118,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 		name: 'Update Document User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_update',
 			descriptionKey: 'actionDescriptions_update',
 		},
@@ -127,7 +128,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_COPY,
 		name: 'Copy Document User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_copy',
 			descriptionKey: 'actionDescriptions_copy',
 			group: 'structure',
@@ -138,7 +139,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_MOVE,
 		name: 'Move Document User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_move',
 			descriptionKey: 'actionDescriptions_move',
 			group: 'structure',
@@ -149,7 +150,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_SORT,
 		name: 'Sort Document User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_sort',
 			descriptionKey: 'actionDescriptions_sort',
 			group: 'structure',
@@ -160,7 +161,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES,
 		name: 'Document Culture And Hostnames User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_assigndomain',
 			descriptionKey: 'actionDescriptions_assignDomain',
 			group: 'administration',
@@ -171,7 +172,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS,
 		name: 'Document Public Access User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_protect',
 			descriptionKey: 'actionDescriptions_protect',
 			group: 'administration',
@@ -182,7 +183,7 @@ const permissions: Array<ManifestUserPermission> = [
 		alias: UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
 		name: 'Document Rollback User Permission',
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			labelKey: 'actions_rollback',
 			descriptionKey: 'actionDescriptions_rollback',
 			group: 'administration',
@@ -197,7 +198,7 @@ export const granularPermissions: Array<ManifestUserGranularPermission> = [
 		name: 'Document Granular User Permission',
 		js: () => import('../components/input-document-granular-permission/input-document-granular-permission.element.js'),
 		meta: {
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 		},
 	},
 ];
