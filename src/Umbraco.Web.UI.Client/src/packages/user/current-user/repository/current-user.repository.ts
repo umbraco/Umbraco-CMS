@@ -39,7 +39,7 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 			this.#currentUserStore?.set(data);
 		}
 
-		return { data, error, asObservable: () => this.#currentUserStore!.get() };
+		return { data, error, asObservable: () => this.#currentUserStore!.data };
 	}
 }
 
