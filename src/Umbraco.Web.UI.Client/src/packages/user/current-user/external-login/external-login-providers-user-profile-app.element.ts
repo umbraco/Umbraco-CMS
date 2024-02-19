@@ -2,8 +2,8 @@ import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-user-profile-app-external-login-providers')
-export class UmbUserProfileAppExternalLoginProvidersElement extends UmbLitElement {
+@customElement('umb-external-login-providers-user-profile-app')
+export class UmbExternalLoginProvidersUserProfileAppElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box>
@@ -16,10 +16,10 @@ export class UmbUserProfileAppExternalLoginProvidersElement extends UmbLitElemen
 	static styles = [UmbTextStyles, css``];
 }
 
-export default UmbUserProfileAppExternalLoginProvidersElement;
+export default UmbExternalLoginProvidersUserProfileAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-profile-app-external-login-providers': UmbUserProfileAppExternalLoginProvidersElement;
+		'umb-external-login-providers-user-profile-app': UmbExternalLoginProvidersUserProfileAppElement;
 	}
 }

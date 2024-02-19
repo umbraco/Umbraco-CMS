@@ -5,8 +5,8 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
 
-@customElement('umb-user-profile-app-profile')
-export class UmbUserProfileAppProfileElement extends UmbLitElement {
+@customElement('umb-current-user-profile-user-profile-app')
+export class UmbCurrentUserProfileUserProfileAppElement extends UmbLitElement {
 	@state()
 	private _currentUser?: UmbCurrentUserModel;
 
@@ -73,10 +73,10 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	static styles = [UmbTextStyles, css``];
 }
 
-export default UmbUserProfileAppProfileElement;
+export default UmbCurrentUserProfileUserProfileAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-profile-app-profile': UmbUserProfileAppProfileElement;
+		'umb-current-user-profile-user-profile-app': UmbCurrentUserProfileUserProfileAppElement;
 	}
 }
