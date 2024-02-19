@@ -31,12 +31,14 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		});
 	}
 
-	async requestCurrentUser() {
+	/**
+	 * Loads the current user
+	 */
+	async load() {
 		const { data } = await this.#currentUserRepository.requestCurrentUser();
 
 		if (data) {
-			// TODO: observe current user
-			this.#currentUser.setValue(data);
+			this.#currentUser?.setValue(data);
 		}
 	}
 
@@ -55,7 +57,7 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 		if (!this.#authContext) return;
 		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
 			if (isAuthorized) {
-				this.requestCurrentUser();
+				this.load();
 			}
 		});
 	}
