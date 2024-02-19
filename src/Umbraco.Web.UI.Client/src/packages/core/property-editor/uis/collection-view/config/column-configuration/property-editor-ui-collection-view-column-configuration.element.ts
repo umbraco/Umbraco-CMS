@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 interface ColumnConfig {
 	alias: string;
 	header: string;
-	isSystem: boolean;
+	isSystem: 1 | 0;
 	nameTemplate?: string;
 }
 
@@ -77,7 +77,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 		const config: ColumnConfig = {
 			alias: selected.value,
 			header: selected.name,
-			isSystem: selected?.group === 'System Fields',
+			isSystem: selected?.group === 'System Fields' ? 1 : 0,
 		};
 		this.value = [...this.value, config];
 
@@ -133,7 +133,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 				(configuration) =>
 					html`<uui-table-row>
 						<uui-table-cell><uui-icon name="icon-navigation"></uui-icon></uui-table-cell>
-						${configuration.isSystem
+						${configuration.isSystem === 1
 							? this.#renderSystemFieldRow(configuration)
 							: this.#renderCustomFieldRow(configuration)}
 						<uui-table-cell>
