@@ -15,8 +15,6 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
-//import './column-layouts/document-table-actions-column-layout.element.js';
-
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
@@ -34,13 +32,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			alias: 'entityName',
 			allowSorting: true,
 		},
-		// TODO: actions should live in an UmbTable element when we have moved the current UmbTable to UUI.
-		// {
-		// 	name: 'Actions',
-		// 	alias: 'entityActions',
-		// 	elementName: 'umb-document-table-actions-column-layout',
-		// 	width: '80px',
-		// },
 	];
 
 	@state()
