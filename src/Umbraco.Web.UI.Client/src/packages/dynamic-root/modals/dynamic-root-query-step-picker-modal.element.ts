@@ -2,7 +2,7 @@ import { UmbDocumentTypePickerContext } from '../../documents/document-types/com
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, map, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreePickerDynamicRootQueryStep } from '@umbraco-cms/backoffice/components';
 import type { ManifestDynamicRootQueryStep } from '@umbraco-cms/backoffice/extension-registry';
@@ -58,8 +58,9 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 			<umb-body-layout headline="${this.localize.term('dynamicRoot_pickDynamicRootQueryStepTitle')}">
 				<div id="main">
 					<uui-box>
-						${map(
+						${repeat(
 							this._querySteps,
+							(item) => item.alias,
 							(item) => html`
 								<uui-button @click=${() => this.#choose(item)} look="placeholder" label="${ifDefined(item.meta.label)}">
 									<h3>${item.meta.label}</h3>

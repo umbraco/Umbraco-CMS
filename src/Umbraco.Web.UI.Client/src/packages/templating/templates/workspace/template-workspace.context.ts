@@ -81,7 +81,7 @@ export class UmbTemplateWorkspaceContext
 		const { data } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			//this.setMasterTemplate(data.masterTemplateId ?? null);
+			this.setMasterTemplate(data.masterTemplate?.unique ?? null);
 			this.#data.setValue(data);
 		}
 	}
@@ -137,10 +137,9 @@ ${currentContent}`;
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.setValue(data);
-		/*
+
 		if (!parentUnique) return;
 		await this.setMasterTemplate(parentUnique);
-		*/
 	}
 
 	async save() {
