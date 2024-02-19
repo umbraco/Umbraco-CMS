@@ -44,7 +44,7 @@ public class UserGroupBuilderTests
         Assert.AreEqual(testName, userGroup.Name);
         Assert.AreEqual(testUserCount, userGroup.UserCount);
         Assert.AreEqual(testIcon, userGroup.Icon);
-        Assert.AreEqual(testPermissions.Count, userGroup.PermissionNames.Count());
+        Assert.AreEqual(testPermissions.Count, userGroup.Permissions.Count());
         Assert.AreEqual(testStartContentId, userGroup.StartContentId);
         Assert.AreEqual(testStartMediaId, userGroup.StartMediaId);
     }

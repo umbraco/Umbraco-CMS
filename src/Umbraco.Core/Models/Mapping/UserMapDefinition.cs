@@ -136,10 +136,11 @@ public class UserMapDefinition : IMapDefinition
         target.Icon = source.Icon;
         target.Alias = source.Alias;
         target.Name = source.Name;
-        target.PermissionNames = source.DefaultPermissions?.ToHashSet() ?? new HashSet<string>();
+        target.Permissions = source.Permissions?.ToHashSet() ?? new HashSet<string>();
+        target.GranularPermissions = source.GranularPermissions ?? new HashSet<IGranularPermission>();
         target.Key = source.Key;
         target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
-        target.PermissionNames = source.Permissions ?? new HashSet<string>();
+        target.Permissions = source.Permissions ?? new HashSet<string>();
 
         var id = GetIntId(source.Id);
         if (id > 0)
@@ -518,8 +519,8 @@ public class UserMapDefinition : IMapDefinition
                 Name = _textService.Localize("actions", action.Alias),
                 Description = _textService.Localize("actionDescriptions", action.Alias),
                 Icon = action.Icon,
-                Checked = source.PermissionNames != null &&
-                          source.PermissionNames.Contains(action.Letter),
+                Checked = source.Permissions != null &&
+                          source.Permissions.Contains(action.Letter),
                 PermissionCode = action.Letter.ToString(CultureInfo.InvariantCulture),
             };
         }

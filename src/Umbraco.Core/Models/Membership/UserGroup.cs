@@ -19,12 +19,19 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
 
+    private static readonly DelegateEqualityComparer<ISet<IGranularPermission>> _granularPermissionSetComparer =
+        new(
+            (set1, set2) => Equals(set1, set2),
+            set => set.GetHashCode());
+
+
     private readonly IShortStringHelper _shortStringHelper;
     private string _alias;
     private string? _icon;
     private string _name;
     private bool _hasAccessToAllLanguages;
-    private ISet<string> _permissionNames = new HashSet<string>();
+    private ISet<string> _permissions;
+    private ISet<IGranularPermission> _granularPermissions;
     private List<string> _sectionCollection;
     private List<int> _languageCollection;
     private int? _startContentId;
@@ -40,6 +47,8 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         _shortStringHelper = shortStringHelper;
         _sectionCollection = new List<string>();
         _languageCollection = new List<int>();
+        _permissions = new HashSet<string>();
+        _granularPermissions = new HashSet<IGranularPermission>();
     }
 
     /// <summary>
@@ -49,6 +58,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     /// <param name="alias"></param>
     /// <param name="name"></param>
     /// <param name="permissions"></param>
+    /// <param name="granularPermissions"></param>
     /// <param name="icon"></param>
     /// <param name="shortStringHelper"></param>
     public UserGroup(
@@ -56,14 +66,12 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         int userCount,
         string? alias,
         string? name,
-        ISet<string> permissionNames,
         string? icon)
         : this(shortStringHelper)
     {
         UserCount = userCount;
         _alias = alias ?? string.Empty;
         _name = name ?? string.Empty;
-        _permissionNames = permissionNames;
         _icon = icon;
     }
 
@@ -112,11 +120,18 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     }
 
     /// <inheritdoc />
-    public ISet<string> PermissionNames
+    public ISet<string> Permissions
     {
-        get => _permissionNames;
-        set => SetPropertyValueAndDetectChanges(value, ref _permissionNames!, nameof(PermissionNames), _stringEnumerableComparer);
+        get => _permissions;
+        set => SetPropertyValueAndDetectChanges(value, ref _permissions!, nameof(Permissions), _stringEnumerableComparer);
     }
+
+    public ISet<IGranularPermission> GranularPermissions
+    {
+        get => _granularPermissions;
+        set => SetPropertyValueAndDetectChanges(value, ref _granularPermissions!, nameof(GranularPermissions), _granularPermissionSetComparer);
+    }
+
 
     public IEnumerable<string> AllowedSections => _sectionCollection;
 

@@ -27,7 +27,7 @@ public class MigrateCharPermissionsToStrings : MigrationBase
 
             var permissions = userGroupDto.DefaultPermissions.Select(x => new UserGroup2PermissionDto()
             {
-                Permission = x.ToString(), UserGroupId = userGroupDto.Id
+                Permission = x.ToString(), UserGroupKey = userGroupDto.Key
             }).ToHashSet();
 
             Database.InsertBulk(permissions);

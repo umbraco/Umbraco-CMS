@@ -13,8 +13,8 @@ public class UserGroup2PermissionDto
 
     [Column("userGroupId")]
     [Index(IndexTypes.NonClustered, IncludeColumns = "permission")]
-    [ForeignKey(typeof(UserGroupDto))]
-    public int UserGroupId { get; set; }
+    [ForeignKey(typeof(UserGroupDto), Column = "key")]
+    public Guid UserGroupKey { get; set; }
 
     [Column("permission")]
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]

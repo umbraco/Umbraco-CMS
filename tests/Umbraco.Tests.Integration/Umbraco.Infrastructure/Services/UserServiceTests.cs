@@ -175,7 +175,7 @@ public class UserServiceTests : UmbracoIntegrationTest
         var userGroup3 = CreateTestUserGroup("test3", "Test 3");
         var user = UserService.CreateUserWithIdentity("John Doe", "john@umbraco.io");
 
-        var defaultPermissionCount = userGroup3.PermissionNames.Count();
+        var defaultPermissionCount = userGroup3.Permissions.Count();
 
         user.AddGroup(userGroup1);
         user.AddGroup(userGroup2);

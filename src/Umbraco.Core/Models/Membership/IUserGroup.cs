@@ -36,11 +36,9 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// </summary>
     /// <remarks>
     /// By default the server has no concept of what these strings mean, we simple store them and return them to the UI.
-    /// FIXME: For now this is named PermissionNames since Permissions already exists, but is subject to change in the future
-    /// when we know more about how we want to handle permissions, potentially those will be migrated in the these "soft" permissions.
     /// </remarks>
-    ISet<string> PermissionNames { get; set; }
-   // ISet<IPermission> GranularPermission { get; set; }
+    ISet<string> Permissions { get; set; }
+    ISet<IGranularPermission> GranularPermissions { get; set; }
 
     IEnumerable<string> AllowedSections { get; }
 

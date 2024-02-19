@@ -24,7 +24,7 @@ public interface IReadOnlyUserGroup
 
     // This is set to return true as default to avoid breaking changes.
     bool HasAccessToAllLanguages => true;
-    ISet<string> PermissionNames { get; }
+    ISet<string> Permissions { get; }
     IEnumerable<string> AllowedSections { get; }
 
     IEnumerable<int> AllowedLanguages => Enumerable.Empty<int>();

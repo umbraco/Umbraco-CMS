@@ -241,8 +241,8 @@ public sealed class AuditNotificationsHandler :
             var sections = ((UserGroup)group).WasPropertyDirty("AllowedSections")
                 ? string.Join(", ", group.AllowedSections)
                 : null;
-            var perms = ((UserGroup)group).WasPropertyDirty("PermissionNames") && group.PermissionNames is not null
-                ? string.Join(", ", group.PermissionNames)
+            var perms = ((UserGroup)group).WasPropertyDirty("PermissionNames") && group.Permissions is not null
+                ? string.Join(", ", group.Permissions)
                 : null;
 
             var sb = new StringBuilder();
