@@ -22,6 +22,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	private _busy = false;
 
 	@state()
+	private _userDefinedProperties?: Array<any>;
+
+	@state()
 	private _items?: Array<UmbDocumentCollectionItemModel>;
 
 	@state()
@@ -67,6 +70,11 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
+		this.observe(this._collectionContext.userDefinedProperties, (userDefinedProperties) => {
+			this._userDefinedProperties = userDefinedProperties;
+			this.#createTableHeadings();
+		});
+
 		this.observe(this._collectionContext.items, (items) => {
 			this._items = items;
 			this.#createTableItems(this._items);
@@ -77,24 +85,55 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
+	#createTableHeadings() {
+		if (this._userDefinedProperties && this._userDefinedProperties.length > 0) {
+			const userColumns: Array<UmbTableColumn> = this._userDefinedProperties.map((item) => {
+				return {
+					name: item.header,
+					alias: item.alias,
+					elementName: item.elementName,
+					allowSorting: true,
+				};
+			});
+
+			this._tableColumns = [...this.#systemColumns, ...userColumns];
+		}
+	}
+
 	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
+		// TODO: [LK] This is a temporary solution. Let's explore a nicer way to display the values.
+		const getValue = (item: UmbDocumentCollectionItemModel, alias: string) => {
+			switch (alias) {
+				case 'createDate':
+					return item.createDate.toLocaleString();
+				case 'owner':
+					return item.creator;
+				case 'published':
+					return item.state !== 'Draft' ? 'True' : 'False';
+				case 'updateDate':
+					return item.updateDate.toLocaleString();
+				case 'updater':
+					return item.updater;
+				default:
+					return item.values.find((value) => value.alias === alias)?.value ?? '';
+			}
+		};
+
 		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
+
+			const data =
+				this._tableColumns?.map((column) => {
+					return {
+						columnAlias: column.alias,
+						value: column.elementName ? item : getValue(item, column.alias),
+					};
+				}) ?? [];
+
 			return {
 				id: item.unique,
-				data: [
-					{
-						columnAlias: 'entityName',
-						value: item.name || 'Unnamed Document',
-					},
-					// {
-					// 	columnAlias: 'entityActions',
-					// 	value: {
-					// 		entityType: item.entityType,
-					// 	},
-					// },
-				],
 				icon: item.icon,
+				data: data,
 			};
 		});
 	}
@@ -117,7 +156,10 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		const table = event.target as UmbTableElement;
 		const orderingColumn = table.orderingColumn;
 		const orderingDesc = table.orderingDesc;
-		console.log(`fetch media items, order column: ${orderingColumn}, desc: ${orderingDesc}`);
+		this._collectionContext?.setFilter({
+			orderBy: orderingColumn,
+			orderDirection: orderingDesc ? 'desc' : 'asc',
+		});
 	}
 
 	render() {
