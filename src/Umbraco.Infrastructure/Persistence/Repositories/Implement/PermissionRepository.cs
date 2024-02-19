@@ -331,6 +331,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
         ReplaceEntityPermissions(entity);
     }
 
+
     private static EntityPermissionCollection ConvertToPermissionList(
         IEnumerable<UserGroup2GranularPermissionWithIdsDto> result)
     {
