@@ -5,10 +5,10 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-
 
 @customElement('umb-block-grid-area-type-workspace-view')
 export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	// TODO: Localization:
-	// TODO: Validation to prevent spaces and wierd characters in alias:
+	// TODO: Add Localizations...
+	// TODO: Validation to prevent spaces and weird characters in alias:
 	// TODO: Add create button label field:
-	// TODO: Add validation field:
+	// TODO: Turn minAllowed and maxAllowed into one range property/input...
 	// TODO: Add validation permission field:
 	render() {
 		return html`
@@ -19,11 +19,25 @@ export class UmbBlockGridAreaTypeWorkspaceViewSettingsElement extends UmbLitElem
 					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
 
 				<umb-property
-					label=${'Temp column span:'}
-					alias="columnSpan"
-					property-editor-ui-alias="Umb.PropertyEditorUi.Number"></umb-property>
+					label=${'Create Button Label'}
+					alias="createLabel"
+					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
 			</uui-box>
-			<uui-box headline=${'Validation'}> TO BE DONE. </uui-box>
+			<uui-box headline=${'Validation'}>
+				<umb-property
+					label=${'minAllowed'}
+					alias="minAllowed"
+					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
+				<umb-property
+					label=${'maxAllowed'}
+					alias="maxAllowed"
+					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
+
+				<umb-property
+					label=${'specifiedAllowance'}
+					alias="specifiedAllowance"
+					property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridAreaTypePermission"></umb-property>
+			</uui-box>
 		`;
 	}
 
