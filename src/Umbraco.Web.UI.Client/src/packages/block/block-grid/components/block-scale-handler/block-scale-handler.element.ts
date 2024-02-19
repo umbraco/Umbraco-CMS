@@ -14,10 +14,13 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 		this.addEventListener('dragstart', (e: DragEvent) => {
 			e.preventDefault();
 		});
+		this.addEventListener('dragstart', (e: DragEvent) => {
+			e.preventDefault();
+		});
 	}
 	render() {
 		return html`
-			<div id="handler"></div>
+			<button aria-label="TODO: Some introduction to keyboard scaling" id="handler"></button>
 			<div id="label">TODO: Label content [NL]</div>
 		`;
 	}
@@ -38,7 +41,7 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 
 			#handler {
 				position: absolute;
-				// TODO: Look at the feature I out-commented here, what was that supose to do [NL]:
+				// TODO: Look at the feature I out-commented here, what was that suppose to do [NL]:
 				//display: var(--umb-block-grid--block-ui-display, block);
 				display: block;
 				z-index: 2;
@@ -60,6 +63,10 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 			#handler:hover,
 			#handler:focus {
 				opacity: 1;
+			}
+			#handler:focus {
+				outline: 2px solid var(--uui-color-selected);
+				outline-offset: 1px;
 			}
 			#handler::after {
 				content: '';

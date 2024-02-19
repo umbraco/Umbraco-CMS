@@ -648,6 +648,23 @@ export const data: Array<UmbMockDataTypeModel> = [
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 						rowMinSpan: 1,
 						rowMaxSpan: 1,
+						columnSpanOptions: [
+							{
+								columnSpan: 1,
+							},
+							{
+								columnSpan: 2,
+							},
+							{
+								columnSpan: 3,
+							},
+							{
+								columnSpan: 6,
+							},
+							{
+								columnSpan: 12,
+							},
+						],
 						areas: [
 							{
 								key: 'area1_key',

@@ -18,6 +18,7 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 		...UUIRefNodeElement.styles,
 		css`
 			:host {
+				min-width: 20px; // Set to something, to overwrite UUI min width.
 				min-height: var(--uui-size-16);
 				flex-flow: row wrap;
 			}
