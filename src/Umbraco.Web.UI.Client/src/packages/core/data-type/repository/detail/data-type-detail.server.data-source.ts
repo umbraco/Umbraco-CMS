@@ -6,7 +6,6 @@ import type { CreateDataTypeRequestModel, DataTypeModelBaseModel } from '@umbrac
 import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { Part } from 'lit-html';
 
 /**
  * A data source for the Data Type that fetches data from the server
