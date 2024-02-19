@@ -18,8 +18,8 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 		...UUIRefNodeElement.styles,
 		css`
 			:host {
-				min-width: 20px; // Set to something, to overwrite UUI min width.
-				height: 100%; // Help to fill out the whole layout entry.
+				min-width: 20px; /* Set to something, to overwrite UUI min width. */
+				height: 100%; /* Help to fill out the whole layout entry. */
 				min-height: var(--uui-size-16);
 				flex-flow: row wrap;
 				background-color: var(--uui-color-surface);
@@ -33,7 +33,7 @@ export class UmbRefGridBlockElement extends UUIRefNodeElement {
 			#open-part {
 				min-height: var(
 					--uui-size-layout-2
-				); // We should not do this, but it is a quick fix for now to ensure that the top part of a block gets a minimum height.
+				); /* We should not do this, but it is a quick fix for now to ensure that the top part of a block gets a minimum height. */
 			}
 		`,
 	];

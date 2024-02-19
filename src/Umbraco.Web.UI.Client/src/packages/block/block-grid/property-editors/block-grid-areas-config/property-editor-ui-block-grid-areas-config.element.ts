@@ -1,6 +1,7 @@
 import type { UmbBlockGridTypeAreaType } from '../../index.js';
 import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from '../../context/block-grid-manager.context.js';
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/index.js';
+import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, css, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -18,6 +19,8 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	//
+	#context = new UmbBlockGridAreaTypeEntriesContext(this);
 	// local vars:
 	#defaultAreaGridColumns: number = 12;
 	#valueOfAreaGridColumns?: number | null;
@@ -93,6 +96,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	#gotAreaColumns() {
 		if (!this.#defaultAreaGridColumns || this.#valueOfAreaGridColumns === undefined) return;
 		this._areaGridColumns = this.#valueOfAreaGridColumns ?? this.#defaultAreaGridColumns;
+		this.#context.setLayoutColumns(this._areaGridColumns);
 	}
 
 	#addNewArea() {
@@ -132,6 +136,7 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 								html`<umb-block-area-config-entry
 									class="umb-block-grid__area"
 									.workspacePath=${this._workspacePath}
+									.areaGridColumns=${this._areaGridColumns}
 									.key=${area.key}></umb-block-area-config-entry>`,
 						)}
 					</div>

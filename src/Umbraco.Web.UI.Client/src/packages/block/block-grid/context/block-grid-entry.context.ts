@@ -1,6 +1,10 @@
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from './block-grid-entries.context-token.js';
 import {
+	type UmbBlockGridScalableContext,
+	UmbBlockGridScaleManager,
+} from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
+import {
 	UmbBlockEntryContext,
 	type UmbBlockGridTypeModel,
 	type UmbBlockGridLayoutModel,
@@ -13,48 +17,6 @@ import {
 	appendToFrozenArray,
 } from '@umbraco-cms/backoffice/observable-api';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
-
-// Utils:
-// TODO: Move these methods into their own files:
-
-function getInterpolatedIndexOfPositionInWeightMap(target: number, weights: Array<number>) {
-	const map = [0];
-	weights.reduce((a, b, i) => {
-		return (map[i + 1] = a + b);
-	}, 0);
-	const foundValue = map.reduce((a, b) => {
-		const aDiff = Math.abs(a - target);
-		const bDiff = Math.abs(b - target);
-
-		if (aDiff === bDiff) {
-			return a < b ? a : b;
-		} else {
-			return bDiff < aDiff ? b : a;
-		}
-	});
-	const foundIndex = map.indexOf(foundValue);
-	const targetDiff = target - foundValue;
-	let interpolatedIndex = foundIndex;
-	if (targetDiff < 0 && foundIndex === 0) {
-		// Don't adjust.
-	} else if (targetDiff > 0 && foundIndex === map.length - 1) {
-		// Don't adjust.
-	} else {
-		const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex - 1];
-		interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : targetDiff / foundInterpolationWeight;
-	}
-	return interpolatedIndex;
-}
-
-function getAccumulatedValueOfIndex(index: number, weights: Array<number>) {
-	const len = Math.min(index, weights.length);
-	let i = 0,
-		calc = 0;
-	while (i < len) {
-		calc += weights[i++];
-	}
-	return calc;
-}
 
 function closestColumnSpanOption(target: number, map: Array<number>, max: number) {
 	if (map.length > 0) {
@@ -78,14 +40,17 @@ function closestColumnSpanOption(target: number, map: Array<number>, max: number
 	return;
 }
 
-export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
-	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
-	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT.TYPE,
-	typeof UMB_BLOCK_GRID_ENTRIES_CONTEXT,
-	typeof UMB_BLOCK_GRID_ENTRIES_CONTEXT.TYPE,
-	UmbBlockGridTypeModel,
-	UmbBlockGridLayoutModel
-> {
+export class UmbBlockGridEntryContext
+	extends UmbBlockEntryContext<
+		typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
+		typeof UMB_BLOCK_GRID_MANAGER_CONTEXT.TYPE,
+		typeof UMB_BLOCK_GRID_ENTRIES_CONTEXT,
+		typeof UMB_BLOCK_GRID_ENTRIES_CONTEXT.TYPE,
+		UmbBlockGridTypeModel,
+		UmbBlockGridLayoutModel
+	>
+	implements UmbBlockGridScalableContext
+{
 	//
 	readonly columnSpan = this._layout.asObservablePart((x) => x?.columnSpan);
 	readonly rowSpan = this._layout.asObservablePart((x) => x?.rowSpan ?? 1);
@@ -93,9 +58,16 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
 	readonly areas = this._blockType.asObservablePart((x) => x?.areas ?? []);
 	readonly minMaxRowSpan = this._blockType.asObservablePart((x) => [x?.rowMinSpan ?? 1, x?.rowMaxSpan ?? 1]);
+	public getMinMaxRowSpan(): [number, number] {
+		const x = this._blockType.getValue();
+		return [x?.rowMinSpan ?? 1, x?.rowMaxSpan ?? 1];
+	}
 
 	#relevantColumnSpanOptions = new UmbArrayState<number>([], (x) => x);
 	readonly relevantColumnSpanOptions = this.#relevantColumnSpanOptions.asObservable();
+	public getRelevantColumnSpanOptions() {
+		return this.#relevantColumnSpanOptions.getValue();
+	}
 
 	#canScale = new UmbBooleanState(false);
 	readonly canScale = this.#canScale.asObservable();
@@ -103,11 +75,9 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	#areaGridColumns = new UmbNumberState(undefined);
 	readonly areaGridColumns = this.#areaGridColumns.asObservable();
 
-	#runtimeGridColumns: Array<number> = [];
-	#runtimeGridRows: Array<number> = [];
-	#lockedGridRows = 0;
-
 	readonly showContentEdit = this._blockType.asObservablePart((x) => !x?.forceHideContentEditorInOverlay);
+
+	readonly scaleManager = new UmbBlockGridScaleManager(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
@@ -196,6 +166,8 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	}
 
 	_gotEntries() {
+		this.scaleManager.setEntriesContext(this._entries);
+
 		if (!this._entries) return;
 
 		this.observe(
@@ -250,207 +222,4 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 			'observeColumnSpanValidation',
 		);
 	}
-
-	// Scaling feature:
-
-	#updateGridData(
-		layoutContainer: HTMLElement,
-		layoutContainerRect: DOMRect,
-		layoutItemRect: DOMRect,
-		updateRowTemplate: boolean,
-	) {
-		if (!this._entries) return;
-		const layoutColumns = this._entries.getLayoutColumns() ?? 0;
-
-		const computedStyles = window.getComputedStyle(layoutContainer);
-
-		const columnGap = Number(computedStyles.columnGap.split('px')[0]) || 0;
-		const rowGap = Number(computedStyles.rowGap.split('px')[0]) || 0;
-
-		let gridColumns = computedStyles.gridTemplateColumns
-			.trim()
-			.split('px')
-			.map((x) => Number(x));
-		let gridRows = computedStyles.gridTemplateRows
-			.trim()
-			.split('px')
-			.map((x) => Number(x));
-
-		// remove empties:
-		gridColumns = gridColumns.filter((n) => n > 0);
-		gridRows = gridRows.filter((n) => n > 0);
-
-		// We use this code to lock the templateRows, while scaling. otherwise scaling Rows is too crazy.
-		if (updateRowTemplate || gridRows.length > this.#lockedGridRows) {
-			this.#lockedGridRows = gridRows.length;
-			layoutContainer.style.gridTemplateRows = computedStyles.gridTemplateRows;
-		}
-
-		// add gaps:
-		const gridColumnsLen = gridColumns.length;
-		gridColumns = gridColumns.map((n, i) => (gridColumnsLen === i ? n : n + columnGap));
-		const gridRowsLen = gridRows.length;
-		gridRows = gridRows.map((n, i) => (gridRowsLen === i ? n : n + rowGap));
-
-		// ensure all columns are there.
-		// This will also ensure handling non-css-grid mode,
-		// use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-		let amountOfColumnsInWeightMap = gridColumns.length;
-		const amountOfUnknownColumns = layoutColumns - amountOfColumnsInWeightMap;
-		if (amountOfUnknownColumns > 0) {
-			const accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, gridColumns) || 0;
-			const missingColumnWidth = (layoutContainerRect.width - accumulatedValue) / amountOfUnknownColumns;
-			while (amountOfColumnsInWeightMap++ < layoutColumns) {
-				gridColumns.push(missingColumnWidth);
-			}
-		}
-
-		// Handle non css grid mode for Rows:
-		// use item height divided by rowSpan to identify row heights.
-		if (gridRows.length === 0) {
-			// Push its own height twice, to give something to scale with.
-			gridRows.push(layoutItemRect.top - layoutContainerRect.top);
-
-			let i = 0;
-			const itemSingleRowHeight = layoutItemRect.height;
-			while (i++ < (this.getRowSpan() ?? 0)) {
-				gridRows.push(itemSingleRowHeight);
-			}
-		}
-
-		// add a few extra rows, so there is something to extend too.
-		// Add extra options for the ability to extend beyond current content:
-		gridRows.push(50);
-		gridRows.push(50);
-		gridRows.push(50);
-		gridRows.push(50);
-		gridRows.push(50);
-
-		this.#runtimeGridColumns = gridColumns;
-		this.#runtimeGridRows = gridRows;
-	}
-
-	// TODO: Rename to calc something.
-	#getNewSpans(startX: number, startY: number, endX: number, endY: number) {
-		const layoutColumns = this._entries?.getLayoutColumns();
-		if (!layoutColumns) return;
-
-		const blockStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(startX, this.#runtimeGridColumns));
-		const blockStartRow = Math.round(getInterpolatedIndexOfPositionInWeightMap(startY, this.#runtimeGridRows));
-		const blockEndCol = getInterpolatedIndexOfPositionInWeightMap(endX, this.#runtimeGridColumns);
-		const blockEndRow = getInterpolatedIndexOfPositionInWeightMap(endY, this.#runtimeGridRows);
-
-		let newColumnSpan = Math.max(blockEndCol - blockStartCol, 1);
-
-		// Find nearest allowed Column:
-		const bestColumnSpanOption = closestColumnSpanOption(
-			newColumnSpan,
-			this.#relevantColumnSpanOptions.getValue(),
-			layoutColumns - blockStartCol,
-		);
-		newColumnSpan = bestColumnSpanOption ?? layoutColumns;
-
-		let newRowSpan = Math.round(Math.max(blockEndRow - blockStartRow, this._blockType.getValue()?.rowMinSpan || 1));
-		const rowMaxSpan = this._blockType.getValue()?.rowMaxSpan;
-		if (rowMaxSpan != null) {
-			newRowSpan = Math.min(newRowSpan, rowMaxSpan);
-		}
-
-		return { columnSpan: newColumnSpan, rowSpan: newRowSpan, startCol: blockStartCol, startRow: blockStartRow };
-	}
-
-	public onScaleMouseDown(event: MouseEvent) {
-		const layoutContainer = this._entries?.getLayoutContainerElement() as HTMLElement;
-		if (!layoutContainer) {
-			return;
-		}
-		event.preventDefault();
-
-		//this.#isScaleMode = true;
-
-		window.addEventListener('mousemove', this.onScaleMouseMove);
-		window.addEventListener('mouseup', this.onScaleMouseUp);
-		window.addEventListener('mouseleave', this.onScaleMouseUp);
-
-		const layoutItemRect = this.getHostElement().getBoundingClientRect();
-		this.#updateGridData(layoutContainer, layoutContainer.getBoundingClientRect(), layoutItemRect, true);
-
-		/*
-		scaleBoxBackdropEl = document.createElement('div');
-		scaleBoxBackdropEl.className = 'umb-block-grid__scalebox-backdrop';
-		layoutContainer.appendChild(scaleBoxBackdropEl);
-		*/
-	}
-
-	#updateLayoutRaf = 0;
-	onScaleMouseMove = (e: MouseEvent) => {
-		const layoutContainer = this._entries?.getLayoutContainerElement() as HTMLElement;
-		if (!layoutContainer) {
-			return;
-		}
-		const layoutContainerRect = layoutContainer.getBoundingClientRect();
-		const layoutItemRect = this.getHostElement().getBoundingClientRect();
-
-		const startX = layoutItemRect.left - layoutContainerRect.left;
-		const startY = layoutItemRect.top - layoutContainerRect.top;
-		const endX = e.clientX - layoutContainerRect.left;
-		const endY = e.clientY - layoutContainerRect.top;
-
-		const newSpans = this.#getNewSpans(startX, startY, endX, endY);
-		if (!newSpans) return;
-
-		const updateRowTemplate = this.getColumnSpan() !== newSpans.columnSpan;
-		if (updateRowTemplate) {
-			// If we like to update we need to first remove the lock, make the browser render onces and then update.
-			(layoutContainer as HTMLElement).style.gridTemplateRows = '';
-		}
-		cancelAnimationFrame(this.#updateLayoutRaf);
-		this.#updateLayoutRaf = requestAnimationFrame(() => {
-			// As mentioned above we need to wait until the browser has rendered DOM without the lock of gridTemplateRows.
-			this.#updateGridData(layoutContainer, layoutContainerRect, layoutItemRect, updateRowTemplate);
-		});
-
-		// update as we go:
-		this.setColumnSpan(newSpans.columnSpan);
-		this.setRowSpan(newSpans.rowSpan);
-	};
-
-	onScaleMouseUp = (e: MouseEvent) => {
-		const layoutContainer = this._entries?.getLayoutContainerElement() as HTMLElement;
-		if (!layoutContainer) {
-			return;
-		}
-		cancelAnimationFrame(this.#updateLayoutRaf);
-
-		// Remove listeners:
-		window.removeEventListener('mousemove', this.onScaleMouseMove);
-		window.removeEventListener('mouseup', this.onScaleMouseUp);
-		window.removeEventListener('mouseleave', this.onScaleMouseUp);
-
-		const layoutContainerRect = layoutContainer.getBoundingClientRect();
-		const layoutItemRect = this.getHostElement().getBoundingClientRect();
-
-		const startX = layoutItemRect.left - layoutContainerRect.left;
-		const startY = layoutItemRect.top - layoutContainerRect.top;
-		const endX = e.clientX - layoutContainerRect.left;
-		const endY = e.clientY - layoutContainerRect.top;
-		const newSpans = this.#getNewSpans(startX, startY, endX, endY);
-
-		// release the lock of gridTemplateRows:
-		//layoutContainer.removeChild(scaleBoxBackdropEl);
-		//this.scaleBoxBackdropEl = null;
-		layoutContainer.style.gridTemplateRows = '';
-		//this.#isScaleMode = false;
-
-		// Clean up variables:
-		//this.layoutContainer = null;
-		//this.gridColumns = [];
-		//this.gridRows = [];
-		this.#lockedGridRows = 0;
-
-		if (!newSpans) return;
-		// Update block size:
-		this.setColumnSpan(newSpans.columnSpan);
-		this.setRowSpan(newSpans.rowSpan);
-	};
 }

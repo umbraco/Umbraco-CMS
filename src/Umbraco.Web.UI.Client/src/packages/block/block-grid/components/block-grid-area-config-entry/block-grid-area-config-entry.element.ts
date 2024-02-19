@@ -3,6 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../block-grid-block-view/index.js';
+import '../block-scale-handler/index.js';
 
 /**
  * @element umb-block-area-config-entry
@@ -74,13 +75,16 @@ export class UmbBlockGridAreaConfigEntryElement extends UmbLitElement implements
 			? html`
 					<span>${this._alias}</span>
 					<uui-action-bar>
-						<uui-button label="edit" compact href=${this.workspacePath + '/edit/' + this._key}>
+						<uui-button label="edit" compact href=${this.workspacePath + 'edit/' + this._key}>
 							<uui-icon name="icon-edit"></uui-icon>
 						</uui-button>
 						<uui-button label="delete" compact @click=${() => this.#context.requestDelete()}>
 							<uui-icon name="icon-remove"></uui-icon>
 						</uui-button>
 					</uui-action-bar>
+					<umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
+						${this._columnSpan}x${this._rowSpan}
+					</umb-block-scale-handler>
 			  `
 			: '';
 	}

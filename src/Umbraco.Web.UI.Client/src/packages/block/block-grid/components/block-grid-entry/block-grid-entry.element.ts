@@ -189,7 +189,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						</uui-action-bar>
 
 						${this._canScale
-							? html` <umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.onScaleMouseDown(e)}>
+							? html` <umb-block-scale-handler
+									@mousedown=${(e: MouseEvent) => this.#context.scaleManager.onScaleMouseDown(e)}>
 									${this._columnSpan}x${this._rowSpan}
 							  </umb-block-scale-handler>`
 							: ''}

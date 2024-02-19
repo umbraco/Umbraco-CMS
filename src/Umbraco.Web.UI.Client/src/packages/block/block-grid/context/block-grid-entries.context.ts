@@ -3,16 +3,20 @@ import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/i
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridWorkspaceData } from '../index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
+import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
-export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
-	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
-	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT.TYPE,
-	UmbBlockGridTypeModel,
-	UmbBlockGridLayoutModel
-> {
+export class UmbBlockGridEntriesContext
+	extends UmbBlockEntriesContext<
+		typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
+		typeof UMB_BLOCK_GRID_MANAGER_CONTEXT.TYPE,
+		UmbBlockGridTypeModel,
+		UmbBlockGridLayoutModel
+	>
+	implements UmbBlockGridScalableContainerContext
+{
 	//
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
@@ -44,7 +48,9 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	getLayoutContainerElement() {
-		return this.getHostElement().shadowRoot?.querySelector('.umb-block-grid__layout-container');
+		return this.getHostElement().shadowRoot?.querySelector('.umb-block-grid__layout-container') as
+			| HTMLElement
+			| undefined;
 	}
 
 	constructor(host: UmbControllerHost) {
