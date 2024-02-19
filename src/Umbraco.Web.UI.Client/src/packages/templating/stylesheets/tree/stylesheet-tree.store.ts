@@ -40,6 +40,7 @@ export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 			name: item.name,
 			hasChildren: false,
 			isFolder: false,
+			icon: 'icon-brush-alt',
 		};
 
 		return treeItem;

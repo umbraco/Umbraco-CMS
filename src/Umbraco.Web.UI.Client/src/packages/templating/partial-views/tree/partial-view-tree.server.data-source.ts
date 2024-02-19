@@ -56,6 +56,6 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeIt
 		name: item.name,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
-		icon: 'icon-notepad',
+		icon: item.isFolder ? undefined : 'icon-notepad',
 	};
 };
