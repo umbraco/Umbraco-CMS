@@ -1,14 +1,15 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
@@ -42,6 +43,9 @@ public class FilterUserController : UserControllerBase
     /// <returns>A paged result of the users matching the query.</returns>
     [HttpGet("filter")]
     [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Filter(
         int skip = 0,
         int take = 100,
@@ -69,7 +73,7 @@ public class FilterUserController : UserControllerBase
         var responseModel = new PagedViewModel<UserResponseModel>
         {
             Total = filterAttempt.Result.Total,
-            Items = filterAttempt.Result.Items.Select(_userPresentationFactory.CreateResponseModel).ToArray()
+            Items = filterAttempt.Result.Items.Select(_userPresentationFactory.CreateResponseModel).ToArray(),
         };
 
         return Ok(responseModel);

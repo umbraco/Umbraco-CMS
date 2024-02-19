@@ -9,7 +9,9 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IMemberPresentationFactory
 {
-    Task<MemberResponseModel> CreateResponseModelAsync(IMember Member);
+    Task<MemberResponseModel> CreateResponseModelAsync(IMember member);
+
+    Task<IEnumerable<MemberResponseModel>> CreateMultipleAsync(IEnumerable<IMember> members);
 
     MemberItemResponseModel CreateItemResponseModel(IMemberEntitySlim entity);
 
