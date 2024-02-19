@@ -7,12 +7,16 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace-view-collection')
 export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
 	private _config?: UmbCollectionConfiguration;
+
+	@state()
+	private _documentUnique?: string;
 
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
@@ -23,13 +27,16 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 
 	async #observeConfig() {
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.observe(workspaceContext.unique, (unique) => {
+				this._documentUnique = unique;
+			});
 			this.observe(
 				workspaceContext.structure.ownerContentType(),
 				async (documentType) => {
 					if (!documentType) return;
 
 					// TODO: [LK] Temp hard-coded. Once the API is ready, wire up the data-type ID from the content-type.
-					const dataTypeUnique = 'dt-collectionView';
+					const dataTypeUnique = 'c0808dd3-8133-4e4b-8ce8-e2bea84a96a4'; // documentType.collection.dataTypeId;
 
 					if (dataTypeUnique) {
 						await this.#dataTypeDetailRepository.requestByUnique(dataTypeUnique);
@@ -37,32 +44,33 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 							await this.#dataTypeDetailRepository.byUnique(dataTypeUnique),
 							(dataType) => {
 								if (!dataType) return;
-								this._config = this.#mapDataTypeConfigToCollectionConfig(
-									new UmbPropertyEditorConfigCollection(dataType.values),
-								);
+								this._config = this.#mapDataTypeConfigToCollectionConfig(dataType);
 							},
-							'#observeConfig.dataType',
+							'_observeConfigDataType',
 						);
 					}
 				},
-				'#observeConfig.documentType',
+				'_observeConfigDocumentType',
 			);
 		});
 	}
 
-	#mapDataTypeConfigToCollectionConfig(
-		config: UmbPropertyEditorConfigCollection | undefined,
-	): UmbCollectionConfiguration {
+	#mapDataTypeConfigToCollectionConfig(dataType: UmbDataTypeDetailModel): UmbCollectionConfiguration {
+		const config = new UmbPropertyEditorConfigCollection(dataType.values);
 		return {
+			unique: this._documentUnique,
+			dataTypeId: dataType.unique,
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
 			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
 			useInfiniteEditor: config?.getValueByAlias('useInfiniteEditor') ?? false,
+			userDefinedProperties: config?.getValueByAlias('includeProperties'),
 		};
 	}
 
 	render() {
+		if (!this._config?.unique || !this._config?.dataTypeId) return html`<uui-loader></uui-loader>`;
 		return html`<umb-collection alias="Umb.Collection.Document" .config=${this._config}></umb-collection>`;
 	}
 }
