@@ -43,7 +43,7 @@ public class DataValueEditorReuseTests
                 new BlockListEditorDataConverter(),
                 _propertyEditorCollection,
                 _dataValueReferenceFactories,
-                Mock.Of<IDataTypeReadCache>(),
+                Mock.Of<IDataTypeConfigurationCache>(),
                 Mock.Of<IContentTypeService>(),
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<ILogger<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>>(),

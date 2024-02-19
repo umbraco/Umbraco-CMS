@@ -338,9 +338,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
 
-            // Register per request caches
-            //Services.AddScoped<IDataTypeReadCache, DataTypeReadCache>(provider => provider.CreateInstance<DataTypeReadCache>());
-            Services.AddUnique<IDataTypeReadCache, DataTypeReadCache>();
+            // Data type configuration cache
+            Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
+            Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCache>();
         }
     }
 }

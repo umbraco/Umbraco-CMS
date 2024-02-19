@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
 {
-    private readonly IDataTypeReadCache _dataTypeReadCache;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
@@ -40,14 +40,14 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
-        IDataTypeReadCache dataTypeReadCache,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         IFileStreamSecurityValidator fileStreamSecurityValidator)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         _contentSettings = contentSettings.CurrentValue;
-        _dataTypeReadCache = dataTypeReadCache;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
         contentSettings.OnChange(x => _contentSettings = x);
     }
@@ -74,10 +74,10 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             value = new ImageCropperValue { Src = val.ToString() };
         }
 
-        IDataType? dataType = _dataTypeReadCache.GetDataType(property.PropertyType.DataTypeId);
-        if (dataType?.Configuration != null)
+        var configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(property.PropertyType.DataTypeId);
+        if (configuration is not null)
         {
-            value?.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
+            value?.ApplyConfiguration(configuration);
         }
 
         return value;
@@ -217,8 +217,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         // more magic here ;-(
-        ImageCropperConfiguration? configuration = _dataTypeReadCache.GetDataType(propertyType.DataTypeId)
-            ?.ConfigurationAs<ImageCropperConfiguration>();
+        ImageCropperConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(propertyType.DataTypeId);
         ImageCropperConfiguration.Crop[] crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
         return JsonConvert.SerializeObject(

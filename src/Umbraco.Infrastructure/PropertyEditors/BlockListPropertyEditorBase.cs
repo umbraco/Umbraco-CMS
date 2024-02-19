@@ -54,7 +54,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             BlockEditorDataConverter blockEditorDataConverter,
             PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeReadCache dataTypeReadCache,
+            IDataTypeConfigurationCache dataTypeConfigurationCache,
             IContentTypeService contentTypeService,
             ILocalizedTextService textService,
             ILogger<BlockEditorPropertyValueEditor> logger,
@@ -62,7 +62,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             IPropertyValidationService propertyValidationService) :
-            base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeReadCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
             BlockEditorValues = new BlockEditorValues(blockEditorDataConverter, contentTypeService, logger);
             Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, contentTypeService));

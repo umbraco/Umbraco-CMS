@@ -52,7 +52,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeReadCache dataTypeReadCache,
+            IDataTypeConfigurationCache dataTypeConfigurationCache,
             ILocalizedTextService textService,
             ILogger<BlockEditorPropertyValueEditor> logger,
             IShortStringHelper shortStringHelper,
@@ -60,7 +60,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
             IIOHelper ioHelper,
             IContentTypeService contentTypeService,
             IPropertyValidationService propertyValidationService)
-            : base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeReadCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            : base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
             BlockEditorValues = new BlockEditorValues(new BlockGridEditorDataConverter(jsonSerializer), contentTypeService, logger);
             Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, contentTypeService));

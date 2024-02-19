@@ -73,7 +73,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
     internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
     {
-        private readonly IDataTypeReadCache _dataTypeReadCache;
+        private readonly IDataTypeConfigurationCache _dataTypeReadCache;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ITemporaryMediaService _temporaryMediaService;
 
@@ -84,7 +84,7 @@ public class MediaPicker3PropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
-            IDataTypeReadCache dataTypeReadCache,
+            IDataTypeConfigurationCache dataTypeReadCache,
             ITemporaryMediaService temporaryMediaService)
             : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
@@ -111,11 +111,9 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             var dtos = Deserialize(_jsonSerializer, value).ToList();
 
-            IDataType? dataType = _dataTypeReadCache.GetDataType(property.PropertyType.DataTypeId);
-            if (dataType?.Configuration != null)
+            var configuration = _dataTypeReadCache.GetConfigurationAs<MediaPicker3Configuration>(property.PropertyType.DataTypeId);
+            if (configuration is not null)
             {
-                MediaPicker3Configuration? configuration = dataType.ConfigurationAs<MediaPicker3Configuration>();
-
                 foreach (MediaWithCropsDto dto in dtos)
                 {
                     dto.ApplyConfiguration(configuration);
