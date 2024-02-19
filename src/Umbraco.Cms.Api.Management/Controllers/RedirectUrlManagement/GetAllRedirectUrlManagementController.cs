@@ -30,9 +30,9 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementContro
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> GetAll(string? filter, int skip = 0, int take  = 100)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize, out ProblemDetails? error) is false)
+        if (PaginationConverter.ConvertSkipTakeToPaging(skip, take, out long pageNumber, out int pageSize) is false)
         {
-            return BadRequest(error);
+            return SkipTakeToPagingProblem();
         }
 
         long total;

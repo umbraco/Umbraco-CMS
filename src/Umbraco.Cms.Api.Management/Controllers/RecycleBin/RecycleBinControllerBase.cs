@@ -31,9 +31,9 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        if (PaginationConverter.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize))
         {
-            return BadRequest(error);
+            return SkipTakeToPagingProblem();
         }
 
         IEntitySlim[] rootEntities = GetPagedRootEntities(pageNumber, pageSize, out var totalItems);
@@ -46,9 +46,9 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentKey, int skip, int take)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        if (PaginationConverter.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize) == false)
         {
-            return BadRequest(error);
+            return SkipTakeToPagingProblem();
         }
 
         IEntitySlim[] children = GetPagedChildEntities(parentKey, pageNumber, pageSize, out var totalItems);

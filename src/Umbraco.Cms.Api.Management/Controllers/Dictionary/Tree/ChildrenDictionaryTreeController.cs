@@ -22,9 +22,9 @@ public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
     [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Children(Guid parentId, int skip = 0, int take = 100)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        if (PaginationConverter.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize) == false)
         {
-            return BadRequest(error);
+            return SkipTakeToPagingProblem();
         }
 
         PagedModel<IDictionaryItem> paginatedItems = await DictionaryItemService.GetPagedAsync(parentId, skip, take);
