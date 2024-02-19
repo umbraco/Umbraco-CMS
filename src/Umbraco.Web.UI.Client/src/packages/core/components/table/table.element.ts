@@ -219,7 +219,7 @@ export class UmbTableElement extends LitElement {
 		if (this.config.hideIcon && !this.config.allowSelection) return;
 
 		return html`<uui-table-cell>
-			${when(!this.config.hideIcon, () => html`<uui-icon name=${ifDefined(item.icon)}></uui-icon>`)}
+			${when(!this.config.hideIcon, () => html`<uui-icon name=${ifDefined(item.icon ?? undefined)}></uui-icon>`)}
 			${when(
 				this.config.allowSelection,
 				() =>
@@ -310,6 +310,10 @@ export class UmbTableElement extends LitElement {
 				align-items: center;
 				justify-content: space-between;
 				width: 100%;
+			}
+
+			uui-table-cell uui-icon {
+				vertical-align: top;
 			}
 		`,
 	];
