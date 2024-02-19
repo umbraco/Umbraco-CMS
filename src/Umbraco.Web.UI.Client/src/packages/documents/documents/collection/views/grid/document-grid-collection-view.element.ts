@@ -1,5 +1,4 @@
-import type { UmbDocumentCollectionFilterModel } from '../../types.js';
-import type { UmbDocumentTreeItemModel } from '../../../tree/types.js';
+import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -9,7 +8,7 @@ import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collec
 @customElement('umb-document-grid-collection-view')
 export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	@state()
-	private _items: Array<UmbDocumentTreeItemModel> = [];
+	private _items: Array<UmbDocumentCollectionItemModel> = [];
 
 	@state()
 	private _selection: Array<string | null> = [];
@@ -17,7 +16,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	@state()
 	private _loading = false;
 
-	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentTreeItemModel, UmbDocumentCollectionFilterModel>;
+	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
 
 	constructor() {
 		super();
@@ -39,11 +38,11 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		history.pushState(null, '', 'section/content/workspace/document/edit/' + id);
 	}
 
-	#onSelect(item: UmbDocumentTreeItemModel) {
+	#onSelect(item: UmbDocumentCollectionItemModel) {
 		this.#collectionContext?.selection.select(item.unique ?? '');
 	}
 
-	#onDeselect(item: UmbDocumentTreeItemModel) {
+	#onDeselect(item: UmbDocumentCollectionItemModel) {
 		this.#collectionContext?.selection.deselect(item.unique ?? '');
 	}
 
@@ -60,7 +59,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		`;
 	}
 
-	#renderCard(item: UmbDocumentTreeItemModel) {
+	#renderCard(item: UmbDocumentCollectionItemModel) {
 		return html`
 			<uui-card-content-node
 				.name=${item.name ?? 'Unnamed Document'}
@@ -70,7 +69,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				@open=${() => this._handleOpenCard(item.unique ?? '')}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
-				<uui-icon slot="icon" name=${item.documentType.icon}></uui-icon>
+				<uui-icon slot="icon" name=${item.icon}></uui-icon>
 			</uui-card-content-node>
 		`;
 	}

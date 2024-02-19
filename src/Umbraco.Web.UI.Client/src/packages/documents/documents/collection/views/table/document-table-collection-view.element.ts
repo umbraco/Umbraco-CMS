@@ -1,5 +1,4 @@
-import type { UmbDocumentCollectionFilterModel } from '../../types.js';
-import type { UmbDocumentTreeItemModel } from '../../../tree/types.js';
+import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -15,12 +14,16 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
-//import './column-layouts/document-table-actions-column-layout.element.js';
-
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
-	private _items?: Array<UmbDocumentTreeItemModel>;
+	private _busy = false;
+
+	@state()
+	private _userDefinedProperties?: Array<any>;
+
+	@state()
+	private _items?: Array<UmbDocumentCollectionItemModel>;
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -28,19 +31,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	};
 
 	@state()
-	private _tableColumns: Array<UmbTableColumn> = [
+	private _tableColumns: Array<UmbTableColumn> = [];
+
+	#systemColumns: Array<UmbTableColumn> = [
 		{
 			name: 'Name',
 			alias: 'entityName',
 			allowSorting: true,
 		},
-		// TODO: actions should live in an UmbTable element when we have moved the current UmbTable to UUI.
-		// {
-		// 	name: 'Actions',
-		// 	alias: 'entityActions',
-		// 	elementName: 'umb-document-table-actions-column-layout',
-		// 	width: '80px',
-		// },
 	];
 
 	@state()
@@ -49,7 +47,10 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	private _collectionContext?: UmbDefaultCollectionContext<UmbDocumentTreeItemModel, UmbDocumentCollectionFilterModel>;
+	private _collectionContext?: UmbDefaultCollectionContext<
+		UmbDocumentCollectionItemModel,
+		UmbDocumentCollectionFilterModel
+	>;
 
 	constructor() {
 		super();
@@ -62,9 +63,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
+		this.observe(this._collectionContext.userDefinedProperties, (userDefinedProperties) => {
+			this._userDefinedProperties = userDefinedProperties;
+			this.#createTableHeadings();
+		});
+
 		this.observe(this._collectionContext.items, (items) => {
 			this._items = items;
-			this._createTableItems(this._items);
+			this.#createTableItems(this._items);
 		});
 
 		this.observe(this._collectionContext.selection.selection, (selection) => {
@@ -72,24 +78,55 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	private _createTableItems(items: Array<UmbDocumentTreeItemModel>) {
+	#createTableHeadings() {
+		if (this._userDefinedProperties && this._userDefinedProperties.length > 0) {
+			const userColumns: Array<UmbTableColumn> = this._userDefinedProperties.map((item) => {
+				return {
+					name: item.header,
+					alias: item.alias,
+					elementName: item.elementName,
+					allowSorting: true,
+				};
+			});
+
+			this._tableColumns = [...this.#systemColumns, ...userColumns];
+		}
+	}
+
+	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
+		// TODO: [LK] This is a temporary solution. Let's explore a nicer way to display the values.
+		const getValue = (item: UmbDocumentCollectionItemModel, alias: string) => {
+			switch (alias) {
+				case 'createDate':
+					return item.createDate.toLocaleString();
+				case 'owner':
+					return item.creator;
+				case 'published':
+					return item.state !== 'Draft' ? 'True' : 'False';
+				case 'updateDate':
+					return item.updateDate.toLocaleString();
+				case 'updater':
+					return item.updater;
+				default:
+					return item.values.find((value) => value.alias === alias)?.value ?? '';
+			}
+		};
+
 		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
+
+			const data =
+				this._tableColumns?.map((column) => {
+					return {
+						columnAlias: column.alias,
+						value: column.elementName ? item : getValue(item, column.alias),
+					};
+				}) ?? [];
+
 			return {
 				id: item.unique,
-				icon: item.documentType.icon,
-				data: [
-					{
-						columnAlias: 'entityName',
-						value: item.name || 'Unnamed Document',
-					},
-					// {
-					// 	columnAlias: 'entityActions',
-					// 	value: {
-					// 		entityType: item.entityType,
-					// 	},
-					// },
-				],
+				icon: item.icon,
+				data: data,
 			};
 		});
 	}
@@ -112,10 +149,18 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		const table = event.target as UmbTableElement;
 		const orderingColumn = table.orderingColumn;
 		const orderingDesc = table.orderingDesc;
-		console.log(`fetch media items, order column: ${orderingColumn}, desc: ${orderingDesc}`);
+		this._collectionContext?.setFilter({
+			orderBy: orderingColumn,
+			orderDirection: orderingDesc ? 'desc' : 'asc',
+		});
 	}
 
 	render() {
+		if (this._busy) return html`<div class="container"><uui-loader></uui-loader></div>`;
+
+		if (this._tableItems.length === 0)
+			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
+
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
@@ -142,6 +187,12 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			/* TODO: Should we have embedded padding in the table component? */
 			umb-table {
 				padding: 0; /* To fix the embedded padding in the table component. */
+			}
+
+			.container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		`,
 	];
