@@ -1,5 +1,5 @@
-import type { UmbEntityTreeItemModel, UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbDocumentRecycleBinTreeItemModel extends UmbEntityTreeItemModel {}
+export interface UmbDocumentRecycleBinTreeItemModel extends UmbUniqueTreeItemModel {}
 
-export interface UmbDocumentRecycleBinTreeRootModel extends UmbEntityTreeRootModel {}
+export interface UmbDocumentRecycleBinTreeRootModel extends UmbUniqueTreeRootModel {}

@@ -1,14 +1,10 @@
-import type {
-	CompositionTypeModel,
-	PropertyTypeModelBaseModel,
-	ReferenceByIdModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { CompositionTypeModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbPropertyContainerTypes = 'Group' | 'Tab';
 export interface UmbPropertyTypeContainerModel {
 	id: string;
-	parent?: ReferenceByIdModel | null;
-	name?: string | null;
+	parent: { id: string } | null;
+	name: string | null;
 	type: UmbPropertyContainerTypes;
 	sortOrder: number;
 }
@@ -24,7 +20,6 @@ export interface UmbContentTypeModel {
 	variesByCulture: boolean;
 	variesBySegment: boolean;
 	isElement: boolean;
-	// TODO: investigate if we need our own model for these
 	properties: Array<UmbPropertyTypeModel>;
 	containers: Array<UmbPropertyTypeContainerModel>;
 	allowedContentTypes: Array<UmbContentTypeSortModel>;

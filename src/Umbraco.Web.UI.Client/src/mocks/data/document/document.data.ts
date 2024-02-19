@@ -698,7 +698,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'simple-document-type-id',
 			icon: 'icon-document',
-			hasListView: false,
+			hasListView: true,
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -718,6 +718,12 @@ export const data: Array<UmbMockDocumentModel> = [
 		values: [
 			{
 				alias: 'multiNodeTreePicker',
+				culture: null,
+				segment: null,
+				value: null,
+			},
+			{
+				alias: 'listView',
 				culture: null,
 				segment: null,
 				value: null,

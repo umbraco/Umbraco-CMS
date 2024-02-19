@@ -84,6 +84,9 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selectedIds = splitStringToArray(idsString);
 	}
+	public get value(): string {
+		return this.selectedIds.join(',');
+	}
 
 	@state()
 	private _items?: Array<UmbDocumentTypeItemModel>;

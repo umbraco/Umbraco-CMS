@@ -4,7 +4,7 @@ import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit
 import type { IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-import '../../components/insert-menu/templating-insert-menu.element.js';
+import '../../components/templating-item-menu/templating-item-menu.element.js';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-template-workspace')

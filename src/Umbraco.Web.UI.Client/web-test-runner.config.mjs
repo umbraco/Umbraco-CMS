@@ -30,6 +30,7 @@ export default {
 					additionalImports: {
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
 					},
+					replaceModuleExtensions: true,
 				}),
 			},
 		}),
