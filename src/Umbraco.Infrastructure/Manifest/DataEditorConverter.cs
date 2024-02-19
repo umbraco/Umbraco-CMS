@@ -19,8 +19,18 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
     private readonly IIOHelper _ioHelper;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IShortStringHelper _shortStringHelper;
-    private readonly ILocalizedTextService _textService;
     private const string SupportsReadOnly = "supportsReadOnly";
+
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
+    public DataEditorConverter(
+        IDataValueEditorFactory dataValueEditorFactory,
+        IIOHelper ioHelper,
+        ILocalizedTextService textService,
+        IShortStringHelper shortStringHelper,
+        IJsonSerializer jsonSerializer)
+        : this(dataValueEditorFactory, ioHelper, shortStringHelper, jsonSerializer)
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DataEditorConverter" /> class.
@@ -28,45 +38,18 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
     public DataEditorConverter(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        ILocalizedTextService textService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer)
     {
         _dataValueEditorFactory = dataValueEditorFactory;
         _ioHelper = ioHelper;
-        _textService = textService;
         _shortStringHelper = shortStringHelper;
         _jsonSerializer = jsonSerializer;
     }
 
     /// <inheritdoc />
     protected override IDataEditor Create(Type objectType, string path, JObject jobject)
-    {
-        // in PackageManifest, property editors are IConfiguredDataEditor[] whereas
-        // parameter editors are IDataEditor[] - both will end up here because we handle
-        // IDataEditor and IConfiguredDataEditor implements it, but we can check the
-        // type to figure out what to create
-        EditorType type = EditorType.PropertyValue;
-
-        var isPropertyEditor = path.StartsWith("propertyEditors[");
-
-        if (isPropertyEditor)
-        {
-            // property editor
-            jobject["isPropertyEditor"] = JToken.FromObject(true);
-            if (jobject["isParameterEditor"] is JToken jToken && jToken.Value<bool>())
-            {
-                type |= EditorType.MacroParameter;
-            }
-        }
-        else
-        {
-            // parameter editor
-            type = EditorType.MacroParameter;
-        }
-
-        return new DataEditor(_dataValueEditorFactory, type);
-    }
+        => new DataEditor(_dataValueEditorFactory);
 
     /// <inheritdoc />
     protected override void Deserialize(JObject jobject, IDataEditor target, JsonSerializer serializer)
@@ -119,7 +102,7 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
         // explicitly assign a value editor of type ValueEditor
         // (else the deserializer will try to read it before setting it)
         // (and besides it's an interface)
-        target.ExplicitValueEditor = new DataValueEditor(_textService, _shortStringHelper, _jsonSerializer);
+        target.ExplicitValueEditor = new DataValueEditor(_shortStringHelper, _jsonSerializer);
 
         // in the manifest, validators are a simple dictionary eg
         // {
@@ -203,7 +186,7 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
         if (jobject.Property("view") != null)
         {
             // explicitly assign a value editor of type ParameterValueEditor
-            target.ExplicitValueEditor = new DataValueEditor(_textService, _shortStringHelper, _jsonSerializer);
+            target.ExplicitValueEditor = new DataValueEditor(_shortStringHelper, _jsonSerializer);
 
             // move the 'view' property
             jobject["editor"] = new JObject { ["view"] = jobject["view"] };

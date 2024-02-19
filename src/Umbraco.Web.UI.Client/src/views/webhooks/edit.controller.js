@@ -33,12 +33,18 @@
                 "treeHeaders_webhooks",
                 "webhooks_addWebhook",
                 "defaultdialogs_confirmSure",
-                "defaultdialogs_editWebhook"
+                "defaultdialogs_editWebhook",
+                "webhooks_selectEventFirst",
+                "general_name",
+                "general_value"
             ]).then(function (values) {
                 vm.labels.webhooks = values[0];
                 vm.labels.addWebhook = values[1];
                 vm.labels.areYouSure = values[2];
                 vm.labels.editWebhook = values[3];
+                vm.labels.selectEventFirst = values[4];
+                vm.labels.headerName = values[5];
+                vm.labels.headerValue = values[6];
 
                 if ($routeParams.create) {
                   vm.isNew = true;

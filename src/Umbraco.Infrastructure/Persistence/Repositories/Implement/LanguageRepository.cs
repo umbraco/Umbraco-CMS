@@ -18,6 +18,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
 {
+    // We need to lock this dictionary every time we do an operation on it as the languageRepository is registered as a unique implementation
+    // It is used to quickly get isoCodes by Id, or the reverse by avoiding (deep)cloning dtos
+    // It is rebuild on PerformGetAll
     private readonly Dictionary<string, int> _codeIdMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<int, string> _idCodeMap = new();
 
@@ -37,8 +40,6 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         return id.HasValue ? Get(id.Value) : null;
     }
 
-    // fast way of getting an id for an isoCode - avoiding cloning
-    // _codeIdMap is rebuilt whenever PerformGetAll runs
     public int? GetIdByIsoCode(string? isoCode, bool throwOnNotFound = true)
     {
         if (isoCode == null)
@@ -64,8 +65,6 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         return null;
     }
 
-    // fast way of getting an isoCode for an id - avoiding cloning
-    // _idCodeMap is rebuilt whenever PerformGetAll runs
     public string? GetIsoCodeById(int? id, bool throwOnNotFound = true)
     {
         if (id == null)
@@ -75,7 +74,6 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
         EnsureCacheIsPopulated();
 
-        // yes, we want to lock _codeIdMap
         lock (_codeIdMap)
         {
             if (_idCodeMap.TryGetValue(id.Value, out var isoCode))
@@ -92,6 +90,38 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         return null;
     }
 
+    // multi implementation of GetIsoCodeById
+    public string[] GetIsoCodesByIds(ICollection<int> ids, bool throwOnNotFound = true)
+    {
+        var isoCodes = new string[ids.Count];
+
+        if (ids.Any() == false)
+        {
+            return isoCodes;
+        }
+
+        EnsureCacheIsPopulated();
+
+
+        lock (_codeIdMap)
+        {
+            for (var i = 0; i < ids.Count; i++)
+            {
+                var id = ids.ElementAt(i);
+                if (_idCodeMap.TryGetValue(id, out var isoCode))
+                {
+                    isoCodes[i] = isoCode;
+                }
+                else if (throwOnNotFound)
+                {
+                    throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
+                }
+            }
+        }
+
+        return isoCodes;
+    }
+
     public string GetDefaultIsoCode() => GetDefault().IsoCode;
 
     public int? GetDefaultId() => GetDefault().Id;
@@ -101,7 +131,6 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
     protected ILanguage ConvertFromDto(LanguageDto dto)
     {
-        // yes, we want to lock _codeIdMap
         lock (_codeIdMap)
         {
             string? fallbackIsoCode = null;

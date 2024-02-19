@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -60,7 +60,13 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
         }
     }
 
-    /// <inheritdoc />
+    public async Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
+
+        return await Task.FromResult(_languageRepository.GetIsoCodesByIds(ids, throwOnNotFound: true));
+    }
+
     public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes) => (await GetAllAsync()).Where(x => isoCodes.Contains(x.IsoCode));
 
     /// <inheritdoc />

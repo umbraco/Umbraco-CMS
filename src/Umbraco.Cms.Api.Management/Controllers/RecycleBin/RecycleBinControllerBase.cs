@@ -1,15 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Controllers.Content;
+using Umbraco.Cms.Api.Management.Services.Paging;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
+using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.Services.Paging;
-using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 
-public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerBase
-    where TItem : RecycleBinItemResponseModel, new()
+public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
+    where TItem : RecycleBinItemResponseModelBase, new()
 {
     private readonly IEntityService _entityService;
     private readonly string _itemUdiType;
@@ -65,17 +69,31 @@ public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerB
 
         var viewModel = new TItem
         {
-            Icon = _itemUdiType,
-            Name = entity.Name!,
             Id = entity.Key,
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
-            IsContainer = entity.IsContainer,
-            ParentId = parentKey
+            Parent = parentKey.HasValue
+                ? new ItemReferenceByIdResponseModel
+                {
+                    Id = parentKey.Value
+                }
+                : null
         };
 
         return viewModel;
     }
+
+    protected IActionResult OperationStatusResult(OperationResult result) =>
+        result.Result switch
+        {
+            OperationResultType.FailedCancelledByEvent => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cancelled by notification")
+                .WithDetail("A notification handler prevented the operation.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown operation status.")
+                .Build()),
+        };
 
     private IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {

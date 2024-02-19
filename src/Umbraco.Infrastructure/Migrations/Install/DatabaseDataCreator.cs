@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -19,6 +18,61 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 /// </summary>
 internal class DatabaseDataCreator
 {
+
+    internal static readonly LogViewerQueryDto[] _defaultLogQueries =
+    [
+        new()
+        {
+            Name = "Find all logs where the Level is NOT Verbose and NOT Debug",
+            Query = "Not(@Level='Verbose') and Not(@Level='Debug')",
+        },
+        new()
+        {
+            Name = "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
+            Query = "Has(@Exception)",
+        },
+        new()
+        {
+            Name = "Find all logs that have the property 'Duration'",
+            Query = "Has(Duration)",
+        },
+        new()
+        {
+            Name = "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
+            Query = "Has(Duration) and Duration > 1000",
+        },
+        new()
+        {
+            Name = "Find all logs that are from the namespace 'Umbraco.Core'",
+            Query = "StartsWith(SourceContext, 'Umbraco.Core')",
+        },
+        new()
+        {
+            Name = "Find all logs that use a specific log message template",
+            Query = "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'",
+        },
+        new()
+        {
+            Name = "Find logs where one of the items in the SortedComponentTypes property array is equal to",
+            Query = "SortedComponentTypes[?] = 'Umbraco.Web.Search.ExamineComponent'",
+        },
+        new()
+        {
+            Name = "Find logs where one of the items in the SortedComponentTypes property array contains",
+            Query = "Contains(SortedComponentTypes[?], 'DatabaseServer')",
+        },
+        new()
+        {
+            Name = "Find all logs that the message has localhost in it with SQL like",
+            Query = "@Message like '%localhost%'",
+        },
+        new()
+        {
+            Name = "Find all logs that the message that starts with 'end' in it with SQL like",
+            Query = "@Message like 'end%'",
+        }
+    ];
+
     private readonly IDatabase _database;
 
     private readonly IDictionary<string, IList<string>> _entitiesToAlwaysCreate = new Dictionary<string, IList<string>>
@@ -2112,32 +2166,6 @@ internal class DatabaseDataCreator
                 });
         }
 
-        if (_database.Exists<NodeDto>(1048))
-        {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
-                new DataTypeDto
-                {
-                    NodeId = 1048,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker,
-                    DbType = "Ntext",
-                });
-        }
-
-        if (_database.Exists<NodeDto>(1049))
-        {
-            _database.Insert(
-                Constants.DatabaseSchema.Tables.DataType,
-                "pk",
-                false,
-                new DataTypeDto
-                {
-                    NodeId = 1049,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker,
-                    DbType = "Ntext",
-                    Configuration = "{\"multiPicker\":1}",
-                });
-        }
-
         if (_database.Exists<NodeDto>(1050))
         {
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
@@ -2299,11 +2327,9 @@ internal class DatabaseDataCreator
 
     private void CreateLogViewerQueryData()
     {
-        LogViewerQueryDto[] defaultData = MigrateLogViewerQueriesFromFileToDb._defaultLogQueries.ToArray();
-
-        for (var i = 0; i < defaultData.Length; i++)
+        for (var i = 0; i < _defaultLogQueries.Length; i++)
         {
-            LogViewerQueryDto dto = defaultData[i];
+            LogViewerQueryDto dto = _defaultLogQueries[i];
             dto.Id = i + 1;
             _database.Insert(Constants.DatabaseSchema.Tables.LogViewerQuery, "id", false, dto);
         }

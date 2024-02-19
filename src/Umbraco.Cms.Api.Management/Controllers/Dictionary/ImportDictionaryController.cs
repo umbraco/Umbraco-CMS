@@ -34,13 +34,13 @@ public class ImportDictionaryController : DictionaryControllerBase
     {
         Attempt<IDictionaryItem?, DictionaryImportOperationStatus> result = await _dictionaryItemImportService
             .ImportDictionaryItemFromUdtFileAsync(
-                importDictionaryRequestModel.TemporaryFileId,
-                importDictionaryRequestModel.ParentId,
+                importDictionaryRequestModel.TemporaryFile.Id,
+                importDictionaryRequestModel.Parent?.Id,
                 CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Status switch
         {
-            DictionaryImportOperationStatus.Success => CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key),
+            DictionaryImportOperationStatus.Success => CreatedAtId<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key),
             DictionaryImportOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
                     .WithTitle("The parent dictionary item could not be found.")
                     .Build()),

@@ -5,15 +5,11 @@
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.PlainTime,
-    EditorType.PropertyValue,
-    "Configuration-less time",
-    "not-applicable",
-    Icon = "umb:edit",
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.Time)]
 public class PlainTimePropertyEditor : DataEditor
 {
-    public PlainTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, EditorType type = EditorType.PropertyValue)
-        : base(dataValueEditorFactory, type)
+    public PlainTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
+        : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
 }

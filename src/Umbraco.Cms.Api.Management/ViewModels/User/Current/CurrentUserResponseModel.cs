@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;
 
-public class CurrentUserResponseModel : INamedEntityPresentationModel
+public class CurrentUserResponseModel
 {
     public required Guid Id { get; init; }
 
@@ -12,7 +12,7 @@ public class CurrentUserResponseModel : INamedEntityPresentationModel
 
     public required string? LanguageIsoCode { get; init; }
 
-    public required ISet<Guid> ContentStartNodeIds { get; init; } = new HashSet<Guid>();
+    public required ISet<Guid> DocumentStartNodeIds { get; init; } = new HashSet<Guid>();
 
     public required ISet<Guid> MediaStartNodeIds { get; init; } = new HashSet<Guid>();
 

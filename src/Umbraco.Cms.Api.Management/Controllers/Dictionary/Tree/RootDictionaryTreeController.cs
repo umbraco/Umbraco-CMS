@@ -19,23 +19,16 @@ public class RootDictionaryTreeController : DictionaryTreeControllerBase
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<EntityTreeItemResponseModel>>> Root(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Root(int skip = 0, int take = 100)
     {
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
         {
             return BadRequest(error);
         }
 
-        IDictionaryItem[] dictionaryItems = PaginatedDictionaryItems(
-            pageNumber,
-            pageSize,
-            await DictionaryItemService.GetAtRootAsync(),
-            out var totalItems);
+        PagedModel<IDictionaryItem> paginatedItems = await DictionaryItemService.GetPagedAsync(null, skip, take);
 
-        EntityTreeItemResponseModel[] viewModels = await MapTreeItemViewModels(null, dictionaryItems);
-
-        PagedViewModel<EntityTreeItemResponseModel> result = PagedViewModel(viewModels, totalItems);
-        return await Task.FromResult(Ok(result));
+        return Ok(PagedViewModel(await MapTreeItemViewModels(null, paginatedItems.Items), paginatedItems.Total));
     }
 }

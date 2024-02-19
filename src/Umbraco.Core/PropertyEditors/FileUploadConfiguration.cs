@@ -5,6 +5,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class FileUploadConfiguration : IFileExtensionsConfig
 {
-    [ConfigurationField("fileExtensions", "Accepted file extensions", "multivalues")]
+    [ConfigurationField("fileExtensions")]
     public List<FileExtensionConfigItem> FileExtensions { get; set; } = new();
 }

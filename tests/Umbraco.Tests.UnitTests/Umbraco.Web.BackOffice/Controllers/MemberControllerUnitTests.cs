@@ -496,7 +496,7 @@ public class MemberControllerUnitTests
         Mock.Get(umbracoMembersUserManager)
             .Verify(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()));
         Mock.Get(memberService)
-            .Verify(m => m.Save(It.IsAny<Member>()));
+            .Verify(m => m.Save(It.IsAny<Member>(), It.IsAny<int>()));
         AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
     }
 
@@ -549,11 +549,9 @@ public class MemberControllerUnitTests
         var mockPasswordConfig = new Mock<IOptions<MemberPasswordConfigurationSettings>>();
         mockPasswordConfig.Setup(x => x.Value).Returns(() => new MemberPasswordConfigurationSettings());
         var dataEditor = Mock.Of<IDataEditor>(
-            x => x.Type == EditorType.PropertyValue
-                 && x.Alias == Constants.PropertyEditors.Aliases.Label);
+            x => x.Alias == Constants.PropertyEditors.Aliases.Label);
         Mock.Get(dataEditor).Setup(x => x.GetValueEditor()).Returns(new TextOnlyValueEditor(
-            new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),
-            textService.Object,
+            new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>(),
             Mock.Of<IIOHelper>()));

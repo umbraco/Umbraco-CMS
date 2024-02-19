@@ -41,7 +41,10 @@ public class UnpublishDocumentController : DocumentControllerBase
 
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionUnpublish.ActionLetter, id),
+            ContentPermissionResource.WithKeys(
+                ActionUnpublish.ActionLetter,
+                id,
+                requestModel.Culture is not null ? requestModel.Culture.Yield() : Enumerable.Empty<string>()),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -55,6 +58,6 @@ public class UnpublishDocumentController : DocumentControllerBase
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            : ContentPublishingOperationStatusResult(attempt.Result);
+            : DocumentPublishingOperationStatusResult(attempt.Result);
     }
 }

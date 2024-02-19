@@ -40,7 +40,7 @@ public class InviteUserController : UserControllerBase
         Attempt<UserInvitationResult, UserOperationStatus> result = await _userService.InviteAsync(CurrentUserKey(_backOfficeSecurityAccessor), userInvite);
 
         return result.Success
-            ? CreatedAtAction<ByKeyUserController>(controller => nameof(controller.ByKey), result.Result.InvitedUser!.Key)
+            ? CreatedAtId<ByKeyUserController>(controller => nameof(controller.ByKey), result.Result.InvitedUser!.Key)
             : UserOperationStatusResult(result.Status, result.Result);
     }
 }

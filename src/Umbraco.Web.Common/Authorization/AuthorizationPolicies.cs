@@ -72,6 +72,9 @@ public static class AuthorizationPolicies
     public const string TreeAccessAnySchemaTypes = nameof(TreeAccessAnySchemaTypes);
     public const string TreeAccessDictionaryOrTemplates = nameof(TreeAccessDictionaryOrTemplates);
 
+    // other
+    public const string DictionaryPermissionByResource = nameof(DictionaryPermissionByResource);
+
     /// <summary>
     ///     Defines access based on if the user has access to any tree's exposing any types of content (documents, media,
     ///     members)

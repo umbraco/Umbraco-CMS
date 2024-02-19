@@ -50,19 +50,18 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IPackagingService, PackagingService>();
         builder.Services.AddUnique<IServerInformationService, ServerInformationService>();
         builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
-        builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
         builder.Services.AddTransient(CreateLocalizedTextServiceFileSourcesFactory);
         builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
         builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
         builder.Services.AddSingleton(CreatePackageDataInstallation);
         builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
-        builder.Services.AddUnique<IHtmlMacroParameterParser, HtmlMacroParameterParser>();
         builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
         builder.Services.AddUnique<IUserDataService, UserDataService>();
         builder.Services.AddUnique<ISystemTroubleshootingInformationService, SystemTroubleshootingInformationTelemetryProvider>();
         builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
-        builder.Services.AddSingleton<IEditorConfigurationParser, EditorConfigurationParser>();
         builder.Services.AddTransient<IPartialViewPopulator, PartialViewPopulator>();
+        builder.Services.AddUnique<IContentListViewService, ContentListViewService>();
+        builder.Services.AddUnique<IMediaListViewService, MediaListViewService>();
 
         return builder;
     }

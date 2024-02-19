@@ -433,7 +433,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var result = new DataTypeReferences();
             var usages = _dataTypeService.GetReferences(id);
 
-            foreach(var groupOfEntityType in usages.GroupBy(x => x.Key.EntityType))
+            // properties
+            foreach (var groupOfEntityType in usages.GroupBy(x => x.Key.EntityType))
             {
                 //get all the GUIDs for the content types to find
                 var guidsAndPropertyAliases = groupOfEntityType.ToDictionary(i => ((GuidUdi)i.Key).Guid, i => i.Value);
@@ -444,6 +445,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     result.MediaTypes = GetContentTypeUsages(_mediaTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
                 else if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.MemberType))
                     result.MemberTypes = GetContentTypeUsages(_memberTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
+            }
+
+            // ListView
+            var listViewUsages = _dataTypeService.GetListViewReferences(id);
+            foreach (var groupOfEntityType in listViewUsages.GroupBy(x => x.Key.EntityType))
+            {
+                //get all the GUIDs for the content types to find
+                var guidsAndPropertyAliases = groupOfEntityType.ToDictionary(i => ((GuidUdi)i.Key).Guid, i => i.Value);
+
+                if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType))
+                    result.DocumentTypes = result.DocumentTypes.Concat(GetListViewContentTypeUsages(_contentTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases));
+                else if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.MediaType))
+                    result.MediaTypes = result.MediaTypes.Concat(GetListViewContentTypeUsages(_mediaTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases));
+                else if (groupOfEntityType.Key == ObjectTypes.GetUdiType(UmbracoObjectTypes.MemberType))
+                    result.MemberTypes = result.MemberTypes.Concat(GetListViewContentTypeUsages(_memberTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases));
             }
 
             return result;
@@ -483,6 +499,22 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     })
             });
         }
+
+        private IEnumerable<DataTypeReferences.ContentTypeReferences> GetListViewContentTypeUsages(
+            IEnumerable<IContentTypeBase> cts,
+            IReadOnlyDictionary<Guid, IEnumerable<string>> usages) => cts.Select(x => new DataTypeReferences.ContentTypeReferences
+            {
+                Id = x.Id,
+                Key = x.Key,
+                Alias = x.Alias,
+                Icon = x.Icon,
+                Name = x.Name,
+                Udi = new GuidUdi(ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType), x.Key),
+                ListViews = usages.GetValueOrDefault(x.Key)?.Select(lv => new DataTypeReferences.ContentTypeReferences.ListViewReferences
+                {
+                    Name = lv
+                })
+            });
 
         #region ReadOnly actions to return basic data - allow access for: content ,media, members, settings, developer
         /// <summary>
@@ -530,7 +562,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var grouped = dataTypes?.WhereNotNull()
-                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group!.ToLower())
+                .GroupBy(x => string.Empty)
                 .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
             return grouped;
@@ -563,7 +595,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var grouped = Enumerable.ToDictionary(datatypes
-                    .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group!.ToLower()), group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
+                    .GroupBy(x => string.Empty), group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
             return grouped;
         }
@@ -580,7 +612,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
         {
             return _propertyEditorCollection
-                .OrderBy(x => x.Name)
+                .OrderBy(x => x.Alias)
                 .Select(_umbracoMapper.Map<PropertyEditorBasic>).WhereNotNull();
         }
         #endregion

@@ -5,10 +5,6 @@
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.PlainInteger,
-    EditorType.PropertyValue,
-    "Configuration-less integer",
-    "not-applicable",
-    Icon = "umb:edit",
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.Integer)]
 public class PlainIntegerPropertyEditor : DataEditor

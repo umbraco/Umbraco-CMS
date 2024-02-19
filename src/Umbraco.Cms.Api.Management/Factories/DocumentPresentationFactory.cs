@@ -1,6 +1,10 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Document;
+﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -9,60 +13,64 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class DocumentPresentationFactory : IDocumentPresentationFactory
+internal sealed class DocumentPresentationFactory
+    : ContentPresentationFactoryBase<IContentType, IContentTypeService>, IDocumentPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IContentUrlFactory _contentUrlFactory;
+    private readonly IDocumentUrlFactory _documentUrlFactory;
     private readonly IFileService _fileService;
     private readonly IContentTypeService _contentTypeService;
+    private readonly IPublicAccessService _publicAccessService;
 
     public DocumentPresentationFactory(
         IUmbracoMapper umbracoMapper,
-        IContentUrlFactory contentUrlFactory,
+        IDocumentUrlFactory documentUrlFactory,
         IFileService fileService,
-        IContentTypeService contentTypeService)
+        IContentTypeService contentTypeService,
+        IPublicAccessService publicAccessService)
+        : base(contentTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
-        _contentUrlFactory = contentUrlFactory;
+        _documentUrlFactory = documentUrlFactory;
         _fileService = fileService;
         _contentTypeService = contentTypeService;
+        _publicAccessService = publicAccessService;
     }
 
     public async Task<DocumentResponseModel> CreateResponseModelAsync(IContent content)
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
 
-        responseModel.Urls = await _contentUrlFactory.GetUrlsAsync(content);
+        responseModel.Urls = await _documentUrlFactory.GetUrlsAsync(content);
 
-        responseModel.TemplateId = content.TemplateId.HasValue
+        Guid? templateKey = content.TemplateId.HasValue
             ? _fileService.GetTemplate(content.TemplateId.Value)?.Key
+            : null;
+
+        responseModel.Template = templateKey.HasValue
+            ? new ReferenceByIdModel { Id = templateKey.Value }
             : null;
 
         return responseModel;
     }
 
-    public DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity, string? culture = null)
+    public DocumentItemResponseModel CreateItemResponseModel(IDocumentEntitySlim entity)
     {
         var responseModel = new DocumentItemResponseModel
         {
-            Name = entity.Name ?? string.Empty,
             Id = entity.Key,
-            Icon = entity.ContentTypeIcon,
             IsTrashed = entity.Trashed
         };
 
+        responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
+
         IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
-        responseModel.ContentTypeId = contentType?.Key ?? Guid.Empty;
-
-        if (culture == null || !entity.Variations.VariesByCulture())
+        if (contentType is not null)
         {
-            return responseModel;
+            responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(contentType)!;
         }
 
-        if (entity.CultureNames.TryGetValue(culture, out var cultureName))
-        {
-            responseModel.Name = cultureName;
-        }
+        responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
         return responseModel;
     }
@@ -78,4 +86,31 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
         responseModel.Name = contentType?.Name ?? entity.Name ?? string.Empty;
         return responseModel;
     }
+
+    public IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity)
+    {
+        if (entity.Variations.VariesByCulture() is false)
+        {
+            yield return new()
+            {
+                Name = entity.Name ?? string.Empty,
+                State = DocumentVariantStateHelper.GetState(entity, null),
+                Culture = null,
+            };
+            yield break;
+        }
+
+        foreach (KeyValuePair<string, string> cultureNamePair in entity.CultureNames)
+        {
+            yield return new()
+            {
+                Name = cultureNamePair.Value,
+                Culture = cultureNamePair.Key,
+                State = DocumentVariantStateHelper.GetState(entity, cultureNamePair.Key)
+            };
+        }
+    }
+
+    public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
+        => CreateContentTypeReferenceResponseModel<DocumentTypeReferenceResponseModel>(entity);
 }

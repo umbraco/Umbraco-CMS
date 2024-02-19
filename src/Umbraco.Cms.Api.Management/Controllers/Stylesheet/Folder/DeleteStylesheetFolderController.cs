@@ -1,23 +1,31 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Core.Services.FileSystem;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 
 [ApiVersion("1.0")]
 public class DeleteStylesheetFolderController : StylesheetFolderControllerBase
 {
-    public DeleteStylesheetFolderController(IUmbracoMapper mapper, IStylesheetFolderService stylesheetFolderService)
-        : base(mapper, stylesheetFolderService)
-    {
-    }
+    private readonly IStylesheetFolderService _stylesheetFolderService;
 
-    [HttpDelete]
+    public DeleteStylesheetFolderController(IStylesheetFolderService stylesheetFolderService)
+        => _stylesheetFolderService = stylesheetFolderService;
+
+    [HttpDelete("{path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public Task<IActionResult> Delete(string path) => DeleteAsync(path);
+    public async Task<IActionResult> Delete(string path)
+    {
+        path = DecodePath(path).VirtualPathToSystemPath();
+        StylesheetFolderOperationStatus result = await _stylesheetFolderService.DeleteAsync(path);
+        return result is StylesheetFolderOperationStatus.Success
+            ? Ok()
+            : OperationStatusResult(result);
+    }
 }

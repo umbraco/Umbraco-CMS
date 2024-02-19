@@ -10,40 +10,41 @@ test.describe('Partial View tests', () => {
   });
 
   test.afterEach(async ({umbracoApi}) => {
-    await umbracoApi.partialView.delete(partialViewPath);
+    await umbracoApi.partialView.ensureNameNotExists(partialViewName);
   });
 
   test('can create a partial view', async ({umbracoApi}) => {
+    // Act
     partialViewPath = await umbracoApi.partialView.create(partialViewName, 'test');
 
     // Assert
-    await expect(await umbracoApi.partialView.doesExist(partialViewPath)).toBeTruthy();
+    expect(await umbracoApi.partialView.doesExist(partialViewPath)).toBeTruthy();
   });
 
   test('can update a partial view', async ({umbracoApi}) => {
+    // Arrange
     const newContent = 'Howdy';
-
     partialViewPath = await umbracoApi.partialView.create(partialViewName, 'test');
-
     const partialView = await umbracoApi.partialView.get(partialViewPath);
-
     partialView.content = newContent;
 
+    // Act
     await umbracoApi.partialView.update(partialView);
 
     // Assert
     const updatedPartialView = await umbracoApi.partialView.get(partialViewPath);
-    await expect(updatedPartialView.content).toEqual(newContent);
+    expect(updatedPartialView.content).toEqual(newContent);
   });
 
   test('can delete a partial view', async ({umbracoApi}) => {
+    // Arrange
     partialViewPath = await umbracoApi.partialView.create(partialViewName, 'test');
+    expect(await umbracoApi.partialView.doesExist(partialViewPath)).toBeTruthy();
 
-    await expect(await umbracoApi.partialView.doesExist(partialViewPath)).toBeTruthy();
-
+    // Act
     await umbracoApi.partialView.delete(partialViewPath);
 
     // Assert
-    await expect(await umbracoApi.partialView.doesExist(partialViewPath)).toBeFalsy();
+    expect(await umbracoApi.partialView.doesExist(partialViewPath)).toBeFalsy();
   });
 });

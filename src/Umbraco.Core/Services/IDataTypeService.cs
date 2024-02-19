@@ -17,6 +17,7 @@ public interface IDataTypeService : IService
     /// <returns></returns>
     [Obsolete("Please use GetReferencesAsync. Will be deleted in V15.")]
     IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
+    IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id) => throw new NotImplementedException();
 
     /// <summary>
     ///     Returns a dictionary of content type <see cref="Udi" />s and the property type aliases that use a <see cref="IDataType" />
@@ -112,6 +113,7 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="ids">Optional array of Ids</param>
     /// <returns>An enumerable list of <see cref="IDataType" /> objects</returns>
+    [Obsolete("Please use GetAllAsync. Will be removed in V15.")]
     IEnumerable<IDataType> GetAll(params int[] ids);
 
     /// <summary>

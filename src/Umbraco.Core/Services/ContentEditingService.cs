@@ -1,15 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-// FIXME: add granular permissions check (for inspiration, check how the old ContentController utilizes IAuthorizationService)
 internal sealed class ContentEditingService
-    : ContentEditingServiceBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
+    : ContentEditingServiceWithSortingBase<IContent, IContentType, IContentService, IContentTypeService>, IContentEditingService
 {
     private readonly ITemplateService _templateService;
     private readonly ILogger<ContentEditingService> _logger;
@@ -23,8 +23,9 @@ internal sealed class ContentEditingService
         ILogger<ContentEditingService> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
-        ITreeEntitySortingService treeEntitySortingService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService)
+        ITreeEntitySortingService treeEntitySortingService,
+        IContentValidationService contentValidationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, contentValidationService, treeEntitySortingService)
     {
         _templateService = templateService;
         _logger = logger;
@@ -36,52 +37,71 @@ internal sealed class ContentEditingService
         return await Task.FromResult(content);
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IContent content, ContentUpdateModel updateModel)
+        => await ValidatePropertiesAsync(updateModel, content.ContentType.Key);
+
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
+        => await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
+
+    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
-        Attempt<IContent?, ContentEditingOperationStatus> result = await MapCreate(createModel);
+        Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await MapCreate<ContentCreateResult>(createModel);
         if (result.Success == false)
         {
             return result;
         }
 
-        IContent content = result.Result!;
-        ContentEditingOperationStatus operationStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        // the create mapping might succeed, but this doesn't mean the model is valid at property level.
+        // we'll return the actual property validation status if the entire operation succeeds.
+        ContentEditingOperationStatus validationStatus = result.Status;
+        ContentValidationResult validationResult = result.Result.ValidationResult;
+
+        IContent content = result.Result.Content!;
+        ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
+        if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(operationStatus, content);
+            return Attempt.FailWithStatus(updateTemplateStatus, new ContentCreateResult { Content = content });
         }
 
-        operationStatus = await Save(content, userKey);
-        return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content)
-            : Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(operationStatus, content);
+        ContentEditingOperationStatus saveStatus = await Save(content, userKey);
+        return saveStatus == ContentEditingOperationStatus.Success
+            ? Attempt.SucceedWithStatus(validationStatus, new ContentCreateResult { Content = content, ValidationResult = validationResult })
+            : Attempt.FailWithStatus(saveStatus, new ContentCreateResult { Content = content });
     }
 
-    public async Task<Attempt<IContent, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, Guid userKey)
+    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, Guid userKey)
     {
-        Attempt<ContentEditingOperationStatus> result = await MapUpdate(content, updateModel);
+        Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(content, updateModel);
         if (result.Success == false)
         {
-            return Attempt.FailWithStatus(result.Result, content);
+            return Attempt.FailWithStatus(result.Status, result.Result);
         }
 
-        ContentEditingOperationStatus operationStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        // the update mapping might succeed, but this doesn't mean the model is valid at property level.
+        // we'll return the actual property validation status if the entire operation succeeds.
+        ContentEditingOperationStatus validationStatus = result.Status;
+        ContentValidationResult validationResult = result.Result.ValidationResult;
+
+        ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
+        if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(operationStatus, content);
+            return Attempt.FailWithStatus(updateTemplateStatus, new ContentUpdateResult { Content = content });
         }
 
-        operationStatus = await Save(content, userKey);
-        return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, content)
-            : Attempt.FailWithStatus(operationStatus, content);
+        ContentEditingOperationStatus saveStatus = await Save(content, userKey);
+        return saveStatus == ContentEditingOperationStatus.Success
+            ? Attempt.SucceedWithStatus(validationStatus, new ContentUpdateResult { Content = content, ValidationResult = validationResult })
+            : Attempt.FailWithStatus(saveStatus, new ContentUpdateResult { Content = content });
     }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)
         => await HandleMoveToRecycleBinAsync(key, userKey);
 
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
+        => await HandleDeleteAsync(key, userKey, true);
+
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey)
-        => await HandleDeleteAsync(key, userKey);
+        => await HandleDeleteAsync(key, userKey, false);
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);

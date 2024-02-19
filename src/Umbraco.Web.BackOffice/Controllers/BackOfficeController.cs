@@ -7,14 +7,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
@@ -48,7 +46,6 @@ public class BackOfficeController : UmbracoController
     private readonly BackOfficeServerVariables _backOfficeServerVariables;
     private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
     private readonly IBackOfficeExternalLoginProviders _externalLogins;
-    private readonly IGridConfig _gridConfig;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IJsonSerializer _jsonSerializer;
@@ -79,7 +76,6 @@ public class BackOfficeController : UmbracoController
         IOptionsSnapshot<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
         ILocalizedTextService textService,
-        IGridConfig gridConfig,
         BackOfficeServerVariables backOfficeServerVariables,
         AppCaches appCaches,
         IBackOfficeSignInManager signInManager,
@@ -99,7 +95,6 @@ public class BackOfficeController : UmbracoController
         _globalSettings = globalSettings.Value;
         _hostingEnvironment = hostingEnvironment;
         _textService = textService;
-        _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
         _backOfficeServerVariables = backOfficeServerVariables;
         _appCaches = appCaches;
         _signInManager = signInManager;
@@ -323,11 +318,6 @@ public class BackOfficeController : UmbracoController
         return nestedDictionary;
     }
 
-    [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
-    [AngularJsonOnlyConfiguration]
-    [HttpGet]
-    public IEnumerable<IGridEditorConfig> GetGridConfig() => _gridConfig.EditorsConfig.Editors;
-
     /// <summary>
     ///     Returns the JavaScript object representing the static server variables javascript object
     /// </summary>
@@ -422,7 +412,8 @@ public class BackOfficeController : UmbracoController
         if (user == null)
         {
             // ... this should really not happen
-            return RedirectToLogin(new { flow = "external-login", status = "localUserNotFound" });
+            TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "Local user does not exist" };
+            return RedirectToLogin(new { flow = "external-login", status = "localUserNotFound", logout = "true"});
         }
 
         ExternalLoginInfo? info =
@@ -431,7 +422,9 @@ public class BackOfficeController : UmbracoController
         if (info == null)
         {
             // Add error and redirect for it to be displayed
-            return RedirectToLogin(new { flow = "external-login", status = "externalLoginInfoNotFound" });
+            TempData[ViewDataExtensions.TokenExternalSignInError] =
+                new[] { "An error occurred, could not get external login info" };
+            return RedirectToLogin(new { flow = "external-login", status = "externalLoginInfoNotFound", logout = "true"});
         }
 
         IdentityResult addLoginResult = await _userManager.AddLoginAsync(user, info);
@@ -444,7 +437,8 @@ public class BackOfficeController : UmbracoController
         }
 
         // Add errors and redirect for it to be displayed
-        return RedirectToLogin(new { flow = "external-login", status = "failed" });
+        TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
+        return RedirectToLogin(new { flow = "external-login", status = "failed", logout = "true" });
     }
 
     /// <summary>
@@ -465,8 +459,9 @@ public class BackOfficeController : UmbracoController
                 _httpContextAccessor.HttpContext,
                 ViewDataExtensions.TokenExternalSignInError,
                 _jsonSerializer) ||
-            ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) || ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
+            ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError))
         {
+            // Return early to let the client side handle the messaging
             return defaultResponse();
         }
 

@@ -165,7 +165,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use 
+    ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<IContent> GetContentForExpiration(DateTime date);
@@ -175,7 +175,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     /// <remarks>
-    ///     The content returned from this method may be culture variant, in which case you can use 
+    ///     The content returned from this method may be culture variant, in which case you can use
     ///     <see cref="Umbraco.Extensions.ContentExtensions.GetStatus(IContent, ContentScheduleCollection, string?)" /> to get the status for a specific culture.
     /// </remarks>
     IEnumerable<IContent> GetContentForRelease(DateTime date);
@@ -521,4 +521,6 @@ public interface IContentService : IContentServiceBase<IContent>
     IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     #endregion
+
+    Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
 }

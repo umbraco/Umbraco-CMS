@@ -7,7 +7,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Document.Item;
 
 [ApiController]
-[VersionedApiBackOfficeRoute(Constants.UdiEntityType.Document)]
+[VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.Document}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocuments)]
 public class DocumentItemControllerBase : ManagementApiControllerBase

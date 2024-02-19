@@ -624,22 +624,18 @@ public class VariationTests
     {
         var ioHelper = Mock.Of<IIOHelper>();
         var dataTypeService = Mock.Of<IDataTypeService>();
-        var localizedTextService = Mock.Of<ILocalizedTextService>();
-        var editorConfigurationParser = Mock.Of<IEditorConfigurationParser>();
 
-        var attribute = new DataEditorAttribute("a", "a", "a");
+        var attribute = new DataEditorAttribute("a");
         var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(x
             => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(
                 attribute,
-                localizedTextService,
                 Mock.Of<IShortStringHelper>(),
                 new JsonNetSerializer(),
                 Mock.Of<IIOHelper>()));
 
         var textBoxEditor = new TextboxPropertyEditor(
             dataValueEditorFactory,
-            ioHelper,
-            editorConfigurationParser);
+            ioHelper);
 
         var serializer = new ConfigurationEditorJsonSerializer();
 
@@ -652,7 +648,6 @@ public class VariationTests
         return new PropertyValidationService(
             propertyEditorCollection,
             dataTypeService,
-            localizedTextService,
             new ValueEditorCache());
     }
 }

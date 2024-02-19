@@ -94,8 +94,9 @@ public class TemplateService : RepositoryService, ITemplateService
         string name,
         string alias,
         string? content,
-        Guid userKey)
-        => await CreateAsync(new Template(_shortStringHelper, name, alias) { Content = content }, userKey);
+        Guid userKey,
+        Guid? templateKey = null)
+        => await CreateAsync(new Template(_shortStringHelper, name, alias) { Content = content, Key = templateKey ?? Guid.NewGuid() }, userKey);
 
     /// <inheritdoc />
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(ITemplate template, Guid userKey)
@@ -179,19 +180,6 @@ public class TemplateService : RepositoryService, ITemplateService
             IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
             return await Task.FromResult(_templateRepository.Get(query)?.SingleOrDefault());
         }
-    }
-
-    /// <inheritdoc />
-    public async Task<string> GetScaffoldAsync(Guid? masterTemplateKey)
-    {
-        string? masterAlias = null;
-        if (masterTemplateKey is not null)
-        {
-            ITemplate? masterTemplate = await GetAsync(masterTemplateKey.Value);
-            masterAlias = masterTemplate?.Alias;
-        }
-
-        return _defaultViewContentProvider.GetDefaultFileContent(masterAlias);
     }
 
     /// <inheritdoc />

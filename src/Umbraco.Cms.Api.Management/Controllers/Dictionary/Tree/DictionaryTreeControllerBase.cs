@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]
 // NOTE: at the moment dictionary items (renamed to dictionary tree) aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
-public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeItemResponseModel>
+public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
     public DictionaryTreeControllerBase(IEntityService entityService, IDictionaryItemService dictionaryItemService)
         : base(entityService) =>
@@ -27,41 +28,26 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
 
     protected IDictionaryItemService DictionaryItemService { get; }
 
-    protected async Task<EntityTreeItemResponseModel[]> MapTreeItemViewModels(Guid? parentKey, IDictionaryItem[] dictionaryItems)
+    protected async Task<IEnumerable<NamedEntityTreeItemResponseModel>> MapTreeItemViewModels(Guid? parentKey, IEnumerable<IDictionaryItem> dictionaryItems)
     {
-        async Task<EntityTreeItemResponseModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)
+        async Task<NamedEntityTreeItemResponseModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)
         {
-            var hasChildren = (await DictionaryItemService.GetChildrenAsync(dictionaryItem.Key)).Any();
-            return new EntityTreeItemResponseModel
+            var hasChildren = await DictionaryItemService.CountChildrenAsync(dictionaryItem.Key) > 0;
+            return new NamedEntityTreeItemResponseModel
             {
                 Name = dictionaryItem.ItemKey,
                 Id = dictionaryItem.Key,
                 Type = Constants.UdiEntityType.DictionaryItem,
                 HasChildren = hasChildren,
-                IsContainer = false,
-                ParentId = parentKey
+                Parent = parentKey.HasValue
+                    ? new ReferenceByIdModel
+                    {
+                        Id = parentKey.Value
+                    }
+                    : null
             };
         }
 
-        var items = new List<EntityTreeItemResponseModel>(dictionaryItems.Length);
-        foreach (IDictionaryItem dictionaryItem in dictionaryItems)
-        {
-            items.Add(await CreateEntityTreeItemViewModelAsync(dictionaryItem));
-        }
-
-        return items.ToArray();
-    }
-
-    // language service does not (yet) allow pagination of dictionary items, we have to do it in memory for now
-    protected IDictionaryItem[] PaginatedDictionaryItems(long pageNumber, int pageSize, IEnumerable<IDictionaryItem> allDictionaryItems, out long totalItems)
-    {
-        IDictionaryItem[] allDictionaryItemsAsArray = allDictionaryItems.ToArray();
-
-        totalItems = allDictionaryItemsAsArray.Length;
-        return allDictionaryItemsAsArray
-            .OrderBy(item => item.ItemKey)
-            .Skip((int)pageNumber * pageSize)
-            .Take(pageSize)
-            .ToArray();
+        return await Task.WhenAll(dictionaryItems.Select(CreateEntityTreeItemViewModelAsync));
     }
 }

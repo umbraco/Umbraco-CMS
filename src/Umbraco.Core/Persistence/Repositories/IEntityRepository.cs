@@ -83,4 +83,6 @@ public interface IEntityRepository : IRepository
         out long totalRecords,
         IQuery<IUmbracoEntity>? filter,
         Ordering? ordering);
+
+    int CountByQuery(IQuery<IUmbracoEntity> query, Guid objectType, IQuery<IUmbracoEntity>? filter);
 }

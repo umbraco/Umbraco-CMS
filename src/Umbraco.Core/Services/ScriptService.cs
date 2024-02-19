@@ -8,181 +8,68 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScriptService
+public class ScriptService : FileServiceOperationBase<IScriptRepository, IScript, ScriptOperationStatus>, IScriptService
 {
-    private readonly IAuditRepository _auditRepository;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly ILogger<ScriptService> _logger;
-
-    protected override string[] AllowedFileExtensions { get; } = { ".js" };
-
     public ScriptService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IScriptRepository scriptRepository,
-        IAuditRepository auditRepository,
+        IScriptRepository repository,
+        ILogger<StylesheetService> logger,
         IUserIdKeyResolver userIdKeyResolver,
-        ILogger<ScriptService> logger)
-        : base(provider, loggerFactory, eventMessagesFactory, scriptRepository)
+        IAuditRepository auditRepository)
+        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditRepository)
     {
-        _auditRepository = auditRepository;
-        _userIdKeyResolver = userIdKeyResolver;
-        _logger = logger;
     }
 
-    /// <inheritdoc />
-    public async Task<ScriptOperationStatus> DeleteAsync(string path, Guid userKey)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+    protected override string[] AllowedFileExtensions { get; } = { ".js" };
 
-        IScript? script = Repository.Get(path);
-        if (script is null)
-        {
-            return ScriptOperationStatus.NotFound;
-        }
+    protected override ScriptOperationStatus Success => ScriptOperationStatus.Success;
 
-        EventMessages eventMessages = EventMessagesFactory.Get();
+    protected override ScriptOperationStatus NotFound => ScriptOperationStatus.NotFound;
 
-        var deletingNotification = new ScriptDeletingNotification(script, eventMessages);
-        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
-        {
-            return ScriptOperationStatus.CancelledByNotification;
-        }
+    protected override ScriptOperationStatus CancelledByNotification => ScriptOperationStatus.CancelledByNotification;
 
-        Repository.Delete(script);
+    protected override ScriptOperationStatus PathTooLong => ScriptOperationStatus.PathTooLong;
 
-        scope.Notifications.Publish(
-            new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
+    protected override ScriptOperationStatus AlreadyExists => ScriptOperationStatus.AlreadyExists;
 
-        await AuditAsync(AuditType.Delete, userKey);
+    protected override ScriptOperationStatus ParentNotFound => ScriptOperationStatus.ParentNotFound;
 
-        scope.Complete();
-        return ScriptOperationStatus.Success;
-    }
+    protected override ScriptOperationStatus InvalidName => ScriptOperationStatus.InvalidName;
+
+    protected override ScriptOperationStatus InvalidFileExtension => ScriptOperationStatus.InvalidFileExtension;
+
+    protected override string EntityType => "Script";
+
+    protected override ScriptSavingNotification SavingNotification(IScript target, EventMessages messages)
+        => new(target, messages);
+
+    protected override ScriptSavedNotification SavedNotification(IScript target, EventMessages messages)
+        => new(target, messages);
+
+    protected override ScriptDeletingNotification DeletingNotification(IScript target, EventMessages messages)
+        => new(target, messages);
+
+    protected override ScriptDeletedNotification DeletedNotification(IScript target, EventMessages messages)
+        => new(target, messages);
+
+    protected override IScript CreateEntity(string path, string? content)
+        => new Script(path) { Content = content };
 
     /// <inheritdoc />
     public async Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid userKey)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        try
-        {
-            ScriptOperationStatus validationResult = await ValidateCreateAsync(createModel);
-            if (validationResult is not ScriptOperationStatus.Success)
-            {
-                return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(validationResult, null);
-            }
-        }
-        catch (PathTooLongException exception)
-        {
-            _logger.LogError(exception, "The script path was too long");
-            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.PathTooLong, null);
-        }
-
-        var script = new Script(createModel.FilePath) { Content = createModel.Content };
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var savingNotification = new ScriptSavingNotification(script, eventMessages);
-        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
-        {
-            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.CancelledByNotification, null);
-        }
-
-        Repository.Save(script);
-
-        scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
-        await AuditAsync(AuditType.Save, userKey);
-
-        scope.Complete();
-        return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
-    }
-
-    private Task<ScriptOperationStatus> ValidateCreateAsync(ScriptCreateModel createModel)
-    {
-        if (Repository.Exists(createModel.FilePath))
-        {
-            return Task.FromResult(ScriptOperationStatus.AlreadyExists);
-        }
-
-        if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false &&
-            Repository.FolderExists(createModel.ParentPath) is false)
-        {
-            return Task.FromResult(ScriptOperationStatus.ParentNotFound);
-        }
-
-        if(HasValidFileName(createModel.Name) is false)
-        {
-            return Task.FromResult(ScriptOperationStatus.InvalidName);
-        }
-
-        if (HasValidFileExtension(createModel.FilePath) is false)
-        {
-            return Task.FromResult(ScriptOperationStatus.InvalidFileExtension);
-        }
-
-        return Task.FromResult(ScriptOperationStatus.Success);
-    }
+        => await HandleCreateAsync(createModel.Name, createModel.ParentPath, createModel.Content, userKey);
 
     /// <inheritdoc />
-    public async Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(ScriptUpdateModel updateModel, Guid userKey)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IScript? script = Repository.Get(updateModel.ExistingPath);
+    public async Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(string path, ScriptUpdateModel updateModel, Guid userKey)
+        => await HandleUpdateAsync(path, updateModel.Content, userKey);
 
-        if (script is null)
-        {
-            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.NotFound, null);
-        }
+    /// <inheritdoc />
+    public async Task<ScriptOperationStatus> DeleteAsync(string path, Guid userKey)
+        => await HandleDeleteAsync(path, userKey);
 
-        ScriptOperationStatus validationResult = ValidateUpdate(updateModel);
-        if (validationResult is not ScriptOperationStatus.Success)
-        {
-            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(validationResult, null);
-        }
-
-        script.Content = updateModel.Content;
-        if (script.Name != updateModel.Name)
-        {
-            // Name has been updated, so we need to update the path as well
-            var newPath = script.Path.Replace(script.Name!, updateModel.Name);
-            script.Path = newPath;
-        }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var savingNotification = new ScriptSavingNotification(script, eventMessages);
-        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
-        {
-            return Attempt.FailWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.CancelledByNotification, null);
-        }
-
-        Repository.Save(script);
-        scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
-
-        await AuditAsync(AuditType.Save, userKey);
-
-        scope.Complete();
-        return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
-    }
-
-    private ScriptOperationStatus ValidateUpdate(ScriptUpdateModel updateModel)
-    {
-        if (HasValidFileExtension(updateModel.Name) is false)
-        {
-            return ScriptOperationStatus.InvalidFileExtension;
-        }
-
-        if (HasValidFileName(updateModel.Name) is false)
-        {
-            return ScriptOperationStatus.InvalidName;
-        }
-
-        return ScriptOperationStatus.Success;
-    }
-
-    private async Task AuditAsync(AuditType type, Guid userKey)
-    {
-        int userId = await _userIdKeyResolver.GetAsync(userKey);
-        _auditRepository.Save(new AuditItem(-1, type, userId, "Script"));
-    }
+    /// <inheritdoc />
+    public async Task<Attempt<IScript?, ScriptOperationStatus>> RenameAsync(string path, ScriptRenameModel renameModel, Guid userKey)
+        => await HandleRenameAsync(path, renameModel.Name, userKey);
 }

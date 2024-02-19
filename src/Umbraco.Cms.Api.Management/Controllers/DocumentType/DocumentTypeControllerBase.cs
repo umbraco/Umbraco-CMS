@@ -18,6 +18,9 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)
         => ContentTypeOperationStatusResult(status, "document");
 
+    protected IActionResult StructureOperationStatusResult(ContentTypeStructureOperationStatus status)
+        => ContentTypeStructureOperationStatusResult(status, "document");
+
     internal static IActionResult ContentTypeOperationStatusResult(ContentTypeOperationStatus status, string type) =>
         status switch
         {
@@ -61,16 +64,41 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 .Build()),
             ContentTypeOperationStatus.InvalidComposition => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Invalid composition")
-                .WithDetail($"The specified {type} type composition is invalid")),
+                .WithDetail($"The specified {type} type composition is invalid")
+                .Build()),
             ContentTypeOperationStatus.InvalidParent => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Invalid parent")
                 .WithDetail(
-                    "The specified parent is invalid, or cannot be used in combination with the specified composition/inheritance")),
+                    "The specified parent is invalid, or cannot be used in combination with the specified composition/inheritance")
+                .Build()),
             ContentTypeOperationStatus.DuplicatePropertyTypeAlias => new BadRequestObjectResult(
                 new ProblemDetailsBuilder()
                     .WithTitle("Duplicate property type alias")
                     .WithDetail("One or more property type aliases are already in use, all property type aliases must be unique.")
                     .Build()),
             _ => new ObjectResult("Unknown content type operation status") { StatusCode = StatusCodes.Status500InternalServerError },
+        };
+
+    public static IActionResult ContentTypeStructureOperationStatusResult(ContentTypeStructureOperationStatus status, string type) =>
+        status switch
+        {
+            ContentTypeStructureOperationStatus.Success => new OkResult(),
+            ContentTypeStructureOperationStatus.CancelledByNotification => new BadRequestObjectResult(new ProblemDetailsBuilder()
+                .WithTitle("Cancelled by notification")
+                .WithDetail($"A notification handler prevented the {type} type operation")
+                .Build()),
+            ContentTypeStructureOperationStatus.ContainerNotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
+                .WithTitle("Container not found")
+                .WithDetail("The specified container was not found")
+                .Build()),
+            ContentTypeStructureOperationStatus.NotAllowedByPath => new BadRequestObjectResult(new ProblemDetailsBuilder()
+                .WithTitle("Not allowed by path")
+                .WithDetail($"The {type} type operation cannot be performed due to not allowed path (i.e. a child of itself)")
+                .Build()),
+            ContentTypeStructureOperationStatus.NotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
+                .WithTitle("Not Found")
+                .WithDetail($"The specified {type} type was not found")
+                .Build()),
+            _ => new ObjectResult("Unknown content type structure operation status") { StatusCode = StatusCodes.Status500InternalServerError }
         };
 }

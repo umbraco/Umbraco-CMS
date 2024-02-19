@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -41,7 +42,7 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
         {
             Name = container.Name!,
             Id = container.Key,
-            ParentId = parentContainer?.Key
+            Parent = ReferenceByIdModel.ReferenceOrNull(parentContainer?.Key)
         });
     }
 
@@ -52,11 +53,11 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
         Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _treeEntityTypeContainerService.CreateAsync(
             createFolderRequestModel.Id,
             createFolderRequestModel.Name,
-            createFolderRequestModel.ParentId,
+            createFolderRequestModel.Parent?.Id,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction(createdAction, result.Result!.Key)
+            ? CreatedAtId(createdAction, result.Result!.Key)
             : OperationStatusResult(result.Status);
     }
 
