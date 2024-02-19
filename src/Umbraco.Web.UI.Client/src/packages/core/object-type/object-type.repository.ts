@@ -1,4 +1,4 @@
-import { ObjectTypesResource } from '@umbraco-cms/backoffice/backend-api';
+import { ObjectTypesResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';

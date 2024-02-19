@@ -2,8 +2,8 @@ import type {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockDocumentTypeModelHack = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
 
@@ -203,6 +203,31 @@ export const data: Array<UmbMockDocumentModel> = [
 							udi: '5678',
 							contentTypeKey: 'all-property-editors-document-type-id',
 							elementProperty: 'Hello world',
+							textBox: 'Hello world 123',
+							blockList: {
+								layout: {
+									'Umbraco.BlockList': [
+										{
+											contentUdi: '1234b',
+											settingsUdi: '5678b',
+										},
+									],
+								},
+								contentData: [
+									{
+										udi: '1234b',
+										contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+										elementProperty: 'Hello world',
+									},
+								],
+								settingsData: [
+									{
+										udi: '5678b',
+										contentTypeKey: 'all-property-editors-document-type-id',
+										elementProperty: 'Hello world',
+									},
+								],
+							},
 						},
 					],
 				},
@@ -303,7 +328,72 @@ export const data: Array<UmbMockDocumentModel> = [
 				alias: 'blockGrid',
 				culture: null,
 				segment: null,
-				value: null,
+				value: {
+					layout: {
+						'Umbraco.BlockGrid': [
+							{
+								contentUdi: '1234',
+								settingsUdi: '5678',
+								areas: [
+									{
+										key: 'area1',
+										items: [
+											{
+												contentUdi: 'a1234',
+												settingsUdi: 'a5678',
+												areas: [],
+											},
+										],
+									},
+									{
+										key: 'area2',
+										items: [
+											{
+												contentUdi: 'b1234',
+												settingsUdi: 'b5678',
+												areas: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					contentData: [
+						{
+							udi: '1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world',
+						},
+						{
+							udi: 'a1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world from area 1',
+						},
+						{
+							udi: 'b1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world from area 2',
+						},
+					],
+					settingsData: [
+						{
+							udi: '5678',
+							contentTypeKey: 'all-property-editors-document-type-id',
+							elementProperty: 'Hello world',
+						},
+						{
+							udi: 'a5678',
+							contentTypeKey: 'all-property-editors-document-type-id',
+							elementProperty: 'Hello world from area 1 settings',
+						},
+						{
+							udi: 'b5678',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world from area 2 settings',
+						},
+					],
+				},
 			},
 			{
 				alias: 'blockGrid',
@@ -605,7 +695,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'simple-document-type-id',
 			icon: 'icon-document',
-			hasListView: false,
+			hasListView: true,
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -625,6 +715,12 @@ export const data: Array<UmbMockDocumentModel> = [
 		values: [
 			{
 				alias: 'multiNodeTreePicker',
+				culture: null,
+				segment: null,
+				value: null,
+			},
+			{
+				alias: 'listView',
 				culture: null,
 				segment: null,
 				value: null,

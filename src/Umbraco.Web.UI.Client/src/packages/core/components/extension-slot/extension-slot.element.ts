@@ -5,7 +5,7 @@ import {
 	type UmbExtensionElementInitializer,
 	UmbExtensionsElementInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-extension-slot
@@ -115,6 +115,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				(extensionControllers) => {
 					this._permittedExts = extensionControllers;
 				},
+				'extensionsInitializer',
 				this.defaultElement,
 			);
 			this.#extensionsController.properties = this.#props;

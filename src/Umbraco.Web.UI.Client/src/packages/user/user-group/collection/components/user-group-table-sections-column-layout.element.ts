@@ -1,7 +1,7 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-user-group-table-sections-column-layout')
 export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement {

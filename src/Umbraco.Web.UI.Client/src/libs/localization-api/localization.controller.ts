@@ -63,7 +63,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	}
 
 	destroy(): void {
-		this.#host.removeController(this);
+		this.#host?.removeController(this);
 		this.#hostEl = undefined as any;
 	}
 

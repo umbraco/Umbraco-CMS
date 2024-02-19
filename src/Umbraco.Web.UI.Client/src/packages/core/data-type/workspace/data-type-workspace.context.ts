@@ -205,9 +205,7 @@ export class UmbDataTypeWorkspaceContext
 			data = { ...data, ...this.modalContext.data.preset };
 		}
 		this.setIsNew(true);
-		// TODO: This is a hack to get around the fact that the data is not typed correctly.
-		// Create and response models are different. We need to look into this.
-		this.#data.setValue(data as unknown as UmbDataTypeDetailModel);
+		this.#data.setValue(data);
 		return { data };
 	}
 
@@ -291,5 +289,6 @@ export class UmbDataTypeWorkspaceContext
 
 	public destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }

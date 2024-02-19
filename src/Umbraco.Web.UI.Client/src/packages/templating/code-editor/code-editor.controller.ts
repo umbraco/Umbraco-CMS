@@ -159,7 +159,11 @@ export class UmbCodeEditorController {
 			...options,
 			lineNumbers: hasLineNumbers ? (options.lineNumbers ? 'on' : 'off') : undefined,
 			minimap: hasMinimap ? (options.minimap ? { enabled: true } : { enabled: false }) : undefined,
-			lightbulb: hasLightbulb ? (options.lightbulb ? { enabled: true } : { enabled: false }) : undefined,
+			lightbulb: hasLightbulb
+				? options.lightbulb
+					? { enabled: monaco.editor.ShowLightbulbIconMode.On }
+					: { enabled: monaco.editor.ShowLightbulbIconMode.Off }
+				: undefined,
 		};
 	}
 	/**

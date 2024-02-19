@@ -2,7 +2,7 @@ import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockDataTypeModelHack = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
 
@@ -559,7 +559,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			},
 			{
 				alias: 'useInlineEditingAsDefault',
-				value: false,
+				value: true,
 			},
 			{
 				alias: 'useLiveEditing',
@@ -705,7 +705,40 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
 		hasChildren: false,
 		isFolder: false,
-		values: [],
+		values: [
+			{ alias: 'pageSize', value: 2 },
+			{ alias: 'orderDirection', value: 'desc' },
+			{
+				alias: 'includeProperties',
+				value: [
+					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: '' },
+					{ alias: 'updateDate', header: 'Last edited', isSystem: true },
+					{ alias: 'owner', header: 'Created by', isSystem: true },
+				],
+			},
+			{ alias: 'orderBy', value: 'updateDate' },
+			{
+				alias: 'bulkActionPermissions',
+				value: {
+					allowBulkPublish: true,
+					allowBulkUnpublish: false,
+					allowBulkCopy: true,
+					allowBulkMove: false,
+					allowBulkDelete: true,
+				},
+			},
+			{
+				alias: 'layouts',
+				value: [
+					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
+					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+				],
+			},
+			{ alias: 'icon', value: 'icon-layers' },
+			{ alias: 'tabName', value: 'Children' },
+			{ alias: 'showContentFirst', value: true },
+			{ alias: 'useInfiniteEditor', value: true },
+		],
 	},
 	{
 		name: 'Icon Picker',

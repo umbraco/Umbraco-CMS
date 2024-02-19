@@ -1,8 +1,8 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -55,7 +55,7 @@ const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel =
 		documentType: {
 			unique: item.documentType.id,
 			icon: item.documentType.icon,
-			hasListView: item.documentType.hasListView,
+			hasCollection: item.documentType.hasListView,
 		},
 		variants: item.variants.map((variant) => {
 			return {

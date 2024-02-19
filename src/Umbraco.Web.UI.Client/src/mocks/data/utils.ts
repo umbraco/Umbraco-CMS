@@ -2,7 +2,7 @@ import type {
 	FolderTreeItemResponseModel,
 	FileSystemTreeItemPresentationModel,
 	NamedEntityTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export const createEntityTreeItem = (item: any): NamedEntityTreeItemResponseModel => {
 	return {

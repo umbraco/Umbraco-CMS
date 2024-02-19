@@ -1,9 +1,9 @@
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
-import type { ModelsBuilderResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { ModelsBuilderResource, ModelsModeModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { ModelsBuilderResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { ModelsBuilderResource, ModelsModeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 

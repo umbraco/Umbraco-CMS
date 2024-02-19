@@ -1,5 +1,5 @@
 import { UmbEntityData } from '../entity.data.js';
-import type { ObjectTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ObjectTypeResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<ObjectTypeResponseModel> = [
 	{

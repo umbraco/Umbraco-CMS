@@ -1,5 +1,7 @@
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
+export const UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS = 'Umbraco.BlockGrid';
+
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.BlockGrid',
@@ -7,7 +9,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	js: () => import('./property-editor-ui-block-grid.element.js'),
 	meta: {
 		label: 'Block Grid',
-		propertyEditorSchemaAlias: 'Umbraco.BlockGrid',
+		propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS,
 		icon: 'icon-layout',
 		group: 'richContent',
 		settings: {

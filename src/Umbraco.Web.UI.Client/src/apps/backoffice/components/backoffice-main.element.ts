@@ -1,12 +1,12 @@
-import type { UmbBackofficeContext} from '../backoffice.context.js';
+import type { UmbBackofficeContext } from '../backoffice.context.js';
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSectionContext, UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbExtensionManifestInitializer} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {

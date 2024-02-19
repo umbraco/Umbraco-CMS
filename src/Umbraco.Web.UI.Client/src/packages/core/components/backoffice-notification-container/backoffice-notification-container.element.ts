@@ -3,7 +3,7 @@ import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbNotificationHandler, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-backoffice-notification-container')
 export class UmbBackofficeNotificationContainerElement extends UmbLitElement {

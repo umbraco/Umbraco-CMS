@@ -1,6 +1,6 @@
-import { DynamicRootResource } from '@umbraco-cms/backoffice/backend-api';
+import { DynamicRootResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { DynamicRootRequestModel, DynamicRootResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DynamicRootRequestModel, DynamicRootResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDynamicRootServerDataSource {

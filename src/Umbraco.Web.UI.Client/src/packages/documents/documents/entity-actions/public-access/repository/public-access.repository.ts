@@ -4,7 +4,7 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PublicAccessRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentPublicAccessRepository extends UmbBaseController implements UmbApi {
 	#dataSource: UmbDocumentPublicAccessServerDataSource;

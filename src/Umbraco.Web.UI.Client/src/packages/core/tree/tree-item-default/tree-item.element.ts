@@ -2,7 +2,7 @@ import type { UmbTreeItemModelBase } from '../types.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-tree-item-default')
 export class UmbTreeItemDefaultElement extends UmbLitElement {

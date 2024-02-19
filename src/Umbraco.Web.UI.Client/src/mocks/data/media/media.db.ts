@@ -11,7 +11,7 @@ import type {
 	MediaItemResponseModel,
 	MediaResponseModel,
 	MediaTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {

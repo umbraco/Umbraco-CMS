@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbUserMockDb } from '../../data/user/user.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { InviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { InviteUserRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 const inviteSlug = `${UMB_SLUG}/invite`;

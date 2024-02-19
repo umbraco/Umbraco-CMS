@@ -1,3 +1,4 @@
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -6,7 +7,6 @@ import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	//private _defaultVariant?: VariantViewModelBaseModel;

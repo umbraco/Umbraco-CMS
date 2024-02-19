@@ -6,11 +6,11 @@ import type {
 	UUIRadioGroupEvent,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import type { UserOrderModel } from '@umbraco-cms/backoffice/backend-api';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserOrderModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 

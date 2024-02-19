@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestMenu, ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './menu-item/menu-item-default.element.js';
 

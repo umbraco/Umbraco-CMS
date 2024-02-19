@@ -1,5 +1,5 @@
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
-import type { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbUserDisplayStatus {
 	look: UUIInterfaceLook;

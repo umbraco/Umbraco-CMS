@@ -3,7 +3,7 @@ import { getDisplayStateFromUserStatus } from '../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { html, customElement, state, css, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 type UmbUserWorkspaceInfoItem = { labelKey: string; value: string | number | undefined };

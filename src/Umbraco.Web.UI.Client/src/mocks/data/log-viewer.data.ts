@@ -4,7 +4,7 @@ import type {
 	LogMessageResponseModel,
 	LogTemplateResponseModel,
 	SavedLogSearchResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 // Temp mocked database
 class UmbLogViewerSearchesData extends UmbMockDBBase<SavedLogSearchResponseModel> {

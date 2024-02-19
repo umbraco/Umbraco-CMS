@@ -2,7 +2,7 @@ module.exports = {
 	meta: {
 		docs: {
 			description:
-				'Ensures that any API resources from the `@umbraco-cms/backoffice/backend-api` module are not used directly. Instead you should use the `tryExecuteAndNotify` function from the `@umbraco-cms/backoffice/resources` module.',
+				'Ensures that any API resources from the `@umbraco-cms/backoffice/external/backend-api` module are not used directly. Instead you should use the `tryExecuteAndNotify` function from the `@umbraco-cms/backoffice/resources` module.',
 			category: 'Best Practices',
 			recommended: true,
 		},

@@ -34,7 +34,9 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
+	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => data?.documentType.hasCollection);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
@@ -67,7 +69,10 @@ export class UmbDocumentWorkspaceContext
 
 	async create(parentUnique: string | null, documentTypeUnique: string) {
 		this.#getDataPromise = this.repository.createScaffold(parentUnique, {
-			documentType: { unique: documentTypeUnique },
+			documentType: {
+				unique: documentTypeUnique,
+				hasCollection: false,
+			},
 		});
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
@@ -119,6 +124,10 @@ export class UmbDocumentWorkspaceContext
 			variantId ? (x) => variantId.compare(x) : () => true,
 		);
 		this.#currentData.update({ variants });
+	}
+
+	setTemplate(templateUnique: string) {
+		this.#currentData.update({ template: { unique: templateUnique } });
 	}
 
 	async propertyStructureById(propertyId: string) {

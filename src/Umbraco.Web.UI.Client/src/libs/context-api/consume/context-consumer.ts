@@ -169,5 +169,6 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		this.#promise = undefined;
 		this.#promiseResolver = undefined;
 		this.#instance = undefined;
+		this.#discriminator = undefined;
 	}
 }

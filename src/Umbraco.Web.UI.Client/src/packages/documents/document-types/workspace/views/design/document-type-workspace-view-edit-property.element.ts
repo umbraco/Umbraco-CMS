@@ -10,7 +10,7 @@ import {
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
@@ -186,7 +186,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			}
 		}
 	}
-
 	renderSortableProperty() {
 		if (!this.property) return;
 		return html`
@@ -198,6 +197,8 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				type="number"
 				?readonly=${this.inherited}
 				label="sort order"
+				@change=${(e: UUIInputEvent) =>
+					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) || 0 } as UmbPropertyTypeModel)}
 				.value=${this.property.sortOrder ?? 0}></uui-input>
 		`;
 	}
@@ -475,6 +476,13 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 
 			a {
 				color: inherit;
+			}
+
+			:host([drag-placeholder]) {
+				opacity: 0.5;
+			}
+			:host([drag-placeholder]) uui-input {
+				visibility: hidden;
 			}
 		`,
 	];

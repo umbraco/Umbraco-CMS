@@ -83,6 +83,7 @@ export class UmbUserGroupWorkspaceContext
 
 	destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 
 	async delete(id: string) {
