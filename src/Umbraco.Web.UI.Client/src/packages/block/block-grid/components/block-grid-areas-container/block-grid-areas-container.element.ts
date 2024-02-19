@@ -35,6 +35,7 @@ export class UmbBlockGridAreasContainerElement extends UmbLitElement {
 				context.areaGridColumns,
 				(areaGridColumns) => {
 					this._areaGridColumns = areaGridColumns;
+					//this.requestUpdate('_areaGridColumns');
 				},
 				'observeAreaGridColumns',
 			);

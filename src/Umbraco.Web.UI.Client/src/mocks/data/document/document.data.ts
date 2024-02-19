@@ -342,7 +342,7 @@ export const data: Array<UmbMockDocumentModel> = [
 											{
 												contentUdi: 'a1234',
 												settingsUdi: 'a5678',
-												columnSpan: 6,
+												columnSpan: 3,
 												areas: [],
 											},
 										],

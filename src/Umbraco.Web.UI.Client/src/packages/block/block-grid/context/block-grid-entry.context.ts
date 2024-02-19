@@ -6,7 +6,12 @@ import {
 	type UmbBlockGridLayoutModel,
 } from '@umbraco-cms/backoffice/block';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbBooleanState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbArrayState,
+	UmbBooleanState,
+	UmbNumberState,
+	appendToFrozenArray,
+} from '@umbraco-cms/backoffice/observable-api';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
 // Utils:
@@ -85,15 +90,18 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 	readonly columnSpan = this._layout.asObservablePart((x) => x?.columnSpan);
 	readonly rowSpan = this._layout.asObservablePart((x) => x?.rowSpan ?? 1);
 	readonly columnSpanOptions = this._blockType.asObservablePart((x) => x?.columnSpanOptions ?? []);
-	readonly areaGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
+	readonly areaTypeGridColumns = this._blockType.asObservablePart((x) => x?.areaGridColumns);
 	readonly areas = this._blockType.asObservablePart((x) => x?.areas ?? []);
-	readonly minMaxRowSpan = this._blockType.asObservablePart((x) => [x?.rowMinSpan ?? 0, x?.rowMaxSpan ?? Infinity]);
+	readonly minMaxRowSpan = this._blockType.asObservablePart((x) => [x?.rowMinSpan ?? 1, x?.rowMaxSpan ?? 1]);
 
 	#relevantColumnSpanOptions = new UmbArrayState<number>([], (x) => x);
 	readonly relevantColumnSpanOptions = this.#relevantColumnSpanOptions.asObservable();
 
 	#canScale = new UmbBooleanState(false);
 	readonly canScale = this.#canScale.asObservable();
+
+	#areaGridColumns = new UmbNumberState(undefined);
+	readonly areaGridColumns = this.#areaGridColumns.asObservable();
 
 	#runtimeGridColumns: Array<number> = [];
 	#runtimeGridRows: Array<number> = [];
@@ -103,15 +111,12 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
+	}
 
-		this.observe(this.relevantColumnSpanOptions, (relevantColumnSpanOptions) => {
-			if (relevantColumnSpanOptions.length === 0) {
-				// Reset to the layoutColumns.
-			} else {
-				// Correct columnSpan so it fits.
-			}
-			console.log('relevantColumnSpanOptions', relevantColumnSpanOptions);
-		});
+	protected _gotLayout(layout: UmbBlockGridLayoutModel | undefined) {
+		// TODO: Implement size correction to fit with configurations. both for columnSpan and rowSpan.
+		//layout?.columnSpan
+		return layout;
 	}
 
 	layoutsOfArea(areaKey: string) {
@@ -203,10 +208,40 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 				const hasRelevantColumnSpanOptions = relevantColumnSpanOptions.length > 1;
 				const hasRowSpanOptions = minMaxRowSpan[0] !== minMaxRowSpan[1];
 				const canScale = hasRelevantColumnSpanOptions || hasRowSpanOptions;
+				console.log('canScale calc:', canScale);
 
 				this.#canScale.setValue(canScale);
 			},
 			'observeScaleOptions',
+		);
+
+		this.observe(
+			combineLatest([this.areaTypeGridColumns, this._entries.layoutColumns]),
+			([areaTypeGridColumns, layoutColumns]) => {
+				this.#areaGridColumns.setValue(areaTypeGridColumns ?? layoutColumns);
+			},
+			'observeAreaGridColumns',
+		);
+
+		this.observe(
+			combineLatest([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
+			([columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
+				if (!columnSpan || !layoutColumns) return;
+				if (relevantColumnSpanOptions.length > 0) {
+					// Correct columnSpan so it fits.
+					const newColumnSpan =
+						closestColumnSpanOption(columnSpan, relevantColumnSpanOptions, layoutColumns) ?? layoutColumns;
+					if (newColumnSpan !== columnSpan) {
+						this.setColumnSpan(newColumnSpan);
+					}
+				} else {
+					// Reset to the layoutColumns.
+					if (layoutColumns !== columnSpan) {
+						this.setColumnSpan(layoutColumns);
+					}
+				}
+			},
+			'observeColumnSpanValidation',
 		);
 	}
 
@@ -325,8 +360,6 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 		}
 		event.preventDefault();
 
-		console.log('onScaleMouseDown');
-
 		//this.#isScaleMode = true;
 
 		window.addEventListener('mousemove', this.onScaleMouseMove);
@@ -358,6 +391,8 @@ export class UmbBlockGridEntryContext extends UmbBlockEntryContext<
 
 		const newSpans = this.#getNewSpans(startX, startY, endX, endY);
 		if (!newSpans) return;
+
+		console.log('newSpans', newSpans);
 
 		const updateRowTemplate = this.getColumnSpan() !== newSpans.columnSpan;
 

@@ -61,6 +61,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	_inlineEditingMode?: boolean;
 
+	@state()
+	_canScale?: boolean;
+
 	// TODO: use this type on the Element Interface for the Manifest.
 	@state()
 	_blockViewProps: UmbBlockViewPropsType<UmbBlockGridLayoutModel> = { contentUdi: undefined!, urls: {} }; // Set to undefined cause it will be set before we render.
@@ -79,6 +82,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 		this.observe(this.#context.settingsElementTypeKey, (settingsElementTypeKey) => {
 			this._hasSettings = !!settingsElementTypeKey;
+		});
+		this.observe(this.#context.canScale, (canScale) => {
+			console.log('canScale', canScale);
+			this._canScale = canScale;
 		});
 		this.observe(this.#context.label, (label) => {
 			this.#updateBlockViewProps({ label });
@@ -182,8 +189,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							</uui-button>
 						</uui-action-bar>
 
-						<umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.onScaleMouseDown(e)}>
-						</umb-block-scale-handler>
+						${this._canScale
+							? html` <umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.onScaleMouseDown(e)}>
+							  </umb-block-scale-handler>`
+							: ''}
 					</div>
 			  `
 			: '';

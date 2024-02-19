@@ -646,11 +646,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 					{
 						label: 'Mocked Block Type for Block Grid',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						rowMinSpan: 1,
+						rowMaxSpan: 1,
 						areas: [
 							{
 								key: 'area1_key',
 								alias: 'area1_alias',
-								colSpan: 6,
+								columnSpan: 6,
 								rowSpan: 1,
 								minAllowed: 1,
 								maxAllowed: 2,
@@ -659,7 +661,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 							{
 								key: 'area2_key',
 								alias: 'area2_alias',
-								colSpan: 6,
+								columnSpan: 6,
 								rowSpan: 1,
 								minAllowed: 1,
 								maxAllowed: 2,

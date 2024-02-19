@@ -44,7 +44,7 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	getLayoutContainerElement() {
-		return this.getHostElement().querySelector('.umb-block-grid__layout-container');
+		return this.getHostElement().shadowRoot?.querySelector('.umb-block-grid__layout-container');
 	}
 
 	constructor(host: UmbControllerHost) {

@@ -9,6 +9,12 @@ import '../block-grid-block-view/index.js';
 @customElement('umb-block-scale-handler')
 export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	//
+	constructor() {
+		super();
+		this.addEventListener('dragstart', (e: DragEvent) => {
+			e.preventDefault();
+		});
+	}
 	render() {
 		return html`
 			<div id="handler"></div>
@@ -18,31 +24,40 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 
 	static styles = [
 		css`
-			:host() {
+			:host {
 				position: absolute;
 				inset: 0;
 				pointer-events: none;
+				box-sizing: border-box;
+			}
+			:host(:focus-within),
+			:host(:hover) {
+				border: var(--uui-color-interactive) solid 1px;
+				border-radius: var(--uui-border-radius);
 			}
 
 			#handler {
-				pointer-events: all;
-				cursor: nwse-resize;
 				position: absolute;
 				// TODO: Look at the feature I out-commented here, what was that supose to do [NL]:
 				//display: var(--umb-block-grid--block-ui-display, block);
 				display: block;
-				z-index: 10;
+				z-index: 2;
+
+				pointer-events: all;
+				cursor: nwse-resize;
+
 				bottom: -4px;
 				right: -4px;
-				width: 8px;
-				height: 8px;
+				width: 7px;
+				height: 7px;
 				padding: 0;
 				background-color: var(--uui-color-surface);
-				border: var(--uui-color-interative) solid 1px;
+				border: var(--uui-color-interactive) solid 1px;
 				box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7);
 				opacity: 0;
 				transition: opacity 120ms;
 			}
+			#handler:hover,
 			#handler:focus {
 				opacity: 1;
 			}
@@ -60,6 +75,7 @@ export class UmbBlockGridScaleHandlerElement extends UmbLitElement implements Um
 			#label {
 				position: absolute;
 				display: block;
+				top: 100%;
 				left: 100%;
 				margin-left: 6px;
 				margin-top: 6px;
