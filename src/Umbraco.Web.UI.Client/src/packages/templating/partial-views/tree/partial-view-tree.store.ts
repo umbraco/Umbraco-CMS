@@ -1,4 +1,3 @@
-import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UMB_PARTIAL_VIEW_DETAIL_STORE_CONTEXT } from '../repository/partial-view-detail.store.js';
 import type { UmbPartialViewDetailModel } from '../types.js';
 import type { UmbPartialViewTreeItemModel } from './types.js';
@@ -22,30 +21,13 @@ export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT.toString());
 
-		new UmbStoreConnector<UmbPartialViewTreeItemModel, UmbPartialViewDetailModel>(
-			host,
-			this,
-			UMB_PARTIAL_VIEW_DETAIL_STORE_CONTEXT,
-			(item) => this.#createTreeItemMapper(item),
-			(item) => this.#updateTreeItemMapper(item),
-		);
+		new UmbStoreConnector<UmbPartialViewTreeItemModel, UmbPartialViewDetailModel>(host, {
+			store: this,
+			connectToStoreAlias: UMB_PARTIAL_VIEW_DETAIL_STORE_CONTEXT,
+			updateStoreItemMapper: (item) => this.#updateTreeItemMapper(item),
+		});
 	}
 
-	// TODO: revisit this when we have decided on detail model sizes
-	#createTreeItemMapper = (item: UmbPartialViewDetailModel) => {
-		const treeItem: UmbPartialViewTreeItemModel = {
-			unique: item.unique,
-			parentUnique: null,
-			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
-			name: item.name,
-			hasChildren: false,
-			isFolder: false,
-		};
-
-		return treeItem;
-	};
-
-	// TODO: revisit this when we have decided on detail model sizes
 	#updateTreeItemMapper = (item: UmbPartialViewDetailModel) => {
 		return {
 			name: item.name,

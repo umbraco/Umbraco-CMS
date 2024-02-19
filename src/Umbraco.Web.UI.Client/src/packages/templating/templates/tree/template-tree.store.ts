@@ -1,6 +1,5 @@
 import { UMB_TEMPLATE_DETAIL_STORE_CONTEXT } from '../repository/detail/template-detail.store.js';
 import type { UmbTemplateDetailModel } from '../types.js';
-import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
 import type { UmbTemplateTreeItemModel } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -22,30 +21,13 @@ export class UmbTemplateTreeStore extends UmbUniqueTreeStore {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_TEMPLATE_TREE_STORE_CONTEXT.toString());
 
-		new UmbStoreConnector<UmbTemplateTreeItemModel, UmbTemplateDetailModel>(
-			host,
-			this,
-			UMB_TEMPLATE_DETAIL_STORE_CONTEXT,
-			(item) => this.#createTreeItemMapper(item),
-			(item) => this.#updateTreeItemMapper(item),
-		);
+		new UmbStoreConnector<UmbTemplateTreeItemModel, UmbTemplateDetailModel>(host, {
+			store: this,
+			connectToStoreAlias: UMB_TEMPLATE_DETAIL_STORE_CONTEXT,
+			updateStoreItemMapper: (item) => this.#updateTreeItemMapper(item),
+		});
 	}
 
-	// TODO: revisit this when we have decided on detail model sizes
-	#createTreeItemMapper = (item: UmbTemplateDetailModel) => {
-		const treeItem: UmbTemplateTreeItemModel = {
-			unique: item.unique,
-			entityType: UMB_TEMPLATE_ENTITY_TYPE,
-			parentUnique: null,
-			name: item.name,
-			hasChildren: false,
-			isFolder: false,
-		};
-
-		return treeItem;
-	};
-
-	// TODO: revisit this when we have decided on detail model sizes
 	#updateTreeItemMapper = (item: UmbTemplateDetailModel) => {
 		return {
 			name: item.name,

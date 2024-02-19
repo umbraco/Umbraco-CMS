@@ -21,30 +21,13 @@ export class UmbMemberTypeTreeStore extends UmbUniqueTreeStore {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT.toString());
 
-		new UmbStoreConnector<UmbMemberTypeTreeItemModel, UmbMemberTypeDetailModel>(
-			host,
-			this,
-			UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT,
-			(item) => this.#createTreeItemMapper(item),
-			(item) => this.#updateTreeItemMapper(item),
-		);
+		new UmbStoreConnector<UmbMemberTypeTreeItemModel, UmbMemberTypeDetailModel>(host, {
+			store: this,
+			connectToStoreAlias: UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT,
+			updateStoreItemMapper: (item) => this.#updateTreeItemMapper(item),
+		});
 	}
 
-	// TODO: revisit this when we have decided on detail model sizes
-	#createTreeItemMapper = (item: UmbMemberTypeDetailModel) => {
-		const treeItem: UmbMemberTypeTreeItemModel = {
-			unique: item.unique,
-			parentUnique: null,
-			name: item.name,
-			entityType: item.entityType,
-			isFolder: false,
-			hasChildren: false,
-		};
-
-		return treeItem;
-	};
-
-	// TODO: revisit this when we have decided on detail model sizes
 	#updateTreeItemMapper = (item: UmbMemberTypeDetailModel) => {
 		return {
 			name: item.name,
