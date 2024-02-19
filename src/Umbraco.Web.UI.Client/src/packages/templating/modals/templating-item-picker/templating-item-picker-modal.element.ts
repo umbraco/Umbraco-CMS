@@ -64,7 +64,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 	async #openDictionaryItemPickerModal() {
 		const dictionaryItemPickerModal = this._itemModalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
 			data: {
-				pickableFilter: (item) => item.id !== null,
+				pickableFilter: (item) => item.unique !== null,
 			},
 		});
 		await dictionaryItemPickerModal?.onSubmit();

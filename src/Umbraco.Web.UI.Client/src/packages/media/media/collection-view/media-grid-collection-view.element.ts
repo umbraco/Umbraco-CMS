@@ -3,17 +3,17 @@ import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	@state()
-	private _mediaItems?: Array<UmbEntityTreeItemModel>;
+	private _mediaItems?: Array<UmbUniqueTreeItemModel>;
 
 	@state()
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbDefaultCollectionContext<UmbEntityTreeItemModel, any>;
+	private _collectionContext?: UmbDefaultCollectionContext<UmbUniqueTreeItemModel, any>;
 
 	constructor() {
 		super();
@@ -58,31 +58,31 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	private _handleOpenItem(mediaItem: UmbEntityTreeItemModel) {
+	private _handleOpenItem(mediaItem: UmbUniqueTreeItemModel) {
 		//TODO: Fix when we have dynamic routing
-		history.pushState(null, '', 'section/media/media/edit/' + mediaItem.id);
+		history.pushState(null, '', 'section/media/media/edit/' + mediaItem.unique);
 	}
 
-	private _handleSelect(mediaItem: UmbEntityTreeItemModel) {
-		if (mediaItem.id) {
-			this._collectionContext?.selection.select(mediaItem.id);
+	private _handleSelect(mediaItem: UmbUniqueTreeItemModel) {
+		if (mediaItem.unique) {
+			this._collectionContext?.selection.select(mediaItem.unique);
 		}
 	}
 
-	private _handleDeselect(mediaItem: UmbEntityTreeItemModel) {
-		if (mediaItem.id) {
-			this._collectionContext?.selection.deselect(mediaItem.id);
+	private _handleDeselect(mediaItem: UmbUniqueTreeItemModel) {
+		if (mediaItem.unique) {
+			this._collectionContext?.selection.deselect(mediaItem.unique);
 		}
 	}
 
-	private _isSelected(mediaItem: UmbEntityTreeItemModel) {
-		if (mediaItem.id) {
-			return this._selection.includes(mediaItem.id);
+	private _isSelected(mediaItem: UmbUniqueTreeItemModel) {
+		if (mediaItem.unique) {
+			return this._selection.includes(mediaItem.unique);
 		}
 		return false;
 	}
 
-	private _renderMediaItem(item: UmbEntityTreeItemModel) {
+	private _renderMediaItem(item: UmbUniqueTreeItemModel) {
 		const name = item.name || '';
 		//TODO: fix the file extension when media items have a file extension.
 		return html`<uui-card-media
@@ -109,7 +109,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 				${this._mediaItems
 					? repeat(
 							this._mediaItems,
-							(file, index) => (file.id || '') + index,
+							(file, index) => (file.unique || '') + index,
 							(file) => this._renderMediaItem(file),
 					  )
 					: ''}

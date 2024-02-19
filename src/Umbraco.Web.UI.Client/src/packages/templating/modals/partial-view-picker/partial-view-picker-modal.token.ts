@@ -1,8 +1,8 @@
 import { UMB_PARTIAL_VIEW_TREE_ALIAS } from '../../partial-views/tree/manifests.js';
 import { UmbModalToken, type UmbPickerModalValue, type UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
-import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
-export type UmbPartialViewPickerModalData = UmbTreePickerModalData<UmbEntityTreeItemModel>;
+export type UmbPartialViewPickerModalData = UmbTreePickerModalData<UmbUniqueTreeItemModel>;
 export type UmbPartialViewPickerModalValue = UmbPickerModalValue;
 
 export const UMB_PARTIAL_VIEW_PICKER_MODAL = new UmbModalToken<

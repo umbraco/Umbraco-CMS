@@ -1,4 +1,3 @@
-export * from './entity-manager-controller.js';
 export * from './property-structure-workspace-context.interface.js';
 export * from './publishable-workspace-context.interface.js';
 export * from './saveable-workspace-context.interface.js';
