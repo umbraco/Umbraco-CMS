@@ -1,8 +1,9 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../block-grid-block-view/index.js';
+import '../block-scale-handler/index.js';
 import type { UmbBlockGridLayoutModel, UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
 
 /**
@@ -161,7 +162,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 					<div class="umb-block-grid__block" part="umb-block-grid__block">
 						<umb-extension-slot
 							type="blockEditorCustomView"
-							default-element=${'umb-block-grid-block'}
+							default-element="umb-block-grid-block"
 							.props=${this._blockViewProps}
 							>${this.#renderRefBlock()}</umb-extension-slot
 						>
@@ -180,6 +181,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 								<uui-icon name="icon-remove"></uui-icon>
 							</uui-button>
 						</uui-action-bar>
+
+						<umb-block-scale-handler @mousedown=${(e: MouseEvent) => this.#context.onScaleMouseDown(e)}>
+						</umb-block-scale-handler>
 					</div>
 			  `
 			: '';
@@ -203,6 +207,29 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			:host([drag-placeholder]) {
 				opacity: 0.2;
+			}
+
+			:host(::after) {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				display: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: 3px;
+				box-shadow:
+					0 0 0 1px rgba(255, 255, 255, 0.7),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			:host(:hover::after) {
+				// TODO: Look at the feature I out-commented here, what was that suppose to do [NL]:
+				//display: var(--umb-block-grid--block-ui-display, block);
+				display: block;
+				border-color: var(--uui-color-interactive);
 			}
 		`,
 	];

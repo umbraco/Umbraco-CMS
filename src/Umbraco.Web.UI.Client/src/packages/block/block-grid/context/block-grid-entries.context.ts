@@ -43,6 +43,10 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 		return this.#layoutColumns.getValue();
 	}
 
+	getLayoutContainerElement() {
+		return this.getHostElement().querySelector('.umb-block-grid__layout-container');
+	}
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT);
 
