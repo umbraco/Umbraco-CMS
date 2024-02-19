@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
+﻿using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Mapping;
@@ -29,13 +30,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.VariesByCulture = source.VariesByCulture();
         target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
-        if (source.ListView is not null)
-        {
-            target.Collection = new ReferenceByIdModel
-            {
-                Id = source.ListView.Value,
-            };
-        }
+        target.Collection = source.ListView.ToReferenceByIdModel();
 
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
@@ -54,14 +49,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-
-        if (source.ListView is not null)
-        {
-            target.Collection = new ReferenceByIdModel
-            {
-                Id = source.ListView.Value,
-            };
-        }
+        target.Collection = source.ListView.ToReferenceByIdModel();
     }
 
     // Umbraco.Code.MapAll
@@ -69,14 +57,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-
-        if (source.ListView is not null)
-        {
-            target.Collection = new ReferenceByIdModel
-            {
-                Id = source.ListView.Value,
-            };
-        }
+        target.Collection = source.ListView.ToReferenceByIdModel();
     }
 
     // Umbraco.Code.MapAll
