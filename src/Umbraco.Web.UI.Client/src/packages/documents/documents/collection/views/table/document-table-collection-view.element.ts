@@ -14,6 +14,8 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
+import './column-layouts/document-table-column-name.element.js';
+import './column-layouts/document-table-column-state.element.js';
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
@@ -35,8 +37,15 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 	#systemColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Name',
+			name: this.localize.term('general_name'),
 			alias: 'entityName',
+			elementName: 'umb-document-table-column-name',
+			allowSorting: true,
+		},
+		{
+			name: this.localize.term('content_publishStatus'),
+			alias: 'entityState',
+			elementName: 'umb-document-table-column-state',
 			allowSorting: true,
 		},
 	];
