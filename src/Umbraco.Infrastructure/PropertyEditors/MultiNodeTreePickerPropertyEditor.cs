@@ -85,7 +85,13 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
 
         private IEnumerable<string> ParseGuidsToConfiguredUdis(IEnumerable<string> stringKeys, object? configuration)
         {
-            var configuredEntityType = (configuration as MultiNodePickerConfiguration)?.Filter;
+            var configuredEntityType = (configuration as MultiNodePickerConfiguration)?.TreeSource?.ObjectType;
+
+            if (configuredEntityType is not null && configuredEntityType.Equals(Constants.Trees.Content, StringComparison.InvariantCultureIgnoreCase))
+            {
+                configuredEntityType = Constants.UdiEntityType.Document;
+            }
+
             foreach (var stringKey in stringKeys)
             {
                 if (Guid.TryParse(stringKey, out Guid guidValue) is false)
