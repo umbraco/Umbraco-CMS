@@ -44,7 +44,7 @@ public class CreateWebhookController : WebhookControllerBase
         Attempt<IWebhook, WebhookOperationStatus> result = await _webhookService.CreateAsync(created); //, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyWebhookController>(controller => nameof(controller.ByKey), new { }, result.Result!.Key.ToString())
+            ? CreatedAtId<ByKeyWebhookController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : WebhookOperationStatusResult(result.Status);
     }
 }
