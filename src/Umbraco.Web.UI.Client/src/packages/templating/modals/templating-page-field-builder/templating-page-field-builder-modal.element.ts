@@ -78,7 +78,7 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 					@click=${this._submit}
 					color="positive"
 					look="primary"
-					label=${this.localize.term('general_close')}></uui-button>
+					label=${this.localize.term('general_submit')}></uui-button>
 			</umb-body-layout>
 		`;
 	}

@@ -4,70 +4,50 @@ import type {
 	UmbTemplatingSectionPickerModalData,
 	UmbTemplatingSectionPickerModalValue,
 } from './templating-section-picker-modal.token.js';
-import type { UmbInsertSectionCheckboxElement } from './templating-section-picker-input.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import './templating-section-picker-input.element.js';
+import type { UUIBooleanInputElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-templating-section-picker-modal')
 export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 	UmbTemplatingSectionPickerModalData,
 	UmbTemplatingSectionPickerModalValue
 > {
-	/*
-	@queryAll('umb-insert-section-checkbox')
-	checkboxes!: NodeListOf<UmbInsertSectionCheckboxElement>;
+	@query('#render-named-section-name')
+	private _renderNamedSectionNameInput?: UUIInputElement;
+
+	@query('#define-named-section-name')
+	private _defineNamedSectionNameInput?: UUIInputElement;
+
+	@query('#render-named-section-is-mandatory')
+	private _renderNamedSectionIsMandatoryCheckbox?: UUIBooleanInputElement;
 
 	@state()
-	selectedCheckbox?: UmbInsertSectionCheckboxElement | null = null;
-
-	@state()
-	snippet = '';
-*/
-	/*
-	#chooseSection(event: Event) {
-		const target = event.target as UmbInsertSectionCheckboxElement;
-		const checkboxes = Array.from(this.checkboxes);
-		if (checkboxes.every((checkbox) => checkbox.checked === false)) {
-			this.selectedCheckbox = null;
-			return;
-		}
-		if (target.checked) {
-			this.selectedCheckbox = target;
-			this.snippet = this.selectedCheckbox.snippet ?? '';
-			checkboxes.forEach((checkbox) => {
-				if (checkbox !== target) {
-					checkbox.checked = false;
-				}
-			});
-		}
-	}
-	*/
-
-	/*
-	firstUpdated() {
-		this.selectedCheckbox = this.checkboxes[0];
-	}
-	*/
-
-	//snippetMethods = [getRenderBodySnippet, getRenderSectionSnippet, getAddSectionSnippet];
-
-	@state()
-	private _pickedSection?: TemplatingSectionType;
+	private _pickedSection: TemplatingSectionType = TemplatingSectionType.renderChildTemplate;
 
 	#close() {
 		this.modalContext?.reject();
 	}
 
 	#submit() {
-		/*
-		const value = this.selectedCheckbox?.snippet;
-		if (this.selectedCheckbox?.validate()) {
-			this.value = { value: value ?? '' };
-			this.modalContext?.submit();
+		switch (this._pickedSection) {
+			case TemplatingSectionType.renderChildTemplate:
+				this.value = { value: getRenderBodySnippet() };
+				break;
+			case TemplatingSectionType.renderANamedSection:
+				this.value = {
+					value: getRenderSectionSnippet(
+						this._renderNamedSectionNameInput?.value as string,
+						this._renderNamedSectionIsMandatoryCheckbox?.checked ?? false,
+					),
+				};
+				break;
+			case TemplatingSectionType.defineANamedSection:
+				this.value = { value: getAddSectionSnippet(this._defineNamedSectionNameInput?.value as string) };
+				break;
 		}
-		*/
+		this.modalContext?.submit();
 	}
 
 	render() {
@@ -81,8 +61,12 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 				</uui-box>
 
 				<div slot="actions">
-					<uui-button @click=${this.#close} look="secondary" label="Close">Close</uui-button>
-					<uui-button @click=${this.#submit} look="primary" color="positive" label="Submit">Submit</uui-button>
+					<uui-button @click=${this.#close} look="secondary" label=${this.localize.term('general_close')}></uui-button>
+					<uui-button
+						@click=${this.#submit}
+						look="primary"
+						color="positive"
+						label=${this.localize.term('general_submit')}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -123,9 +107,13 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			</p>
 			${this._pickedSection === TemplatingSectionType.renderANamedSection
 				? html`<div class="section">
-						<uui-label for="section-name" required>Section Name</uui-label>
-						<uui-input id="section-name" label="section name"></uui-input>
-						<uui-checkbox label=${this.localize.term('template_sectionMandatory')}></uui-checkbox>
+						<uui-label for="render-named-section-name" required>
+							<umb-localize key="template_sectionName">Section Name</umb-localize>
+						</uui-label>
+						<uui-input id="render-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
+						<uui-checkbox
+							id="render-named-section-is-mandatory"
+							label=${this.localize.term('template_sectionMandatory')}></uui-checkbox>
 						<small>
 							<umb-localize key="template_sectionMandatoryDesc">
 								If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is
@@ -152,93 +140,20 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 					be rendered in a specific area of the parent of this template, by using <code>@RenderSection</code>.
 				</umb-localize>
 			</p>
+			${this._pickedSection === TemplatingSectionType.defineANamedSection
+				? html`<div class="section">
+						<uui-label for="define-named-section-name" required>
+							<umb-localize key="template_sectionName">Section Name</umb-localize>
+						</uui-label>
+						<uui-input id="define-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
+				  </div>`
+				: ''}
 		</uui-button>`;
 	}
-
-	/*
-	render() {
-		return html`
-			<umb-body-layout headline=${this.localize.term('template_insert')}>
-				<div id="main">
-					<uui-box>
-						<uui-button label="Render Child Template">
-							<uui-badge color="positive"><uui-icon name="icon-check"></uui-icon></uui-badge>
-							<h3>Render Child Template</h3>
-							Renders the contents of a child template, by inserting a @RenderBody() placeholder.
-						</uui-button>
-						<umb-insert-section-checkbox
-							@change=${this.#chooseSection}
-							label=${this.localize.term('template_renderBody')}
-							checked
-							.snippetMethod=${getRenderBodySnippet}>
-							<p slot="description">
-								<umb-localize key="template_renderBodyDesc">
-									Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.
-								</umb-localize>
-							</p>
-						</umb-insert-section-checkbox>
-
-						<umb-insert-section-checkbox
-							@change=${this.#chooseSection}
-							label=${this.localize.term('template_renderSection')}
-							show-mandatory
-							show-input
-							.snippetMethod=${getRenderSectionSnippet}>
-							<p slot="description">
-								<umb-localize key="template_renderSectionDesc">
-									Renders a named area of a child template, by inserting a
-									<code>@RenderSection(name)</code> placeholder. This renders an area of a child template which is
-									wrapped in a corresponding <code>@section [name]{ ... }</code> definition.
-								</umb-localize>
-							</p>
-						</umb-insert-section-checkbox>
-
-						<umb-insert-section-checkbox
-							@change=${this.#chooseSection}
-							label=${this.localize.term('template_defineSection')}
-							show-input
-							.snippetMethod=${getAddSectionSnippet}>
-							<p slot="description">
-								<umb-localize key="template_defineSectionDesc">
-									Renders a named area of a child template, by inserting a
-									<code>@RenderSection(name)</code> placeholder. This renders an area of a child template which is
-									wrapped in a corresponding <code>@section [name]{ ... }</code> definition.
-								</umb-localize>
-							</p>
-						</umb-insert-section-checkbox>
-					</uui-box>
-				</div>
-				<div slot="actions">
-					<uui-button @click=${this.#close} look="secondary" label="Close">Close</uui-button>
-					<uui-button @click=${this.#submit} look="primary" color="positive" label="Submit">Submit</uui-button>
-				</div>
-			</umb-body-layout>
-		`;
-	}
-	*/
 
 	static styles = [
 		UmbTextStyles,
 		css`
-			/*
-			:host {
-				display: block;
-				color: var(--uui-color-text);
-				--umb-header-layout-height: 70px;
-			}
-
-			#main {
-				box-sizing: border-box;
-				height: calc(
-					100dvh - var(--umb-header-layout-height) - var(--umb-footer-layout-height) - 2 * var(--uui-size-layout-1)
-				);
-			}
-
-			#main umb-insert-section-checkbox:not(:last-of-type) {
-				margin-bottom: var(--uui-size-space-5);
-			}
-			*/
-
 			code {
 				background-color: var(--uui-color-surface-alt);
 				border: 1px solid var(--uui-color-border);

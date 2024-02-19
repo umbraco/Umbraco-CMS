@@ -96,7 +96,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				@click=${this.#openTemplatingPageFieldModal}
 				look="placeholder"
 				label=${this.localize.term('template_insert')}>
-				<h3><umb-localize key="template_insertPageField">Value</umb-localize> (Not implemented)</h3>
+				<h3><umb-localize key="template_insertPageField">Value</umb-localize></h3>
 				<p>
 					<umb-localize key="template_insertPageFieldDesc">
 						Displays the value of a named field from the current page, with options to modify the value or fallback to
