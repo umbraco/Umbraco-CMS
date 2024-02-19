@@ -1,5 +1,7 @@
+import { getPropertyValueByAlias } from '../index.js';
+import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
-import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
@@ -14,6 +16,9 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	private _selection: Array<string | null> = [];
 
 	@state()
+	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
+
+	@state()
 	private _loading = false;
 
 	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
@@ -23,18 +28,29 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
-			this.observe(
-				this.#collectionContext.selection.selection,
-				(selection) => (this._selection = selection),
-				'umbCollectionSelectionObserver',
-			);
-			this.observe(this.#collectionContext.items, (items) => (this._items = items), 'umbCollectionItemsObserver');
+			this.#observeCollectionContext();
 		});
 	}
 
-	//TODO How should we handle url stuff?
+	#observeCollectionContext() {
+		if (!this.#collectionContext) return;
+
+		this.observe(this.#collectionContext.userDefinedProperties, (userDefinedProperties) => {
+			this._userDefinedProperties = userDefinedProperties;
+		},'umbCollectionUserDefinedPropertiesObserver');
+
+		this.observe(
+			this.#collectionContext.selection.selection,
+			(selection) => (this._selection = selection),
+			'umbCollectionSelectionObserver',
+		);
+
+		this.observe(this.#collectionContext.items, (items) => (this._items = items), 'umbCollectionItemsObserver');
+	}
+
+	// TODO: How should we handle url stuff? [?]
 	private _handleOpenCard(id: string) {
-		//TODO this will not be needed when cards works as links with href
+		// TODO: this will not be needed when cards works as links with href [?]
 		history.pushState(null, '', 'section/content/workspace/document/edit/' + id);
 	}
 
@@ -47,7 +63,14 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	}
 
 	render() {
-		if (this._loading) nothing;
+		if (this._loading) {
+			return html`<div class="container"><uui-loader></uui-loader></div>`;
+		}
+
+		if (this._items.length === 0) {
+			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
+		}
+
 		return html`
 			<div id="document-grid">
 				${repeat(
@@ -70,7 +93,47 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<uui-icon slot="icon" name=${item.icon}></uui-icon>
+				${this.#renderState(item)} ${this.#renderProperties(item)}
 			</uui-card-content-node>
+		`;
+	}
+
+	#renderState(item: UmbDocumentCollectionItemModel) {
+		switch (item.state) {
+			case 'Published':
+				return html`<uui-tag slot="tag" color="positive" look="secondary"
+					>${this.localize.term('content_published')}</uui-tag
+				>`;
+			case 'PublishedPendingChanges':
+				return html`<uui-tag slot="tag" color="warning" look="secondary"
+					>${this.localize.term('content_publishedPendingChanges')}</uui-tag
+				>`;
+			case 'Draft':
+				return html`<uui-tag slot="tag" color="default" look="secondary"
+					>${this.localize.term('content_unpublished')}</uui-tag
+				>`;
+			case 'NotCreated':
+				return html`<uui-tag slot="tag" color="danger" look="secondary"
+					>${this.localize.term('content_notCreated')}</uui-tag
+				>`;
+			default:
+				// TODO: [LK] Check if we have a `SplitPascalCase`-esque utility function that could be used here.
+				return html`<uui-tag slot="tag" color="danger" look="secondary"
+					>${item.state.replace(/([A-Z])/g, ' $1')}</uui-tag
+				>`;
+		}
+	}
+
+	#renderProperties(item: UmbDocumentCollectionItemModel) {
+		if (!this._userDefinedProperties) return;
+		return html`
+			<ul>
+				${repeat(
+					this._userDefinedProperties,
+					(column) => column.alias,
+					(column) => html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(item, column.alias)}</li>`,
+				)}
+			</ul>
 		`;
 	}
 
@@ -82,6 +145,12 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				flex-direction: column;
 			}
 
+			.container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
 			#document-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -91,6 +160,16 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 			uui-card-content-node {
 				width: 100%;
 				height: 180px;
+			}
+
+			ul {
+				list-style: none;
+				padding-inline-start: 0px;
+				margin: 0;
+			}
+
+			ul > li > span {
+				font-weight: 700;
 			}
 		`,
 	];
