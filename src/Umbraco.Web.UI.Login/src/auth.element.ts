@@ -77,6 +77,9 @@ export default class UmbAuthElement extends LitElement {
   set disableLocalLogin(value: boolean) {
     umbAuthContext.disableLocalLogin = value;
   }
+  get disableLocalLogin() {
+    return umbAuthContext.disableLocalLogin;
+  }
 
   @property({attribute: 'background-image'})
   backgroundImage?: string;
@@ -100,6 +103,9 @@ export default class UmbAuthElement extends LitElement {
   set returnPath(value: string) {
     umbAuthContext.returnPath = value;
   }
+  get returnPath() {
+    return umbAuthContext.returnPath;
+  }
 
   /**
    * Override the default flow.
@@ -116,8 +122,6 @@ export default class UmbAuthElement extends LitElement {
 
   constructor() {
     super();
-    this.classList.add('uui-text');
-    this.classList.add('uui-font');
 
     (this as unknown as EventTarget).addEventListener('umb-login-flow', (e) => {
       if (e instanceof CustomEvent) {
@@ -129,6 +133,8 @@ export default class UmbAuthElement extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    this.classList.add('uui-text');
+    this.classList.add('uui-font');
 
     this.#initializeForm();
   }

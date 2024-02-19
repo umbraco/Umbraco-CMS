@@ -15,7 +15,7 @@ public class ItemPartialViewItemController : PartialViewItemControllerBase
     public ItemPartialViewItemController(IFileItemPresentationFactory fileItemPresentationFactory)
         => _fileItemPresentationFactory = fileItemPresentationFactory;
 
-    [HttpGet("item")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<PartialViewItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Item([FromQuery(Name = "path")] HashSet<string> paths)

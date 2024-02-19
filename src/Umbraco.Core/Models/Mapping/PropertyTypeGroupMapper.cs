@@ -272,7 +272,6 @@ public class PropertyTypeGroupMapper<TPropertyType>
                     PatternMessage = p.ValidationRegExpMessage,
                 },
                 Label = p.Name,
-                View = propertyEditor?.GetValueEditor().View,
                 Config = config,
 
                 // Value = "",
@@ -281,7 +280,6 @@ public class PropertyTypeGroupMapper<TPropertyType>
                 DataTypeId = p.DataTypeId,
                 DataTypeKey = p.DataTypeKey,
                 DataTypeName = dataType?.Name,
-                DataTypeIcon = propertyEditor?.Icon,
                 SortOrder = p.SortOrder,
                 ContentTypeId = contentType.Id,
                 ContentTypeName = contentType.Name,

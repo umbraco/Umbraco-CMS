@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
 [ApiController]
-[VersionedApiBackOfficeRoute("language")]
-[ApiExplorerSettings(GroupName = "Language")]
+[VersionedApiBackOfficeRoute(Constants.UdiEntityType.Language)]
+[ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Language))]
 public abstract class LanguageControllerBase : ManagementApiControllerBase
 {
     protected IActionResult LanguageOperationStatusResult(LanguageOperationStatus status) =>

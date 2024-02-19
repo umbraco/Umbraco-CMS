@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Mapping;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 using Umbraco.Extensions;
@@ -46,7 +47,7 @@ public class DictionaryMapDefinition : IMapDefinition
         }
 
         target.ItemKey = source.Name;
-        target.ParentId = source.ParentId;
+        target.ParentId = source.Parent?.Id;
         target.DeleteDate = null;
     }
 
@@ -55,7 +56,7 @@ public class DictionaryMapDefinition : IMapDefinition
     {
         target.Id = source.Key;
         target.Name = source.ItemKey;
-        target.ParentId = source.ParentId;
+        target.Parent = ReferenceByIdModel.ReferenceOrNull(source.ParentId);
         target.TranslatedIsoCodes = source
             .Translations
             .Where(translation => translation.Value.IsNullOrWhiteSpace() == false)

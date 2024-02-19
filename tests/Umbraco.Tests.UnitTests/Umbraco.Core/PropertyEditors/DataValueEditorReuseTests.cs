@@ -25,7 +25,7 @@ public class DataValueEditorReuseTests
         _dataValueEditorFactoryMock
             .Setup(m => m.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()))
             .Returns(() => new TextOnlyValueEditor(
-                new DataEditorAttribute("a", "b", "c"),
+                new DataEditorAttribute("a"),
                 Mock.Of<IShortStringHelper>(),
                 Mock.Of<IJsonSerializer>(),
                 Mock.Of<IIOHelper>()));
@@ -37,7 +37,7 @@ public class DataValueEditorReuseTests
             .Setup(m =>
                 m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()))
             .Returns(() => new BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor(
-                new DataEditorAttribute("a", "b", "c"),
+                new DataEditorAttribute("a"),
                 new BlockListEditorDataConverter(Mock.Of<IJsonSerializer>()),
                 _propertyEditorCollection,
                 _dataValueReferenceFactories,
@@ -56,8 +56,7 @@ public class DataValueEditorReuseTests
     {
         var textboxPropertyEditor = new TextboxPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>());
+            Mock.Of<IIOHelper>());
 
         // textbox is set to reuse its data value editor when created *without* configuration
         var dataValueEditor1 = textboxPropertyEditor.GetValueEditor();
@@ -75,8 +74,7 @@ public class DataValueEditorReuseTests
     {
         var textboxPropertyEditor = new TextboxPropertyEditor(
             _dataValueEditorFactoryMock.Object,
-            Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>());
+            Mock.Of<IIOHelper>());
 
         // no matter what, a property editor should never reuse its data value editor when created *with* configuration
         var dataValueEditor1 = textboxPropertyEditor.GetValueEditor("config");
@@ -98,7 +96,6 @@ public class DataValueEditorReuseTests
             _dataValueEditorFactoryMock.Object,
             _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());
 
@@ -120,7 +117,6 @@ public class DataValueEditorReuseTests
             _dataValueEditorFactoryMock.Object,
             _propertyEditorCollection,
             Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>(),
             Mock.Of<IBlockValuePropertyIndexValueFactory>(),
             Mock.Of<IJsonSerializer>());
 

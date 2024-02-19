@@ -26,7 +26,6 @@ public static partial class UmbracoBuilderExtensions
             .Add<EntityMapDefinition>()
             .Add<RelationModelMapDefinition>()
             .Add<DictionaryMapDefinition>()
-            .Add<MacroMapDefinition>()
             .Add<RedirectUrlMapDefinition>()
             .Add<RelationMapDefinition>()
             .Add<SectionMapDefinition>()

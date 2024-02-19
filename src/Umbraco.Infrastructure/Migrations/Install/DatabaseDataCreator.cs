@@ -2165,32 +2165,6 @@ internal class DatabaseDataCreator
                 });
         }
 
-        if (_database.Exists<NodeDto>(1048))
-        {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
-                new DataTypeDto
-                {
-                    NodeId = 1048,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker,
-                    DbType = "Ntext",
-                });
-        }
-
-        if (_database.Exists<NodeDto>(1049))
-        {
-            _database.Insert(
-                Constants.DatabaseSchema.Tables.DataType,
-                "pk",
-                false,
-                new DataTypeDto
-                {
-                    NodeId = 1049,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker,
-                    DbType = "Ntext",
-                    Configuration = "{\"multiPicker\":1}",
-                });
-        }
-
         if (_database.Exists<NodeDto>(1050))
         {
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,

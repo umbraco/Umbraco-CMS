@@ -120,8 +120,6 @@ public class ListViewContentAppFactory : IContentAppFactory
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}containerView",
                 Label = string.Empty,
                 Value = null,
-                View = editor.GetValueEditor().View,
-                HideLabel = true,
                 Config = listViewConfig,
             },
         };

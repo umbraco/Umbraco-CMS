@@ -151,8 +151,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 prop.IsSensitive = true;
                 // mark this property as readonly so that it does not post any data
                 prop.Readonly = true;
-                // replace this editor with a sensitive value
-                prop.View = "sensitivevalue";
                 // clear the value
                 prop.Value = null;
             }
@@ -180,7 +178,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
             Value = member.Username
         };
 
-        prop.View = "textbox";
         prop.Validation.Mandatory = true;
         return prop;
     }
@@ -224,7 +221,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
                 Label = _localizedTextService.Localize("general","email"),
                 Value = member.Email,
-                View = "email",
                 Validation = { Mandatory = true }
             },
             new()
@@ -236,7 +232,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                     // TODO: why ignoreCase, what are we doing here?!
                     { "newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) }
                 },
-                View = "changepassword",
                 Config = GetPasswordConfig(member) // Initialize the dictionary with the configuration from the default membership provider
             },
             new()
@@ -244,7 +239,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
                 Label = _localizedTextService.Localize("content","membergroup"),
                 Value = GetMemberGroupValue(member.Username),
-                View = "membergroups",
                 Config = new Dictionary<string, object>
                 {
                     { "IsRequired", true }
@@ -257,7 +251,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}failedPasswordAttempts",
                 Label = _localizedTextService.Localize("user", "failedPasswordAttempts"),
                 Value = member.FailedPasswordAttempts,
-                View = "readonlyvalue",
                 IsSensitive = true,
             },
 
@@ -266,7 +259,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}approved",
                 Label = _localizedTextService.Localize("user", "stateApproved"),
                 Value = member.IsApproved,
-                View = "boolean",
                 IsSensitive = true,
                 Readonly = false,
             },
@@ -276,7 +268,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lockedOut",
                 Label = _localizedTextService.Localize("user", "stateLockedOut"),
                 Value = member.IsLockedOut,
-                View = "boolean",
                 IsSensitive = true,
                 Readonly = !member.IsLockedOut, // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
             },
@@ -287,7 +278,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}twoFactorEnabled",
                 Label = _localizedTextService.Localize("member", "2fa"),
                 Value = isTwoFactorEnabled,
-                View = "boolean",
                 IsSensitive = true,
                 Readonly = !isTwoFactorEnabled, // The value can't be set to true, so make it readonly when that's the case (you can only disable)
             },
@@ -297,7 +287,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLockoutDate",
                 Label = _localizedTextService.Localize("user", "lastLockoutDate"),
                 Value = member.LastLockoutDate?.ToString(),
-                View = "readonlyvalue",
                 IsSensitive = true,
             },
 
@@ -306,7 +295,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLoginDate",
                 Label = _localizedTextService.Localize("user", "lastLogin"),
                 Value = member.LastLoginDate?.ToString(),
-                View = "readonlyvalue",
                 IsSensitive = true,
             },
 
@@ -315,7 +303,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastPasswordChangeDate",
                 Label = _localizedTextService.Localize("user", "lastPasswordChangeDate"),
                 Value = member.LastPasswordChangeDate?.ToString(),
-                View = "readonlyvalue",
                 IsSensitive = true,
             },
         };
@@ -328,7 +315,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 if (property.IsSensitive)
                 {
                     property.Value = null;
-                    property.View = "sensitivevalue";
                     property.Readonly = true;
                 }
             }

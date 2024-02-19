@@ -10,18 +10,24 @@ export default class UmbCustomViewElement extends LitElement {
     this.#customView = value;
     this.#loadView();
   }
+  get customView () {
+    return this.#customView;
+  }
 
   @property({ type: Object, attribute: 'args'})
   set args (value: any) {
     this.#args = value;
     this.#loadView();
   }
+  get args () {
+    return this.#args;
+  }
 
   @state()
   protected component: any = null;
 
   #args?: any;
-  #customView?: string;
+  #customView = '';
 
   async #loadView() {
     if (!this.#customView || !this.#customView.endsWith('.js') && !this.#customView.endsWith('.html')) {

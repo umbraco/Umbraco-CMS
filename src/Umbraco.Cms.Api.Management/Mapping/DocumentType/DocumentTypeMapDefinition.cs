@@ -1,7 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -17,6 +16,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         mapper.Define<IContentType, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
         mapper.Define<ISimpleContentType, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
         mapper.Define<IContentType, AllowedDocumentType>((_, _) => new AllowedDocumentType(), Map);
+        mapper.Define<ISimpleContentType, DocumentTypeCollectionReferenceResponseModel>((_, _) => new DocumentTypeCollectionReferenceResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -49,13 +49,11 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
             target.AllowedTemplates = source.AllowedTemplates.Select(template => new ReferenceByIdModel(template.Key));
         }
 
-        target.DefaultTemplate = source.DefaultTemplate is not null
-            ? new ReferenceByIdModel(source.DefaultTemplate.Key)
-            : null;
+        target.DefaultTemplate = ReferenceByIdModel.ReferenceOrNull(source.DefaultTemplate?.Key);
 
         if (source.HistoryCleanup != null)
         {
-            target.Cleanup = new ContentTypeCleanup
+            target.Cleanup = new DocumentTypeCleanup
             {
                 PreventCleanup = source.HistoryCleanup.PreventCleanup,
                 KeepAllVersionsNewerThanDays = source.HistoryCleanup.KeepAllVersionsNewerThanDays,
@@ -86,6 +84,14 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
         target.Description = source.Description;
+        target.Icon = source.Icon ?? string.Empty;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(ISimpleContentType source, DocumentTypeCollectionReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Alias = source.Alias;
         target.Icon = source.Icon ?? string.Empty;
     }
 }

@@ -45,13 +45,6 @@ public interface ITemplateService : IService
     Task<ITemplate?> GetAsync(Guid id);
 
     /// <summary>
-    /// Gets the scaffold code for a template.
-    /// </summary>
-    /// <param name="masterTemplateKey"></param>
-    /// <returns></returns>
-    Task<string> GetScaffoldAsync(Guid? masterTemplateKey);
-
-    /// <summary>
     ///     Gets the template descendants
     /// </summary>
     /// <param name="masterTemplateId"></param>

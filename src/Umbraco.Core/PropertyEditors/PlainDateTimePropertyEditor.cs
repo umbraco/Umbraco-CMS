@@ -8,10 +8,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.PlainDateTime,
-    EditorType.PropertyValue,
-    "Configuration-less date/time",
-    "not-applicable",
-    Icon = "umb:edit",
     ValueEditorIsReusable = true,
     ValueType = ValueTypes.DateTime)]
 public class PlainDateTimePropertyEditor : DataEditor

@@ -363,7 +363,6 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
         {
             Editor = dataTypeDiff.EditorAlias,
             Validation = new PropertyTypeValidation(),
-            View = editor?.GetValueEditor().View,
             Config = configuration != null
                 ? editor?.GetConfigurationEditor().ToConfigurationEditor(configuration)
                 : null
