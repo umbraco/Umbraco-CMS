@@ -64,11 +64,10 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped<IInviteUriProvider, InviteUriProvider>();
         services.AddScoped<IForgotPasswordUriProvider, ForgotPasswordUriProvider>();
 
-        services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>(); ;
+        services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
 
         // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
         services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
-        services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
 
         return builder;
     }
