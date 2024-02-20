@@ -264,8 +264,13 @@ export class UmbBlockGridEntriesContext
 		return this._manager.getBlockTypes().map((x) => x.contentElementTypeKey);
 	}
 
-	allowDrop(item: UmbBlockGridLayoutModel) {
-		const content = this._manager?.getContentOf(item.contentUdi);
+	/**
+	 * Check if given contentUdi is allowed in the current area.
+	 * @param contentUdi {string} - The contentUdi of the content to check.
+	 * @returns {boolean} - True if the content is allowed in the current area, otherwise false.
+	 */
+	allowDrop(contentUdi: string) {
+		const content = this._manager?.getContentOf(contentUdi);
 		if (!content) return false;
 
 		return this.#retrieveAllowedElementTypes().indexOf(content.contentTypeKey) !== -1;
