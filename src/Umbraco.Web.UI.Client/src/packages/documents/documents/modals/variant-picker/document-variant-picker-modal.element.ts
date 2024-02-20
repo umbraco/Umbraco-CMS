@@ -126,7 +126,6 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 			}
 			.label-status {
 				font-size: 0.8rem;
-				color: rgba(var(--uui-color-text), 0.6);
 			}
 		`,
 	];
