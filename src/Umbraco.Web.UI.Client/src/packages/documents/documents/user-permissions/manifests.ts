@@ -13,7 +13,6 @@ export const UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT = 'Umb.UserPermission
 export const UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS = 'Umb.UserPermission.Document.Notifications';
 export const UMB_USER_PERMISSION_DOCUMENT_PUBLISH = 'Umb.UserPermission.Document.Publish';
 export const UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS = 'Umb.UserPermission.Document.Permissions';
-export const UMB_USER_PERMISSION_DOCUMENT_SEND_FOR_APPROVAL = 'Umb.UserPermission.Document.SendForApproval';
 export const UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH = 'Umb.UserPermission.Document.Unpublish';
 export const UMB_USER_PERMISSION_DOCUMENT_COPY = 'Umb.UserPermission.Document.Copy';
 export const UMB_USER_PERMISSION_DOCUMENT_MOVE = 'Umb.UserPermission.Document.Move';
@@ -98,17 +97,6 @@ const permissions: Array<ManifestEntityUserPermission> = [
 			verb: 'Umb.Document.Permissions',
 			labelKey: 'actions_setPermissions',
 			descriptionKey: 'actionDescriptions_rights',
-		},
-	},
-	{
-		type: 'entityUserPermission',
-		alias: UMB_USER_PERMISSION_DOCUMENT_SEND_FOR_APPROVAL,
-		name: 'Send Document For Approval User Permission',
-		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
-			verb: 'Umb.Document.SendForApproval',
-			labelKey: 'actions_sendtopublish',
-			descriptionKey: 'actionDescriptions_sendtopublish',
 		},
 	},
 	{
