@@ -30,6 +30,7 @@ const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMembe
 
 	return {
 		email: request.email,
+		name: '',
 		failedPasswordAttempts: 0,
 		groups: request.groups ? request.groups : [],
 		id: request.id ? request.id : UmbId.new(),
@@ -80,6 +81,7 @@ const detailResponseMapper = (item: UmbMockMemberModel): MemberResponseModel => 
 const itemResponseMapper = (item: UmbMockMemberModel): MemberItemResponseModel => {
 	return {
 		id: item.id,
+		name: item.username,
 		memberType: item.memberType,
 		variants: item.variants,
 	};
@@ -88,6 +90,7 @@ const itemResponseMapper = (item: UmbMockMemberModel): MemberItemResponseModel =
 const collectionItemResponseMapper = (item: UmbMockMemberModel): any => {
 	return {
 		id: item.id,
+		name: item.name,
 		email: item.email,
 		variants: item.variants,
 	};
