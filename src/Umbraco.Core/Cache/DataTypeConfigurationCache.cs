@@ -14,12 +14,14 @@ internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache
 {
     private readonly IDataTypeService _dataTypeService;
     private readonly IMemoryCache _memoryCache;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly ConcurrentHashSet<string> _cacheKeys = new ConcurrentHashSet<string>();
 
-    public DataTypeConfigurationCache(IDataTypeService dataTypeService, IMemoryCache memoryCache)
+    public DataTypeConfigurationCache(IDataTypeService dataTypeService, IMemoryCache memoryCache, IIdKeyMap idKeyMap)
     {
         _dataTypeService = dataTypeService;
         _memoryCache = memoryCache;
+        _idKeyMap = idKeyMap;
     }
 
     public T? GetConfigurationAs<T>(Guid key)
@@ -28,7 +30,13 @@ internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache
         var cacheKey = GetCacheKey(key);
         if (_memoryCache.TryGetValue(cacheKey, out T? configuration) is false)
         {
-            IDataType? dataType = _dataTypeService.GetDataType(key);
+            var idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.DataType);
+            if (idAttempt.Success is false)
+            {
+                return null;
+            }
+
+            IDataType? dataType = _dataTypeService.GetDataType(idAttempt.Result);
             configuration = dataType?.ConfigurationAs<T>();
 
             // Only cache if data type was found (but still cache null configurations)
