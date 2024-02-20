@@ -1,3 +1,4 @@
+import type { UmbCollectionBulkActionPermissions } from '../../../../../../core/collection/types.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -13,14 +14,6 @@ type BulkActionPermissionType =
 	| 'allowBulkPublish'
 	| 'allowBulkUnpublish';
 
-interface BulkActionPermissions {
-	allowBulkCopy: boolean;
-	allowBulkDelete: boolean;
-	allowBulkMove: boolean;
-	allowBulkPublish: boolean;
-	allowBulkUnpublish: boolean;
-}
-
 /**
  * @element umb-property-editor-ui-collection-view-bulk-action-permissions
  */
@@ -29,7 +22,7 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	private _value: BulkActionPermissions = {
+	private _value: UmbCollectionBulkActionPermissions = {
 		allowBulkPublish: false,
 		allowBulkUnpublish: false,
 		allowBulkCopy: false,
@@ -38,7 +31,7 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement
 	};
 
 	@property({ type: Object })
-	public set value(obj: BulkActionPermissions) {
+	public set value(obj: UmbCollectionBulkActionPermissions) {
 		if (!obj) return;
 		this._value = obj;
 	}

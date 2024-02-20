@@ -44,8 +44,8 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: DocumentRecycleBinItemResponseModel): UmbDocumentRecycleBinTreeItemModel => {
 	return {
-		id: item.id,
-		parentId: item.parent ? item.parent.id : null,
+		unique: item.id,
+		parentUnique: item.parent ? item.parent.id : null,
 		entityType: 'document-recycle-bin',
 		hasChildren: item.hasChildren,
 		isFolder: false,

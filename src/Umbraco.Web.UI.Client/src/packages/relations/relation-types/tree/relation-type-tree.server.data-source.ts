@@ -41,8 +41,8 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbRelationTypeTreeItemModel => {
 	return {
-		id: item.id,
-		parentId: item.parent ? item.parent.id : null,
+		unique: item.id,
+		parentUnique: item.parent ? item.parent.id : null,
 		name: item.name,
 		entityType: 'relation-type',
 		hasChildren: item.hasChildren,

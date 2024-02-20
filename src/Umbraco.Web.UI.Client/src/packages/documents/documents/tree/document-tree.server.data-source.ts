@@ -55,7 +55,7 @@ const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel =
 		documentType: {
 			unique: item.documentType.id,
 			icon: item.documentType.icon,
-			hasListView: item.documentType.hasListView,
+			hasCollection: item.documentType.hasListView,
 		},
 		variants: item.variants.map((variant) => {
 			return {

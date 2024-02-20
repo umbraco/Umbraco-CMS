@@ -17,6 +17,7 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 			:host {
 				display: flex;
 				gap: var(--uui-size-space-5);
+				justify-content: space-between;
 				width: 100%;
 			}
 		`,

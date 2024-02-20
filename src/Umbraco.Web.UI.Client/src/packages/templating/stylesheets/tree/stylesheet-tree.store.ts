@@ -10,7 +10,7 @@ import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbStylesheetTreeStore
- * @extends {UmbEntityTreeStore}
+ * @extends {UmbUniqueTreeStore}
  * @description - Tree Data Store for Stylesheets
  */
 export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
@@ -40,6 +40,7 @@ export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 			name: item.name,
 			hasChildren: false,
 			isFolder: false,
+			icon: 'icon-brush-alt',
 		};
 
 		return treeItem;

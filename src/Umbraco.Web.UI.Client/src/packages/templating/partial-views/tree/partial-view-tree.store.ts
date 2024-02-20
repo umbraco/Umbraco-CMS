@@ -40,6 +40,7 @@ export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 			name: item.name,
 			hasChildren: false,
 			isFolder: false,
+			icon: 'icon-notepad',
 		};
 
 		return treeItem;
