@@ -22,7 +22,7 @@ export class UmbDocumentPermissionsEntityAction extends UmbEntityActionBase<UmbD
 		this.#modalManagerContext.open(UMB_PERMISSIONS_MODAL, {
 			data: {
 				unique: this.unique,
-				entityType: 'document',
+				entityType: this.entityType,
 			},
 		});
 	}
