@@ -203,7 +203,9 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				@change="${this.#onUpload}"
 				accept="${ifDefined(this.extensions?.join(', '))}"
 				?multiple="${this.multiple}">
-				<uui-button label="upload" @click="${this.#handleBrowse}">Upload file here</uui-button>
+				<uui-button label="upload" @click="${this.#handleBrowse}"
+					>${this.localize.term('media_clickToUpload')}</uui-button
+				>
 			</uui-file-dropzone>
 		`;
 	}
