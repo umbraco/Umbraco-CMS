@@ -33,6 +33,7 @@ public static partial class UmbracoBuilderExtensions
             .Add<TagMapDefinition>()
             .Add<TemplateMapDefinition>()
             .Add<UserMapDefinition>()
+            .Add<MediaMapDefinition>()
             .Add<MemberMapDefinition>()
             .Add<LanguageMapDefinition>()
             .Add<IdentityMapDefinition>();
