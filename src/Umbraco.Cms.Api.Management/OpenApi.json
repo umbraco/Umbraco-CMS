@@ -26229,6 +26229,9 @@
         "type": "string"
       },
       "DataTypeItemResponseModel": {
+        "required": [
+          "isDeletable"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -26239,6 +26242,9 @@
           "editorUiAlias": {
             "type": "string",
             "nullable": true
+          },
+          "isDeletable": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -26337,7 +26343,8 @@
       },
       "DataTypeResponseModel": {
         "required": [
-          "id"
+          "id",
+          "isDeletable"
         ],
         "type": "object",
         "allOf": [
@@ -26357,11 +26364,17 @@
               }
             ],
             "nullable": true
+          },
+          "isDeletable": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
       },
       "DataTypeTreeItemResponseModel": {
+        "required": [
+          "isDeletable"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -26372,6 +26385,9 @@
           "editorUiAlias": {
             "type": "string",
             "nullable": true
+          },
+          "isDeletable": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
