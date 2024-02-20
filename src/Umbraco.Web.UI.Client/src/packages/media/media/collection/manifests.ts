@@ -1,4 +1,5 @@
 import { UMB_MEDIA_COLLECTION_REPOSITORY_ALIAS } from './repository/index.js';
+import { manifests as collectionActionManifests } from './action/manifests.js';
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { UmbMediaCollectionContext } from './media-collection.context.js';
@@ -18,6 +19,7 @@ const collectionManifest: ManifestTypes = {
 
 export const manifests = [
 	collectionManifest,
+	...collectionActionManifests,
 	...collectionRepositoryManifests,
 	...collectionViewManifests,
 ];
