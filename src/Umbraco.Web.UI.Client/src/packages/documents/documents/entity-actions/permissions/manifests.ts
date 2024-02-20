@@ -11,7 +11,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		api: UmbDocumentPermissionsEntityAction,
 		meta: {
 			icon: 'icon-vcard',
-			label: 'Permissions (TBD)',
+			label: 'Permissions',
 			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
