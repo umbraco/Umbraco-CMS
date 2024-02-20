@@ -157,6 +157,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             .AddExamine()
             .AddUmbracoSqlServerSupport()
             .AddUmbracoSqliteSupport()
+            .AddComposers()
             .AddTestServices(TestHelper);
 
         if (TestOptions.Mapper)
