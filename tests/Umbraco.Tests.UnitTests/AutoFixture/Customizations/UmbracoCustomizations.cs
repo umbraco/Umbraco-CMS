@@ -14,8 +14,6 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.AutoFixture.Customizations;
@@ -29,15 +27,9 @@ internal class UmbracoCustomizations : ICustomization
                 (a, b, c) => BackOfficeIdentityUser.CreateNew(new GlobalSettings(), a, b, c)));
 
         fixture
-            .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(InstallController), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(PreviewController), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(MemberController), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
-            .Customize(new ConstructorCustomization(typeof(BackOfficeServerVariables), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(DatabaseBuilder), new GreedyConstructorQuery()));
 

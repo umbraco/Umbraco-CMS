@@ -6,7 +6,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Security;
 
 [TestFixture]
 public class BackOfficeAuthenticationBuilderTests

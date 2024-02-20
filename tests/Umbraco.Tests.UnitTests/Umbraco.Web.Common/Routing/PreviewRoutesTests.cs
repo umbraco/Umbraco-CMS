@@ -1,18 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Controllers.Preview;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
@@ -52,7 +51,7 @@ public class PreviewRoutesTests
         Assert.AreEqual($"{routes.GetPreviewHubRoute()}", endpoint1.RoutePattern.RawText);
 
         var endpoint3 = (RouteEndpoint)endpoints.DataSources.Last().Endpoints[0];
-        var previewControllerName = ControllerExtensions.GetControllerName<PreviewController>();
+        var previewControllerName = ControllerExtensions.GetControllerName<PreviewControllerBase>();
         Assert.AreEqual(
             $"umbraco/{previewControllerName.ToLowerInvariant()}/{{action}}/{{id?}}",
             endpoint3.RoutePattern.RawText);
@@ -61,7 +60,7 @@ public class PreviewRoutesTests
         Assert.AreEqual(previewControllerName, endpoint3.RoutePattern.Defaults[ControllerToken]);
         Assert.AreEqual(
             endpoint3.RoutePattern.Defaults["area"],
-            typeof(PreviewController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
+            typeof(PreviewControllerBase).GetCustomAttribute<AreaAttribute>(false).RouteValue);
     }
 
     private PreviewRoutes GetRoutes(RuntimeLevel level)

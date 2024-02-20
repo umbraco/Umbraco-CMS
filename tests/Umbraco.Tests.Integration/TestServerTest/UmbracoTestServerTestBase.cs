@@ -17,18 +17,16 @@ using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Delivery.Controllers.Content;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Persistence.Sqlite;
-using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
 
@@ -245,42 +243,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             builder.Services.AddTransient<IHostedService>(sp => new TestDatabaseHostedLifecycleService(() => UseTestDatabase(sp)));
 
             builder
-                .AddConfiguration()
-                .AddUmbracoCore()
-                .AddWebComponents()
-                .AddNuCache()
-                .AddRuntimeMinifier()
-                .AddBackOfficeCore()
-                .AddBackOfficeAuthentication()
-                .AddBackOfficeIdentity()
-                .AddMembersIdentity()
-                .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
-                .AddPreviewSupport()
-                .AddMvcAndRazor(mvcBuilding: mvcBuilder =>
-                {
-                    // Adds Umbraco.Web.BackOffice
-                    mvcBuilder.AddApplicationPart(typeof(ContentController).Assembly);
-
-                    // Adds Umbraco.Web.Common
-                    mvcBuilder.AddApplicationPart(typeof(RenderController).Assembly);
-
-                    // Adds Umbraco.Web.Website
-                    mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
-
-                    // Adds Umbraco.Cms.Api.ManagementApi
-                    mvcBuilder.AddApplicationPart(typeof(ModelsBuilderControllerBase).Assembly);
-
-                    // Adds Umbraco.Cms.Api.DeliveryApi
-                    mvcBuilder.AddApplicationPart(typeof(ContentApiItemControllerBase).Assembly);
-
-                    // Adds Umbraco.Tests.Integration
-                    mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
-                })
-                .AddWebServer()
-                .AddWebsite()
-                .AddUmbracoSqlServerSupport()
-                .AddUmbracoSqliteSupport()
-                .AddDeliveryApi()
                 .AddUmbracoManagementApi()
                 .AddComposers()
                 .AddTestServices(TestHelper); // This is the important one!
