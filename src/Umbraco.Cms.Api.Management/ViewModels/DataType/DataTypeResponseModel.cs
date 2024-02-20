@@ -5,4 +5,6 @@ public class DataTypeResponseModel : DataTypeModelBase
     public Guid Id { get; set; }
 
     public ReferenceByIdModel? Parent { get; set; }
+
+    public bool CanIgnoreStartNodes { get; set; }
 }
