@@ -46,7 +46,7 @@ const meta: Meta<UmbDocumentVariantPickerModalElement> = {
 		data: modalData,
 		value: modalValue,
 	},
-	decorators: [(Story) => html`<div style="height: 500px; width: 500px; border: 1px solid #000;">${Story()}</div>`],
+	decorators: [(Story) => html`<div style="width: 500px; border: 1px solid #000;">${Story()}</div>`],
 	parameters: {
 		layout: 'centered',
 		docs: {
