@@ -89,9 +89,9 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	onContainerChange?: (argument: { item: T; element: ElementType }) => void;
 	onEnd?: (argument: { item: T; element: ElementType }) => void;
 	itemHasNestedContainersResolver?: (element: HTMLElement) => boolean;
-	onDisallowed?: () => void;
-	onAllowed?: () => void;
-	onRequestDrop?: (argument: { item: T }) => boolean | void;
+	onDisallowed?: (argument: { item: T; element: ElementType }) => void;
+	onAllowed?: (argument: { item: T; element: ElementType }) => void;
+	onRequestDrop?: (argument: { item: T }) => boolean;
 	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => void;
 	performItemMove?: (argument: { item: T; newIndex: number; oldIndex: number }) => Promise<boolean> | boolean;
 	performItemInsert?: (argument: { item: T; newIndex: number }) => Promise<boolean> | boolean;
@@ -113,6 +113,9 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
  */
 export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> implements UmbController {
 	//
+	// The sorter who last indicated that it was okay or not okay to drop here:
+	static lastIndicationSorter?: UmbSorterController<unknown>;
+
 	// A sorter that is requested to become the next sorter:
 	static originalSorter?: UmbSorterController<unknown>;
 	static originalIndex?: number;
@@ -143,8 +146,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#dragX = 0;
 	#dragY = 0;
-
-	#lastIndicationContainerCtrl: UmbSorterController<T, ElementType> | null = null;
 
 	public get controllerAlias() {
 		// We only support one Sorter Controller pr. Controller Host.
@@ -756,30 +757,26 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	updateAllowIndication(item: T) {
-		// TODO: Allow indication.
-		/*
 		// Remove old indication:
-		if (this.#lastIndicationContainerCtrl !== null && this.#lastIndicationContainerCtrl !== controller) {
-			this.#lastIndicationContainerCtrl.notifyAllowed();
+		if (UmbSorterController.lastIndicationSorter && UmbSorterController.lastIndicationSorter !== (this as unknown)) {
+			UmbSorterController.lastIndicationSorter.notifyAllowed();
 		}
-		this.#lastIndicationContainerCtrl = controller;
+		UmbSorterController.lastIndicationSorter = this as unknown as UmbSorterController<unknown>;
 
-		if (controller.notifyRequestDrop({ item: item }) === true) {
-			controller.notifyAllowed();
+		if (this.notifyRequestDrop({ item: item }) === true) {
+			this.notifyAllowed();
 			return true;
 		}
 
-		controller.notifyDisallowed(); // This block is not accepted to we will indicate that its not allowed.
+		this.notifyDisallowed(); // This block is not accepted to we will indicate that its not allowed.
 		return false;
-		*/
-		return true;
 	}
 	removeAllowIndication() {
 		// Remove old indication:
-		if (this.#lastIndicationContainerCtrl !== null) {
-			this.#lastIndicationContainerCtrl.notifyAllowed();
+		if (UmbSorterController.lastIndicationSorter) {
+			UmbSorterController.lastIndicationSorter.notifyAllowed();
 		}
-		this.#lastIndicationContainerCtrl = null;
+		UmbSorterController.lastIndicationSorter = undefined;
 	}
 
 	// TODO: Move auto scroll into its own class?
@@ -844,12 +841,18 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	public notifyDisallowed() {
 		if (this.#config.onDisallowed) {
-			this.#config.onDisallowed();
+			this.#config.onDisallowed({
+				item: UmbSorterController.activeItem,
+				element: UmbSorterController.activeElement! as ElementType,
+			});
 		}
 	}
 	public notifyAllowed() {
 		if (this.#config.onAllowed) {
-			this.#config.onAllowed();
+			this.#config.onAllowed({
+				item: UmbSorterController.activeItem,
+				element: UmbSorterController.activeElement! as ElementType,
+			});
 		}
 	}
 	public notifyRequestDrop(data: any) {
@@ -865,7 +868,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#handleDragEnd();
 		}
 
-		this.#lastIndicationContainerCtrl = null;
+		UmbSorterController.lastIndicationSorter = undefined;
 
 		// TODO: Clean up items??
 		this.#observer.disconnect();
