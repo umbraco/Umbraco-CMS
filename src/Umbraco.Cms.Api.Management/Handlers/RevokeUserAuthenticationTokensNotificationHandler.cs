@@ -1,3 +1,4 @@
+using System.Data.Common;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core.Events;
@@ -37,66 +38,82 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
     // We need to know the pre-saving state of the saved users in order to compare if their access has changed
     public async Task HandleAsync(UserSavingNotification notification, CancellationToken cancellationToken)
     {
-        var usersAccess = new Dictionary<Guid, UserStartNodesAndGroupAccess>();
-        foreach (IUser user in notification.SavedEntities)
+        try
         {
-            UserStartNodesAndGroupAccess? priorUserAccess = await GetRelevantUserAccessDataByUserKeyAsync(user.Key);
-            if (priorUserAccess == null)
+            var usersAccess = new Dictionary<Guid, UserStartNodesAndGroupAccess>();
+            foreach (IUser user in notification.SavedEntities)
             {
-                continue;
+                UserStartNodesAndGroupAccess? priorUserAccess = await GetRelevantUserAccessDataByUserKeyAsync(user.Key);
+                if (priorUserAccess == null)
+                {
+                    continue;
+                }
+
+                usersAccess.Add(user.Key, priorUserAccess);
             }
 
-            usersAccess.Add(user.Key, priorUserAccess);
+            notification.State[NotificationStateKey] = usersAccess;
+        }
+        catch (DbException e)
+        {
+            _logger.LogWarning(e, "This is expected when we upgrade from < Umbraco 14. Otherwise it should not happen");
         }
 
-        notification.State[NotificationStateKey] = usersAccess;
     }
 
     public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken)
     {
-        Dictionary<Guid, UserStartNodesAndGroupAccess>? preSavingUsersState = null;
-
-        if (notification.State.TryGetValue(NotificationStateKey, out var value))
+        try
         {
-            preSavingUsersState = value as Dictionary<Guid, UserStartNodesAndGroupAccess>;
-        }
+            Dictionary<Guid, UserStartNodesAndGroupAccess>? preSavingUsersState = null;
 
-        // If we have a new user, there is no token
-        if (preSavingUsersState is null || preSavingUsersState.Count == 0)
-        {
-            return;
-        }
-
-        foreach (IUser user in notification.SavedEntities)
-        {
-            if (user.IsSuper())
+            if (notification.State.TryGetValue(NotificationStateKey, out var value))
             {
-                continue;
+                preSavingUsersState = value as Dictionary<Guid, UserStartNodesAndGroupAccess>;
             }
 
-            // When a user is locked out and/or un-approved, make sure we revoke all tokens
-            if (user.IsLockedOut || user.IsApproved is false)
+            // If we have a new user, there is no token
+            if (preSavingUsersState is null || preSavingUsersState.Count == 0)
             {
-                await RevokeTokensAsync(user);
-                continue;
+                return;
             }
 
-            // Don't revoke admin tokens to prevent log out when accidental changes
-            if (user.IsAdmin())
+            foreach (IUser user in notification.SavedEntities)
             {
-                continue;
-            }
+                if (user.IsSuper())
+                {
+                    continue;
+                }
 
-            // Check if the user access has changed - we also need to revoke all tokens in this case
-            if (preSavingUsersState.TryGetValue(user.Key, out UserStartNodesAndGroupAccess? preSavingState))
-            {
-                UserStartNodesAndGroupAccess postSavingState = MapToUserStartNodesAndGroupAccess(user);
-                if (preSavingState.CompareAccess(postSavingState) == false)
+                // When a user is locked out and/or un-approved, make sure we revoke all tokens
+                if (user.IsLockedOut || user.IsApproved is false)
                 {
                     await RevokeTokensAsync(user);
+                    continue;
+                }
+
+                // Don't revoke admin tokens to prevent log out when accidental changes
+                if (user.IsAdmin())
+                {
+                    continue;
+                }
+
+                // Check if the user access has changed - we also need to revoke all tokens in this case
+                if (preSavingUsersState.TryGetValue(user.Key, out UserStartNodesAndGroupAccess? preSavingState))
+                {
+                    UserStartNodesAndGroupAccess postSavingState = MapToUserStartNodesAndGroupAccess(user);
+                    if (preSavingState.CompareAccess(postSavingState) == false)
+                    {
+                        await RevokeTokensAsync(user);
+                    }
                 }
             }
         }
+        catch (DbException e)
+        {
+            _logger.LogWarning(e, "This is expected when we upgrade from < Umbraco 14. Otherwise it should not happen");
+        }
+
     }
 
     // We can only delete non-logged in users in Umbraco, meaning that such will not have a token,

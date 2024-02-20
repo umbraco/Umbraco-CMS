@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -415,17 +416,33 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         List<int> userIds = dtos.Count == 1 ? new List<int> {dtos[0].Id} : dtos.Select(x => x.Id).ToList();
         Dictionary<int, UserDto>? xUsers = dtos.Count == 1 ? null : dtos.ToDictionary(x => x.Id, x => x);
 
+        List<int> groupIds = new List<int>();
+        List<Guid> groupKeys = new List<Guid>();
+        Sql<ISqlContext> sql;
+        try
+        {
+            sql = SqlContext.Sql()
+                .Select<UserGroupDto>(x=>x.Id, x=>x.Key)
+                .From<UserGroupDto>()
+                .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
+                .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
 
-        Sql<ISqlContext> sql = SqlContext.Sql()
-            .Select<UserGroupDto>()
-            .From<UserGroupDto>()
-            .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
-            .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
+            List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>(sql);
 
-        List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>(sql);
 
-        var groupIds = userGroups.Select(x => x.Id).ToList();
-        var groupKeys= userGroups.Select(x => x.Key).ToList();
+            groupKeys= userGroups.Select(x => x.Key).ToList();
+
+        }
+        catch (DbException e)
+        {
+            // ignore doing upgrade, as we know the Key potentially do not exists
+            if (_runtimeState.Level != RuntimeLevel.Upgrade)
+            {
+                throw;
+            }
+
+        }
+
 
         // get users2groups
         sql = SqlContext.Sql()
@@ -434,6 +451,14 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
 
         List<User2UserGroupDto>? user2Groups = Database.Fetch<User2UserGroupDto>(sql);
+
+        if (groupIds.Any() is false)
+        {
+            //this can happen if we are upgrading, so we try do read from this table, as we counn't because of the key earlier
+            groupIds = user2Groups.Select(x=>x.UserGroupId).Distinct().ToList();
+        }
+
+
         // get groups
         // We wrap this in a try-catch, as this might throw errors when you try to login before having migrated your database
         Dictionary<int, UserGroupDto> groups;

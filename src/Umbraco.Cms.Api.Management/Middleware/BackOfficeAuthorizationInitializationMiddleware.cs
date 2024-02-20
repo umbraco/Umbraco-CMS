@@ -40,7 +40,7 @@ public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
             return;
         }
 
-        if (_runtimeState.Level < RuntimeLevel.Run)
+        if (_runtimeState.Level < RuntimeLevel.Install)
         {
             return;
         }

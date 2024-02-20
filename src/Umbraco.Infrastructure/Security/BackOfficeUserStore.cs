@@ -325,6 +325,7 @@ public class BackOfficeUserStore :
 
             throw;
         }
+
     }
 
     /// <inheritdoc />
