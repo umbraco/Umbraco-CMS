@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValueEditorBase
 {
     private BlockEditorValues? _blockEditorValues;
-    private readonly IDataTypeReadCache _dataTypeReadCache;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
     private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
@@ -26,17 +26,17 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
         DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeReadCache dataTypeReadCache,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         ILocalizedTextService textService,
         ILogger<BlockEditorPropertyValueEditor> logger,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper)
-        : base(attribute, propertyEditors, dataTypeReadCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactories)
+        : base(attribute, propertyEditors, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactories)
     {
         _propertyEditors = propertyEditors;
         _dataValueReferenceFactories = dataValueReferenceFactories;
-        _dataTypeReadCache = dataTypeReadCache;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _logger = logger;
     }
 
@@ -76,7 +76,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
                 continue;
             }
 
-            object? configuration = _dataTypeReadCache.GetDataType(propertyValue.PropertyType.DataTypeId)?.Configuration;
+            object? configuration = _dataTypeConfigurationCache.GetConfiguration(propertyValue.PropertyType.DataTypeKey);
             foreach (ITag tag in dataValueTags.GetTags(propertyValue.Value, configuration, languageId))
             {
                 yield return tag;

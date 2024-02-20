@@ -28,7 +28,7 @@ public class ContentPropertyMapDefinition : IMapDefinition
         ILocalizedTextService textService,
         ILoggerFactory loggerFactory,
         PropertyEditorCollection propertyEditors,
-        IDataTypeReadCache dataTypeReadCache)
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(
             dataTypeService,
@@ -47,7 +47,7 @@ public class ContentPropertyMapDefinition : IMapDefinition
             textService,
             loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(),
             propertyEditors,
-            dataTypeReadCache);
+            dataTypeConfigurationCache);
     }
 
     [Obsolete]
@@ -58,26 +58,15 @@ public class ContentPropertyMapDefinition : IMapDefinition
         ILocalizedTextService textService,
         ILoggerFactory loggerFactory,
         PropertyEditorCollection propertyEditors)
-    {
-        _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(
-            dataTypeService,
-            entityService,
-            loggerFactory.CreateLogger<ContentPropertyBasicMapper<ContentPropertyBasic>>(),
-            propertyEditors);
-        _contentPropertyDtoConverter = new ContentPropertyDtoMapper(
-            dataTypeService,
-            entityService,
-            loggerFactory.CreateLogger<ContentPropertyDtoMapper>(),
-            propertyEditors);
-        _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(
+        : this(
             cultureDictionary,
             dataTypeService,
             entityService,
             textService,
-            loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(),
+            loggerFactory,
             propertyEditors,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeReadCache>());
-    }
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeConfigurationCache>())
+    { }
 
     public void DefineMaps(IUmbracoMapper mapper)
     {
