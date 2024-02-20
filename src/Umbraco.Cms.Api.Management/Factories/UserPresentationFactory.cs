@@ -171,7 +171,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             LanguageIsoCode = presentationUser.LanguageIsoCode,
             MediaStartNodeIds = mediaStartNodeKeys,
             DocumentStartNodeIds = documentStartNodeKeys,
-            Permissions = permissions,
+            Permissions = permissions.Select(x=>x.Verb).ToHashSet(),
             HasAccessToAllLanguages = hasAccessToAllLanguages
         });
     }
