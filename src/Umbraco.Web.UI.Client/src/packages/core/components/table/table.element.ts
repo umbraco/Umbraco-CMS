@@ -32,6 +32,12 @@ export interface UmbTableColumn {
 	allowSorting?: boolean;
 }
 
+export interface UmbTableColumnLayoutElement extends HTMLElement {
+	column: UmbTableColumn;
+	item: UmbTableItem;
+	value: any;
+}
+
 export interface UmbTableConfig {
 	allowSelection: boolean;
 	hideIcon?: boolean;
@@ -243,7 +249,7 @@ export class UmbTableElement extends LitElement {
 		const value = item.data.find((data) => data.columnAlias === column.alias)?.value;
 
 		if (column.elementName) {
-			const element = document.createElement(column.elementName) as any; // TODO: add interface for UmbTableColumnLayoutElement
+			const element = document.createElement(column.elementName) as UmbTableColumnLayoutElement;
 			element.column = column;
 			element.item = item;
 			element.value = value;
