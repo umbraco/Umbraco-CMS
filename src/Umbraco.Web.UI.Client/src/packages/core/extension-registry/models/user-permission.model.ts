@@ -1,6 +1,6 @@
-import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestUserPermission extends ManifestBase {
+export interface ManifestUserPermission extends ManifestWithDynamicConditions {
 	type: 'userPermission';
 	meta: MetaUserPermission;
 }
