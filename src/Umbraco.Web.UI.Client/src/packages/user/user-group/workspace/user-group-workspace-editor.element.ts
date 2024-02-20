@@ -141,12 +141,10 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 				<umb-user-group-entity-user-permission-list></umb-user-group-entity-user-permission-list>
 			</uui-box>
 
-			<!-- Temp disabled because it is work in progress
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
 				<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
 			</uui-box>
-	-->
 		`;
 	}
 
