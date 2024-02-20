@@ -1,9 +1,4 @@
 import type { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import {
-	UMB_USER_PERMISSION_DOCUMENT_CREATE,
-	UMB_USER_PERMISSION_DOCUMENT_DELETE,
-	UMB_USER_PERMISSION_DOCUMENT_READ,
-} from '@umbraco-cms/backoffice/document';
 
 export type UmbMockUserGroupModel = UserGroupResponseModel & UserGroupItemResponseModel;
 
@@ -14,9 +9,9 @@ export const data: Array<UmbMockUserGroupModel> = [
 		icon: 'icon-medal',
 		documentStartNode: { id: 'all-property-editors-document-id' },
 		permissions: [
-			UMB_USER_PERMISSION_DOCUMENT_READ,
-			UMB_USER_PERMISSION_DOCUMENT_CREATE,
-			UMB_USER_PERMISSION_DOCUMENT_DELETE,
+			{
+				verb: 'Umb.Document.Read',
+			},
 		],
 		sections: [],
 		languages: [],
@@ -30,7 +25,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		name: 'Editors',
 		icon: 'icon-tools',
 		documentStartNode: { id: 'all-property-editors-document-id' },
-		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		permissions: [],
 		sections: [],
 		languages: [],
 		hasAccessToAllLanguages: true,
@@ -43,7 +38,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		name: 'Sensitive data',
 		icon: 'icon-lock',
 		documentStartNode: { id: 'all-property-editors-document-id' },
-		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		permissions: [],
 		sections: [],
 		languages: [],
 		hasAccessToAllLanguages: true,
@@ -56,7 +51,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		name: 'Translators',
 		icon: 'icon-globe',
 		documentStartNode: { id: 'all-property-editors-document-id' },
-		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		permissions: [],
 		sections: [],
 		languages: [],
 		hasAccessToAllLanguages: true,
@@ -69,7 +64,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 		name: 'Writers',
 		icon: 'icon-edit',
 		documentStartNode: { id: 'all-property-editors-document-id' },
-		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		permissions: [],
 		sections: [],
 		languages: [],
 		hasAccessToAllLanguages: true,
