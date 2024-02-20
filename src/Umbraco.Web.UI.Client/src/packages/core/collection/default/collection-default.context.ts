@@ -1,17 +1,17 @@
-import type { UmbCollectionConfiguration, UmbCollectionContext } from '../types.js';
+import type { UmbCollectionColumnConfiguration, UmbCollectionConfiguration, UmbCollectionContext } from '../types.js';
 import { UmbCollectionViewManager } from '../collection-view.manager.js';
-import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestCollection, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { ManifestCollection, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
+import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDefaultCollectionContext<
 		CollectionItemType = any,
@@ -31,7 +31,7 @@ export class UmbDefaultCollectionContext<
 	#filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this.#filter.asObservable();
 
-	#userDefinedProperties = new UmbArrayState<any>([], (x) => x);
+	#userDefinedProperties = new UmbArrayState<UmbCollectionColumnConfiguration>([], (x) => x);
 	public readonly userDefinedProperties = this.#userDefinedProperties.asObservable();
 
 	repository?: UmbCollectionRepository;

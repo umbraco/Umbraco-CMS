@@ -31,6 +31,7 @@ export class UmbMemberTypeTreeStore extends UmbUniqueTreeStore {
 	#updateTreeItemMapper = (item: UmbMemberTypeDetailModel) => {
 		return {
 			name: item.name,
+			icon: item.icon,
 		};
 	};
 }

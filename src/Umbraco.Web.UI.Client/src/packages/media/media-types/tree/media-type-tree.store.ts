@@ -31,6 +31,7 @@ export class UmbMediaTypeTreeStore extends UmbUniqueTreeStore {
 	#updateTreeItemMapper = (item: UmbMediaTypeDetailModel) => {
 		return {
 			name: item.name,
+			icon: item.icon,
 		};
 	};
 }
