@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionBrowse : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
-    public const string ActionLetter = "F";
+    public const string ActionLetter = "Umb.Document.Read";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
     public const string ActionAlias = "browse";

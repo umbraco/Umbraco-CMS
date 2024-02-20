@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionSort : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const string ActionLetter = "S";
+    public const string ActionLetter = "Umb.Document.Sort";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "sort";

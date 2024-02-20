@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionUnpublish : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const string ActionLetter = "Z";
+    public const string ActionLetter = "Umb.Document.Unpublish";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "unpublish";

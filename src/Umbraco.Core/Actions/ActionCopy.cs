@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionCopy : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
-    public const string ActionLetter = "O";
+    public const string ActionLetter = "Umb.Document.Duplicate";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
     public const string ActionAlias = "copy";

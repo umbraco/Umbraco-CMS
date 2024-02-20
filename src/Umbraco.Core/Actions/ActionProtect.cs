@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionProtect : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const string ActionLetter = "P";
+    public const string ActionLetter = "Umb.Document.PublicAccess";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "protect";

@@ -55,9 +55,13 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
                 continue;
             }
 
-            var permissions = userGroupDto.DefaultPermissions.Select(x => new UserGroup2PermissionDto()
+            var permissions = userGroupDto.DefaultPermissions.SelectMany(oldPermission =>
             {
-                Permission = x.ToString(), UserGroupKey = userGroupDto.Key
+                IEnumerable<string> newPermissions = ReplacePermissionValue(oldPermission);
+                return newPermissions.Select(permission => new UserGroup2PermissionDto()
+                {
+                    Permission = permission, UserGroupKey = userGroupDto.Key
+                });
             }).ToHashSet();
 
             Database.InsertBulk(permissions);
@@ -103,5 +107,5 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
         Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2Node).Do();
     }
 
-    private IEnumerable<string> ReplacePermissionValue(char oldPermission) => _charToStringPermissionDictionary.TryGetValue(oldPermission, out var newPermission) ? newPermission : oldPermission.ToString().Yield();
+    private IEnumerable<string> ReplacePermissionValue(char oldPermission) => _charToStringPermissionDictionary.TryGetValue(oldPermission, out IEnumerable<string>? newPermission) ? newPermission : oldPermission.ToString().Yield();
 }

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionCreateBlueprintFromContent : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const string ActionLetter = "ï";
+    public const string ActionLetter = "Umb.Document.CreateBlueprint";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
     public const string ActionAlias = "createblueprint";

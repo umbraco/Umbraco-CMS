@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionToPublish : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const string ActionLetter = "H";
+    public const string ActionLetter = "Umb.Document.SendForApproval";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "sendtopublish";

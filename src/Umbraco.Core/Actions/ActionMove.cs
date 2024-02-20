@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionMove : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const string ActionLetter = "M";
+    public const string ActionLetter = "Umb.Document.Move";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "move";

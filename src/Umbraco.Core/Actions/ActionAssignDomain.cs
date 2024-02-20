@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionAssignDomain : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter" />
-    public const string ActionLetter = "I";
+    public const string ActionLetter = "Umb.Document.CultureAndHostnames";
 
     /// <inheritdoc cref="IAction.ActionAlias" />
     public const string ActionAlias = "assigndomain";

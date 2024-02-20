@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionRollback : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const string ActionLetter = "K";
+    public const string ActionLetter = "Umb.Document.Rollback";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "rollback";

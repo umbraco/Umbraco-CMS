@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionRights : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const string ActionLetter = "R";
+    public const string ActionLetter = "Umb.Document.Permissions";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "rights";

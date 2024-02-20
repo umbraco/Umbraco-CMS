@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionNotify : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>
-    public const string ActionLetter = "N";
+    public const string ActionLetter = "Umb.Document.Notifications";
 
     /// <inheritdoc cref="IAction.ActionAlias"/>
     public const string ActionAlias = "notify";

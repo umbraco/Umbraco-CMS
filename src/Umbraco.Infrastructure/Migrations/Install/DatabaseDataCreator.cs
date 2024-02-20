@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -192,10 +193,10 @@ internal class DatabaseDataCreator
     {
         var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
         {
-            [Constants.Security.AdminGroupKey] = "CADMOSKTPIURZ:5F7ïN".ToCharArray().Select(x=>x.ToString()),
-            [Constants.Security.WriterGroupKey] = "CAH:FN".ToCharArray().Select(x=>x.ToString()),
-            [Constants.Security.EditorGroupKey] = "CADMOSKTPUZ:5FïN".ToCharArray().Select(x=>x.ToString()),
-            [Constants.Security.TranslatorGroupKey] = "AF".ToCharArray().Select(x=>x.ToString()),
+            [Constants.Security.AdminGroupKey] = new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T"},
+            [Constants.Security.WriterGroupKey] =  new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionToPublish.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":"},
+            [Constants.Security.EditorGroupKey] = new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter,  ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T"},
+            [Constants.Security.TranslatorGroupKey] =  new []{ActionUpdate.ActionLetter, ActionBrowse.ActionLetter},
         };
 
         var i = 1;
