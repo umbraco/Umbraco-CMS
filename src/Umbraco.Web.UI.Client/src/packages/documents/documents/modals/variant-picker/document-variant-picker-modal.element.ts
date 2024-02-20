@@ -20,8 +20,14 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(true);
 
-		// Make sure all mandatory variants are selected
+		// Make sure all mandatory variants are selected when not in unpublish mode
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
+		if (this.data?.type !== 'unpublish') {
+			this.#selectMandatoryVariants();
+		}
+	}
+
+	#selectMandatoryVariants() {
 		this.data?.variants.forEach((variant) => {
 			if (variant.isMandatory) {
 				this.#selectionManager.select(variant.culture);
@@ -85,11 +91,11 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 				(item) => item.culture,
 				(item) => html`
 					<uui-menu-item
+						selectable
 						label=${item.name}
 						@selected=${() => this.#selectionManager.select(item.culture)}
 						@deselected=${() => this.#selectionManager.deselect(item.culture)}
-						?selected=${this.#selectionManager.isSelected(item.culture)}
-						?selectable=${!item.isMandatory}>
+						?selected=${this.#selectionManager.isSelected(item.culture)}>
 						<uui-icon slot="icon" name="icon-globe"></uui-icon>
 						${this.#renderLabel(item)}
 					</uui-menu-item>
