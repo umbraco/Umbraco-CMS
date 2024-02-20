@@ -238,30 +238,44 @@ export class UmbBlockGridEntriesContext
 	 * @returns an Array of ElementTypeKeys that are allowed in the current area. Or undefined if not ready jet.
 	 */
 	#retrieveAllowedElementTypes() {
-		if (!this.#areaType || !this._manager) return [];
+		if (!this._manager) return [];
 
-		if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance.length > 0) {
-			return this.#areaType.specifiedAllowance
-				.flatMap((permission) => {
-					if (permission.groupKey) {
-						return (
-							this._manager
-								?.getBlockTypes()
-								.filter((blockType) => blockType.groupKey === permission.groupKey && blockType.allowInAreas === true) ??
-							[]
-						);
-					} else if (permission.elementTypeKey) {
-						return (
-							this._manager?.getBlockTypes().filter((x) => x.contentElementTypeKey === permission.elementTypeKey) ?? []
-						);
-					}
-					return [];
-				})
-				.map((x) => x.contentElementTypeKey)
-				.filter((v, i, a) => a.indexOf(v) === -1);
+		if (this.#areaKey) {
+			// Area entries:
+			if (!this.#areaType) return [];
+
+			if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance.length > 0) {
+				return this.#areaType.specifiedAllowance
+					.flatMap((permission) => {
+						if (permission.groupKey) {
+							return (
+								this._manager
+									?.getBlockTypes()
+									.filter(
+										(blockType) => blockType.groupKey === permission.groupKey && blockType.allowInAreas === true,
+									) ?? []
+							);
+						} else if (permission.elementTypeKey) {
+							return (
+								this._manager?.getBlockTypes().filter((x) => x.contentElementTypeKey === permission.elementTypeKey) ??
+								[]
+							);
+						}
+						return [];
+					})
+					.map((x) => x.contentElementTypeKey)
+					.filter((v, i, a) => a.indexOf(v) === -1);
+			}
+
+			return this._manager.getBlockTypes().map((x) => x.contentElementTypeKey);
 		}
+		// If no AreaKey, then we are representing the items of the root:
 
-		return this._manager.getBlockTypes().map((x) => x.contentElementTypeKey);
+		// Root entries:
+		return this._manager
+			.getBlockTypes()
+			.filter((x) => x.allowAtRoot)
+			.map((x) => x.contentElementTypeKey);
 	}
 
 	/**
