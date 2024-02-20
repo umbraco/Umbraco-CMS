@@ -1,6 +1,4 @@
-import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from './media/repository/index.js';
 import type {
-	ManifestDashboardCollection,
 	ManifestSection,
 	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
@@ -18,24 +16,6 @@ const section: ManifestSection = {
 	},
 	conditions: [],
 };
-
-const dashboards: Array<ManifestDashboardCollection> = [
-	{
-		type: 'dashboardCollection',
-		alias: 'Umb.Dashboard.MediaCollection',
-		name: 'Media Dashboard',
-		weight: 10,
-		meta: {
-			label: 'Media',
-			pathname: 'media-management',
-			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
-		},
-		conditions: {
-			sections: [sectionAlias],
-			entityType: 'media',
-		},
-	},
-];
 
 const menuSectionSidebarApp: ManifestTypes = {
 	type: 'sectionSidebarApp',
@@ -55,4 +35,4 @@ const menuSectionSidebarApp: ManifestTypes = {
 	],
 };
 
-export const manifests = [section, menuSectionSidebarApp, ...dashboards];
+export const manifests = [section, menuSectionSidebarApp];
