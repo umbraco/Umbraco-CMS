@@ -1,4 +1,4 @@
-import { UmbDocumentVariantState } from '../../types.js';
+import { type UmbDocumentVariantModel, UmbDocumentVariantState } from '../../types.js';
 import type {
 	UmbDocumentVariantPickerModalValue,
 	UmbDocumentVariantPickerModalData,
@@ -97,7 +97,7 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 				(item) => item.culture,
 				(item) => html`
 					<uui-menu-item
-						label=${item.name ?? ''}
+						label=${item.name}
 						selectable
 						@selected=${() => this.#selectionManager.select(item.culture)}
 						@deselected=${() => this.#selectionManager.deselect(item.culture)}
@@ -105,11 +105,7 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 						<uui-icon slot="icon" name="icon-globe"></uui-icon>
 						<div class="label" slot="label">
 							<strong>${item.name}</strong>
-							<div class="label-status">
-								${this.localize.term(
-									item.state === UmbDocumentVariantState.PUBLISHED ? 'content_published' : 'content_unpublished',
-								)}
-							</div>
+							<div class="label-status">${this.#renderVariantStatus(item)}</div>
 						</div>
 					</uui-menu-item>
 				`,
@@ -123,6 +119,19 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 					@click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
+	}
+
+	#renderVariantStatus(variant: UmbDocumentVariantModel) {
+		switch (variant.state) {
+			case UmbDocumentVariantState.PUBLISHED:
+				return this.localize.term('content_published');
+			case UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES:
+				return this.localize.term('content_publishedPendingChanges');
+			case UmbDocumentVariantState.NOT_CREATED:
+			case UmbDocumentVariantState.DRAFT:
+			default:
+				return this.localize.term('content_unpublished');
+		}
 	}
 
 	static styles = [
