@@ -269,9 +269,10 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderButtonRemove() {
-		if (!this._files.length && !this._files.length) return;
+		if (!this._files.length) return;
+
 		return html`<uui-button compact @click=${this.#handleRemove} label="Remove files">
-			<uui-icon name="icon-trash"></uui-icon> Remove file ${this._files.length > 1 ? 's' : ''}
+			<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
 		</uui-button>`;
 	}
 
