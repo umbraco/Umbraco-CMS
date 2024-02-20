@@ -103,11 +103,11 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.structure.getOwnerContentType();
 	}
 
 	getEntityId() {
-		return this.getData()?.unique || '';
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
