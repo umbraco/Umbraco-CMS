@@ -39,13 +39,7 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	};
 
 	render() {
-		return html`
-			<umb-workspace-editor alias="Umb.Workspace.Member">
-				<div>Unique: ${this._data?.unique}</div>
-				<!-- Only for CRUD demonstration purposes -->
-				<input type="email" value=${ifDefined(this._data?.email)} @change=${this.#onChange} />
-			</umb-workspace-editor>
-		`;
+		return html` <umb-workspace-editor alias="Umb.Workspace.Member"></umb-workspace-editor> `;
 	}
 
 	static styles = [
