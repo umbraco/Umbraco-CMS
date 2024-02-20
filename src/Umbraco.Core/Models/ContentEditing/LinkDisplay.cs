@@ -38,21 +38,4 @@ public class LinkDisplay
         public const string Media = "media";
         public const string External = "external";
     }
-
-    public bool TypeIsDocument =>
-        Type is not null && Type.Equals(Types.Document, StringComparison.InvariantCultureIgnoreCase);
-
-    public bool TypeIsMedia =>
-        Type is not null && Type.Equals(Types.Media, StringComparison.InvariantCultureIgnoreCase);
-
-    public bool TypeIsExternal =>
-        Type is not null && Type.Equals(Types.External, StringComparison.InvariantCultureIgnoreCase);
-
-    /// <summary>
-    /// If true, Type is not null AND Unique is not null
-    /// </summary>
-    public bool TypeIsUdiBased =>
-        Type is not null && Unique is not null &&
-        (Type.Equals(Types.Document, StringComparison.InvariantCultureIgnoreCase)
-        || Type.Equals(Types.Media, StringComparison.InvariantCultureIgnoreCase));
 }
