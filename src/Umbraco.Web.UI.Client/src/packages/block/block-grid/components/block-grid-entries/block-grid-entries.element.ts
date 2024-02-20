@@ -143,6 +143,16 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 		onChange: ({ model }) => {
 			this.#context.setLayouts(model);
 		},
+		onRequestMove: ({ item }) => {
+			// TODO: implement
+			return true;
+		},
+		onDisallowed: () => {
+			this.setAttribute('disallow-drop', '');
+		},
+		onAllowed: () => {
+			this.removeAttribute('disallow-drop');
+		},
 	});
 
 	#context = new UmbBlockGridEntriesContext(this);
@@ -241,8 +251,28 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
+				position: relative;
 				display: grid;
 				gap: 1px;
+			}
+			:host([disallow-drop])::before {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				inset: 0;
+				border: 2px solid var(--uui-color-danger);
+				border-radius: calc(var(--uui-border-radius) * 2);
+				pointer-events: none;
+			}
+			:host([disallow-drop])::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				inset: 0;
+				border-radius: calc(var(--uui-border-radius) * 2);
+				background-color: var(--uui-color-danger);
+				opacity: 0.2;
+				pointer-events: none;
 			}
 			> div {
 				display: flex;
