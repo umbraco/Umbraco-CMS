@@ -456,6 +456,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return startNodesValidationStatus;
         }
 
+        UserGroupOperationStatus granularPermissionsValidationStatus = ValidateGranularPermissionsExists(userGroup);
+        if (granularPermissionsValidationStatus is not UserGroupOperationStatus.Success)
+        {
+            return granularPermissionsValidationStatus;
+        }
+
         return UserGroupOperationStatus.Success;
     }
 
@@ -483,6 +489,16 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             && _entityService.Exists(userGroup.StartMediaId.Value, UmbracoObjectTypes.Media) is false)
         {
             return UserGroupOperationStatus.MediaStartNodeKeyNotFound;
+        }
+
+        return UserGroupOperationStatus.Success;
+    }
+    private UserGroupOperationStatus ValidateGranularPermissionsExists(IUserGroup userGroup)
+    {
+        IEnumerable<Guid> documentKeys = userGroup.GranularPermissions.Select(x => x.Key).ToArray();
+        if (documentKeys.Any() && _entityService.Exists(documentKeys) is false)
+        {
+            return UserGroupOperationStatus.DocumentPermissionKeyNotFound;
         }
 
         return UserGroupOperationStatus.Success;

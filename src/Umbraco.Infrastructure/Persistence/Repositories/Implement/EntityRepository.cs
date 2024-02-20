@@ -313,6 +313,12 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
+    public bool Exists(IEnumerable<Guid> keys)
+    {
+        Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => keys.Contains(x.UniqueId));
+        return Database.ExecuteScalar<int>(sql) == keys.Count();
+    }
+
     /// <inheritdoc />
     public bool Exists(Guid key, Guid objectType)
     {
