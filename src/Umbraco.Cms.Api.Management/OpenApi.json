@@ -26337,6 +26337,7 @@
       },
       "DataTypeResponseModel": {
         "required": [
+          "canIgnoreStartNodes",
           "id"
         ],
         "type": "object",
@@ -26357,6 +26358,9 @@
               }
             ],
             "nullable": true
+          },
+          "canIgnoreStartNodes": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
