@@ -1,9 +1,9 @@
-using System.Xml.Linq;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
@@ -12,6 +12,26 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
 {
     private readonly IIdKeyMap _idKeyMap;
 
+    private static Dictionary<char, IEnumerable<string>> _charToStringPermissionDictionary =
+        new()
+        {
+            ['I'] = new []{ActionAssignDomain.ActionLetter},
+            ['F'] = new []{ActionBrowse.ActionLetter},
+            ['O'] = new []{ActionCopy.ActionLetter},
+            ['ï'] = new []{ActionCreateBlueprintFromContent.ActionLetter},
+            ['D'] = new []{ActionDelete.ActionLetter},
+            ['M'] = new []{ActionMove.ActionLetter},
+            ['C'] = new []{ActionNew.ActionLetter},
+            ['N'] = new []{ActionNotify.ActionLetter},
+            ['P'] = new []{ActionProtect.ActionLetter},
+            ['U'] = new []{ActionPublish.ActionLetter},
+            ['V'] = new []{ActionRestore.ActionLetter},
+            ['R'] = new []{ActionRights.ActionLetter},
+            ['K'] = new []{ActionRollback.ActionLetter},
+            ['S'] = new []{ActionSort.ActionLetter},
+            ['Z'] = new []{ActionUnpublish.ActionLetter},
+            ['A'] = new []{ActionUpdate.ActionLetter},
+        };
 
     public MigrateCharPermissionsToStrings(IMigrationContext context, IIdKeyMap idKeyMap)
         : base(context)
@@ -55,7 +75,7 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
         var userGroupIdToKeys = userGroups.ToDictionary(x => x.Id, x => x.Key);
         IEnumerable<UserGroup2GranularPermissionDto> userGroup2GranularPermissionDtos = userGroup2NodePermissionDtos.SelectMany(userGroup2NodePermissionDto =>
         {
-            HashSet<string> permissions = userGroup2NodePermissionDto.Permission?.Select(x => x.ToString()).ToHashSet() ?? new HashSet<string>();
+            HashSet<string> permissions = userGroup2NodePermissionDto.Permission?.SelectMany(ReplacePermissionValue).ToHashSet() ?? new HashSet<string>();
 
             return permissions.Select(permission =>
             {
@@ -82,4 +102,6 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
         Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2NodePermission).Do();
         Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2Node).Do();
     }
+
+    private IEnumerable<string> ReplacePermissionValue(char oldPermission) => _charToStringPermissionDictionary.TryGetValue(oldPermission, out var newPermission) ? newPermission : oldPermission.ToString().Yield();
 }
