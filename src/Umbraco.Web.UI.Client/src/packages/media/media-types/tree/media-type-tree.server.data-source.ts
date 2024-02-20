@@ -51,5 +51,6 @@ const mapper = (item: MediaTypeTreeItemResponseModel): UmbMediaTypeTreeItemModel
 		entityType: item.isFolder ? UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE : UMB_MEDIA_TYPE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		isFolder: item.isFolder,
+		icon: item.icon,
 	};
 };
