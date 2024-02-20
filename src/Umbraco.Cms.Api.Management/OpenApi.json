@@ -26795,6 +26795,26 @@
         },
         "additionalProperties": false
       },
+      "DocumentPermissionModel": {
+        "required": [
+          "document",
+          "verb"
+        ],
+        "type": "object",
+        "properties": {
+          "verb": {
+            "type": "string"
+          },
+          "document": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentRecycleBinItemResponseModel": {
         "required": [
           "documentType",
@@ -27727,6 +27747,18 @@
         "properties": {
           "isFolder": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalPermissionModel": {
+        "required": [
+          "verb"
+        ],
+        "type": "object",
+        "properties": {
+          "verb": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -30465,26 +30497,6 @@
         },
         "additionalProperties": false
       },
-      "PermissionModel": {
-        "required": [
-          "document",
-          "verb"
-        ],
-        "type": "object",
-        "properties": {
-          "verb": {
-            "type": "string"
-          },
-          "document": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ]
-          }
-        },
-        "additionalProperties": false
-      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -32701,7 +32713,6 @@
       "UserGroupBaseModel": {
         "required": [
           "documentRootAccess",
-          "granularPermissions",
           "hasAccessToAllLanguages",
           "languages",
           "mediaRootAccess",
@@ -32759,16 +32770,12 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string"
-            }
-          },
-          "granularPermissions": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/PermissionModel"
+                  "$ref": "#/components/schemas/DocumentPermissionModel"
+                },
+                {
+                  "$ref": "#/components/schemas/GlobalPermissionModel"
                 }
               ]
             }
