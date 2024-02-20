@@ -9,7 +9,6 @@ export interface UmbBlockTypeBaseModel {
 	iconColor?: string;
 	backgroundColor?: string;
 	editorSize?: UUIModalSidebarSize;
-	icon?: string; // remove later
 	forceHideContentEditorInOverlay: boolean;
 }
 

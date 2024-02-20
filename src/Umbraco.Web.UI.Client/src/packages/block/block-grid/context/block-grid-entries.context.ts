@@ -266,7 +266,7 @@ export class UmbBlockGridEntriesContext
 					.filter((v, i, a) => a.find((x) => x.contentElementTypeKey === v.contentElementTypeKey) === undefined);
 			}
 
-			return this._manager.getBlockTypes().filter((x) => x.allowAtAreas);
+			return this._manager.getBlockTypes().filter((x) => x.allowInAreas);
 		}
 		// If no AreaKey, then we are representing the items of the root:
 
