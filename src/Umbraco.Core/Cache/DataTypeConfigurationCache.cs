@@ -15,12 +15,14 @@ namespace Umbraco.Cms.Core.Cache;
 internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache, INotificationHandler<DataTypeCacheRefresherNotification>
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly IMemoryCache _memoryCache;
     private readonly ConcurrentBag<string> _cacheKeys = new ConcurrentBag<string>();
 
-    public DataTypeConfigurationCache(IDataTypeService dataTypeService, IMemoryCache memoryCache)
+    public DataTypeConfigurationCache(IDataTypeService dataTypeService, IIdKeyMap idKeyMap, IMemoryCache memoryCache)
     {
         _dataTypeService = dataTypeService;
+        _idKeyMap = idKeyMap;
         _memoryCache = memoryCache;
     }
 
@@ -35,6 +37,14 @@ internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache, 
 
         return GetConfiguration<T>(_dataTypeService.GetDataType(id));
     }
+
+    public T? GetConfigurationAs<T>(Guid key)
+        where T : class
+        => _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.DataType) switch
+        {
+            { Success: false } => null,
+            { Result: int id } => GetConfigurationAs<T>(id)
+        };
 
     private T? GetConfiguration<T>(IDataType? dataType)
         where T : class

@@ -15,6 +15,15 @@ public interface IDataTypeConfigurationCache
     object? GetConfiguration(int id) => GetConfigurationAs<object>(id);
 
     /// <summary>
+    /// Gets the data type configuration.
+    /// </summary>
+    /// <param name="key">The data type key.</param>
+    /// <returns>
+    /// The data type configuration.
+    /// </returns>
+    object? GetConfiguration(Guid key) => GetConfigurationAs<object>(key);
+
+    /// <summary>
     /// Gets the data type configuration as <typeparamref name="T" />.
     /// </summary>
     /// <typeparam name="T">The data type configuration type.</typeparam>
@@ -23,5 +32,16 @@ public interface IDataTypeConfigurationCache
     /// The data type configuration as <typeparamref name="T" />.
     /// </returns>
     T? GetConfigurationAs<T>(int id)
+        where T : class;
+
+    /// <summary>
+    /// Gets the data type configuration as <typeparamref name="T" />.
+    /// </summary>
+    /// <typeparam name="T">The data type configuration type.</typeparam>
+    /// <param name="key">The data type key.</param>
+    /// <returns>
+    /// The data type configuration as <typeparamref name="T" />.
+    /// </returns>
+    T? GetConfigurationAs<T>(Guid key)
         where T : class;
 }
