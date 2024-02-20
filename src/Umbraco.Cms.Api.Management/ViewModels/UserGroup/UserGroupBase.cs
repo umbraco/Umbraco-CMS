@@ -70,15 +70,22 @@ public class UserGroupBase
     /// <summary>
     /// List of permissions provided, and maintained by the front-end. The server has no concept all of them, but some can be used on the server.
     /// </summary>
-    public required ISet<DocumentPermissionViewModel> Permissions { get; init; }
+    public required ISet<IPermissionViewModel> Permissions { get; init; }
 }
 
-public class PermissionViewModel
+public interface IPermissionViewModel
+{
+    string Verb { get; set; }
+}
+
+public class GlobalPermissionViewModel : IPermissionViewModel
 {
     public required string Verb { get; set; }
 }
 
-public class DocumentPermissionViewModel : PermissionViewModel
+public class DocumentPermissionViewModel : IPermissionViewModel
 {
-    public required ReferenceByIdModel? Document { get; set; } // Null means a general permission
+    public required string Verb { get; set; }
+
+    public required ReferenceByIdModel Document { get; set; } // Null means a general permission
 }

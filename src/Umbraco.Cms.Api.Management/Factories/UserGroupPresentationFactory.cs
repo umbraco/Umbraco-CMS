@@ -55,16 +55,15 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = new HashSet<DocumentPermissionViewModel>(userGroup.GranularPermissions.Select(x=>new DocumentPermissionViewModel()
+            Permissions = new HashSet<IPermissionViewModel>(userGroup.GranularPermissions.Select(x=>(IPermissionViewModel)new DocumentPermissionViewModel()
             {
                 Document = new ReferenceByIdModel()
                 {
                     Id = x.Key,
                 },
                 Verb = x.Permission
-            }).Union(userGroup.Permissions.Select(x=> new DocumentPermissionViewModel()
+            }).Union(userGroup.Permissions.Select(x=> (IPermissionViewModel)new GlobalPermissionViewModel()
             {
-                Document = null,
                 Verb = x
             }))),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
@@ -94,16 +93,15 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions =  new HashSet<DocumentPermissionViewModel>(userGroup.GranularPermissions.Select(x=>new DocumentPermissionViewModel()
+            Permissions =  new HashSet<IPermissionViewModel>(userGroup.GranularPermissions.Select(x=>(IPermissionViewModel)new DocumentPermissionViewModel()
             {
                 Document = new ReferenceByIdModel()
                 {
                     Id = x.Key,
                 },
                 Verb = x.Permission
-            }).Union(userGroup.Permissions.Select(x=> new DocumentPermissionViewModel()
+            }).Union(userGroup.Permissions.Select(x=> (IPermissionViewModel)new GlobalPermissionViewModel()
             {
-                Document = null,
                 Verb = x
             }))),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
@@ -138,24 +136,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     {
         var cleanedName = requestModel.Name.CleanForXss('[', ']', '(', ')', ':');
 
-        var permissions = new HashSet<string>();
-        var granularPermissions = new HashSet<IGranularPermission>();
-        foreach (DocumentPermissionViewModel documentPermissionViewModel in requestModel.Permissions)
-        {
-            if (documentPermissionViewModel.Document is null)
-            {
-                permissions.Add(documentPermissionViewModel.Verb);
-            }
-            else
-            {
-                granularPermissions.Add(new GranularPermission()
-                {
-                    Key = documentPermissionViewModel.Document.Id,
-                    Permission = documentPermissionViewModel.Verb
-                });
-            }
-        }
-
+        GetPermissionSets(requestModel, out HashSet<string> permissions, out HashSet<IGranularPermission> granularPermissions);
 
         var group = new UserGroup(_shortStringHelper)
         {
@@ -223,15 +204,21 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
 
-        var permissions = new HashSet<string>();
-        var granularPermissions = new HashSet<IGranularPermission>();
-        foreach (DocumentPermissionViewModel documentPermissionViewModel in request.Permissions)
+        GetPermissionSets(request, out HashSet<string> permissions, out HashSet<IGranularPermission> granularPermissions);
+
+        current.Permissions = permissions;
+        current.GranularPermissions = granularPermissions;
+
+        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);
+    }
+
+    private static void GetPermissionSets(UserGroupBase request, out HashSet<string> permissions, out HashSet<IGranularPermission> granularPermissions)
+    {
+        permissions = new HashSet<string>();
+        granularPermissions = new HashSet<IGranularPermission>();
+        foreach (IPermissionViewModel permissionViewModel in request.Permissions)
         {
-            if (documentPermissionViewModel.Document is null)
-            {
-                permissions.Add(documentPermissionViewModel.Verb);
-            }
-            else
+            if (permissionViewModel is DocumentPermissionViewModel documentPermissionViewModel)
             {
                 granularPermissions.Add(new GranularPermission()
                 {
@@ -239,12 +226,12 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
                     Permission = documentPermissionViewModel.Verb
                 });
             }
+            // Here we can use elseif, for document or whatever in the fu
+            else
+            {
+                permissions.Add(permissionViewModel.Verb);
+            }
         }
-
-        current.Permissions = permissions;
-        current.GranularPermissions = granularPermissions;
-
-        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);
     }
 
     private async Task<Attempt<IEnumerable<string>, UserGroupOperationStatus>> MapLanguageIdsToIsoCodeAsync(IEnumerable<int> ids)
