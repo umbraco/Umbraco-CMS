@@ -114,12 +114,14 @@ export class UmbMemberTypeWorkspaceContext
 		return 'member-type';
 	}
 
-	getName() {
-		return this.#data.getValue()?.name;
+	setName(name: string) {
+		this.structure.updateOwnerContentType({ name });
 	}
-
-	setName(name: string | undefined) {
-		this.#data.update({ name });
+	setAlias(alias: string) {
+		this.structure.updateOwnerContentType({ alias });
+	}
+	setDescription(description: string) {
+		this.structure.updateOwnerContentType({ description });
 	}
 }
 
