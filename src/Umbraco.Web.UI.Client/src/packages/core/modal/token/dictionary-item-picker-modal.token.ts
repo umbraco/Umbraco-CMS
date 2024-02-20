@@ -14,6 +14,7 @@ export const UMB_DICTIONARY_ITEM_PICKER_MODAL = new UmbModalToken<
 		size: 'small',
 	},
 	data: {
+		hideTreeRoot: true,
 		treeAlias: 'Umb.Tree.Dictionary',
 	},
 });

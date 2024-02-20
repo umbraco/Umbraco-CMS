@@ -28,14 +28,8 @@ export class UmbDocumentCollectionToolbarElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-collection-action-bundle></umb-collection-action-bundle>
-			${this.#renderSearch()}
-			<umb-collection-view-bundle></umb-collection-view-bundle>
-		`;
-	}
-
-	#renderSearch() {
-		return html`
 			<uui-input @input=${this.#updateSearch} label="Search" placeholder="Search..." id="input-search"></uui-input>
+			<umb-collection-view-bundle></umb-collection-view-bundle>
 		`;
 	}
 
