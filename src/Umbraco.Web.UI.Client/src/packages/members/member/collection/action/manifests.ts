@@ -3,8 +3,8 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const createManifest: ManifestTypes = {
 	type: 'collectionAction',
-	kind: 'button',
 	name: 'Create Member Collection Action',
+	kind: 'button',
 	alias: 'Umb.CollectionAction.Member.Create',
 	weight: 200,
 	meta: {
@@ -17,6 +17,7 @@ export const createManifest: ManifestTypes = {
 			match: 'Umb.Collection.Member',
 		},
 	],
+	// element: () => import('./create-member-collection-action.element.js'),
 };
 
 export const manifests = [createManifest];

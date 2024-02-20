@@ -1,6 +1,7 @@
 import { UmbMemberDetailRepository } from '../repository/index.js';
 import type { UmbMemberDetailModel } from '../types.js';
 import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbMemberTypeDetailRepository, type UmbMemberTypeDetailModel } from '@umbraco-cms/backoffice/member-type';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
@@ -8,6 +9,7 @@ import {
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 
 export class UmbMemberWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberDetailModel>
@@ -17,6 +19,11 @@ export class UmbMemberWorkspaceContext
 
 	#data = new UmbObjectState<UmbMemberDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+
+	readonly structure = new UmbContentTypePropertyStructureManager<UmbMemberTypeDetailModel>(
+		this,
+		new UmbMemberTypeDetailRepository(this),
+	);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_WORKSPACE_ALIAS);
