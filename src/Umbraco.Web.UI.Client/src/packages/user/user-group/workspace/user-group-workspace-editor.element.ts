@@ -12,7 +12,7 @@ import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/components'
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 
-import './components/user-group-default-permission-list.element.js';
+import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
 
 @customElement('umb-user-group-workspace-editor')
@@ -138,7 +138,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
-				<umb-user-group-default-permission-list></umb-user-group-default-permission-list>
+				<umb-user-group-entity-user-permission-list></umb-user-group-entity-user-permission-list>
 			</uui-box>
 
 			<!-- Temp disabled because it is work in progress
