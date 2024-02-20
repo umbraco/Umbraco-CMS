@@ -44,4 +44,9 @@ public interface IDataTypeConfigurationCache
     /// </returns>
     T? GetConfigurationAs<T>(Guid key)
         where T : class;
+
+    /// <summary>
+    /// Clears the cache.
+    /// </summary>
+    void ClearCache();
 }

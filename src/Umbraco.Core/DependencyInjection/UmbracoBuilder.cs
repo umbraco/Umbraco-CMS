@@ -340,7 +340,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
-            Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCache>();
+            Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();
         }
     }
 }
