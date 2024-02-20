@@ -91,6 +91,8 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 					</uui-menu-item>
 				`,
 			)}
+			${this.data?.type === 'publish' ? html`<p>${this.localize.term('content_variantsWillBeSaved')}</p>` : ''}
+
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
