@@ -19,7 +19,14 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(true);
+
+		// Make sure all mandatory variants are selected
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
+		this.data?.variants.forEach((variant) => {
+			if (variant.isMandatory) {
+				this.#selectionManager.select(variant.culture);
+			}
+		});
 	}
 
 	get #headline(): string {
@@ -79,15 +86,12 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 				(item) => html`
 					<uui-menu-item
 						label=${item.name}
-						selectable
 						@selected=${() => this.#selectionManager.select(item.culture)}
 						@deselected=${() => this.#selectionManager.deselect(item.culture)}
-						?selected=${this.#selectionManager.isSelected(item.culture)}>
+						?selected=${this.#selectionManager.isSelected(item.culture)}
+						?selectable=${!item.isMandatory}>
 						<uui-icon slot="icon" name="icon-globe"></uui-icon>
-						<div class="label" slot="label">
-							<strong>${item.name}</strong>
-							<div class="label-status">${this.#renderVariantStatus(item)}</div>
-						</div>
+						${this.#renderLabel(item)}
 					</uui-menu-item>
 				`,
 			)}
@@ -102,6 +106,18 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 					@click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
+	}
+
+	#renderLabel(variant: UmbDocumentVariantModel) {
+		return html`<div class="label" slot="label">
+			<strong>${variant.segment ? variant.segment + ' - ' : ''}${variant.name}</strong>
+			<div class="label-status">${this.#renderVariantStatus(variant)}</div>
+			${variant.isMandatory && variant.state !== UmbDocumentVariantState.PUBLISHED
+				? html`<div class="label-status">
+						<umb-localize key="languages_mandatoryLanguage">Mandatory language</umb-localize>
+				  </div>`
+				: ''}
+		</div>`;
 	}
 
 	#renderVariantStatus(variant: UmbDocumentVariantModel) {

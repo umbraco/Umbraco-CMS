@@ -21,6 +21,7 @@ export interface UmbDocumentDetailModel {
 export interface UmbDocumentVariantModel extends UmbVariantModel {
 	state: UmbDocumentVariantState | null;
 	publishDate: string | null;
+	isMandatory: boolean;
 }
 
 export interface UmbDocumentUrlInfoModel {
