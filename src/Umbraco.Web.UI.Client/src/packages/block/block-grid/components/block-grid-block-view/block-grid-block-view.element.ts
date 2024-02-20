@@ -28,7 +28,10 @@ export class UmbRefGridBlockElement extends UmbLitElement {
 				min-height: var(--uui-size-16);
 			}
 			umb-block-grid-areas-container {
-				margin-top: calc(var(--uui-size-2, 6px) + 1px);
+				margin-top: calc(var(--uui-size-2) + 1px);
+			}
+			umb-block-grid-areas-container::part(area) {
+				margin: var(--uui-size-2);
 			}
 		`,
 	];
