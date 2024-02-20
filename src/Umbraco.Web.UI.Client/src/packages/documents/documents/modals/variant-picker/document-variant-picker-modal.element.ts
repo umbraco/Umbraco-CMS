@@ -3,10 +3,8 @@ import type {
 	UmbDocumentVariantPickerModalValue,
 	UmbDocumentVariantPickerModalData,
 } from './document-variant-picker-modal.token.js';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
-import type { UmbLanguageItemModel } from '@umbraco-cms/backoffice/language';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
@@ -15,10 +13,6 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 	UmbDocumentVariantPickerModalData,
 	UmbDocumentVariantPickerModalValue
 > {
-	@state()
-	private _languages: Array<UmbLanguageItemModel> = [];
-
-	#collectionRepository = new UmbLanguageCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
 
 	connectedCallback(): void {
@@ -26,19 +20,6 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
-	}
-
-	async firstUpdated() {
-		const { data } = await this.#collectionRepository.requestCollection({ skip: 0, take: 1000 });
-		this._languages = data?.items ?? [];
-	}
-
-	get #filteredLanguages() {
-		if (this.data?.filter) {
-			return this._languages.filter(this.data.filter);
-		} else {
-			return this._languages;
-		}
 	}
 
 	get #headline(): string {
