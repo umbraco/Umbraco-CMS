@@ -146,15 +146,6 @@ public class LegacyPackageManifest
     public IDataEditor[] ParameterEditors { get; set; } = Array.Empty<IDataEditor>();
 
     /// <summary>
-    /// Gets or sets the grid editors listed in the manifest.
-    /// </summary>
-    /// <value>
-    /// The grid editors.
-    /// </value>
-    [DataMember(Name = "gridEditors")]
-    public GridEditor[] GridEditors { get; set; } = Array.Empty<GridEditor>();
-
-    /// <summary>
     /// Gets or sets the content apps listed in the manifest.
     /// </summary>
     /// <value>

@@ -33,11 +33,10 @@ public class PropertyValidationServiceTests
 
         // new data editor that returns a TextOnlyValueEditor which will do the validation for the properties
         var dataEditor = Mock.Of<IDataEditor>(
-            x => x.Type == EditorType.PropertyValue
-                 && x.Alias == Constants.PropertyEditors.Aliases.TextBox);
+            x => x.Alias == Constants.PropertyEditors.Aliases.TextBox);
         Mock.Get(dataEditor).Setup(x => x.GetValueEditor(It.IsAny<object>()))
             .Returns(new CustomTextOnlyValueEditor(
-                new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),
+                new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox),
                 Mock.Of<IShortStringHelper>(),
                 new JsonNetSerializer(),
                 Mock.Of<IIOHelper>()));

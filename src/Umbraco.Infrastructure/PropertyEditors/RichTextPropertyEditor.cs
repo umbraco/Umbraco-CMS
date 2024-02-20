@@ -2,11 +2,8 @@
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
@@ -16,7 +13,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Macros;
-using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -26,122 +22,24 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 [DataEditor(
     Constants.PropertyEditors.Aliases.RichText,
-    "Rich Text Editor",
-    "rte",
     ValueType = ValueTypes.Text,
-    HideLabel = false,
-    Group = Constants.PropertyEditors.Groups.RichContent,
-    Icon = "icon-browser-window",
     ValueEditorIsReusable = true)]
 public class RichTextPropertyEditor : DataEditor
 {
-    private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IIOHelper _ioHelper;
     private readonly IRichTextPropertyIndexValueFactory _richTextPropertyIndexValueFactory;
-
-    [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead. Will be removed in V15.")]
-    public RichTextPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        HtmlImageSourceParser imageSourceParser,
-        HtmlLocalLinkParser localLinkParser,
-        RichTextEditorPastedImages pastedImages,
-        IIOHelper ioHelper,
-        IImageUrlGenerator imageUrlGenerator,
-        IHtmlMacroParameterParser macroParameterParser)
-        : this(
-            dataValueEditorFactory,
-            backOfficeSecurityAccessor,
-            imageSourceParser,
-            localLinkParser,
-            pastedImages,
-            ioHelper,
-            imageUrlGenerator,
-            macroParameterParser,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
-
-    [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead. Will be removed in V15.")]
-    public RichTextPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        HtmlImageSourceParser imageSourceParser,
-        HtmlLocalLinkParser localLinkParser,
-        RichTextEditorPastedImages pastedImages,
-        IIOHelper ioHelper,
-        IImageUrlGenerator imageUrlGenerator)
-        : this(
-            dataValueEditorFactory,
-            backOfficeSecurityAccessor,
-            imageSourceParser,
-            localLinkParser,
-            pastedImages,
-            ioHelper,
-            imageUrlGenerator,
-            StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>(),
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-    {
-    }
-
-    [Obsolete($"Use the constructor which accepts an {nameof(IRichTextPropertyIndexValueFactory)} parameter. Will be removed in V15.")]
-    public RichTextPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        HtmlImageSourceParser imageSourceParser,
-        HtmlLocalLinkParser localLinkParser,
-        RichTextEditorPastedImages pastedImages,
-        IIOHelper ioHelper,
-        IImageUrlGenerator imageUrlGenerator,
-        IHtmlMacroParameterParser macroParameterParser,
-        IEditorConfigurationParser editorConfigurationParser)
-        : this(
-            dataValueEditorFactory,
-            backOfficeSecurityAccessor,
-            imageSourceParser,
-            localLinkParser,
-            pastedImages,
-            ioHelper,
-            imageUrlGenerator,
-            macroParameterParser,
-            editorConfigurationParser,
-            StaticServiceProvider.Instance.GetRequiredService<IRichTextPropertyIndexValueFactory>())
-    {
-    }
-
-    [Obsolete($"Use the non-obsolete constructor. Will be removed in V15.")]
-    public RichTextPropertyEditor(
-        IDataValueEditorFactory dataValueEditorFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        HtmlImageSourceParser imageSourceParser,
-        HtmlLocalLinkParser localLinkParser,
-        RichTextEditorPastedImages pastedImages,
-        IIOHelper ioHelper,
-        IImageUrlGenerator imageUrlGenerator,
-        IHtmlMacroParameterParser macroParameterParser,
-        IEditorConfigurationParser editorConfigurationParser,
-        IRichTextPropertyIndexValueFactory richTextPropertyIndexValueFactory)
-        : this(
-            dataValueEditorFactory,
-            editorConfigurationParser,
-            ioHelper,
-            richTextPropertyIndexValueFactory)
-    {
-    }
 
     /// <summary>
     ///     The constructor will setup the property editor based on the attribute if one is found.
     /// </summary>
     public RichTextPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
-        IEditorConfigurationParser editorConfigurationParser,
         IIOHelper ioHelper,
         IRichTextPropertyIndexValueFactory richTextPropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
         _richTextPropertyIndexValueFactory = richTextPropertyIndexValueFactory;
-        _editorConfigurationParser = editorConfigurationParser;
         SupportsReadOnly = true;
     }
 
@@ -155,7 +53,7 @@ public class RichTextPropertyEditor : DataEditor
         DataValueEditorFactory.Create<RichTextPropertyValueEditor>(Attribute!);
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>
-        new RichTextConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        new RichTextConfigurationEditor(_ioHelper);
 
     /// <summary>
     ///     A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for
@@ -167,7 +65,6 @@ public class RichTextPropertyEditor : DataEditor
         private readonly IHtmlSanitizer _htmlSanitizer;
         private readonly HtmlImageSourceParser _imageSourceParser;
         private readonly HtmlLocalLinkParser _localLinkParser;
-        private readonly IHtmlMacroParameterParser _macroParameterParser;
         private readonly RichTextEditorPastedImages _pastedImages;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IContentTypeService _contentTypeService;
@@ -187,7 +84,6 @@ public class RichTextPropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             IHtmlSanitizer htmlSanitizer,
-            IHtmlMacroParameterParser macroParameterParser,
             IContentTypeService contentTypeService,
             IPropertyValidationService propertyValidationService,
             DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
@@ -198,7 +94,6 @@ public class RichTextPropertyEditor : DataEditor
             _localLinkParser = localLinkParser;
             _pastedImages = pastedImages;
             _htmlSanitizer = htmlSanitizer;
-            _macroParameterParser = macroParameterParser;
             _contentTypeService = contentTypeService;
             _jsonSerializer = jsonSerializer;
             _logger = logger;
@@ -225,8 +120,6 @@ public class RichTextPropertyEditor : DataEditor
                 }
 
                 base.ConfigurationObject = value;
-
-                HideLabel = configuration.HideLabel;
             }
         }
 
@@ -254,10 +147,6 @@ public class RichTextPropertyEditor : DataEditor
                 .FindUdisFromLocalLinks(richTextEditorValue.Markup)
                 .WhereNotNull()
                 .Select(udi => new UmbracoEntityReference(udi)));
-
-            // TODO: Detect Macros too ... but we can save that for a later date, right now need to do media refs
-            // UPDATE: We are getting the Macros in 'FindUmbracoEntityReferencesFromEmbeddedMacros' - perhaps we just return the macro Udis here too or do they need their own relationAlias?
-            references.AddRange(_macroParameterParser.FindUmbracoEntityReferencesFromEmbeddedMacros(richTextEditorValue.Markup));
 
             // references from blocks
             if (richTextEditorValue.Blocks is not null)
