@@ -41,7 +41,7 @@ internal class UserGroupDto
     [Column("userGroupDefaultPermissions")]
     [Length(50)]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [Obsolete]
+    [Obsolete("Is not used anymore Use UserGroup2PermissionDtos instead. This will be removed in Umbraco 18.")]
     public string? DefaultPermissions { get; set; }
 
     [Column("createDate")]

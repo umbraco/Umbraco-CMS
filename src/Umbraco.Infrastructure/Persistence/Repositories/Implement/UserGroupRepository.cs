@@ -426,7 +426,6 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.StartMediaId,
                 x => x.UpdateDate,
                 x => x.Alias,
-                x => x.DefaultPermissions,
                 x => x.Name,
                 x => x.HasAccessToAllLanguages,
                 x => x.Key)
