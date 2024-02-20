@@ -4,11 +4,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 
 @customElement('umb-user-group-entity-user-permission-list')
 export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 	@state()
-	private _userGroupPermissions?: Array<string>;
+	private _userGroupPermissions?: Array<UmbUserPermissionModel>;
 
 	@state()
 	private _entityTypes: Array<string> = [];
@@ -43,7 +44,7 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
 		const target = event.target as any;
 		const selection = target.selectedPermissions;
-		this.#userGroupWorkspaceContext?.setDefaultPermissions(selection);
+		this.#userGroupWorkspaceContext?.setPermissions(selection);
 	}
 
 	render() {

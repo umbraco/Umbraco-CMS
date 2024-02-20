@@ -1,8 +1,9 @@
+import type { UmbUserPermissionModel } from '../../types.js';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -21,15 +22,17 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	private _entityType: string = '';
 
 	@property({ attribute: false })
-	selectedPermissions: Array<string> = [];
+	selectedPermissions: Array<UmbUserPermissionModel> = [];
 
 	@state()
 	private _manifests: Array<ManifestEntityUserPermission> = [];
 
 	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
 
-	#isAllowed(permissionAlias: string) {
-		return this.selectedPermissions?.includes(permissionAlias);
+	#isAllowed(permissionVerb: string) {
+		const permission = { verb: permissionVerb };
+		const permissionAsString = JSON.stringify(permission);
+		return this.selectedPermissions?.map((p) => JSON.stringify(p)).includes(permissionAsString);
 	}
 
 	#observeEntityUserPermissions() {
@@ -44,19 +47,28 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		);
 	}
 
-	#onChangeUserPermission(event: UmbChangeEvent, permissionAlias: string) {
+	#onChangeUserPermission(event: UmbChangeEvent, permissionVerb: string) {
 		event.stopPropagation();
 		const target = event.target as UmbUserPermissionSettingElement;
-		target.allowed ? this.#addUserPermission(permissionAlias) : this.#removeUserPermission(permissionAlias);
+		target.allowed ? this.#addUserPermission(permissionVerb) : this.#removeUserPermission(permissionVerb);
 	}
 
-	#addUserPermission(permissionAlias: string) {
-		this.selectedPermissions = [...this.selectedPermissions, permissionAlias];
+	#addUserPermission(permissionVerb: string) {
+		const newUserPermission: UmbUserPermissionModel = { verb: permissionVerb };
+		this.selectedPermissions = [...this.selectedPermissions, newUserPermission];
 		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
-	#removeUserPermission(permissionAlias: string) {
-		this.selectedPermissions = this.selectedPermissions.filter((alias) => alias !== permissionAlias);
+	#removeUserPermission(permissionVerb: string) {
+		// We only want to remove the global permission and not any granular permissions with the same verb
+		// because we don't know what models can be part of the array we will make a string comparison
+		const permission: UmbUserPermissionModel = { verb: permissionVerb };
+		const permissionAsString = JSON.stringify(permission);
+
+		this.selectedPermissions = this.selectedPermissions
+			.map((p) => JSON.stringify(p))
+			.filter((p) => p !== permissionAsString)
+			.map((p) => JSON.parse(p));
 		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
@@ -90,17 +102,15 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 			description=${ifDefined(
 				manifest.meta.descriptionKey ? this.localize.term(manifest.meta.descriptionKey) : manifest.meta.description,
 			)}
-			?allowed=${this.#isAllowed(manifest.alias)}
+			?allowed=${this.#isAllowed(manifest.meta.verb)}
 			@change=${(event: UmbChangeEvent) =>
-				this.#onChangeUserPermission(event, manifest.alias)}></umb-user-permission-setting>`;
+				this.#onChangeUserPermission(event, manifest.meta.verb)}></umb-user-permission-setting>`;
 	}
 
 	disconnectedCallback() {
 		super.disconnectedCallback();
 		this.#manifestObserver?.destroy();
 	}
-
-	static styles = [css``];
 }
 
 export default UmbEntityUserPermissionSettingsListElement;

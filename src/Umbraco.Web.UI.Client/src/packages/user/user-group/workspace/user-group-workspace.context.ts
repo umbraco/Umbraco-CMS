@@ -1,6 +1,7 @@
 import { UmbUserGroupDetailRepository } from '../repository/detail/index.js';
 import { UmbUserRepository } from '../../user/repository/user.repository.js';
 import type { UmbUserGroupDetailModel } from '../types.js';
+import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -99,42 +100,20 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	/**
-	 * Sets the user group default permissions.
-	 * @param {Array<string>} permissionAliases
+	 * Gets the user group user permissions.
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
-	setDefaultPermissions(permissionAliases: Array<string>) {
-		this.#data.update({ permissions: permissionAliases });
-	}
-
-	/**
-	 * Gets the user group default permissions.
-	 * @memberof UmbUserGroupWorkspaceContext
-	 */
-	getDefaultPermissions() {
+	getPermissions() {
 		return this.#data.getValue()?.permissions ?? [];
 	}
 
 	/**
-	 * Allows a default permission on the user group.
-	 * @param {string} permissionAlias
+	 * Sets the user group user permissions.
+	 * @param {Array<UmbUserPermissionModel>} permissions
 	 * @memberof UmbUserGroupWorkspaceContext
 	 */
-	allowDefaultPermission(permissionAlias: string) {
-		const permissions = this.#data.getValue()?.permissions ?? [];
-		const newValue = [...permissions, permissionAlias];
-		this.#data.update({ permissions: newValue });
-	}
-
-	/**
-	 * Disallows a default permission on the user group.
-	 * @param {string} permissionAlias
-	 * @memberof UmbUserGroupWorkspaceContext
-	 */
-	disallowDefaultPermission(permissionAlias: string) {
-		const permissions = this.#data.getValue()?.permissions ?? [];
-		const newValue = permissions.filter((alias) => alias !== permissionAlias);
-		this.#data.update({ permissions: newValue });
+	setPermissions(permissions: Array<UmbUserPermissionModel>) {
+		this.#data.update({ permissions: permissions });
 	}
 }
 

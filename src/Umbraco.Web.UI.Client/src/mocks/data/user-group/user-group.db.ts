@@ -5,6 +5,8 @@ import type { UmbMockUserGroupModel } from './user-group.data.js';
 import { data } from './user-group.data.js';
 import type {
 	CreateUserGroupRequestModel,
+	DocumentPermissionModel,
+	GlobalPermissionModel,
 	UserGroupItemResponseModel,
 	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -24,14 +26,15 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	 * @return {*}  {string[]}
 	 * @memberof UmbUserGroupData
 	 */
-	getPermissions(userGroupIds: string[]): string[] {
+	getPermissions(userGroupIds: string[]): Array<GlobalPermissionModel | DocumentPermissionModel> {
 		const permissions = this.data
-			.filter((userGroup) => userGroupIds.includes(userGroup.id || ''))
+			.filter((userGroup) => userGroupIds.includes(userGroup.id))
 			.map((userGroup) => (userGroup.permissions?.length ? userGroup.permissions : []))
 			.flat();
 
 		// Remove duplicates
-		return [...new Set(permissions)];
+		const uniqueArray = Array.from(new Set(permissions.map((e) => JSON.stringify(e)))).map((e) => JSON.parse(e));
+		return uniqueArray;
 	}
 }
 
