@@ -48,5 +48,6 @@ const mapper = (item: NamedEntityTreeItemResponseModel): UmbMemberTypeTreeItemMo
 		entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		isFolder: false,
+		icon: 'icon-user',
 	};
 };

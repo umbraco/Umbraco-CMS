@@ -49,9 +49,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 						)}
 					</div>
 
-					<umb-workspace-footer alias="Umb.Workspace.Document">
-						<div id="breadcrumbs">Breadcrumbs</div>
-					</umb-workspace-footer>`
+					<umb-workspace-footer alias="Umb.Workspace.Document"></umb-workspace-footer>`
 			: nothing;
 	}
 

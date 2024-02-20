@@ -45,6 +45,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-footer-layout>
+				<umb-extension-slot type="workspaceFooterApp"></umb-extension-slot>
 				<slot></slot>
 				${this._modalContext
 					? html`<uui-button
