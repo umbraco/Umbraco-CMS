@@ -73,8 +73,8 @@ export class UmbBlockGridEntriesContext
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				return {
 					data: {
-						blocks: [],
-						blockGroups: [],
+						blocks: this.#retrieveAllowedElementTypes(),
+						blockGroups: this._manager?.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						blockOriginData: { index: index },
 					},
@@ -263,19 +263,15 @@ export class UmbBlockGridEntriesContext
 						}
 						return [];
 					})
-					.map((x) => x.contentElementTypeKey)
-					.filter((v, i, a) => a.indexOf(v) === -1);
+					.filter((v, i, a) => a.find((x) => x.contentElementTypeKey === v.contentElementTypeKey) === undefined);
 			}
 
-			return this._manager.getBlockTypes().map((x) => x.contentElementTypeKey);
+			return this._manager.getBlockTypes().filter((x) => x.allowAtAreas);
 		}
 		// If no AreaKey, then we are representing the items of the root:
 
 		// Root entries:
-		return this._manager
-			.getBlockTypes()
-			.filter((x) => x.allowAtRoot)
-			.map((x) => x.contentElementTypeKey);
+		return this._manager.getBlockTypes().filter((x) => x.allowAtRoot);
 	}
 
 	/**
@@ -287,6 +283,10 @@ export class UmbBlockGridEntriesContext
 		const content = this._manager?.getContentOf(contentUdi);
 		if (!content) return false;
 
-		return this.#retrieveAllowedElementTypes().indexOf(content.contentTypeKey) !== -1;
+		return (
+			this.#retrieveAllowedElementTypes()
+				.map((x) => x.contentElementTypeKey)
+				.indexOf(content.contentTypeKey) !== -1
+		);
 	}
 }
