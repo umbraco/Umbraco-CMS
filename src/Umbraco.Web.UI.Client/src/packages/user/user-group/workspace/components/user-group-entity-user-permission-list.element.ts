@@ -5,10 +5,10 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-user-group-default-permission-list')
-export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
+@customElement('umb-user-group-entity-user-permission-list')
+export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 	@state()
-	private _userGroupDefaultPermissions?: Array<string>;
+	private _userGroupPermissions?: Array<string>;
 
 	@state()
 	private _entityTypes: Array<string> = [];
@@ -18,23 +18,23 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#observeUserPermissions();
+		this.#observeEntityUserPermissions();
 
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#userGroupWorkspaceContext = instance;
 			this.observe(
 				this.#userGroupWorkspaceContext.data,
-				(userGroup) => (this._userGroupDefaultPermissions = userGroup?.permissions),
-				'umbUserGroupPermissionsObserver',
+				(userGroup) => (this._userGroupPermissions = userGroup?.permissions),
+				'umbUserGroupEntityUserPermissionsObserver',
 			);
 		});
 	}
 
-	#observeUserPermissions() {
+	#observeEntityUserPermissions() {
 		this.observe(
 			umbExtensionsRegistry.byType('entityUserPermission'),
-			(userPermissionManifests) => {
-				this._entityTypes = [...new Set(userPermissionManifests.map((manifest) => manifest.meta.entityType))];
+			(manifests) => {
+				this._entityTypes = [...new Set(manifests.map((manifest) => manifest.meta.entityType))];
 			},
 			'umbUserPermissionsObserver',
 		);
@@ -55,7 +55,7 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 			<h4><umb-localize .key=${`user_permissionsEntityGroup_${entityType}`}>${entityType}</umb-localize></h4>
 			<umb-entity-user-permission-settings-list
 				.entityType=${entityType}
-				.selectedPermissions=${this._userGroupDefaultPermissions || []}
+				.selectedPermissions=${this._userGroupPermissions || []}
 				@selection-change=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>
 		`;
 	}
@@ -63,10 +63,10 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 	static styles = [UmbTextStyles];
 }
 
-export default UmbUserGroupDefaultPermissionListElement;
+export default UmbUserGroupEntityUserPermissionListElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-group-default-permission-list': UmbUserGroupDefaultPermissionListElement;
+		'umb-user-group-default-permission-list': UmbUserGroupEntityUserPermissionListElement;
 	}
 }
