@@ -4,7 +4,7 @@ import type { UmbBlockListWorkspaceData } from '../index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
@@ -14,7 +14,6 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 > {
 	//
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
-	#catalogueRouteBuilder?: UmbModalRouteBuilder;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT);
@@ -35,8 +34,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				};
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this.#catalogueRouteBuilder = routeBuilder;
-				// TODO: Trigger render update?
+				this._catalogueRouteBuilderState.setValue(routeBuilder);
 			});
 	}
 
@@ -78,11 +76,11 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 	}
 
 	getPathForCreateBlock(index: number) {
-		return this.#catalogueRouteBuilder?.({ view: 'create', index: index });
+		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create', index: index });
 	}
 
 	getPathForClipboard(index: number) {
-		return this.#catalogueRouteBuilder?.({ view: 'clipboard', index: index });
+		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
 	async create(

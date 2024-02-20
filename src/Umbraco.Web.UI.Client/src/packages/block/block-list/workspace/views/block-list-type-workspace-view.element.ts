@@ -12,14 +12,14 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 					label="Label"
 					alias="label"
 					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
-				<umb-property
+				<!--<umb-property
 					label="Custom view"
 					alias="view"
 					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
 				<umb-property
 					label="Custom stylesheet"
 					alias="stylesheet"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>-->
 				<umb-property
 					label="Overlay size"
 					alias="editorSize"
@@ -70,6 +70,12 @@ export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement 
 					label="Custom stylesheet"
 					alias="stylesheet"
 					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
+			</uui-box>
+			<uui-box headline="Advanced">
+				<umb-property
+					label="Hide Content Editor"
+					alias="forceHideContentEditorInOverlay"
+					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 			</uui-box>
 		`;
 	}

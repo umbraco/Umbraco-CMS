@@ -17,11 +17,18 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 		super(deepFreeze(initialData));
 	}
 
+	/**
+	 * @export
+	 * @method createObservablePart
+	 * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
+	 * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
+	 * @description - Creates an Observable from this State.
+	 */
 	asObservablePart<ReturnType>(
 		mappingFunction: MappingFunction<T, ReturnType>,
 		memoizationFunction?: MemoizationFunction<ReturnType>,
 	) {
-		return createObservablePart(this._subject, mappingFunction, memoizationFunction);
+		return createObservablePart(this._subject, mappingFunction, memoizationFunction ?? naiveObjectComparison);
 	}
 
 	/**
