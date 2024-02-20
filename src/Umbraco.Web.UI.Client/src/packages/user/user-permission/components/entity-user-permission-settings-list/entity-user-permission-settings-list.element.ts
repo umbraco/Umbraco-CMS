@@ -1,6 +1,6 @@
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { ManifestUserPermission } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -24,9 +24,9 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	selectedPermissions: Array<string> = [];
 
 	@state()
-	private _manifests: Array<ManifestUserPermission> = [];
+	private _manifests: Array<ManifestEntityUserPermission> = [];
 
-	#manifestObserver?: UmbObserverController<Array<ManifestUserPermission>>;
+	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
 
 	#isAllowed(permissionAlias: string) {
 		return this.selectedPermissions?.includes(permissionAlias);
@@ -36,7 +36,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		this.#manifestObserver?.destroy();
 
 		this.#manifestObserver = this.observe(
-			umbExtensionsRegistry.byType('userPermission'),
+			umbExtensionsRegistry.byType('entityUserPermission'),
 			(userPermissionManifests) => {
 				this._manifests = userPermissionManifests.filter((manifest) => manifest.meta.entityType === this.entityType);
 			},
@@ -64,14 +64,14 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		return html`${this.#renderGroupedPermissions(this._manifests)} `;
 	}
 
-	#renderGroupedPermissions(permissionManifests: Array<ManifestUserPermission>) {
+	#renderGroupedPermissions(permissionManifests: Array<ManifestEntityUserPermission>) {
 		// TODO: groupBy is not known by TS yet
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
 		const groupedPermissions = Object.groupBy(
 			permissionManifests,
-			(manifest: ManifestUserPermission) => manifest.meta.group,
-		) as Record<string, Array<ManifestUserPermission>>;
+			(manifest: ManifestEntityUserPermission) => manifest.meta.group,
+		) as Record<string, Array<ManifestEntityUserPermission>>;
 		return html`
 			${Object.entries(groupedPermissions).map(
 				([group, manifests]) => html`
@@ -84,7 +84,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		`;
 	}
 
-	#renderPermission(manifest: ManifestUserPermission) {
+	#renderPermission(manifest: ManifestEntityUserPermission) {
 		return html` <umb-user-permission-setting
 			label=${ifDefined(manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label)}
 			description=${ifDefined(

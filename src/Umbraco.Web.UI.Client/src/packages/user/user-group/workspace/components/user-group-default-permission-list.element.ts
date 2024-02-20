@@ -32,7 +32,7 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 
 	#observeUserPermissions() {
 		this.observe(
-			umbExtensionsRegistry.byType('userPermission'),
+			umbExtensionsRegistry.byType('entityUserPermission'),
 			(userPermissionManifests) => {
 				this._entityTypes = [...new Set(userPermissionManifests.map((manifest) => manifest.meta.entityType))];
 			},

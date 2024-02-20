@@ -2,7 +2,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import type {
 	ManifestUserGranularPermission,
-	ManifestUserPermission,
+	ManifestEntityUserPermission,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_USER_PERMISSION_DOCUMENT_CREATE = 'Umb.UserPermission.Document.Create';
@@ -22,9 +22,9 @@ export const UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES = 'Umb.UserPermi
 export const UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS = 'Umb.UserPermission.Document.PublicAccess';
 export const UMB_USER_PERMISSION_DOCUMENT_ROLLBACK = 'Umb.UserPermission.Document.Rollback';
 
-const permissions: Array<ManifestUserPermission> = [
+const permissions: Array<ManifestEntityUserPermission> = [
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_READ,
 		name: 'Read Document User Permission',
 		meta: {
@@ -34,7 +34,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
 		name: 'Create Document Blueprint User Permission',
 		meta: {
@@ -44,7 +44,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_DELETE,
 		name: 'Delete Document User Permission',
 		meta: {
@@ -54,7 +54,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE,
 		name: 'Create Document User Permission',
 		meta: {
@@ -64,7 +64,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
 		name: 'Document Notifications User Permission',
 		meta: {
@@ -74,7 +74,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 		name: 'Publish Document User Permission',
 		meta: {
@@ -84,7 +84,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 		name: 'Document Permissions User Permission',
 		meta: {
@@ -94,7 +94,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_SEND_FOR_APPROVAL,
 		name: 'Send Document For Approval User Permission',
 		meta: {
@@ -104,7 +104,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 		name: 'Unpublish Document User Permission',
 		meta: {
@@ -114,7 +114,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 		name: 'Update Document User Permission',
 		meta: {
@@ -124,7 +124,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_COPY,
 		name: 'Copy Document User Permission',
 		meta: {
@@ -135,7 +135,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_MOVE,
 		name: 'Move Document User Permission',
 		meta: {
@@ -146,7 +146,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_SORT,
 		name: 'Sort Document User Permission',
 		meta: {
@@ -157,7 +157,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES,
 		name: 'Document Culture And Hostnames User Permission',
 		meta: {
@@ -168,7 +168,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS,
 		name: 'Document Public Access User Permission',
 		meta: {
@@ -179,7 +179,7 @@ const permissions: Array<ManifestUserPermission> = [
 		},
 	},
 	{
-		type: 'userPermission',
+		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
 		name: 'Document Rollback User Permission',
 		meta: {
