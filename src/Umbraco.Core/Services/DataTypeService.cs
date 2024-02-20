@@ -590,6 +590,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.NotFound, dataType);
             }
 
+            if (dataType.IsDeletableDataType() is false)
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.NonDeletable, dataType);
+            }
+
             var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(deletingDataTypeNotification))
             {
