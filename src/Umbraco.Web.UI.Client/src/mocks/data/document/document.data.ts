@@ -18,6 +18,45 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 		],
 		template: null,
+		id: 'the-simplest-document-id',
+		parent: null,
+		documentType: {
+			id: 'the-simplest-document-type-id',
+			icon: 'icon-document',
+			hasListView: true,
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		variants: [
+			{
+				state: DocumentVariantStateModel.DRAFT,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: 'en-us',
+				segment: null,
+				name: 'The Simplest Document',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+			},
+		],
+		values: [
+			{
+				alias: 'prop1',
+				culture: null,
+				segment: null,
+				value: 'default value here',
+			},
+		],
+	},
+	{
+		urls: [
+			{
+				culture: 'en-US',
+				url: '/',
+			},
+		],
+		template: null,
 		id: 'all-property-editors-document-id',
 		parent: null,
 		documentType: {
