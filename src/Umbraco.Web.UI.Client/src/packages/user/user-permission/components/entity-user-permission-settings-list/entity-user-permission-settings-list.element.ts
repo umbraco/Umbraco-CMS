@@ -16,7 +16,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	public set entityType(value: string) {
 		if (value === this._entityType) return;
 		this._entityType = value;
-		this.#observeUserPermissions();
+		this.#observeEntityUserPermissions();
 	}
 	private _entityType: string = '';
 
@@ -32,12 +32,13 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		return this.selectedPermissions?.includes(permissionAlias);
 	}
 
-	#observeUserPermissions() {
+	#observeEntityUserPermissions() {
 		this.#manifestObserver?.destroy();
 
 		this.#manifestObserver = this.observe(
 			umbExtensionsRegistry.byType('entityUserPermission'),
 			(userPermissionManifests) => {
+				debugger;
 				this._manifests = userPermissionManifests.filter((manifest) => manifest.meta.entityType === this.entityType);
 			},
 			'umbUserPermissionManifestsObserver',
