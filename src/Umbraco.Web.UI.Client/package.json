@@ -123,7 +123,7 @@
 		"format:fix": "npm run format -- --write",
 		"format": "prettier 'src/**/*.ts' -- check",
 		"generate:api-dev": "openapi --input http://localhost:11000/umbraco/swagger/management/swagger.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
-		"generate:api": "openapi --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
+		"generate:api": "openapi --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/feature/granular-permissions/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
 		"generate:icons": "node ./devops/icons/index.js",
 		"generate:jsonschema:dist": "typescript-json-schema --required --include \"./src/packages/core/extension-registry/umbraco-package.ts\" --out dist-cms/umbraco-package-schema.json tsconfig.json UmbracoPackage",
 		"generate:jsonschema": "typescript-json-schema --required --include \"./src/packages/core/extension-registry/*.ts\"",

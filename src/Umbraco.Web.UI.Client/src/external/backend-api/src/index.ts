@@ -106,6 +106,7 @@ export type { DocumentCollectionResponseModel } from './models/DocumentCollectio
 export type { DocumentConfigurationResponseModel } from './models/DocumentConfigurationResponseModel';
 export type { DocumentItemResponseModel } from './models/DocumentItemResponseModel';
 export type { DocumentNotificationResponseModel } from './models/DocumentNotificationResponseModel';
+export type { DocumentPermissionModel } from './models/DocumentPermissionModel';
 export type { DocumentRecycleBinItemResponseModel } from './models/DocumentRecycleBinItemResponseModel';
 export type { DocumentResponseModel } from './models/DocumentResponseModel';
 export type { DocumentTreeItemResponseModel } from './models/DocumentTreeItemResponseModel';
@@ -154,6 +155,7 @@ export type { FileSystemTreeItemPresentationModel } from './models/FileSystemTre
 export type { FolderModelBaseModel } from './models/FolderModelBaseModel';
 export type { FolderResponseModel } from './models/FolderResponseModel';
 export type { FolderTreeItemResponseModel } from './models/FolderTreeItemResponseModel';
+export type { GlobalPermissionModel } from './models/GlobalPermissionModel';
 export type { HealthCheckActionRequestModel } from './models/HealthCheckActionRequestModel';
 export type { HealthCheckGroupPresentationBaseModel } from './models/HealthCheckGroupPresentationBaseModel';
 export type { HealthCheckGroupPresentationModel } from './models/HealthCheckGroupPresentationModel';
@@ -264,6 +266,7 @@ export type { PagedMediaCollectionResponseModel } from './models/PagedMediaColle
 export type { PagedMediaRecycleBinItemResponseModel } from './models/PagedMediaRecycleBinItemResponseModel';
 export type { PagedMediaTreeItemResponseModel } from './models/PagedMediaTreeItemResponseModel';
 export type { PagedMediaTypeTreeItemResponseModel } from './models/PagedMediaTypeTreeItemResponseModel';
+export type { PagedMemberResponseModel } from './models/PagedMemberResponseModel';
 export type { PagedNamedEntityTreeItemResponseModel } from './models/PagedNamedEntityTreeItemResponseModel';
 export type { PagedObjectTypeResponseModel } from './models/PagedObjectTypeResponseModel';
 export type { PagedPackageDefinitionResponseModel } from './models/PagedPackageDefinitionResponseModel';

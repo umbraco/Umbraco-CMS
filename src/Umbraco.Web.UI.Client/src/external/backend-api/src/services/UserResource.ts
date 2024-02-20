@@ -617,7 +617,7 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns PagedUserResponseModel Success
      * @throws ApiError
      */
     public static getUserFilter({
@@ -636,7 +636,7 @@ export class UserResource {
         userGroupIds?: Array<string>,
         userStates?: Array<UserStateModel>,
         filter?: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<PagedUserResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/filter',
@@ -650,7 +650,9 @@ export class UserResource {
                 'filter': filter,
             },
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
