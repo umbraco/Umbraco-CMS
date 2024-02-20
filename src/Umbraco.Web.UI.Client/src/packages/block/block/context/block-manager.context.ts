@@ -141,6 +141,13 @@ export abstract class UmbBlockManagerContext<
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
 	}
 
+	getBlockTypeOf(contentTypeKey: string) {
+		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);
+	}
+	getContentOf(contentUdi: string) {
+		return this.#contents.value.find((x) => x.udi === contentUdi);
+	}
+
 	/*setOneLayout(layoutData: BlockLayoutType) {
 		return this._layouts.appendOne(layoutData);
 	}*/

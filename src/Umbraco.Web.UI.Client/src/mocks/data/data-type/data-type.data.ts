@@ -692,7 +692,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 						iconColor: '#FFFDD0',
 						backgroundColor: '#633f32',
 						editorSize: 'medium',
-						icon: 'icon-coffee',
 					},
 
 					{
@@ -700,36 +699,30 @@ export const data: Array<UmbMockDataTypeModel> = [
 						contentElementTypeKey: 'headline-umbraco-demo-block-id',
 						backgroundColor: 'gold',
 						editorSize: 'medium',
-						icon: 'icon-edit',
 						groupKey: 'demo-block-group-id',
 					},
 					{
 						label: 'Image',
 						contentElementTypeKey: 'image-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-picture',
-
 						groupKey: 'demo-block-group-id',
 					},
 					{
 						label: 'Rich Text',
 						contentElementTypeKey: 'rich-text-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-diploma',
 						groupKey: 'demo-block-group-id',
 					},
 					{
 						label: 'Two Column Layout',
 						contentElementTypeKey: 'two-column-layout-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-book-alt',
 						groupKey: 'demo-block-group-id',
 					},
 					{
 						label: 'Test broken group key',
 						contentElementTypeKey: 'test-block-id',
 						editorSize: 'medium',
-						icon: 'icon-war',
 						groupKey: 'group-id-that-does-not-exist',
 					},
 				],

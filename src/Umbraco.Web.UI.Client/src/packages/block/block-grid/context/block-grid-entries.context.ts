@@ -1,7 +1,7 @@
 import type { UmbBlockDataType } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridWorkspaceData } from '../index.js';
-import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
+import type { UmbBlockGridLayoutModel, UmbBlockGridTypeAreaType, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
@@ -24,6 +24,8 @@ export class UmbBlockGridEntriesContext
 
 	#layoutColumns = new UmbNumberState(undefined);
 	readonly layoutColumns = this.#layoutColumns.asObservable();
+
+	#areaType?: UmbBlockGridTypeAreaType;
 
 	//#parentUnique?: string;
 	#areaKey?: string | null;
@@ -180,6 +182,7 @@ export class UmbBlockGridEntriesContext
 			this.observe(
 				this.#parentEntry.areaType(this.#areaKey),
 				(areaType) => {
+					this.#areaType = areaType;
 					const hostEl = this.getHostElement() as HTMLElement | undefined;
 					if (!hostEl) return;
 					hostEl.setAttribute('data-area-alias', areaType?.alias ?? '');
@@ -228,5 +231,43 @@ export class UmbBlockGridEntriesContext
 	async delete(contentUdi: string) {
 		// TODO: Loop through children and delete them as well?
 		await super.delete(contentUdi);
+	}
+
+	/**
+	 * @internal
+	 * @returns an Array of ElementTypeKeys that are allowed in the current area. Or undefined if not ready jet.
+	 */
+	#retrieveAllowedElementTypes() {
+		if (!this.#areaType || !this._manager) return [];
+
+		if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance.length > 0) {
+			return this.#areaType.specifiedAllowance
+				.flatMap((permission) => {
+					if (permission.groupKey) {
+						return (
+							this._manager
+								?.getBlockTypes()
+								.filter((blockType) => blockType.groupKey === permission.groupKey && blockType.allowInAreas === true) ??
+							[]
+						);
+					} else if (permission.elementTypeKey) {
+						return (
+							this._manager?.getBlockTypes().filter((x) => x.contentElementTypeKey === permission.elementTypeKey) ?? []
+						);
+					}
+					return [];
+				})
+				.map((x) => x.contentElementTypeKey)
+				.filter((v, i, a) => a.indexOf(v) === -1);
+		}
+
+		return this._manager.getBlockTypes().map((x) => x.contentElementTypeKey);
+	}
+
+	allowDrop(item: UmbBlockGridLayoutModel) {
+		const content = this._manager?.getContentOf(item.contentUdi);
+		if (!content) return false;
+
+		return this.#retrieveAllowedElementTypes().indexOf(content.contentTypeKey) !== -1;
 	}
 }
