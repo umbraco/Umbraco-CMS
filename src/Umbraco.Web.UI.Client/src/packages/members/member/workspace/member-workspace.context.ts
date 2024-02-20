@@ -19,7 +19,7 @@ export class UmbMemberWorkspaceContext
 
 	#data = new UmbObjectState<UmbMemberDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
-
+	readonly contentTypeUnique = this.#data.asObservablePart((data) => data?.memberType.unique);
 	readonly structure = new UmbContentTypePropertyStructureManager<UmbMemberTypeDetailModel>(
 		this,
 		new UmbMemberTypeDetailRepository(this),
@@ -27,6 +27,8 @@ export class UmbMemberWorkspaceContext
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_WORKSPACE_ALIAS);
+
+		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 	}
 
 	async load(unique: string) {

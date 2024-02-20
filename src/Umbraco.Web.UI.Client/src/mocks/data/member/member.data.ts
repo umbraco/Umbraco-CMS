@@ -16,14 +16,63 @@ export const data: Array<UmbMockMemberModel> = [
 		lastPasswordChangeDate: null,
 		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
 		username: 'member1',
-		values: [],
-		variants: [
+		values: [
 			{
-				name: 'Member 1',
+				culture: null,
+				segment: null,
+				alias: 'masterText',
+				value: 'i have a master text B',
+			},
+			{
+				culture: null,
+				segment: null,
+				alias: 'pageTitle',
+				value: 'with a page title B',
+			},
+			{
+				culture: null,
+				segment: null,
+				alias: 'blogPostText',
+				value: 'My first blog post B',
+			},
+			{
 				culture: 'en-us',
 				segment: null,
-				createDate: '2023-02-06T15:31:46.876902',
-				updateDate: '2023-02-06T15:31:51.354764',
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'in the master tab B',
+			},
+			{
+				culture: 'en-us',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'which is under another group in the tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderMasterTab',
+				value: 'på master dokument tab B',
+			},
+			{
+				culture: 'da-dk',
+				segment: null,
+				alias: 'blogTextStringUnderGroupUnderMasterTab',
+				value: 'denne er under en anden gruppe i tab B',
+			},
+			{
+				culture: null,
+				segment: null,
+				alias: 'localBlogTabString',
+				value: '1234567890',
+			},
+		],
+		variants: [
+			{
+				culture: 'en-us',
+				segment: null,
+				name: 'Blog post B',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
 			},
 		],
 	},
