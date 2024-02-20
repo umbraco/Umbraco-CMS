@@ -8,7 +8,7 @@ import { css, html, customElement, repeat } from '@umbraco-cms/backoffice/extern
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-document-language-picker-modal')
+@customElement('umb-document-variant-picker-modal')
 export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 	UmbDocumentVariantPickerModalData,
 	UmbDocumentVariantPickerModalValue
@@ -135,6 +135,6 @@ export default UmbDocumentVariantPickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-language-picker-modal': UmbDocumentVariantPickerModalElement;
+		'umb-document-variant-picker-modal': UmbDocumentVariantPickerModalElement;
 	}
 }
