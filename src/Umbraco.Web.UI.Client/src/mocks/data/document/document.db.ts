@@ -13,6 +13,7 @@ import {
 	type DocumentItemResponseModel,
 	type DocumentResponseModel,
 	type DocumentTreeItemResponseModel,
+	type DomainsResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -30,6 +31,10 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	// permissions
 	getUserPermissionsForDocument(id: string): Array<any> {
 		return [];
+	}
+
+	getDomainsForDocument(id: string): DomainsResponseModel {
+		return { defaultIsoCode: 'en', domains: [] };
 	}
 }
 

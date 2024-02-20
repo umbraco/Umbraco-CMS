@@ -109,6 +109,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	#openInsertSectionModal() {
 		const sectionModal = this._modalContext?.open(UMB_TEMPLATING_SECTION_PICKER_MODAL);
+
 		sectionModal?.onSubmit().then((insertSectionModalValue) => {
 			if (insertSectionModalValue?.value) {
 				this._codeEditor?.insert(insertSectionModalValue.value);
