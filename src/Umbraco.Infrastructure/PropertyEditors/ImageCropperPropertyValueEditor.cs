@@ -74,7 +74,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             value = new ImageCropperValue { Src = val.ToString() };
         }
 
-        var configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(property.PropertyType.DataTypeId);
+        var configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(property.PropertyType.DataTypeKey);
         if (configuration is not null)
         {
             value?.ApplyConfiguration(configuration);
@@ -217,7 +217,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         // more magic here ;-(
-        ImageCropperConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(propertyType.DataTypeId);
+        ImageCropperConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(propertyType.DataTypeKey);
         ImageCropperConfiguration.Crop[] crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
         return JsonConvert.SerializeObject(

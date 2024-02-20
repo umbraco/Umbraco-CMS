@@ -30,58 +30,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
         private readonly IIOHelper _ioHelper;
-        private readonly ILocalizedTextService _localizedTextService;
-        private readonly ILocalizationService _localizationService;
-        private readonly IShortStringHelper _shortStringHelper;
-        private readonly IJsonSerializer _jsonSerializer;
         private readonly IEditorConfigurationParser _editorConfigurationParser;
+        private readonly IIdKeyMap _idKeyMap;
 
-        [Obsolete("Please use constructor that takes an IEditorConfigurationParser. Will be removed in V13.")]
-        public DataTypeService(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeRepository dataTypeRepository,
-            IDataTypeContainerRepository dataTypeContainerRepository,
-            IAuditRepository auditRepository,
-            IEntityRepository entityRepository,
-            IContentTypeRepository contentTypeRepository,
-            IIOHelper ioHelper,
-            ILocalizedTextService localizedTextService,
-            ILocalizationService localizationService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : this(
-                dataValueEditorFactory,
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                dataTypeRepository,
-                dataTypeContainerRepository,
-                auditRepository,
-                entityRepository,
-                contentTypeRepository,
-                ioHelper,
-                localizedTextService,
-                localizationService,
-                shortStringHelper,
-                jsonSerializer,
-                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-        {
-            _dataValueEditorFactory = dataValueEditorFactory;
-            _dataTypeRepository = dataTypeRepository;
-            _dataTypeContainerRepository = dataTypeContainerRepository;
-            _auditRepository = auditRepository;
-            _entityRepository = entityRepository;
-            _contentTypeRepository = contentTypeRepository;
-            _ioHelper = ioHelper;
-            _localizedTextService = localizedTextService;
-            _localizationService = localizationService;
-            _shortStringHelper = shortStringHelper;
-            _jsonSerializer = jsonSerializer;
-        }
-
+        [Obsolete("Please use constructor that takes an I. Will be removed in V13.")]
         public DataTypeService(
             IDataValueEditorFactory dataValueEditorFactory,
             ICoreScopeProvider provider,
@@ -98,6 +50,35 @@ namespace Umbraco.Cms.Core.Services.Implement
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IEditorConfigurationParser editorConfigurationParser)
+            : this(
+                dataValueEditorFactory,
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                dataTypeRepository,
+                dataTypeContainerRepository,
+                auditRepository,
+                entityRepository,
+                contentTypeRepository,
+                ioHelper,
+                editorConfigurationParser,
+                StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+        {
+        }
+
+        public DataTypeService(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IDataTypeRepository dataTypeRepository,
+            IDataTypeContainerRepository dataTypeContainerRepository,
+            IAuditRepository auditRepository,
+            IEntityRepository entityRepository,
+            IContentTypeRepository contentTypeRepository,
+            IIOHelper ioHelper,
+            IEditorConfigurationParser editorConfigurationParser,
+            IIdKeyMap idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
@@ -107,11 +88,8 @@ namespace Umbraco.Cms.Core.Services.Implement
             _entityRepository = entityRepository;
             _contentTypeRepository = contentTypeRepository;
             _ioHelper = ioHelper;
-            _localizedTextService = localizedTextService;
-            _localizationService = localizationService;
-            _shortStringHelper = shortStringHelper;
-            _jsonSerializer = jsonSerializer;
             _editorConfigurationParser = editorConfigurationParser;
+            _idKeyMap = idKeyMap;
         }
 
         #region Containers
@@ -335,14 +313,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType? GetDataType(Guid id)
-        {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IDataType> query = Query<IDataType>().Where(x => x.Key == id);
-            IDataType? dataType = _dataTypeRepository.Get(query).FirstOrDefault();
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return dataType;
-        }
+        public IDataType? GetDataType(Guid id) =>
+            _idKeyMap.GetIdForKey(id, UmbracoObjectTypes.DataType) switch
+            {
+                { Success: false } => null,
+                { Result: var intId } => GetDataType(intId),
+            };
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its control Id

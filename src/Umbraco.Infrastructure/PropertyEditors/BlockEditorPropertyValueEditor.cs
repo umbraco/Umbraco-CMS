@@ -76,7 +76,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
                 continue;
             }
 
-            object? configuration = _dataTypeConfigurationCache.GetConfiguration(propertyValue.PropertyType.DataTypeId);
+            object? configuration = _dataTypeConfigurationCache.GetConfiguration(propertyValue.PropertyType.DataTypeKey);
             foreach (ITag tag in dataValueTags.GetTags(propertyValue.Value, configuration, languageId))
             {
                 yield return tag;

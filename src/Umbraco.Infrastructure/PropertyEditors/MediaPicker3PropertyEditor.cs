@@ -111,7 +111,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             var dtos = Deserialize(_jsonSerializer, value).ToList();
 
-            var configuration = _dataTypeReadCache.GetConfigurationAs<MediaPicker3Configuration>(property.PropertyType.DataTypeId);
+            var configuration = _dataTypeReadCache.GetConfigurationAs<MediaPicker3Configuration>(property.PropertyType.DataTypeKey);
             if (configuration is not null)
             {
                 foreach (MediaWithCropsDto dto in dtos)

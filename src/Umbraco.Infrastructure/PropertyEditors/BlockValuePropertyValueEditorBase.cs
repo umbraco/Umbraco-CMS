@@ -91,7 +91,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                     continue;
                 }
 
-                object? configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeId);
+                object? configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
 
                 result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
             }
@@ -114,7 +114,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
 
     private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
     {
-        var valEditors = new Dictionary<int, IDataValueEditor>();
+        var valEditors = new Dictionary<Guid, IDataValueEditor>();
 
         foreach (BlockItemData row in items)
         {
@@ -136,13 +136,13 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                     continue;
                 }
 
-                int dataTypeId = prop.Value.PropertyType.DataTypeId;
-                if (!valEditors.TryGetValue(dataTypeId, out IDataValueEditor? valEditor))
+                Guid dataTypeKey = prop.Value.PropertyType.DataTypeKey;
+                if (!valEditors.TryGetValue(dataTypeKey, out IDataValueEditor? valEditor))
                 {
-                    var configuration = _dataTypeConfigurationCache.GetConfiguration(dataTypeId);
+                    var configuration = _dataTypeConfigurationCache.GetConfiguration(dataTypeKey);
                     valEditor = propEditor.GetValueEditor(configuration);
 
-                    valEditors.Add(dataTypeId, valEditor);
+                    valEditors.Add(dataTypeKey, valEditor);
                 }
 
                 var convValue = valEditor.ToEditor(tempProp);
@@ -160,7 +160,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
             {
                 // Fetch the property types prevalue
-                var configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeId);
+                var configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
 
                 // Lookup the property editor
                 IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];

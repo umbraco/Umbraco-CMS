@@ -13,24 +13,22 @@ namespace Umbraco.Cms.Core.Cache;
 internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache
 {
     private readonly IDataTypeService _dataTypeService;
-    private readonly IIdKeyMap _idKeyMap;
     private readonly IMemoryCache _memoryCache;
     private readonly ConcurrentHashSet<string> _cacheKeys = new ConcurrentHashSet<string>();
 
-    public DataTypeConfigurationCache(IDataTypeService dataTypeService, IIdKeyMap idKeyMap, IMemoryCache memoryCache)
+    public DataTypeConfigurationCache(IDataTypeService dataTypeService, IMemoryCache memoryCache)
     {
         _dataTypeService = dataTypeService;
-        _idKeyMap = idKeyMap;
         _memoryCache = memoryCache;
     }
 
-    public T? GetConfigurationAs<T>(int id)
+    public T? GetConfigurationAs<T>(Guid key)
         where T : class
     {
-        var cacheKey = GetCacheKey(id);
-        if (!_memoryCache.TryGetValue(cacheKey, out T? configuration))
+        var cacheKey = GetCacheKey(key);
+        if (_memoryCache.TryGetValue(cacheKey, out T? configuration) is false)
         {
-            IDataType? dataType = _dataTypeService.GetDataType(id);
+            IDataType? dataType = _dataTypeService.GetDataType(key);
             configuration = dataType?.ConfigurationAs<T>();
 
             // Only cache if data type was found (but still cache null configurations)
@@ -44,14 +42,6 @@ internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache
         return configuration;
     }
 
-    public T? GetConfigurationAs<T>(Guid key)
-        where T : class
-        => _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.DataType) switch
-        {
-            { Success: false } => null,
-            { Result: int id } => GetConfigurationAs<T>(id)
-        };
-
     public void ClearCache()
     {
         foreach (var key in _cacheKeys)
@@ -61,5 +51,5 @@ internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache
         }
     }
 
-    private static string GetCacheKey(int id) => $"DataTypeConfigurationCache_{id}";
+    private static string GetCacheKey(Guid id) => $"DataTypeConfigurationCache_{id}";
 }

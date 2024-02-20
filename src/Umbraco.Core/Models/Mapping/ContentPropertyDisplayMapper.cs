@@ -42,7 +42,7 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
 
         var config = originalProp.PropertyType is null
             ? null
-            : _dataTypeConfigurationCache.GetConfiguration(originalProp.PropertyType.DataTypeId);
+            : _dataTypeConfigurationCache.GetConfiguration(originalProp.PropertyType.DataTypeKey);
 
         // TODO: IDataValueEditor configuration - general issue
         // GetValueEditor() returns a non-configured IDataValueEditor
