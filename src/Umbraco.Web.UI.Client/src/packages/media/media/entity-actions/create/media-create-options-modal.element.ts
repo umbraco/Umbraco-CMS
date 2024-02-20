@@ -20,7 +20,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	private _allowedMediaTypes: UmbAllowedMediaTypeModel[] = [];
 
 	@state()
-	private _headline: string = 'Create';
+	private _headline: string = this.localize.term('general_create');
 
 	async firstUpdated() {
 		const mediaUnique = this.data?.media?.unique || null;
@@ -47,7 +47,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 		const { data } = await this.#mediaItemRepository.requestItems([unique]);
 		if (data) {
 			// TODO: we need to get the correct variant context here
-			this._headline = `Create at ${data[0].variants?.[0].name}`;
+			this._headline = this.localize.term('create_createUnder') + ' ' + data[0].variants?.[0].name;
 		}
 	}
 
@@ -60,7 +60,9 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline=${this._headline ?? ''}>
 				<uui-box>
-					${this._allowedMediaTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
+					${this._allowedMediaTypes.length === 0
+						? html`<umb-localize key="create_noMediaTypes"></umb-localize>`
+						: nothing}
 					${this._allowedMediaTypes.map(
 						(mediaType) => html`
 							<uui-menu-item
@@ -75,7 +77,13 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 						`,
 					)}
 				</uui-box>
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}">Cancel</uui-button>
+				<uui-button
+					slot="actions"
+					id="cancel"
+					label=${this.localize.term('general_cancel')}
+					@click="${this._rejectModal}"
+					>${this.localize.term('general_cancel')}</uui-button
+				>
 			</umb-body-layout>
 		`;
 	}
