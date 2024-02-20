@@ -24,6 +24,8 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Persistence.Sqlite;
+using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -243,6 +245,38 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             builder.Services.AddTransient<IHostedService>(sp => new TestDatabaseHostedLifecycleService(() => UseTestDatabase(sp)));
 
             builder
+                .AddConfiguration()
+                .AddUmbracoCore()
+                .AddWebComponents()
+                .AddNuCache()
+                .AddRuntimeMinifier()
+                .AddBackOfficeCore()
+                .AddBackOfficeAuthentication()
+                .AddBackOfficeIdentity()
+                .AddMembersIdentity()
+                // .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
+                .AddMvcAndRazor(mvcBuilding: mvcBuilder =>
+                {
+                    // Adds Umbraco.Web.Common
+                    mvcBuilder.AddApplicationPart(typeof(RenderController).Assembly);
+
+                    // Adds Umbraco.Web.Website
+                    mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
+
+                    // Adds Umbraco.Cms.Api.ManagementApi
+                    mvcBuilder.AddApplicationPart(typeof(ModelsBuilderControllerBase).Assembly);
+
+                    // Adds Umbraco.Cms.Api.DeliveryApi
+                    mvcBuilder.AddApplicationPart(typeof(ContentApiItemControllerBase).Assembly);
+
+                    // Adds Umbraco.Tests.Integration
+                    mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
+                })
+                .AddWebServer()
+                .AddWebsite()
+                .AddUmbracoSqlServerSupport()
+                .AddUmbracoSqliteSupport()
+                .AddDeliveryApi()
                 .AddUmbracoManagementApi()
                 .AddComposers()
                 .AddTestServices(TestHelper); // This is the important one!

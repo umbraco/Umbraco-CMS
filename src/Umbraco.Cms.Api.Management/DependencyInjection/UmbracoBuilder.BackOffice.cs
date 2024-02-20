@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
@@ -26,6 +27,7 @@ public static partial class UmbracoBuilderExtensions
         .AddRuntimeMinifier()
         .AddBackOfficeCore()
         .AddBackOfficeIdentity()
+        .AddBackOfficeAuthentication()
         .AddMembersIdentity()
         .AddUmbracoProfiler()
         .AddMvcAndRazor(configureMvc)

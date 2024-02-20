@@ -31,7 +31,6 @@ public static partial class UmbracoBuilderExtensions
                 .AddInstaller()
                 .AddUpgrader()
                 .AddSearchManagement()
-                .AddBackOffice()
                 .AddTrees()
                 .AddAuditLogs()
                 .AddDocuments()
@@ -64,7 +63,6 @@ public static partial class UmbracoBuilderExtensions
                 .AddCorsPolicy()
                 .AddWebhooks()
                 .AddPreview()
-                .AddBackOfficeAuthentication()
                 .AddPasswordConfiguration()
                 .AddSupplemenataryLocalizedTextFileSources();
 

@@ -63,6 +63,7 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped<ICoreBackOfficeUserManager, BackOfficeUserManager>();
         services.AddScoped<IInviteUriProvider, InviteUriProvider>();
         services.AddScoped<IForgotPasswordUriProvider, ForgotPasswordUriProvider>();
+        services.AddScoped<IBackOfficePasswordChanger, BackOfficePasswordChanger>();
 
         services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
 
