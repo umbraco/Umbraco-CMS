@@ -82,7 +82,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 * A query selector for the item element.
 	 */
 	itemSelector: string;
-	//disabledItemSelector?: string;
+	disabledItemSelector?: string;
 	/**
 	 * A selector for the container element, if not defined the host element will be used as container.
 	 */
@@ -333,12 +333,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			setupIgnorerElements(element, this.#config.ignorerSelector);
 		}
 
-		//if (!this.#config.disabledItemSelector || !element.matches('> ' + this.#config.disabledItemSelector)) {
-		// Idea: to make sure on does not get initialized twice: if ((element as HTMLElement).draggable === true) return;
-		(element as HTMLElement).draggable = true;
-		element.addEventListener('dragstart', this.#handleDragStart);
-		element.addEventListener('dragend', this.#handleDragEnd);
-		//}
+		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
+			// Idea: to make sure on does not get initialized twice: if ((element as HTMLElement).draggable === true) return;
+			(element as HTMLElement).draggable = true;
+			element.addEventListener('dragstart', this.#handleDragStart);
+			element.addEventListener('dragend', this.#handleDragEnd);
+		}
 
 		// If we have a currentItem and the element matches, we should set the currentElement to this element.
 		if (
