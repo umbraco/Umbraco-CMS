@@ -6,7 +6,6 @@ export interface ManifestUserPermission extends ManifestWithDynamicConditions {
 }
 
 export interface MetaUserPermission {
-	entityType: string;
 	label?: string;
 	labelKey?: string;
 	description?: string;
