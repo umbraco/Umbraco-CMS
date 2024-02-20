@@ -26,7 +26,8 @@ public interface IDataTypeConfigurationCache
         where T : class;
 
     /// <summary>
-    /// Clears the cache.
+    /// Clears the cache for the specified keys.
     /// </summary>
-    void ClearCache();
+    /// <param name="keys">The keys.</param>
+    void ClearCache(IEnumerable<Guid> keys);
 }

@@ -7,7 +7,9 @@ internal sealed class DataTypeConfigurationCacheRefresher : INotificationHandler
 {
     private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
 
-    public DataTypeConfigurationCacheRefresher(IDataTypeConfigurationCache dataTypeConfigurationCache) => _dataTypeConfigurationCache = dataTypeConfigurationCache;
+    public DataTypeConfigurationCacheRefresher(IDataTypeConfigurationCache dataTypeConfigurationCache)
+        => _dataTypeConfigurationCache = dataTypeConfigurationCache;
 
-    public void Handle(DataTypeCacheRefresherNotification notification) => _dataTypeConfigurationCache.ClearCache();
+    public void Handle(DataTypeCacheRefresherNotification notification)
+        => _dataTypeConfigurationCache.ClearCache(((DataTypeCacheRefresher.JsonPayload[])notification.MessageObject).Select(x => x.Key));
 }

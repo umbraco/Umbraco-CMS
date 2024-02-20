@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Caching.Memory;
-using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -14,14 +13,11 @@ internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache
 {
     private readonly IDataTypeService _dataTypeService;
     private readonly IMemoryCache _memoryCache;
-    private readonly IIdKeyMap _idKeyMap;
-    private readonly ConcurrentHashSet<string> _cacheKeys = new ConcurrentHashSet<string>();
 
     public DataTypeConfigurationCache(IDataTypeService dataTypeService, IMemoryCache memoryCache, IIdKeyMap idKeyMap)
     {
         _dataTypeService = dataTypeService;
         _memoryCache = memoryCache;
-        _idKeyMap = idKeyMap;
     }
 
     public T? GetConfigurationAs<T>(Guid key)
@@ -30,34 +26,26 @@ internal sealed class DataTypeConfigurationCache : IDataTypeConfigurationCache
         var cacheKey = GetCacheKey(key);
         if (_memoryCache.TryGetValue(cacheKey, out T? configuration) is false)
         {
-            var idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.DataType);
-            if (idAttempt.Success is false)
-            {
-                return null;
-            }
-
-            IDataType? dataType = _dataTypeService.GetDataType(idAttempt.Result);
+            IDataType? dataType = _dataTypeService.GetDataType(key);
             configuration = dataType?.ConfigurationAs<T>();
 
             // Only cache if data type was found (but still cache null configurations)
             if (dataType is not null)
             {
                 _memoryCache.Set(cacheKey, configuration);
-                _cacheKeys.Add(cacheKey);
             }
         }
 
         return configuration;
     }
 
-    public void ClearCache()
+    public void ClearCache(IEnumerable<Guid> keys)
     {
-        foreach (var key in _cacheKeys)
+        foreach (Guid key in keys)
         {
-            _memoryCache.Remove(key);
-            _cacheKeys.Remove(key);
+            _memoryCache.Remove(GetCacheKey(key));
         }
     }
 
-    private static string GetCacheKey(Guid id) => $"DataTypeConfigurationCache_{id}";
+    private static string GetCacheKey(Guid key) => $"DataTypeConfigurationCache_{key}";
 }
