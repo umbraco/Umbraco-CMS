@@ -1,7 +1,8 @@
+import { UmbDocumentVariantState } from '../../types.js';
 import type {
-	UmbDocumentLanguagePickerModalValue,
-	UmbDocumentLanguagePickerModalData,
-} from './document-language-picker-modal.token.js';
+	UmbDocumentVariantPickerModalValue,
+	UmbDocumentVariantPickerModalData,
+} from './document-variant-picker-modal.token.js';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbLanguageItemModel } from '@umbraco-cms/backoffice/language';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -10,9 +11,9 @@ import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-document-language-picker-modal')
-export class UmbDocumentLanguagePickerModalElement extends UmbModalBaseElement<
-	UmbDocumentLanguagePickerModalData,
-	UmbDocumentLanguagePickerModalValue
+export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
+	UmbDocumentVariantPickerModalData,
+	UmbDocumentVariantPickerModalValue
 > {
 	@state()
 	private _languages: Array<UmbLanguageItemModel> = [];
@@ -92,21 +93,21 @@ export class UmbDocumentLanguagePickerModalElement extends UmbModalBaseElement<
 		return html`<umb-body-layout headline=${this.localize.term(this.#headline)}>
 			<p id="subtitle">${this.localize.term(this.#subtitle)}</p>
 			${repeat(
-				this.#filteredLanguages,
-				(item) => item.unique,
+				this.data?.variants ?? [],
+				(item) => item.culture,
 				(item) => html`
 					<uui-menu-item
 						label=${item.name ?? ''}
 						selectable
-						@selected=${() => this.#selectionManager.select(item.unique)}
-						@deselected=${() => this.#selectionManager.deselect(item.unique)}
-						?selected=${this.#selectionManager.isSelected(item.unique)}>
+						@selected=${() => this.#selectionManager.select(item.culture)}
+						@deselected=${() => this.#selectionManager.deselect(item.culture)}
+						?selected=${this.#selectionManager.isSelected(item.culture)}>
 						<uui-icon slot="icon" name="icon-globe"></uui-icon>
 						<div class="label" slot="label">
 							<strong>${item.name}</strong>
 							<div class="label-status">
 								${this.localize.term(
-									this.data?.publishedVariants.includes(item.unique) ? 'content_published' : 'content_unpublished',
+									item.state === UmbDocumentVariantState.PUBLISHED ? 'content_published' : 'content_unpublished',
 								)}
 							</div>
 						</div>
@@ -141,10 +142,10 @@ export class UmbDocumentLanguagePickerModalElement extends UmbModalBaseElement<
 	];
 }
 
-export default UmbDocumentLanguagePickerModalElement;
+export default UmbDocumentVariantPickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-language-picker-modal': UmbDocumentLanguagePickerModalElement;
+		'umb-document-language-picker-modal': UmbDocumentVariantPickerModalElement;
 	}
 }

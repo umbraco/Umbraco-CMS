@@ -3,7 +3,7 @@ import { UmbDocumentPropertyDataContext } from '../property-dataset-context/docu
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type { UmbDocumentDetailModel } from '../types.js';
-import { type UmbDocumentLanguagePickerModalData, UMB_DOCUMENT_LANGUAGE_PICKER_MODAL } from '../modals/index.js';
+import { type UmbDocumentVariantPickerModalData, UMB_DOCUMENT_LANGUAGE_PICKER_MODAL } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -186,25 +186,22 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async #selectVariants(type: UmbDocumentLanguagePickerModalData['type']): Promise<UmbVariantId[]> {
+	async #selectVariants(type: UmbDocumentVariantPickerModalData['type']): Promise<UmbVariantId[]> {
 		const currentData = this.getData();
 		if (!currentData) throw new Error('Data is missing');
 
-		const availableVariants = currentData.variants;
+		const variants = currentData.variants;
 
 		// If there is only one variant, we don't need to select anything.
-		if (availableVariants.length === 1) {
-			// TODO: Apply this when the server returns all variants
-			//return [UmbVariantId.Create(availableVariants[0])];
+		if (variants.length === 1) {
+			return [UmbVariantId.Create(variants[0])];
 		}
 
 		if (!this.#modalManagerContext) throw new Error('Modal manager context is missing');
 
-		const modalData: UmbDocumentLanguagePickerModalData = {
+		const modalData: UmbDocumentVariantPickerModalData = {
 			type,
-			publishedVariants: availableVariants
-				.filter((x) => x.state === DocumentVariantStateModel.PUBLISHED)
-				.map((x) => x.culture?.toLowerCase() ?? ''),
+			variants, // TODO: Filter out variants that do not have any changes unless it is the current variant.
 		};
 
 		const activeVariants = this.splitView.getActiveVariants();
@@ -221,13 +218,12 @@ export class UmbDocumentWorkspaceContext
 		const selectedVariants = result.selection.map((x) => x?.toLowerCase() ?? '');
 
 		// Match the result to the available variants.
-		const variantIds = availableVariants
-			.filter((x) => selectedVariants.includes(x.culture!))
-			.map((x) => UmbVariantId.Create(x));
+		const variantIds = variants.filter((x) => selectedVariants.includes(x.culture!)).map((x) => UmbVariantId.Create(x));
+
 		return variantIds;
 	}
 
-	async #createOrSave(type: UmbDocumentLanguagePickerModalData['type']): Promise<UmbVariantId[]> {
+	async #createOrSave(type: UmbDocumentVariantPickerModalData['type']): Promise<UmbVariantId[]> {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		if (!data.unique) throw new Error('Unique is missing');
