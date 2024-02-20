@@ -144,8 +144,7 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 			this.#context.setLayouts(model);
 		},
 		onRequestMove: ({ item }) => {
-			// TODO: implement
-			return true;
+			return this.#context.allowDrop(item);
 		},
 		onDisallowed: () => {
 			this.setAttribute('disallow-drop', '');
