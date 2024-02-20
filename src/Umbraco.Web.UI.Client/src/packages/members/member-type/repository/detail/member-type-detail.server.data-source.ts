@@ -43,7 +43,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			name: '',
 			alias: '',
 			description: '',
-			icon: '',
+			icon: 'icon-user',
 			allowedAsRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
