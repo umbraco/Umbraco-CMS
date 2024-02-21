@@ -13,7 +13,7 @@ export interface UmbBlockTypeBaseModel {
 }
 
 export interface UmbBlockTypeGroup {
-	name?: string | null;
+	name?: string;
 	key: string;
 }
 

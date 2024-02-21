@@ -100,14 +100,14 @@ export class UmbInputBlockTypeElement<
 		</div>`;
 	}
 
-	#renderItem = (item: BlockType) => {
+	#renderItem = (block: BlockType) => {
 		return html`
 			<umb-block-type-card
 				.name=${block.label}
 				.iconColor=${block.iconColor}
 				.backgroundColor=${block.backgroundColor}
-				.href="${this.workspacePath}/edit/${item.contentElementTypeKey}"
-				.key=${item.contentElementTypeKey}>
+				.href="${this.workspacePath}/edit/${block.contentElementTypeKey}"
+				.contentElementTypeKey=${block.contentElementTypeKey}>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${this.#onRequestDelete} label="Remove block">
 						<uui-icon name="icon-trash"></uui-icon>

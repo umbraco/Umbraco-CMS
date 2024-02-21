@@ -44,10 +44,10 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	private _elementTypeKey?: string | undefined;
 
 	@state()
-	_name?: string;
+	_fallbackName?: string;
 
 	@state()
-	_icon?: string | null;
+	_fallbackIcon?: string | null;
 
 	constructor() {
 		super();
@@ -55,8 +55,9 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		this.observe(this.#itemManager.items, (items) => {
 			const item = items[0];
 			if (item) {
-				this._icon = item.icon;
-				this._name = item.name;
+				console.log('got item', item);
+				this._fallbackIcon = item.icon;
+				this._fallbackName = item.name;
 			}
 		});
 	}
@@ -66,9 +67,9 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		return html`
 			<uui-card-block-type
 				href=${ifDefined(this.href)}
-				.name=${this.name ?? this._name ?? ''}
+				.name=${this.name ?? this._fallbackName ?? ''}
 				.background=${this.backgroundColor}>
-				<uui-icon name=${this._icon ?? ''} style="color:${this.iconColor}"></uui-icon>
+				<uui-icon name=${this._fallbackIcon ?? ''} style="color:${this.iconColor}"></uui-icon>
 				<slot name="actions" slot="actions"> </slot>
 			</uui-card-block-type>
 		`;

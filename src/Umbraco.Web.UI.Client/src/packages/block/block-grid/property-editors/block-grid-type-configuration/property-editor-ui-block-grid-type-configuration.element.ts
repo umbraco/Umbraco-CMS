@@ -13,7 +13,7 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
-interface MappedGroupWithBlockTypes extends UmbBlockGridTypeGroupType {
+interface MappedGroupWithBlockTypes extends Partial<UmbBlockGridTypeGroupType> {
 	blocks: Array<UmbBlockTypeWithGroupKey>;
 }
 
@@ -90,7 +90,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			return { name: group.name, key: group.key, blocks: this._value.filter((value) => value.groupKey === group.key) };
 		});
 
-		this._mappedValuesAndGroups = [{ name: '', key: '', blocks: valuesWithNoGroup }, ...valuesWithGroup];
+		this._mappedValuesAndGroups = [{ blocks: valuesWithNoGroup }, ...valuesWithGroup];
 	}
 
 	#onChange(e: CustomEvent, groupKey?: string) {
