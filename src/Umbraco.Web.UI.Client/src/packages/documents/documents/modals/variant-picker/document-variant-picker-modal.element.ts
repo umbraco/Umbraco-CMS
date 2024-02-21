@@ -142,6 +142,11 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 	static styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				display: block;
+				width: 400px;
+				max-width: 90vw;
+			}
 			#subtitle {
 				margin-top: 0;
 			}
