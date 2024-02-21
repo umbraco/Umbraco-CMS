@@ -90,7 +90,9 @@ export class UmbMediaWorkspaceViewInfoReferenceElement extends UmbLitElement {
 										<uui-icon style=" vertical-align: middle;" name="icon-media"></uui-icon>
 									</uui-table-cell>
 									<uui-table-cell class="link-cell">
-										<uui-button label="Edit" href=${`${this._editMediaPath}edit/${item.nodeId}`}>
+										<uui-button
+											label="${this.localize.term('general_edit')} ${item.nodeName}"
+											href=${`${this._editMediaPath}edit/${item.nodeId}`}>
 											${item.nodeName}
 										</uui-button>
 									</uui-table-cell>

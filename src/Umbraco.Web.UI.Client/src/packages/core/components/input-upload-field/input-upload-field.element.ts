@@ -203,9 +203,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				@change="${this.#onUpload}"
 				accept="${ifDefined(this.extensions?.join(', '))}"
 				?multiple="${this.multiple}">
-				<uui-button 
-				    label=${this.localize.term('media_clickToUpload')}
-				    @click="${this.#handleBrowse}"></uui-button>
+				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#handleBrowse}"></uui-button>
 			</uui-file-dropzone>
 		`;
 	}
@@ -273,7 +271,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	#renderButtonRemove() {
 		if (!this._files.length) return;
 
-		return html`<uui-button compact @click=${this.#handleRemove} label="Remove files">
+		return html`<uui-button compact @click=${this.#handleRemove} label=${this.localize.term('content_uploadClear')}>
 			<uui-icon name="icon-trash"></uui-icon>${this.localize.term('content_uploadClear')}
 		</uui-button>`;
 	}
