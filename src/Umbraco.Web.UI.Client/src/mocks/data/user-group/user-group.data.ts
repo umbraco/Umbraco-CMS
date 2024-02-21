@@ -25,7 +25,7 @@ export const data: Array<UmbMockUserGroupModel> = [
 			{ $type: 'GlobalPermissionModel', verb: 'Umb.Document.PublicAccess' },
 			{ $type: 'GlobalPermissionModel', verb: 'Umb.Document.Rollback' },
 
-			{ $type: 'DocumentPermissionModel', verb: 'Umb.Document.Rollback', document: { id: '12345' } },
+			{ $type: 'DocumentPermissionModel', verb: 'Umb.Document.Rollback', document: { id: 'simple-document-id' } },
 		],
 		sections: [],
 		languages: [],
