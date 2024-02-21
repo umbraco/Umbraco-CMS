@@ -1,11 +1,5 @@
 import { UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_MENU_ALIAS } from './media/index.js';
-import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from './media/repository/index.js';
-import type {
-	ManifestDashboardCollection,
-	ManifestSection,
-	ManifestSectionSidebarAppMenuWithEntityActionsKind,
-	ManifestTypes,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Media';
 
@@ -16,30 +10,12 @@ const section: ManifestSection = {
 	weight: 500,
 	meta: {
 		label: 'Media',
-		pathname: 'media',
+		pathname: 'media-management',
 	},
 	conditions: [],
 };
 
-const dashboards: Array<ManifestDashboardCollection> = [
-	{
-		type: 'dashboardCollection',
-		alias: 'Umb.Dashboard.MediaCollection',
-		name: 'Media Dashboard',
-		weight: 10,
-		meta: {
-			label: 'Media',
-			pathname: 'media-management',
-			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
-		},
-		conditions: {
-			sections: [sectionAlias],
-			entityType: 'media',
-		},
-	},
-];
-
-const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind = {
+const menuSectionSidebarApp: ManifestTypes = {
 	type: 'sectionSidebarApp',
 	kind: 'menuWithEntityActions',
 	alias: 'Umb.SectionSidebarMenu.Media',
@@ -58,4 +34,4 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind 
 	],
 };
 
-export const manifests = [section, menuSectionSidebarApp, ...dashboards];
+export const manifests = [section, menuSectionSidebarApp];

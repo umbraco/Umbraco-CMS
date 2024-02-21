@@ -13,7 +13,6 @@ export class UmbPropertyTypeWorkspaceContext
 	implements UmbWorkspaceContextInterface
 {
 	constructor(host: UmbControllerHostElement) {
-		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
 		super(host, UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT);
 	}
 

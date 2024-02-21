@@ -12,7 +12,6 @@ import {
 	UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
 } from '@umbraco-cms/backoffice/collection';
 
-// TODO: [LK] Wondering how these actions could be wired up to the `bulkActionPermissions` config?
 export const manifests: Array<ManifestEntityBulkAction> = [
 	{
 		type: 'entityBulkAction',

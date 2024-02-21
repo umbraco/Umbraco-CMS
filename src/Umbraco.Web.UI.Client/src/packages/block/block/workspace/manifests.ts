@@ -48,8 +48,12 @@ export const manifests: Array<ManifestTypes> = [
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
+			{
+				alias: 'Umb.Condition.BlockEntryShowContentEdit',
+			},
 		],
 	} as any,
+	// TODO: Fix manifest types so it support additional properties.
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Block.Settings',

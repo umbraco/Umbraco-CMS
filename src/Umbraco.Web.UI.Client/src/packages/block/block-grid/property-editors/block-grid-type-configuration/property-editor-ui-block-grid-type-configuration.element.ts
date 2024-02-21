@@ -59,8 +59,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			this.#observeProperties();
 		});
 
-		this.#blockTypeWorkspaceModalRegistration?.destroy();
-
 		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(UMB_BLOCK_GRID_TYPE)
 			.onSetup(() => {

@@ -28,7 +28,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	}
 
 	async firstUpdated() {
-		const { data } = await this.#languageCollectionRepository.requestCollection({ skip: 0, take: 200 });
+		const { data } = await this.#languageCollectionRepository.requestCollection({});
 		if (data) {
 			this._languages = data.items;
 		}

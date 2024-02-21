@@ -1,25 +1,26 @@
+import {
+	UMB_USER_PERMISSION_DOCUMENT_READ,
+	UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
+	UMB_USER_PERMISSION_DOCUMENT_DELETE,
+	UMB_USER_PERMISSION_DOCUMENT_CREATE,
+	UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
+	UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
+	UMB_USER_PERMISSION_DOCUMENT_SEND_FOR_APPROVAL,
+	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
+	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
+	UMB_USER_PERMISSION_DOCUMENT_COPY,
+	UMB_USER_PERMISSION_DOCUMENT_MOVE,
+	UMB_USER_PERMISSION_DOCUMENT_SORT,
+	UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES,
+	UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS,
+	UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
+} from './constants.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import type {
 	ManifestUserGranularPermission,
 	ManifestUserPermission,
 } from '@umbraco-cms/backoffice/extension-registry';
-
-export const UMB_USER_PERMISSION_DOCUMENT_CREATE = 'Umb.UserPermission.Document.Create';
-export const UMB_USER_PERMISSION_DOCUMENT_READ = 'Umb.UserPermission.Document.Read';
-export const UMB_USER_PERMISSION_DOCUMENT_UPDATE = 'Umb.UserPermission.Document.Update';
-export const UMB_USER_PERMISSION_DOCUMENT_DELETE = 'Umb.UserPermission.Document.Delete';
-export const UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT = 'Umb.UserPermission.Document.CreateBlueprint';
-export const UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS = 'Umb.UserPermission.Document.Notifications';
-export const UMB_USER_PERMISSION_DOCUMENT_PUBLISH = 'Umb.UserPermission.Document.Publish';
-export const UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS = 'Umb.UserPermission.Document.Permissions';
-export const UMB_USER_PERMISSION_DOCUMENT_SEND_FOR_APPROVAL = 'Umb.UserPermission.Document.SendForApproval';
-export const UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH = 'Umb.UserPermission.Document.Unpublish';
-export const UMB_USER_PERMISSION_DOCUMENT_COPY = 'Umb.UserPermission.Document.Copy';
-export const UMB_USER_PERMISSION_DOCUMENT_MOVE = 'Umb.UserPermission.Document.Move';
-export const UMB_USER_PERMISSION_DOCUMENT_SORT = 'Umb.UserPermission.Document.Sort';
-export const UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES = 'Umb.UserPermission.Document.CultureAndHostnames';
-export const UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS = 'Umb.UserPermission.Document.PublicAccess';
-export const UMB_USER_PERMISSION_DOCUMENT_ROLLBACK = 'Umb.UserPermission.Document.Rollback';
 
 const permissions: Array<ManifestUserPermission> = [
 	{

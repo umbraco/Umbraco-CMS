@@ -42,7 +42,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	async #observeLanguages() {
-		const { data } = await this.#collectionRepository.requestCollection({ skip: 0, take: 1000 });
+		const { data } = await this.#collectionRepository.requestCollection({});
 
 		// TODO: listen to changes
 		if (data) {
