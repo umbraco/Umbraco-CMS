@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import type {
-	ManifestUserGranularPermission,
+	ManifestGranularUserPermission,
 	ManifestEntityUserPermission,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -195,14 +195,14 @@ const permissions: Array<ManifestEntityUserPermission> = [
 	},
 ];
 
-export const granularPermissions: Array<ManifestUserGranularPermission> = [
+export const granularPermissions: Array<ManifestGranularUserPermission> = [
 	{
 		type: 'userGranularPermission',
 		alias: 'Umb.UserGranularPermission.Document',
 		name: 'Document Granular User Permission',
-		element: () => import('./input-document-granular-permission/input-document-granular-permission.element.js'),
+		element: () => import('./document-granular-user-permission/document-granular-user-permission.element.js'),
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
+			schemaType: 'DocumentPermissionModel',
 		},
 	},
 ];

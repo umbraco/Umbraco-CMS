@@ -33,7 +33,7 @@ import type { ManifestWorkspaceContext } from './workspace-context.model.js';
 import type { ManifestWorkspaceFooterApp } from './workspace-footer-app.model.js';
 import type { ManifestWorkspaceView } from './workspace-view.model.js';
 import type { ManifestEntityUserPermission } from './user-permission.model.js';
-import type { ManifestUserGranularPermission } from './user-granular-permission.model.js';
+import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
 import type {
 	ManifestBase,
@@ -127,5 +127,5 @@ export type ManifestTypes =
 	| ManifestWorkspaceFooterApp
 	| ManifestWorkspaceView
 	| ManifestEntityUserPermission
-	| ManifestUserGranularPermission
+	| ManifestGranularUserPermission
 	| ManifestBase;
