@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
+﻿using Umbraco.Cms.Api.Management.OpenApi;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
 /// <summary>
 /// <para>
@@ -73,7 +75,7 @@ public class UserGroupBase
     public required ISet<IPermissionViewModel> Permissions { get; init; }
 }
 
-public interface IPermissionViewModel
+public interface IPermissionViewModel : IOpenApiDiscriminator
 {
    ISet<string> Verbs { get; set; }
 }

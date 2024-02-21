@@ -32,6 +32,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
         swaggerGenOptions.OperationFilter<ResponseHeaderOperationFilter>();
         swaggerGenOptions.SelectSubTypesUsing(_umbracoJsonTypeInfoResolver.FindSubTypes);
         swaggerGenOptions.UseOneOfForPolymorphism();
+        swaggerGenOptions.SelectDiscriminatorNameUsing(type => typeof(IOpenApiDiscriminator).IsAssignableFrom(type) ? "$type" : null);
         swaggerGenOptions.UseAllOfForInheritance();
 
         swaggerGenOptions.AddSecurityDefinition(
