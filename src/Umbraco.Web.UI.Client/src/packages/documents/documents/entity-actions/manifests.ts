@@ -79,7 +79,7 @@ const entityActions: Array<ManifestTypes> = [
 		api: UmbPublishDocumentEntityAction,
 		meta: {
 			icon: 'icon-globe',
-			label: 'Publish (TBD)',
+			label: 'Publish',
 			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
@@ -91,7 +91,7 @@ const entityActions: Array<ManifestTypes> = [
 		api: UmbUnpublishDocumentEntityAction,
 		meta: {
 			icon: 'icon-globe',
-			label: 'Unpublish (TBD)',
+			label: 'Unpublish',
 			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},

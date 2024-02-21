@@ -1,7 +1,6 @@
 import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
-import type { UmbAppLanguageContext } from './app-language.context.js';
-import { UMB_APP_LANGUAGE_CONTEXT } from './app-language.context.js';
+import { type UmbAppLanguageContext, UMB_APP_LANGUAGE_CONTEXT } from '../global-contexts/index.js';
 import type { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -115,7 +114,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 			}
 
 			#toggle {
-				width: var(--umb-section-sidebar-width);
+				width: 100%;
 				text-align: left;
 				background: none;
 				border: none;

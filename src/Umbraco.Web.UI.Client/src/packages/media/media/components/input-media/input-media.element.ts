@@ -212,7 +212,9 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 
 	#renderIsTrashed(item: UmbMediaItemModel) {
 		if (!item.isTrashed) return;
-		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
+		return html`<uui-tag size="s" slot="tag" color="danger"
+			><umb-localize key="mediaPicker_trashed">Trashed</umb-localize></uui-tag
+		>`;
 	}
 
 	#renderOpenButton(item: UmbMediaItemModel) {

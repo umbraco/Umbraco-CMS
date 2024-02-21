@@ -17,6 +17,5 @@ export const UMB_DOCUMENT_LANGUAGE_PICKER_MODAL = new UmbModalToken<
 >(UMB_DOCUMENT_VARIANT_PICKER_MODAL_ALIAS, {
 	modal: {
 		type: 'dialog',
-		size: 'small',
 	},
 });

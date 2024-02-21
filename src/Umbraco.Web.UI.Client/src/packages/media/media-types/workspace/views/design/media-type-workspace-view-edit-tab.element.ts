@@ -210,7 +210,6 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						id="add"
 						look="placeholder"
 						@click=${this.#onAddGroup}>
-						${this.localize.term('contentTypeEditor_addGroup')}
 				  </uui-button>`
 				: ''}
 		`;
