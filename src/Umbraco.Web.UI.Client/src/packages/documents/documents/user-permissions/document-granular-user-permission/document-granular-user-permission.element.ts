@@ -1,20 +1,23 @@
 import type { UmbDocumentUserPermissionModel } from '../types.js';
 import { UmbDocumentItemRepository, type UmbDocumentItemModel } from '../../repository/index.js';
-import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_DOCUMENT_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-granular-user-permission')
 export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
-	/*
-	public get value(): Array<UmbDocumentUserPermissionModel> {
-		return this.#pickerContext.getSelection();
-	}
-	*/
+	@property({ type: Object, attribute: false })
+	manifest?: ManifestGranularUserPermission;
 
+	_value: Array<UmbDocumentUserPermissionModel> = [];
+	public get value(): Array<UmbDocumentUserPermissionModel> {
+		return this._value;
+	}
 	public set value(value: Array<UmbDocumentUserPermissionModel>) {
+		this._value = value;
 		const uniques = value.map((item) => item.document.id);
 		this.#observePickedDocuments(uniques);
 	}
@@ -85,7 +88,7 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 		const name = item.variants[0]?.name;
 
 		return html`
-			<uui-ref-node name=${name} detail=${ifDefined(item.unique)}>
+			<uui-ref-node name=${name} detail=${ifDefined(this.#getPermissionVerbsForItem(item))}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions"> </uui-action-bar>
 			</uui-ref-node>
@@ -100,6 +103,11 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 	#renderIsTrashed(item: UmbDocumentItemModel) {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
+	}
+
+	#getPermissionVerbsForItem(item: UmbDocumentItemModel) {
+		const permission = this._value?.find((permission) => permission.document.id === item.unique);
+		return permission?.verbs;
 	}
 
 	static styles = [

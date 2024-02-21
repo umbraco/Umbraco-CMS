@@ -48,6 +48,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 				const permissionsForSchemaType =
 					userGroup.permissions.filter((permission) => permission.$type === schemaType) || [];
 
+				element.manifest = manifest;
 				element.value = permissionsForSchemaType;
 			},
 			'umbUserGroupPermissionObserver',

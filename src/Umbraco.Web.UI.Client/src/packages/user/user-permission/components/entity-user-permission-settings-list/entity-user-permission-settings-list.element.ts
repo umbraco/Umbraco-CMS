@@ -29,8 +29,8 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 
 	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
 
-	#isAllowed(permissionVerb: string) {
-		const permission = { verb: permissionVerb };
+	#isAllowed(permissionVerbs: Array<string>) {
+		const permission = { verbs: permissionVerbs };
 		const permissionAsString = JSON.stringify(permission);
 		return this.selectedPermissions?.map((p) => JSON.stringify(p)).includes(permissionAsString);
 	}
@@ -47,22 +47,22 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		);
 	}
 
-	#onChangeUserPermission(event: UmbChangeEvent, permissionVerb: string) {
+	#onChangeUserPermission(event: UmbChangeEvent, permissionVerbs: Array<string>) {
 		event.stopPropagation();
 		const target = event.target as UmbUserPermissionSettingElement;
-		target.allowed ? this.#addUserPermission(permissionVerb) : this.#removeUserPermission(permissionVerb);
+		target.allowed ? this.#addUserPermission(permissionVerbs) : this.#removeUserPermission(permissionVerbs);
 	}
 
-	#addUserPermission(permissionVerb: string) {
-		const newUserPermission: UmbUserPermissionModel = { verb: permissionVerb };
+	#addUserPermission(permissionVerbs: Array<string>) {
+		const newUserPermission: UmbUserPermissionModel = { verbs: permissionVerbs };
 		this.selectedPermissions = [...this.selectedPermissions, newUserPermission];
 		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
-	#removeUserPermission(permissionVerb: string) {
+	#removeUserPermission(permissionVerbs: Array<string>) {
 		// We only want to remove the global permission and not any granular permissions with the same verb
 		// because we don't know what models can be part of the array we will make a string comparison
-		const permission: UmbUserPermissionModel = { verb: permissionVerb };
+		const permission: UmbUserPermissionModel = { verbs: permissionVerbs };
 		const permissionAsString = JSON.stringify(permission);
 
 		this.selectedPermissions = this.selectedPermissions
@@ -102,9 +102,9 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 			description=${ifDefined(
 				manifest.meta.descriptionKey ? this.localize.term(manifest.meta.descriptionKey) : manifest.meta.description,
 			)}
-			?allowed=${this.#isAllowed(manifest.meta.verb)}
+			?allowed=${this.#isAllowed(manifest.meta.verbs)}
 			@change=${(event: UmbChangeEvent) =>
-				this.#onChangeUserPermission(event, manifest.meta.verb)}></umb-user-permission-setting>`;
+				this.#onChangeUserPermission(event, manifest.meta.verbs)}></umb-user-permission-setting>`;
 	}
 
 	disconnectedCallback() {

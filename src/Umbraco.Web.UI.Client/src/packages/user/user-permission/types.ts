@@ -1,3 +1,3 @@
 export interface UmbUserPermissionModel {
-	verb: string;
+	verbs: Array<string>;
 }
