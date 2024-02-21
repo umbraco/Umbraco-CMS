@@ -34,23 +34,26 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._variants
-			? html`<div id="splitViews">
-						${repeat(
-							this._variants,
-							(view) =>
-								view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
-							(view) => html`
-								<umb-workspace-split-view
-									alias="Umb.Workspace.Document"
-									.splitViewIndex=${view.index}
-									.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
-							`,
-						)}
-					</div>
+		if (!this._variants) return nothing;
 
-					<umb-workspace-footer alias="Umb.Workspace.Document"></umb-workspace-footer>`
-			: nothing;
+		return html`<div id="splitViews">
+				<umb-split-panel snap="50%">
+					${repeat(
+						this._variants,
+						(view) =>
+							view.index + '_' + (view.culture ?? '') + '_' + (view.segment ?? '') + '_' + this._variants!.length,
+						(view, index) => html`
+							<umb-workspace-split-view
+								slot=${['start', 'end'][index] || ''}
+								alias="Umb.Workspace.Document"
+								.splitViewIndex=${view.index}
+								.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
+						`,
+					)}
+				</umb-split-panel>
+			</div>
+
+			<umb-workspace-footer alias="Umb.Workspace.Document"></umb-workspace-footer>`;
 	}
 
 	static styles = [
@@ -66,9 +69,14 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			}
 
 			#splitViews {
-				display: flex;
 				width: 100%;
 				height: calc(100% - var(--umb-footer-layout-height));
+			}
+
+			umb-split-panel {
+				--umb-split-panel-start-min-width: 25%;
+				--umb-split-panel-end-min-width: 25%;
+				--umb-split-panel-divider-color: var(--uui-color-border);
 			}
 
 			#breadcrumbs {
