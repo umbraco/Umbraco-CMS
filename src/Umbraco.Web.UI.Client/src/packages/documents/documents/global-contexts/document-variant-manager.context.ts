@@ -11,6 +11,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 export class UmbDocumentVariantManagerContext
 	extends UmbContextBase<UmbDocumentVariantManagerContext>
@@ -19,12 +20,19 @@ export class UmbDocumentVariantManagerContext
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
 	#documentRepository = new UmbDocumentDetailRepository(this);
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+	#appLanguageCulture?: string;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
+		});
+
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {
+			this.observe(appLanguageContext.appLanguageCulture, (culture) => {
+				this.#appLanguageCulture = culture?.toLowerCase();
+			});
 		});
 	}
 
@@ -54,7 +62,7 @@ export class UmbDocumentVariantManagerContext
 			type,
 			variants: availableVariants,
 		};
-
+		debugger;
 		const modalContext = this.#modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
 			data: modalData,
 			value: { selection: activeVariantCulture ? [activeVariantCulture] : [] },
@@ -81,7 +89,7 @@ export class UmbDocumentVariantManagerContext
 	async publish(documentUnique: string) {
 		const { data } = await this.#documentRepository.requestByUnique(documentUnique);
 		if (!data) throw new Error('Document not found');
-		const variantIds = await this.pickVariants(data.variants, 'publish');
+		const variantIds = await this.pickVariants(data.variants, 'publish', this.#appLanguageCulture);
 		if (variantIds.length) {
 			await this.#publishingRepository.publish(documentUnique, variantIds);
 		}
@@ -98,7 +106,7 @@ export class UmbDocumentVariantManagerContext
 		// Only show published variants
 		const variants = data.variants.filter((variant) => variant.state === UmbDocumentVariantState.PUBLISHED);
 
-		const variantIds = await this.pickVariants(variants, 'unpublish');
+		const variantIds = await this.pickVariants(variants, 'unpublish', this.#appLanguageCulture);
 
 		if (variantIds.length) {
 			await this.#publishingRepository.unpublish(documentUnique, variantIds);
