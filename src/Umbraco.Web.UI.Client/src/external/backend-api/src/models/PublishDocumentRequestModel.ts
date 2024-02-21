@@ -3,9 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { CultureAndScheduleRequestModel } from './CultureAndScheduleRequestModel';
-
 export type PublishDocumentRequestModel = {
-    publishSchedules: Array<CultureAndScheduleRequestModel>;
+    cultures: Array<string>;
 };
 

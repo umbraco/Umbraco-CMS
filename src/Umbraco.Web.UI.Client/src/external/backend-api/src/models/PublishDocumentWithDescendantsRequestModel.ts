@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type PublishDocumentWithDescendantsRequestModel = {
+import type { PublishDocumentRequestModel } from './PublishDocumentRequestModel';
+
+export type PublishDocumentWithDescendantsRequestModel = (PublishDocumentRequestModel & {
     includeUnpublishedDescendants: boolean;
-    cultures: Array<string>;
-};
+});
 

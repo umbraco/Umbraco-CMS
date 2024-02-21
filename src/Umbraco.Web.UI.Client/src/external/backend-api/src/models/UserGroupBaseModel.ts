@@ -4,8 +4,9 @@
 /* eslint-disable */
 
 import type { DocumentPermissionModel } from './DocumentPermissionModel';
-import type { GlobalPermissionModel } from './GlobalPermissionModel';
+import type { FallbackPermissionModel } from './FallbackPermissionModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
+import type { UnknownTypePermissionModel } from './UnknownTypePermissionModel';
 
 export type UserGroupBaseModel = {
     name: string;
@@ -17,6 +18,6 @@ export type UserGroupBaseModel = {
     documentRootAccess: boolean;
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
-    permissions: Array<(DocumentPermissionModel | GlobalPermissionModel)>;
+    permissions: Array<(DocumentPermissionModel | FallbackPermissionModel | UnknownTypePermissionModel)>;
 };
 

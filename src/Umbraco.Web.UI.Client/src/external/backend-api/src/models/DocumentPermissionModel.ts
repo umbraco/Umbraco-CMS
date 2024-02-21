@@ -6,7 +6,7 @@
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type DocumentPermissionModel = {
-    verb: string;
     document: ReferenceByIdModel;
+    verbs: Array<string>;
 };
 

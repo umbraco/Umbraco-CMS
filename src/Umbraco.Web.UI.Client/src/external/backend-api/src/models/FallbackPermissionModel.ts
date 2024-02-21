@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type GlobalPermissionModel = {
-    verb: string;
+export type FallbackPermissionModel = {
+    verbs: Array<string>;
 };
 
