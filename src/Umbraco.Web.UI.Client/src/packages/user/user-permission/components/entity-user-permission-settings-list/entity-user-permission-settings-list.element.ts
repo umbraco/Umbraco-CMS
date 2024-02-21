@@ -30,7 +30,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
 
 	#isAllowed(permissionVerbs: Array<string>) {
-		const permission = { verbs: permissionVerbs };
+		const permission = { $type: 'FallbackPermissionModel', verbs: permissionVerbs };
 		const permissionAsString = JSON.stringify(permission);
 		return this.selectedPermissions?.map((p) => JSON.stringify(p)).includes(permissionAsString);
 	}
