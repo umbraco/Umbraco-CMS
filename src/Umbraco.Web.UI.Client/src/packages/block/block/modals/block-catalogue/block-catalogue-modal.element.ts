@@ -6,6 +6,7 @@ import type {
 	UmbBlockTypeWithGroupKey,
 } from '@umbraco-cms/backoffice/block';
 import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_MODAL_CONTEXT,
 	UmbModalBaseElement,
@@ -21,10 +22,13 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	private _groupedBlocks: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
 
 	@state()
-	_openClipboard?: boolean;
+	private _openClipboard?: boolean;
 
 	@state()
-	_workspacePath?: string;
+	private _workspacePath?: string;
+
+	@state()
+	private _filter?: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }>;
 
 	constructor() {
 		super();
@@ -85,8 +89,21 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		return html`Clipboard`;
 	}
 
+	#onSearch(e: UUIInputEvent) {
+		console.log('on search change', e.target.value);
+	}
+
 	#renderCreateEmpty() {
 		return html`
+			${this._groupedBlocks.length > 7
+				? html`<uui-input
+						id="search"
+						@change=${this.#onSearch}
+						label=${this.localize.term('general_search')}
+						placeholder=${this.localize.term('placeholders_search')}>
+						<uui-icon name="icon-search" slot="prepend"></uui-icon>
+				  </uui-input>`
+				: nothing}
 			${this._groupedBlocks.map(
 				(group) => html`
 					${group.name ? html`<h4>${group.name}</h4>` : nothing}
@@ -133,6 +150,13 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	static styles = [
 		css`
+			#search {
+				width: 100%;
+				align-items: center;
+			}
+			#search uui-icon {
+				padding-left: var(--uui-size-space-3);
+			}
 			.blockGroup {
 				display: grid;
 				gap: 1rem;
