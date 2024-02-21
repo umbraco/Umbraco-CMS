@@ -4,6 +4,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -30,12 +31,12 @@ public class DataValueReferenceFactoryCollectionTests
                  Mock.Of<IJsonSerializer>(),
                  Mock.Of<IIOHelper>(),
                  new DataEditorAttribute("a"),
-                 Mock.Of<IDataTypeService>(),
                  Mock.Of<IMediaImportService>(),
                  Mock.Of<IMediaService>(),
                  Mock.Of<ITemporaryFileService>(),
                  Mock.Of<IScopeProvider>(),
-                 Mock.Of<IBackOfficeSecurityAccessor>()));
+                 Mock.Of<IBackOfficeSecurityAccessor>(),
+                 Mock.Of<IDataTypeConfigurationCache>()));
 
     private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
 

@@ -46,8 +46,7 @@ public class ContentPropertyMapDefinition : IMapDefinition
             entityService,
             textService,
             loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(),
-            propertyEditors,
-            dataTypeConfigurationCache);
+            propertyEditors);
     }
 
     [Obsolete("Please use constructor that takes an IDataTypeConfigurationCache. Will be removed in V14.")]
