@@ -707,9 +707,9 @@ public class MigrateDataTypeConfigurations : MigrationBase
 
         public const bool UseInfiniteEditor = false;
 
-        public const string OrderBy = "sortOrder";
+        public const string OrderBy = "updateDate";
 
-        public const string OrderDirection = "asc";
+        public const string OrderDirection = "desc";
 
         public const int PageSize = 10;
     }
