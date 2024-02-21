@@ -9,7 +9,7 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 	UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-	UMB_USER_PERMISSION_DOCUMENT_COPY,
+	UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
 	UMB_USER_PERMISSION_DOCUMENT_MOVE,
 	UMB_USER_PERMISSION_DOCUMENT_SORT,
 	UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES,
@@ -124,11 +124,11 @@ const permissions: Array<ManifestEntityUserPermission> = [
 	},
 	{
 		type: 'entityUserPermission',
-		alias: UMB_USER_PERMISSION_DOCUMENT_COPY,
-		name: 'Copy Document User Permission',
+		alias: UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
+		name: 'Duplicate Document User Permission',
 		meta: {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
-			verbs: ['Umb.Document.Copy'],
+			verbs: ['Umb.Document.Duplicate'],
 			labelKey: 'actions_copy',
 			descriptionKey: 'actionDescriptions_copy',
 			group: 'structure',
