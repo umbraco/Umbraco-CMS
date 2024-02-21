@@ -75,17 +75,5 @@ public class UserGroupBase
 
 public interface IPermissionViewModel
 {
-    string Verb { get; set; }
-}
-
-public class GlobalPermissionViewModel : IPermissionViewModel
-{
-    public required string Verb { get; set; }
-}
-
-public class DocumentPermissionViewModel : IPermissionViewModel
-{
-    public required string Verb { get; set; }
-
-    public required ReferenceByIdModel Document { get; set; } // Null means a general permission
+   ISet<string> Verbs { get; set; }
 }

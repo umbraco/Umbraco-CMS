@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -495,7 +496,16 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     }
     private UserGroupOperationStatus ValidateGranularPermissionsExists(IUserGroup userGroup)
     {
-        IEnumerable<Guid> documentKeys = userGroup.GranularPermissions.Select(x => x.Key).ToArray();
+        IEnumerable<Guid> documentKeys = userGroup.GranularPermissions.Select(x =>
+        {
+            if (x is DocumentGranularPermission nodeGranularPermission)
+            {
+                return (Guid?)nodeGranularPermission.Key;
+            }
+
+            return null;
+
+        }).Where(x=>x.HasValue).Cast<Guid>().ToArray();
         if (documentKeys.Any() && _entityService.Exists(documentKeys) is false)
         {
             return UserGroupOperationStatus.DocumentPermissionKeyNotFound;

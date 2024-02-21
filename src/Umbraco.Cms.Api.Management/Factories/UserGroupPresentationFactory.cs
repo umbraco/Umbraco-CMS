@@ -1,9 +1,11 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
+using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
@@ -38,7 +40,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
-        // We've gotten this data from the database, so the mapping should not fail
+        // We've gotten this data from the database, so the ping should not fail
         if (languageIsoCodesMappingAttempt.Success is false)
         {
             throw new InvalidOperationException($"Unknown language ID in User Group: {userGroup.Name}");
@@ -55,21 +57,46 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = new HashSet<IPermissionViewModel>(userGroup.GranularPermissions.Select(x=>(IPermissionViewModel)new DocumentPermissionViewModel()
-            {
-                Document = new ReferenceByIdModel()
-                {
-                    Id = x.Key,
-                },
-                Verb = x.Permission
-            }).Union(userGroup.Permissions.Select(x=> (IPermissionViewModel)new GlobalPermissionViewModel()
-            {
-                Verb = x
-            }))),
+            Permissions = MapPermissions(userGroup.Permissions, userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
             IsSystemGroup = userGroup.IsSystemUserGroup()
         };
     }
+
+    private static HashSet<IPermissionViewModel> MapPermissions(ISet<string> permissions, ISet<IGranularPermission> granularPermissions)
+    {
+        var result = new HashSet<IPermissionViewModel> { };
+        if (permissions.Any())
+        {
+            result.Add(new FallbackPermissionViewModel() { Verbs = permissions });
+        }
+
+        IEnumerable<IGrouping<string, IGranularPermission>> contexts = granularPermissions.GroupBy(x => x.Context);
+
+        foreach (IGrouping<string, IGranularPermission> contextGroup in contexts)
+        {
+            IEnumerable<IGrouping<Guid?, IGranularPermission>> keyGroups = contextGroup.GroupBy(x => x.Key);
+            foreach (IGrouping<Guid?, IGranularPermission> keyGroup in keyGroups)
+            {
+                var verbs = keyGroup.Select(x => x.Permission).ToHashSet();
+                if (verbs.Any())
+                {
+                    switch (contextGroup.Key)
+                    {
+                        case DocumentGranularPermission.ContextType:
+                            result.Add(new DocumentPermissionViewModel() { Document = new ReferenceByIdModel() { Id = keyGroup.Key!.Value, }, Verbs = verbs });
+                            break;
+                        default:
+                            result.Add(new UnknownTypePermissionViewModel() { Context = contextGroup.Key, Verbs = verbs });
+                            break;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     /// <inheritdoc />
     public async Task<UserGroupResponseModel> CreateAsync(IReadOnlyUserGroup userGroup)
     {
@@ -93,17 +120,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions =  new HashSet<IPermissionViewModel>(userGroup.GranularPermissions.Select(x=>(IPermissionViewModel)new DocumentPermissionViewModel()
-            {
-                Document = new ReferenceByIdModel()
-                {
-                    Id = x.Key,
-                },
-                Verb = x.Permission
-            }).Union(userGroup.Permissions.Select(x=> (IPermissionViewModel)new GlobalPermissionViewModel()
-            {
-                Verb = x
-            }))),
+            Permissions = MapPermissions(userGroup.Permissions, userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
         };
     }
@@ -220,16 +237,34 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         {
             if (permissionViewModel is DocumentPermissionViewModel documentPermissionViewModel)
             {
-                granularPermissions.Add(new GranularPermission()
+                foreach (var verb in documentPermissionViewModel.Verbs)
                 {
-                    Key = documentPermissionViewModel.Document.Id,
-                    Permission = documentPermissionViewModel.Verb
-                });
+                    granularPermissions.Add(new DocumentGranularPermission()
+                    {
+                        Key = documentPermissionViewModel.Document.Id,
+                        Permission = verb
+                    });
+                }
             }
-            // Here we can use elseif, for document or whatever in the fu
+            if (permissionViewModel is UnknownTypePermissionViewModel unknownTypePermissionViewModel)
+            {
+                foreach (var verb in unknownTypePermissionViewModel.Verbs)
+                {
+                    granularPermissions.Add(new UnknownTypeGranularPermission()
+                    {
+                        Context = unknownTypePermissionViewModel.Context,
+                        Permission = verb
+                    });
+                }
+
+
+            }
             else
             {
-                permissions.Add(permissionViewModel.Verb);
+                foreach (var verb in permissionViewModel.Verbs)
+                {
+                    permissions.Add(verb);
+                }
             }
         }
     }

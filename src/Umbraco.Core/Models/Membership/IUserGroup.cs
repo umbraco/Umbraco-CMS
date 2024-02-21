@@ -1,5 +1,6 @@
 using System.Collections;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 
 namespace Umbraco.Cms.Core.Models.Membership;
 

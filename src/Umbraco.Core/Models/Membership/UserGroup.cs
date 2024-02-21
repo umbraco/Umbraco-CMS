@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 

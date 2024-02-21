@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models.Membership.Permissions;
+
 namespace Umbraco.Cms.Core.Models.Membership;
 
 public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>

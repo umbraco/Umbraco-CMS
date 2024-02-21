@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
@@ -529,9 +530,18 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         Database.Delete<UserGroup2GranularPermissionDto>("WHERE userGroupKey = @UserGroupKey", new { UserGroupKey = userGroup.Key });
 
         IEnumerable<UserGroup2GranularPermissionDto> permissionDtos = userGroup.GranularPermissions
-            .Select(permission => new UserGroup2GranularPermissionDto
+            .Select(permission =>
             {
-                UserGroupKey = userGroup.Key, Permission = permission.Permission, UniqueId = permission.Key
+                var dto = new UserGroup2GranularPermissionDto
+                {
+                    UserGroupKey = userGroup.Key, Permission = permission.Permission, Context = permission.Context
+                };
+                if (permission is INodeGranularPermission nodeGranularPermission)
+                {
+                    dto.UniqueId = nodeGranularPermission.Key;
+                }
+
+                return dto;
             });
 
         Database.InsertBulk(permissionDtos);

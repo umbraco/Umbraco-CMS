@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -128,10 +129,23 @@ internal static class UserFactory
             group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
             group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
             group.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet(),
-            new HashSet<IGranularPermission>(group.UserGroup2GranularPermissionDtos.Select(x => new GranularPermission()
+            new HashSet<IGranularPermission>(group.UserGroup2GranularPermissionDtos.Select(granularPermission =>
             {
-                Key = x.UniqueId,
-                Permission = x.Permission
+                switch (granularPermission.Context)
+                {
+                    case DocumentGranularPermission.ContextType:
+                        return (IGranularPermission) new DocumentGranularPermission()
+                        {
+                            Key = granularPermission.UniqueId!.Value,
+                            Permission = granularPermission.Permission
+                        };
+                    default:
+                        return new UnknownTypeGranularPermission()
+                        {
+                            Permission = granularPermission.Permission,
+                            Context = granularPermission.Context
+                        };
+                }
             })),
             group.HasAccessToAllLanguages);
     }

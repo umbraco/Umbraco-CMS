@@ -1,6 +1,8 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
@@ -96,7 +98,8 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
                 {
                     Permission = permission,
                     UserGroupKey = userGroupIdToKeys[userGroup2NodePermissionDto.UserGroupId],
-                    UniqueId = uniqueIdAttempt.Result
+                    UniqueId = uniqueIdAttempt.Result,
+                    Context = DocumentGranularPermission.ContextType
                 };
             });
         });

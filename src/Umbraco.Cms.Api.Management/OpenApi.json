@@ -26214,7 +26214,17 @@
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentPermissionModel"
+                },
+                {
+                  "$ref": "#/components/schemas/FallbackPermissionModel"
+                },
+                {
+                  "$ref": "#/components/schemas/UnknownTypePermissionModel"
+                }
+              ]
             }
           }
         },
@@ -26798,19 +26808,23 @@
       "DocumentPermissionModel": {
         "required": [
           "document",
-          "verb"
+          "verbs"
         ],
         "type": "object",
         "properties": {
-          "verb": {
-            "type": "string"
-          },
           "document": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ]
+          },
+          "verbs": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
@@ -27474,6 +27488,22 @@
         },
         "additionalProperties": false
       },
+      "FallbackPermissionModel": {
+        "required": [
+          "verbs"
+        ],
+        "type": "object",
+        "properties": {
+          "verbs": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "FieldPresentationModel": {
         "required": [
           "name",
@@ -27747,18 +27777,6 @@
         "properties": {
           "isFolder": {
             "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "GlobalPermissionModel": {
-        "required": [
-          "verb"
-        ],
-        "type": "object",
-        "properties": {
-          "verb": {
-            "type": "string"
           }
         },
         "additionalProperties": false
@@ -31902,6 +31920,26 @@
         },
         "additionalProperties": false
       },
+      "UnknownTypePermissionModel": {
+        "required": [
+          "context",
+          "verbs"
+        ],
+        "type": "object",
+        "properties": {
+          "verbs": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "context": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "UnlockUsersRequestModel": {
         "required": [
           "userIds"
@@ -32775,7 +32813,10 @@
                   "$ref": "#/components/schemas/DocumentPermissionModel"
                 },
                 {
-                  "$ref": "#/components/schemas/GlobalPermissionModel"
+                  "$ref": "#/components/schemas/FallbackPermissionModel"
+                },
+                {
+                  "$ref": "#/components/schemas/UnknownTypePermissionModel"
                 }
               ]
             }
@@ -33243,6 +33284,8 @@
         },
         "additionalProperties": false
       }
+    },
+    },
     },
     "securitySchemes": {
       "Backoffice User": {

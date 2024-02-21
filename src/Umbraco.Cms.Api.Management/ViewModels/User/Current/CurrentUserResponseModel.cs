@@ -1,3 +1,6 @@
+using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
+using Umbraco.Cms.Core.Models.Membership;
+
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;
 
 public class CurrentUserResponseModel
@@ -22,5 +25,5 @@ public class CurrentUserResponseModel
 
     public required bool HasAccessToAllLanguages { get; init; }
 
-    public required ISet<string> Permissions { get; init; }
+    public required ISet<IPermissionViewModel> Permissions { get; init; }
 }

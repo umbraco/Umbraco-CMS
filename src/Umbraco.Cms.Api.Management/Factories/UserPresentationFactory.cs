@@ -157,7 +157,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         var mediaStartNodeKeys = GetKeysFromIds(user.CalculateMediaStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Media);
         var documentStartNodeKeys = GetKeysFromIds(user.CalculateContentStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Document);
 
-        var permissions = presentationGroups.SelectMany(x => x.Permissions).Distinct().ToHashSet();
+        var permissions = presentationGroups.SelectMany(x => x.Permissions).ToHashSet();
+
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
 
         return await Task.FromResult(new CurrentUserResponseModel()
@@ -171,7 +172,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             LanguageIsoCode = presentationUser.LanguageIsoCode,
             MediaStartNodeIds = mediaStartNodeKeys,
             DocumentStartNodeIds = documentStartNodeKeys,
-            Permissions = permissions.Select(x=>x.Verb).ToHashSet(),
+            Permissions = permissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages
         });
     }

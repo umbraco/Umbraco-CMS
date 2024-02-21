@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -182,7 +183,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
             from permission in permissions
             select new UserGroup2GranularPermissionDto()
             {
-                Permission = permission, UniqueId = idToKey[entityId], UserGroupKey = userGroupKey
+                Permission = permission, UniqueId = idToKey[entityId], UserGroupKey = userGroupKey, Context = DocumentGranularPermission.ContextType
             };
 
         db.InsertBulk(toInsert);
@@ -225,7 +226,8 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
                 {
                     Permission = permission,
                     UniqueId = idToKey[e],
-                    UserGroupKey = userGroupKey
+                    UserGroupKey = userGroupKey,
+                    Context = DocumentGranularPermission.ContextType
                 });
 
         db.InsertBulk(toInsert);
@@ -258,7 +260,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
 
         var toInsert = groupIds.Select(x => new UserGroup2GranularPermissionDto()
         {
-            Permission = permission, UniqueId = entity.Key, UserGroupKey = idToKey[x]
+            Permission = permission, UniqueId = entity.Key, UserGroupKey = idToKey[x], Context = DocumentGranularPermission.ContextType
         });
 
         db.InsertBulk(toInsert);
@@ -301,7 +303,8 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
                 {
                     Permission = p,
                     UniqueId = entityKey,
-                    UserGroupKey = idToKey[x.UserGroupId]
+                    UserGroupKey = idToKey[x.UserGroupId],
+                    Context = DocumentGranularPermission.ContextType
                 }));
 
         db.InsertBulk(toInsert);

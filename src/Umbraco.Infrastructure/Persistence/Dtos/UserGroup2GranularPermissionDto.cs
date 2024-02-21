@@ -15,13 +15,17 @@ internal class UserGroup2GranularPermissionDto
 
     [Column("uniqueId")]
     [ForeignKey(typeof(NodeDto), Column = "uniqueId")]
-    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [NullSetting(NullSetting = NullSettings.Null)]
     [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserGroup2GranularPermissionDto_UniqueId")]
-    public Guid UniqueId { get; set; }
+    public Guid? UniqueId { get; set; }
 
     [Column("permission")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    public string Permission { get; set; } = string.Empty;
+    public required string Permission { get; set; }
+
+    [Column("context")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    public required string Context { get; set; }
 }
 
 

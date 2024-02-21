@@ -1,5 +1,6 @@
 using System.Globalization;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
@@ -41,18 +42,40 @@ internal static class UserGroupFactory
                 userGroup.AddAllowedLanguage(language.LanguageId);
             }
 
+            //TODO move to it's own factory
             foreach (UserGroup2PermissionDto permission in dto.UserGroup2PermissionDtos)
             {
                 userGroup.Permissions.Add(permission.Permission);
             }
-
+            //TODO move to it's own factory
             foreach (UserGroup2GranularPermissionDto granularPermission in dto.UserGroup2GranularPermissionDtos)
             {
-                userGroup.GranularPermissions.Add(new GranularPermission()
+                IGranularPermission toInsert;
+
+                if (granularPermission.Context == DocumentGranularPermission.ContextType)
                 {
-                    Key = granularPermission.UniqueId,
-                    Permission = granularPermission.Permission
-                });
+                    toInsert = new DocumentGranularPermission()
+                    {
+                        Key = granularPermission.UniqueId!.Value, Permission = granularPermission.Permission
+                    };
+                }
+                // else if (granularPermission.Context == MediaGranularPermission.ContextType)
+                // {
+                //     toInsert = new MediaGranularPermission()
+                //     {
+                //         Key = granularPermission.UniqueId!.Value, Permission = granularPermission.Permission
+                //     };
+                // }
+                else
+                {
+                    toInsert = new UnknownTypeGranularPermission()
+                    {
+                        Permission = granularPermission.Permission,
+                        Context = granularPermission.Context,
+                    };
+                }
+
+                userGroup.GranularPermissions.Add(toInsert);
             }
 
             userGroup.ResetDirtyProperties(false);

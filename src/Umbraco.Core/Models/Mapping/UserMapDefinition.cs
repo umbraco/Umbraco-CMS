@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;

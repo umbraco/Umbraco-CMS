@@ -166,7 +166,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
             foreach (var p in permissionsToCheck)
             {
-                if (permissionSet.GetAllPermissions().Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
+                if (permissionSet.GetAllPermissions().Contains(p) == false)
                 {
                     return false;
                 }
