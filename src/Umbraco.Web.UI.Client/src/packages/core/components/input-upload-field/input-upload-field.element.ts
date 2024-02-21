@@ -209,7 +209,6 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderFiles() {
-		console.log('files', this._files);
 		return repeat(
 			this._files,
 			(path) => path,
