@@ -37,7 +37,7 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	}
 
 	getDomainsForDocument(id: string): DomainsResponseModel {
-		return { defaultIsoCode: 'en', domains: [] };
+		return { defaultIsoCode: 'en-us', domains: [] };
 	}
 }
 

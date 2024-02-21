@@ -1,6 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 
 import type { DebugContextData, DebugContextItemData } from '@umbraco-cms/backoffice/context-api';
 import { contextData, UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
@@ -31,9 +31,15 @@ export class UmbDebugElement extends UmbLitElement {
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	render() {
+		if (this.visible) {
+			return this.dialog ? this._renderDialog() : this._renderPanel();
+		} else {
+			return nothing;
+		}
+	}
 
+	private _update() {
 		// Dispatch it
 		this.dispatchEvent(
 			new UmbContextDebugRequest((contexts: Map<any, any>) => {
@@ -46,20 +52,16 @@ export class UmbDebugElement extends UmbLitElement {
 				// Massage the data into a simplier array of objects
 				// From a function in the context-api '
 				this.contextData = contextData(contexts);
+				this.requestUpdate('contextData');
 			}),
 		);
 	}
 
-	render() {
-		if (this.visible) {
-			return this.dialog ? this._renderDialog() : this._renderPanel();
-		} else {
-			return nothing;
-		}
-	}
-
 	private _toggleDebugPane() {
 		this._debugPaneOpen = !this._debugPaneOpen;
+		if (this._debugPaneOpen) {
+			this._update();
+		}
 	}
 
 	private _openDialog() {
@@ -96,21 +98,19 @@ export class UmbDebugElement extends UmbLitElement {
 	}
 
 	private _renderContextAliases() {
-		const contextsTemplates: TemplateResult[] = [];
-
-		this.contextData.forEach((contextData) => {
-			contextsTemplates.push(
-				html` <li>
+		return repeat(
+			this.contextData,
+			(contextData) => contextData.alias,
+			(contextData) => {
+				return html` <li>
 					Context: <strong>${contextData.alias}</strong>
 					<em>(${contextData.type})</em>
 					<ul>
 						${this._renderInstance(contextData.data)}
 					</ul>
-				</li>`,
-			);
-		});
-
-		return contextsTemplates;
+				</li>`;
+			},
+		);
 	}
 
 	private _renderInstance(instance: DebugContextItemData) {

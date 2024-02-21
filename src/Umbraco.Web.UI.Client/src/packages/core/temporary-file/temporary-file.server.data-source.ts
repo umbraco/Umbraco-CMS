@@ -30,7 +30,7 @@ export class UmbTemporaryFileServerDataSource {
 	async create(id: string, file: File) {
 		return tryExecuteAndNotify(
 			this.#host,
-			TemporaryFileResource.postTemporaryfile({
+			TemporaryFileResource.postTemporaryFile({
 				formData: {
 					Id: id,
 					File: file,
@@ -47,7 +47,7 @@ export class UmbTemporaryFileServerDataSource {
 	 */
 	read(id: string) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, TemporaryFileResource.getTemporaryfileById({ id }));
+		return tryExecuteAndNotify(this.#host, TemporaryFileResource.getTemporaryFileById({ id }));
 	}
 
 	/**
@@ -58,6 +58,6 @@ export class UmbTemporaryFileServerDataSource {
 	 */
 	delete(id: string) {
 		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, TemporaryFileResource.deleteTemporaryfileById({ id }));
+		return tryExecuteAndNotify(this.#host, TemporaryFileResource.deleteTemporaryFileById({ id }));
 	}
 }
