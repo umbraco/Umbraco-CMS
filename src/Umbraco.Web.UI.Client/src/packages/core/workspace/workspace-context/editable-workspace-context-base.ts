@@ -1,12 +1,12 @@
+import { UMB_WORKSPACE_CONTEXT } from './workspace-context.token.js';
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export abstract class UmbEditableWorkspaceContextBase<WorkspaceData>
+export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 	extends UmbBaseController
 	implements UmbSaveableWorkspaceContextInterface
 {
@@ -35,7 +35,7 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceData>
 		this.#isNew.setValue(isNew);
 	}
 
-	protected saveComplete(data: WorkspaceData) {
+	protected saveComplete(data: WorkspaceDataModelType) {
 		if (this.modalContext) {
 			this.modalContext?.setValue(data);
 			this.modalContext?.submit();
@@ -46,7 +46,7 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceData>
 	}
 
 	abstract getEntityId(): string | undefined; // TODO: Consider if this should go away/be renamed? now that we have getUnique()
-	abstract getEntityType(): string; // TODO: consider if this should be on the repository because a repo is responsible for one entity type
-	abstract getData(): WorkspaceData | undefined;
+	abstract getEntityType(): string;
+	abstract getData(): WorkspaceDataModelType | undefined;
 	abstract save(): Promise<void>;
 }

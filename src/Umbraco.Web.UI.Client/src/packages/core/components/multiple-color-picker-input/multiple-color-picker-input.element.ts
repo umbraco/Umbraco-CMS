@@ -12,16 +12,16 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { type UmbInputEvent, UmbChangeEvent, type UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
-const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails> = {
-	compareElementToModel: (element: HTMLElement, model: UmbSwatchDetails) => {
-		return element.getAttribute('data-sort-entry-id') === model.value;
+const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails, UmbMultipleColorPickerItemInputElement> = {
+	getUniqueOfElement: (element) => {
+		return element.value.toString();
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbSwatchDetails) => {
-		return container.querySelector('[data-sort-entry-id=' + modelEntry.value + ']');
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.value;
 	},
 	identifier: 'Umb.SorterIdentifier.ColorEditor',
 	itemSelector: 'umb-multiple-color-picker-item-input',
@@ -192,7 +192,6 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 					html` <umb-multiple-color-picker-item-input
 						?showLabels=${this.showLabels}
 						value=${item.value}
-						data-sort-entry-id=${item.value}
 						label=${ifDefined(item.label)}
 						name="item-${index}"
 						@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}

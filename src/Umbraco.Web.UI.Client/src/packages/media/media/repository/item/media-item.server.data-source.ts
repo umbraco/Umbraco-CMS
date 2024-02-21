@@ -1,6 +1,6 @@
 import type { UmbMediaItemModel } from './types.js';
-import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { MediaResource } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 
@@ -28,7 +28,7 @@ export class UmbMediaItemServerDataSource extends UmbItemServerDataSourceBase<
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => MediaResource.getMediaItem({ id: uniques });
+const getItems = (uniques: Array<string>) => MediaResource.getItemMedia({ id: uniques });
 
 const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 	return {

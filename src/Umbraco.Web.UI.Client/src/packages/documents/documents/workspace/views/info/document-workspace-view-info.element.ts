@@ -1,13 +1,18 @@
 import { TimeOptions } from './utils.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT,
+	UMB_TEMPLATE_PICKER_MODAL,
+	UMB_WORKSPACE_MODAL,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
 import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
-import type { ContentUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
@@ -20,16 +25,21 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
 	private _documentUnique = '';
 
-	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
+	@state()
+	private _templateUnique = '';
+
+	private _workspaceContext?: UmbDocumentWorkspaceContext;
 
 	@state()
 	private _editDocumentTypePath = '';
 
 	@state()
-	private _urls?: Array<ContentUrlInfoModel>;
+	private _urls?: Array<DocumentUrlInfoModel>;
 
 	@state()
 	private _createDate = 'Unknown';
+
+	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -44,8 +54,12 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			});
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (nodeContext) => {
-			this._workspaceContext = nodeContext;
+			this._workspaceContext = nodeContext as UmbDocumentWorkspaceContext;
 			this._observeContent();
+		});
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManagerContext) => {
+			this.#modalManagerContext = modalManagerContext;
 		});
 	}
 
@@ -54,18 +68,30 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		this._nodeName = 'TBD, with variants this is not as simple.';
 
-		this._documentTypeId = (this._workspaceContext as UmbDocumentWorkspaceContext).getContentTypeId()!;
+		this._documentTypeId = this._workspaceContext.getContentTypeId()!;
 
-		this.observe((this._workspaceContext as UmbDocumentWorkspaceContext).urls, (urls) => {
+		this.observe(this._workspaceContext.urls, (urls) => {
 			this._urls = urls;
 		});
 
-		this.observe((this._workspaceContext as UmbDocumentWorkspaceContext).unique, (unique) => {
-			this._documentUnique = unique!;
-		});
+		this.observe(
+			this._workspaceContext.unique,
+			(unique) => {
+				this._documentUnique = unique!;
+			},
+			'_documentUnique',
+		);
+
+		this.observe(
+			this._workspaceContext.templateId,
+			(templateUnique) => {
+				this._templateUnique = templateUnique!;
+			},
+			'_templateUnique',
+		);
 
 		/** TODO: Doubt this is the right way to get the create date... */
-		this.observe((this._workspaceContext as UmbDocumentWorkspaceContext).variants, (variants) => {
+		this.observe(this._workspaceContext.variants, (variants) => {
 			this._createDate = Array.isArray(variants) ? variants[0].createDate || 'Unknown' : 'Unknown';
 		});
 	}
@@ -136,13 +162,38 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="template_template"></umb-localize></strong>
-				<uui-button look="secondary" label="Template picker TODO"></uui-button>
+				<uui-button
+					look="secondary"
+					label="${this.localize.term('template_template')}"
+					@click=${this.#openTemplatePicker}></uui-button>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="template_id"></umb-localize></strong>
 				<span>${this._documentTypeId}</span>
 			</div>
 		`;
+	}
+
+	async #openTemplatePicker() {
+		const modal = this.#modalManagerContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+			data: {
+				hideTreeRoot: true,
+				multiple: false,
+			},
+			value: {
+				selection: [this._templateUnique],
+			},
+		});
+
+		const result = await modal?.onSubmit().catch(() => undefined);
+
+		if (!result?.selection.length) return;
+
+		const templateUnique = result.selection[0];
+
+		if (!templateUnique) return;
+
+		this._workspaceContext?.setTemplate(templateUnique);
 	}
 
 	static styles = [

@@ -1,15 +1,14 @@
 import type { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { UmbDocumentWorkspaceEditorElement } from './document-workspace-editor.element.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement {
@@ -36,7 +35,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 				component: this.#editorElement,
 				setup: async (_component, info) => {
 					// TODO: Remember the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
-					const parentUnique = info.match.params.parentId === 'null' ? null : info.match.params.parentUnique;
+					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
 					this.#workspaceContext!.create(parentUnique, documentTypeUnique);
 

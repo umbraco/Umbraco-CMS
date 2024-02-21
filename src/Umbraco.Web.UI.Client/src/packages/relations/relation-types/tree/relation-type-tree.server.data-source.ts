@@ -1,6 +1,6 @@
 import type { UmbRelationTypeTreeItemModel } from './types.js';
-import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { RelationTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
@@ -41,8 +41,8 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbRelationTypeTreeItemModel => {
 	return {
-		id: item.id,
-		parentId: item.parent ? item.parent.id : null,
+		unique: item.id,
+		parentUnique: item.parent ? item.parent.id : null,
 		name: item.name,
 		entityType: 'relation-type',
 		hasChildren: item.hasChildren,

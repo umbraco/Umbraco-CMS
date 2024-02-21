@@ -3,10 +3,9 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import type {
 	PagedRedirectUrlResponseModel,
 	RedirectUrlResponseModel,
-	RedirectUrlStatusResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	RedirectStatusModel
-} from '@umbraco-cms/backoffice/backend-api';
+	RedirectUrlStatusResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/redirect-management'), (_req, res, ctx) => {
@@ -100,77 +99,77 @@ const RedirectUrlData: RedirectUrlResponseModel[] = [
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'kitty.com',
 		originalUrl: 'kitty.dk',
-		contentId: '7191c911-6747-4824-849e-5208e2b31d9f2',
+		document: { id: '7191c911-6747-4824-849e-5208e2b31d9f2' },
 	},
 	{
 		id: '2',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'umbraco.com',
 		originalUrl: 'umbraco.dk',
-		contentId: '7191c911-6747-4824-849e-5208e2b31d9f',
+		document: { id: '7191c911-6747-4824-849e-5208e2b31d9f' },
 	},
 	{
 		id: '3',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'uui.umbraco.com',
 		originalUrl: 'uui.umbraco.dk',
-		contentId: '7191c911-6747-4824-849e-5208e2b31d9f23',
+		document: { id: '7191c911-6747-4824-849e-5208e2b31d9f23' },
 	},
 	{
 		id: '4',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'umbracoffee.com',
 		originalUrl: 'umbracoffee.dk',
-		contentId: '7191c911-6747-4824-849e-5208e2b31d9fdsaa',
+		document: { id: '7191c911-6747-4824-849e-5208e2b31d9fdsaa' },
 	},
 	{
 		id: '5',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'section/settings',
 		originalUrl: 'section/settings/123',
-		contentId: '7191c911-6747-4824-849e-5208e2b31d9f2e23',
+		document: { id: '7191c911-6747-4824-849e-5208e2b31d9f2e23' },
 	},
 	{
 		id: '6',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'dxp.com',
 		originalUrl: 'dxp.dk',
-		contentId: '7191c911-6747-4824-849e-5208e2b31d9fsafsfd',
+		document: { id: '7191c911-6747-4824-849e-5208e2b31d9fsafsfd' },
 	},
 	{
 		id: '7',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'google.com',
 		originalUrl: 'google.dk',
-		contentId: '7191c911-6747-4824-849e-5208e2b31d9f2cxza',
+		document: { id: '7191c911-6747-4824-849e-5208e2b31d9f2cxza' },
 	},
 	{
 		id: '8',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'unicorns.com',
 		originalUrl: 'unicorns.dk',
-		contentId: '7191c911-6747-4824-849e-5208e2b31d9fweds',
+		document: { id: '7191c911-6747-4824-849e-5208e2b31d9fweds' },
 	},
 	{
 		id: '9',
 		created: '2022-12-05T13:59:43.6827244',
 		destinationUrl: 'h5yr.com',
 		originalUrl: 'h5yr.dk',
-		contentId: '7191c911-6747-4824-849e-5208e2b31ddsfsdsfadsfdx9f2',
+		document: { id: '7191c911-6747-4824-849e-5208e2b31ddsfsdsfadsfdx9f2' },
 	},
 	{
 		id: '10',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'our.umbraco.com',
 		originalUrl: 'our.umbraco.dk',
-		contentId: '7191c911-6747-4824-849e-52dsacx08e2b31d9dsafdsff',
+		document: { id: '7191c911-6747-4824-849e-52dsacx08e2b31d9dsafdsff' },
 	},
 	{
 		id: '11',
 		created: '2022-13-05T13:59:43.6827244',
 		destinationUrl: 'your.umbraco.com',
 		originalUrl: 'your.umbraco.dk',
-		contentId: '7191c911-6747-4824-849e-52dsacx08e2b31d9fsda',
+		document: { id: '7191c911-6747-4824-849e-52dsacx08e2b31d9fsda' },
 	},
 ];
 

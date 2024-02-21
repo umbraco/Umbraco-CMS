@@ -18,6 +18,27 @@ import { request as __request } from '../core/request';
 export class StylesheetResource {
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemStylesheet({
+        path,
+    }: {
+        path?: Array<string>,
+    }): CancelablePromise<Array<StylesheetItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/stylesheet',
+            query: {
+                'path': path,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns string Created
      * @throws ApiError
      */
@@ -204,27 +225,6 @@ export class StylesheetResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getStylesheetItem({
-        path,
-    }: {
-        path?: Array<string>,
-    }): CancelablePromise<Array<StylesheetItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/stylesheet/item',
-            query: {
-                'path': path,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

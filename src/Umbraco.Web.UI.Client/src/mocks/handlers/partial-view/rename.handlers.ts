@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbPartialViewMockDB } from '../../data/partial-view/partial-view.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { RenameStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { RenameStylesheetRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const renameHandlers = [

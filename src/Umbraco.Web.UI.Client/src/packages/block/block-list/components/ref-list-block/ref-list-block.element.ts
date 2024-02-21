@@ -1,7 +1,6 @@
-import { UMB_BLOCK_LIST_CONTEXT } from '../../context/block-list.context-token.js';
+import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-ref-list-block
@@ -10,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export class UmbRefListBlockElement extends UmbLitElement {
 	//
 	@property({ type: String })
-	name?: string;
+	label?: string;
 
 	@state()
 	_workspaceEditPath?: string;
@@ -18,9 +17,10 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_BLOCK_LIST_CONTEXT, (context) => {
+		// UMB_BLOCK_LIST_ENTRY_CONTEXT
+		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.observe(
-				context.workspaceEditPath,
+				context.workspaceEditContentPath,
 				(workspaceEditPath) => {
 					this._workspaceEditPath = workspaceEditPath;
 				},
@@ -30,14 +30,15 @@ export class UmbRefListBlockElement extends UmbLitElement {
 	}
 
 	render() {
-		// href=${this._workspaceEditPath ?? '#'}
-		return html`<uui-ref-node border .name=${this.name ?? ''}></uui-ref-node>`;
+		return html`<uui-ref-node
+			standalone
+			.name=${this.label ?? ''}
+			href=${this._workspaceEditPath ?? '#'}></uui-ref-node>`;
 	}
 
 	static styles = [
-		...UUIRefNodeElement.styles,
 		css`
-			:host {
+			uui-ref-node {
 				min-height: var(--uui-size-16);
 			}
 		`,

@@ -1,5 +1,5 @@
-import { UMB_STATIC_FILE_TREE_ALIAS } from '@umbraco-cms/backoffice/static-file';
-import type { StaticFileItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_STATIC_FILE_TREE_ALIAS } from '../tree/manifests.js';
+import type { StaticFileItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 

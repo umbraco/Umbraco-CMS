@@ -1,6 +1,6 @@
 import type { UmbDocumentItemModel } from './types.js';
-import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 
@@ -28,7 +28,7 @@ export class UmbDocumentItemServerDataSource extends UmbItemServerDataSourceBase
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DocumentResource.getDocumentItem({ id: uniques });
+const getItems = (uniques: Array<string>) => DocumentResource.getItemDocument({ id: uniques });
 
 const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 	return {
@@ -38,7 +38,7 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 		documentType: {
 			unique: item.documentType.id,
 			icon: item.documentType.icon,
-			hasListView: item.documentType.hasListView,
+			hasCollection: item.documentType.hasListView,
 		},
 		variants: item.variants.map((variant) => {
 			return {

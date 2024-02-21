@@ -1,8 +1,8 @@
 import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbStylesheetTreeItemModel } from './types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
+import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { StylesheetResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
@@ -56,5 +56,6 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeIte
 		name: item.name,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
+		icon: item.isFolder ? undefined : 'icon-brush-alt',
 	};
 };

@@ -10,7 +10,7 @@ import type {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 

@@ -105,4 +105,9 @@ export class UmbExtensionElementInitializer<
 			this.#component = undefined;
 		}
 	}
+
+	public destroy(): void {
+		super.destroy();
+		this.#properties = undefined;
+	}
 }

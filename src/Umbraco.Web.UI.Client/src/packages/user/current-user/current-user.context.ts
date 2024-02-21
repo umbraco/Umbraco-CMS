@@ -1,21 +1,21 @@
-import type { UmbCurrentUser } from './types.js';
+import type { UmbCurrentUserModel } from './types.js';
+import { UmbCurrentUserRepository } from './repository/index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 export class UmbCurrentUserContext extends UmbBaseController {
-	#currentUser = new UmbObjectState<UmbCurrentUser | undefined>(undefined);
+	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
 
-	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode ?? 'en-us');
+	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode);
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#currentUserRepository = new UmbCurrentUserRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -26,6 +26,7 @@ export class UmbCurrentUserContext extends UmbBaseController {
 		});
 
 		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
+			if (!currentLanguageIsoCode) return;
 			umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
 		});
 
@@ -33,22 +34,23 @@ export class UmbCurrentUserContext extends UmbBaseController {
 	}
 
 	async requestCurrentUser() {
-		// TODO: use repository
-		const { data, error } = await tryExecuteAndNotify(this._host, UserResource.getUserCurrent());
-		// TODO: add current user store
-		this.#currentUser.setValue(data);
-		return { data, error };
+		const { data } = await this.#currentUserRepository.requestCurrentUser();
+
+		if (data) {
+			// TODO: observe current user
+			this.#currentUser.setValue(data);
+		}
 	}
 
 	/**
 	 * Checks if a user is the current user.
 	 *
-	 * @param userId The user id to check
+	 * @param userUnique The user id to check
 	 * @returns True if the user is the current user, otherwise false
 	 */
-	async isUserCurrentUser(userId: string): Promise<boolean> {
+	async isUserCurrentUser(userUnique: string): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);
-		return currentUser?.id === userId;
+		return currentUser?.unique === userUnique;
 	}
 
 	#observeIsAuthorized() {

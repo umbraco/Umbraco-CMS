@@ -1,18 +1,9 @@
-import type { UmbUserDetailModel, UmbUserDetailDataSource } from '../../types.js';
+import type { UmbUserDetailModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
-import type {
-	DataSourceResponse,
-	UmbDataSourceErrorResponse} from '@umbraco-cms/backoffice/repository';
-import {
-	extendDataSourceResponseData,
-} from '@umbraco-cms/backoffice/repository';
-import type {
-	CreateUserRequestModel,
-	UpdateUserRequestModel,
-	UserPresentationBaseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	UserResource,
-} from '@umbraco-cms/backoffice/backend-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { CreateUserRequestModel, UpdateUserRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -22,7 +13,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbUserServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbUserServerDataSource implements UmbUserDetailDataSource {
+export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -34,94 +25,156 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 		this.#host = host;
 	}
 
-	// Details
-	createScaffold(parentId: string | null): Promise<DataSourceResponse<UserPresentationBaseModel>> {
-		throw new Error('Method not implemented.');
+	/**
+	 * Creates a new User scaffold
+	 * @param {(string | null)} parentUnique
+	 * @return { CreateUserRequestModel }
+	 * @memberof UmbUserServerDataSource
+	 */
+	async createScaffold() {
+		const data: UmbUserDetailModel = {
+			avatarUrls: [],
+			documentStartNodeUniques: [],
+			createDate: null,
+			email: '',
+			entityType: UMB_USER_ENTITY_TYPE,
+			failedLoginAttempts: 0,
+			languageIsoCode: '',
+			lastLockoutDate: null,
+			lastLoginDate: null,
+			lastPasswordChangeDate: null,
+			mediaStartNodeUniques: [],
+			name: '',
+			state: null,
+			unique: UmbId.new(),
+			updateDate: null,
+			userGroupUniques: [],
+			userName: '',
+		};
+
+		return { data };
 	}
 
 	/**
-	 * Gets the user with the given id
-	 * @param {string} id
+	 * Fetches a User with the given id from the server
+	 * @param {string} unique
 	 * @return {*}
 	 * @memberof UmbUserServerDataSource
 	 */
-	async read(id: string) {
-		if (!id) throw new Error('Unique is missing');
+	async read(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id: unique }));
 
 		if (error || !data) {
 			return { error };
 		}
 
 		// TODO: make data mapper to prevent errors
-		// TODO: use unique
-		const user: UmbUserDetailModel = {
-			entityType: 'user',
-			...data,
+		const dataType: UmbUserDetailModel = {
+			avatarUrls: data.avatarUrls,
+			documentStartNodeUniques: data.documentStartNodeIds,
+			createDate: data.createDate,
+			email: data.email,
+			entityType: UMB_USER_ENTITY_TYPE,
+			failedLoginAttempts: data.failedLoginAttempts,
+			languageIsoCode: data.languageIsoCode || null,
+			lastLockoutDate: data.lastLockoutDate || null,
+			lastLoginDate: data.lastLoginDate || null,
+			lastPasswordChangeDate: data.lastPasswordChangeDate || null,
+			mediaStartNodeUniques: data.mediaStartNodeIds,
+			name: data.name,
+			state: data.state,
+			unique: data.id,
+			updateDate: data.updateDate,
+			userGroupUniques: data.userGroupIds,
+			userName: data.userName,
 		};
 
-		return { data: user };
+		return { data: dataType };
 	}
 
 	/**
-	 * Creates a new user
-	 * @param {CreateUserRequestModel} data
+	 * Inserts a new User on the server
+	 * @param {UmbUserDetailModel} model
 	 * @return {*}
 	 * @memberof UmbUserServerDataSource
 	 */
-	create(data: CreateUserRequestModel) {
-		return tryExecuteAndNotify(this.#host, UserResource.postUser({ requestBody: data }));
+	async create(model: UmbUserDetailModel) {
+		if (!model) throw new Error('User is missing');
+
+		// TODO: make data mapper to prevent errors
+		const requestBody: CreateUserRequestModel = {
+			email: model.email,
+			name: model.name,
+			userGroupIds: model.userGroupUniques,
+			userName: model.userName,
+		};
+
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			UserResource.postUser({
+				requestBody,
+			}),
+		);
+
+		if (data) {
+			// TODO: get back to this when we get a location header
+			return this.read(data.user.id);
+		}
+
+		return { error };
 	}
 
 	/**
-	 * Updates the user with the given id
-	 * @param {string} id
-	 * @param {UpdateUserRequestModel} data
+	 * Updates a User on the server
+	 * @param {UmbUserDetailModel} User
 	 * @return {*}
 	 * @memberof UmbUserServerDataSource
 	 */
-	update(id: string, data: UpdateUserRequestModel) {
-		if (!id) throw new Error('Id is missing');
+	async update(model: UmbUserDetailModel) {
+		if (!model.unique) throw new Error('Unique is missing');
+
+		// TODO: make data mapper to prevent errors
+		const requestBody: UpdateUserRequestModel = {
+			documentStartNodeIds: model.documentStartNodeUniques,
+			email: model.email,
+			languageIsoCode: model.languageIsoCode || '',
+			mediaStartNodeIds: model.mediaStartNodeUniques,
+			name: model.name,
+			userGroupIds: model.userGroupUniques,
+			userName: model.userName,
+		};
+
+		const { error } = await tryExecuteAndNotify(
+			this.#host,
+			UserResource.putUserById({
+				id: model.unique,
+				requestBody,
+			}),
+		);
+
+		if (!error) {
+			return this.read(model.unique);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Deletes a User on the server
+	 * @param {string} unique
+	 * @return {*}
+	 * @memberof UmbUserServerDataSource
+	 */
+	async delete(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.putUserById({
-				id,
-				requestBody: data,
+			UserResource.deleteUserById({
+				id: unique,
 			}),
 		);
-	}
-
-	/**
-	 * Deletes the user with the given id
-	 * @param {string} id
-	 * @return {*}
-	 * @memberof UmbUserServerDataSource
-	 */
-	delete(id: string) {
-		if (!id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, UserResource.deleteUserById({ id }));
-	}
-
-	/**
-	 * Creates an avatar for the user with the given id based on a temporary uploaded file
-	 * @param {string} id
-	 * @param {string} fileId
-	 * @return {*}  {Promise<UmbDataSourceErrorResponse>}
-	 * @memberof UmbUserServerDataSource
-	 */
-	createAvatar(id: string, fileId: string): Promise<UmbDataSourceErrorResponse> {
-		return tryExecuteAndNotify(this.#host, UserResource.postUserAvatarById({ id, requestBody: { fileId } }));
-	}
-
-	/**
-	 * Deletes the avatar for the user with the given id
-	 * @param {string} id
-	 * @return {*}  {Promise<UmbDataSourceErrorResponse>}
-	 * @memberof UmbUserServerDataSource
-	 */
-	deleteAvatar(id: string): Promise<UmbDataSourceErrorResponse> {
-		return tryExecuteAndNotify(this.#host, UserResource.deleteUserAvatarById({ id }));
 	}
 }

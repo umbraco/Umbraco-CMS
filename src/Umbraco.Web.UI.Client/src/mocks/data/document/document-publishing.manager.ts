@@ -1,7 +1,10 @@
 import type { UmbMockDocumentModel } from './document.data.js';
 import type { UmbDocumentMockDB } from './document.db.js';
-import type { PublishDocumentRequestModel, UnpublishDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	PublishDocumentRequestModel,
+	UnpublishDocumentRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMockDocumentPublishingManager {
 	#documentDb: UmbDocumentMockDB;
@@ -14,10 +17,10 @@ export class UmbMockDocumentPublishingManager {
 		const document: UmbMockDocumentModel = this.#documentDb.detail.read(id);
 
 		document?.variants?.forEach((variant) => {
-			const hasCulture = variant.culture && data.cultures?.includes(variant.culture);
+			const hasCulture = variant.culture && data.publishSchedules.find((x) => x.culture === variant.culture);
 
 			if (hasCulture) {
-				variant.state = ContentStateModel.PUBLISHED;
+				variant.state = DocumentVariantStateModel.PUBLISHED;
 			}
 		});
 
@@ -31,7 +34,7 @@ export class UmbMockDocumentPublishingManager {
 			const hasCulture = variant.culture && data.culture === variant.culture;
 
 			if (hasCulture) {
-				variant.state = ContentStateModel.DRAFT;
+				variant.state = DocumentVariantStateModel.DRAFT;
 			}
 		});
 

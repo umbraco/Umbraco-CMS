@@ -1,8 +1,8 @@
+import type { UmbStaticFileItemModel } from '../../repository/item/types.js';
 import { UmbStaticFilePickerContext } from './input-static-file.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { StaticFileItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-static-file')
@@ -68,7 +68,7 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items?: Array<StaticFileItemResponseModel>;
+	private _items?: Array<UmbStaticFileItemModel>;
 
 	#pickerContext = new UmbStaticFilePickerContext(this);
 
@@ -101,7 +101,7 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 				? html` <uui-ref-list
 						>${repeat(
 							this._items,
-							(item) => item.path,
+							(item) => item.unique,
 							(item) => this._renderItem(item),
 						)}
 				  </uui-ref-list>`
@@ -119,13 +119,15 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 			label=${this.localize.term('general_add')}></uui-button>`;
 	}
 
-	private _renderItem(item: StaticFileItemResponseModel) {
-		if (!item.path) return;
+	private _renderItem(item: UmbStaticFileItemModel) {
+		if (!item.unique) return;
 		return html`
-			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.path)}>
+			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.unique)}>
 				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.path!)} label="Remove file ${item.name}"
+					<uui-button
+						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
+						label="Remove file ${item.name}"
 						>Remove</uui-button
 					>
 				</uui-action-bar>

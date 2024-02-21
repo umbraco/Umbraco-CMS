@@ -2,11 +2,9 @@ import type {
 	MediaTypeItemResponseModel,
 	MediaTypeResponseModel,
 	MediaTypeTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockMediaTypeModelHack = MediaTypeResponseModel &
-	MediaTypeTreeItemResponseModel &
-	MediaTypeItemResponseModel;
+type UmbMockMediaTypeModelHack = MediaTypeResponseModel & MediaTypeTreeItemResponseModel & MediaTypeItemResponseModel;
 
 export interface UmbMockMediaTypeModel extends Omit<UmbMockMediaTypeModelHack, 'type'> {}
 

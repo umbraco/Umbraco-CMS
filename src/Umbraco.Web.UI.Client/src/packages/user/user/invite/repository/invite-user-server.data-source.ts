@@ -1,11 +1,6 @@
 import { UmbUserServerDataSource } from '../../repository/detail/user-detail.server.data-source.js';
-import type { UmbInviteUserDataSource } from './types.js';
-import type {
-	InviteUserRequestModel,
-	ResendInviteUserRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	UserResource,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { UmbInviteUserDataSource, UmbInviteUserRequestModel, UmbResendUserInviteRequestModel } from './types.js';
+import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -29,22 +24,30 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Invites a user
-	 * @param {InviteUserRequestModel} requestModel
+	 * @param {UmbInviteUserRequestModel} request
 	 * @returns
 	 * @memberof UmbInviteUserServerDataSource
 	 */
-	async invite(requestModel: InviteUserRequestModel) {
-		if (!requestModel) throw new Error('Data is missing');
+	async invite(request: UmbInviteUserRequestModel) {
+		if (!request) throw new Error('Request Data is missing');
 
-		const { data: newUserId, error } = await tryExecuteAndNotify(
+		const requestBody = {
+			email: request.email,
+			userName: request.userName,
+			name: request.name,
+			userGroupIds: request.userGroupUniques,
+			message: request.message,
+		};
+
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			UserResource.postUserInvite({
-				requestBody: requestModel,
+				requestBody,
 			}),
 		);
 
-		if (newUserId) {
-			return this.#detailSource.read(newUserId);
+		if (data) {
+			return this.#detailSource.read(data);
 		}
 
 		return { error };
@@ -52,19 +55,25 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Resend an invite to a user
-	 * @param {string} userUnique
-	 * @param {InviteUserRequestModel} requestModel
+	 * @param {UmbResendUserInviteRequestModel} request
 	 * @returns
 	 * @memberof UmbInviteUserServerDataSource
 	 */
-	async resendInvite(requestModel: ResendInviteUserRequestModel) {
-		if (!requestModel.userId) throw new Error('User id is missing');
-		if (!requestModel) throw new Error('Data is missing');
+	async resendInvite(request: UmbResendUserInviteRequestModel) {
+		if (!request.user.unique) throw new Error('User unique is missing');
+		if (!request) throw new Error('Request data is missing');
+
+		const requestBody = {
+			user: {
+				id: request.user.unique,
+			},
+			message: request.message,
+		};
 
 		return tryExecuteAndNotify(
 			this.#host,
 			UserResource.postUserInviteResend({
-				requestBody: requestModel,
+				requestBody,
 			}),
 		);
 	}

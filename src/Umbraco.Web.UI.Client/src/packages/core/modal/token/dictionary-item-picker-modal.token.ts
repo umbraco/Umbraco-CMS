@@ -1,8 +1,8 @@
-import type { UmbEntityTreeItemModel } from '../../tree/types.js';
+import type { UmbUniqueTreeItemModel } from '../../tree/types.js';
+import { UmbModalToken } from './modal-token.js';
 import type { UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export type UmbDictionaryItemPickerModalData = UmbTreePickerModalData<UmbEntityTreeItemModel>;
+export type UmbDictionaryItemPickerModalData = UmbTreePickerModalData<UmbUniqueTreeItemModel>;
 export type UmbDictionaryItemPickerModalValue = UmbPickerModalValue;
 
 export const UMB_DICTIONARY_ITEM_PICKER_MODAL = new UmbModalToken<
@@ -14,6 +14,7 @@ export const UMB_DICTIONARY_ITEM_PICKER_MODAL = new UmbModalToken<
 		size: 'small',
 	},
 	data: {
+		hideTreeRoot: true,
 		treeAlias: 'Umb.Tree.Dictionary',
 	},
 });

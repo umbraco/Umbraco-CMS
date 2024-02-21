@@ -2,7 +2,7 @@ import { UmbUserGroupWorkspaceContext } from './user-group-workspace.context.js'
 import { UmbUserGroupWorkspaceEditorElement } from './user-group-workspace-editor.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
@@ -27,11 +27,11 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 			},
 		},
 		{
-			path: 'edit/:id',
+			path: 'edit/:unique',
 			component: this.#createElement,
 			setup: (component, info) => {
-				const id = info.match.params.id;
-				this.#workspaceContext.load(id);
+				const unique = info.match.params.unique;
+				this.#workspaceContext.load(unique);
 			},
 		},
 	];

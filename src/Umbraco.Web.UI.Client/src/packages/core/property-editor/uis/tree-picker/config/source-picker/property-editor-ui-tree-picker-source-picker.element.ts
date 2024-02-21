@@ -6,7 +6,7 @@ import {
 	UmbPropertyValueChangeEvent,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-tree-picker-source-picker
@@ -37,8 +37,9 @@ export class UmbPropertyEditorUITreePickerSourcePickerElement
 	render() {
 		return html`<umb-input-tree-picker-source
 			@change=${this.#onChange}
-			.type=${this.value?.type}
-			.nodeId=${this.value?.id}></umb-input-tree-picker-source>`;
+			.type=${this.value?.type ?? 'content'}
+			.nodeId=${this.value?.id}
+			.dynamicRoot=${this.value?.dynamicRoot}></umb-input-tree-picker-source>`;
 	}
 
 	static styles = [UmbTextStyles];

@@ -2,11 +2,9 @@ import type {
 	FileSystemTreeItemPresentationModel,
 	ScriptItemResponseModel,
 	ScriptResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockScriptModelHack = ScriptResponseModel &
-	FileSystemTreeItemPresentationModel &
-	ScriptItemResponseModel;
+type UmbMockScriptModelHack = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
 
 export interface UmbMockScriptModel extends Omit<UmbMockScriptModelHack, 'type' | 'icon'> {}
 

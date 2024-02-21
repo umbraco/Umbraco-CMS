@@ -85,6 +85,11 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, alias, callback);
 		}
+
+		destroy(): void {
+			super.destroy();
+			(this.localize as any) = undefined;
+		}
 	}
 
 	return UmbElementMixinClass as unknown as HTMLElementConstructor<UmbElement> & T;

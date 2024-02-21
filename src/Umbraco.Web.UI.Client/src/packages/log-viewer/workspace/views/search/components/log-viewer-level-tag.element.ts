@@ -1,10 +1,10 @@
-import type { InterfaceColor, InterfaceLook } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, LitElement, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+import { html, LitElement, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import type { LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 interface LevelMapStyles {
-	look?: InterfaceLook;
-	color?: InterfaceColor;
+	look?: UUIInterfaceLook;
+	color?: UUIInterfaceColor;
 	style?: string;
 }
 

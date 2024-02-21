@@ -3,8 +3,8 @@ import { css, html, nothing, repeat, customElement, property, state } from '@umb
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbSorterConfig} from '@umbraco-cms/backoffice/sorter';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 export type MultipleTextStringValue = Array<MultipleTextStringValueItem>;
@@ -14,11 +14,11 @@ export interface MultipleTextStringValueItem {
 }
 
 const SORTER_CONFIG: UmbSorterConfig<MultipleTextStringValueItem> = {
-	compareElementToModel: (element: HTMLElement, model: MultipleTextStringValueItem) => {
-		return element.getAttribute('data-sort-entry-id') === model.value;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-sort-entry-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: MultipleTextStringValueItem) => {
-		return container.querySelector('[data-sort-entry-id=' + modelEntry.value + ']');
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.value;
 	},
 	identifier: 'Umb.SorterIdentifier.ColorEditor',
 	itemSelector: 'umb-input-multiple-text-string-item',

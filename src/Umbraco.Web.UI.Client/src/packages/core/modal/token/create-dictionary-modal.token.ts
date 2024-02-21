@@ -1,5 +1,5 @@
+import { UmbModalToken } from './modal-token.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCreateDictionaryModalData {
 	parentId: string | null;
@@ -14,7 +14,7 @@ export interface UmbCreateDictionaryModalValue {
 export const UMB_CREATE_DICTIONARY_MODAL = new UmbModalToken<
 	UmbCreateDictionaryModalData,
 	UmbCreateDictionaryModalValue
->('Umb.Modal.CreateDictionary', {
+>('Umb.Modal.Dictionary.Create', {
 	modal: {
 		type: 'sidebar',
 		size: 'small',

@@ -1,11 +1,11 @@
-import { UMB_BLOCK_LIST_CONTEXT } from '../../index.js';
+import { UMB_BLOCK_LIST_ENTRY_CONTEXT } from '../../index.js';
 import type { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../../block/index.js';
 import { UMB_BLOCK_WORKSPACE_ALIAS } from '../../../block/index.js';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import '../../../block/workspace/views/edit/block-workspace-view-edit-no-router.element.js';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
@@ -13,12 +13,12 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
  */
 @customElement('umb-inline-list-block')
 export class UmbInlineListBlockElement extends UmbLitElement {
-	#blockContext?: typeof UMB_BLOCK_LIST_CONTEXT.TYPE;
+	#blockContext?: typeof UMB_BLOCK_LIST_ENTRY_CONTEXT.TYPE;
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#contentUdi?: string;
 
-	@state()
-	_label = '';
+	@property({ type: String })
+	label?: string;
 
 	@state()
 	_isOpen = false;
@@ -26,27 +26,23 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_BLOCK_LIST_CONTEXT, (blockContext) => {
+		this.consumeContext(UMB_BLOCK_LIST_ENTRY_CONTEXT, (blockContext) => {
 			this.#blockContext = blockContext;
 			this.observe(
-				this.#blockContext.contentUdi,
+				this.#blockContext.unique,
 				(contentUdi) => {
 					this.#contentUdi = contentUdi;
 					this.#load();
 				},
 				'observeContentUdi',
 			);
-			this.observe(blockContext.label, (label) => {
-				this._label = label;
-			});
 		});
-		this.observe(umbExtensionsRegistry.getByTypeAndAlias('workspace', UMB_BLOCK_WORKSPACE_ALIAS), (manifest) => {
+		this.observe(umbExtensionsRegistry.byTypeAndAlias('workspace', UMB_BLOCK_WORKSPACE_ALIAS), (manifest) => {
 			if (manifest) {
 				createExtensionApi(manifest, [this, { manifest: manifest }]).then((context) => {
 					if (context) {
 						this.#workspaceContext = context as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 						this.#load();
-						this.#workspaceContext.content.createPropertyDatasetContext(this);
 
 						new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
 							this,
@@ -73,15 +69,16 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 				}}>
 				<uui-icon name="icon-document"></uui-icon>
 				<uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
-				<span>${this._label}</span>
+				<span>${this.label}</span>
 			</button>
 			${this._isOpen === true
-				? html`<umb-block-workspace-view-edit-no-router></umb-block-workspace-view-edit-no-router>`
+				? html`<umb-block-workspace-view-edit-content-no-router></umb-block-workspace-view-edit-content-no-router>`
 				: ''}
 		</uui-box>`;
 	}
 
 	static styles = [
+		UmbTextStyles,
 		css`
 			#accordion-button {
 				display: flex;

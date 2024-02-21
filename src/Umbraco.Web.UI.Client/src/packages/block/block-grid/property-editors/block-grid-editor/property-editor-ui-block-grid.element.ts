@@ -1,108 +1,130 @@
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
+import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { html, customElement, property, state, css, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbBlockGridTypeModel, UmbBlockGridValueModel, UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block';
+import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import '../../components/block-grid-entries/index.js';
 
 /**
  * @element umb-property-editor-ui-block-grid
  */
 @customElement('umb-property-editor-ui-block-grid')
 export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value = '';
+	#context = new UmbBlockGridManagerContext(this);
+	//
+	private _value: UmbBlockGridValueModel = {
+		layout: {},
+		contentData: [],
+		settingsData: [],
+	};
 
 	@property({ attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		if (!config) return;
 
-	@state()
-	private _routes: UmbRoute[] = [];
+		const validationLimit = config.getValueByAlias<NumberRangeValueType>('validationLimit');
 
-	@state()
-	private _routerPath: string | undefined;
+		this._limitMin = validationLimit?.min;
+		this._limitMax = validationLimit?.max;
 
-	@state()
-	private _activePath: string | undefined;
+		const blocks = config.getValueByAlias<Array<UmbBlockGridTypeModel>>('blocks') ?? [];
+		this.#context.setBlockTypes(blocks);
 
+		const blockGroups = config.getValueByAlias<Array<UmbBlockTypeGroup>>('blockGroups') ?? [];
+		this.#context.setBlockGroups(blockGroups);
+
+		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
+
+		//config.useLiveEditing, is covered by the EditorConfiguration of context.
+		this.#context.setEditorConfiguration(config);
+	}
+
+	//
 	@state()
-	private _variantId?: UmbVariantId;
+	private _limitMin?: number;
+	@state()
+	private _limitMax?: number;
+	@state()
+	private _layoutColumns?: number;
+
+	@property({ attribute: false })
+	public get value(): UmbBlockGridValueModel {
+		return this._value;
+	}
+	public set value(value: UmbBlockGridValueModel | undefined) {
+		const buildUpValue: Partial<UmbBlockGridValueModel> = value ? { ...value } : {};
+		buildUpValue.layout ??= {};
+		buildUpValue.contentData ??= [];
+		buildUpValue.settingsData ??= [];
+		this._value = buildUpValue as UmbBlockGridValueModel;
+
+		this.#context.setLayouts(this._value.layout[UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS] ?? []);
+		this.#context.setContents(buildUpValue.contentData);
+		this.#context.setSettings(buildUpValue.settingsData);
+	}
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
-			this.observe(context?.variantId, (propertyVariantId) => {
-				this._variantId = propertyVariantId;
-				this.setupRoutes();
-			});
+		// TODO: Prevent initial notification from these observes:
+		this.observe(this.#context.layouts, (layouts) => {
+			this._value = { ...this._value, layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS]: layouts } };
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		});
+		this.observe(this.#context.contents, (contents) => {
+			this._value = { ...this._value, contentData: contents };
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		});
+		this.observe(this.#context.settings, (settings) => {
+			this._value = { ...this._value, settingsData: settings };
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
 		});
 	}
 
-	setupRoutes() {
-		this._routes = [];
-		if (this._variantId !== undefined) {
-			this._routes = [
-				{
-					path: 'modal-1',
-					component: () => {
-						return import('./property-editor-ui-block-grid-inner-test.element.js');
-					},
-					setup: (component) => {
-						if (component instanceof HTMLElement) {
-							(component as any).name = 'block-grid-1';
-						}
-					},
-				},
-				{
-					path: 'modal-2',
-					component: () => {
-						return import('./property-editor-ui-block-grid-inner-test.element.js');
-					},
-					setup: (component) => {
-						if (component instanceof HTMLElement) {
-							(component as any).name = 'block-grid-2';
-						}
-					},
-				},
-			];
-		}
+	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+
+		this.observe(this.#context.gridColumns, (gridColumns) => {
+			if (gridColumns) {
+				this._layoutColumns = gridColumns;
+				this.style.setProperty('--umb-block-grid--grid-columns', gridColumns.toString());
+			}
+		});
 	}
 
 	render() {
-		return this._variantId
-			? html`<div>
-					umb-property-editor-ui-block-grid, inner routing test:
-
-					<uui-tab-group slot="navigation">
-						<uui-tab
-							label="TAB 1"
-							href="${this._routerPath + '/'}modal-1"
-							.active=${this._routerPath + '/' + 'modal-1' === this._activePath}></uui-tab>
-						<uui-tab
-							label="TAB 2"
-							href="${this._routerPath + '/'}modal-2"
-							.active=${this._routerPath + '/' + 'modal-2' === this._activePath}></uui-tab>
-					</uui-tab-group>
-
-					<umb-variant-router-slot
-						.variantId=${[this._variantId]}
-						id="router-slot"
-						.routes="${this._routes}"
-						@init=${(event: UmbRouterSlotInitEvent) => {
-							this._routerPath = event.target.absoluteRouterPath;
-						}}
-						@change=${(event: UmbRouterSlotChangeEvent) => {
-							this._activePath = event.target.localActiveViewPath;
-						}}>
-					</umb-variant-router-slot>
-			  </div>`
-			: 'loading...';
+		return html`<umb-block-grid-entries
+			.areaKey=${null}
+			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				display: grid;
+				gap: 1px;
+			}
+			> div {
+				display: flex;
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			uui-button-group {
+				padding-top: 1px;
+				display: grid;
+				grid-template-columns: 1fr auto;
+			}
+		`,
+	];
 }
 
 export default UmbPropertyEditorUIBlockGridElement;

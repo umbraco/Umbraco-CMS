@@ -41,12 +41,39 @@ export const manifests: Array<ManifestTypes> = [
 			label: 'Content',
 			pathname: 'content',
 			icon: 'icon-document',
+			blockElementManagerName: 'content',
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
 				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
+			{
+				alias: 'Umb.Condition.BlockEntryShowContentEdit',
+			},
 		],
-	},
+	} as any,
+	// TODO: Fix manifest types so it support additional properties.
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Block.Settings',
+		name: 'Block Workspace Settings View',
+		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
+		weight: 1000,
+		meta: {
+			label: 'Settings',
+			pathname: 'settings',
+			icon: 'icon-settings',
+			blockElementManagerName: 'settings',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: UMB_BLOCK_WORKSPACE_ALIAS,
+			},
+			{
+				alias: 'Umb.Condition.BlockWorkspaceHasSettings',
+			},
+		],
+	} as any,
 ];

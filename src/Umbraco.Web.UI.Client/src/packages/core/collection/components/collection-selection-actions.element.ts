@@ -1,9 +1,8 @@
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
 import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
-import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
@@ -18,7 +17,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbDefaultCollectionContext<any, any>;
+	private _collectionContext?: typeof UMB_DEFAULT_COLLECTION_CONTEXT.TYPE;
 
 	constructor() {
 		super();

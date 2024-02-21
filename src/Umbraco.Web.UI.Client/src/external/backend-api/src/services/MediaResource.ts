@@ -3,10 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateMediaRequestModel } from '../models/CreateMediaRequestModel';
+import type { DirectionModel } from '../models/DirectionModel';
 import type { MediaConfigurationResponseModel } from '../models/MediaConfigurationResponseModel';
 import type { MediaItemResponseModel } from '../models/MediaItemResponseModel';
 import type { MediaResponseModel } from '../models/MediaResponseModel';
 import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
+import type { PagedMediaCollectionResponseModel } from '../models/PagedMediaCollectionResponseModel';
 import type { PagedMediaRecycleBinItemResponseModel } from '../models/PagedMediaRecycleBinItemResponseModel';
 import type { PagedMediaTreeItemResponseModel } from '../models/PagedMediaTreeItemResponseModel';
 import type { SortingRequestModel } from '../models/SortingRequestModel';
@@ -17,6 +19,68 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class MediaResource {
+
+    /**
+     * @returns PagedMediaCollectionResponseModel Success
+     * @throws ApiError
+     */
+    public static getCollectionMedia({
+        id,
+        dataTypeId,
+        orderBy = 'updateDate',
+        orderDirection,
+        filter,
+        skip,
+        take = 100,
+    }: {
+        id?: string,
+        dataTypeId?: string,
+        orderBy?: string,
+        orderDirection?: DirectionModel,
+        filter?: string,
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedMediaCollectionResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/collection/media',
+            query: {
+                'id': id,
+                'dataTypeId': dataTypeId,
+                'orderBy': orderBy,
+                'orderDirection': orderDirection,
+                'filter': filter,
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemMedia({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<MediaItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/media',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
 
     /**
      * @returns string Created
@@ -34,6 +98,7 @@ export class MediaResource {
             mediaType: 'application/json',
             responseHeader: 'Umb-Generated-Resource',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
@@ -68,6 +133,30 @@ export class MediaResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static deleteMediaById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/media/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static putMediaById({
         id,
         requestBody,
@@ -84,6 +173,7 @@ export class MediaResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
@@ -146,12 +236,26 @@ export class MediaResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getMediaConfiguration(): CancelablePromise<MediaConfigurationResponseModel> {
+    public static putMediaByIdValidate({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateMediaRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/media/configuration',
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/media/{id}/validate',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
             },
         });
     }
@@ -160,17 +264,10 @@ export class MediaResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getMediaItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<MediaItemResponseModel>> {
+    public static getMediaConfiguration(): CancelablePromise<MediaConfigurationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/media/item',
-            query: {
-                'id': id,
-            },
+            url: '/umbraco/management/api/v1/media/configuration',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },
@@ -204,6 +301,29 @@ export class MediaResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static postMediaValidate({
+        requestBody,
+    }: {
+        requestBody?: CreateMediaRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/media/validate',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static deleteRecycleBinMedia(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
@@ -212,6 +332,30 @@ export class MediaResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteRecycleBinMediaById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/recycle-bin/media/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
             },
         });
     }

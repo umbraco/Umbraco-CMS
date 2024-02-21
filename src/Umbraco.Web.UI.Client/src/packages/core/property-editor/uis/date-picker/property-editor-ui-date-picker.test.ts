@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import type { UmbInputDateElement } from '../../../components/input-date/input-date.element.js';
 import { UmbPropertyEditorUIDatePickerElement } from './property-editor-ui-date-picker.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 describe('UmbPropertyEditorUIDatePickerElement', () => {
@@ -37,7 +37,7 @@ describe('UmbPropertyEditorUIDatePickerElement', () => {
 		expect(inputElement.type).to.equal('time');
 	});
 
-	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});

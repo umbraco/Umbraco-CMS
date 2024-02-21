@@ -1,20 +1,11 @@
+import type { UmbCollectionColumnConfiguration } from '../../../../../../core/collection/types.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, repeat, css, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, repeat, css, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbPropertyEditorConfigCollection} from '@umbraco-cms/backoffice/property-editor';
-import {
-	UmbPropertyValueChangeEvent,
-} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-interface ColumnConfig {
-	alias: string;
-	header: string;
-	isSystem: boolean;
-	nameTemplate?: string;
-}
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-collection-view-column-configuration
@@ -25,7 +16,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: Array })
-	value: Array<ColumnConfig> = [];
+	value: Array<UmbCollectionColumnConfiguration> = [];
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
@@ -77,18 +68,19 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 			this._selectEl.error = false;
 		}
 
-		const config: ColumnConfig = {
+		const config: UmbCollectionColumnConfiguration = {
 			alias: selected.value,
 			header: selected.name,
-			isSystem: selected?.group === 'System Fields',
+			isSystem: selected?.group === 'System Fields' ? 1 : 0,
 		};
+
 		this.value = [...this.value, config];
 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onRemove(unique: string) {
-		const newValue: Array<ColumnConfig> = [];
+		const newValue: Array<UmbCollectionColumnConfiguration> = [];
 		this.value.forEach((config) => {
 			if (config.alias !== unique) newValue.push(config);
 		});
@@ -96,17 +88,17 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onHeaderChange(e: UUIInputEvent, configuration: ColumnConfig) {
+	#onHeaderChange(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
 		this.value = this.value.map(
-			(config): ColumnConfig =>
+			(config): UmbCollectionColumnConfiguration =>
 				config.alias === configuration.alias ? { ...config, header: e.target.value as string } : config,
 		);
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onTemplateChange(e: UUIInputEvent, configuration: ColumnConfig) {
+	#onTemplateChange(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
 		this.value = this.value.map(
-			(config): ColumnConfig =>
+			(config): UmbCollectionColumnConfiguration =>
 				config.alias === configuration.alias ? { ...config, nameTemplate: e.target.value as string } : config,
 		);
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
@@ -136,7 +128,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 				(configuration) =>
 					html`<uui-table-row>
 						<uui-table-cell><uui-icon name="icon-navigation"></uui-icon></uui-table-cell>
-						${configuration.isSystem
+						${configuration.isSystem === 1
 							? this.#renderSystemFieldRow(configuration)
 							: this.#renderCustomFieldRow(configuration)}
 						<uui-table-cell>
@@ -144,12 +136,12 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 								>Remove</uui-button
 							>
 						</uui-table-cell>
-					</uui-table-row> `,
+					</uui-table-row>`,
 			)}
 		</uui-table>`;
 	}
 
-	#renderSystemFieldRow(configuration: ColumnConfig) {
+	#renderSystemFieldRow(configuration: UmbCollectionColumnConfiguration) {
 		return html`
 			<uui-table-cell><strong>${configuration.alias}</strong><small>(system field)</small></uui-table-cell>
 			<uui-table-cell>${configuration.header}</uui-table-cell>
@@ -157,7 +149,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 		`;
 	}
 
-	#renderCustomFieldRow(configuration: ColumnConfig) {
+	#renderCustomFieldRow(configuration: UmbCollectionColumnConfiguration) {
 		return html`
 			<uui-table-cell><strong>${configuration.alias}</strong></uui-table-cell>
 			<uui-table-cell>

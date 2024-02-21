@@ -1,24 +1,11 @@
-import type {
-	CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
-import {
-	css,
-	html,
-	customElement,
-	property,
-	state,
-	repeat,
-	nothing,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type {
-	ManifestPropertyAction,
-	ManifestTypes} from '@umbraco-cms/backoffice/extension-registry';
-import {
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbExtensionElementInitializer} from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestPropertyAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
@@ -48,6 +35,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			(ctrls) => {
 				this._actions = ctrls;
 			},
+			'extensionsInitializer',
 		);
 	}
 	@state()

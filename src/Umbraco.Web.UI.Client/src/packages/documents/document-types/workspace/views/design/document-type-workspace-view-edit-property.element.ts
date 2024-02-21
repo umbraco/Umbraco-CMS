@@ -10,10 +10,10 @@ import {
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
  *  @element umb-document-type-workspace-view-edit-property
@@ -22,22 +22,22 @@ import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type'
  */
 @customElement('umb-document-type-workspace-view-edit-property')
 export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
-	private _property?: UmbPropertyTypeModel | undefined;
+	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
 	/**
 	 * Property, the data object for the property.
-	 * @type {UmbPropertyTypeModel}
+	 * @type {UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined}
 	 * @attr
 	 * @default undefined
 	 */
 	@property({ type: Object })
-	public get property(): UmbPropertyTypeModel | undefined {
+	public get property(): UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined {
 		return this._property;
 	}
-	public set property(value: UmbPropertyTypeModel | undefined) {
+	public set property(value: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined) {
 		const oldValue = this._property;
 		this._property = value;
 		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
-		this.setDataType(this._property?.dataType.unique);
+		this.setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
 
@@ -96,7 +96,10 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				return { data: { documentTypeId }, value: propertyData };
 			})
 			.onSubmit((result) => {
-				this._partialUpdate(result);
+				if (!result.dataType) {
+					throw new Error('No dataType found on property');
+				}
+				this._partialUpdate(result as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder(null);
@@ -183,7 +186,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			}
 		}
 	}
-
 	renderSortableProperty() {
 		if (!this.property) return;
 		return html`
@@ -195,6 +197,8 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				type="number"
 				?readonly=${this.inherited}
 				label="sort order"
+				@change=${(e: UUIInputEvent) =>
+					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) || 0 } as UmbPropertyTypeModel)}
 				.value=${this.property.sortOrder ?? 0}></uui-input>
 		`;
 	}
@@ -295,7 +299,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	renderPropertyTags() {
 		return this.property
 			? html`<div class="types">
-					${this.property.dataType.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
+					${this.property.dataType?.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
@@ -472,6 +476,13 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 
 			a {
 				color: inherit;
+			}
+
+			:host([drag-placeholder]) {
+				opacity: 0.5;
+			}
+			:host([drag-placeholder]) uui-input {
+				visibility: hidden;
 			}
 		`,
 	];

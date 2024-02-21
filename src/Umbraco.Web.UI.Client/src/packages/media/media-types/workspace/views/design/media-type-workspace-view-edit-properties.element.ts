@@ -3,20 +3,20 @@ import './media-type-workspace-view-edit-property.element.js';
 import type { UmbMediaTypeDetailModel } from '../../../types.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { PropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel> = {
-	compareElementToModel: (element: HTMLElement, model: UmbPropertyTypeModel) => {
-		return element.getAttribute('data-umb-property-id') === model.id;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-tabs-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbPropertyTypeModel) => {
-		return container.querySelector('[data-umb-property-id=' + modelEntry.id + ']');
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
 	},
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',
@@ -80,10 +80,10 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 	}
 
 	@property({ type: String, attribute: 'container-type', reflect: false })
-	public get containerType(): PropertyContainerTypes | undefined {
+	public get containerType(): UmbPropertyContainerTypes | undefined {
 		return this._propertyStructureHelper.getContainerType();
 	}
-	public set containerType(value: PropertyContainerTypes | undefined) {
+	public set containerType(value: UmbPropertyContainerTypes | undefined) {
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
@@ -104,7 +104,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this._propertyStructureHelper.setStructureManager((workspaceContext as UmbMediaTypeWorkspaceContext).structure);
 			this.observe(
 				(workspaceContext as UmbMediaTypeWorkspaceContext).isSorting,
@@ -113,6 +113,16 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 					this.#setModel(isSorting);
 				},
 				'_observeIsSorting',
+			);
+
+			const mediaTypesObservable = await this._propertyStructureHelper.ownerDocumentTypes();
+			if (!mediaTypesObservable) return;
+			this.observe(
+				mediaTypesObservable,
+				(medias) => {
+					this._ownerMediaTypes = medias;
+				},
+				'observeOwnerMediaTypes',
 			);
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
@@ -132,7 +142,10 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 				return { data: { documentTypeId: mediaTypeId }, value: propertyData }; //TODO: Should we have a separate modal for mediaTypes?
 			})
 			.onSubmit((value) => {
-				this.#addProperty(value);
+				if (!value.dataType) {
+					throw new Error('No data type selected');
+				}
+				this.#addProperty(value as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteNewProperty = routeBuilder(null);
@@ -145,19 +158,6 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 		} else {
 			this.#propertySorter.setModel([]);
 		}
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		const mediaTypes = this._propertyStructureHelper.ownerDocumentTypes; //TODO: Should we have a separate propertyStructureHelper for mediaTypes?
-		if (!mediaTypes) return;
-		this.observe(
-			mediaTypes,
-			(medias) => {
-				this._ownerMediaTypes = medias;
-			},
-			'observeOwnerMediaTypes',
-		);
 	}
 
 	async #addProperty(propertyData: UmbPropertyTypeModel) {

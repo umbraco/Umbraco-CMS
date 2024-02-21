@@ -1,4 +1,8 @@
-export type variantObject = { culture?: string | null; segment?: string | null };
+export type variantObject = {
+	culture: string | null;
+	segment: string | null;
+	schedule?: { publishTime?: string | null; unpublishTime?: string | null };
+};
 
 export const UMB_INVARIANT_CULTURE = 'invariant';
 
@@ -8,15 +12,17 @@ export class UmbVariantId {
 	}
 
 	public static CreateInvariant(): UmbVariantId {
-		return Object.freeze(new UmbVariantId({}));
+		return Object.freeze(new UmbVariantId({ culture: null, segment: null }));
 	}
 
 	public readonly culture: string | null = null;
 	public readonly segment: string | null = null;
+	public readonly schedule: { publishTime?: string | null; unpublishTime?: string | null } | null = null;
 
 	constructor(variantData: variantObject) {
 		this.culture = (variantData.culture === UMB_INVARIANT_CULTURE ? null : variantData.culture) ?? null;
 		this.segment = variantData.segment ?? null;
+		this.schedule = variantData.schedule ?? null;
 	}
 
 	public compare(obj: variantObject): boolean {

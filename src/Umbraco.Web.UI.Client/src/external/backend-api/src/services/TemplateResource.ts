@@ -10,7 +10,6 @@ import type { TemplateQueryExecuteModel } from '../models/TemplateQueryExecuteMo
 import type { TemplateQueryResultResponseModel } from '../models/TemplateQueryResultResponseModel';
 import type { TemplateQuerySettingsResponseModel } from '../models/TemplateQuerySettingsResponseModel';
 import type { TemplateResponseModel } from '../models/TemplateResponseModel';
-import type { TemplateScaffoldResponseModel } from '../models/TemplateScaffoldResponseModel';
 import type { UpdateTemplateRequestModel } from '../models/UpdateTemplateRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -18,6 +17,27 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class TemplateResource {
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemTemplate({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<TemplateItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/template',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
 
     /**
      * @returns string Created
@@ -132,27 +152,6 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTemplateItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<TemplateItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/template/item',
-            query: {
-                'id': id,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
     public static postTemplateQueryExecute({
         requestBody,
     }: {
@@ -179,28 +178,6 @@ export class TemplateResource {
             url: '/umbraco/management/api/v1/template/query/settings',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTemplateScaffold({
-        masterTemplateId,
-    }: {
-        masterTemplateId?: string,
-    }): CancelablePromise<TemplateScaffoldResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/template/scaffold',
-            query: {
-                'masterTemplateId': masterTemplateId,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-                404: `Not Found`,
             },
         });
     }

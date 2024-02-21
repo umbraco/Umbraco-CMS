@@ -1,11 +1,11 @@
-import { CompositionTypeModel } from '@umbraco-cms/backoffice/backend-api';
+import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	DocumentTypeItemResponseModel,
 	DocumentTypeResponseModel,
 	DocumentTypeTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockDocumentTypeModelHack = DocumentTypeResponseModel &
+type UmbMockDocumentTypeModelHack = DocumentTypeResponseModel &
 	DocumentTypeTreeItemResponseModel &
 	DocumentTypeItemResponseModel;
 
@@ -685,7 +685,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		alias: 'blogPost',
 		name: 'All property editors document type',
 		description: null,
-		icon: 'umb:item-arrangement',
+		icon: 'icon-eco',
 		allowedAsRoot: true,
 		variesByCulture: true,
 		variesBySegment: false,
@@ -714,6 +714,26 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 					labelOnTop: false,
 				},
 			},
+			{
+				id: '7',
+				container: { id: 'all-properties-group-key' },
+				alias: 'listView',
+				name: 'List View',
+				description: '',
+				dataType: { id: 'dt-collectionView' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 1,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{
@@ -724,7 +744,10 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				sortOrder: 0,
 			},
 		],
-		allowedDocumentTypes: [{ documentType: { id: 'simple-document-type-id' }, sortOrder: 0 }],
+		allowedDocumentTypes: [
+			{ documentType: { id: 'simple-document-type-id' }, sortOrder: 0 },
+			{ documentType: { id: '29643452-cff9-47f2-98cd-7de4b6807681' }, sortOrder: 1 },
+		],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -994,12 +1017,59 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 					labelOnTop: false,
 				},
 			},
+			{
+				id: 'a92de6ac-1a22-4a45-a481-b6cae1cccbba',
+				container: { id: '2e845ca8-1e3e-4b03-be1d-0b4149ce2120' },
+				alias: 'alchemyElement',
+				name: 'Alchemy Element',
+				description: null,
+				dataType: { id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'c92de6ac-1a22-4a45-a481-b6cae1cccbba',
+				container: { id: '2e845ca8-1e3e-4b03-be1d-0b4149ce2120' },
+				alias: 'acidScale',
+				name: 'Acid Scale',
+				description: null,
+				dataType: { id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{
 				id: '1e845ca8-1e3e-4b03-be1d-0b4149ce2129',
 				parent: null,
 				name: 'Content-group',
+				type: 'Group',
+				sortOrder: 0,
+			},
+			{
+				id: '2e845ca8-1e3e-4b03-be1d-0b4149ce2120',
+				parent: null,
+				name: 'Alchemy',
 				type: 'Group',
 				sortOrder: 0,
 			},

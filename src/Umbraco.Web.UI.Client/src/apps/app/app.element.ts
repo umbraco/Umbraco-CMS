@@ -6,10 +6,10 @@ import { UMB_STORAGE_REDIRECT_URL, UmbAuthContext } from '@umbraco-cms/backoffic
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
-import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/backend-api';
+import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
 
 @customElement('umb-app')
@@ -136,6 +136,7 @@ export class UmbAppElement extends UmbLitElement {
 		// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
 		OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
 		OpenAPI.WITH_CREDENTIALS = true;
+		OpenAPI.CREDENTIALS = 'include';
 	}
 
 	#redirect() {

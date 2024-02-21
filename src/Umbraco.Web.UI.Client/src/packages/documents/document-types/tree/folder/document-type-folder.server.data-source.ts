@@ -1,5 +1,5 @@
 import type { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -41,7 +41,7 @@ export class UmbDocumentTypeFolderServerDataSource implements UmbFolderDataSourc
 			const mappedData = {
 				unique: data.id,
 				name: data.name,
-				parentUnique: data.parentId || null,
+				parentUnique: data.parent ? data.parent.id : null,
 			};
 
 			return { data: mappedData };

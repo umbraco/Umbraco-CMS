@@ -1,4 +1,4 @@
-import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbCopyDataSource } from '@umbraco-cms/backoffice/repository';
@@ -35,7 +35,7 @@ export class UmbDataTypeCopyServerDataSource implements UmbCopyDataSource {
 			DataTypeResource.postDataTypeByIdCopy({
 				id: unique,
 				requestBody: {
-					targetId: targetUnique,
+					target: targetUnique ? { id: targetUnique } : null,
 				},
 			}),
 		);

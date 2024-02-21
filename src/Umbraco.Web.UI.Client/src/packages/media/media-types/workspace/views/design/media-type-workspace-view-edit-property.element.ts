@@ -10,7 +10,7 @@ import {
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -96,7 +96,10 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 				return { data: { documentTypeId: mediaTypeId }, value: propertyData }; //TODO: Should we have a separate modal for mediaTypes?
 			})
 			.onSubmit((result) => {
-				this._partialUpdate(result);
+				if (!result.dataType) {
+					throw new Error('No dataType found on property');
+				}
+				this._partialUpdate(result as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder(null);
@@ -295,7 +298,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 	renderPropertyTags() {
 		return this.property
 			? html`<div class="types">
-					${this.property.dataType.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
+					${this.property.dataType?.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}

@@ -101,6 +101,7 @@ export class UmbStylesheetWorkspaceContext
 
 	public destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }
 

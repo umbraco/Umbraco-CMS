@@ -1,11 +1,10 @@
-import {
-	ContentStateModel,
-	type MediaItemResponseModel,
-	type MediaResponseModel,
-	type MediaTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type {
+	MediaItemResponseModel,
+	MediaResponseModel,
+	MediaTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockMediaModelHack = MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel;
+type UmbMockMediaModelHack = MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel;
 
 export interface UmbMockMediaModel extends Omit<UmbMockMediaModelHack, 'type'> {}
 
@@ -29,7 +28,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -59,7 +57,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -84,7 +81,6 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -109,7 +105,6 @@ export const data: Array<UmbMockMediaModel> = [
 		values: [],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -139,7 +134,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -167,7 +161,14 @@ export const data: Array<UmbMockMediaModel> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
-		variants: [],
+		variants: [{
+			publishDate: '2023-02-06T15:31:51.354764',
+			culture: 'en-us',
+			segment: null,
+			name: 'John Doe',
+			createDate: '2023-02-06T15:31:46.876902',
+			updateDate: '2023-02-06T15:31:51.354764',
+		},],
 		urls: [],
 	},
 	{
@@ -189,7 +190,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,
@@ -219,7 +219,6 @@ export const data: Array<UmbMockMediaModel> = [
 		],
 		variants: [
 			{
-				state: ContentStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-us',
 				segment: null,

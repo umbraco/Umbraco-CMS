@@ -1,15 +1,10 @@
 import { css, html, nothing, customElement, property, query, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UUIColorPickerElement,
-	UUIInputElement,
-	UUIInputEvent} from '@umbraco-cms/backoffice/external/uui';
-import {
-	FormControlMixin
-} from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-multiple-color-picker-item-input

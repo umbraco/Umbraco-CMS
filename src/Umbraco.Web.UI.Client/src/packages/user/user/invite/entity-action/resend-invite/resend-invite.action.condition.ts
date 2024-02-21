@@ -1,5 +1,5 @@
 import { UmbUserActionConditionBase } from '../../../conditions/user-allow-action-base.condition.js';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -12,7 +12,7 @@ export class UmbUserAllowResendInviteActionCondition extends UmbUserActionCondit
 	}
 
 	async onUserDataChange() {
-		if (!this.userData || !this.userData.id) {
+		if (!this.userData || !this.userData.unique) {
 			this.permitted = false;
 			super.onUserDataChange();
 			return;

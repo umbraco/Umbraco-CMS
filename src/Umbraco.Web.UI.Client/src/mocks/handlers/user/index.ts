@@ -1,5 +1,5 @@
-import { handlers as detailHandlers } from './detail.handlers.js';
-import { handlers as itemHandlers } from './item.handlers.js';
+import { detailHandlers } from './detail.handlers.js';
+import { itemHandlers } from './item.handlers.js';
 import { handlers as currentHandlers } from './current.handlers.js';
 import { handlers as setUserGroupsHandlers } from './set-user-groups.handlers.js';
 import { handlers as enableHandlers } from './enable.handlers.js';

@@ -1,11 +1,11 @@
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { type ManifestTypes, umbExtensionsRegistry } from '../../extension-registry/index.js';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import { css, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, repeat, customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import {
 	type UmbExtensionElementInitializer,
 	UmbExtensionsElementInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-extension-slot
@@ -115,6 +115,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				(extensionControllers) => {
 					this._permittedExts = extensionControllers;
 				},
+				'extensionsInitializer',
 				this.defaultElement,
 			);
 			this.#extensionsController.properties = this.#props;
@@ -122,11 +123,13 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 
 	render() {
-		return repeat(
-			this._permittedExts,
-			(ext) => ext.alias,
-			(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
-		);
+		return this._permittedExts.length > 0
+			? repeat(
+					this._permittedExts,
+					(ext) => ext.alias,
+					(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
+			  )
+			: html`<slot></slot>`;
 	}
 
 	static styles = css`

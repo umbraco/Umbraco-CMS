@@ -3,7 +3,7 @@ import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 

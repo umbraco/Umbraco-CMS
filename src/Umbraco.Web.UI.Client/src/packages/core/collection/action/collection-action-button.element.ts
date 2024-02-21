@@ -2,7 +2,7 @@ import type { UmbCollectionAction } from './collection-action-base.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbBackofficeManifestKind, ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
@@ -82,6 +82,6 @@ export default UmbCollectionActionButtonElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-action': UmbCollectionActionButtonElement;
+		'umb-collection-action-button': UmbCollectionActionButtonElement;
 	}
 }

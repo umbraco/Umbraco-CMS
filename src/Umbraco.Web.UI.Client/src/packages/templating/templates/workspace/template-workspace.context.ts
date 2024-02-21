@@ -1,42 +1,36 @@
-import { UmbTemplateRepository } from '../repository/index.js';
-import { UmbTemplateTreeRepository } from '../tree/index.js';
+import type { UmbTemplateDetailModel } from '../types.js';
+import type { UmbTemplateItemModel } from '../repository/index.js';
+import { UmbTemplateDetailRepository, UmbTemplateItemRepository } from '../repository/index.js';
+import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import type {
-	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbEditableWorkspaceContextBase,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<TemplateResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbTemplateDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	//
-	public readonly repository: UmbTemplateRepository = new UmbTemplateRepository(this);
+	public readonly detailRepository = new UmbTemplateDetailRepository(this);
+	public readonly itemRepository = new UmbTemplateItemRepository(this);
 
-	#data = new UmbObjectState<TemplateResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbTemplateDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
-	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
+	#masterTemplate = new UmbObjectState<UmbTemplateItemModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
 	alias = this.#data.asObservablePart((data) => data?.alias);
 	content = this.#data.asObservablePart((data) => data?.content);
-	id = this.#data.asObservablePart((data) => data?.id);
-	masterTemplateID = this.#data.asObservablePart((data) => data?.masterTemplateId);
+	unique = this.#data.asObservablePart((data) => data?.unique);
+	masterTemplateUnique = this.#data.asObservablePart((data) => data?.masterTemplate?.unique);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	// TODO: temp solution until we have automatic tree updates
-	#treeRepository = new UmbTemplateTreeRepository(this);
-
 	constructor(host: UmbControllerHost) {
-		super(host, 'Umb.Workspace.Template');
+		super(host, UMB_TEMPLATE_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
 	}
 
@@ -54,7 +48,7 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.id || '';
+		return this.getData()?.unique;
 	}
 
 	getData() {
@@ -81,11 +75,11 @@ export class UmbTemplateWorkspaceContext
 		return this.getData()?.content ? this.getLayoutBlockRegexPattern().test(this.getData()?.content as string) : false;
 	}
 
-	async load(entityId: string) {
-		const { data } = await this.repository.requestById(entityId);
+	async load(unique: string) {
+		const { data } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			this.setMasterTemplate(data.masterTemplateId ?? null);
+			this.setMasterTemplate(data.masterTemplate?.unique ?? null);
 			this.#data.setValue(data);
 		}
 	}
@@ -97,7 +91,7 @@ export class UmbTemplateWorkspaceContext
 			return null;
 		}
 
-		const { data } = await this.repository.requestItems([id]);
+		const { data } = await this.itemRepository.requestItems([id]);
 		if (data) {
 			this.#masterTemplate.setValue(data[0]);
 			this.#updateMasterTemplateLayoutBlock();
@@ -135,45 +129,33 @@ ${currentContent}`;
 		this.setContent(string);
 	};
 
-	public async save() {
-		const template = this.#data.getValue();
-		const isNew = this.getIsNew();
-
-		if (isNew && template) {
-			const key = UmbId.new();
-			this.#data.update({ id: key });
-			await this.repository.create({
-				key: key,
-				name: template.name,
-				content: template.content,
-				alias: template.alias,
-			});
-			if (this.#masterTemplate.value?.id) {
-				this.#treeRepository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? '');
-			} else {
-				this.#treeRepository.requestRootTreeItems();
-			}
-			this.setIsNew(false);
-			return;
-		}
-
-		if (template?.id) {
-			await this.repository.save(template.id, {
-				name: template.name,
-				content: template.content,
-				alias: template.alias,
-			});
-			this.#treeRepository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? null);
-		}
-	}
-
-	async create(parentId: string | null = null) {
-		const { data } = await this.repository.createScaffold(parentId);
+	async create(parentUnique: string | null, preset?: Partial<UmbTemplateDetailModel>) {
+		const { data } = await this.detailRepository.createScaffold(parentUnique, preset);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.setValue({ ...data, id: '', name: '', alias: '' });
-		if (!parentId) return;
-		await this.setMasterTemplate(parentId);
+		this.#data.setValue(data);
+
+		if (!parentUnique) return;
+		await this.setMasterTemplate(parentUnique);
+	}
+
+	async save() {
+		if (!this.#data.value) throw new Error('Data is missing');
+
+		let newData = undefined;
+
+		if (this.getIsNew()) {
+			const { data } = await this.detailRepository.create(this.#data.value);
+			newData = data;
+		} else {
+			const { data } = await this.detailRepository.save(this.#data.value);
+			newData = data;
+		}
+
+		if (newData) {
+			this.#data.setValue(newData);
+			this.saveComplete(newData);
+		}
 	}
 
 	public destroy() {

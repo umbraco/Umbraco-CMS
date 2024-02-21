@@ -1,7 +1,7 @@
 import type { UmbDataTypeItemModel } from './types.js';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
-import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -28,7 +28,7 @@ export class UmbDataTypeItemServerDataSource extends UmbItemServerDataSourceBase
 }
 
 /* eslint-disable local-rules/no-direct-api-import */
-const getItems = (uniques: Array<string>) => DataTypeResource.getDataTypeItem({ id: uniques });
+const getItems = (uniques: Array<string>) => DataTypeResource.getItemDataType({ id: uniques });
 
 const mapper = (item: DataTypeItemResponseModel): UmbDataTypeItemModel => {
 	return {

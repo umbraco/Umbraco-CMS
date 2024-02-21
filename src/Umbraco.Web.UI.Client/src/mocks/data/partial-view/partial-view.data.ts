@@ -3,9 +3,9 @@ import type {
 	PartialViewItemResponseModel,
 	PartialViewResponseModel,
 	PartialViewSnippetResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockPartialViewModelHack = PartialViewResponseModel &
+type UmbMockPartialViewModelHack = PartialViewResponseModel &
 	FileSystemTreeItemPresentationModel &
 	PartialViewItemResponseModel;
 
@@ -89,7 +89,7 @@ export const data: Array<UmbMockPartialViewModel> = [
 	},
 	{
 		name: 'embed.cshtml',
-		path: '/grid/embed.cshtm',
+		path: '/grid/embed.cshtml',
 		parent: {
 			path: '/grid',
 		},

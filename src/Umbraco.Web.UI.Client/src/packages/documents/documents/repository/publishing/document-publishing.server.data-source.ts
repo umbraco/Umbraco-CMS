@@ -1,5 +1,9 @@
-import type { PublishDocumentRequestModel, UnpublishDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	CultureAndScheduleRequestModel,
+	PublishDocumentRequestModel,
+	UnpublishDocumentRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -32,11 +36,18 @@ export class UmbDocumentPublishingServerDataSource {
 	async publish(unique: string, variantIds: Array<UmbVariantId>) {
 		if (!unique) throw new Error('Id is missing');
 
+		const publishSchedules: CultureAndScheduleRequestModel[] = variantIds.map<CultureAndScheduleRequestModel>(
+			(variant) => {
+				return {
+					culture: variant.isCultureInvariant() ? null : variant.toCultureString(),
+					schedule: variant.schedule,
+				};
+			},
+		);
+
 		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
 		const requestBody: PublishDocumentRequestModel = {
-			cultures: variantIds
-				.map((variant) => (variant.isCultureInvariant() ? null : variant.toCultureString()))
-				.filter((x) => x !== null) as Array<string>,
+			publishSchedules,
 		};
 
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdPublish({ id: unique, requestBody }));
@@ -54,7 +65,7 @@ export class UmbDocumentPublishingServerDataSource {
 
 		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
 		const requestBody: UnpublishDocumentRequestModel = {
-			culture: variantIds.map((variant) => variant.toCultureString())[0],
+			culture: variantIds.map((variant) => (variant.isCultureInvariant() ? null : variant.toCultureString()))[0],
 		};
 
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdUnpublish({ id: unique, requestBody }));

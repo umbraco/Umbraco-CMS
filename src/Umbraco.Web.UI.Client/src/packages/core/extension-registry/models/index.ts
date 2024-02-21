@@ -1,7 +1,9 @@
+import type { ManifestBlockEditorCustomView } from './block-editor-custom-view.model.js';
 import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
 import type { ManifestDashboardCollection } from './dashboard-collection.model.js';
+import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityAction } from './entity-action.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
@@ -28,8 +30,8 @@ import type { ManifestUserProfileApp } from './user-profile-app.model.js';
 import type { ManifestWorkspace } from './workspace.model.js';
 import type { ManifestWorkspaceAction } from './workspace-action.model.js';
 import type { ManifestWorkspaceContext } from './workspace-context.model.js';
+import type { ManifestWorkspaceFooterApp } from './workspace-footer-app.model.js';
 import type { ManifestWorkspaceView } from './workspace-view.model.js';
-import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.model.js';
 import type { ManifestUserPermission } from './user-permission.model.js';
 import type { ManifestUserGranularPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
@@ -40,11 +42,13 @@ import type {
 	ManifestEntryPoint,
 } from '@umbraco-cms/backoffice/extension-api';
 
+export type * from './block-editor-custom-view.model.js';
 export type * from './collection.models.js';
 export type * from './collection-action.model.js';
 export type * from './collection-view.model.js';
 export type * from './dashboard-collection.model.js';
 export type * from './dashboard.model.js';
+export type * from './dynamic-root.model.js';
 export type * from './entity-action.model.js';
 export type * from './entity-bulk-action.model.js';
 export type * from './external-login-provider.model.js';
@@ -72,18 +76,21 @@ export type * from './user-permission.model.js';
 export type * from './user-profile-app.model.js';
 export type * from './workspace-action.model.js';
 export type * from './workspace-context.model.js';
+export type * from './workspace-footer-app.model.js';
 export type * from './workspace-view.model.js';
-export type * from './workspace-view-collection.model.js';
 export type * from './workspace.model.js';
 
 export type ManifestTypes =
 	| ManifestBundle<ManifestTypes>
 	| ManifestCondition
+	| ManifestBlockEditorCustomView
 	| ManifestCollection
 	| ManifestCollectionView
 	| ManifestCollectionAction
 	| ManifestDashboard
 	| ManifestDashboardCollection
+	| ManifestDynamicRootOrigin
+	| ManifestDynamicRootQueryStep
 	| ManifestEntityAction
 	| ManifestEntityBulkAction
 	| ManifestEntryPoint
@@ -117,8 +124,8 @@ export type ManifestTypes =
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
 	| ManifestWorkspaceContext
+	| ManifestWorkspaceFooterApp
 	| ManifestWorkspaceView
-	| ManifestWorkspaceViewCollection
 	| ManifestUserPermission
 	| ManifestUserGranularPermission
 	| ManifestBase;

@@ -1,7 +1,10 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { type UmbPropertyEditorConfigCollection, UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
@@ -16,7 +19,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	value = '';
 
 	@state()
-	type?: UmbTreePickerSource['type'];
+	type: UmbTreePickerSource['type'] = 'content';
 
 	@state()
 	startNodeId?: string | null;
@@ -36,12 +39,19 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	@state()
 	ignoreUserStartNodes?: boolean;
 
+	#dynamicRoot?: UmbTreePickerSource['dynamicRoot'];
+
+	#dynamicRootRepository = new UmbDynamicRootRepository(this);
+
+	#workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
+
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const startNode: UmbTreePickerSource | undefined = config?.getValueByAlias('startNode');
 		if (startNode) {
 			this.type = startNode.type;
 			this.startNodeId = startNode.id;
+			this.#dynamicRoot = startNode.dynamicRoot;
 		}
 
 		this.min = Number(config?.getValueByAlias('minNumber')) || 0;
@@ -50,6 +60,34 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		this.allowedContentTypeIds = config?.getValueByAlias('filter');
 		this.showOpenButton = config?.getValueByAlias('showOpenButton');
 		this.ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
+	}
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this.#workspaceContext = workspaceContext;
+		});
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
+
+		this.#setStartNodeId();
+	}
+
+	async #setStartNodeId() {
+		if (this.startNodeId) return;
+
+		const entityId = this.#workspaceContext?.getEntityId();
+		// TODO: Awaiting the workspace context to have a parent entity ID value. [LK]
+		// e.g. const parentEntityId = this.#workspaceContext?.getParentEntityId();
+		if (entityId && this.#dynamicRoot) {
+			const result = await this.#dynamicRootRepository.postDynamicRootQuery(this.#dynamicRoot, entityId);
+			if (result && result.length > 0) {
+				this.startNodeId = result[0];
+			}
+		}
 	}
 
 	#onChange(e: CustomEvent) {

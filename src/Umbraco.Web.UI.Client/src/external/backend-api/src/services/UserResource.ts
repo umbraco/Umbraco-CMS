@@ -41,6 +41,27 @@ export class UserResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getItemUser({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<UserItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/user',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static postUser({
         requestBody,
     }: {
@@ -596,7 +617,7 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns PagedUserResponseModel Success
      * @throws ApiError
      */
     public static getUserFilter({
@@ -615,7 +636,7 @@ export class UserResource {
         userGroupIds?: Array<string>,
         userStates?: Array<UserStateModel>,
         filter?: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<PagedUserResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/filter',
@@ -629,7 +650,9 @@ export class UserResource {
                 'filter': filter,
             },
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -714,27 +737,6 @@ export class UserResource {
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getUserItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<UserItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/user/item',
-            query: {
-                'id': id,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

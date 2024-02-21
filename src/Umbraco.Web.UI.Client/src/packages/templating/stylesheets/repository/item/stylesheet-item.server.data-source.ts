@@ -4,7 +4,7 @@ import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/serve
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
+import { StylesheetResource } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A data source for stylesheet items that fetches data from the server
@@ -43,7 +43,7 @@ export class UmbStylesheetItemServerDataSource implements UmbItemDataSource<UmbS
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.getStylesheetItem({
+			StylesheetResource.getItemStylesheet({
 				path: paths,
 			}),
 		);

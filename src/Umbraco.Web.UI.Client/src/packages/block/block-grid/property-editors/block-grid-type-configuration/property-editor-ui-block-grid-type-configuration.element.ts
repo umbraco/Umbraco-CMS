@@ -7,10 +7,10 @@ import {
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UMB_BLOCK_GRID_TYPE,
-	type UmbBlockGridGroupType,
+	type UmbBlockGridTypeGroupType,
 	type UmbBlockGridGroupTypeConfiguration,
 } from '@umbraco-cms/backoffice/block';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -44,7 +44,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	public config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _blockGroups: Array<UmbBlockGridGroupType> = [];
+	private _blockGroups: Array<UmbBlockGridTypeGroupType> = [];
 
 	@state()
 	private _mappedValuesAndGroups: Array<UmbBlockGridGroupTypeConfiguration> = [];
@@ -58,8 +58,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			this.#datasetContext = instance;
 			this.#observeProperties();
 		});
-
-		this.#blockTypeWorkspaceModalRegistration?.destroy();
 
 		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(UMB_BLOCK_GRID_TYPE)
@@ -76,7 +74,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		if (!this.#datasetContext) return;
 
 		this.observe(await this.#datasetContext.propertyValueByAlias('blockGroups'), (value) => {
-			this._blockGroups = (value as Array<UmbBlockGridGroupType>) ?? [];
+			this._blockGroups = (value as Array<UmbBlockGridTypeGroupType>) ?? [];
 			this.#mapValuesToBlockGroups();
 		});
 		this.observe(await this.#datasetContext.propertyValueByAlias('blocks'), () => {

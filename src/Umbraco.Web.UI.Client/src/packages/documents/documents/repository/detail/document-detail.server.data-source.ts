@@ -2,8 +2,11 @@ import type { UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateDocumentRequestModel, UpdateDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	CreateDocumentRequestModel,
+	UpdateDocumentRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -40,6 +43,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			template: null,
 			documentType: {
 				unique: '',
+				hasCollection: false,
 			},
 			isTrashed: false,
 			values: [],
@@ -52,6 +56,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: null,
 					createDate: null,
 					updateDate: null,
+					isMandatory: false,
 				},
 			],
 			...preset,
@@ -80,7 +85,14 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			unique: data.id,
 			parentUnique: null, // TODO: this is not correct. It will be solved when we know where to get the parent from
-			values: data.values,
+			values: data.values.map((value) => {
+				return {
+					alias: value.alias,
+					culture: value.culture || null,
+					segment: value.segment || null,
+					value: value.value,
+				};
+			}),
 			variants: data.variants.map((variant) => {
 				return {
 					state: variant.state,
@@ -90,11 +102,20 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
+					isMandatory: false, // TODO: this is not correct. It will be solved when we know where to get the isMandatory from
 				};
 			}),
-			urls: data.urls,
-			template: data.template ? { id: data.template.id } : null,
-			documentType: { unique: data.documentType.id },
+			urls: data.urls.map((url) => {
+				return {
+					culture: url.culture || null,
+					url: url.url,
+				};
+			}),
+			template: data.template ? { unique: data.template.id } : null,
+			documentType: {
+				unique: data.documentType.id,
+				hasCollection: data.documentType.hasListView,
+			},
 			isTrashed: data.isTrashed,
 		};
 
@@ -116,7 +137,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			id: model.unique,
 			parent: model.parentUnique ? { id: model.parentUnique } : null,
 			documentType: { id: model.documentType.unique },
-			template: model.template,
+			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
 		};
@@ -146,12 +167,12 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateDocumentRequestModel = {
-			template: model.template,
+			template: model.template ? { id: model.template.unique } : null,
 			values: model.values,
 			variants: model.variants,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentResource.putDocumentById({
 				id: model.unique,
@@ -159,8 +180,8 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

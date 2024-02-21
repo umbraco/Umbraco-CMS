@@ -5,10 +5,11 @@ import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentTypeRequestModel,
 	UpdateDocumentTypeRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Document Type that fetches data from the server
@@ -109,7 +110,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 					appearance: property.appearance,
 				};
 			}),
-			containers: data.containers,
+			containers: data.containers as UmbPropertyTypeContainerModel[],
 			allowedContentTypes: data.allowedDocumentTypes.map((allowedDocumentType) => {
 				return {
 					contentType: { unique: allowedDocumentType.documentType.id },
@@ -142,6 +143,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDocumentTypeRequestModel = {
+			folder: model.parentUnique ? { id: model.parentUnique } : null,
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
@@ -250,7 +252,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			cleanup: model.cleanup,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeResource.putDocumentTypeById({
 				id: model.unique,
@@ -258,8 +260,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

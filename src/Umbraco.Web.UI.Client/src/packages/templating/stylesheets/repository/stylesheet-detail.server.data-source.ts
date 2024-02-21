@@ -6,10 +6,9 @@ import {
 } from '@umbraco-cms/backoffice/server-file-system';
 import type {
 	CreateStylesheetRequestModel,
-	UpdateStylesheetRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	StylesheetResource
-} from '@umbraco-cms/backoffice/backend-api';
+	UpdateStylesheetRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { StylesheetResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -102,7 +101,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 			content: model.content,
 		};
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			StylesheetResource.putStylesheetByPath({
 				path: encodeURIComponent(path),
@@ -110,8 +109,8 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(model.unique);
 		}
 
 		return { error };

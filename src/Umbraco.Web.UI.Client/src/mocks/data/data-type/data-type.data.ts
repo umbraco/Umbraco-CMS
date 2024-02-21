@@ -2,11 +2,9 @@ import type {
 	DataTypeItemResponseModel,
 	DataTypeResponseModel,
 	DataTypeTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
-export type UmbMockDataTypeModelHack = DataTypeResponseModel &
-	DataTypeTreeItemResponseModel &
-	DataTypeItemResponseModel;
+type UmbMockDataTypeModelHack = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
 
 export interface UmbMockDataTypeModel extends Omit<UmbMockDataTypeModelHack, 'type'> {}
 
@@ -227,6 +225,15 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: {
 					type: 'content',
 					id: null,
+					dynamicRoot: {
+						originAlias: 'Root',
+						querySteps: [
+							{
+								alias: 'FurthestAncestorOrSelf',
+								anyOfDocTypeKeys: ['all-property-editors-document-type-id'],
+							},
+						],
+					},
 				},
 			},
 			{
@@ -512,6 +519,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 					{
 						label: 'Mocked Block Type for Block List',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						settingsElementTypeKey: 'all-property-editors-document-type-id',
 						icon: 'icon-server-alt',
 					},
 					{
@@ -638,6 +646,45 @@ export const data: Array<UmbMockDataTypeModel> = [
 					{
 						label: 'Mocked Block Type for Block Grid',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						rowMinSpan: 1,
+						rowMaxSpan: 2,
+						columnSpanOptions: [
+							{
+								columnSpan: 1,
+							},
+							{
+								columnSpan: 2,
+							},
+							{
+								columnSpan: 3,
+							},
+							{
+								columnSpan: 6,
+							},
+							{
+								columnSpan: 12,
+							},
+						],
+						areas: [
+							{
+								key: 'area1_key',
+								alias: 'area1_alias',
+								columnSpan: 6,
+								rowSpan: 1,
+								minAllowed: 1,
+								maxAllowed: 2,
+								specifiedAllowance: [],
+							},
+							{
+								key: 'area2_key',
+								alias: 'area2_alias',
+								columnSpan: 6,
+								rowSpan: 1,
+								minAllowed: 1,
+								maxAllowed: 2,
+								specifiedAllowance: [],
+							},
+						],
 					},
 					{
 						label: 'Mocked Coffee Block',
@@ -697,7 +744,40 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
 		hasChildren: false,
 		isFolder: false,
-		values: [],
+		values: [
+			{ alias: 'pageSize', value: 2 },
+			{ alias: 'orderDirection', value: 'desc' },
+			{
+				alias: 'includeProperties',
+				value: [
+					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: '' },
+					{ alias: 'updateDate', header: 'Last edited', isSystem: true },
+					{ alias: 'owner', header: 'Created by', isSystem: true },
+				],
+			},
+			{ alias: 'orderBy', value: 'updateDate' },
+			{
+				alias: 'bulkActionPermissions',
+				value: {
+					allowBulkPublish: true,
+					allowBulkUnpublish: false,
+					allowBulkCopy: true,
+					allowBulkMove: false,
+					allowBulkDelete: true,
+				},
+			},
+			{
+				alias: 'layouts',
+				value: [
+					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
+					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+				],
+			},
+			{ alias: 'icon', value: 'icon-layers' },
+			{ alias: 'tabName', value: 'Children' },
+			{ alias: 'showContentFirst', value: true },
+			{ alias: 'useInfiniteEditor', value: true },
+		],
 	},
 	{
 		name: 'Icon Picker',

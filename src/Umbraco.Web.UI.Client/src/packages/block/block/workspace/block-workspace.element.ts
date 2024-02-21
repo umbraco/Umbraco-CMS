@@ -3,12 +3,12 @@ import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
-import type { UmbApi} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestWorkspace} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 
@@ -31,7 +31,7 @@ export class UmbBlockWorkspaceElement extends UmbLitElement {
 		createExtensionApi(manifest, [this, { manifest: manifest }]).then((context) => {
 			if (context) {
 				this.#gotWorkspaceContext(context);
-				// TODO: We need to recreate when ID changed?
+				// TODO: Do we need to recreate when ID changed? Or is that a responsibility of the context it self?
 				new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
 					this,
 					this.#workspaceContext,

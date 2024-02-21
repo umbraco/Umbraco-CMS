@@ -8,13 +8,17 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 	@property({ type: String, reflect: true })
 	name: string = '';
 
+	// TODO: Does it make any different to have this as a property?
 	@property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
 	umbDragPlaceholder = false;
 
 	render() {
 		return html`
-			${this.name}
-			<img src="https://picsum.photos/seed/${this.name}/400/400" style="width:120px;" />
+			<div>
+				${this.name}
+				<img src="https://picsum.photos/seed/${this.name}/400/400" style="width:120px;" />
+				<slot name="action"></slot>
+			</div>
 			<slot></slot>
 		`;
 	}
@@ -23,9 +27,7 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 		UmbTextStyles,
 		css`
 			:host {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
+				display: block;
 				padding: var(--uui-size-layout-1);
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
@@ -33,6 +35,16 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 			}
 			:host([drag-placeholder]) {
 				opacity: 0.2;
+			}
+
+			div {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			slot:not([name]) {
+				// go on new line:
 			}
 		`,
 	];
