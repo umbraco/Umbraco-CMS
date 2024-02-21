@@ -38,6 +38,10 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 			return { error };
 		}
 
+		if (!data) {
+			return { data: { items: [], total: 0 } };
+		}
+
 		const { items, total } = data;
 
 		const mappedItems: Array<UmbUserDetailModel> = items.map((item: UserResponseModel) => {
