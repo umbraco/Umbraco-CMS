@@ -14,3 +14,17 @@ export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseMod
 	contentData: Array<UmbBlockDataType>;
 	settingsData: Array<UmbBlockDataType>;
 }
+
+export interface UmbBlockViewUrlsPropType {
+	editContent?: string;
+	editSettings?: string;
+}
+
+export interface UmbBlockViewPropsType<BlockLayoutType extends UmbBlockLayoutBaseModel> {
+	label?: string;
+	contentUdi: string;
+	layout?: BlockLayoutType;
+	content?: UmbBlockDataType;
+	settings?: UmbBlockDataType;
+	urls: UmbBlockViewUrlsPropType;
+}

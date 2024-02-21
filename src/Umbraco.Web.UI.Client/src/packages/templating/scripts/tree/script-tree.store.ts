@@ -40,6 +40,7 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 			name: item.name,
 			hasChildren: false,
 			isFolder: false,
+			icon: 'icon-diploma',
 		};
 
 		return treeItem;

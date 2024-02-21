@@ -364,23 +364,30 @@ export const data: Array<UmbMockDocumentModel> = [
 							{
 								contentUdi: '1234',
 								settingsUdi: '5678',
+								columnSpan: 12,
 								areas: [
 									{
-										key: 'area1',
+										key: 'area1_key',
 										items: [
 											{
 												contentUdi: 'a1234',
 												settingsUdi: 'a5678',
-												areas: [],
+												columnSpan: 3,
+												rowSpan: 2,
+											},
+											{
+												contentUdi: 'c1234',
+												columnSpan: 3,
 											},
 										],
 									},
 									{
-										key: 'area2',
+										key: 'area2_key',
 										items: [
 											{
 												contentUdi: 'b1234',
 												settingsUdi: 'b5678',
+												columnSpan: 6,
 												areas: [],
 											},
 										],
@@ -404,6 +411,11 @@ export const data: Array<UmbMockDocumentModel> = [
 							udi: 'b1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world from area 2',
+						},
+						{
+							udi: 'c1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello CCC from area 1',
 						},
 					],
 					settingsData: [

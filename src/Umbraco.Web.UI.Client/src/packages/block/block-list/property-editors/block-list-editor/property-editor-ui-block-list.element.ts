@@ -1,3 +1,4 @@
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
 import '../../components/block-list-entry/index.js';
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
@@ -7,17 +8,13 @@ import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_BLOCK_CATALOGUE_MODAL } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockLayoutBaseModel, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
@@ -44,7 +41,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		},
 	});
 
-	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
+	//#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
 
 	private _value: UmbBlockListValueModel = {
 		layout: {},
@@ -119,6 +116,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	constructor() {
 		super();
 
+		/*
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.observe(
 				propertyContext?.alias,
@@ -128,6 +126,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				'observePropertyAlias',
 			);
 		});
+		*/
 
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#managerContext.layouts, (layouts) => {
@@ -161,6 +160,11 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			this._blocks = blockTypes;
 		});
 
+		this.observe(this.#entriesContext.catalogueRouteBuilder, (routeBuilder) => {
+			this._catalogueRouteBuilder = routeBuilder;
+		});
+
+		/*
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
 			.addUniquePaths(['propertyAlias'])
 			.addAdditionalPath(':view/:index')
@@ -177,6 +181,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			.observeRouteBuilder((routeBuilder) => {
 				this._catalogueRouteBuilder = routeBuilder;
 			});
+			*/
 	}
 
 	render() {

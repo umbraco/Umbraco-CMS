@@ -17,7 +17,7 @@ export class UmbMockDocumentPublishingManager {
 		const document: UmbMockDocumentModel = this.#documentDb.detail.read(id);
 
 		document?.variants?.forEach((variant) => {
-			const hasCulture = variant.culture && data.cultures?.includes(variant.culture);
+			const hasCulture = variant.culture && data.publishSchedules.find((x) => x.culture === variant.culture);
 
 			if (hasCulture) {
 				variant.state = DocumentVariantStateModel.PUBLISHED;

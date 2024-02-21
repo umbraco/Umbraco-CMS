@@ -1,9 +1,11 @@
-import type { UmbDocumentCollectionFilterModel } from '../../types.js';
-import type { UmbDocumentTreeItemModel } from '../../../tree/types.js';
+import { getPropertyValueByAlias } from '../index.js';
+import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
+import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -13,12 +15,20 @@ import type {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+
+import './column-layouts/document-table-column-name.element.js';
+import './column-layouts/document-table-column-state.element.js';
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
-	private _items?: Array<UmbDocumentTreeItemModel>;
+	private _loading = false;
+
+	@state()
+	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
+
+	@state()
+	private _items?: Array<UmbDocumentCollectionItemModel>;
 
 	@state()
 	private _tableConfig: UmbTableConfig = {
@@ -26,10 +36,19 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	};
 
 	@state()
-	private _tableColumns: Array<UmbTableColumn> = [
+	private _tableColumns: Array<UmbTableColumn> = [];
+
+	#systemColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Name',
+			name: this.localize.term('general_name'),
 			alias: 'entityName',
+			elementName: 'umb-document-table-column-name',
+			allowSorting: true,
+		},
+		{
+			name: this.localize.term('content_publishStatus'),
+			alias: 'entityState',
+			elementName: 'umb-document-table-column-state',
 			allowSorting: true,
 		},
 	];
@@ -40,82 +59,123 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	private _collectionContext?: UmbDefaultCollectionContext<UmbDocumentTreeItemModel, UmbDocumentCollectionFilterModel>;
+	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
-			this._collectionContext = instance;
-			this._observeCollectionContext();
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+			this.#collectionContext = collectionContext;
+			this.#observeCollectionContext();
 		});
 	}
 
-	private _observeCollectionContext() {
-		if (!this._collectionContext) return;
+	#observeCollectionContext() {
+		if (!this.#collectionContext) return;
 
-		this.observe(this._collectionContext.items, (items) => {
-			this._items = items;
-			this._createTableItems(this._items);
-		});
+		this.observe(
+			this.#collectionContext.userDefinedProperties,
+			(userDefinedProperties) => {
+				this._userDefinedProperties = userDefinedProperties;
+				this.#createTableHeadings();
+			},
+			'umbCollectionUserDefinedPropertiesObserver',
+		);
 
-		this.observe(this._collectionContext.selection.selection, (selection) => {
-			this._selection = selection as string[];
-		});
+		this.observe(
+			this.#collectionContext.items,
+			(items) => {
+				this._items = items;
+				this.#createTableItems(this._items);
+			},
+			'umbCollectionItemsObserver',
+		);
+
+		this.observe(
+			this.#collectionContext.selection.selection,
+			(selection) => {
+				this._selection = selection as string[];
+			},
+			'umbCollectionSelectionObserver',
+		);
 	}
 
-	private _createTableItems(items: Array<UmbDocumentTreeItemModel>) {
+	#createTableHeadings() {
+		if (this._userDefinedProperties && this._userDefinedProperties.length > 0) {
+			const userColumns: Array<UmbTableColumn> = this._userDefinedProperties.map((item) => {
+				return {
+					name: item.header,
+					alias: item.alias,
+					elementName: item.elementName,
+					allowSorting: true,
+				};
+			});
+
+			this._tableColumns = [...this.#systemColumns, ...userColumns];
+		}
+	}
+
+	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
 		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
+
+			const data =
+				this._tableColumns?.map((column) => {
+					return {
+						columnAlias: column.alias,
+						value: column.elementName ? item : getPropertyValueByAlias(item, column.alias),
+					};
+				}) ?? [];
+
 			return {
 				id: item.unique,
-				icon: item.documentType.icon,
-				data: [
-					{
-						columnAlias: 'entityName',
-						value: item.name || 'Unnamed Document',
-					},
-					// {
-					// 	columnAlias: 'entityActions',
-					// 	value: {
-					// 		entityType: item.entityType,
-					// 	},
-					// },
-				],
+				icon: item.icon,
+				data: data,
 			};
 		});
 	}
 
-	private _handleSelect(event: UmbTableSelectedEvent) {
+	#handleSelect(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.selection.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	private _handleDeselect(event: UmbTableDeselectedEvent) {
+	#handleDeselect(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.selection.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	private _handleOrdering(event: UmbTableOrderedEvent) {
+	#handleOrdering(event: UmbTableOrderedEvent) {
 		const table = event.target as UmbTableElement;
 		const orderingColumn = table.orderingColumn;
 		const orderingDesc = table.orderingDesc;
-		console.log(`fetch media items, order column: ${orderingColumn}, desc: ${orderingDesc}`);
+		this.#collectionContext?.setFilter({
+			orderBy: orderingColumn,
+			orderDirection: orderingDesc ? 'desc' : 'asc',
+		});
 	}
 
 	render() {
+		if (this._loading) {
+			return html`<div class="container"><uui-loader></uui-loader></div>`;
+		}
+
+		if (this._tableItems.length === 0) {
+			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
+		}
+
 		return html`
 			<umb-table
 				.config=${this._tableConfig}
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this._handleSelect}"
-				@deselected="${this._handleDeselect}"
-				@ordered="${this._handleOrdering}"></umb-table>
+				@selected="${this.#handleSelect}"
+				@deselected="${this.#handleDeselect}"
+				@ordered="${this.#handleOrdering}"></umb-table>
 		`;
 	}
 
@@ -134,6 +194,12 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			umb-table {
 				padding: 0; /* To fix the embedded padding in the table component. */
 			}
+
+			.container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
 		`,
 	];
 }
@@ -142,6 +208,6 @@ export default UmbDocumentTableCollectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-view-document-table': UmbDocumentTableCollectionViewElement;
+		'umb-document-table-collection-view': UmbDocumentTableCollectionViewElement;
 	}
 }

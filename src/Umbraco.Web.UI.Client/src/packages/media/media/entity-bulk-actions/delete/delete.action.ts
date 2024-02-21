@@ -5,7 +5,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaDetailRepository> {
+export class UmbMediaDeleteEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaDetailRepository> {
 	#modalContext?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
@@ -17,7 +17,8 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 	}
 
 	async execute() {
-		alert('not implemented');
+		console.log(`execute delete for: ${this.selection}`);
+
 		// TODO: show error
 		if (!this.#modalContext || !this.repository) return;
 

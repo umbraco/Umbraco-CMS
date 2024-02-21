@@ -4,21 +4,24 @@ import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manage
 import { umbMediaTypeMockDb } from '../media-type/media-type.db.js';
 import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbEntityRecycleBin } from '../utils/entity/entity-recycle-bin.js';
-import type { UmbMockMediaModel } from './media.data.js';
+import { UmbMockMediaCollectionManager } from './media-collection.manager.js';
 import { data } from './media.data.js';
+import type { UmbMockMediaModel } from './media.data.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CreateMediaRequestModel,
+	MediaCollectionResponseModel,
 	MediaItemResponseModel,
 	MediaResponseModel,
 	MediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMediaModel>(this, treeItemMapper);
 	item = new UmbMockEntityItemManager<UmbMockMediaModel>(this, itemMapper);
 	detail = new UmbMockEntityDetailManager<UmbMockMediaModel>(this, createMockMediaMapper, detailResponseMapper);
 	recycleBin = new UmbEntityRecycleBin<UmbMockMediaModel>(this.data, treeItemMapper);
+	collection = new UmbMockMediaCollectionManager(this, collectionMapper);
 
 	constructor(data: Array<UmbMockMediaModel>) {
 		super(data);
@@ -96,6 +99,21 @@ const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
 		},
 		id: model.id,
 		isTrashed: model.isTrashed,
+		variants: model.variants,
+	};
+};
+
+const collectionMapper = (model: UmbMockMediaModel): MediaCollectionResponseModel => {
+	return {
+		creator: null,
+		id: model.id,
+		mediaType: {
+			id: model.mediaType.id,
+			alias: '',
+			icon: model.mediaType.icon,
+		},
+		sortOrder: 0,
+		values: model.values,
 		variants: model.variants,
 	};
 };

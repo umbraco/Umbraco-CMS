@@ -51,5 +51,6 @@ const mapper = (item: NamedEntityTreeItemResponseModel): UmbDictionaryTreeItemMo
 		entityType: UMB_DICTIONARY_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
 		isFolder: false,
+		icon: 'icon-book-alt',
 	};
 };

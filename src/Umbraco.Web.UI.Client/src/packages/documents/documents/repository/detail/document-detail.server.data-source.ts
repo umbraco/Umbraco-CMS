@@ -56,6 +56,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: null,
 					createDate: null,
 					updateDate: null,
+					isMandatory: false,
 				},
 			],
 			...preset,
@@ -101,6 +102,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
+					isMandatory: false, // TODO: this is not correct. It will be solved when we know where to get the isMandatory from
 				};
 			}),
 			urls: data.urls.map((url) => {

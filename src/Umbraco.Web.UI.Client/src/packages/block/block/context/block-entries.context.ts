@@ -6,8 +6,8 @@ import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 export abstract class UmbBlockEntriesContext<
 	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
@@ -22,6 +22,9 @@ export abstract class UmbBlockEntriesContext<
 	_retrieveManager;
 
 	_workspaceModal: UmbModalRouteRegistrationController;
+
+	protected _catalogueRouteBuilderState = new UmbBasicState<UmbModalRouteBuilder | undefined>(undefined);
+	readonly catalogueRouteBuilder = this._catalogueRouteBuilderState.asObservable();
 
 	#workspacePath = new UmbStringState(undefined);
 	workspacePath = this.#workspacePath.asObservable();
@@ -65,6 +68,11 @@ export abstract class UmbBlockEntriesContext<
 				const newPath = routeBuilder({});
 				this.#workspacePath.setValue(newPath);
 			});
+	}
+
+	async getManager() {
+		await this._retrieveManager;
+		return this._manager!;
 	}
 
 	protected abstract _gotBlockManager(): void;

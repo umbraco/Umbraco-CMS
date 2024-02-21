@@ -666,6 +666,45 @@ export const data: Array<UmbMockDataTypeModel> = [
 					{
 						label: 'Mocked Block Type for Block Grid',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						rowMinSpan: 1,
+						rowMaxSpan: 2,
+						columnSpanOptions: [
+							{
+								columnSpan: 1,
+							},
+							{
+								columnSpan: 2,
+							},
+							{
+								columnSpan: 3,
+							},
+							{
+								columnSpan: 6,
+							},
+							{
+								columnSpan: 12,
+							},
+						],
+						areas: [
+							{
+								key: 'area1_key',
+								alias: 'area1_alias',
+								columnSpan: 6,
+								rowSpan: 1,
+								minAllowed: 1,
+								maxAllowed: 2,
+								specifiedAllowance: [],
+							},
+							{
+								key: 'area2_key',
+								alias: 'area2_alias',
+								columnSpan: 6,
+								rowSpan: 1,
+								minAllowed: 1,
+								maxAllowed: 2,
+								specifiedAllowance: [],
+							},
+						],
 					},
 					{
 						label: 'Mocked Coffee Block',

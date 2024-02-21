@@ -459,7 +459,7 @@ export class DocumentResource {
         requestBody,
     }: {
         id: string,
-        requestBody?: (PublishDocumentRequestModel | PublishDocumentWithDescendantsRequestModel),
+        requestBody?: PublishDocumentRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',

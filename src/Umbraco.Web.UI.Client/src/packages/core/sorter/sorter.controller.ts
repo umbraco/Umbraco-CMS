@@ -52,10 +52,24 @@ function destroyIgnorerElements(element: HTMLElement, ignorerSelectors: string) 
 }
 function setupPreventEvent(element: Element) {
 	(element as HTMLElement).draggable = false;
+	//(element as HTMLElement).setAttribute('draggable', 'false');
 }
 function destroyPreventEvent(element: Element) {
-	element.removeAttribute('draggable');
+	(element as HTMLElement).draggable = false;
+	//element.removeAttribute('draggable');
 }
+
+export type resolveVerticalDirectionArgs<T, ElementType extends HTMLElement> = {
+	containerElement: Element;
+	containerRect: DOMRect;
+	item: T;
+	element: ElementType;
+	elementRect: DOMRect;
+	relatedElement: ElementType;
+	relatedRect: DOMRect;
+	placeholderIsInThisRow: boolean;
+	horizontalPlaceAfter: boolean;
+};
 
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	getUniqueOfElement: (element: ElementType) => string | null | symbol | number;
@@ -78,17 +92,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	onDisallowed?: () => void;
 	onAllowed?: () => void;
 	onRequestDrop?: (argument: { item: T }) => boolean | void;
-	resolveVerticalDirection?: (argument: {
-		containerElement: Element;
-		containerRect: DOMRect;
-		item: T;
-		element: ElementType;
-		elementRect: DOMRect;
-		relatedElement: ElementType;
-		relatedRect: DOMRect;
-		placeholderIsInThisRow: boolean;
-		horizontalPlaceAfter: boolean;
-	}) => void;
+	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => void;
 	performItemMove?: (argument: { item: T; newIndex: number; oldIndex: number }) => Promise<boolean> | boolean;
 	performItemInsert?: (argument: { item: T; newIndex: number }) => Promise<boolean> | boolean;
 	performItemRemove?: (argument: { item: T }) => Promise<boolean> | boolean;
@@ -276,8 +280,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			setupIgnorerElements(element, this.#config.ignorerSelector);
 		}
 
-		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
-			element.draggable = true;
+		if (!this.#config.disabledItemSelector || !element.matches('> ' + this.#config.disabledItemSelector)) {
+			// Idea: to make sure on does not get initialized twice: if ((element as HTMLElement).draggable === true) return;
+			(element as HTMLElement).draggable = true;
 			element.addEventListener('dragstart', this.#handleDragStart);
 			element.addEventListener('dragend', this.#handleDragEnd);
 		}
