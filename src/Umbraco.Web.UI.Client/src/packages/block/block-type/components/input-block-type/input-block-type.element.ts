@@ -1,5 +1,9 @@
 import type { UmbBlockTypeBaseModel } from '../../types.js';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_CONFIRM_MODAL,
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT,
+} from '@umbraco-cms/backoffice/modal';
 import '../block-type-card/index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -74,6 +78,22 @@ export class UmbInputBlockTypeElement<
 		return undefined;
 	}
 
+	#onRequestDelete(item: BlockType) {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
+			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
+				data: {
+					color: 'danger',
+					headline: `Remove [TODO: Get name]?`,
+					content: 'Are you sure you want to remove this block type?',
+					confirmLabel: 'Remove',
+				},
+			});
+
+			await modalContext?.onSubmit();
+			this.deleteItem(item.contentElementTypeKey);
+		});
+	}
+
 	render() {
 		return html`<div>
 			${repeat(this.value, (block) => block.contentElementTypeKey, this.#renderItem)} ${this.#renderButton()}
@@ -83,9 +103,16 @@ export class UmbInputBlockTypeElement<
 	#renderItem = (item: BlockType) => {
 		return html`
 			<umb-block-type-card
-				.workspacePath=${this.workspacePath}
-				.key=${item.contentElementTypeKey}
-				@delete=${() => this.deleteItem(item.contentElementTypeKey)}>
+				.name=${block.label}
+				.iconColor=${block.iconColor}
+				.backgroundColor=${block.backgroundColor}
+				.href="${this.workspacePath}/edit/${item.contentElementTypeKey}"
+				.key=${item.contentElementTypeKey}>
+				<uui-action-bar slot="actions">
+					<uui-button @click=${this.#onRequestDelete} label="Remove block">
+						<uui-icon name="icon-trash"></uui-icon>
+					</uui-button>
+				</uui-action-bar>
 			</umb-block-type-card>
 		`;
 	};

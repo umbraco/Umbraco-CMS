@@ -56,6 +56,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		const blocks: Array<UmbBlockTypeWithGroupKey> = this.data.blocks ?? [];
 		const blockGroups: Array<UmbBlockTypeGroup> = this.data.blockGroups ?? [];
 
+		console.log(blocks, blockGroups);
+
 		const noGroupBlocks = blocks.filter((block) => !blockGroups.find((group) => group.key === block.groupKey));
 		const grouped = blockGroups.map((group) => ({
 			name: group.name ?? '',
@@ -86,22 +88,23 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderCreateEmpty() {
+		console.log('render', this._groupedBlocks);
 		return html`
 			${this._groupedBlocks.map(
 				(group) => html`
-					${group.name ? html`<h4>${group.name}</h4>` : nothing}
+					${group.name && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
 					<div class="blockGroup">
 						${repeat(
 							group.blocks,
 							(block) => block.contentElementTypeKey,
 							(block) => html`
-								<uui-card-block-type
-									name=${ifDefined(block.label)}
-									background=${ifDefined(block.backgroundColor)}
-									style="color: ${block.iconColor}"
-									href="${this._workspacePath}create/${block.contentElementTypeKey}">
-									<uui-icon .name=${block.icon ?? ''}></uui-icon>
-								</uui-card-block-type>
+								<umb-block-type-card
+									.name=${ifDefined(block.label)}
+									.iconColor=${block.iconColor}
+									.backgroundColor=${block.backgroundColor}
+									.key=${block.contentElementTypeKey}
+									.href="${this._workspacePath}create/${block.contentElementTypeKey}">
+								</umb-block-type-card>
 							`,
 						)}
 					</div>
