@@ -10,7 +10,8 @@
   },
   "publicReleaseRefSpec": [
     "^refs/heads/main$",
-    "^refs/heads/release/"
+    "^refs/heads/release/",
+    "^refs/tags/release-"
   ],
   "release": {
     "branchName": "release/{version}",
