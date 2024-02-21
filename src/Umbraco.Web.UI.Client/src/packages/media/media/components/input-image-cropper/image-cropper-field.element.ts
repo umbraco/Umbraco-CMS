@@ -9,7 +9,6 @@ import type {
 	UmbImageCropperPropertyEditorValue,
 } from './index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -56,19 +55,10 @@ export class UmbInputImageCropperFieldElement extends UmbLitElement {
 	@state()
 	src = '';
 
-	#serverUrl = '';
-
 	get source() {
 		if (this.fileDataUrl) return this.fileDataUrl;
-		if (this.src) return this.#serverUrl + this.src;
+		if (this.src) return this.src;
 		return '';
-	}
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.#serverUrl = instance.getServerUrl();
-		});
 	}
 
 	updated(changedProperties: Map<string | number | symbol, unknown>) {

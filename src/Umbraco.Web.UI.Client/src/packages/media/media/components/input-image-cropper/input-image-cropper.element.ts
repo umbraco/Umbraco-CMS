@@ -1,6 +1,4 @@
-import type { TemporaryFileQueueItem } from '../../../../core/temporary-file/temporary-file-manager.class.js';
-import { UmbTemporaryFileManager } from '../../../../core/temporary-file/temporary-file-manager.class.js';
-import type { UmbImageCropperPropertyEditorValue } from './index.js';
+import type { UmbImageCropperPropertyEditorValue } from './types.js';
 import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
@@ -10,6 +8,7 @@ import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { type TemporaryFileQueueItem, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 
 @customElement('umb-input-image-cropper')
 export class UmbInputImageCropperElement extends UmbLitElement {
