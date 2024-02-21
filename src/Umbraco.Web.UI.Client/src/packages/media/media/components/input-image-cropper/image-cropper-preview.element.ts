@@ -153,7 +153,9 @@ export class UmbImageCropperPreviewElement extends LitElement {
 			</div>
 			<span id="alias">${this.crop.alias}</span>
 			<span id="dimensions">${this.crop.width} x ${this.crop.height}</span>
-			${this.crop.coordinates ? html`<span id="user-defined">User defined</span>` : nothing}
+			${this.crop.coordinates
+				? html`<span id="user-defined"><umb-localize key="imagecropper_customCrop">User defined</umb-localize></span>`
+				: nothing}
 		`;
 	}
 	static styles = css`
