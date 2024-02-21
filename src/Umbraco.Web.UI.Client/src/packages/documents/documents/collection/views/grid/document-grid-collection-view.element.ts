@@ -13,21 +13,21 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	private _items: Array<UmbDocumentCollectionItemModel> = [];
 
 	@state()
+	private _loading = false;
+
+	@state()
 	private _selection: Array<string | null> = [];
 
 	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
-
-	@state()
-	private _loading = false;
 
 	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance;
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
 	}
@@ -35,31 +35,39 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	#observeCollectionContext() {
 		if (!this.#collectionContext) return;
 
-		this.observe(this.#collectionContext.userDefinedProperties, (userDefinedProperties) => {
-			this._userDefinedProperties = userDefinedProperties;
-		},'umbCollectionUserDefinedPropertiesObserver');
+		this.observe(
+			this.#collectionContext.userDefinedProperties,
+			(userDefinedProperties) => {
+				this._userDefinedProperties = userDefinedProperties;
+			},
+			'umbCollectionUserDefinedPropertiesObserver',
+		);
+
+		this.observe(this.#collectionContext.items, (items) => (this._items = items), 'umbCollectionItemsObserver');
 
 		this.observe(
 			this.#collectionContext.selection.selection,
 			(selection) => (this._selection = selection),
 			'umbCollectionSelectionObserver',
 		);
-
-		this.observe(this.#collectionContext.items, (items) => (this._items = items), 'umbCollectionItemsObserver');
 	}
 
 	// TODO: How should we handle url stuff? [?]
-	private _handleOpenCard(id: string) {
+	#onOpen(id: string) {
 		// TODO: this will not be needed when cards works as links with href [?]
 		history.pushState(null, '', 'section/content/workspace/document/edit/' + id);
 	}
 
 	#onSelect(item: UmbDocumentCollectionItemModel) {
-		this.#collectionContext?.selection.select(item.unique ?? '');
+		this.#collectionContext?.selection.select(item.unique);
 	}
 
 	#onDeselect(item: UmbDocumentCollectionItemModel) {
-		this.#collectionContext?.selection.deselect(item.unique ?? '');
+		this.#collectionContext?.selection.deselect(item.unique);
+	}
+
+	#isSelected(item: UmbDocumentCollectionItemModel) {
+		return this.#collectionContext?.selection.isSelected(item.unique);
 	}
 
 	render() {
@@ -88,8 +96,8 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				.name=${item.name ?? 'Unnamed Document'}
 				selectable
 				?select-only=${this._selection.length > 0}
-				?selected=${this.#collectionContext?.selection.isSelected(item.unique ?? '')}
-				@open=${() => this._handleOpenCard(item.unique ?? '')}
+				?selected=${this.#isSelected(item)}
+				@open=${() => this.#onOpen(item.unique ?? '')}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<uui-icon slot="icon" name=${item.icon}></uui-icon>

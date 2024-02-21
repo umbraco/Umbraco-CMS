@@ -38,6 +38,47 @@ import { request as __request } from '../core/request';
 export class UserResource {
 
     /**
+     * @returns PagedUserResponseModel Success
+     * @throws ApiError
+     */
+    public static getFilterUser({
+        skip,
+        take = 100,
+        orderBy,
+        orderDirection,
+        userGroupIds,
+        userStates,
+        filter = '',
+    }: {
+        skip?: number,
+        take?: number,
+        orderBy?: UserOrderModel,
+        orderDirection?: DirectionModel,
+        userGroupIds?: Array<string>,
+        userStates?: Array<UserStateModel>,
+        filter?: string,
+    }): CancelablePromise<PagedUserResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/filter/user',
+            query: {
+                'skip': skip,
+                'take': take,
+                'orderBy': orderBy,
+                'orderDirection': orderDirection,
+                'userGroupIds': userGroupIds,
+                'userStates': userStates,
+                'filter': filter,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -612,45 +653,6 @@ export class UserResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getUserFilter({
-        skip,
-        take = 100,
-        orderBy,
-        orderDirection,
-        userGroupIds,
-        userStates,
-        filter = '',
-    }: {
-        skip?: number,
-        take?: number,
-        orderBy?: UserOrderModel,
-        orderDirection?: DirectionModel,
-        userGroupIds?: Array<string>,
-        userStates?: Array<UserStateModel>,
-        filter?: string,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/user/filter',
-            query: {
-                'skip': skip,
-                'take': take,
-                'orderBy': orderBy,
-                'orderDirection': orderDirection,
-                'userGroupIds': userGroupIds,
-                'userStates': userStates,
-                'filter': filter,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

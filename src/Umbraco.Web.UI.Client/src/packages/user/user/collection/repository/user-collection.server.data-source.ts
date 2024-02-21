@@ -32,10 +32,14 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbUserCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserFilter(filter));
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getFilterUser(filter));
 
 		if (error) {
 			return { error };
+		}
+
+		if (!data) {
+			return { data: { items: [], total: 0 } };
 		}
 
 		const { items, total } = data;
