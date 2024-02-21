@@ -5687,9 +5687,6 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/PublishDocumentRequestModel"
-                  },
-                  {
-                    "$ref": "#/components/schemas/PublishDocumentWithDescendantsRequestModel"
                   }
                 ]
               }
@@ -5699,9 +5696,6 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/PublishDocumentRequestModel"
-                  },
-                  {
-                    "$ref": "#/components/schemas/PublishDocumentWithDescendantsRequestModel"
                   }
                 ]
               }
@@ -5711,9 +5705,6 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/PublishDocumentRequestModel"
-                  },
-                  {
-                    "$ref": "#/components/schemas/PublishDocumentWithDescendantsRequestModel"
                   }
                 ]
               }
@@ -11516,6 +11507,81 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/recycle-bin/media/{id}": {
+      "delete": {
+        "tags": [
+          "Media"
+        ],
+        "operationId": "DeleteRecycleBinMediaById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -26105,6 +26171,24 @@
         },
         "additionalProperties": false
       },
+      "CultureAndScheduleRequestModel": {
+        "type": "object",
+        "properties": {
+          "culture": {
+            "type": "string",
+            "nullable": true
+          },
+          "schedule": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ScheduleRequestModel"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CultureReponseModel": {
         "required": [
           "englishName",
@@ -30751,14 +30835,18 @@
       },
       "PublishDocumentRequestModel": {
         "required": [
-          "cultures"
+          "publishSchedules"
         ],
         "type": "object",
         "properties": {
-          "cultures": {
+          "publishSchedules": {
             "type": "array",
             "items": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CultureAndScheduleRequestModel"
+                }
+              ]
             }
           }
         },
@@ -30766,17 +30854,19 @@
       },
       "PublishDocumentWithDescendantsRequestModel": {
         "required": [
+          "cultures",
           "includeUnpublishedDescendants"
         ],
         "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/PublishDocumentRequestModel"
-          }
-        ],
         "properties": {
           "includeUnpublishedDescendants": {
             "type": "boolean"
+          },
+          "cultures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "additionalProperties": false
@@ -31177,6 +31267,22 @@
             "$ref": "#/components/schemas/SavedLogSearchPresenationBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "ScheduleRequestModel": {
+        "type": "object",
+        "properties": {
+          "publishTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "unpublishTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
         "additionalProperties": false
       },
       "ScriptFolderResponseModel": {

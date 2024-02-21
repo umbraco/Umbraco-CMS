@@ -33,7 +33,7 @@ public class RelationResponseModel
     ///     Gets or sets the date when the Relation was created.
     /// </summary>
     [ReadOnly(true)]
-    public DateTime CreateDate { get; set; }
+    public DateTimeOffset CreateDate { get; set; }
 
     /// <summary>
     ///     Gets or sets a comment for the Relation.

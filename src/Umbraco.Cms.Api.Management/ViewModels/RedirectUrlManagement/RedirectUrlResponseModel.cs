@@ -8,7 +8,7 @@ public class RedirectUrlResponseModel
 
     public required string DestinationUrl { get; set; }
 
-    public DateTime Created { get; set; }
+    public DateTimeOffset Created { get; set; }
 
     public required ReferenceByIdModel Document { get; set; }
 
