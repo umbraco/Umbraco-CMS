@@ -354,8 +354,9 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
         /// <returns><see cref="IDataType"/></returns>
-        public IDataType? GetDataType(Guid id) =>
-            _idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.DataType) switch
+        public IDataType? GetDataType(Guid id)
+            // Lookup the integer ID, so the data type can be retrieved from the repository cache
+            =>_idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.DataType) switch
             {
                 { Success: false } => null,
                 { Result: var intId } => GetDataType(intId),

@@ -50,7 +50,7 @@ public class ContentPropertyMapDefinition : IMapDefinition
             dataTypeConfigurationCache);
     }
 
-    [Obsolete]
+    [Obsolete("Please use constructor that takes an IDataTypeConfigurationCache. Will be removed in V14.")]
     public ContentPropertyMapDefinition(
         ICultureDictionary cultureDictionary,
         IDataTypeService dataTypeService,
