@@ -72,8 +72,6 @@ public class ExamineExternalIndexTests : ExamineBaseTest
                 ContentTreeChangeDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddExamineIndexes();
-        builder.AddBackOfficeIdentity();
-        BackOfficeAuthBuilderExtensions.AddBackOfficeAuthentication(builder);
         builder.Services.AddHostedService<QueuedHostedService>();
     }
 
