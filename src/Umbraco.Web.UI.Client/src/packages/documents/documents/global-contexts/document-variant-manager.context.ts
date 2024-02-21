@@ -62,7 +62,7 @@ export class UmbDocumentVariantManagerContext
 			type,
 			variants: availableVariants,
 		};
-		debugger;
+
 		const modalContext = this.#modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
 			data: modalData,
 			value: { selection: activeVariantCulture ? [activeVariantCulture] : [] },
