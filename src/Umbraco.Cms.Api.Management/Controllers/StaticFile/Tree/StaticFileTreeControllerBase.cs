@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 
@@ -32,7 +33,12 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
             ? Array.Empty<string>()
             : base.GetFiles(path);
 
+    protected override FileSystemTreeItemPresentationModel[] GetAncestorDirectories(string path)
+        => IsAllowedPath(path)
+            ? base.GetAncestorDirectories(path)
+            : Array.Empty<FileSystemTreeItemPresentationModel>();
+
     private bool IsTreeRootPath(string path) => string.IsNullOrWhiteSpace(path);
 
-    private bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}/"));
+    private bool IsAllowedPath(string path) => _allowedRootFolders.Contains(path) || _allowedRootFolders.Any(folder => path.StartsWith($"{folder}{Path.DirectorySeparatorChar}"));
 }

@@ -41,6 +41,24 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         return await Task.FromResult(Ok(result));
     }
 
+    protected virtual async Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetAncestors(string path)
+    {
+        path = path.VirtualPathToSystemPath();
+        FileSystemTreeItemPresentationModel[] models = GetAncestorDirectories(path);
+
+        return await Task.FromResult(Ok(models));
+    }
+
+    protected virtual FileSystemTreeItemPresentationModel[] GetAncestorDirectories(string path)
+    {
+        var directories = path.Split(Path.DirectorySeparatorChar).Take(Range.EndAt(Index.FromEnd(1))).ToArray();
+        FileSystemTreeItemPresentationModel[] result = directories
+            .Select((directory, index) => MapViewModel(string.Join(Path.DirectorySeparatorChar, directories.Take(index + 1)), directory, true))
+            .ToArray();
+
+        return result;
+    }
+
     protected virtual string[] GetDirectories(string path) => FileSystem
         .GetDirectories(path)
         .OrderBy(directory => directory)
