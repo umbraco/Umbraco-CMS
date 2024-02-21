@@ -198,6 +198,8 @@ test.describe('Partial View tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
+    // Wait for the partial view to open
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.insertDictionaryByName(dictionaryName);
     await umbracoUi.partialView.clickSaveButton();
 
