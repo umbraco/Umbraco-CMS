@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
-using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -35,14 +34,11 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
                 .Build());
         }
 
-        EntityContainer? parentContainer = await _treeEntityTypeContainerService.GetParentAsync(container);
-
         // we could implement a mapper for this but it seems rather overkill at this point
         return Ok(new FolderResponseModel
         {
             Name = container.Name!,
-            Id = container.Key,
-            Parent = ReferenceByIdModel.ReferenceOrNull(parentContainer?.Key)
+            Id = container.Key
         });
     }
 
