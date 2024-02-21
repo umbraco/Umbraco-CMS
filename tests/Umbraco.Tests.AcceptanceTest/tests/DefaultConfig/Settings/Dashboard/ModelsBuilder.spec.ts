@@ -1,6 +1,6 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-test.describe('Models Builder tests', () => {
+test.describe('Models Builder Dashboard tests', () => {
 
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();

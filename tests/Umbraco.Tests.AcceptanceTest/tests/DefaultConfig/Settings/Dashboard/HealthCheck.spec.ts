@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
-test.describe('Health Check tests', () => {
+test.describe('Health Check Dashboard tests', () => {
 
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
