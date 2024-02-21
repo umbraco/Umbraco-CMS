@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Extensions;
@@ -18,8 +17,6 @@ public class BackOfficeWebAssets
     public const string UmbracoInitCssBundleName = "umbraco-backoffice-init-css";
     public const string UmbracoCoreJsBundleName = "umbraco-backoffice-js";
     public const string UmbracoExtensionsJsBundleName = "umbraco-backoffice-extensions-js";
-    public const string UmbracoNonOptimizedPackageJsBundleName = "umbraco-backoffice-non-optimized-js";
-    public const string UmbracoNonOptimizedPackageCssBundleName = "umbraco-backoffice-non-optimized-css";
     public const string UmbracoTinyMceJsBundleName = "umbraco-tinymce-js";
     public const string UmbracoUpgradeCssBundleName = "umbraco-authorize-upgrade-css";
     private readonly CustomBackOfficeAssetsCollection _customBackOfficeAssetsCollection;
