@@ -24,7 +24,6 @@ public class BackOfficeWebAssets
     public const string UmbracoUpgradeCssBundleName = "umbraco-authorize-upgrade-css";
     private readonly CustomBackOfficeAssetsCollection _customBackOfficeAssetsCollection;
     private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly ILegacyManifestParser _parser;
     private readonly PropertyEditorCollection _propertyEditorCollection;
 
     private readonly IRuntimeMinifier _runtimeMinifier;
@@ -32,14 +31,12 @@ public class BackOfficeWebAssets
 
     public BackOfficeWebAssets(
         IRuntimeMinifier runtimeMinifier,
-        ILegacyManifestParser parser,
         PropertyEditorCollection propertyEditorCollection,
         IHostingEnvironment hostingEnvironment,
         IOptionsMonitor<GlobalSettings> globalSettings,
         CustomBackOfficeAssetsCollection customBackOfficeAssetsCollection)
     {
         _runtimeMinifier = runtimeMinifier;
-        _parser = parser;
         _propertyEditorCollection = propertyEditorCollection;
         _hostingEnvironment = hostingEnvironment;
         _globalSettings = globalSettings.CurrentValue;
@@ -47,9 +44,6 @@ public class BackOfficeWebAssets
 
         globalSettings.OnChange(x => _globalSettings = x);
     }
-
-    public static string GetIndependentPackageBundleName(LegacyManifestAssets legacyManifestAssets, AssetType assetType)
-        => $"{legacyManifestAssets.PackageName.ToLowerInvariant()}-{(assetType == AssetType.Css ? "css" : "js")}";
 
     public void CreateBundles()
     {
@@ -118,12 +112,6 @@ public class BackOfficeWebAssets
             FormatPaths(
                 GetScriptsForBackOfficeExtensions(jsAssets)));
 
-        // Create a bundle per package manifest that is declaring an Independent bundle type
-        RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest.Scripts, AssetType.Javascript);
-
-        // Create a single non-optimized (no file processing) bundle for all manifests declaring None as a bundle option
-        RegisterPackageBundlesForNoneOption(_parser.CombinedManifest.Scripts, UmbracoNonOptimizedPackageJsBundleName);
-
         // This bundle includes all CSS from property editor assets,
         // custom back office assets, and any CSS found in package manifests
         // that have the default bundle options.
@@ -140,68 +128,6 @@ public class BackOfficeWebAssets
             BundlingOptions.OptimizedAndComposite,
             FormatPaths(
                 GetStylesheetsForBackOffice(cssAssets)));
-
-        // Create a bundle per package manifest that is declaring an Independent bundle type
-        RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest?.Stylesheets, AssetType.Css);
-
-        // Create a single non-optimized (no file processing) bundle for all manifests declaring None as a bundle option
-        RegisterPackageBundlesForNoneOption(
-            _parser.CombinedManifest?.Stylesheets,
-            UmbracoNonOptimizedPackageCssBundleName);
-    }
-
-    private void RegisterPackageBundlesForNoneOption(
-        IReadOnlyDictionary<BundleOptions, IReadOnlyList<LegacyManifestAssets>>? combinedPackageManifestAssets,
-        string bundleName)
-    {
-        var assets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-
-        // Create a bundle per package manifest that is declaring the matching BundleOptions
-        if (combinedPackageManifestAssets?.TryGetValue(
-            BundleOptions.None,
-            out IReadOnlyList<LegacyManifestAssets>? manifestAssetList) ?? false)
-        {
-            foreach (var asset in manifestAssetList.SelectMany(x => x.Assets))
-            {
-                assets.Add(asset);
-            }
-        }
-
-        _runtimeMinifier.CreateJsBundle(
-            bundleName,
-
-            // no optimization, no composite files, just render individual files
-            BundlingOptions.NotOptimizedNotComposite,
-            FormatPaths(assets.ToArray()));
-    }
-
-    private void RegisterPackageBundlesForIndependentOptions(
-        IReadOnlyDictionary<BundleOptions, IReadOnlyList<LegacyManifestAssets>>? combinedPackageManifestAssets,
-        AssetType assetType)
-    {
-        // Create a bundle per package manifest that is declaring the matching BundleOptions
-        if (combinedPackageManifestAssets?.TryGetValue(
-            BundleOptions.Independent,
-            out IReadOnlyList<LegacyManifestAssets>? manifestAssetList) ?? false)
-        {
-            foreach (LegacyManifestAssets manifestAssets in manifestAssetList)
-            {
-                var bundleName = GetIndependentPackageBundleName(manifestAssets, assetType);
-                var filePaths = FormatPaths(manifestAssets.Assets.ToArray());
-
-                switch (assetType)
-                {
-                    case AssetType.Javascript:
-                        _runtimeMinifier.CreateJsBundle(bundleName, BundlingOptions.OptimizedAndComposite, filePaths);
-                        break;
-                    case AssetType.Css:
-                        _runtimeMinifier.CreateCssBundle(bundleName, BundlingOptions.OptimizedAndComposite, filePaths);
-                        break;
-                    default:
-                        throw new IndexOutOfRangeException();
-                }
-            }
-        }
     }
 
     /// <summary>
@@ -211,17 +137,6 @@ public class BackOfficeWebAssets
     private string[] GetScriptsForBackOfficeExtensions(IEnumerable<string?> propertyEditorScripts)
     {
         var scripts = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-
-        // only include scripts with the default bundle options here
-        if (_parser.CombinedManifest.Scripts.TryGetValue(
-            BundleOptions.Default,
-            out IReadOnlyList<LegacyManifestAssets>? manifestAssets))
-        {
-            foreach (var script in manifestAssets.SelectMany(x => x.Assets))
-            {
-                scripts.Add(script);
-            }
-        }
 
         foreach (var script in propertyEditorScripts)
         {
@@ -251,17 +166,6 @@ public class BackOfficeWebAssets
     private string[] GetStylesheetsForBackOffice(IEnumerable<string?> propertyEditorStyles)
     {
         var stylesheets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-
-        // only include css with the default bundle options here
-        if (_parser.CombinedManifest.Stylesheets.TryGetValue(
-            BundleOptions.Default,
-            out IReadOnlyList<LegacyManifestAssets>? manifestAssets))
-        {
-            foreach (var script in manifestAssets.SelectMany(x => x.Assets))
-            {
-                stylesheets.Add(script);
-            }
-        }
 
         foreach (var stylesheet in propertyEditorStyles)
         {

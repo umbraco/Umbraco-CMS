@@ -65,10 +65,6 @@ public class DictionaryMapDefinition : IMapDefinition
         target.Name = source.ItemKey;
         target.ParentId = source.ParentId ?? Guid.Empty;
         target.Udi = Udi.Create(Constants.UdiEntityType.DictionaryItem, source.Key);
-        if (_commonMapper != null)
-        {
-            target.ContentApps.AddRange(_commonMapper.GetContentAppsForEntity(source));
-        }
 
         target.Path = _dictionaryService.CalculatePath(source.ParentId, source.Id);
 

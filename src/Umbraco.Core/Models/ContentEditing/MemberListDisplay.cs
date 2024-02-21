@@ -8,6 +8,4 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 [DataContract(Name = "content", Namespace = "")]
 public class MemberListDisplay : ContentItemDisplayBase<ContentPropertyDisplay>
 {
-    [DataMember(Name = "apps")]
-    public IEnumerable<ContentApp>? ContentApps { get; set; }
 }

@@ -281,7 +281,6 @@ public class ContentTypeMapDefinition : IMapDefinition
 
         target.AllowCultureVariant = source.VariesByCulture();
         target.AllowSegmentVariant = source.VariesBySegment();
-        target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
         target.Variations = source.Variations;
 
         // sync templates

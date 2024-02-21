@@ -28,7 +28,6 @@ public class ContentItemDisplay<TVariant> :
         Notifications = new List<BackOfficeNotification>();
         Errors = new Dictionary<string, object>();
         Variants = new List<TVariant>();
-        ContentApps = new List<ContentApp>();
     }
 
     [DataMember(Name = "id", IsRequired = true)]
@@ -170,9 +169,6 @@ public class ContentItemDisplay<TVariant> :
 
     [DataMember(Name = "isBlueprint")]
     public bool IsBlueprint { get; set; }
-
-    [DataMember(Name = "apps")]
-    public IEnumerable<ContentApp> ContentApps { get; set; }
 
     /// <summary>
     ///     The real persisted content object - used during inbound model binding

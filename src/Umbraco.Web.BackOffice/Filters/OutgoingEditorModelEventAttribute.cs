@@ -2,7 +2,6 @@ using System.Collections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
@@ -120,9 +119,6 @@ internal sealed class OutgoingEditorModelEventAttribute : TypeFilterAttribute
                                 break;
                             case UserDisplay user:
                                 _eventAggregator.Publish(new SendingUserNotification(user, umbracoContext));
-                                break;
-                            case IEnumerable<Tab<IDashboardSlim>> dashboards:
-                                _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
                                 break;
                             case IEnumerable<ContentTypeBasic> allowedChildren:
                                 // Changing the Enumerable will generate a new instance, so we need to update the context result with the new content
