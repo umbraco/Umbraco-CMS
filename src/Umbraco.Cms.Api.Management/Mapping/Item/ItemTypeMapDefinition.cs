@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Item;
 
@@ -47,6 +48,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
         target.EditorUiAlias = source.EditorUiAlias;
+        target.IsDeletable = source.IsDeletableDataType();
     }
 
     // Umbraco.Code.MapAll
