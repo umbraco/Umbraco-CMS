@@ -102,7 +102,13 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
-	static styles = [css``];
+	static styles = [
+		css`
+			#add-button {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbDocumentGranularUserPermissionElement;
