@@ -9,6 +9,7 @@ export * from './components/index.js';
 export * from './entity.js';
 export * from './entity-actions/index.js';
 export * from './conditions/index.js';
+export * from './modals/index.js';
 
 export { UMB_DOCUMENT_TREE_ALIAS } from './tree/index.js';
 export { UMB_CONTENT_MENU_ALIAS } from './menu.manifests.js';

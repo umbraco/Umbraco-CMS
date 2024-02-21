@@ -174,14 +174,14 @@ A modal can be opened by calling the open method on the UmbModalManagerContext. 
 
 ```ts
 import { html, LitElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbElementMixin } from '@umbraco-cms/element';
-import { UmbModalManagerContext, UMB_MODAL_CONTEXT_ALIAS } from '@umbraco-cms/modal';
+import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 class MyElement extends UmbElementMixin(LitElement) {
-	#modalManagerContext?: UmbmodalManagerContext;
+	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 			// modalManagerContext is now ready to be used
 		});
@@ -190,7 +190,7 @@ class MyElement extends UmbElementMixin(LitElement) {
 	#onClick() {
 		const data = {'data goes here'};
 		const value = {'initial value go here'};
-		const modalContext = this.#modalManagerContext?.open(MY_MODAL_TOKEN), {data: data, value: value});
+		const modalContext = this.#modalManagerContext?.open(MY_MODAL_TOKEN, {data: data, value: value});
 
 		modalContext?.onSubmit().then((value) => {
 			// if modal submitted, then data is supplied here.

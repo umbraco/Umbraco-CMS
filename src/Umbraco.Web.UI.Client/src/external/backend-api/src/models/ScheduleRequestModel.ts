@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type PublishDocumentWithDescendantsRequestModel = {
-    includeUnpublishedDescendants: boolean;
-    cultures: Array<string>;
+export type ScheduleRequestModel = {
+    publishTime?: string | null;
+    unpublishTime?: string | null;
 };
 
