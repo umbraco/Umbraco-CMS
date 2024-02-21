@@ -8,6 +8,7 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 	@property({ type: String, reflect: true })
 	name: string = '';
 
+	// TODO: Does it make any different to have this as a property?
 	@property({ type: Boolean, reflect: true, attribute: 'drag-placeholder' })
 	umbDragPlaceholder = false;
 

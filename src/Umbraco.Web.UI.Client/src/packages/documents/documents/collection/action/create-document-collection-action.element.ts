@@ -1,5 +1,4 @@
-import type { UmbCollectionConfiguration } from '../../../../core/collection/types.js';
-import { html, customElement, property, state, map, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';

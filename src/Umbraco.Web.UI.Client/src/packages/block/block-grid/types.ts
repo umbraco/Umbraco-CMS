@@ -5,14 +5,35 @@ export const UMB_BLOCK_GRID_TYPE = 'block-grid-type';
 
 // Configuration models:
 export interface UmbBlockGridTypeModel extends UmbBlockTypeBaseModel {
-	columnSpanOptions: Array<number>;
+	columnSpanOptions: Array<UmbBlockGridTypeColumnSpanOption>;
 	allowAtRoot: boolean;
 	allowInAreas: boolean;
 	rowMinSpan: number;
 	rowMaxSpan: number;
 	thumbnail?: string;
 	areaGridColumns?: number;
-	areas: Array<any>;
+	areas: Array<UmbBlockGridTypeAreaType>;
+}
+
+export type UmbBlockGridTypeColumnSpanOption = {
+	columnSpan: number;
+};
+
+export interface UmbBlockGridTypeAreaType {
+	key: string;
+	alias: string;
+	columnSpan?: number;
+	rowSpan?: number;
+	minAllowed?: number;
+	maxAllowed?: number;
+	specifiedAllowance?: Array<UmbBlockGridTypeAreaTypePermission>;
+}
+
+export interface UmbBlockGridTypeAreaTypePermission {
+	elementTypeKey?: string;
+	groupKey?: string;
+	minAllowed?: number;
+	maxAllowed?: number;
 }
 
 export interface UmbBlockGridTypeGroupType {

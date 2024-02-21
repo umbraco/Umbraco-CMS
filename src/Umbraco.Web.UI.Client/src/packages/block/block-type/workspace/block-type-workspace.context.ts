@@ -33,7 +33,6 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	readonly properties = this.#properties.asObservable();
 
 	constructor(host: UmbControllerHostElement, workspaceArgs: { manifest: ManifestWorkspace }) {
-		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
 		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 	}
