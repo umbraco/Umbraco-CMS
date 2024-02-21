@@ -264,6 +264,7 @@ export type { PagedMediaCollectionResponseModel } from './models/PagedMediaColle
 export type { PagedMediaRecycleBinItemResponseModel } from './models/PagedMediaRecycleBinItemResponseModel';
 export type { PagedMediaTreeItemResponseModel } from './models/PagedMediaTreeItemResponseModel';
 export type { PagedMediaTypeTreeItemResponseModel } from './models/PagedMediaTypeTreeItemResponseModel';
+export type { PagedMemberResponseModel } from './models/PagedMemberResponseModel';
 export type { PagedNamedEntityTreeItemResponseModel } from './models/PagedNamedEntityTreeItemResponseModel';
 export type { PagedObjectTypeResponseModel } from './models/PagedObjectTypeResponseModel';
 export type { PagedPackageDefinitionResponseModel } from './models/PagedPackageDefinitionResponseModel';
