@@ -161,7 +161,14 @@ export const data: Array<UmbMockMediaModel> = [
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
-		variants: [],
+		variants: [{
+			publishDate: '2023-02-06T15:31:51.354764',
+			culture: 'en-us',
+			segment: null,
+			name: 'John Doe',
+			createDate: '2023-02-06T15:31:46.876902',
+			updateDate: '2023-02-06T15:31:51.354764',
+		},],
 		urls: [],
 	},
 	{
