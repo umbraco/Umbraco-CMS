@@ -2,7 +2,7 @@ import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/e
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement, UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-tree-picker-modal')
@@ -30,11 +30,21 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this._selectionConfiguration.multiple = this.data?.multiple ?? false;
 	}
 
-	#onSelectionChange(e: CustomEvent) {
-		e.stopPropagation();
-		const element = e.target as UmbTreeElement;
+	#onSelectionChange(event: UmbSelectionChangeEvent) {
+		event.stopPropagation();
+		const element = event.target as UmbTreeElement;
 		this.value = { selection: element.getSelection() };
-		this.dispatchEvent(new UmbSelectionChangeEvent());
+		this.modalContext?.dispatchEvent(new UmbSelectionChangeEvent());
+	}
+
+	#onSelected(event: UmbSelectedEvent) {
+		event.stopPropagation();
+		this.modalContext?.dispatchEvent(new UmbSelectedEvent(event.unique));
+	}
+
+	#onDeselected(event: UmbDeselectedEvent) {
+		event.stopPropagation();
+		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
 
 	render() {
@@ -45,6 +55,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 						?hide-tree-root=${this.data?.hideTreeRoot}
 						alias=${ifDefined(this.data?.treeAlias)}
 						@selection-change=${this.#onSelectionChange}
+						@selected=${this.#onSelected}
+						@deselected=${this.#onDeselected}
 						.selectionConfiguration=${this._selectionConfiguration}
 						.filter=${this.data?.filter}
 						.selectableFilter=${this.data?.pickableFilter}></umb-tree>
