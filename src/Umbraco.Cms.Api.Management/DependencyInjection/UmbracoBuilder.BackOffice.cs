@@ -28,6 +28,7 @@ public static partial class UmbracoBuilderExtensions
         .AddBackOfficeCore()
         .AddBackOfficeIdentity()
         .AddBackOfficeAuthentication()
+        .AddTokenRevocation()
         .AddMembersIdentity()
         .AddUmbracoProfiler()
         .AddMvcAndRazor(configureMvc)
@@ -36,7 +37,8 @@ public static partial class UmbracoBuilderExtensions
         .AddNuCache()
         .AddDistributedCache()
         .AddCoreNotifications()
-        .AddExamine();
+        .AddExamine()
+        .AddExamineIndexes();
 
     public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
     {
