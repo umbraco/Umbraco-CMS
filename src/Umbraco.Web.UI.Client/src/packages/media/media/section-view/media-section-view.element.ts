@@ -14,7 +14,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 				// TODO: [LK] Work-in-progress. Need to get the data-type configuration for the Media Collection.
 				const config = {
 					unique: '',
-					dataTypeId: 'dt-collectionView',
+					dataTypeId: '', //'3a0156c4-3b8c-4803-bdc1-6871faa83fff', //'dt-collectionView',
 					allowedEntityBulkActions: {
 						allowBulkCopy: true,
 						allowBulkDelete: true,
@@ -22,7 +22,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 						allowBulkPublish: false,
 						allowBulkUnpublish: false,
 					},
-					orderBy: 'entityName',
+					orderBy: 'updateDate',
 					orderDirection: 'asc',
 					pageSize: 50,
 					useInfiniteEditor: false,
