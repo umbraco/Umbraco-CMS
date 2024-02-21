@@ -4,7 +4,7 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension
 const inputTypeConfig = {
 	alias: 'inputType',
 	label: 'Input type',
-	description: 'Select input type',
+	description: 'Predefined input type',
 	propertyEditorUiAlias: 'Umb.PropertyEditorUi.Label',
 };
 
