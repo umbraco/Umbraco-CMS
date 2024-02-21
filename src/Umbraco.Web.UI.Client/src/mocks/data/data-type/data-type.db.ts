@@ -33,6 +33,7 @@ const createFolderMockMapper = (request: CreateFolderRequestModel): UmbMockDataT
 		isFolder: true,
 		hasChildren: false,
 		editorAlias: '',
+		isDeletable: true,
 		values: [],
 	};
 };
@@ -47,6 +48,7 @@ const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDat
 		values: request.values,
 		isFolder: false,
 		hasChildren: false,
+		isDeletable: true,
 	};
 };
 
@@ -58,6 +60,7 @@ const detailResponseMapper = (item: UmbMockDataTypeModel): DataTypeResponseModel
 		editorAlias: item.editorAlias,
 		editorUiAlias: item.editorUiAlias,
 		values: item.values,
+		isDeletable: item.isDeletable,
 	};
 };
 
@@ -65,6 +68,7 @@ const itemResponseMapper = (item: UmbMockDataTypeModel): DataTypeItemResponseMod
 	return {
 		id: item.id,
 		name: item.name,
+		isDeletable: item.isDeletable,
 	};
 };
 
