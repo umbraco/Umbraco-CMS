@@ -99,9 +99,12 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 
 		this.#userGroupPickerModal = this.#modalManagerContext.open(UMB_USER_GROUP_PICKER_MODAL);
 
-		this.#userGroupPickerModal.addEventListener(UmbSelectedEvent.TYPE, (event) =>
-			this.#openUserPermissionsModal((event as UmbSelectedEvent).unique),
-		);
+		this.#userGroupPickerModal.addEventListener(UmbSelectedEvent.TYPE, (event) => {
+			const selectEvent = event as UmbSelectedEvent;
+			const unique = selectEvent.unique;
+			if (!unique) return;
+			this.#openUserPermissionsModal(unique);
+		});
 	}
 
 	#openUserPermissionsModal(id: string) {
