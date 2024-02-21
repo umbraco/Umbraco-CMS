@@ -81,9 +81,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 					slot="actions"
 					id="cancel"
 					label=${this.localize.term('general_cancel')}
-					@click="${this._rejectModal}"
-					>${this.localize.term('general_cancel')}</uui-button
-				>
+					@click="${this._rejectModal}"></uui-button>
 			</umb-body-layout>
 		`;
 	}

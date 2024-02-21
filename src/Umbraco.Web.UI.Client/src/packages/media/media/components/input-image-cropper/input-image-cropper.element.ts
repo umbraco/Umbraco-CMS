@@ -87,7 +87,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	#renderDropzone() {
 		return html`
 			<uui-file-dropzone id="dropzone" label="dropzone" @change="${this.#onUpload}">
-				<uui-button label="upload" @click="${this.#onBrowse}">${this.localize.term('media_clickToUpload')}</uui-button>
+				<uui-button label=${this.localize.term('media_clickToUpload')} @click="${this.#onBrowse}"></uui-button>
 			</uui-file-dropzone>
 		`;
 	}
