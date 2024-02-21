@@ -48,14 +48,6 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
             : CalculateAccessMap(() => _userStartNodeEntitiesService.ChildUserAccessEntities(children, UserStartNodePaths), out totalItems);
     }
 
-    protected override IEntitySlim[] GetEntities(Guid[] keys)
-    {
-        IEntitySlim[] entities = base.GetEntities(keys);
-        return UserHasRootAccess() || IgnoreUserStartNodes()
-            ? entities
-            : CalculateAccessMap(() => _userStartNodeEntitiesService.UserAccessEntities(entities, UserStartNodePaths), out _);
-    }
-
     protected override TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         if (UserHasRootAccess() || IgnoreUserStartNodes())
