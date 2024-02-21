@@ -9,5 +9,6 @@ import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type DataTypeResponseModel = (DataTypeModelBaseModel & {
     id: string;
     parent?: ReferenceByIdModel | null;
+    isDeletable: boolean;
 });
 
