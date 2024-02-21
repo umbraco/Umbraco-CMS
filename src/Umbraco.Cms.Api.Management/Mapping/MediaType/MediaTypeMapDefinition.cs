@@ -31,7 +31,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.VariesByCulture = source.VariesByCulture();
         target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
-        target.Collection = source.ListView.ToReferenceByIdModel();
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
 
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
@@ -50,7 +50,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.Collection = source.ListView.ToReferenceByIdModel();
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
     // Umbraco.Code.MapAll
@@ -58,7 +58,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.Collection = source.ListView.ToReferenceByIdModel();
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
     // Umbraco.Code.MapAll
