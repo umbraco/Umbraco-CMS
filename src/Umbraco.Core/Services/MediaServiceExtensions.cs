@@ -17,7 +17,7 @@ namespace Umbraco.Extensions;
 /// </remarks>
 public static class MediaServiceExtensions
 {
-    public static IEnumerable<IMedia>? GetByIds(this IMediaService mediaService, IEnumerable<Udi> ids)
+    public static IEnumerable<IMedia> GetByIds(this IMediaService mediaService, IEnumerable<Udi> ids)
     {
         var guids = new List<GuidUdi>();
         foreach (Udi udi in ids)
