@@ -5,6 +5,7 @@ import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as appLanguageSelect } from './app-language-select/manifests.js';
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
+import { manifests as globalContextManifests } from './global-contexts/manifests.js';
 
 export const manifests = [
 	...repositoryManifests,
@@ -14,4 +15,5 @@ export const manifests = [
 	...appLanguageSelect,
 	...modalManifests,
 	...collectionManifests,
+	...globalContextManifests,
 ];
