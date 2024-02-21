@@ -31,8 +31,17 @@ export class UmbMemberWorkspaceContext
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 	}
 
+	set<PropertyName extends keyof UmbMemberDetailModel>(
+		propertyName: PropertyName,
+		value: UmbMemberDetailModel[PropertyName],
+	) {
+		this.structure.updateOwnerContentType({ [propertyName]: value });
+	}
+
 	async load(unique: string) {
 		const { data } = await this.repository.requestByUnique(unique);
+
+		console.log('data', data);
 
 		if (data) {
 			this.setIsNew(false);
@@ -78,11 +87,39 @@ export class UmbMemberWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.unique || '';
+		return this.#get('unique');
 	}
 
 	getEntityType() {
 		return 'member';
+	}
+
+	getEmail() {
+		return this.#get('email') || '';
+	}
+
+	getUsername() {
+		return this.#get('username') || '';
+	}
+
+	getLockedOut() {
+		return this.#get('isLockedOut') || false;
+	}
+
+	getIsTwoFactorEnabled() {
+		return this.#get('isTwoFactorEnabled') || false;
+	}
+
+	getIsApproved() {
+		return this.#get('isApproved') || false;
+	}
+
+	getOldPassword() {
+		return this.#get('oldPassword') || '';
+	}
+
+	#get<PropertyName extends keyof UmbMemberDetailModel>(propertyName: PropertyName) {
+		return this.#data.getValue()?.[propertyName];
 	}
 
 	public destroy(): void {

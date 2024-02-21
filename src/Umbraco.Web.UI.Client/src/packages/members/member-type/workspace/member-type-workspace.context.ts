@@ -68,7 +68,6 @@ export class UmbMemberTypeWorkspaceContext
 
 		this.setIsNew(false);
 		this.setIsSorting(false);
-		//this.#draft.next(data);
 		return { data } || undefined;
 	}
 
