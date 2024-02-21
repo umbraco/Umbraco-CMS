@@ -1,7 +1,16 @@
 import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state, repeat, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	nothing,
+	css,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
@@ -16,6 +25,7 @@ import {
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 /**
  * @element umb-property-editor-ui-block-grid-type-configuration
@@ -25,6 +35,25 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	#model: Array<UmbBlockGridGroupTypeConfiguration> = [];
+	#sorter = new UmbSorterController<UmbBlockGridGroupTypeConfiguration, HTMLElement>(this, {
+		getUniqueOfElement: (element) => element.getAttribute('data-umb-group-key'),
+		getUniqueOfModel: (modelEntry) => modelEntry.key!,
+		identifier: 'block-grid-block-groups-sorter',
+		itemSelector: '.group-handle',
+		containerSelector: '#groups',
+		onChange: ({ model }) => {
+			this._mappedValuesWithGroup = model;
+			this.#model = model;
+		},
+		onEnd: () => {
+			this.#datasetContext?.setPropertyValue(
+				'blockGroups',
+				this.#model.map((group) => ({ key: group.key, name: group.name })),
+			);
+		},
+	});
+
 	#datasetContext?: UmbPropertyDatasetContext;
 	#blockTypeWorkspaceModalRegistration?: UmbModalRouteRegistrationController<
 		typeof UMB_WORKSPACE_MODAL.DATA,
@@ -47,7 +76,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	private _blockGroups: Array<UmbBlockGridTypeGroupType> = [];
 
 	@state()
-	private _mappedValuesAndGroups: Array<UmbBlockGridGroupTypeConfiguration> = [];
+	private _mappedValuesWithGroup: Array<UmbBlockGridGroupTypeConfiguration> = [];
+
+	@state()
+	private _mappedValuesNoGroup: Array<UmbBlockGridGroupTypeConfiguration> = [];
 
 	@state()
 	private _workspacePath?: string;
@@ -77,20 +109,25 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			this._blockGroups = (value as Array<UmbBlockGridTypeGroupType>) ?? [];
 			this.#mapValuesToBlockGroups();
 		});
-		this.observe(await this.#datasetContext.propertyValueByAlias('blocks'), () => {
+		this.observe(await this.#datasetContext.propertyValueByAlias('blocks'), (value) => {
+			this.value = (value as Array<UmbBlockTypeWithGroupKey>) ?? [];
 			this.#mapValuesToBlockGroups();
 		});
 	}
 
 	#mapValuesToBlockGroups() {
-		// What if a block is in a group that does not exist in the block groups? Should it be removed? (Right now they will never be rendered)
-		const valuesWithNoGroup = this._value.filter((value) => !value.groupKey);
+		// Map blocks that are not in any group, or in a group that does not exist
+		const valuesWithNoGroup = this._value.filter(
+			(block) => !block.groupKey || !this._blockGroups.find((group) => group.key === block.groupKey),
+		);
+		this._mappedValuesNoGroup = [{ blocks: valuesWithNoGroup }];
 
-		const valuesWithGroup = this._blockGroups.map((group) => {
+		// Map blocks to the group they belong to
+		this._mappedValuesWithGroup = this._blockGroups.map((group) => {
 			return { name: group.name, key: group.key, blocks: this._value.filter((value) => value.groupKey === group.key) };
 		});
 
-		this._mappedValuesAndGroups = [{ blocks: valuesWithNoGroup }, ...valuesWithGroup];
+		this.#sorter.setModel(this._mappedValuesWithGroup);
 	}
 
 	#onChange(e: CustomEvent, groupKey?: string) {
@@ -126,44 +163,71 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	}
 
 	render() {
-		return html`${repeat(
-			this._mappedValuesAndGroups,
-			(group) => group.key,
-			(group) =>
-				html`${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
-					<umb-input-block-type
+		return html`<div id="groups">
+			${repeat(
+				this._mappedValuesNoGroup,
+				() => '',
+				(group) =>
+					html`<umb-input-block-type
 						.value=${group.blocks}
 						.workspacePath=${this._workspacePath}
 						@create=${(e: CustomEvent) => this.#onCreate(e, group.key ?? null)}
 						@change=${(e: CustomEvent) => this.#onChange(e, group.key)}></umb-input-block-type>`,
-		)}`;
+			)}
+			${repeat(
+				this._mappedValuesWithGroup,
+				(group) => group.key,
+				(group) =>
+					html`<div class="group">
+						${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
+						<umb-input-block-type
+							.value=${group.blocks}
+							.workspacePath=${this._workspacePath}
+							@create=${(e: CustomEvent) => this.#onCreate(e, group.key ?? null)}
+							@change=${(e: CustomEvent) => this.#onChange(e, group.key)}></umb-input-block-type>
+					</div>`,
+			)}
+		</div>`;
 	}
 
 	#renderGroupInput(groupKey: string, groupName?: string) {
-		return html`<uui-input
-			auto-width
-			label="Group"
-			.value=${groupName ?? ''}
-			@change=${(e: UUIInputEvent) => this.#changeGroupName(e, groupKey)}>
-			<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
-				<uui-icon name="icon-trash"></uui-icon>
-			</uui-button>
-		</uui-input>`;
+		return html`<div class="group-handle" data-umb-group-key=${ifDefined(groupKey)}>
+			<uui-input
+				auto-width
+				label="Group"
+				.value=${groupName ?? ''}
+				@change=${(e: UUIInputEvent) => this.#changeGroupName(e, groupKey)}>
+				<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
+					<uui-icon name="icon-trash"></uui-icon>
+				</uui-button>
+			</uui-input>
+		</div>`;
 	}
 
 	static styles = [
 		UmbTextStyles,
 		css`
-			uui-input {
-				margin-top: var(--uui-size-6);
-				margin-bottom: var(--uui-size-4);
-			}
-
 			uui-input:not(:hover, :focus) {
 				border: 1px solid transparent;
 			}
 			uui-input:not(:hover, :focus) uui-button {
 				opacity: 0;
+			}
+
+			.group-handle {
+				padding: var(--uui-size-1);
+				margin-top: var(--uui-size-6);
+				margin-bottom: var(--uui-size-4);
+				cursor: grab;
+			}
+
+			.group-handle:hover {
+				background-color: var(--uui-color-divider);
+				border-radius: var(--uui-border-radius);
+			}
+
+			.group:has([drag-placeholder]) {
+				opacity: 0.2;
 			}
 		`,
 	];
