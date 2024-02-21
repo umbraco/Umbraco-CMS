@@ -3,10 +3,11 @@ import { UmbDocumentPropertyDataContext } from '../property-dataset-context/docu
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type { UmbDocumentDetailModel } from '../types.js';
-import { type UmbDocumentVariantPickerModalData, UMB_DOCUMENT_LANGUAGE_PICKER_MODAL } from '../modals/index.js';
+import type { UmbDocumentVariantPickerModalData } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
+import { UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT } from '../global-contexts/document-variant-manager.context.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
@@ -16,7 +17,6 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -48,13 +48,13 @@ export class UmbDocumentWorkspaceContext
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
-	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+	#variantManagerContext?: typeof UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalManagerContext = instance;
+		this.consumeContext(UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT, (instance) => {
+			this.#variantManagerContext = instance;
 		});
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
@@ -185,49 +185,20 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async #selectVariants(type: UmbDocumentVariantPickerModalData['type']): Promise<UmbVariantId[]> {
-		const currentData = this.getData();
-		if (!currentData) throw new Error('Data is missing');
-
-		const variants = currentData.variants;
-
-		// If there is only one variant, we don't need to select anything.
-		if (variants.length === 1) {
-			return [UmbVariantId.Create(variants[0])];
-		}
-
-		if (!this.#modalManagerContext) throw new Error('Modal manager context is missing');
-
-		const modalData: UmbDocumentVariantPickerModalData = {
-			type,
-			variants, // TODO: Filter out variants that do not have any changes unless it is the current variant.
-		};
-
-		const activeVariants = this.splitView.getActiveVariants();
-		const activeVariant = activeVariants[activeVariants.length - 1];
-		const modalContext = this.#modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
-			data: modalData,
-			value: { selection: activeVariant ? [activeVariant.culture] : [] },
-		});
-
-		const result = await modalContext.onSubmit().catch(() => undefined);
-
-		if (!result?.selection.length) return [];
-
-		const selectedVariants = result.selection.map((x) => x?.toLowerCase() ?? '');
-
-		// Match the result to the available variants.
-		const variantIds = variants.filter((x) => selectedVariants.includes(x.culture!)).map((x) => UmbVariantId.Create(x));
-
-		return variantIds;
-	}
-
 	async #createOrSave(type: UmbDocumentVariantPickerModalData['type']): Promise<UmbVariantId[]> {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		if (!data.unique) throw new Error('Unique is missing');
+		if (!this.#variantManagerContext) throw new Error('Variant manager context is missing');
 
-		const selectedVariants = await this.#selectVariants(type);
+		const activeVariants = this.splitView.getActiveVariants();
+		const activeVariant = activeVariants.length ? activeVariants[0] : undefined;
+
+		const selectedVariants = await this.#variantManagerContext.pickVariants(
+			data.variants, // TODO: Add a filter function to only show variants that have been changed
+			type,
+			activeVariant?.culture ?? undefined,
+		);
 
 		// If no variants are selected, we don't save anything.
 		if (!selectedVariants.length) return [];
@@ -244,9 +215,9 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async save() {
+		await this.#createOrSave('save');
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
-		await this.#createOrSave('save');
 		this.saveComplete(data);
 	}
 
@@ -263,11 +234,12 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async unpublish() {
-		const variantIds = await this.#selectVariants('unpublish');
 		const unique = this.getEntityId();
-		if (variantIds.length && unique) {
-			await this.publishingRepository.unpublish(unique, variantIds);
-		}
+
+		if (!unique) throw new Error('Unique is missing');
+		if (!this.#variantManagerContext) throw new Error('Variant manager context is missing');
+
+		this.#variantManagerContext.unpublish(unique);
 	}
 
 	async delete() {
