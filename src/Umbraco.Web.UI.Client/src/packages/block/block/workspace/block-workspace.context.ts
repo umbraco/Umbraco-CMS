@@ -324,6 +324,7 @@ export class UmbBlockWorkspaceContext<
 	};
 
 	public destroy(): void {
+		super.destroy();
 		this.#layout.destroy();
 	}
 }
