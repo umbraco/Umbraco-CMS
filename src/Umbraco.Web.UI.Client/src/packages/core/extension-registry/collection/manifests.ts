@@ -10,6 +10,7 @@ const collectionManifest: ManifestTypes = {
 	kind: 'default',
 	alias: UMB_EXTENSION_COLLECTION_ALIAS,
 	name: 'Extension Collection',
+	element: () => import('./extension-collection.element.js'),
 	meta: {
 		repositoryAlias: UMB_EXTENSION_COLLECTION_REPOSITORY_ALIAS,
 	},
