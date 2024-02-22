@@ -1,4 +1,5 @@
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -49,6 +50,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 					userGroup.permissions.filter((permission) => permission.$type === schemaType) || [];
 
 				element.value = permissionsForSchemaType;
+				element.addEventListener(UmbChangeEvent.TYPE, this.#onValueChange);
 			},
 			'umbUserGroupPermissionObserver',
 		);
@@ -57,8 +59,19 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 		this.requestUpdate('_extensionElements');
 	}
 
+	#onValueChange = (e: UmbChangeEvent) => {
+		e.stopPropagation();
+		const target = e.target as any;
+		console.log('Value changed', target.value);
+	};
+
 	render() {
 		return html`${this._extensionElements.map((element) => html`${element}`)}`;
+	}
+
+	disconnectedCallback(): void {
+		this._extensionElements.forEach((element) => element.removeEventListener(UmbChangeEvent.TYPE, this.#onValueChange));
+		super.disconnectedCallback();
 	}
 
 	static styles = [UmbTextStyles, css``];
