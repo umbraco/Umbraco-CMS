@@ -5,20 +5,13 @@ import {
 	UUIInputEvent,
 	type UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	html,
-	nothing,
-	customElement,
-	property,
-	state,
-	ifDefined,
-	query,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
+import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -32,8 +25,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	_activeVariants: Array<ActiveVariant> = [];
 
-	@property({ attribute: false })
-	public get _activeVariantsCultures(): string[] {
+	@state()
+	get _activeVariantsCultures(): string[] {
 		return this._activeVariants.map((el) => el.culture ?? '') ?? [];
 	}
 
@@ -43,20 +36,30 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	private _name?: string;
 
+	private _languageName?: string | null;
 	private _culture?: string | null;
 	private _segment?: string | null;
 
 	@state()
-	private _variantDisplayName?: string;
+	private get _variantDisplayName() {
+		return (this._languageName ? this._languageName : '') + (this._segment ? ' — ' + this._segment : '');
+	}
 
 	@state()
-	private _variantTitleName?: string;
+	private get _variantTitleName() {
+		return (
+			(this._languageName ? this._languageName + ` (${this._culture})` : '') +
+			(this._segment ? ' — ' + this._segment : '')
+		);
+	}
 
 	@state()
 	private _variantSelectorOpen = false;
 
-	// TODO: make adapt to backoffice locale.
-	private _cultureNames = new Intl.DisplayNames('en', { type: 'language' });
+	#languageRepository = new UmbLanguageCollectionRepository(this);
+
+	@state()
+	private _languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 
 	constructor() {
 		super();
@@ -70,6 +73,15 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			this.#variantContext = instance;
 			this._observeVariantContext();
 		});
+
+		this._loadLanguages();
+	}
+
+	private async _loadLanguages() {
+		const { data: languages } = await this.#languageRepository.requestCollection({});
+		if (!languages) return;
+		this._languages.setValue(languages.items);
+		this.requestUpdate('_languages');
 	}
 
 	private async _observeVariants() {
@@ -113,9 +125,17 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (!this.#variantContext) return;
 
 		const variantId = this.#variantContext.getVariantId();
+
 		this._culture = variantId.culture;
 		this._segment = variantId.segment;
-		this.updateVariantDisplayName();
+
+		this.observe(
+			this._languages.asObservable(),
+			(languages) => {
+				this._languageName = languages.find((language) => language.unique === variantId.culture)?.name ?? '';
+			},
+			'_languages',
+		);
 
 		this.observe(
 			this.#variantContext.name,
@@ -124,15 +144,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			},
 			'_name',
 		);
-	}
-
-	private updateVariantDisplayName() {
-		if (!this._culture && !this._segment) return;
-		this._variantTitleName =
-			(this._culture ? this._cultureNames.of(this._culture) + ` (${this._culture})` : '') +
-			(this._segment ? ' — ' + this._segment : '');
-		this._variantDisplayName =
-			(this._culture ? this._cultureNames.of(this._culture) : '') + (this._segment ? ' — ' + this._segment : '');
 	}
 
 	// TODO: find a way where we don't have to do this for all workspaces.
@@ -189,7 +200,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return html`
 			<uui-input id="name-input" .value=${this._name} @input="${this._handleInput}">
 				${
-					this._variants && this._variants.length > 0
+					this._variants?.length
 						? html`
 								<uui-button
 									id="variant-selector-toggle"
@@ -212,7 +223,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			</uui-input>
 
 			${
-				this._variants && this._variants.length > 0
+				this._variants?.length
 					? html`
 							<uui-popover-container
 								id="variant-selector-popover"
@@ -232,7 +243,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
 																: nothing}
 															<div>
-																${variant.name} <i>(${variant.culture})</i> ${variant.segment}
+																${variant.name ||
+																this._languages.getValue().find((x) => x.unique === variant.culture)?.name}
+																<i>(${variant.culture})</i> ${variant.segment}
 																<div class="variant-selector-state">${variant.state}</div>
 															</div>
 														</button>
