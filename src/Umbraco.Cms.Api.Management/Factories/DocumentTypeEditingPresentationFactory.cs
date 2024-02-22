@@ -28,6 +28,7 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         createModel.ContainerKey = requestModel.Folder?.Id;
         createModel.AllowedTemplateKeys = requestModel.AllowedTemplates.Select(reference => reference.Id).ToArray();
         createModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
+        createModel.ListView = requestModel.Collection?.Id;
         createModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedDocumentTypes);
         createModel.Compositions = MapCompositions(requestModel.Compositions);
 
@@ -48,6 +49,7 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
 
         updateModel.AllowedTemplateKeys = requestModel.AllowedTemplates.Select(reference => reference.Id).ToArray();
         updateModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
+        updateModel.ListView = requestModel.Collection?.Id;
         updateModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedDocumentTypes);
         updateModel.Compositions = MapCompositions(requestModel.Compositions);
 

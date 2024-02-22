@@ -27,6 +27,7 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.EditorAlias = source.EditorAlias;
         target.EditorUiAlias = source.EditorUiAlias;
+        target.IsDeletable = source.IsDeletableDataType();
         target.CanIgnoreStartNodes = source.IsBuildInDataType() is false;
 
         IConfigurationEditor? configurationEditor = source.Editor?.GetConfigurationEditor();

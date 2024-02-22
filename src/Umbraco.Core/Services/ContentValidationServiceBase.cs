@@ -67,7 +67,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
             ? contentEditingModelBase.InvariantProperties
             : contentEditingModelBase
                 .Variants
-                .FirstOrDefault(variant => variant.Culture == culture && variant.Segment == segment)?
+                .FirstOrDefault(variant => string.Equals(variant.Culture, culture, StringComparison.InvariantCultureIgnoreCase) && string.Equals(segment, variant.Segment, StringComparison.InvariantCultureIgnoreCase))?
                 .Properties;
 
         PropertyValueModel? propertyValueModel = properties?.FirstOrDefault(p => p.Alias == propertyType.Alias);

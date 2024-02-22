@@ -60,7 +60,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(display.ParentId, result.ParentId);
         Assert.AreEqual(display.Path, result.Path);
         Assert.AreEqual(display.Thumbnail, result.Thumbnail);
-        Assert.AreEqual(display.IsContainer, result.IsContainer);
+        Assert.AreEqual(display.ListView, result.ListView);
         Assert.AreEqual(display.AllowAsRoot, result.AllowedAsRoot);
         Assert.AreEqual(display.CreateDate, result.CreateDate);
         Assert.AreEqual(display.UpdateDate, result.UpdateDate);
@@ -106,7 +106,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(display.ParentId, result.ParentId);
         Assert.AreEqual(display.Path, result.Path);
         Assert.AreEqual(display.Thumbnail, result.Thumbnail);
-        Assert.AreEqual(display.IsContainer, result.IsContainer);
+        Assert.AreEqual(display.ListView, result.ListView);
         Assert.AreEqual(display.AllowAsRoot, result.AllowedAsRoot);
         Assert.AreEqual(display.CreateDate, result.CreateDate);
         Assert.AreEqual(display.UpdateDate, result.UpdateDate);
@@ -163,7 +163,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(display.ParentId, result.ParentId);
         Assert.AreEqual(display.Path, result.Path);
         Assert.AreEqual(display.Thumbnail, result.Thumbnail);
-        Assert.AreEqual(display.IsContainer, result.IsContainer);
+        Assert.AreEqual(display.ListView, result.ListView);
         Assert.AreEqual(display.AllowAsRoot, result.AllowedAsRoot);
         Assert.AreEqual(display.CreateDate, result.CreateDate);
         Assert.AreEqual(display.UpdateDate, result.UpdateDate);
@@ -256,7 +256,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(memberType.ParentId, result.ParentId);
         Assert.AreEqual(memberType.Path, result.Path);
         Assert.AreEqual(memberType.Thumbnail, result.Thumbnail);
-        Assert.AreEqual(memberType.IsContainer, result.IsContainer);
+        Assert.AreEqual(memberType.ListView, result.ListView);
         Assert.AreEqual(memberType.CreateDate, result.CreateDate);
         Assert.AreEqual(memberType.UpdateDate, result.UpdateDate);
 
@@ -300,7 +300,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(mediaType.ParentId, result.ParentId);
         Assert.AreEqual(mediaType.Path, result.Path);
         Assert.AreEqual(mediaType.Thumbnail, result.Thumbnail);
-        Assert.AreEqual(mediaType.IsContainer, result.IsContainer);
+        Assert.AreEqual(mediaType.ListView, result.ListView);
         Assert.AreEqual(mediaType.CreateDate, result.CreateDate);
         Assert.AreEqual(mediaType.UpdateDate, result.UpdateDate);
 
@@ -345,7 +345,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(contentType.ParentId, result.ParentId);
         Assert.AreEqual(contentType.Path, result.Path);
         Assert.AreEqual(contentType.Thumbnail, result.Thumbnail);
-        Assert.AreEqual(contentType.IsContainer, result.IsContainer);
+        Assert.AreEqual(contentType.ListView, result.ListView);
         Assert.AreEqual(contentType.CreateDate, result.CreateDate);
         Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
         Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
@@ -629,7 +629,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(contentType.ParentId, result.ParentId);
         Assert.AreEqual(contentType.Path, result.Path);
         Assert.AreEqual(contentType.Thumbnail, result.Thumbnail);
-        Assert.AreEqual(contentType.IsContainer, result.IsContainer);
+        Assert.AreEqual(contentType.ListView, result.ListView);
         Assert.AreEqual(contentType.CreateDate, result.CreateDate);
         Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
 
@@ -711,7 +711,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(contentType.ParentId, result.ParentId);
         Assert.AreEqual(contentType.Path, result.Path);
         Assert.AreEqual(contentType.Thumbnail, result.Thumbnail);
-        Assert.AreEqual(contentType.IsContainer, result.IsContainer);
+        Assert.AreEqual(contentType.ListView, result.ListView);
         Assert.AreEqual(contentType.CreateDate, result.CreateDate);
         Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
         Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
@@ -818,7 +818,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             Path = "-1,1234",
             ParentId = -1,
             Thumbnail = "tree-thumb",
-            IsContainer = true,
+            ListView = Constants.DataTypes.Guids.ListViewMembersGuid,
             Groups = new[]
             {
                 new PropertyGroupBasic<MemberPropertyTypeBasic>
@@ -865,7 +865,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             Path = "-1,1234",
             ParentId = -1,
             Thumbnail = "tree-thumb",
-            IsContainer = true,
+            ListView = Constants.DataTypes.Guids.ListViewMembersGuid,
             Groups = new[]
             {
                 new PropertyGroupBasic<PropertyTypeBasic>
@@ -908,7 +908,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             Path = "-1,1234",
             ParentId = -1,
             Thumbnail = "tree-thumb",
-            IsContainer = true,
+            ListView = Constants.DataTypes.Guids.ListViewMembersGuid,
             Groups = new[]
             {
                 new PropertyGroupBasic<PropertyTypeBasic>
@@ -953,7 +953,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             Path = "-1,1234",
             ParentId = -1,
             Thumbnail = "tree-thumb",
-            IsContainer = true,
+            ListView = Constants.DataTypes.Guids.ListViewMembersGuid,
             Groups = new[]
             {
                 new PropertyGroupBasic<PropertyTypeBasic>
@@ -1019,7 +1019,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             Path = "-1,1234",
             ParentId = -1,
             Thumbnail = "tree-thumb",
-            IsContainer = true,
+            ListView = Constants.DataTypes.Guids.ListViewMembersGuid,
             Groups = new[]
             {
                 new PropertyGroupBasic<PropertyTypeBasic>
