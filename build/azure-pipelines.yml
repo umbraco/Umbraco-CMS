@@ -358,7 +358,7 @@ stages:
       - job:
         timeoutInMinutes: 180
         # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}}) # Outcommented due to timeouts
-        condition: and(succeeded(), ${{parameters.sqlServerIntegrationTests}})
+        condition: or(${{parameters.sqlServerIntegrationTests}})
         displayName: Integration Tests (SQL Server)
         strategy:
           matrix:
@@ -577,7 +577,7 @@ stages:
       - job:
         displayName: E2E Tests (SQL Server)
         # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}}) # Outcommented due to timeouts
-        condition: and(succeeded(), ${{parameters.sqlServerAcceptanceTests}})
+        condition: or(${{parameters.sqlServerAcceptanceTests}})
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
