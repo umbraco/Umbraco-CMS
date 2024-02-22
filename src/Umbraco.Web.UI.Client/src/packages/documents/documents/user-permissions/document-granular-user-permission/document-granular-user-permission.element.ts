@@ -85,11 +85,10 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 			const permissionItem: UmbDocumentUserPermissionModel = {
 				$type: 'DocumentPermissionPresentationModel',
 				document: { id: unique },
-				verbs: [],
+				verbs: result,
 			};
 
-			this._value = [...this._value, permissionItem];
-			this.requestUpdate();
+			this.value = [...this._value, permissionItem];
 		});
 	}
 
