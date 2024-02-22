@@ -26,7 +26,7 @@ public class PublishedMediaTests : PublishedSnapshotServiceTestBase
         base.Setup();
 
         var dataTypes = GetDefaultDataTypes().ToList();
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var rteDataType = new DataType(new VoidEditor("RTE", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 4 };
         dataTypes.Add(rteDataType);
         _dataTypes = dataTypes.ToArray();

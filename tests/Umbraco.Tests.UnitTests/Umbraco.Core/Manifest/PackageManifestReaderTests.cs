@@ -47,8 +47,7 @@ public class PackageManifestReaderTests
         var first = result.First();
         Assert.AreEqual("My Package", first.Name);
         Assert.AreEqual("1.2.3", first.Version);
-        Assert.AreEqual(2, first.Extensions.Count());
-        Assert.IsTrue(first.Extensions.All(e => e is JsonElement));
+        Assert.AreEqual(2, first.Extensions.Length);
 
         Assert.NotNull(first.Importmap);
         var importmap = first.Importmap;
@@ -64,6 +63,45 @@ public class PackageManifestReaderTests
         Assert.NotNull(firstScope);
         Assert.AreEqual("square", firstScope.Key);
         Assert.AreEqual("https://example.com/modules/shapes/square.js", firstScope.Value);
+    }
+
+    [Test]
+    public async Task Can_Deserialize_Extensions()
+    {
+        const string content = @"{
+    ""name"": ""My Package"",
+    ""version"": ""1.2.3"",
+    ""allowTelemetry"": true,
+    ""extensions"": [{
+            ""type"": ""tree"",
+            ""meta"": {
+                ""label"": ""My Tree"",
+                ""someArray"": [1, 2, 3]
+            }
+        }, {
+            ""type"": ""headerApp""
+        }
+    ]
+    }";
+        _rootDirectoryContentsMock
+            .Setup(f => f.GetEnumerator())
+            .Returns(new List<IFileInfo> { CreatePackageManifestFile(content) }.GetEnumerator());
+
+        var result = await _reader.ReadPackageManifestsAsync();
+        Assert.AreEqual(1, result.Count());
+
+        var first = result.First();
+
+        // Ensure that the extensions are deserialized as JsonElement
+        Assert.IsTrue(first.Extensions.All(e => e is JsonElement));
+
+        // Test the deserialization of the first extension to make sure we don't break the JSON parsing
+        JsonElement firstExtension = (JsonElement)first.Extensions.First();
+        Assert.AreEqual("tree", firstExtension.GetProperty("type").GetString());
+        var meta = firstExtension.GetProperty("meta");
+        Assert.AreEqual("My Tree", meta.GetProperty("label").GetString());
+        var someArray = meta.GetProperty("someArray");
+        Assert.AreEqual(1, someArray[0].GetInt32());
     }
 
     [Test]
