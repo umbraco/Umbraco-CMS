@@ -283,7 +283,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Id = source.Id;
         target.IsBlueprint = source.Blueprint;
         target.IsChildOfListView = DetermineIsChildOfListView(source, parent, context);
-        target.IsContainer = source.ContentType.IsContainer;
+        target.IsContainer = source.ContentType.ListView is not null;
         target.IsElement = source.ContentType.IsElement;
         target.Key = source.Key;
         target.Owner = _commonMapper.GetOwner(source, context);
@@ -542,7 +542,7 @@ internal class ContentMapDefinition : IMapDefinition
             }
         }
 
-        return parent.ContentType.IsContainer || _contentTypeService.HasContainerInPath(pathParts.ToArray());
+        return parent.ContentType.ListView is not null || _contentTypeService.HasContainerInPath(pathParts.ToArray());
     }
 
 

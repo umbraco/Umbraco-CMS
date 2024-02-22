@@ -117,7 +117,7 @@ public class MediaTypeBuilder
         mediaType.Thumbnail = GetThumbnail();
         mediaType.CreatorId = GetCreatorId();
         mediaType.Trashed = GetTrashed();
-        mediaType.IsContainer = GetIsContainer();
+        mediaType.ListView = GetListView();
 
         BuildPropertyGroups(mediaType, _propertyGroupBuilders.Select(x => x.Build()));
         BuildPropertyTypeIds(mediaType, _propertyTypeIdsIncrementingFrom);

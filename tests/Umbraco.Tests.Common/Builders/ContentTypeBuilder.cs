@@ -123,7 +123,7 @@ public class ContentTypeBuilder
         contentType.Thumbnail = GetThumbnail();
         contentType.CreatorId = GetCreatorId();
         contentType.Trashed = GetTrashed();
-        contentType.IsContainer = GetIsContainer();
+        contentType.ListView = GetListView();
         contentType.IsElement = _isElement ?? false;
         contentType.HistoryCleanup = new HistoryCleanup();
 

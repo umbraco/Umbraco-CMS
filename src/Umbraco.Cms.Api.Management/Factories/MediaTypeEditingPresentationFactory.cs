@@ -27,6 +27,7 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
         createModel.ContainerKey = requestModel.Folder?.Id;
         createModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedMediaTypes);
         createModel.Compositions = MapCompositions(requestModel.Compositions);
+        createModel.ListView = requestModel.Collection?.Id;
 
         return createModel;
     }
@@ -43,6 +44,7 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
 
         updateModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedMediaTypes);
         updateModel.Compositions = MapCompositions(requestModel.Compositions);
+        updateModel.ListView = requestModel.Collection?.Id;
 
         return updateModel;
     }

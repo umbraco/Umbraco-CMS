@@ -16,7 +16,7 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         mapper.Define<ISimpleContentType, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Collection
     private void Map(IMemberType source, MemberTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -30,6 +30,7 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         target.IsElement = source.IsElement;
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
+
         target.Compositions = source.ContentTypeComposition.Select(contentTypeComposition => new MemberTypeComposition
         {
             MemberType = new ReferenceByIdModel(contentTypeComposition.Key),
@@ -37,19 +38,17 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         }).ToArray();
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Collection
     private void Map(IMemberType source, MemberTypeReferenceResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Collection
     private void Map(ISimpleContentType source, MemberTypeReferenceResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
     }
 }

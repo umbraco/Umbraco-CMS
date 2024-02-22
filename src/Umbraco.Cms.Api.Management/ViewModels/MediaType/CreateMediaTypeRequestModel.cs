@@ -10,4 +10,6 @@ public class CreateMediaTypeRequestModel
     public IEnumerable<MediaTypeSort> AllowedMediaTypes { get; set; } = Enumerable.Empty<MediaTypeSort>();
 
     public IEnumerable<MediaTypeComposition> Compositions { get; set; } = Enumerable.Empty<MediaTypeComposition>();
+
+    public ReferenceByIdModel? Collection { get; set; }
 }
