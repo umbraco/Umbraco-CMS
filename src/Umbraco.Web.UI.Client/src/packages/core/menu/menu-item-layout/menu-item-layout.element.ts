@@ -36,7 +36,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 		if (!this.#sectionContext) return;
 
 		this.observe(this.#sectionContext?.pathname, (pathname) => {
-			if (!pathname) return;
+			if (!pathname || !this.entityType) return;
 			this._href = this._constructPath(pathname);
 		});
 	}
