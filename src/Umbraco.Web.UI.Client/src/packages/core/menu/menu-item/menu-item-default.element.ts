@@ -1,4 +1,4 @@
-import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestMenuItem, UmbMenuItemElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -10,9 +10,9 @@ export class UmbMenuItemDefaultElement extends UmbLitElement implements UmbMenuI
 
 	render() {
 		return html`<umb-menu-item-layout
-			label=${this.manifest.meta.label || this.manifest.name}
-			icon-name=${this.manifest.meta.icon}
-			entity-type=${ifDefined(this.manifest.meta.entityType)}></umb-menu-item-layout>`;
+			.label=${this.manifest.meta.label ?? this.manifest.name}
+			.iconName=${this.manifest.meta.icon ?? ''}
+			.entityType=${this.manifest.meta.entityType}></umb-menu-item-layout>`;
 	}
 
 	static styles = [UmbTextStyles];
