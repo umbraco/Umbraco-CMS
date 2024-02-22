@@ -475,7 +475,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             new XElement("Thumbnail", contentType.Thumbnail),
             new XElement("Description", contentType.Description),
             new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()),
-            new XElement("IsListView", contentType.IsContainer.ToString()),
+            new XElement("ListView", contentType.ListView.ToString()),
             new XElement("IsElement", contentType.IsElement.ToString()),
             new XElement("Variations", contentType.Variations.ToString()));
 

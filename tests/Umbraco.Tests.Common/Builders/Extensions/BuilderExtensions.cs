@@ -205,10 +205,10 @@ public static class BuilderExtensions
         return builder;
     }
 
-    public static T WithIsContainer<T>(this T builder, bool isContainer)
+    public static T WithIsContainer<T>(this T builder, Guid? listView)
         where T : IWithIsContainerBuilder
     {
-        builder.IsContainer = isContainer;
+        builder.ListView = listView;
         return builder;
     }
 

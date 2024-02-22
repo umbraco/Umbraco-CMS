@@ -1,4 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -29,7 +32,8 @@ public class ContentPropertyMapDefinition : IMapDefinition
         ILocalizedTextService textService,
         ILoggerFactory loggerFactory,
         PropertyEditorCollection propertyEditors,
-        CommonMapper commonMapper)
+        CommonMapper commonMapper,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
     {
         _commonMapper = commonMapper;
         _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();;
@@ -51,6 +55,24 @@ public class ContentPropertyMapDefinition : IMapDefinition
             loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(),
             propertyEditors);
     }
+
+    [Obsolete("Please use constructor that takes an IDataTypeConfigurationCache. Will be removed in V14.")]
+    public ContentPropertyMapDefinition(
+        ICultureDictionary cultureDictionary,
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        ILocalizedTextService textService,
+        ILoggerFactory loggerFactory,
+        PropertyEditorCollection propertyEditors)
+        : this(
+            cultureDictionary,
+            dataTypeService,
+            entityService,
+            textService,
+            loggerFactory,
+            propertyEditors,
+            StaticServiceProvider.Instance.GetRequiredService<IDataTypeConfigurationCache>())
+    { }
 
     public void DefineMaps(IUmbracoMapper mapper)
     {

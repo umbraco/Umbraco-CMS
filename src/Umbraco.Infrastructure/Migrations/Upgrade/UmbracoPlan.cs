@@ -71,5 +71,7 @@ public class UmbracoPlan : MigrationPlan
         To<V_14_0_0.AddGuidsToUsers>("{A8E01644-9F2E-4988-8341-587EF5B7EA69}");
         To<V_14_0_0.UpdateDefaultGuidsOfCreatedPackages>("{E073DBC0-9E8E-4C92-8210-9CB18364F46E}");
         To<V_14_0_0.RenameTechnologyLeakingPropertyEditorAliases>("{80D282A4-5497-47FF-991F-BC0BCE603121}");
+        To<V_14_0_0.MigrateSchduledPublishesToUtc>("{96525697-E9DC-4198-B136-25AD033442B8}");
+        To<V_14_0_0.AddListViewKeysToDocumentTypes>("{7FC5AC9B-6F56-415B-913E-4A900629B853}");
     }
 }

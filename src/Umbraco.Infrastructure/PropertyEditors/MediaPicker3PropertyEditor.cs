@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -48,7 +49,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
     internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
     {
-        private readonly IDataTypeService _dataTypeService;
+        private readonly IDataTypeConfigurationCache _dataTypeReadCache;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IMediaImportService _mediaImportService;
         private readonly IMediaService _mediaService;
@@ -61,21 +62,21 @@ public class MediaPicker3PropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             DataEditorAttribute attribute,
-            IDataTypeService dataTypeService,
             IMediaImportService mediaImportService,
             IMediaService mediaService,
             ITemporaryFileService temporaryFileService,
             IScopeProvider scopeProvider,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IDataTypeConfigurationCache dataTypeReadCache)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
-            _dataTypeService = dataTypeService;
             _mediaImportService = mediaImportService;
             _mediaService = mediaService;
             _temporaryFileService = temporaryFileService;
             _scopeProvider = scopeProvider;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _dataTypeReadCache = dataTypeReadCache;
         }
 
         /// <remarks>
@@ -97,11 +98,9 @@ public class MediaPicker3PropertyEditor : DataEditor
             var dtos = Deserialize(_jsonSerializer, value).ToList();
             dtos = UpdateMediaTypeAliases(dtos);
 
-            IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-            if (dataType?.ConfigurationObject != null)
+            var configuration = _dataTypeReadCache.GetConfigurationAs<MediaPicker3Configuration>(property.PropertyType.DataTypeKey);
+            if (configuration is not null)
             {
-                MediaPicker3Configuration? configuration = dataType.ConfigurationAs<MediaPicker3Configuration>();
-
                 foreach (MediaWithCropsDto dto in dtos)
                 {
                     dto.ApplyConfiguration(configuration);

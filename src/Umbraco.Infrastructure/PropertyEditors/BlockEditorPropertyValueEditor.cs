@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -18,7 +19,7 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
 {
     private readonly IJsonSerializer _jsonSerializer;
     private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
-    private readonly IDataTypeService _dataTypeService;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
 
@@ -26,17 +27,17 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
         DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
-        IDataTypeService dataTypeService,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         ILocalizedTextService textService,
         ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>> logger,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper)
-        : base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactories)
+        : base(attribute, propertyEditors, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactories)
     {
         _propertyEditors = propertyEditors;
         _dataValueReferenceFactories = dataValueReferenceFactories;
-        _dataTypeService = dataTypeService;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _jsonSerializer = jsonSerializer;
     }
 
@@ -76,7 +77,7 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
                 continue;
             }
 
-            object? configuration = _dataTypeService.GetDataType(propertyValue.PropertyType.DataTypeKey)?.ConfigurationObject;
+            object? configuration = _dataTypeConfigurationCache.GetConfiguration(propertyValue.PropertyType.DataTypeKey);
             foreach (ITag tag in dataValueTags.GetTags(propertyValue.Value, configuration, languageId))
             {
                 yield return tag;

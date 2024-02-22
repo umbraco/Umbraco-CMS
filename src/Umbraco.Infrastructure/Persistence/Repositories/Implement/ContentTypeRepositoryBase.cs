@@ -1510,8 +1510,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         var sql = new Sql(
             $@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
-WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer",
-            new { ids, isContainer = true });
+WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.listView IS NULL", new { ids});
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
