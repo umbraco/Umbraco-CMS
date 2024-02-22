@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 
-public class UnknownTypePermissionViewModel : IPermissionViewModel
+public class UnknownTypePermissionPresentationModel : IPermissionPresentationModel
 {
     public required ISet<string> Verbs { get; set; }
 

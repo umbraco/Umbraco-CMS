@@ -72,10 +72,10 @@ public class UserGroupBase
     /// <summary>
     /// List of permissions provided, and maintained by the front-end. The server has no concept all of them, but some can be used on the server.
     /// </summary>
-    public required ISet<IPermissionViewModel> Permissions { get; init; }
+    public required ISet<IPermissionPresentationModel> Permissions { get; init; }
 }
 
-public interface IPermissionViewModel : IOpenApiDiscriminator
+public interface IPermissionPresentationModel : IOpenApiDiscriminator
 {
    ISet<string> Verbs { get; set; }
 }

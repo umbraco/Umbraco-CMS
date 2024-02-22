@@ -63,12 +63,12 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         };
     }
 
-    private static HashSet<IPermissionViewModel> MapPermissions(ISet<string> permissions, ISet<IGranularPermission> granularPermissions)
+    private static HashSet<IPermissionPresentationModel> MapPermissions(ISet<string> permissions, ISet<IGranularPermission> granularPermissions)
     {
-        var result = new HashSet<IPermissionViewModel> { };
+        var result = new HashSet<IPermissionPresentationModel> { };
         if (permissions.Any())
         {
-            result.Add(new FallbackPermissionViewModel() { Verbs = permissions });
+            result.Add(new FallbackPermissionPresentationModel() { Verbs = permissions });
         }
 
         IEnumerable<IGrouping<string, IGranularPermission>> contexts = granularPermissions.GroupBy(x => x.Context);
@@ -84,10 +84,10 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
                     switch (contextGroup.Key)
                     {
                         case DocumentGranularPermission.ContextType:
-                            result.Add(new DocumentPermissionViewModel() { Document = new ReferenceByIdModel() { Id = keyGroup.Key!.Value, }, Verbs = verbs });
+                            result.Add(new DocumentPermissionPresentationModel() { Document = new ReferenceByIdModel() { Id = keyGroup.Key!.Value, }, Verbs = verbs });
                             break;
                         default:
-                            result.Add(new UnknownTypePermissionViewModel() { Context = contextGroup.Key, Verbs = verbs });
+                            result.Add(new UnknownTypePermissionPresentationModel() { Context = contextGroup.Key, Verbs = verbs });
                             break;
                     }
                 }
@@ -233,9 +233,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     {
         permissions = new HashSet<string>();
         granularPermissions = new HashSet<IGranularPermission>();
-        foreach (IPermissionViewModel permissionViewModel in request.Permissions)
+        foreach (IPermissionPresentationModel permissionViewModel in request.Permissions)
         {
-            if (permissionViewModel is DocumentPermissionViewModel documentPermissionViewModel)
+            if (permissionViewModel is DocumentPermissionPresentationModel documentPermissionViewModel)
             {
                 foreach (var verb in documentPermissionViewModel.Verbs)
                 {
@@ -246,7 +246,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
                     });
                 }
             }
-            if (permissionViewModel is UnknownTypePermissionViewModel unknownTypePermissionViewModel)
+            if (permissionViewModel is UnknownTypePermissionPresentationModel unknownTypePermissionViewModel)
             {
                 foreach (var verb in unknownTypePermissionViewModel.Verbs)
                 {

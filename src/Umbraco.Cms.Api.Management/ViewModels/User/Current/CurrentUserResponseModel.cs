@@ -25,5 +25,5 @@ public class CurrentUserResponseModel
 
     public required bool HasAccessToAllLanguages { get; init; }
 
-    public required ISet<IPermissionViewModel> Permissions { get; init; }
+    public required ISet<IPermissionPresentationModel> Permissions { get; init; }
 }

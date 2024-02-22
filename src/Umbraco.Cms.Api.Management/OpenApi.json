@@ -26216,13 +26216,13 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentPermissionModel"
+                  "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/FallbackPermissionModel"
+                  "$ref": "#/components/schemas/FallbackPermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/UnknownTypePermissionModel"
+                  "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
             }
@@ -26805,13 +26805,17 @@
         },
         "additionalProperties": false
       },
-      "DocumentPermissionModel": {
+      "DocumentPermissionPresentationModel": {
         "required": [
+          "$type",
           "document",
           "verbs"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "document": {
             "oneOf": [
               {
@@ -26827,7 +26831,10 @@
             }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type"
+        }
       },
       "DocumentRecycleBinItemResponseModel": {
         "required": [
@@ -27488,12 +27495,16 @@
         },
         "additionalProperties": false
       },
-      "FallbackPermissionModel": {
+      "FallbackPermissionPresentationModel": {
         "required": [
+          "$type",
           "verbs"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "verbs": {
             "uniqueItems": true,
             "type": "array",
@@ -27502,7 +27513,10 @@
             }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type"
+        }
       },
       "FieldPresentationModel": {
         "required": [
@@ -31920,13 +31934,17 @@
         },
         "additionalProperties": false
       },
-      "UnknownTypePermissionModel": {
+      "UnknownTypePermissionPresentationModel": {
         "required": [
+          "$type",
           "context",
           "verbs"
         ],
         "type": "object",
         "properties": {
+          "$type": {
+            "type": "string"
+          },
           "verbs": {
             "uniqueItems": true,
             "type": "array",
@@ -31938,7 +31956,10 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type"
+        }
       },
       "UnlockUsersRequestModel": {
         "required": [
@@ -32810,13 +32831,13 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/DocumentPermissionModel"
+                  "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/FallbackPermissionModel"
+                  "$ref": "#/components/schemas/FallbackPermissionPresentationModel"
                 },
                 {
-                  "$ref": "#/components/schemas/UnknownTypePermissionModel"
+                  "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
             }
@@ -33284,8 +33305,6 @@
         },
         "additionalProperties": false
       }
-    },
-    },
     },
     "securitySchemes": {
       "Backoffice User": {
