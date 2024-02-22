@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Services.Paging;
@@ -84,16 +83,16 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
     }
 
     protected IActionResult OperationStatusResult(OperationResult result) =>
-        result.Result switch
+        OperationStatusResult(result.Result, problemDetailsBuilder => result.Result switch
         {
-            OperationResultType.FailedCancelledByEvent => BadRequest(new ProblemDetailsBuilder()
+            OperationResultType.FailedCancelledByEvent => BadRequest(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the operation.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown operation status.")
                 .Build()),
-        };
+        });
 
     private IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {
