@@ -26,8 +26,6 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
 
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
-    private IEditorConfigurationParser EditorConfigurationParser => GetRequiredService<IEditorConfigurationParser>();
-
     [Test]
     public async Task Can_Create_Container_At_Root()
     {
@@ -187,7 +185,7 @@ public class DataTypeContainerServiceTests : UmbracoIntegrationTest
         EntityContainer container = (await DataTypeContainerService.CreateAsync(null,"Root Container", null, Constants.Security.SuperUserKey)).Result;
 
         IDataType dataType =
-            new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper, EditorConfigurationParser), ConfigurationEditorJsonSerializer)
+            new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
                 Name = Guid.NewGuid().ToString(),
                 DatabaseType = ValueStorageType.Nvarchar,

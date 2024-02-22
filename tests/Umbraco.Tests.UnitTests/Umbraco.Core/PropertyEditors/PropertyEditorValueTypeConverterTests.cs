@@ -212,7 +212,7 @@ public class PropertyEditorValueTypeConverterTests
     private static PropertyEditorCollection ValueTypePropertyEditorCollection(string valueType)
     {
         var valueEditor = Mock.Of<IDataValueEditor>(x => x.ValueType == valueType);
-        var dataEditor = Mock.Of<IDataEditor>(x => x.GetValueEditor() == valueEditor && x.Alias == "My.Custom.Alias" && x.Type == EditorType.PropertyValue);
+        var dataEditor = Mock.Of<IDataEditor>(x => x.GetValueEditor() == valueEditor && x.Alias == "My.Custom.Alias");
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
         return propertyEditors;
     }

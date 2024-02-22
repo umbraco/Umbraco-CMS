@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
+﻿using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Mapping;
@@ -15,6 +16,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         mapper.Define<IMediaType, MediaTypeReferenceResponseModel>((_, _) => new MediaTypeReferenceResponseModel(), Map);
         mapper.Define<ISimpleContentType, MediaTypeReferenceResponseModel>((_, _) => new MediaTypeReferenceResponseModel(), Map);
         mapper.Define<IMediaType, AllowedMediaType>((_, _) => new AllowedMediaType(), Map);
+        mapper.Define<ISimpleContentType, MediaTypeCollectionReferenceResponseModel>((_, _) => new MediaTypeCollectionReferenceResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -29,6 +31,8 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.VariesByCulture = source.VariesByCulture();
         target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
+
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
         target.AllowedMediaTypes = source.AllowedContentTypes?.Select(ct =>
@@ -46,7 +50,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
     // Umbraco.Code.MapAll
@@ -54,7 +58,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
     // Umbraco.Code.MapAll
@@ -63,6 +67,14 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
         target.Description = source.Description;
+        target.Icon = source.Icon ?? string.Empty;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(ISimpleContentType source, MediaTypeCollectionReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Alias = source.Alias;
         target.Icon = source.Icon ?? string.Empty;
     }
 }

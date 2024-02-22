@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models.ContentPublishing;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -12,7 +13,7 @@ public interface IContentPublishingService
     /// <param name="cultures">The cultures to publish.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Result of the publish operation.</returns>
-    Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(Guid key, IEnumerable<string> cultures, Guid userKey);
+    Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(Guid key, CultureAndScheduleModel cultureAndSchedule, Guid userKey);
 
     /// <summary>
     ///     Publishes a content branch.

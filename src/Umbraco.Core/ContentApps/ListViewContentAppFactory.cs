@@ -120,8 +120,6 @@ public class ListViewContentAppFactory : IContentAppFactory
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}containerView",
                 Label = string.Empty,
                 Value = null,
-                View = editor.GetValueEditor().View,
-                HideLabel = true,
                 Config = listViewConfig,
             },
         };
@@ -136,14 +134,14 @@ public class ListViewContentAppFactory : IContentAppFactory
 
         switch (o)
         {
-            case IContent content when !content.ContentType.IsContainer:
+            case IContent content when content.ContentType.ListView is null:
                 return null;
             case IContent content:
                 contentTypeAlias = content.ContentType.Alias;
                 entityType = "content";
                 dtdId = Constants.DataTypes.DefaultContentListView;
                 break;
-            case IMedia media when !media.ContentType.IsContainer &&
+            case IMedia media when media.ContentType.ListView is null &&
                                    media.ContentType.Alias != Constants.Conventions.MediaTypes.Folder:
                 return null;
             case IMedia media:

@@ -1079,7 +1079,6 @@ internal class DatabaseDataCreator
                     Alias = Constants.Conventions.MediaTypes.Folder,
                     Icon = Constants.Icons.MediaFolder,
                     Thumbnail = Constants.Icons.MediaFolder,
-                    IsContainer = false,
                     AllowAtRoot = true,
                     Variations = (byte)ContentVariation.Nothing,
                 });
@@ -2163,32 +2162,6 @@ internal class DatabaseDataCreator
                     NodeId = 1047,
                     EditorAlias = Constants.PropertyEditors.Aliases.MemberPicker,
                     DbType = "Nvarchar",
-                });
-        }
-
-        if (_database.Exists<NodeDto>(1048))
-        {
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false,
-                new DataTypeDto
-                {
-                    NodeId = 1048,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker,
-                    DbType = "Ntext",
-                });
-        }
-
-        if (_database.Exists<NodeDto>(1049))
-        {
-            _database.Insert(
-                Constants.DatabaseSchema.Tables.DataType,
-                "pk",
-                false,
-                new DataTypeDto
-                {
-                    NodeId = 1049,
-                    EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker,
-                    DbType = "Ntext",
-                    Configuration = "{\"multiPicker\":1}",
                 });
         }
 

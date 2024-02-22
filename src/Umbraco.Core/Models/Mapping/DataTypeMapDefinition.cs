@@ -50,32 +50,23 @@ public class DataTypeMapDefinition : IMapDefinition
     private static void Map(IDataEditor source, PropertyEditorBasic target, MapperContext context)
     {
         target.Alias = source.Alias;
-        target.Icon = source.Icon;
-        target.Name = source.Name;
     }
 
     // Umbraco.Code.MapAll -Value
     private static void Map(ConfigurationField source, DataTypeConfigurationFieldDisplay target, MapperContext context)
     {
         target.Config = source.Config;
-        target.Description = source.Description;
-        target.HideLabel = source.HideLabel;
         target.Key = source.Key;
-        target.Name = source.Name;
-        target.View = source.View;
     }
 
     // Umbraco.Code.MapAll -Udi -HasPrevalues -IsSystemDataType -Id -Trashed -Key
-    // Umbraco.Code.MapAll -ParentId -Path
+    // Umbraco.Code.MapAll -ParentId -Path -Icon -Name
     private static void Map(IDataEditor source, DataTypeBasic target, MapperContext context)
     {
         target.Alias = source.Alias;
-        target.Group = source.Group;
-        target.Icon = source.Icon;
-        target.Name = source.Name;
     }
 
-    // Umbraco.Code.MapAll -HasPrevalues
+    // Umbraco.Code.MapAll -HasPrevalues -Icon
     private void Map(IDataType source, DataTypeBasic target, MapperContext context)
     {
         target.Id = source.Id;
@@ -93,11 +84,9 @@ public class DataTypeMapDefinition : IMapDefinition
         }
 
         target.Alias = editor.Alias;
-        target.Group = editor.Group;
-        target.Icon = editor.Icon;
     }
 
-    // Umbraco.Code.MapAll -HasPrevalues
+    // Umbraco.Code.MapAll -HasPrevalues -Icon
     private void Map(IDataType source, DataTypeDisplay target, MapperContext context)
     {
         target.AvailableEditors = MapAvailableEditors(source, context);
@@ -118,8 +107,6 @@ public class DataTypeMapDefinition : IMapDefinition
         }
 
         target.Alias = editor.Alias;
-        target.Group = editor.Group;
-        target.Icon = editor.Icon;
     }
 
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
@@ -139,7 +126,7 @@ public class DataTypeMapDefinition : IMapDefinition
         IOrderedEnumerable<IDataEditor> properties = _propertyEditors
             .Where(x => !x.IsDeprecated || _contentSettings.ShowDeprecatedPropertyEditors ||
                         source.EditorAlias == x.Alias)
-            .OrderBy(x => x.Name);
+            .OrderBy(x => x.Alias);
         return context.MapEnumerable<IDataEditor, PropertyEditorBasic>(properties).WhereNotNull();
     }
 

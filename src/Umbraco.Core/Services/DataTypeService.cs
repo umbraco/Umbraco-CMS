@@ -11,9 +11,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -29,40 +27,9 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IAuditRepository _auditRepository;
         private readonly IIOHelper _ioHelper;
-        private readonly IEditorConfigurationParser _editorConfigurationParser;
         private readonly IDataTypeContainerService _dataTypeContainerService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
-
-        [Obsolete("Please use the constructor that takes less parameters. Will be removed in V15.")]
-        public DataTypeService(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDataTypeRepository dataTypeRepository,
-            IDataTypeContainerRepository dataTypeContainerRepository,
-            IAuditRepository auditRepository,
-            IEntityRepository entityRepository,
-            IContentTypeRepository contentTypeRepository,
-            IIOHelper ioHelper,
-            ILocalizedTextService localizedTextService,
-            ILocalizationService localizationService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
-            IEditorConfigurationParser editorConfigurationParser)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                dataTypeRepository,
-                dataValueEditorFactory,
-                auditRepository,
-                contentTypeRepository,
-                ioHelper,
-                editorConfigurationParser)
-        {
-        }
-
+        private readonly Lazy<IIdKeyMap> _idKeyMap;
 
         public DataTypeService(
             ICoreScopeProvider provider,
@@ -73,7 +40,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper,
-            IEditorConfigurationParser editorConfigurationParser)
+            Lazy<IIdKeyMap> idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
@@ -81,7 +48,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
             _ioHelper = ioHelper;
-            _editorConfigurationParser = editorConfigurationParser;
+            _idKeyMap = idKeyMap;
 
             // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
             _dataTypeContainerService = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>();
@@ -372,7 +339,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 .Where(x => x.Editor is MissingPropertyEditor);
             foreach (IDataType dataType in dataTypesWithMissingEditors)
             {
-                dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper, _editorConfigurationParser);
+                dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper);
             }
         }
 
@@ -626,6 +593,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.NotFound, dataType);
             }
 
+            if (dataType.IsDeletableDataType() is false)
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.NonDeletable, dataType);
+            }
+
             var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(deletingDataTypeNotification))
             {
@@ -698,6 +671,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             return await Task.FromResult(Attempt.SucceedWithStatus(DataTypeOperationStatus.Success, usages));
         }
 
+        public IReadOnlyDictionary<Udi, IEnumerable<string>> GetListViewReferences(int id)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            return _dataTypeRepository.FindListViewUsages(id);
+        }
+
         /// <inheritdoc />
         public IEnumerable<ValidationResult> ValidateConfigurationData(IDataType dataType)
         {
@@ -767,11 +746,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         private IDataType? GetDataTypeFromRepository(Guid id)
+        => _idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.DataType) switch
         {
-            IQuery<IDataType> query = Query<IDataType>().Where(x => x.Key == id);
-            IDataType? dataType = _dataTypeRepository.Get(query).FirstOrDefault();
-            return dataType;
-        }
+            { Success: false } => null,
+            { Result: var intId } => _dataTypeRepository.Get(intId),
+        };
 
         private void Audit(AuditType type, int userId, int objectId)
             => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));

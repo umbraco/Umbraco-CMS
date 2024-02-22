@@ -101,9 +101,9 @@ public class ContentTypeBasic : EntityBasic
     [ReadOnly(true)]
     public IDictionary<int, string> Blueprints { get; set; }
 
-    [DataMember(Name = "isContainer")]
+    [DataMember(Name = "listView")]
     [ReadOnly(true)]
-    public bool IsContainer { get; set; }
+    public Guid? ListView { get; set; }
 
     [DataMember(Name = "isElement")]
     [ReadOnly(true)]

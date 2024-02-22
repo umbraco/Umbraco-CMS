@@ -306,7 +306,7 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
         }
 
-        _logger.LogInformation($"Rebuilding index '{indexer?.Name}' done.");
+        _logger.LogInformation("Rebuilding index '{indexerName}' done.", indexer?.Name);
 
         var cacheKey = "temp_indexing_op_" + indexer?.Name;
         _runtimeCache.Clear(cacheKey);

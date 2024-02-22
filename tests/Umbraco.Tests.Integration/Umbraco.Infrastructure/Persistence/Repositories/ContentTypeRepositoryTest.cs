@@ -405,7 +405,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             // ContentTypeSave
             CompositeContentTypes = display.CompositeContentTypes,
-            IsContainer = display.IsContainer,
+            ListView = display.ListView,
             AllowAsRoot = display.AllowAsRoot,
             AllowedTemplates = display.AllowedTemplates.Select(x => x.Alias),
             AllowedContentTypes = display.AllowedContentTypes,

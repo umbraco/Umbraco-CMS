@@ -144,7 +144,7 @@ public class AliasUrlProvider : IUrlProvider
                 foreach (var alias in aliases.Distinct())
                 {
                     var path = "/" + alias;
-                    var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                    var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Authority), path));
                     yield return UrlInfo.Url(
                         _uriUtility.UriFromUmbraco(uri, _requestConfig).ToString(),
                         domainUri.Culture);

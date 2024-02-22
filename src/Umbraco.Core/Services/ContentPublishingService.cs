@@ -1,7 +1,10 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -10,30 +13,104 @@ internal sealed class ContentPublishingService : IContentPublishingService
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IContentService _contentService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IContentValidationService _contentValidationService;
+    private readonly IContentTypeService _contentTypeService;
+    private readonly ILanguageService _languageService;
 
     public ContentPublishingService(
         ICoreScopeProvider coreScopeProvider,
         IContentService contentService,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IContentValidationService contentValidationService,
+        IContentTypeService contentTypeService,
+        ILanguageService languageService)
     {
         _coreScopeProvider = coreScopeProvider;
         _contentService = contentService;
         _userIdKeyResolver = userIdKeyResolver;
+        _contentValidationService = contentValidationService;
+        _contentTypeService = contentTypeService;
+        _languageService = languageService;
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(Guid key, IEnumerable<string> cultures, Guid userKey)
+    public async Task<Attempt<ContentPublishingResult, ContentPublishingOperationStatus>> PublishAsync(
+        Guid key,
+        CultureAndScheduleModel cultureAndSchedule,
+        Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {
+            scope.Complete();
             return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentNotFound, new ContentPublishingResult());
         }
 
+
+        var cultures =
+            cultureAndSchedule.CulturesToPublishImmediately.Union(
+                cultureAndSchedule.Schedules.FullSchedule.Select(x => x.Culture)).ToArray();
+
+        if (content.ContentType.VariesByCulture())
+        {
+            if (cultures.Any() is false)
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.CultureMissing, new ContentPublishingResult());
+            }
+
+            var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
+            if (cultures.Any(x => x == "*") || cultures.All(x=> validCultures.Contains(x, StringComparer.InvariantCultureIgnoreCase) is false))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
+            }
+        }
+        else
+        {
+            if (cultures.Length != 1 || cultures.Any(x => x != "*"))
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
+            }
+        }
+
+        ContentValidationResult validationResult = await ValidateCurrentContentAsync(content, cultures);
+
+        var errors = validationResult.ValidationErrors.Where(err =>
+            cultures.Contains(err.Culture ?? "*", StringComparer.InvariantCultureIgnoreCase));
+        if (errors.Any())
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(ContentPublishingOperationStatus.ContentInvalid, new ContentPublishingResult
+            {
+                Content = content,
+                InvalidPropertyAliases = errors.Select(property => property.Alias).ToArray()
+                                         ?? Enumerable.Empty<string>()
+            });
+        }
+
+
         var userId = await _userIdKeyResolver.GetAsync(userKey);
-        PublishResult result = _contentService.Publish(content, cultures.ToArray(), userId);
+
+        PublishResult? result = null;
+        if (cultureAndSchedule.CulturesToPublishImmediately.Any())
+        {
+            result = _contentService.Publish(content, cultureAndSchedule.CulturesToPublishImmediately.ToArray(), userId);
+        }
+        else if(cultureAndSchedule.Schedules.FullSchedule.Any())
+        {
+            _contentService.PersistContentSchedule(content, cultureAndSchedule.Schedules);
+            result = new PublishResult(PublishResultType.SuccessPublish, new EventMessages(), content);
+        }
+
         scope.Complete();
+
+        if (result is null)
+        {
+            return Attempt.FailWithStatus(ContentPublishingOperationStatus.NothingToPublish, new ContentPublishingResult());
+        }
 
         ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
         return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
@@ -46,6 +123,34 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 InvalidPropertyAliases = result.InvalidProperties?.Select(property => property.Alias).ToArray()
                                          ?? Enumerable.Empty<string>()
             });
+    }
+
+    private async Task<ContentValidationResult> ValidateCurrentContentAsync(IContent content, string[] cultures)
+    {
+        // Would be better to be able to use a mapper/factory, but currently all that functionality is very much presentation logic.
+        var model = new ContentUpdateModel()
+        {
+            InvariantName = content.Name,
+            InvariantProperties = cultures.Contains("*") ? content.Properties.Where(x=>x.PropertyType.VariesByCulture() is false).Select(x=> new PropertyValueModel()
+            {
+                Alias = x.Alias,
+                Value = x.GetValue()
+            }) : Array.Empty<PropertyValueModel>(),
+            Variants = cultures.Select(culture => new VariantModel()
+            {
+                Name = content.GetPublishName(culture) ?? string.Empty,
+                Culture = culture,
+                Segment = null,
+                Properties = content.Properties.Where(prop=>prop.PropertyType.VariesByCulture()).Select(prop=> new PropertyValueModel()
+                {
+                    Alias = prop.Alias,
+                    Value = prop.GetValue(culture: culture, segment:null, published:false)
+                })
+            })
+        };
+        IContentType? contentType = _contentTypeService.Get(content.ContentType.Key)!;
+        ContentValidationResult validationResult = await _contentValidationService.ValidatePropertiesAsync(model, contentType);
+        return validationResult;
     }
 
     /// <inheritdoc />
