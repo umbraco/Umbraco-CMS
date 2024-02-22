@@ -148,6 +148,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	}
 
 	public destroy(): void {
+		super.destroy();
 		this.#alias.destroy();
 		this.#label.destroy();
 		this.#description.destroy();
@@ -155,6 +156,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 		this.#value.destroy();
 		this.#configCollection.destroy();
 		this._providerController.destroy(); // This would also be handled by the controller host, but if someone wanted to replace/remove this context without the host being destroyed. Then we have clean up out selfs here.
+		this.#datasetContext = undefined;
 	}
 }
 
