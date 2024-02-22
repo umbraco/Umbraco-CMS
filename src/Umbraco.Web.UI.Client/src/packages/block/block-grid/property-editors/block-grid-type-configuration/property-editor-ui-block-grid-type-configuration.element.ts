@@ -8,14 +8,14 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_BLOCK_GRID_TYPE,
-	type UmbBlockGridTypeGroupType,
-	type UmbBlockGridGroupTypeConfiguration,
-} from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_GRID_TYPE, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+
+interface MappedGroupWithBlockTypes extends Partial<UmbBlockGridTypeGroupType> {
+	blocks: Array<UmbBlockTypeWithGroupKey>;
+}
 
 /**
  * @element umb-property-editor-ui-block-grid-type-configuration
@@ -47,7 +47,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	private _blockGroups: Array<UmbBlockGridTypeGroupType> = [];
 
 	@state()
-	private _mappedValuesAndGroups: Array<UmbBlockGridGroupTypeConfiguration> = [];
+	private _mappedValuesAndGroups: Array<MappedGroupWithBlockTypes> = [];
 
 	@state()
 	private _workspacePath?: string;
