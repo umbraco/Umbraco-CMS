@@ -1,12 +1,11 @@
 // import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context.js';
+import type { UmbMemberDetailModel } from '../../../types.js';
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbMemberDetailModel } from '../../../types.js';
-import { UUIBooleanInputEvent } from '@umbraco-ui/uui';
-import { UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_CONTEXT, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-member-workspace-view-member')
 export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -172,13 +171,10 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			}
 			#left-column {
 				/* Is there a way to make the wrapped right column grow only when wrapped? */
-				flex-grow: 9999999;
-				flex-shrink: 0;
-				flex-basis: 700px;
+				flex: 9999 1 500px;
 			}
 			#right-column {
-				flex-basis: 300px;
-				flex-grow: 1;
+				flex: 1 1 300px;
 			}
 			uui-box {
 				height: fit-content;
