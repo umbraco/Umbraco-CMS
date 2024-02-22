@@ -51,7 +51,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             Mappers,
             Options.Create(GlobalSettings),
             Options.Create(new UserPasswordConfigurationSettings()),
-            new JsonNetSerializer(),
+            new SystemTextJsonSerializer(),
             mockRuntimeState.Object);
         return repository;
     }
@@ -157,7 +157,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
                 Mock.Of<IMapperCollection>(),
                 Options.Create(GlobalSettings),
                 Options.Create(new UserPasswordConfigurationSettings()),
-                new JsonNetSerializer(),
+                new SystemTextJsonSerializer(),
                 mockRuntimeState.Object);
 
             repository2.Delete(user);
