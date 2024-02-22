@@ -9,7 +9,6 @@ export * from './path-decode.function.js';
 export * from './path-encode.function.js';
 export * from './path-folder-name.function.js';
 export * from './selection-manager/selection.manager.js';
-export * from './udi.js';
 export * from './umbraco-path.function.js';
 export * from './math.js';
 export * from './split-string-to-array.js';
