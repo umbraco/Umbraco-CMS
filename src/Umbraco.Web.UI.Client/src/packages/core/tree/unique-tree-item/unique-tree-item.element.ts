@@ -35,7 +35,7 @@ export class UmbUniqueTreeItemElement extends UmbLitElement implements UmbTreeIt
 	render() {
 		if (!this.item) return nothing;
 		return html`<umb-tree-item-base></umb-tree-item-base>`;
-	}];
+	}
 }
 
 declare global {
