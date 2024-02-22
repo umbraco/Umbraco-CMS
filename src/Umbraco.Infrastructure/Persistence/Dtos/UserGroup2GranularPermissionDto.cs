@@ -8,8 +8,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class UserGroup2GranularPermissionDto
 {
+    [Column("id")]
+    [PrimaryKeyColumn(Name = "PK_umbracoUserGroup2GranularPermissionDto", AutoIncrement = true)]
+    public int Id { get; set; }
+
     [Column("userGroupKey")]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_umbracoUserGroup2GranularPermissionDto", OnColumns = "userGroupKey, uniqueId, permission")]
+    [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserGroup2GranularPermissionDto_UserGroupKey_UniqueId", IncludeColumns = "uniqueId")]
     [ForeignKey(typeof(UserGroupDto), Column = "key")]
     public Guid UserGroupKey { get; set; }
 
