@@ -8,7 +8,7 @@ import {
 	UMB_ENTITY_USER_PERMISSION_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
+import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -70,7 +70,7 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 			},
 		});
 
-		this.#documentPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event) => {
+		this.#documentPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbDeselectedEvent) => {
 			const selectedEvent = event as UmbSelectedEvent;
 			const unique = selectedEvent.unique;
 			if (!unique) return;
