@@ -11,8 +11,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 /**
  */
 export class UmbExtensionsElementInitializer<
-	ManifestTypes extends ManifestBase,
-	ManifestTypeName extends string = ManifestTypes['type'],
+	ManifestTypes extends ManifestBase = ManifestBase,
+	ManifestTypeName extends string = string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbExtensionElementInitializer<ManifestType> = UmbExtensionElementInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
