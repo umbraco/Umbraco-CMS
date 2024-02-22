@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.Routing;
@@ -19,15 +18,17 @@ namespace Umbraco.Cms.Api.Management.Controllers.Upgrade;
 public abstract class UpgradeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UpgradeOperationResult(UpgradeOperationStatus status, InstallationResult? result = null) =>
-        status switch
-        {
-            UpgradeOperationStatus.Success => Ok(),
-            UpgradeOperationStatus.UpgradeFailed => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
-                .WithTitle("Upgrade failed")
-                .WithDetail(result?.ErrorMessage ?? "An unknown error occurred.")
-                .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
-                .WithTitle("Unknown upgrade operation status.")
-                .Build()),
-        };
+        status is UpgradeOperationStatus.Success
+            ? Ok()
+            : OperationStatusResult(status, problemDetailsBuilder => status switch
+            {
+                UpgradeOperationStatus.UpgradeFailed => StatusCode(StatusCodes.Status500InternalServerError,
+                    problemDetailsBuilder
+                        .WithTitle("Upgrade failed")
+                        .WithDetail(result?.ErrorMessage ?? "An unknown error occurred.")
+                        .Build()),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                    .WithTitle("Unknown upgrade operation status.")
+                    .Build()),
+            });
 }

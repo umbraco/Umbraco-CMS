@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Controllers.Content;
 using Umbraco.Cms.Api.Management.Services.Paging;
@@ -9,6 +8,7 @@ using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 
@@ -84,16 +84,41 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
     }
 
     protected IActionResult OperationStatusResult(OperationResult result) =>
-        result.Result switch
+        OperationStatusResult(result.Result, problemDetailsBuilder => result.Result switch
         {
-            OperationResultType.FailedCancelledByEvent => BadRequest(new ProblemDetailsBuilder()
+            OperationResultType.FailedCancelledByEvent => BadRequest(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the operation.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown operation status.")
                 .Build()),
-        };
+        });
+
+    protected IActionResult MapRecycleBinQueryAttemptFailure(RecycleBinQueryResultType status, string contentType)
+        => OperationStatusResult(status, problemDetailsBuilder => status switch
+        {
+            RecycleBinQueryResultType.NotFound => NotFound(problemDetailsBuilder
+                .WithTitle($"The {contentType} could not be found")
+                .Build()),
+            RecycleBinQueryResultType.NotTrashed => BadRequest(problemDetailsBuilder
+                .WithTitle($"The {contentType} is not trashed")
+                .WithDetail($"The {contentType} needs to be trashed for the parent-before-recycled relation to be created.")
+                .Build()),
+            RecycleBinQueryResultType.NoParentRecycleRelation => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("The parent relation could not be found")
+                .WithDetail($"The relation between the parent and the {contentType} that should have been created when the {contentType} was deleted could not be found.")
+                .Build()),
+            RecycleBinQueryResultType.ParentNotFound => NotFound(problemDetailsBuilder
+                .WithTitle($"The original {contentType} parent could not be found")
+                .Build()),
+            RecycleBinQueryResultType.ParentIsTrashed => NotFound(problemDetailsBuilder
+                .WithTitle($"The original {contentType} parent is in the recycle bin")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                .WithTitle("Unknown recycle bin query type.")
+                .Build()),
+        });
 
     private IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {
