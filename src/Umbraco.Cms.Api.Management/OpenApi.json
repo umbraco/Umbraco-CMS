@@ -25905,6 +25905,14 @@
                 }
               ]
             }
+          },
+          "collection": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true
           }
         },
         "additionalProperties": false
