@@ -203,7 +203,7 @@ export const granularPermissions: Array<ManifestGranularUserPermission> = [
 		name: 'Document Granular User Permission',
 		element: () => import('./document-granular-user-permission/document-granular-user-permission.element.js'),
 		meta: {
-			schemaType: 'DocumentPermissionModel',
+			schemaType: 'DocumentPermissionPresentationModel',
 		},
 	},
 ];
