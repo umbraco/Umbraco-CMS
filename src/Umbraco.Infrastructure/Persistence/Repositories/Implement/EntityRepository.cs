@@ -466,7 +466,11 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
             {
                 sql
                     .AndSelect<ContentVersionDto>(x => Alias(x.Id, "versionId"), x => x.VersionDate)
-                    .AndSelect<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer,
+                    .AndSelect<ContentTypeDto>(
+                        x => x.Alias,
+                        x => x.Icon,
+                        x => x.Thumbnail,
+                        x => x.ListView,
                         x => x.Variations);
             }
 
@@ -595,7 +599,11 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         {
             sql
                 .AndBy<ContentVersionDto>(x => x.Id, x => x.VersionDate)
-                .AndBy<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer,
+                .AndBy<ContentTypeDto>(
+                    x => x.Alias,
+                    x => x.Icon,
+                    x => x.Thumbnail,
+                    x => x.ListView,
                     x => x.Variations);
         }
 

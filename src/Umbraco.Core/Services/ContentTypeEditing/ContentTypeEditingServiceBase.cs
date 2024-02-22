@@ -427,6 +427,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         contentType.Name = model.Name;
         contentType.AllowedAsRoot = model.AllowedAsRoot;
         contentType.IsElement = model.IsElement;
+        contentType.ListView = model.ListView;
         contentType.SetVariesBy(ContentVariation.Culture, model.VariesByCulture);
         contentType.SetVariesBy(ContentVariation.Segment, model.VariesBySegment);
 

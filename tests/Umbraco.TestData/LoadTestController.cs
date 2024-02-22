@@ -214,7 +214,7 @@ public class LoadTestController : Controller
             Description = "Container for LoadTest content",
             Icon = "icon-document",
             AllowedAsRoot = true,
-            IsContainer = true
+            ListView = Constants.DataTypes.Guids.ListViewContentGuid,
         };
         containerType.AllowedContentTypes = containerType.AllowedContentTypes.Union(new[]
         {

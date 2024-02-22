@@ -149,7 +149,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
            .Select<ContentTypeDto>(ct => ct.Select(node => node.NodeDto))
            .From<ContentTypeDto>()
            .InnerJoin<NodeDto>().On<NodeDto, ContentTypeDto>(n => n.NodeId, ct => ct.NodeId)
-           .Where<ContentTypeDto>(ct => ct.IsContainer == true);
+           .Where<ContentTypeDto>(ct => ct.ListView != null);
 
             List<ContentTypeDto> ctds = Database.Fetch<ContentTypeDto>(sql);
 
