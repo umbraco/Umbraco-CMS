@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type PublishDocumentWithDescendantsRequestModel = {
-    includeUnpublishedDescendants: boolean;
-    cultures: Array<string>;
+export type UnknownTypePermissionPresentationModel = {
+    $type: string;
+    verbs: Array<string>;
+    context: string;
 };
 

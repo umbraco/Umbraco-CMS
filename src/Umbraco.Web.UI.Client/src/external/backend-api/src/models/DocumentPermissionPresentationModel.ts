@@ -5,7 +5,8 @@
 
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
-export type DocumentPermissionModel = {
+export type DocumentPermissionPresentationModel = {
+    $type: string;
     document: ReferenceByIdModel;
     verbs: Array<string>;
 };

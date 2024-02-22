@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DocumentPermissionModel } from './DocumentPermissionModel';
-import type { FallbackPermissionModel } from './FallbackPermissionModel';
+import type { DocumentPermissionPresentationModel } from './DocumentPermissionPresentationModel';
+import type { FallbackPermissionPresentationModel } from './FallbackPermissionPresentationModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-import type { UnknownTypePermissionModel } from './UnknownTypePermissionModel';
+import type { UnknownTypePermissionPresentationModel } from './UnknownTypePermissionPresentationModel';
 
 export type UserGroupBaseModel = {
     name: string;
@@ -18,6 +18,6 @@ export type UserGroupBaseModel = {
     documentRootAccess: boolean;
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
-    permissions: Array<(DocumentPermissionModel | FallbackPermissionModel | UnknownTypePermissionModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | FallbackPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
 };
 

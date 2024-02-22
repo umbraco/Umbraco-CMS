@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type UnknownTypePermissionModel = {
-    verbs: Array<string>;
-    context: string;
+export type ScheduleRequestModel = {
+    publishTime?: string | null;
+    unpublishTime?: string | null;
 };
 

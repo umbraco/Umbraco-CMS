@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DocumentPermissionModel } from './DocumentPermissionModel';
-import type { FallbackPermissionModel } from './FallbackPermissionModel';
-import type { UnknownTypePermissionModel } from './UnknownTypePermissionModel';
+import type { DocumentPermissionPresentationModel } from './DocumentPermissionPresentationModel';
+import type { FallbackPermissionPresentationModel } from './FallbackPermissionPresentationModel';
+import type { UnknownTypePermissionPresentationModel } from './UnknownTypePermissionPresentationModel';
 
 export type CurrentUserResponseModel = {
     id: string;
@@ -18,6 +18,6 @@ export type CurrentUserResponseModel = {
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
-    permissions: Array<(DocumentPermissionModel | FallbackPermissionModel | UnknownTypePermissionModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | FallbackPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
 };
 

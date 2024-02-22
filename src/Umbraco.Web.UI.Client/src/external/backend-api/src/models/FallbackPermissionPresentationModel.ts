@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type FallbackPermissionModel = {
+export type FallbackPermissionPresentationModel = {
+    $type: string;
     verbs: Array<string>;
 };
 
