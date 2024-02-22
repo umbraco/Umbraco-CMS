@@ -74,6 +74,7 @@ export const data: Array<UmbMockMediaModel> = [
 		mediaType: {
 			id: 'media-type-1-id',
 			icon: 'icon-bug',
+			collection: { id: 'dt-collectionView' },
 		},
 		values: [],
 		variants: [
@@ -97,6 +98,7 @@ export const data: Array<UmbMockMediaModel> = [
 		mediaType: {
 			id: 'media-type-1-id',
 			icon: 'icon-bug',
+			collection: { id: 'dt-collectionView' },
 		},
 		values: [],
 		variants: [
