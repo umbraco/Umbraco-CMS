@@ -1,5 +1,4 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestMenuItem, UmbMenuItemElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
@@ -48,8 +47,6 @@ export class UmbMenuItemDefaultElement extends UmbLitElement implements UmbMenuI
 			.iconName=${this.manifest.meta.icon ?? ''}
 			.href=${this._href}></umb-menu-item-layout>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 declare global {

@@ -1,5 +1,4 @@
 import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -51,8 +50,6 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 			<slot></slot>
 		</uui-menu-item>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 declare global {
