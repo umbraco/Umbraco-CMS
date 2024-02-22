@@ -1,6 +1,6 @@
 import type { UmbDocumentUserPermissionModel } from '../types.js';
 import { UmbDocumentItemRepository, type UmbDocumentItemModel } from '../../repository/index.js';
-import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
