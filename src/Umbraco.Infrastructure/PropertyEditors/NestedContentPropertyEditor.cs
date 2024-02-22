@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -90,14 +91,14 @@ public class NestedContentPropertyEditor : DataEditor
 
     internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference, IDataValueTags
     {
-        private readonly IDataTypeService _dataTypeService;
+        private readonly IDataTypeConfigurationCache _dataTypeReadCache;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
         private readonly ILogger<NestedContentPropertyEditor> _logger;
         private readonly NestedContentValues _nestedContentValues;
 
         public NestedContentPropertyValueEditor(
-            IDataTypeService dataTypeService,
+            IDataTypeConfigurationCache dataTypeReadCache,
             ILocalizedTextService localizedTextService,
             IContentTypeService contentTypeService,
             IShortStringHelper shortStringHelper,
@@ -110,7 +111,7 @@ public class NestedContentPropertyEditor : DataEditor
             IPropertyValidationService propertyValidationService)
             : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
-            _dataTypeService = dataTypeService;
+            _dataTypeReadCache = dataTypeReadCache;
             _propertyEditors = propertyEditors;
             _dataValueReferenceFactories = dataValueReferenceFactories;
             _logger = logger;
@@ -173,7 +174,7 @@ public class NestedContentPropertyEditor : DataEditor
                     continue;
                 }
 
-                object? configuration = _dataTypeService.GetDataType(propertyValue.PropertyType.DataTypeKey)?.Configuration;
+                object? configuration = _dataTypeReadCache.GetConfiguration(propertyValue.PropertyType.DataTypeKey);
                 foreach (ITag tag in dataValueTags.GetTags(propertyValue.Value, configuration, languageId))
                 {
                     yield return tag;
@@ -188,8 +189,7 @@ public class NestedContentPropertyEditor : DataEditor
 
         public override string ConvertDbToString(IPropertyType propertyType, object? propertyValue)
         {
-            IReadOnlyList<NestedContentValues.NestedContentRowValue> rows =
-                _nestedContentValues.GetPropertyValues(propertyValue);
+            IReadOnlyList<NestedContentValues.NestedContentRowValue> rows = _nestedContentValues.GetPropertyValues(propertyValue);
 
             if (rows.Count == 0)
             {
@@ -198,8 +198,7 @@ public class NestedContentPropertyEditor : DataEditor
 
             foreach (NestedContentValues.NestedContentRowValue row in rows.ToList())
             {
-                foreach (KeyValuePair<string, NestedContentValues.NestedContentPropertyValue> prop in row.PropertyValues
-                             .ToList())
+                foreach (KeyValuePair<string, NestedContentValues.NestedContentPropertyValue> prop in row.PropertyValues.ToList())
                 {
                     try
                     {
@@ -210,9 +209,8 @@ public class NestedContentPropertyEditor : DataEditor
                             continue;
                         }
 
-                        var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)
-                            ?.Configuration;
-                        IDataValueEditor valEditor = propEditor.GetValueEditor(tempConfig);
+                        var configuration = _dataTypeReadCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
+                        IDataValueEditor valEditor = propEditor.GetValueEditor(configuration);
                         var convValue = valEditor.ConvertDbToString(prop.Value.PropertyType, prop.Value.Value);
 
                         // update the raw value since this is what will get serialized out
@@ -246,7 +244,7 @@ public class NestedContentPropertyEditor : DataEditor
         public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var val = property.GetValue(culture, segment);
-            var valEditors = new Dictionary<int, IDataValueEditor>();
+            var valEditors = new Dictionary<Guid, IDataValueEditor>();
 
             IReadOnlyList<NestedContentValues.NestedContentRowValue> rows = _nestedContentValues.GetPropertyValues(val);
 
@@ -278,13 +276,13 @@ public class NestedContentPropertyEditor : DataEditor
                             continue;
                         }
 
-                        var dataTypeId = prop.Value.PropertyType.DataTypeId;
-                        if (!valEditors.TryGetValue(dataTypeId, out IDataValueEditor? valEditor))
+                        Guid dataTypeKey = prop.Value.PropertyType.DataTypeKey;
+                        if (!valEditors.TryGetValue(dataTypeKey, out IDataValueEditor? valEditor))
                         {
-                            var tempConfig = _dataTypeService.GetDataType(dataTypeId)?.Configuration;
+                            var tempConfig = _dataTypeReadCache.GetConfiguration(dataTypeKey);
                             valEditor = propEditor.GetValueEditor(tempConfig);
 
-                            valEditors.Add(dataTypeId, valEditor);
+                            valEditors.Add(dataTypeKey, valEditor);
                         }
 
                         var convValue = valEditor.ToEditor(tempProp);
@@ -318,8 +316,7 @@ public class NestedContentPropertyEditor : DataEditor
                 return null;
             }
 
-            IReadOnlyList<NestedContentValues.NestedContentRowValue> rows =
-                _nestedContentValues.GetPropertyValues(editorValue.Value);
+            IReadOnlyList<NestedContentValues.NestedContentRowValue> rows = _nestedContentValues.GetPropertyValues(editorValue.Value);
 
             if (rows.Count == 0)
             {
@@ -328,12 +325,10 @@ public class NestedContentPropertyEditor : DataEditor
 
             foreach (NestedContentValues.NestedContentRowValue row in rows.ToList())
             {
-                foreach (KeyValuePair<string, NestedContentValues.NestedContentPropertyValue> prop in row.PropertyValues
-                             .ToList())
+                foreach (KeyValuePair<string, NestedContentValues.NestedContentPropertyValue> prop in row.PropertyValues.ToList())
                 {
                     // Fetch the property types prevalue
-                    var propConfiguration =
-                        _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+                    var propConfiguration = _dataTypeReadCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
 
                     // Lookup the property editor
                     IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
