@@ -1,5 +1,5 @@
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
-import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
@@ -104,8 +104,6 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 			</uui-button>
 		</umb-image-cropper-field> `;
 	}
-
-	static styles = css``;
 }
 
 declare global {
