@@ -196,8 +196,12 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 		return umbExtensionsRegistry
 			.getAllExtensions()
 			.filter((manifest) => manifest.type === 'entityUserPermission')
-			.filter((manifest) => manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)))
-			.map((manifest) => {
+			.filter((manifest) =>
+				(manifest as ManifestEntityUserPermission).meta.verbs.every((verb) => permission.verbs.includes(verb)),
+			)
+			.map((m) => {
+				const manifest = m as ManifestEntityUserPermission;
+
 				if (manifest.meta.labelKey) {
 					return this.localize.term(manifest.meta.labelKey);
 				} else if (manifest.meta.label) {
