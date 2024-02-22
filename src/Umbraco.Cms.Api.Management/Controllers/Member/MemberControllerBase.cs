@@ -18,9 +18,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member;
 // [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMembers)]
 public class MemberControllerBase : ContentControllerBase
 {
-    protected IActionResult MemberNotFound() => NotFound(new ProblemDetailsBuilder()
-        .WithTitle("The requested member could not be found")
-        .Build());
+    protected IActionResult MemberNotFound() => OperationStatusResult(MemberEditingOperationStatus.MemberNotFound, MemberNotFound);
 
     protected IActionResult MemberEditingStatusResult(MemberEditingStatus status)
         => status.MemberEditingOperationStatus is not MemberEditingOperationStatus.Success
@@ -32,9 +30,7 @@ public class MemberControllerBase : ContentControllerBase
     protected IActionResult MemberEditingOperationStatusResult(MemberEditingOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
-            MemberEditingOperationStatus.MemberNotFound => NotFound(problemDetailsBuilder
-                .WithTitle("The requested member could not be found")
-                .Build()),
+            MemberEditingOperationStatus.MemberNotFound => MemberNotFound(problemDetailsBuilder),
             MemberEditingOperationStatus.MemberTypeNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The requested member type could not be found")
                 .Build()),
@@ -92,4 +88,8 @@ public class MemberControllerBase : ContentControllerBase
         ContentValidationResult validationResult)
         where TContentModelBase : ContentModelBase<MemberValueModel, MemberVariantRequestModel>
         => ContentEditingOperationStatusResult<TContentModelBase, MemberValueModel, MemberVariantRequestModel>(status, requestModel, validationResult);
+
+    private IActionResult MemberNotFound(ProblemDetailsBuilder problemDetailsBuilder) => NotFound(problemDetailsBuilder
+        .WithTitle("The requested member could not be found")
+        .Build());
 }

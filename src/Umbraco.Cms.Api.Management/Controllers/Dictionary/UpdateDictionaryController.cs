@@ -45,7 +45,7 @@ public class UpdateDictionaryController : DictionaryControllerBase
         IDictionaryItem? current = await _dictionaryItemService.GetAsync(id);
         if (current == null)
         {
-            return DictionaryNotFound();
+            return DictionaryItemNotFound();
         }
 
         AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
