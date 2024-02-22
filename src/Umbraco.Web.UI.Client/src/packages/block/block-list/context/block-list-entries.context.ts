@@ -26,7 +26,7 @@ export class UmbBlockListEntriesContext extends UmbBlockEntriesContext<
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				return {
 					data: {
-						blocks: [],
+						blocks: this._manager?.getBlockTypes() ?? [],
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
 						blockOriginData: { index: index },

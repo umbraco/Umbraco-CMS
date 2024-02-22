@@ -40,7 +40,7 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 		documentType: {
 			unique: item.documentType.id,
 			icon: item.documentType.icon,
-			hasCollection: item.documentType.hasListView,
+			collection: item.documentType.collection ?? undefined,
 		},
 		variants: item.variants.map((variant) => {
 			return {
