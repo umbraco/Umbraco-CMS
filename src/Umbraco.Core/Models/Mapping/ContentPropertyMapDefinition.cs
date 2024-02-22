@@ -32,11 +32,10 @@ public class ContentPropertyMapDefinition : IMapDefinition
         ILocalizedTextService textService,
         ILoggerFactory loggerFactory,
         PropertyEditorCollection propertyEditors,
-        CommonMapper commonMapper,
-        IDataTypeConfigurationCache dataTypeConfigurationCache)
+        CommonMapper commonMapper)
     {
         _commonMapper = commonMapper;
-        _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();;
+        _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();
         _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(
             dataTypeService,
             entityService,
@@ -55,24 +54,6 @@ public class ContentPropertyMapDefinition : IMapDefinition
             loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(),
             propertyEditors);
     }
-
-    [Obsolete("Please use constructor that takes an IDataTypeConfigurationCache. Will be removed in V14.")]
-    public ContentPropertyMapDefinition(
-        ICultureDictionary cultureDictionary,
-        IDataTypeService dataTypeService,
-        IEntityService entityService,
-        ILocalizedTextService textService,
-        ILoggerFactory loggerFactory,
-        PropertyEditorCollection propertyEditors)
-        : this(
-            cultureDictionary,
-            dataTypeService,
-            entityService,
-            textService,
-            loggerFactory,
-            propertyEditors,
-            StaticServiceProvider.Instance.GetRequiredService<IDataTypeConfigurationCache>())
-    { }
 
     public void DefineMaps(IUmbracoMapper mapper)
     {
