@@ -43,11 +43,21 @@ public class DocumentRecycleBinQueryService : IDocumentRecycleBinQueryService
             return Task.FromResult(Attempt<IDocumentEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.NoParentRecycleRelation));
         }
 
+        if (parentRecycleRelation.ParentId == Constants.System.Root)
+        {
+            return Task.FromResult(Attempt<IDocumentEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.ParentIsRoot, null));
+        }
+
         var parent =
             _entityService.Get(parentRecycleRelation.ParentId, UmbracoObjectTypes.Document) as IDocumentEntitySlim;
-        if (parent is null || parent.Trashed)
+        if (parent is null)
         {
-            return Task.FromResult(Attempt<IDocumentEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.ParentUnavailable, parent));
+            return Task.FromResult(Attempt<IDocumentEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentNotFound));
+        }
+
+        if (parent.Trashed)
+        {
+            return Task.FromResult(Attempt<IDocumentEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentNotFound, parent));
         }
 
         return Task.FromResult(Attempt<IDocumentEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.Success, parent));

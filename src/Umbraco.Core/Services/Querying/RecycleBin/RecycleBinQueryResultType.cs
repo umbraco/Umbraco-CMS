@@ -6,8 +6,10 @@ namespace Umbraco.Cms.Core.Services.Querying.RecycleBin;
 public enum RecycleBinQueryResultType
 {
     Success = 0,
-    ParentUnavailable = 1,
+    ParentIsRoot = 2,
     NotFound = 11,
     NotTrashed = 12,
-    NoParentRecycleRelation = 13
+    NoParentRecycleRelation = 13,
+    ParentNotFound = 14,
+    ParentIsTrashed = 15,
 }

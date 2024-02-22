@@ -110,6 +110,12 @@ public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
                 .WithTitle("The parent relation could not be found")
                 .WithDetail($"The relation between the parent and the {contentType} that should have been created when the {contentType} was deleted could not be found.")
                 .Build()),
+            RecycleBinQueryResultType.ParentNotFound => NotFound(problemDetailsBuilder
+                .WithTitle($"The original {contentType} parent could not be found")
+                .Build()),
+            RecycleBinQueryResultType.ParentIsTrashed => NotFound(problemDetailsBuilder
+                .WithTitle($"The original {contentType} parent is in the recycle bin")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown recycle bin query type.")
                 .Build()),

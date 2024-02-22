@@ -43,11 +43,22 @@ public class MediaRecycleBinQueryService : IMediaRecycleBinQueryService
             return Task.FromResult(Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.NoParentRecycleRelation));
         }
 
+        if (parentRecycleRelation.ParentId == Constants.System.Root)
+        {
+            return Task.FromResult(Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.ParentIsRoot, null));
+        }
+
         var parent =
             _entityService.Get(parentRecycleRelation.ParentId, UmbracoObjectTypes.Media) as IMediaEntitySlim;
-        if (parent is null || parent.Trashed)
+
+        if (parent is null)
         {
-            return Task.FromResult(Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.ParentUnavailable, parent));
+            return Task.FromResult(Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentNotFound));
+        }
+
+        if (parent.Trashed)
+        {
+            return Task.FromResult(Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentNotFound, parent));
         }
 
         return Task.FromResult(Attempt<IMediaEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.Success, parent));

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -36,7 +37,7 @@ public class OriginalParentDocumentRecycleBinController : DocumentRecycleBinCont
 
     [HttpGet("{id:guid}/original-parent")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DocumentItemResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ReferenceByIdModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> OriginalParent(Guid id)
@@ -52,14 +53,14 @@ public class OriginalParentDocumentRecycleBinController : DocumentRecycleBinCont
         }
 
         Attempt<IDocumentEntitySlim?, RecycleBinQueryResultType> getParentAttempt = await _documentRecycleBinQueryService.GetOriginalParentAsync(id);
-        if (getParentAttempt.Success is false)
+        return getParentAttempt.Success switch
         {
-            return MapAttemptFailure(getParentAttempt.Status);
-        }
-
-        return getParentAttempt.Result is not null
-            ? Ok(_documentPresentationFactory.CreateItemResponseModel(getParentAttempt.Result))
-            : NotFound();
+            true when getParentAttempt.Status == RecycleBinQueryResultType.Success
+                => Ok(new ReferenceByIdModel(getParentAttempt.Result!.Key)),
+            true when getParentAttempt.Status == RecycleBinQueryResultType.ParentIsRoot
+                => Ok(null),
+            _ => MapAttemptFailure(getParentAttempt.Status),
+        };
     }
 
     private IActionResult MapAttemptFailure(RecycleBinQueryResultType status)
