@@ -63,6 +63,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 		return html`
 			<umb-backoffice-header></umb-backoffice-header>
 			<umb-backoffice-main></umb-backoffice-main>
+			<slot></slot>
 		`;
 	}
 
