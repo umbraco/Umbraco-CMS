@@ -36,6 +36,7 @@ export class UmbMemberWorkspaceContext
 		value: UmbMemberDetailModel[PropertyName],
 	) {
 		this.structure.updateOwnerContentType({ [propertyName]: value });
+		console.log('set', propertyName, value);
 	}
 
 	async load(unique: string) {
@@ -94,28 +95,41 @@ export class UmbMemberWorkspaceContext
 		return 'member';
 	}
 
-	getEmail() {
+	get email() {
 		return this.#get('email') || '';
 	}
 
-	getUsername() {
+	get username() {
 		return this.#get('username') || '';
 	}
 
-	getLockedOut() {
+	get isLockedOut() {
 		return this.#get('isLockedOut') || false;
 	}
 
-	getIsTwoFactorEnabled() {
+	get isTwoFactorEnabled() {
 		return this.#get('isTwoFactorEnabled') || false;
 	}
 
-	getIsApproved() {
+	get isApproved() {
 		return this.#get('isApproved') || false;
 	}
 
-	getOldPassword() {
-		return this.#get('oldPassword') || '';
+	get failedPasswordAttempts() {
+		return this.#get('failedPasswordAttempts') || 0;
+	}
+
+	//TODO Use localization for "never"
+	get lastLockOutDate() {
+		return this.#get('lastLockoutDate') || 'never';
+	}
+
+	get lastLoginDate() {
+		return this.#get('lastLoginDate') || 'never';
+	}
+
+	get lastPasswordChangeDate() {
+		return this.#get('lastPasswordChangeDate') || 'never';
 	}
 
 	#get<PropertyName extends keyof UmbMemberDetailModel>(propertyName: PropertyName) {
