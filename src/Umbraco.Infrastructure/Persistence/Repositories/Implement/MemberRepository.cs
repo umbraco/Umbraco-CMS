@@ -541,8 +541,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         {
             "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
 
-            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT Key FROM umbracoUserGroup WHERE Id = @id)",
-            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT Key FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
             "DELETE FROM umbracoRelation WHERE parentId = @id",
             "DELETE FROM umbracoRelation WHERE childId = @id",
             "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
