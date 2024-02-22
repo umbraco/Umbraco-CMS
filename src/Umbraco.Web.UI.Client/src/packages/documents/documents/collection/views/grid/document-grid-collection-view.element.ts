@@ -19,6 +19,9 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	private _selection: Array<string | null> = [];
 
 	@state()
+	private _skip: number = 0;
+
+	@state()
 	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 
 	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
@@ -49,6 +52,14 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 			this.#collectionContext.selection.selection,
 			(selection) => (this._selection = selection),
 			'umbCollectionSelectionObserver',
+		);
+
+		this.observe(
+			this.#collectionContext.pagination.skip,
+			(skip) => {
+				this._skip = skip;
+			},
+			'umbCollectionSkipObserver',
 		);
 	}
 
@@ -84,13 +95,14 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) => this.#renderCard(item),
+					(item, index) => this.#renderCard(index, item),
 				)}
 			</div>
 		`;
 	}
 
-	#renderCard(item: UmbDocumentCollectionItemModel) {
+	#renderCard(index: number, item: UmbDocumentCollectionItemModel) {
+		const sortOrder = this._skip + index;
 		return html`
 			<uui-card-content-node
 				.name=${item.name ?? 'Unnamed Document'}
@@ -101,7 +113,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<uui-icon slot="icon" name=${item.icon}></uui-icon>
-				${this.#renderState(item)} ${this.#renderProperties(item)}
+				${this.#renderState(item)} ${this.#renderProperties(sortOrder, item)}
 			</uui-card-content-node>
 		`;
 	}
@@ -132,14 +144,14 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		}
 	}
 
-	#renderProperties(item: UmbDocumentCollectionItemModel) {
+	#renderProperties(sortOrder: number, item: UmbDocumentCollectionItemModel) {
 		if (!this._userDefinedProperties) return;
 		return html`
 			<ul>
 				${repeat(
 					this._userDefinedProperties,
 					(column) => column.alias,
-					(column) => html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(item, column.alias)}</li>`,
+					(column) => html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(sortOrder, item, column.alias)}</li>`,
 				)}
 			</ul>
 		`;
