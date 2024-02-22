@@ -8,7 +8,7 @@ public class AuditLogBaseModel
 
     public AuditLogEntity? Entity { get; set; }
 
-    public DateTime Timestamp { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 
     public AuditType LogType { get; set; }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -18,6 +18,6 @@ public class UserLoginRequiresVerificationWebhookEvent : WebhookEventBase<UserLo
     {
     }
 
-    public override string Alias => "userLoginRequiresVerification";
+    public override string Alias => Constants.WebhookEvents.Aliases.UserLoginRequiresVerification;
 
 }

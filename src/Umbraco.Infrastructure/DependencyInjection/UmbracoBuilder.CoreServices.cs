@@ -135,7 +135,8 @@ public static partial class UmbracoBuilderExtensions
 
         // register manifest parser, will be injected in collection builders where needed
         builder.Services.AddSingleton<ILegacyManifestParser, LegacyManifestParser>();
-        builder.Services.AddSingleton<IPackageManifestReader, AppPluginsFileProviderPackageManifestReader>();
+        builder.Services.AddSingleton<IPackageManifestReader, BackOfficePackageManifestReader>();
+        builder.Services.AddSingleton<IPackageManifestReader, AppPluginsPackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestService, PackageManifestService>();
 
         // register the manifest filter collection builder (collection is empty by default)
@@ -252,7 +253,6 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
-        builder.Services.AddSingleton<INestedContentPropertyIndexValueFactory, NestedContentPropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
 
@@ -365,9 +365,6 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentSavingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, BlockGridPropertyNotificationHandler>()
             .AddNotificationHandler<ContentScaffoldedNotification, BlockGridPropertyNotificationHandler>()
-            .AddNotificationHandler<ContentSavingNotification, NestedContentPropertyHandler>()
-            .AddNotificationHandler<ContentCopyingNotification, NestedContentPropertyHandler>()
-            .AddNotificationHandler<ContentScaffoldedNotification, NestedContentPropertyHandler>()
             .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<ContentDeletedNotification, FileUploadPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, FileUploadPropertyEditor>()

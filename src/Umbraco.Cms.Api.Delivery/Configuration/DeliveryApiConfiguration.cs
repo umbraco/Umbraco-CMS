@@ -8,6 +8,5 @@ internal static class DeliveryApiConfiguration
 
     internal const string ApiDocumentationContentArticleLink = "https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api";
 
-    // TODO: update this when the Media article is out
-    internal const string ApiDocumentationMediaArticleLink = "https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api";
+    internal const string ApiDocumentationMediaArticleLink = "https://docs.umbraco.com/umbraco-cms/reference/content-delivery-api/media-delivery-api";
 }

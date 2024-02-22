@@ -624,9 +624,8 @@ public class VariationTests
     {
         var ioHelper = Mock.Of<IIOHelper>();
         var dataTypeService = Mock.Of<IDataTypeService>();
-        var editorConfigurationParser = Mock.Of<IEditorConfigurationParser>();
 
-        var attribute = new DataEditorAttribute("a", "a", "a");
+        var attribute = new DataEditorAttribute("a");
         var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(x
             => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(
                 attribute,
@@ -636,8 +635,7 @@ public class VariationTests
 
         var textBoxEditor = new TextboxPropertyEditor(
             dataValueEditorFactory,
-            ioHelper,
-            editorConfigurationParser);
+            ioHelper);
 
         var serializer = new ConfigurationEditorJsonSerializer();
 

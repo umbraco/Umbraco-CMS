@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 
 [ApiController]
-[VersionedApiBackOfficeRoute("temporaryfile")]
+[VersionedApiBackOfficeRoute("temporary-file")]
 [ApiExplorerSettings(GroupName = "Temporary File")]
 public abstract class TemporaryFileControllerBase : ManagementApiControllerBase
 {
