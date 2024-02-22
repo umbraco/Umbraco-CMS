@@ -57,7 +57,7 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 		mediaType: {
 			id: mediaType.id,
 			icon: mediaType.icon,
-			collection: undefined, // TODO: get list from doc type when ready
+			collection: mediaType.collection,
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
