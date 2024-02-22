@@ -88,7 +88,7 @@ public class UserServiceTests : UmbracoIntegrationTest
         ContentService.SetPermission(content[2], ActionBrowse.ActionLetter, new[] { userGroup.Id });
 
         // Act
-        var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
+        var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).OrderBy(x=>x.EntityId).ToArray();
 
         // Assert
         Assert.AreEqual(3, permissions.Length);

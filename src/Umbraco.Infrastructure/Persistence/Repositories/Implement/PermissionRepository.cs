@@ -54,7 +54,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
                     .Select<UserGroup2GranularPermissionDto>("gp").AndSelect("ug.id as userGroupId, en.id as entityId")
                     .From<UserGroupDto>("ug")
                     .InnerJoin<UserGroup2GranularPermissionDto>("gp")
-                    .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key && userGroupIds.Contains(right.Id), "gp", "ug")
+                    .On<UserGroup2GranularPermissionDto, UserGroupDto>((left, right) => left.UserGroupKey == right.Key && group.Contains(right.Id), "gp", "ug")
                     .InnerJoin<NodeDto>("en")
                     .On<UserGroup2GranularPermissionDto, NodeDto>((left, right) => left.UniqueId == right.UniqueId, "gp", "en");
 
@@ -339,7 +339,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
         IEnumerable<UserGroup2GranularPermissionWithIdsDto> result)
     {
         var permissions = new EntityPermissionCollection();
-        IEnumerable<IGrouping<int, UserGroup2GranularPermissionWithIdsDto>> nodePermissions = result.GroupBy(x => x.EntityId);
+        IEnumerable<IGrouping<int, UserGroup2GranularPermissionWithIdsDto>> nodePermissions = result.GroupBy(x => x.EntityId).OrderBy(x=>x.Key);
         foreach (IGrouping<int, UserGroup2GranularPermissionWithIdsDto> np in nodePermissions)
         {
             IEnumerable<IGrouping<int, UserGroup2GranularPermissionWithIdsDto>> userGroupPermissions =
