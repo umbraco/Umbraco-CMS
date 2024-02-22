@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -18,7 +18,7 @@ public class UserGroupDeletedWebhookEvent : WebhookEventBase<UserGroupDeletedNot
     {
     }
 
-    public override string Alias => "userGroupDeleted";
+    public override string Alias => Constants.WebhookEvents.Aliases.UserGroupDeleted;
 
     public override object? ConvertNotificationToRequestPayload(UserGroupDeletedNotification notification) => notification.DeletedEntities;
 }

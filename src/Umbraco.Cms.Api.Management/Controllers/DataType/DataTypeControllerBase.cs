@@ -46,6 +46,10 @@ public abstract class DataTypeControllerBase : ManagementApiControllerBase
             DataTypeOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
                     .WithTitle("The targeted parent for the data type operation was not found.")
                     .Build()),
+            DataTypeOperationStatus.NonDeletable => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("The data type is non-deletable")
+                .WithDetail("The specified data type is required by the system and cannot be deleted.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown data type operation status.")
                 .Build()),

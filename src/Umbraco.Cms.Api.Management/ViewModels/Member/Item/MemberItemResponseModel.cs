@@ -4,7 +4,7 @@ using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 
-public class MemberItemResponseModel : NamedItemResponseModelBase
+public class MemberItemResponseModel : ItemResponseModelBase
 {
     public MemberTypeReferenceResponseModel MemberType { get; set; } = new();
 
