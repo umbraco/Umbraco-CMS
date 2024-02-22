@@ -8,5 +8,5 @@ export type ManifestTypeMap<ManifestTypes extends ManifestBase> = {
 
 export type SpecificManifestTypeOrManifestBase<
 	ManifestTypes extends ManifestBase,
-	T extends keyof ManifestTypeMap<ManifestTypes> | string,
+	T extends string,
 > = T extends keyof ManifestTypeMap<ManifestTypes> ? ManifestTypeMap<ManifestTypes>[T] : ManifestBase;
