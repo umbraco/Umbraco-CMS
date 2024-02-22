@@ -94,12 +94,6 @@ stages:
                 "npm_client"
               path: $(npm_config_cache)
           - script: npm ci --no-fund --no-audit --prefer-offline
-            displayName: Run npm ci (Login)
-            workingDirectory: src/Umbraco.Web.UI.Login
-          - script: npm run build
-            displayName: Run npm build (Login)
-            workingDirectory: src/Umbraco.Web.UI.Login
-          - script: npm ci --no-fund --no-audit --prefer-offline
             displayName: Run npm ci (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - script: npm run build:for:cms
@@ -108,6 +102,12 @@ stages:
           - script: npm run build
             displayName: Run Login Build (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client/apps/auth
+          - script: npm ci --no-fund --no-audit --prefer-offline
+            displayName: Run npm ci (Login)
+            workingDirectory: src/Umbraco.Web.UI.Login
+          - script: npm run build
+            displayName: Run npm build (Login)
+            workingDirectory: src/Umbraco.Web.UI.Login
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
