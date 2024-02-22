@@ -1,4 +1,3 @@
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/extension-registry';
