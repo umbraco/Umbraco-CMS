@@ -841,17 +841,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             contentType.Thumbnail = infoElement.Element("Thumbnail")?.Value;
             contentType.Description = infoElement.Element("Description")?.Value;
 
-            //NOTE AllowAtRoot, IsListView, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
+            //NOTE AllowAtRoot, IsElement and Variations are new properties in the package xml so we need to verify it exists before using it.
             XElement? allowAtRoot = infoElement.Element("AllowAtRoot");
             if (allowAtRoot != null)
             {
                 contentType.AllowedAsRoot = allowAtRoot.Value.InvariantEquals("true");
             }
 
-            XElement? isListView = infoElement.Element("IsListView");
-            if (isListView != null)
+            if (Guid.TryParse(infoElement.Element("ListView")?.Value, out Guid listView))
             {
-                contentType.IsContainer = isListView.Value.InvariantEquals("true");
+                contentType.ListView = listView;
             }
 
             XElement? isElement = infoElement.Element("IsElement");
