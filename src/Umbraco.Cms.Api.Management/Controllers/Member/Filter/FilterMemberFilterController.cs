@@ -7,18 +7,17 @@ using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.Member;
+namespace Umbraco.Cms.Api.Management.Controllers.Member.Filter;
 
 [ApiVersion("1.0")]
-public class FilterMemberController : MemberControllerBase
+public class FilterMemberFilterController : MemberFilterControllerBase
 {
     private readonly IMemberTypeService _memberTypeService;
     private readonly IMemberService _memberService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
 
-    public FilterMemberController(
+    public FilterMemberFilterController(
         IMemberTypeService memberTypeService,
         IMemberService memberService,
         IMemberPresentationFactory memberPresentationFactory)
@@ -28,10 +27,9 @@ public class FilterMemberController : MemberControllerBase
         _memberPresentationFactory = memberPresentationFactory;
     }
 
-    [HttpGet("filter")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MemberResponseModel>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Filter(
         Guid? memberTypeId = null,
@@ -48,7 +46,7 @@ public class FilterMemberController : MemberControllerBase
             IMemberType? memberType = await _memberTypeService.GetAsync(memberTypeId.Value);
             if (memberType == null)
             {
-                return MemberEditingOperationStatusResult(MemberEditingOperationStatus.MemberTypeNotFound);
+                return MemberTypeNotFound();
             }
 
             memberTypeAlias = memberType.Alias;
