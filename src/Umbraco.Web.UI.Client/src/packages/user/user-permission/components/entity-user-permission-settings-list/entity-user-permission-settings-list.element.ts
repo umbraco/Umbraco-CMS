@@ -22,7 +22,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	private _entityType: string = '';
 
 	@property({ attribute: false })
-	selectedPermissions: Array<UmbUserPermissionModel> = [];
+	allowedVerbs: Array<string> = [];
 
 	@state()
 	private _manifests: Array<ManifestEntityUserPermission> = [];
@@ -30,9 +30,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
 
 	#isAllowed(permissionVerbs: Array<string>) {
-		const permission = { $type: 'FallbackPermissionModel', verbs: permissionVerbs };
-		const permissionAsString = JSON.stringify(permission);
-		return this.selectedPermissions?.map((p) => JSON.stringify(p)).includes(permissionAsString);
+		return permissionVerbs.some((verb) => this.allowedVerbs.includes(verb));
 	}
 
 	#observeEntityUserPermissions() {
@@ -54,21 +52,14 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	}
 
 	#addUserPermission(permissionVerbs: Array<string>) {
-		const newUserPermission: UmbUserPermissionModel = { $type: 'FallbackPermissionModel', verbs: permissionVerbs };
-		this.selectedPermissions = [...this.selectedPermissions, newUserPermission];
+		const verbs = [...this.allowedVerbs, ...permissionVerbs];
+		// ensure we only have unique verbs
+		this.allowedVerbs = [...new Set(verbs)];
 		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	#removeUserPermission(permissionVerbs: Array<string>) {
-		// We only want to remove the global permission and not any granular permissions with the same verb
-		// because we don't know what models can be part of the array we will make a string comparison
-		const permission: UmbUserPermissionModel = { $type: 'FallbackPermissionModel', verbs: permissionVerbs };
-		const permissionAsString = JSON.stringify(permission);
-
-		this.selectedPermissions = this.selectedPermissions
-			.map((p) => JSON.stringify(p))
-			.filter((p) => p !== permissionAsString)
-			.map((p) => JSON.parse(p));
+		this.allowedVerbs = this.allowedVerbs.filter((p) => !permissionVerbs.includes(p));
 		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
 

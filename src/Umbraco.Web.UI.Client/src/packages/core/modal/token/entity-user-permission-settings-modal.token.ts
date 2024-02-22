@@ -3,7 +3,6 @@ import { UmbModalToken } from './modal-token.js';
 export interface UmbEntityUserPermissionSettingsModalData {
 	unique: string;
 	entityType: string;
-	allowedVerbs: Array<string>;
 	headline?: string;
 }
 

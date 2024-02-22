@@ -10,7 +10,6 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbDocumentTreeItemModel } from '../../tree/types.js';
 
 @customElement('umb-document-granular-user-permission')
 export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
@@ -47,9 +46,19 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 	}
 
 	async #editGranularPermission(item: UmbDocumentItemModel) {
-		const currentPermissionVerbs = this.#getPermissionVerbsForItem(item);
+		const currentPermissionVerbs = this.#getPermissionForDocument(item.unique)?.verbs ?? [];
 		const result = await this.#selectEntityUserPermissionsForDocument(item, currentPermissionVerbs);
-		debugger;
+
+		// update permission with new verbs
+		this.value = this._value.map((permission) => {
+			if (permission.document.id === item.unique) {
+				return {
+					...permission,
+					verbs: result,
+				};
+			}
+			return permission;
+		});
 	}
 
 	#addGranularPermission() {
@@ -102,8 +111,10 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 			data: {
 				unique: item.unique,
 				entityType: item.entityType,
-				allowedVerbs,
 				headline,
+			},
+			value: {
+				allowedVerbs,
 			},
 		});
 
@@ -135,7 +146,7 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 			id="add-button"
 			look="placeholder"
 			@click=${this.#addGranularPermission}
-			label=${this.localize.term('general_choose')}></uui-button>`;
+			label=${this.localize.term('general_add')}></uui-button>`;
 	}
 
 	// TODO: make umb-document-ref element
@@ -145,7 +156,7 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 		const name = item.variants[0]?.name;
 
 		return html`
-			<uui-ref-node name=${name} detail=${ifDefined(this.#getPermissionVerbsForItem(item))}>
+			<uui-ref-node name=${name} detail=${ifDefined(this.#getPermissionForDocument(item.unique)?.verbs)}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions"> ${this.#renderEditButton(item)} </uui-action-bar>
 			</uui-ref-node>
@@ -175,9 +186,8 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 		`;
 	}
 
-	#getPermissionVerbsForItem(item: UmbDocumentItemModel) {
-		const permission = this._value?.find((permission) => permission.document.id === item.unique);
-		return permission?.verbs;
+	#getPermissionForDocument(unique: string) {
+		return this._value?.find((permission) => permission.document.id === unique);
 	}
 
 	static styles = [

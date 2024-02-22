@@ -15,7 +15,6 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	set data(data: UmbEntityUserPermissionSettingsModalData | undefined) {
 		super.data = data;
 		this._entityType = data?.entityType;
-		this._allowedVerbs = data?.allowedVerbs ?? [];
 		this._headline = data?.headline ?? this._headline;
 	}
 
@@ -25,17 +24,9 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	@state()
 	_entityType?: string;
 
-	@state()
-	_allowedVerbs: Array<string> = [];
-
-	private _handleConfirm() {
-		this.value = { allowedVerbs: this._allowedVerbs };
-		this.modalContext?.submit();
-	}
-
 	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
 		const target = event.target as any;
-		this._allowedVerbs = target.selectedPermissions;
+		this.updateValue({ allowedVerbs: target.allowedVerbs });
 	}
 
 	render() {
@@ -45,7 +36,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 					${this._entityType
 						? html` <umb-entity-user-permission-settings-list
 								.entityType=${this._entityType}
-								.selectedPermissions=${this._allowedVerbs}
+								.allowedVerbs=${this.value?.allowedVerbs ?? []}
 								@selection-change=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>`
 						: nothing}
 				</uui-box>
@@ -57,7 +48,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 					color="positive"
 					look="primary"
 					label="Confirm"
-					@click=${this._handleConfirm}></uui-button>
+					@click=${this._submitModal}></uui-button>
 			</umb-body-layout>
 		`;
 	}
