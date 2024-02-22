@@ -1,9 +1,11 @@
+import type { UmbReferenceById } from '@umbraco-cms/backoffice/models';
+
 export interface UmbMemberItemModel {
 	unique: string;
 	memberType: {
 		unique: string;
 		icon: string;
-		hasListView: boolean;
+		collection?: UmbReferenceById;
 	};
 	variants: Array<UmbMemberVariantItemModel>;
 }
