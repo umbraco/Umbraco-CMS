@@ -1,6 +1,6 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenuItemTreeKind } from '@umbraco-cms/backoffice/extension-registry';
 
-const menuItem: ManifestTypes = {
+const menuItem: ManifestMenuItemTreeKind = {
 	type: 'menuItem',
 	kind: 'tree',
 	alias: 'Umb.MenuItem.DataTypes',
