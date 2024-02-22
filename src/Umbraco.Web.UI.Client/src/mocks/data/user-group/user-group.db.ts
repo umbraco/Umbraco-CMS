@@ -5,9 +5,9 @@ import type { UmbMockUserGroupModel } from './user-group.data.js';
 import { data } from './user-group.data.js';
 import type {
 	CreateUserGroupRequestModel,
-	DocumentPermissionModel,
-	FallbackPermissionModel,
-	UnknownTypePermissionModel,
+	DocumentPermissionPresentationModel,
+	FallbackPermissionPresentationModel,
+	UnknownTypePermissionPresentationModel,
 	UserGroupItemResponseModel,
 	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -29,7 +29,9 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	 */
 	getPermissions(
 		userGroupIds: string[],
-	): Array<FallbackPermissionModel | DocumentPermissionModel | UnknownTypePermissionModel> {
+	): Array<
+		FallbackPermissionPresentationModel | DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel
+	> {
 		const permissions = this.data
 			.filter((userGroup) => userGroupIds.includes(userGroup.id))
 			.map((userGroup) => (userGroup.permissions?.length ? userGroup.permissions : []))

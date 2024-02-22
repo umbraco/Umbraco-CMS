@@ -80,7 +80,7 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 			this.#documentPickerModalContext?.reject();
 
 			const permissionItem: UmbDocumentUserPermissionModel = {
-				$type: 'DocumentPermissionModel',
+				$type: 'DocumentPermissionPresentationModel',
 				document: { id: unique },
 				verbs: [],
 			};
