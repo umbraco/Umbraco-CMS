@@ -117,7 +117,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 			data: {
 				unique: id,
 				entityType: this.data.entityType,
-				allowedPermissions: userGroupRef?.permissions || [],
+				allowedVerbs: userGroupRef?.permissions || [],
 				headline: `Permissions for ${userGroupRef?.name}`,
 			},
 		});

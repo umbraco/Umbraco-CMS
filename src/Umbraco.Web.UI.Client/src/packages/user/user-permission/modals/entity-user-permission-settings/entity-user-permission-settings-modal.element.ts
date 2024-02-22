@@ -2,10 +2,9 @@ import { html, customElement, css, nothing, state } from '@umbraco-cms/backoffic
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbEntityUserPermissionSettingsModalData,
-	UmbEntityUserPermissionSettingsModalValue} from '@umbraco-cms/backoffice/modal';
-import {
-	UmbModalBaseElement,
+	UmbEntityUserPermissionSettingsModalValue,
 } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-entity-user-permission-settings-modal')
@@ -16,7 +15,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	set data(data: UmbEntityUserPermissionSettingsModalData | undefined) {
 		super.data = data;
 		this._entityType = data?.entityType;
-		this._allowedPermissions = data?.allowedPermissions ?? [];
+		this._allowedVerbs = data?.allowedVerbs ?? [];
 		this._headline = data?.headline ?? this._headline;
 	}
 
@@ -27,16 +26,16 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	_entityType?: string;
 
 	@state()
-	_allowedPermissions: Array<string> = [];
+	_allowedVerbs: Array<string> = [];
 
 	private _handleConfirm() {
-		this.value = { allowedPermissions: this._allowedPermissions };
+		this.value = { allowedVerbs: this._allowedVerbs };
 		this.modalContext?.submit();
 	}
 
 	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
 		const target = event.target as any;
-		this._allowedPermissions = target.selectedPermissions;
+		this._allowedVerbs = target.selectedPermissions;
 	}
 
 	render() {
@@ -46,7 +45,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 					${this._entityType
 						? html` <umb-entity-user-permission-settings-list
 								.entityType=${this._entityType}
-								.selectedPermissions=${this._allowedPermissions}
+								.selectedPermissions=${this._allowedVerbs}
 								@selection-change=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>`
 						: nothing}
 				</uui-box>

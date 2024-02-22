@@ -54,7 +54,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	}
 
 	#addUserPermission(permissionVerbs: Array<string>) {
-		const newUserPermission: UmbUserPermissionModel = { verbs: permissionVerbs };
+		const newUserPermission: UmbUserPermissionModel = { $type: 'FallbackPermissionModel', verbs: permissionVerbs };
 		this.selectedPermissions = [...this.selectedPermissions, newUserPermission];
 		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
@@ -62,7 +62,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	#removeUserPermission(permissionVerbs: Array<string>) {
 		// We only want to remove the global permission and not any granular permissions with the same verb
 		// because we don't know what models can be part of the array we will make a string comparison
-		const permission: UmbUserPermissionModel = { verbs: permissionVerbs };
+		const permission: UmbUserPermissionModel = { $type: 'FallbackPermissionModel', verbs: permissionVerbs };
 		const permissionAsString = JSON.stringify(permission);
 
 		this.selectedPermissions = this.selectedPermissions
