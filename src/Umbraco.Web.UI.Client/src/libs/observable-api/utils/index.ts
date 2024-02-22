@@ -1,4 +1,5 @@
 export * from './append-to-frozen-array.function.js';
+export * from './combine-observables.function.js';
 export * from './create-observable-part.function.js';
 export * from './deep-freeze.function.js';
 export * from './default-memoization.function.js';

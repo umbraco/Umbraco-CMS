@@ -32,6 +32,18 @@ export const manifest: ManifestPropertyEditorUi = {
 					description: 'Override the label text for adding a new block, Example Add Widget',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
+				{
+					alias: 'gridColumns',
+					label: 'Grid Columns',
+					description: 'Set the number of columns for the layout. (defaults to 12)',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+				},
+				{
+					alias: 'layoutStylesheet',
+					label: 'Layout Stylesheet',
+					description: 'Override default stylesheet for backoffice layout.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGridLayoutStylesheet',
+				},
 			],
 		},
 	},

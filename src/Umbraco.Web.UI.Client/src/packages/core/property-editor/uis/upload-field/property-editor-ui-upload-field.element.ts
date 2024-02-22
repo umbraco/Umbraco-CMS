@@ -15,8 +15,13 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		this._fileExtensions = config?.getValueByAlias('fileExtensions');
-		this._multiple = config?.getValueByAlias('multiple');
+		if (!config) return;
+
+		this._fileExtensions = config
+			.getValueByAlias<{ id: number; value: string }[]>('fileExtensions')
+			?.map((ext) => ext.value);
+
+		this._multiple = config.getValueByAlias('multiple');
 	}
 
 	@state()

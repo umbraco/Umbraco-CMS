@@ -19,3 +19,7 @@ export interface NumberRangeValueType {
 	min?: number;
 	max?: number;
 }
+
+export interface UmbReferenceById {
+	id: string;
+}

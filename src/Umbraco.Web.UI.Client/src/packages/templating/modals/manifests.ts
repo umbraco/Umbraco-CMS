@@ -13,6 +13,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Templating Section Picker Modal',
 		js: () => import('./templating-section-picker/templating-section-picker-modal.element.js'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.TemplatingPageFieldBuilder',
+		name: 'Templating Page Field Builder Modal',
+		js: () => import('./templating-page-field-builder/templating-page-field-builder-modal.element.js'),
+	},
 ];
 
 export const manifests = [...modals];

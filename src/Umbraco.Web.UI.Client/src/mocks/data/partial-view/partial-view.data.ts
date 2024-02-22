@@ -89,7 +89,7 @@ export const data: Array<UmbMockPartialViewModel> = [
 	},
 	{
 		name: 'embed.cshtml',
-		path: '/grid/embed.cshtm',
+		path: '/grid/embed.cshtml',
 		parent: {
 			path: '/grid',
 		},

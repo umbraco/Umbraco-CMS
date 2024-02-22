@@ -1,101 +1,208 @@
-import { UmbMediaDetailRepository } from '../repository/detail/index.js';
-import type { UmbMediaDetailModel } from '../index.js';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbMediaTypeDetailRepository } from '../../media-types/repository/detail/media-type-detail.repository.js';
+import { UmbMediaPropertyDataContext } from '../property-dataset-context/media-property-dataset-context.js';
+import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
+import { UmbMediaDetailRepository } from '../repository/index.js';
+import type { UmbMediaDetailModel } from '../types.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import {
+	UmbEditableWorkspaceContextBase,
+	UmbWorkspaceSplitViewManager,
+	type UmbVariantableWorkspaceContextInterface,
+} from '@umbraco-cms/backoffice/workspace';
+import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbSaveableWorkspaceContextInterface, UmbApi
+	implements UmbVariantableWorkspaceContextInterface
 {
 	//
 	public readonly repository = new UmbMediaDetailRepository(this);
 
-	#data = new UmbObjectState<EntityType | undefined>(undefined);
-	data = this.#data.asObservable();
-	// TODO: get correct variant name
-	name = this.#data.asObservablePart((data) => data?.variants[0].name);
+	/**
+	 * The media is the current state/draft version of the media.
+	 */
+	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
+	#getDataPromise?: Promise<any>;
+	public isLoaded() {
+		return this.#getDataPromise;
+	}
+
+	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.mediaType.unique);
+
+	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
+	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
+
+	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbMediaTypeDetailRepository(this));
+	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	constructor(host: UmbControllerHost) {
+		// TODO: Get Workspace Alias via Manifest.
 		super(host, 'Umb.Workspace.Media');
+
+		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
+	}
+
+	async load(unique: string) {
+		this.#getDataPromise = this.repository.requestByUnique(unique);
+		const { data } = await this.#getDataPromise;
+		if (!data) return undefined;
+
+		this.setIsNew(false);
+		//this.#persisted.next(data);
+		this.#currentData.setValue(data);
+		return data || undefined;
+	}
+
+	async create(parentUnique: string | null, mediaTypeUnique: string) {
+		this.#getDataPromise = this.repository.createScaffold(parentUnique, { unique: mediaTypeUnique });
+		const { data } = await this.#getDataPromise;
+		if (!data) return undefined;
+
+		this.setIsNew(true);
+		this.#currentData.setValue(data);
+		return data || undefined;
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.#currentData.getValue();
 	}
 
-	// TODO: this should be async because it can only return the id if the data is loaded.
 	getEntityId() {
 		return this.getData()?.unique;
 	}
 
 	getEntityType() {
-		return 'media';
+		return UMB_MEDIA_ENTITY_TYPE;
 	}
 
-	setPropertyValue(alias: string, value: unknown) {
-		const entry = { alias: alias, value: value };
+	getContentTypeId() {
+		return this.getData()?.mediaType.unique;
+	}
 
-		const currentData = this.#data.value;
+	variantById(variantId: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
+	}
+
+	getVariant(variantId: UmbVariantId) {
+		return this.#currentData.getValue()?.variants?.find((x) => variantId.compare(x));
+	}
+
+	getName(variantId?: UmbVariantId) {
+		const variants = this.#currentData.getValue()?.variants;
+		if (!variants) return;
+		if (variantId) {
+			return variants.find((x) => variantId.compare(x))?.name;
+		} else {
+			return variants[0]?.name;
+		}
+	}
+
+	setName(name: string, variantId?: UmbVariantId) {
+		const oldVariants = this.#currentData.getValue()?.variants || [];
+		const variants = partialUpdateFrozenArray(
+			oldVariants,
+			{ name },
+			variantId ? (x) => variantId.compare(x) : () => true,
+		);
+		this.#currentData.update({ variants });
+	}
+
+	async propertyStructureById(propertyId: string) {
+		return this.structure.propertyStructureById(propertyId);
+	}
+
+	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
+		return this.#currentData.asObservablePart(
+			(data) =>
+				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x as any) : true))
+					?.value as PropertyValueType,
+		);
+	}
+
+	/**
+	 * Get the current value of the property with the given alias and variantId.
+	 * @param alias
+	 * @param variantId
+	 * @returns The value or undefined if not set or found.
+	 */
+	getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
+		const currentData = this.#currentData.value;
 		if (currentData) {
-			const newDataSet = appendToFrozenArray(currentData.values, entry, (x) => x.alias);
+			const newDataSet = currentData.values?.find(
+				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
+			);
+			return newDataSet?.value as ReturnType;
+		}
+		return undefined;
+	}
+	async setPropertyValue<UmbMediaValueModel = unknown>(
+		alias: string,
+		value: UmbMediaValueModel,
+		variantId?: UmbVariantId,
+	) {
+		if (!variantId) throw new Error('VariantId is missing');
 
-			this.#data.update({ values: newDataSet });
+		const entry = { ...variantId.toObject(), alias, value };
+		const currentData = this.#currentData.value;
+		if (currentData) {
+			const values = appendToFrozenArray(
+				currentData.values || [],
+				entry,
+				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
+			);
+			this.#currentData.update({ values });
 		}
 	}
 
-	async load(unique: string) {
-		const { data } = await this.repository.requestByUnique(unique);
-		if (data) {
-			this.setIsNew(false);
-			this.#data.setValue(data);
-		}
-	}
+	async #createOrSave() {
+		if (!this.#currentData.value?.unique) throw new Error('Unique is missing');
 
-	async create(parentUnique: string | null) {
-		const { data } = await this.repository.createScaffold(parentUnique);
-		if (!data) return;
-		this.setIsNew(true);
-		// TODO: This is a hack to get around the fact that the data is not typed correctly.
-		// Create and response models are different. We need to look into this.
-		this.#data.setValue(data as unknown as UmbMediaDetailModel);
+		if (this.getIsNew()) {
+			const value = this.#currentData.value;
+
+			if ((await this.repository.create(value)).data !== undefined) {
+				this.setIsNew(false);
+			}
+		} else {
+			await this.repository.save(this.#currentData.value);
+		}
 	}
 
 	async save() {
-		if (!this.#data.value) return;
-		if (this.isNew) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			await this.repository.create(this.#data.value);
-		} else {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			await this.repository.save(this.#data.value.id, this.#data.value);
-		}
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+		await this.#createOrSave();
+		this.saveComplete(data);
 	}
 
-	async delete(id: string) {
-		await this.repository.delete(id);
+	async delete() {
+		const id = this.getEntityId();
+		if (id) {
+			await this.repository.delete(id);
+		}
+	}
+
+	/*
+	concept notes:
+
+	public saveAndPreview() {
+
+	}
+	*/
+
+	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
+		return new UmbMediaPropertyDataContext(host, this, variantId);
 	}
 
 	public destroy(): void {
-		this.#data.destroy();
+		this.#currentData.destroy();
+		this.structure.destroy();
 		super.destroy();
 	}
 }
-export const api = UmbMediaWorkspaceContext;
 
-export const UMB_MEDIA_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbMediaWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbMediaWorkspaceContext => context.getEntityType?.() === 'media',
-);
+export default UmbMediaWorkspaceContext;

@@ -43,7 +43,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			template: null,
 			documentType: {
 				unique: '',
-				hasCollection: false,
 			},
 			isTrashed: false,
 			values: [],
@@ -56,6 +55,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: null,
 					createDate: null,
 					updateDate: null,
+					isMandatory: false,
 				},
 			],
 			...preset,
@@ -101,6 +101,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
+					isMandatory: false, // TODO: this is not correct. It will be solved when we know where to get the isMandatory from
 				};
 			}),
 			urls: data.urls.map((url) => {
@@ -112,7 +113,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			template: data.template ? { unique: data.template.id } : null,
 			documentType: {
 				unique: data.documentType.id,
-				hasCollection: data.documentType.hasListView,
+				collection: data.documentType.collection ?? undefined,
 			},
 			isTrashed: data.isTrashed,
 		};

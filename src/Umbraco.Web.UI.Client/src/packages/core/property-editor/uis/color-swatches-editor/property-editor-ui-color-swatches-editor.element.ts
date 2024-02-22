@@ -21,7 +21,10 @@ export class UmbPropertyEditorUIColorSwatchesEditorElement extends UmbLitElement
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._showLabels = config?.getValueByAlias('useLabel') ?? this.#defaultShowLabels;
-		this.value = config?.getValueByAlias('items') ?? [];
+		const items = config?.getValueByAlias('items') as typeof this.value;
+		if (items) {
+			this.value = items;
+		}
 	}
 
 	#onChange(event: CustomEvent) {
@@ -32,7 +35,7 @@ export class UmbPropertyEditorUIColorSwatchesEditorElement extends UmbLitElement
 	render() {
 		return html`<umb-multiple-color-picker-input
 			?showLabels=${this._showLabels}
-			.items="${this.value ?? []}"
+			.items="${this.value}"
 			@change=${this.#onChange}></umb-multiple-color-picker-input>`;
 	}
 }

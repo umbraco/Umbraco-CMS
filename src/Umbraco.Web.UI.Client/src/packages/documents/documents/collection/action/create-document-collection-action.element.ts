@@ -1,14 +1,19 @@
 import { html, customElement, property, state, map } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-create-document-collection-action')
 export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	@state()
 	private _allowedDocumentTypes: Array<UmbAllowedDocumentTypeModel> = [];
+
+	@state()
+	private _createDocumentPath = '';
 
 	@state()
 	private _documentUnique?: string;
@@ -19,6 +24,9 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	@state()
 	private _popoverOpen = false;
 
+	@state()
+	private _useInfiniteEditor = false;
+
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
 
@@ -27,12 +35,27 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document')
+			.onSetup(() => {
+				return { data: { entityType: 'document', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._createDocumentPath = routeBuilder({});
+			});
+
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.observe(workspaceContext.unique, (unique) => {
 				this._documentUnique = unique;
 			});
 			this.observe(workspaceContext.contentTypeUnique, (documentTypeUnique) => {
 				this._documentTypeUnique = documentTypeUnique;
+			});
+		});
+
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+			this.observe(collectionContext.filter, (filter) => {
+				this._useInfiniteEditor = filter.useInfiniteEditor == true;
 			});
 		});
 	}
@@ -58,14 +81,11 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	#onClick(item: UmbAllowedDocumentTypeModel, e: Event) {
-		e.preventDefault();
-		// TODO: Do anything else here? [LK]
-	}
-
 	#getCreateUrl(item: UmbAllowedDocumentTypeModel) {
-		// TODO: Review how the "Create" URL is generated. [LK]
-		return `section/content/workspace/document/create/${this._documentUnique ?? 'null'}/${item.unique}`;
+		// TODO: [LK] I need help with this. I don't know what the infinity editor URL should be.
+		return this._useInfiniteEditor
+			? `${this._createDocumentPath}create/${this._documentUnique ?? 'null'}/${item.unique}`
+			: `section/content/workspace/document/create/${this._documentUnique ?? 'null'}/${item.unique}`;
 	}
 
 	render() {
@@ -79,7 +99,6 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		const label = (this.manifest?.meta.label ?? this.localize.term('general_create')) + ' ' + item.name;
 
 		return html`<uui-button
-			@click=${(e: Event) => this.#onClick(item, e)}
 			color="default"
 			href=${this.#getCreateUrl(item)}
 			label=${label}
@@ -105,10 +124,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 						${map(
 							this._allowedDocumentTypes,
 							(item) => html`
-								<uui-menu-item
-									@click=${(e: Event) => this.#onClick(item, e)}
-									label=${item.name}
-									href=${this.#getCreateUrl(item)}>
+								<uui-menu-item label=${item.name} href=${this.#getCreateUrl(item)}>
 									<uui-icon slot="icon" name=${item.icon ?? 'icon-document'}></uui-icon>
 								</uui-menu-item>
 							`,

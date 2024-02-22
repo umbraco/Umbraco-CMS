@@ -1,45 +1,39 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import '../block-grid-areas-container/index.js';
+import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * @element umb-ref-grid-block
  */
 @customElement('umb-ref-grid-block')
-export class UmbRefGridBlockElement extends UmbLitElement {
-	//
-	@property({ type: String })
-	label?: string;
-
-	@state()
-	_workspaceEditPath?: string;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			this.observe(
-				context.workspaceEditPath,
-				(workspaceEditPath) => {
-					this._workspaceEditPath = workspaceEditPath;
-				},
-				'observeWorkspaceEditPath',
-			);
-		});
-	}
-
+export class UmbRefGridBlockElement extends UUIRefNodeElement {
 	render() {
-		// href=${this._workspaceEditPath ?? '#'}
-		return html`<uui-ref-node standalone .name=${this.label ?? ''}>
-			<umb-block-grid-area-container></umb-block-grid-area-container>
-		</uui-ref-node>`;
+		return html`
+			${super.render()}
+			<div class="break"></div>
+			<slot name="areas"></slot>
+		`;
 	}
 
 	static styles = [
+		...UUIRefNodeElement.styles,
 		css`
-			uui-ref-node {
+			:host {
+				min-width: 20px; /* Set to something, to overwrite UUI min width. */
+				height: 100%; /* Help to fill out the whole layout entry. */
 				min-height: var(--uui-size-16);
+				flex-flow: row wrap;
+				background-color: var(--uui-color-surface);
+			}
+
+			.break {
+				flex-basis: 100%;
+				height: 0;
+			}
+
+			#open-part {
+				min-height: var(
+					--uui-size-layout-2
+				); /* We should not do this, but it is a quick fix for now to ensure that the top part of a block gets a minimum height. */
 			}
 		`,
 	];

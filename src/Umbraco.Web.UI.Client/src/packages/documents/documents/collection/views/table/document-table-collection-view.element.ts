@@ -1,8 +1,11 @@
+import { getPropertyValueByAlias } from '../index.js';
+import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
 import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -12,15 +15,17 @@ import type {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+
+import './column-layouts/document-table-column-name.element.js';
+import './column-layouts/document-table-column-state.element.js';
 
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
-	private _busy = false;
+	private _loading = false;
 
 	@state()
-	private _userDefinedProperties?: Array<any>;
+	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 
 	@state()
 	private _items?: Array<UmbDocumentCollectionItemModel>;
@@ -35,8 +40,15 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 
 	#systemColumns: Array<UmbTableColumn> = [
 		{
-			name: 'Name',
+			name: this.localize.term('general_name'),
 			alias: 'entityName',
+			elementName: 'umb-document-table-column-name',
+			allowSorting: true,
+		},
+		{
+			name: this.localize.term('content_publishStatus'),
+			alias: 'entityState',
+			elementName: 'umb-document-table-column-state',
 			allowSorting: true,
 		},
 	];
@@ -47,35 +59,44 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
-	private _collectionContext?: UmbDefaultCollectionContext<
-		UmbDocumentCollectionItemModel,
-		UmbDocumentCollectionFilterModel
-	>;
+	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
-			this._collectionContext = instance;
-			this._observeCollectionContext();
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+			this.#collectionContext = collectionContext;
+			this.#observeCollectionContext();
 		});
 	}
 
-	private _observeCollectionContext() {
-		if (!this._collectionContext) return;
+	#observeCollectionContext() {
+		if (!this.#collectionContext) return;
 
-		this.observe(this._collectionContext.userDefinedProperties, (userDefinedProperties) => {
-			this._userDefinedProperties = userDefinedProperties;
-			this.#createTableHeadings();
-		});
+		this.observe(
+			this.#collectionContext.userDefinedProperties,
+			(userDefinedProperties) => {
+				this._userDefinedProperties = userDefinedProperties;
+				this.#createTableHeadings();
+			},
+			'umbCollectionUserDefinedPropertiesObserver',
+		);
 
-		this.observe(this._collectionContext.items, (items) => {
-			this._items = items;
-			this.#createTableItems(this._items);
-		});
+		this.observe(
+			this.#collectionContext.items,
+			(items) => {
+				this._items = items;
+				this.#createTableItems(this._items);
+			},
+			'umbCollectionItemsObserver',
+		);
 
-		this.observe(this._collectionContext.selection.selection, (selection) => {
-			this._selection = selection as string[];
-		});
+		this.observe(
+			this.#collectionContext.selection.selection,
+			(selection) => {
+				this._selection = selection as string[];
+			},
+			'umbCollectionSelectionObserver',
+		);
 	}
 
 	#createTableHeadings() {
@@ -94,24 +115,6 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
-		// TODO: [LK] This is a temporary solution. Let's explore a nicer way to display the values.
-		const getValue = (item: UmbDocumentCollectionItemModel, alias: string) => {
-			switch (alias) {
-				case 'createDate':
-					return item.createDate.toLocaleString();
-				case 'owner':
-					return item.creator;
-				case 'published':
-					return item.state !== 'Draft' ? 'True' : 'False';
-				case 'updateDate':
-					return item.updateDate.toLocaleString();
-				case 'updater':
-					return item.updater;
-				default:
-					return item.values.find((value) => value.alias === alias)?.value ?? '';
-			}
-		};
-
 		this._tableItems = items.map((item) => {
 			if (!item.unique) throw new Error('Item id is missing.');
 
@@ -119,7 +122,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				this._tableColumns?.map((column) => {
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? item : getValue(item, column.alias),
+						value: column.elementName ? item : getPropertyValueByAlias(item, column.alias),
 					};
 				}) ?? [];
 
@@ -131,35 +134,38 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	private _handleSelect(event: UmbTableSelectedEvent) {
+	#handleSelect(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.selection.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	private _handleDeselect(event: UmbTableDeselectedEvent) {
+	#handleDeselect(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.selection.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	private _handleOrdering(event: UmbTableOrderedEvent) {
+	#handleOrdering(event: UmbTableOrderedEvent) {
 		const table = event.target as UmbTableElement;
 		const orderingColumn = table.orderingColumn;
 		const orderingDesc = table.orderingDesc;
-		this._collectionContext?.setFilter({
+		this.#collectionContext?.setFilter({
 			orderBy: orderingColumn,
 			orderDirection: orderingDesc ? 'desc' : 'asc',
 		});
 	}
 
 	render() {
-		if (this._busy) return html`<div class="container"><uui-loader></uui-loader></div>`;
+		if (this._loading) {
+			return html`<div class="container"><uui-loader></uui-loader></div>`;
+		}
 
-		if (this._tableItems.length === 0)
+		if (this._tableItems.length === 0) {
 			return html`<div class="container"><p>${this.localize.term('content_listViewNoItems')}</p></div>`;
+		}
 
 		return html`
 			<umb-table
@@ -167,9 +173,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this._handleSelect}"
-				@deselected="${this._handleDeselect}"
-				@ordered="${this._handleOrdering}"></umb-table>
+				@selected="${this.#handleSelect}"
+				@deselected="${this.#handleDeselect}"
+				@ordered="${this.#handleOrdering}"></umb-table>
 		`;
 	}
 
@@ -202,6 +208,6 @@ export default UmbDocumentTableCollectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-view-document-table': UmbDocumentTableCollectionViewElement;
+		'umb-document-table-collection-view': UmbDocumentTableCollectionViewElement;
 	}
 }

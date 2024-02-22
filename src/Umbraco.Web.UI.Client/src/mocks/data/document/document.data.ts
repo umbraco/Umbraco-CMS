@@ -23,7 +23,6 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'all-property-editors-document-type-id',
 			icon: 'icon-document',
-			hasListView: false,
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -334,23 +333,30 @@ export const data: Array<UmbMockDocumentModel> = [
 							{
 								contentUdi: '1234',
 								settingsUdi: '5678',
+								columnSpan: 12,
 								areas: [
 									{
-										key: 'area1',
+										key: 'area1_key',
 										items: [
 											{
 												contentUdi: 'a1234',
 												settingsUdi: 'a5678',
-												areas: [],
+												columnSpan: 3,
+												rowSpan: 2,
+											},
+											{
+												contentUdi: 'c1234',
+												columnSpan: 3,
 											},
 										],
 									},
 									{
-										key: 'area2',
+										key: 'area2_key',
 										items: [
 											{
 												contentUdi: 'b1234',
 												settingsUdi: 'b5678',
+												columnSpan: 6,
 												areas: [],
 											},
 										],
@@ -374,6 +380,11 @@ export const data: Array<UmbMockDocumentModel> = [
 							udi: 'b1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 							elementProperty: 'Hello world from area 2',
+						},
+						{
+							udi: 'c1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello CCC from area 1',
 						},
 					],
 					settingsData: [
@@ -490,7 +501,6 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: '29643452-cff9-47f2-98cd-7de4b6807681',
 			icon: 'icon-document',
-			hasListView: false,
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -614,7 +624,6 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: '29643452-cff9-47f2-98cd-7de4b6807681',
 			icon: 'icon-document',
-			hasListView: false,
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -695,7 +704,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'simple-document-type-id',
 			icon: 'icon-document',
-			hasListView: true,
+			collection: { id: 'dt-collectionView'},
 		},
 		hasChildren: false,
 		noAccess: false,

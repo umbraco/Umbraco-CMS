@@ -36,8 +36,8 @@ export abstract class UmbBlockManagerContext<
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
 	public readonly blockTypes = this.#blockTypes.asObservable();
 
-	#editorConfiguration = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
-	public readonly editorConfiguration = this.#editorConfiguration.asObservable();
+	protected _editorConfiguration = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
+	public readonly editorConfiguration = this._editorConfiguration.asObservable();
 
 	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentUdi);
 	public readonly layouts = this._layouts.asObservable();
@@ -51,7 +51,6 @@ export abstract class UmbBlockManagerContext<
 	// TODO: maybe its bad to consume Property Context, and instead wire this up manually in the property editor? With these: (and one for variant-id..)
 	/*setPropertyAlias(alias: string) {
 		this.#propertyAlias.setValue(alias);
-		console.log('!!!!!manager got alias: ', alias);
 		this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
 	}
 	getPropertyAlias() {
@@ -59,7 +58,7 @@ export abstract class UmbBlockManagerContext<
 	}*/
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
-		this.#editorConfiguration.setValue(configs);
+		this._editorConfiguration.setValue(configs);
 	}
 
 	setBlockTypes(blockTypes: Array<BlockType>) {
@@ -120,9 +119,8 @@ export abstract class UmbBlockManagerContext<
 		return data;
 	}
 
-	contentTypeOf(contentTypeUdi: string) {
-		const contentTypeUnique = getKeyFromUdi(contentTypeUdi);
-		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeUnique));
+	contentTypeOf(contentTypeKey: string) {
+		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey));
 	}
 	contentTypeNameOf(contentTypeKey: string) {
 		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey)?.name);
@@ -141,6 +139,13 @@ export abstract class UmbBlockManagerContext<
 	}
 	settingsOf(udi: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
+	}
+
+	getBlockTypeOf(contentTypeKey: string) {
+		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);
+	}
+	getContentOf(contentUdi: string) {
+		return this.#contents.value.find((x) => x.udi === contentUdi);
 	}
 
 	/*setOneLayout(layoutData: BlockLayoutType) {
