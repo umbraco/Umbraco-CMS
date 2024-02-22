@@ -51,6 +51,9 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
+	@state()
+	private _skip: number = 0;
+
 	#collectionContext?: UmbDefaultCollectionContext<UmbMediaCollectionItemModel, UmbMediaCollectionFilterModel>;
 
 	constructor() {
@@ -89,6 +92,14 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			},
 			'umbCollectionSelectionObserver',
 		);
+
+		this.observe(
+			this.#collectionContext.pagination.skip,
+			(skip) => {
+				this._skip = skip;
+			},
+			'umbCollectionSkipObserver',
+		);
 	}
 
 	#createTableHeadings() {
@@ -113,14 +124,16 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			this.#createTableHeadings();
 		}
 
-		this._tableItems = items.map((item) => {
+		this._tableItems = items.map((item, rowIndex) => {
 			if (!item.unique) throw new Error('Item id is missing.');
+
+			const sortOrder = this._skip + rowIndex;
 
 			const data =
 				this._tableColumns?.map((column) => {
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? item : this.#getPropertyValueByAlias(item, column.alias),
+						value: column.elementName ? item : this.#getPropertyValueByAlias(sortOrder, item, column.alias),
 					};
 				}) ?? [];
 
@@ -132,7 +145,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	#getPropertyValueByAlias(item: UmbMediaCollectionItemModel, alias: string) {
+	#getPropertyValueByAlias(sortOrder: number, item: UmbMediaCollectionItemModel, alias: string) {
 		switch (alias) {
 			case 'createDate':
 				return item.createDate.toLocaleString();
@@ -140,6 +153,8 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 				return item.name;
 			case 'owner':
 				return item.creator;
+			case 'sortOrder':
+				return sortOrder;
 			case 'updateDate':
 				return item.updateDate.toLocaleString();
 			default:
