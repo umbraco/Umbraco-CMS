@@ -1,6 +1,6 @@
 import type { UmbDocumentUserPermissionModel } from '../types.js';
 import { UmbDocumentItemRepository, type UmbDocumentItemModel } from '../../repository/index.js';
-import { css, customElement, html, ifDefined, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
@@ -9,13 +9,11 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
-import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-granular-user-permission')
 export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
-	@property({ type: Object, attribute: false })
-	manifest?: ManifestGranularUserPermission;
-
 	_value: Array<UmbDocumentUserPermissionModel> = [];
 	public get value(): Array<UmbDocumentUserPermissionModel> {
 		return this._value;
@@ -154,9 +152,10 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 		if (!item.unique) return;
 		// TODO: get correct variant name
 		const name = item.variants[0]?.name;
+		const permissionNames = this.#getPermissionNamesForDocument(item.unique);
 
 		return html`
-			<uui-ref-node name=${name} detail=${ifDefined(this.#getPermissionForDocument(item.unique)?.verbs)}>
+			<uui-ref-node .name=${name} .detail=${permissionNames || ''}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions"> ${this.#renderEditButton(item)} </uui-action-bar>
 			</uui-ref-node>
@@ -188,6 +187,26 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 
 	#getPermissionForDocument(unique: string) {
 		return this._value?.find((permission) => permission.document.id === unique);
+	}
+
+	#getPermissionNamesForDocument(unique: string) {
+		const permission = this.#getPermissionForDocument(unique);
+		if (!permission) return;
+
+		return umbExtensionsRegistry
+			.getAllExtensions()
+			.filter((manifest) => manifest.type === 'entityUserPermission')
+			.filter((manifest) => manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)))
+			.map((manifest) => {
+				if (manifest.meta.labelKey) {
+					return this.localize.term(manifest.meta.labelKey);
+				} else if (manifest.meta.label) {
+					return manifest.meta.label;
+				} else {
+					return manifest.name;
+				}
+			})
+			.join(', ');
 	}
 
 	static styles = [
