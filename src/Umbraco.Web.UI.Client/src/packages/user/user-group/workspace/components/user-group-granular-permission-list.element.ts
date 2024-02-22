@@ -5,6 +5,7 @@ import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/ext
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { appendToFrozenArray, filterFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-user-group-granular-permission-list')
@@ -50,6 +51,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 					userGroup.permissions.filter((permission) => permission.$type === schemaType) || [];
 
 				element.value = permissionsForSchemaType;
+				element.manifest = manifest;
 				element.addEventListener(UmbChangeEvent.TYPE, this.#onValueChange);
 			},
 			'umbUserGroupPermissionObserver',
@@ -61,8 +63,24 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 
 	#onValueChange = (e: UmbChangeEvent) => {
 		e.stopPropagation();
+		// TODO: make interface
 		const target = e.target as any;
-		console.log('Value changed', target.value);
+		const schemaType = target.manifest?.meta.schemaType;
+		if (!schemaType) throw new Error('Schema type is not available');
+
+		/* Remove all permissions of the same schema type from 
+		the user group and append the new permissions.
+		We do it this way to support appends, updates and deletion without we know the 
+		exact action but on the changed value */
+		const storedValueWithoutSchemaTypeItems = filterFrozenArray(
+			this.#workspaceContext?.getPermissions() || [],
+			(x) => x.$type !== schemaType,
+		);
+
+		const value = target.value || [];
+		const newCombinedValue = [...storedValueWithoutSchemaTypeItems, ...value];
+
+		this.#workspaceContext?.setPermissions(newCombinedValue);
 	};
 
 	render() {

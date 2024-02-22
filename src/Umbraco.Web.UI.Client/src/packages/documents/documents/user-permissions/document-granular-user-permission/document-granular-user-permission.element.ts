@@ -12,6 +12,7 @@ import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 @customElement('umb-document-granular-user-permission')
 export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
@@ -47,6 +48,8 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 	async #editGranularPermission(item: UmbDocumentItemModel) {
 		const currentPermissionVerbs = this.#getPermissionForDocument(item.unique)?.verbs ?? [];
 		const result = await this.#selectEntityUserPermissionsForDocument(item, currentPermissionVerbs);
+		// don't do anything if the verbs have not been updated
+		if (JSON.stringify(result) === JSON.stringify(currentPermissionVerbs)) return;
 
 		// update permission with new verbs
 		this.value = this._value.map((permission) => {
@@ -83,12 +86,14 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 			this.#documentPickerModalContext?.reject();
 
 			const permissionItem: UmbDocumentUserPermissionModel = {
+				id: UmbId.new(),
 				$type: 'DocumentPermissionPresentationModel',
 				document: { id: unique },
 				verbs: result,
 			};
 
 			this.value = [...this._value, permissionItem];
+			this.dispatchEvent(new UmbChangeEvent());
 		});
 	}
 
@@ -122,8 +127,16 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 			const value = await this.#entityUserPermissionModalContext?.onSubmit();
 			return value?.allowedVerbs;
 		} catch (error) {
-			return [];
+			return allowedVerbs;
 		}
+	}
+
+	#removeGranularPermission(item: UmbDocumentItemModel) {
+		const permission = this.#getPermissionForDocument(item.unique);
+		if (!permission) return;
+
+		this.value = this._value.filter((p) => p.id !== permission.id);
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
@@ -149,7 +162,6 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 			label=${this.localize.term('general_add')}></uui-button>`;
 	}
 
-	// TODO: make umb-document-ref element
 	#renderRef(item: UmbDocumentItemModel) {
 		if (!item.unique) return;
 		// TODO: get correct variant name
@@ -159,7 +171,9 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 		return html`
 			<uui-ref-node .name=${name} .detail=${permissionNames || ''}>
 				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
-				<uui-action-bar slot="actions"> ${this.#renderEditButton(item)} </uui-action-bar>
+				<uui-action-bar slot="actions">
+					${this.#renderEditButton(item)} ${this.#renderRemoveButton(item)}
+				</uui-action-bar>
 			</uui-ref-node>
 		`;
 	}
@@ -175,16 +189,17 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 	}
 
 	#renderEditButton(item: UmbDocumentItemModel) {
-		// TODO: get correct variant name
-		const name = item.variants[0]?.name;
-
 		return html`
 			<uui-button
 				@click=${() => this.#editGranularPermission(item)}
-				label="${this.localize.term('general_edit')} ${name}"
-				>${this.localize.term('general_edit')}</uui-button
-			>
+				label=${this.localize.term('general_edit')}></uui-button>
 		`;
+	}
+
+	#renderRemoveButton(item: UmbDocumentItemModel) {
+		return html`<uui-button
+			@click=${() => this.#removeGranularPermission(item)}
+			label=${this.localize.term('general_remove')}></uui-button>`;
 	}
 
 	#getPermissionForDocument(unique: string) {
