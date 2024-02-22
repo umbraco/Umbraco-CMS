@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey("id", AutoIncrement = true)]
 [ExplicitColumns]
-internal class UserDto
+public class UserDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.User;
 

@@ -74,7 +74,7 @@ public class ContentPermissions
     public ContentAccess CheckPermissions(
         IContent content,
         IUser user,
-        string permissionToCheck) => CheckPermissions(content, user, new[] { permissionToCheck }.ToHashSet());
+        string permissionToCheck) => CheckPermissions(content, user, new HashSet<string>(){ permissionToCheck });
 
     [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
@@ -114,7 +114,7 @@ public class ContentPermissions
     public ContentAccess CheckPermissions(
         IUmbracoEntity entity,
         IUser? user,
-        string permissionToCheck) => CheckPermissions(entity, user, new[] { permissionToCheck }.ToHashSet());
+        string permissionToCheck) => CheckPermissions(entity, user, new HashSet<string>(){ permissionToCheck });
 
     [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(

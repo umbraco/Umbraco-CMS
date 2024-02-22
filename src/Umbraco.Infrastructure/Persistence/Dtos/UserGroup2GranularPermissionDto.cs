@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 [TableName(Constants.DatabaseSchema.Tables.UserGroup2GranularPermission)]
 [ExplicitColumns]
-internal class UserGroup2GranularPermissionDto
+public class UserGroup2GranularPermissionDto
 {
     [Column("id")]
     [PrimaryKeyColumn(Name = "PK_umbracoUserGroup2GranularPermissionDto", AutoIncrement = true)]

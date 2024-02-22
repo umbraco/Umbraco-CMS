@@ -1844,7 +1844,7 @@ internal class UserService : RepositoryService, IUserService
             _userGroupRepository.AssignGroupPermission(groupId, permission, entityIds);
             scope.Complete();
 
-            var assigned = new[] { permission }.ToHashSet();
+            var assigned = new HashSet<string>() { permission };
             EntityPermission[] entityPermissions =
                 entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
             scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));

@@ -42,12 +42,11 @@ internal static class UserGroupFactory
                 userGroup.AddAllowedLanguage(language.LanguageId);
             }
 
-            //TODO move to it's own factory
             foreach (UserGroup2PermissionDto permission in dto.UserGroup2PermissionDtos)
             {
                 userGroup.Permissions.Add(permission.Permission);
             }
-            //TODO move to it's own factory
+
             foreach (UserGroup2GranularPermissionDto granularPermission in dto.UserGroup2GranularPermissionDtos)
             {
                 IGranularPermission toInsert;
@@ -59,13 +58,6 @@ internal static class UserGroupFactory
                         Key = granularPermission.UniqueId!.Value, Permission = granularPermission.Permission
                     };
                 }
-                // else if (granularPermission.Context == MediaGranularPermission.ContextType)
-                // {
-                //     toInsert = new MediaGranularPermission()
-                //     {
-                //         Key = granularPermission.UniqueId!.Value, Permission = granularPermission.Permission
-                //     };
-                // }
                 else
                 {
                     toInsert = new UnknownTypeGranularPermission()
