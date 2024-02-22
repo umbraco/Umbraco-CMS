@@ -86,7 +86,7 @@ public class RichTextPropertyEditorHelperTests
                                   "layout": {
                                       "Umbraco.TinyMCE": [{
                                               "contentUdi": "umb://element/36cc710ad8a645d0a07f7bbd8742cf02",
-                                              "settingsUdi": "umb://element/d2eeef66411142f4a1647a523eaffbc2",
+                                              "settingsUdi": "umb://element/d2eeef66411142f4a1647a523eaffbc2"
                                           }
                                       ]
                                   },
@@ -172,7 +172,7 @@ public class RichTextPropertyEditorHelperTests
         Assert.AreEqual(0, value.Blocks.SettingsData.Count);
     }
 
-    private IJsonSerializer JsonSerializer() => new JsonNetSerializer();
+    private IJsonSerializer JsonSerializer() => new SystemTextJsonSerializer();
 
     private ILogger Logger() => Mock.Of<ILogger>();
 }

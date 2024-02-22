@@ -24,7 +24,7 @@ public sealed class JsonDateTimeFormatAttribute : TypeFilterAttribute
     private class JsonDateTimeFormatFilter : IResultFilter
     {
         private readonly ArrayPool<char> _arrayPool;
-        private readonly string _format = "yyyy-MM-dd HH:mm:ss";
+        private readonly string _format = "yyyy-MM-ddTHH:mm:ss";
         private readonly MvcOptions _options;
 
         public JsonDateTimeFormatFilter(ArrayPool<char> arrayPool, IOptionsSnapshot<MvcOptions> options)

@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -11,6 +11,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class ColorPickerValueConverter : PropertyValueConverterBase
 {
+    private readonly IJsonSerializer _jsonSerializer;
+
+    public ColorPickerValueConverter(IJsonSerializer jsonSerializer)
+    {
+        _jsonSerializer = jsonSerializer;
+    }
+
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.ColorPicker);
 
@@ -24,36 +31,25 @@ public class ColorPickerValueConverter : PropertyValueConverterBase
     {
         var useLabel = UseLabel(propertyType);
 
-        if (source == null)
+        if (source is null)
         {
             return useLabel ? null : string.Empty;
         }
 
-        var ssource = source.ToString()!;
-        if (ssource.DetectIsJson())
+        var value = source.ToString()!;
+        if (value.DetectIsJson())
         {
-            try
-            {
-                JObject? jo = JsonConvert.DeserializeObject<JObject>(ssource);
-                if (useLabel)
-                {
-                    return new PickedColor(jo!["value"]!.ToString(), jo["label"]!.ToString());
-                }
-
-                return jo!["value"]!.ToString();
-            }
-            catch
-            {
-                /* not json finally */
-            }
+            PickedColor? convertedValue = _jsonSerializer.Deserialize<PickedColor>(value);
+            return useLabel ? convertedValue : convertedValue?.Color;
         }
 
+        // This seems to be something old old where it may not be json at all.
         if (useLabel)
         {
-            return new PickedColor(ssource, ssource);
+            return new PickedColor(value, value);
         }
 
-        return ssource;
+        return value;
     }
 
     private bool UseLabel(IPublishedPropertyType propertyType) => ConfigurationEditor
@@ -67,6 +63,7 @@ public class ColorPickerValueConverter : PropertyValueConverterBase
             Label = label;
         }
 
+        [JsonPropertyName("value")]
         public string Color { get; }
 
         public string Label { get; }
