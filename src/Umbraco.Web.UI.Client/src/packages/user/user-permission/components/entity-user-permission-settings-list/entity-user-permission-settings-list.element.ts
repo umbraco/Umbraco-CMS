@@ -30,7 +30,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
 
 	#isAllowed(permissionVerbs: Array<string>) {
-		return permissionVerbs.some((verb) => this.allowedVerbs.includes(verb));
+		return permissionVerbs.every((verb) => this.allowedVerbs.includes(verb));
 	}
 
 	#observeEntityUserPermissions() {
