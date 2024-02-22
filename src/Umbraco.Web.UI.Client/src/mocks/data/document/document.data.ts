@@ -704,6 +704,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'simple-document-type-id',
 			icon: 'icon-document',
+			collection: { id: 'dt-collectionView'},
 		},
 		hasChildren: false,
 		noAccess: false,
