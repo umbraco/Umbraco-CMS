@@ -39,7 +39,7 @@ export class UmbDocumentWorkspaceContext
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
-	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => data?.documentType.hasCollection);
+	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
@@ -79,7 +79,6 @@ export class UmbDocumentWorkspaceContext
 		this.#getDataPromise = this.repository.createScaffold(parentUnique, {
 			documentType: {
 				unique: documentTypeUnique,
-				hasCollection: false,
 			},
 		});
 		const { data } = await this.#getDataPromise;

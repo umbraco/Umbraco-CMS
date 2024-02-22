@@ -47,7 +47,6 @@ const treeItemMapper = (model: UmbMockDocumentModel): Omit<DocumentTreeItemRespo
 
 	return {
 		documentType: {
-			hasListView: false,
 			icon: documentType.icon,
 			id: documentType.id,
 		},
@@ -71,7 +70,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,
-			hasListView: false, // TODO: get list from doc type when ready
+			collection: undefined, // TODO: get list from doc type when ready
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
@@ -110,7 +109,7 @@ const detailResponseMapper = (model: UmbMockDocumentModel): DocumentResponseMode
 const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 	return {
 		documentType: {
-			hasListView: model.documentType.hasListView,
+			collection: model.documentType.collection,
 			icon: model.documentType.icon,
 			id: model.documentType.id,
 		},
