@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -63,6 +62,8 @@ public class ExamineExternalIndexTests : ExamineBaseTest
 
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
+    private IHttpContextAccessor HttpContextAccessor => GetRequiredService<IHttpContextAccessor>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IExamineExternalIndexSearcherTest, ExamineExternalIndexSearcherTest>();
@@ -89,6 +90,8 @@ public class ExamineExternalIndexTests : ExamineBaseTest
         var identity =
             await BackOfficeUserStore.FindByIdAsync(userId, CancellationToken.None);
         await BackOfficeSignInManager.SignInAsync(identity, false);
+        var principal = await BackOfficeSignInManager.CreateUserPrincipalAsync(identity);
+        HttpContextAccessor.HttpContext.SetPrincipalForRequest(principal);
     }
 
     [Test]
