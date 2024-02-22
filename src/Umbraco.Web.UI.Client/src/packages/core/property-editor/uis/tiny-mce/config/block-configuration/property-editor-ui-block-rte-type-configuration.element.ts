@@ -3,7 +3,6 @@ import { UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -30,8 +29,6 @@ export class UmbPropertyEditorUIBlockRteBlockConfigurationElement
 					}}></umb-input-block-type>`
 			: '';
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIBlockRteBlockConfigurationElement;

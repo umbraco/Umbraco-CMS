@@ -92,6 +92,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 	}
 
 	destroy(): void {
-		throw new Error('Method not implemented.');
+		super.destroy();
+		this.#data.destroy();
 	}
 }

@@ -2,7 +2,7 @@ import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -99,8 +99,6 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		super.disconnectedCallback();
 		this.#manifestObserver?.destroy();
 	}
-
-	static styles = [css``];
 }
 
 export default UmbEntityUserPermissionSettingsListElement;

@@ -77,7 +77,7 @@ export class UmbMemberWorkspaceContext
 	}
 
 	public destroy(): void {
-		console.log('destroy');
+		super.destroy();
 	}
 }
 

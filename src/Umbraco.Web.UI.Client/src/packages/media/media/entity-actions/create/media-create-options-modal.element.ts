@@ -4,7 +4,6 @@ import type {
 	UmbMediaCreateOptionsModalValue,
 } from './media-create-options-modal.token.js';
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 
@@ -85,8 +84,6 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbMediaCreateOptionsModalElement;

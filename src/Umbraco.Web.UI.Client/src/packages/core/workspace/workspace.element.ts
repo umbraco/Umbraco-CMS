@@ -1,5 +1,4 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -14,8 +13,6 @@ export class UmbWorkspaceElement extends UmbLitElement {
 			type="workspace"
 			.filter=${(manifest: ManifestWorkspace) => manifest.meta.entityType === this.entityType}></umb-extension-slot>`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbWorkspaceElement;

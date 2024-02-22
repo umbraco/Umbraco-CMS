@@ -1,8 +1,7 @@
 import type { UmbTreeItemContext } from '../tree-item-default/index.js';
 import type { UmbTreeItemModelBase } from '../types.js';
 import { UMB_TREE_ITEM_CONTEXT } from './tree-item-base.context.js';
-import { css, html, nothing, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, nothing, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-tree-item-base')
@@ -165,8 +164,6 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				: ''}
 		`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 declare global {
