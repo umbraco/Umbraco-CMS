@@ -20,7 +20,7 @@ export class UmbVariantId {
 	public readonly schedule: { publishTime?: string | null; unpublishTime?: string | null } | null = null;
 
 	constructor(variantData: variantObject) {
-		this.culture = (variantData.culture === UMB_INVARIANT_CULTURE ? null : variantData.culture) ?? null;
+		this.culture = (variantData.culture === UMB_INVARIANT_CULTURE ? null : variantData.culture?.toLowerCase()) ?? null;
 		this.segment = variantData.segment ?? null;
 		this.schedule = variantData.schedule ?? null;
 	}
