@@ -1,4 +1,4 @@
-import type { UmbDocumentDetailModel } from '../../types.js';
+import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
@@ -9,6 +9,7 @@ import type {
 import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -18,6 +19,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  */
 export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocumentDetailModel> {
 	#host: UmbControllerHost;
+	#languageRepository;
 
 	/**
 	 * Creates an instance of UmbDocumentServerDataSource.
@@ -26,6 +28,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
+		this.#languageRepository = new UmbLanguageCollectionRepository(host);
 	}
 
 	/**
@@ -46,22 +49,28 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			},
 			isTrashed: false,
 			values: [],
-			variants: [
-				{
-					state: null,
-					culture: null,
-					segment: null,
-					name: '',
-					publishDate: null,
-					createDate: null,
-					updateDate: null,
-					isMandatory: false,
-				},
-			],
+			variants: [this.createVariantScaffold()],
 			...preset,
 		};
 
 		return { data };
+	}
+
+	/**
+	 * Creates a new variant scaffold.
+	 * @returns A new variant scaffold.
+	 */
+	createVariantScaffold(): UmbDocumentVariantModel {
+		return {
+			state: null,
+			culture: null,
+			segment: null,
+			name: '',
+			publishDate: null,
+			createDate: null,
+			updateDate: null,
+			isMandatory: false,
+		};
 	}
 
 	/**
@@ -117,6 +126,28 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			},
 			isTrashed: data.isTrashed,
 		};
+
+		// Add missing languages as variants to the document if the document allows variants
+		const { data: languages } = await this.#languageRepository.requestCollection({});
+		if (!languages) return { data: document };
+
+		const allowVariants = document.variants.length > 1 || document.variants[0].culture !== null;
+		if (!allowVariants) return { data: document };
+
+		const missingLanguages = languages.items.filter(
+			(language) => !document.variants.some((variant) => variant.culture === language.unique),
+		);
+		document.variants = document.variants.concat(
+			missingLanguages.map((language) => {
+				const scaffold = this.createVariantScaffold();
+				return {
+					...scaffold,
+					languageName: language.name,
+					culture: language.unique,
+					isMandatory: language.isMandatory,
+				};
+			}),
+		);
 
 		return { data: document };
 	}
