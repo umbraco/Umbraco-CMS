@@ -5,6 +5,7 @@
 
 import type { MediaTypePropertyTypeContainerResponseModel } from './MediaTypePropertyTypeContainerResponseModel';
 import type { MediaTypePropertyTypeResponseModel } from './MediaTypePropertyTypeResponseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type ContentTypeForMediaTypeResponseModel = {
     alias: string;
@@ -14,6 +15,7 @@ export type ContentTypeForMediaTypeResponseModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<MediaTypePropertyTypeResponseModel>;
     containers: Array<MediaTypePropertyTypeContainerResponseModel>;

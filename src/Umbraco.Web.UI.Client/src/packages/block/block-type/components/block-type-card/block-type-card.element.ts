@@ -2,9 +2,7 @@ import {
 	DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 	type UmbDocumentTypeItemModel,
 } from '@umbraco-cms/backoffice/document-type';
-import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -18,27 +16,38 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 	);
 
 	@property({ type: String, attribute: false })
-	workspacePath?: string;
+	href?: string;
 
 	@property({ type: String, attribute: false })
-	public get key(): string | undefined {
-		return this._key;
+	name?: string;
+
+	@property({ type: String, attribute: false })
+	iconColor?: string;
+
+	@property({ type: String, attribute: false })
+	backgroundColor?: string;
+
+	// TODO: support custom icon/image file
+
+	@property({ type: String, attribute: false })
+	public get contentElementTypeKey(): string | undefined {
+		return this._elementTypeKey;
 	}
-	public set key(value: string | undefined) {
-		this._key = value;
+	public set contentElementTypeKey(value: string | undefined) {
+		this._elementTypeKey = value;
 		if (value) {
 			this.#itemManager.setUniques([value]);
 		} else {
 			this.#itemManager.setUniques([]);
 		}
 	}
-	private _key?: string | undefined;
+	private _elementTypeKey?: string | undefined;
 
 	@state()
-	_name?: string;
+	_fallbackName?: string;
 
 	@state()
-	_icon?: string | null;
+	_fallbackIcon?: string | null;
 
 	constructor() {
 		super();
@@ -46,37 +55,22 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		this.observe(this.#itemManager.items, (items) => {
 			const item = items[0];
 			if (item) {
-				this._icon = item.icon;
-				this._name = item.name;
+				console.log('got item', item);
+				this._fallbackIcon = item.icon;
+				this._fallbackName = item.name;
 			}
 		});
 	}
 
-	#onRequestDelete() {
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
-			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
-				data: {
-					color: 'danger',
-					headline: `Remove ${this._name}?`,
-					content: 'Are you sure you want to remove this block type?',
-					confirmLabel: 'Remove',
-				},
-			});
-
-			await modalContext?.onSubmit();
-			this.dispatchEvent(new UmbDeleteEvent());
-		});
-	}
-
+	// TODO: Support image files instead of icons.
 	render() {
 		return html`
-			<uui-card-block-type href="${this.workspacePath}/edit/${this.key}" .name=${this._name ?? ''}>
-				<uui-icon name=${this._icon ?? ''}></uui-icon>
-				<uui-action-bar slot="actions">
-					<uui-button @click=${this.#onRequestDelete} label="Remove block">
-						<uui-icon name="icon-trash"></uui-icon>
-					</uui-button>
-				</uui-action-bar>
+			<uui-card-block-type
+				href=${ifDefined(this.href)}
+				.name=${this.name ?? this._fallbackName ?? ''}
+				.background=${this.backgroundColor}>
+				<uui-icon name=${this._fallbackIcon ?? ''} style="color:${this.iconColor}"></uui-icon>
+				<slot name="actions" slot="actions"> </slot>
 			</uui-card-block-type>
 		`;
 	}

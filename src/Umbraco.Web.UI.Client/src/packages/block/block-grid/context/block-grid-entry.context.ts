@@ -184,7 +184,6 @@ export class UmbBlockGridEntryContext
 				const hasRelevantColumnSpanOptions = relevantColumnSpanOptions.length > 1;
 				const hasRowSpanOptions = minMaxRowSpan[0] !== minMaxRowSpan[1];
 				const canScale = hasRelevantColumnSpanOptions || hasRowSpanOptions;
-				console.log('canScale calc:', canScale);
 
 				this.#canScale.setValue(canScale);
 			},

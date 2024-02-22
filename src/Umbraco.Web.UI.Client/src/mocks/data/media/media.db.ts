@@ -34,7 +34,7 @@ const treeItemMapper = (model: UmbMockMediaModel): Omit<MediaTreeItemResponseMod
 
 	return {
 		mediaType: {
-			hasListView: model.mediaType.hasListView,
+			collection: model.mediaType.collection,
 			icon: model.mediaType.icon,
 			id: model.mediaType.id,
 		},
@@ -57,7 +57,7 @@ const createMockMediaMapper = (request: CreateMediaRequestModel): UmbMockMediaMo
 		mediaType: {
 			id: mediaType.id,
 			icon: mediaType.icon,
-			hasListView: false, // TODO: get list from doc type when ready
+			collection: undefined, // TODO: get list from doc type when ready
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
@@ -93,7 +93,7 @@ const detailResponseMapper = (model: UmbMockMediaModel): MediaResponseModel => {
 const itemMapper = (model: UmbMockMediaModel): MediaItemResponseModel => {
 	return {
 		mediaType: {
-			hasListView: model.mediaType.hasListView,
+			collection: model.mediaType.collection,
 			icon: model.mediaType.icon,
 			id: model.mediaType.id,
 		},

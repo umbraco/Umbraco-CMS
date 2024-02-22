@@ -674,6 +674,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 					{
 						label: 'Mocked Block Type for Block Grid',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						allowAtRoot: true,
+						allowInAreas: true,
 						rowMinSpan: 1,
 						rowMaxSpan: 2,
 						columnSpanOptions: [
@@ -720,7 +722,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 						iconColor: '#FFFDD0',
 						backgroundColor: '#633f32',
 						editorSize: 'medium',
-						icon: 'icon-coffee',
+						allowInAreas: true,
 					},
 
 					{
@@ -728,37 +730,36 @@ export const data: Array<UmbMockDataTypeModel> = [
 						contentElementTypeKey: 'headline-umbraco-demo-block-id',
 						backgroundColor: 'gold',
 						editorSize: 'medium',
-						icon: 'icon-edit',
 						groupKey: 'demo-block-group-id',
+						allowInAreas: true,
 					},
 					{
 						label: 'Image',
 						contentElementTypeKey: 'image-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-picture',
-
 						groupKey: 'demo-block-group-id',
+						allowInAreas: true,
 					},
 					{
 						label: 'Rich Text',
 						contentElementTypeKey: 'rich-text-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-diploma',
 						groupKey: 'demo-block-group-id',
+						allowInAreas: true,
 					},
 					{
 						label: 'Two Column Layout',
 						contentElementTypeKey: 'two-column-layout-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-book-alt',
 						groupKey: 'demo-block-group-id',
+						allowAtRoot: false,
 					},
 					{
 						label: 'Test broken group key',
 						contentElementTypeKey: 'test-block-id',
 						editorSize: 'medium',
-						icon: 'icon-war',
 						groupKey: 'group-id-that-does-not-exist',
+						allowAtRoot: true,
 					},
 				],
 			},
