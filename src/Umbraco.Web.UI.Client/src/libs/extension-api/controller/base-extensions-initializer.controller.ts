@@ -45,7 +45,7 @@ export abstract class UmbBaseExtensionsInitializer<
 
 	constructor(
 		host: UmbControllerHost,
-		extensionRegistry: UmbExtensionRegistry<ManifestType>,
+		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
