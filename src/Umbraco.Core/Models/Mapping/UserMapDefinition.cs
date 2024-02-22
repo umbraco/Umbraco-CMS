@@ -137,11 +137,10 @@ public class UserMapDefinition : IMapDefinition
         target.Icon = source.Icon;
         target.Alias = source.Alias;
         target.Name = source.Name;
-        target.Permissions = source.Permissions?.ToHashSet() ?? new HashSet<string>();
-        target.GranularPermissions = source.GranularPermissions ?? new HashSet<IGranularPermission>();
+        target.Permissions = source.Permissions;
+        target.GranularPermissions = source.GranularPermissions;
         target.Key = source.Key;
         target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
-        target.Permissions = source.Permissions ?? new HashSet<string>();
 
         var id = GetIntId(source.Id);
         if (id > 0)

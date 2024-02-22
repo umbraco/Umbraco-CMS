@@ -36,7 +36,7 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// The set of permissions provided by the frontend.
     /// </summary>
     /// <remarks>
-    /// By default the server has no concept of what these strings mean, we simple store them and return them to the UI.
+    /// By default the server has no concept of what all of these strings mean, we simple store them and return them to the UI.
     /// </remarks>
     ISet<string> Permissions { get; set; }
     ISet<IGranularPermission> GranularPermissions { get; set; }

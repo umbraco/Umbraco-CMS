@@ -40,7 +40,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
 
         Attempt<IEnumerable<string>, UserGroupOperationStatus> languageIsoCodesMappingAttempt = await MapLanguageIdsToIsoCodeAsync(userGroup.AllowedLanguages);
 
-        // We've gotten this data from the database, so the ping should not fail
+        // We've gotten this data from the database, so the mapping should not fail
         if (languageIsoCodesMappingAttempt.Success is false)
         {
             throw new InvalidOperationException($"Unknown language ID in User Group: {userGroup.Name}");

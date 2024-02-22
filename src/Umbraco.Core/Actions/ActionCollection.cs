@@ -29,15 +29,15 @@ public class ActionCollection : BuilderCollectionBase<IAction>
         where T : IAction => this.OfType<T>().FirstOrDefault();
 
     /// <summary>
-    ///     Gets the actions by the specified letters
+    ///     Gets the actions by the specified verbs
     /// </summary>
-    public IEnumerable<IAction> GetByVerb(IEnumerable<string> verbs)
+    public ISet<IAction> GetByVerbs(ISet<string> verbs)
     {
         IAction[] actions = this.ToArray(); // no worry: internally, it's already an array
         return verbs
             .Select(x => actions.FirstOrDefault(y => y.Letter == x))
             .WhereNotNull()
-            .ToList();
+            .ToHashSet();
     }
 
     /// <summary>

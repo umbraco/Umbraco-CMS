@@ -40,6 +40,8 @@ public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
             return;
         }
 
+        // Install is okay without this, because we do not need a token to install,
+        // but upgrades do, so we need to execute for everything higher then or equal to upgrade.
         if (_runtimeState.Level < RuntimeLevel.Upgrade)
         {
             return;

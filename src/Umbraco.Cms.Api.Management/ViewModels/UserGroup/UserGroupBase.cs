@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.OpenApi;
+﻿using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
@@ -73,9 +73,4 @@ public class UserGroupBase
     /// List of permissions provided, and maintained by the front-end. The server has no concept all of them, but some can be used on the server.
     /// </summary>
     public required ISet<IPermissionPresentationModel> Permissions { get; init; }
-}
-
-public interface IPermissionPresentationModel : IOpenApiDiscriminator
-{
-   ISet<string> Verbs { get; set; }
 }

@@ -371,10 +371,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.PostSaveUser(new UserSave()))
                         },
                         {
-                            "userGroupsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UserGroupsController>(
-                                controller => controller.PostSaveUserGroup(new UserGroupSave()))
-                        },
-                        {
                             "contentApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentController>(
                                 controller => controller.PostSave(new ContentItemSave()))
                         },

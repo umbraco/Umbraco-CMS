@@ -1,4 +1,5 @@
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
+using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
 using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;

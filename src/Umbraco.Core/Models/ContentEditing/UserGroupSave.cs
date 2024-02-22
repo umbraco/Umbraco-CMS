@@ -42,13 +42,14 @@ public class UserGroupSave : EntityBasic, IValidatableObject
     /// A set of ad-hoc permissions provided by the frontend.
     /// </summary>
     /// <remarks>
-    /// By default the server has no concept of what these strings mean, we simple store them and return them to the UI.
-    /// FIXME: Permissions already exists in the form of "DefaultPermissions", but is subject to change in the future
-    /// when we know more about how we want to handle permissions, potentially those will be migrated in the these "soft" permissions.
+    /// By default the server has no concept of what all of these strings mean, we simple store them and return them to the UI.
     /// </remarks>
-    public ISet<string>? Permissions { get; set; }
+    public required ISet<string> Permissions { get; set; }
 
-    public ISet<IGranularPermission>? GranularPermissions { get; set; }
+    /// <summary>
+    /// A set of granular permissions
+    /// </summary>
+    public required ISet<IGranularPermission> GranularPermissions { get; set; }
 
     /// <summary>
     ///     The assigned permissions for content
@@ -73,7 +74,7 @@ public class UserGroupSave : EntityBasic, IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (Permissions?.Any(x => x.IsNullOrWhiteSpace()) ?? false)
+        if (Permissions.Any(x => x.IsNullOrWhiteSpace()) || GranularPermissions.Any(x=>x.Permission.IsNullOrWhiteSpace()))
         {
             yield return new ValidationResult("A permission value cannot be null or empty", new[] { "Permissions" });
         }
