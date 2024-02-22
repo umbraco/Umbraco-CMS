@@ -10,6 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDocumentTreeItemModel } from '../../tree/types.js';
 
 @customElement('umb-document-granular-user-permission')
 export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
@@ -55,6 +56,10 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 		this.#documentPickerModalContext = this.#modalManagerContext?.open(UMB_DOCUMENT_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
+				// prevent already selected items to be picked again
+				// TODO: this type is wrong. It should be the tree item type
+				pickableFilter: (treeItem: UmbDocumentItemModel) =>
+					!this._items?.map((i) => i.unique).includes(treeItem.unique),
 			},
 		});
 
