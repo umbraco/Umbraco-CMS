@@ -1,4 +1,4 @@
-import type { DataSourceResponse, UmbDataSourceErrorResponse } from '../data-source/index.js';
+import type { DataSourceResponse, UmbDataSourceErrorResponse } from '../data-source-response.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbDetailRepository<DetailModelType> {
