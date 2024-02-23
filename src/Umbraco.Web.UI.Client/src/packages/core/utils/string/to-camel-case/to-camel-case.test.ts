@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { toCamelCase } from './to-camel-case.js';
+import { toCamelCase } from './to-camel-case.function.js';
 
 describe('to-camel-case', () => {
 	/* All tests have been run against the the lodash camelCase function, 
