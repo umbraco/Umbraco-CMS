@@ -19,15 +19,18 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     private readonly IEntityService _entityService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ILanguageService _languageService;
+    private readonly IPermissionPresentationFactory _permissionPresentationFactory;
 
     public UserGroupPresentationFactory(
         IEntityService entityService,
         IShortStringHelper shortStringHelper,
-        ILanguageService languageService)
+        ILanguageService languageService,
+        IPermissionPresentationFactory permissionPresentationFactory)
     {
         _entityService = entityService;
         _shortStringHelper = shortStringHelper;
         _languageService = languageService;
+        _permissionPresentationFactory = permissionPresentationFactory;
     }
 
     /// <inheritdoc />
@@ -58,41 +61,13 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
             FallbackPermissions = userGroup.Permissions,
-            Permissions = MapPermissions(userGroup.GranularPermissions),
+            Permissions = await _permissionPresentationFactory.CreateAsync(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
             IsSystemGroup = userGroup.IsSystemUserGroup()
         };
     }
 
-    private static HashSet<IPermissionPresentationModel> MapPermissions(ISet<IGranularPermission> granularPermissions)
-    {
-        var result = new HashSet<IPermissionPresentationModel> { };
 
-        IEnumerable<IGrouping<string, IGranularPermission>> contexts = granularPermissions.GroupBy(x => x.Context);
-
-        foreach (IGrouping<string, IGranularPermission> contextGroup in contexts)
-        {
-            IEnumerable<IGrouping<Guid?, IGranularPermission>> keyGroups = contextGroup.GroupBy(x => x.Key);
-            foreach (IGrouping<Guid?, IGranularPermission> keyGroup in keyGroups)
-            {
-                var verbs = keyGroup.Select(x => x.Permission).ToHashSet();
-                if (verbs.Any())
-                {
-                    switch (contextGroup.Key)
-                    {
-                        case DocumentGranularPermission.ContextType:
-                            result.Add(new DocumentPermissionPresentationModel() { Document = new ReferenceByIdModel() { Id = keyGroup.Key!.Value, }, Verbs = verbs });
-                            break;
-                        default:
-                            result.Add(new UnknownTypePermissionPresentationModel() { Context = contextGroup.Key, Verbs = verbs });
-                            break;
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
 
     /// <inheritdoc />
     public async Task<UserGroupResponseModel> CreateAsync(IReadOnlyUserGroup userGroup)
@@ -118,7 +93,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
             FallbackPermissions = userGroup.Permissions,
-            Permissions = MapPermissions(userGroup.GranularPermissions),
+            Permissions = await _permissionPresentationFactory.CreateAsync(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
         };
     }
@@ -158,7 +133,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = requestModel.Icon,
             HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
             Permissions = requestModel.FallbackPermissions,
-            GranularPermissions = GetPermissionSets(requestModel)
+            GranularPermissions = await _permissionPresentationFactory.CreatePermissionSetsAsync(requestModel.Permissions)
         };
 
         Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(requestModel, group);
@@ -218,41 +193,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
 
         current.Permissions = request.FallbackPermissions;
-        current.GranularPermissions = GetPermissionSets(request);
+        current.GranularPermissions = await _permissionPresentationFactory.CreatePermissionSetsAsync(request.Permissions);
 
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);
-    }
-
-    private static HashSet<IGranularPermission> GetPermissionSets(UserGroupBase request)
-    {
-
-        var granularPermissions = new HashSet<IGranularPermission>();
-        foreach (IPermissionPresentationModel permissionViewModel in request.Permissions)
-        {
-            if (permissionViewModel is DocumentPermissionPresentationModel documentPermissionViewModel)
-            {
-                foreach (var verb in documentPermissionViewModel.Verbs)
-                {
-                    granularPermissions.Add(new DocumentGranularPermission()
-                    {
-                        Key = documentPermissionViewModel.Document.Id,
-                        Permission = verb
-                    });
-                }
-            }
-            if (permissionViewModel is UnknownTypePermissionPresentationModel unknownTypePermissionViewModel)
-            {
-                foreach (var verb in unknownTypePermissionViewModel.Verbs)
-                {
-                    granularPermissions.Add(new UnknownTypeGranularPermission()
-                    {
-                        Context = unknownTypePermissionViewModel.Context,
-                        Permission = verb
-                    });
-                }
-            }
-        }
-        return granularPermissions;
     }
 
     private async Task<Attempt<IEnumerable<string>, UserGroupOperationStatus>> MapLanguageIdsToIsoCodeAsync(IEnumerable<int> ids)

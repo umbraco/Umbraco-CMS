@@ -3,13 +3,14 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class UserGroupFactory
 {
-    public static IUserGroup BuildEntity(IShortStringHelper shortStringHelper, UserGroupDto dto)
+    public static IUserGroup BuildEntity(IShortStringHelper shortStringHelper, UserGroupDto dto, IDictionary<string, IPermissionMapper> permissionMappers)
     {
         var userGroup = new UserGroup(
             shortStringHelper,
@@ -51,12 +52,9 @@ internal static class UserGroupFactory
             {
                 IGranularPermission toInsert;
 
-                if (granularPermission.Context == DocumentGranularPermission.ContextType)
+                if (permissionMappers.TryGetValue(granularPermission.Context, out var mapper))
                 {
-                    toInsert = new DocumentGranularPermission()
-                    {
-                        Key = granularPermission.UniqueId!.Value, Permission = granularPermission.Permission
-                    };
+                    toInsert = mapper.MapFromDto(granularPermission);
                 }
                 else
                 {

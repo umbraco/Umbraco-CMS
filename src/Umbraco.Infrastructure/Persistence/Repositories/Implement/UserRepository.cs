@@ -35,6 +35,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     private string? _passwordConfigJson;
     private bool _passwordConfigInitialized;
     private readonly object _sqliteValidateSessionLock = new();
+    private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -50,6 +51,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     /// <param name="passwordConfiguration">The password configuration.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
+    /// <param name="permissionMappers">The permission mappers.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -65,7 +67,8 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
         IOptions<GlobalSettings> globalSettings,
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
-        IRuntimeState runtimeState)
+        IRuntimeState runtimeState,
+        IEnumerable<IPermissionMapper> permissionMappers)
         : base(scopeAccessor, appCaches, logger)
     {
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
@@ -74,6 +77,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
             passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
+        _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
     /// <summary>
@@ -100,7 +104,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     }
 
     private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos) =>
-        dtos.Select(x => UserFactory.BuildEntity(_globalSettings, x));
+        dtos.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
 
     #region Overrides of RepositoryBase<int,IUser>
 
@@ -138,7 +142,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
         }
 
         PerformGetReferencedDtos(dtos);
-        return UserFactory.BuildEntity(_globalSettings, dtos[0]);
+        return UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
     }
 
     /// <summary>
@@ -195,7 +199,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
 
         PerformGetReferencedDtos(new List<UserDto> { userDto });
 
-        return UserFactory.BuildEntity(_globalSettings, userDto);
+        return UserFactory.BuildEntity(_globalSettings, userDto, _permissionMappers);
     }
 
     /// <summary>
@@ -350,7 +354,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var i = 0;
         foreach (UserDto dto in dtos)
         {
-            users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
+            users[i++] = UserFactory.BuildEntity(_globalSettings, dto, _permissionMappers);
         }
 
         return users;
@@ -366,7 +370,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var i = 0;
         foreach (UserDto dto in dtos)
         {
-            users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
+            users[i++] = UserFactory.BuildEntity(_globalSettings, dto, _permissionMappers);
         }
 
         return users;
@@ -375,7 +379,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     private IUser? GetWith(Action<Sql<ISqlContext>> with, bool includeReferences)
     {
         UserDto? dto = GetDtoWith(with, includeReferences);
-        return dto == null ? null : UserFactory.BuildEntity(_globalSettings, dto);
+        return dto == null ? null : UserFactory.BuildEntity(_globalSettings, dto, _permissionMappers);
     }
 
     private UserDto? GetDtoWith(Action<Sql<ISqlContext>> with, bool includeReferences)
@@ -1127,7 +1131,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         // map references
         PerformGetReferencedDtos(pagedResult.Items);
-        return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x));
+        return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
     }
 
     private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext>? filterSql, bool hasWhereClause)

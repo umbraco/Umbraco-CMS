@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -26,18 +27,21 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     private readonly PermissionRepository<IContent> _permissionRepository;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
+    private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
 
     public UserGroupRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
         ILogger<UserGroupRepository> logger,
         ILoggerFactory loggerFactory,
-        IShortStringHelper shortStringHelper)
+        IShortStringHelper shortStringHelper,
+        IEnumerable<IPermissionMapper> permissionMappers)
         : base(scopeAccessor, appCaches, logger)
     {
         _shortStringHelper = shortStringHelper;
         _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches, loggerFactory.CreateLogger<UserGroupWithUsersRepository>());
         _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, loggerFactory.CreateLogger<PermissionRepository<IContent>>());
+        _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
     public IUserGroup? Get(string alias)
@@ -87,7 +91,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         sql.Where($"umbracoUserGroup.id IN ({innerSql.SQL})");
         AppendGroupBy(sql);
 
-        return Database.Fetch<UserGroupDto>(sql).Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
+        return Database.Fetch<UserGroupDto>(sql).Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x, _permissionMappers));
     }
 
     public void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[]? userIds) =>
@@ -309,7 +313,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         dto.UserGroup2PermissionDtos = GetUserGroupPermissions(dto.Key);
         dto.UserGroup2GranularPermissionDtos = GetUserGroupGranularPermissions(dto.Key);
 
-        IUserGroup userGroup = UserGroupFactory.BuildEntity(_shortStringHelper, dto);
+        IUserGroup userGroup = UserGroupFactory.BuildEntity(_shortStringHelper, dto, _permissionMappers);
         return userGroup;
     }
 
@@ -333,7 +337,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
         AssignUserGroupOneToManyTables(ref dtos);
 
-        return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
+        return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x, _permissionMappers));
     }
 
     protected override IEnumerable<IUserGroup> PerformGetByQuery(IQuery<IUserGroup> query)
@@ -349,7 +353,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
         AssignUserGroupOneToManyTables(ref dtos);
 
-        return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
+        return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x, _permissionMappers));
     }
 
     private void AssignUserGroupOneToManyTables(ref List<UserGroupDto> userGroupDtos)

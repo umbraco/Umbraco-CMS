@@ -26621,6 +26621,7 @@
           "avatarUrls",
           "documentStartNodeIds",
           "email",
+          "fallbackPermissions",
           "hasAccessToAllLanguages",
           "id",
           "languages",
@@ -26679,6 +26680,13 @@
           "hasAccessToAllLanguages": {
             "type": "boolean"
           },
+          "fallbackPermissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "permissions": {
             "uniqueItems": true,
             "type": "array",
@@ -26686,9 +26694,6 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
-                },
-                {
-                  "$ref": "#/components/schemas/FallbackPermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -27986,32 +27991,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "FallbackPermissionPresentationModel": {
-        "required": [
-          "$type",
-          "verbs"
-        ],
-        "type": "object",
-        "properties": {
-          "$type": {
-            "type": "string"
-          },
-          "verbs": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "FallbackPermissionPresentationModel": "#/components/schemas/FallbackPermissionPresentationModel"
-          }
-        }
       },
       "FieldPresentationModel": {
         "required": [
@@ -33316,6 +33295,7 @@
       "UserGroupBaseModel": {
         "required": [
           "documentRootAccess",
+          "fallbackPermissions",
           "hasAccessToAllLanguages",
           "languages",
           "mediaRootAccess",
@@ -33369,6 +33349,13 @@
           "mediaRootAccess": {
             "type": "boolean"
           },
+          "fallbackPermissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "permissions": {
             "uniqueItems": true,
             "type": "array",
@@ -33376,9 +33363,6 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
-                },
-                {
-                  "$ref": "#/components/schemas/FallbackPermissionPresentationModel"
                 },
                 {
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
@@ -33492,6 +33476,7 @@
             "format": "uuid"
           },
           "permissions": {
+            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"
