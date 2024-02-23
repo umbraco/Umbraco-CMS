@@ -7,6 +7,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
@@ -26,6 +27,8 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
+	#languageRepository = new UmbLanguageCollectionRepository(this);
+
 	constructor() {
 		super();
 
@@ -39,7 +42,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	#observeVariants() {
 		if (!this.#workspaceContext) return;
 		this.observe(
-			this.#workspaceContext.variants,
+			this.#workspaceContext.variantsWithLanguages,
 			(variants) => {
 				this._availableVariants = variants;
 				this._generateRoutes();
@@ -66,8 +69,14 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
 	}
 
-	private _generateRoutes() {
+	private async _generateRoutes() {
 		if (!this._availableVariants || this._availableVariants.length === 0) return;
+
+		const { data: languages } = await this.#languageRepository.requestCollection({});
+
+		if (languages?.items.length) {
+			this._availableVariants;
+		}
 
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];

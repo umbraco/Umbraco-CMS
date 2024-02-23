@@ -88,42 +88,18 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
 		if (!workspaceContext) throw new Error('Split View Workspace context not found');
 
-		const combinedVariantOptions: Observable<UmbDocumentVariantOptions> = combineObservables(
-			[workspaceContext.variants, this.#languages.asObservable()],
-			([variants, languages]) => {
-				const variantOptions: UmbDocumentVariantOptions = variants.map((variant) => {
-					const language = languages.find((lang) => lang.unique === variant.culture);
+		this.observe(
+			workspaceContext.variantsWithLanguages,
+			(variants) => {
+				this._variants = variants.map<UmbDocumentVariantOption>((variant) => {
 					return {
 						culture: variant.culture,
 						segment: variant.segment,
-						title:
-							`${variant.name ?? language?.name ?? ''} (${variant.culture})` +
-							(variant.segment ? ` — ${variant.segment}` : ''),
-						displayName: (language ? language.name : '') + (variant.segment ? ` — ${variant.segment}` : ''),
+						title: `${variant.name ?? ''} (${variant.culture})` + (variant.segment ? ` — ${variant.segment}` : ''),
+						displayName: variant.name + (variant.segment ? ` — ${variant.segment}` : ''),
 						state: (variant as UmbDocumentVariantModel).state ?? DocumentVariantStateModel.NOT_CREATED,
 					};
 				});
-
-				const missingLanguages: UmbDocumentVariantOptions = languages
-					.filter((language) => !variants.some((variant) => variant.culture === language.unique))
-					.map((language) => {
-						return {
-							culture: language.unique,
-							segment: null,
-							title: `${language.name} (${language.unique})`,
-							displayName: language.name,
-							state: DocumentVariantStateModel.NOT_CREATED,
-						};
-					});
-
-				return [...variantOptions, ...missingLanguages];
-			},
-		);
-
-		this.observe(
-			combinedVariantOptions,
-			(variants) => {
-				this._variants = variants;
 			},
 			'_observeVariants',
 		);

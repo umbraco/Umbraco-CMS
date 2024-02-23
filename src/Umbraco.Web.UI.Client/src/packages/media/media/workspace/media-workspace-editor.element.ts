@@ -38,7 +38,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 	#observeVariants() {
 		if (!this.#workspaceContext) return;
 		this.observe(
-			this.#workspaceContext.variants,
+			this.#workspaceContext.variantsWithLanguages,
 			(variants) => {
 				this._availableVariants = variants;
 				this._generateRoutes();

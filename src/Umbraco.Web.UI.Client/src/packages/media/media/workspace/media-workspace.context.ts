@@ -3,15 +3,23 @@ import { UmbMediaPropertyDataContext } from '../property-dataset-context/media-p
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import type { UmbMediaDetailModel } from '../types.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId, UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
 	type UmbVariantableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
-import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	appendToFrozenArray,
+	combineObservables,
+	partialUpdateFrozenArray,
+	UmbArrayState,
+	UmbObjectState,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { Observable } from 'rxjs';
+import { UmbLanguageCollectionRepository, UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
@@ -26,6 +34,8 @@ export class UmbMediaWorkspaceContext
 	 */
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 	#getDataPromise?: Promise<any>;
+	#languageRepository = new UmbLanguageCollectionRepository(this);
+	#languageCollection = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public isLoaded() {
 		return this.#getDataPromise;
 	}
@@ -34,6 +44,22 @@ export class UmbMediaWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.mediaType.unique);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
+	readonly variantsWithLanguages = combineObservables(
+		[this.variants, this.#languageCollection.asObservable()],
+		([variants, languages]) => {
+			const missingLanguages = languages.filter((x) => !variants.some((v) => v.culture === x.unique));
+			const newVariants = variants.concat(
+				missingLanguages.map((x) => ({
+					culture: x.unique,
+					segment: null,
+					name: x.name,
+					createDate: '',
+					updateDate: '',
+				})),
+			);
+			return newVariants;
+		},
+	);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbMediaTypeDetailRepository(this));
@@ -44,6 +70,11 @@ export class UmbMediaWorkspaceContext
 		super(host, 'Umb.Workspace.Media');
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
+	}
+
+	async loadLanguages() {
+		const { data } = await this.#languageRepository.requestCollection({});
+		this.#languageCollection.setValue(data?.items ?? []);
 	}
 
 	async load(unique: string) {

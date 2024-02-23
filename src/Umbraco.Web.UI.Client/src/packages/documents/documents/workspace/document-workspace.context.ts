@@ -53,6 +53,25 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
+	readonly variantsWithLanguages = combineObservables(
+		[this.variants, this.#languageCollection.asObservable()],
+		([variants, languages]) => {
+			const missingLanguages = languages.filter((x) => !variants.some((v) => v.culture === x.unique));
+			const newVariants = variants.concat(
+				missingLanguages.map<UmbDocumentVariantModel>((language) => ({
+					state: UmbDocumentVariantState.NOT_CREATED,
+					isMandatory: language.isMandatory,
+					culture: language.unique,
+					segment: null,
+					name: '',
+					createDate: '',
+					publishDate: '',
+					updateDate: '',
+				})),
+			);
+			return newVariants;
+		},
+	);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
