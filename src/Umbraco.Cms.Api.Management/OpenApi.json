@@ -26459,6 +26459,7 @@
       },
       "DataTypeResponseModel": {
         "required": [
+          "canIgnoreStartNodes",
           "id",
           "isDeletable"
         ],
@@ -26482,6 +26483,9 @@
             "nullable": true
           },
           "isDeletable": {
+            "type": "boolean"
+          },
+          "canIgnoreStartNodes": {
             "type": "boolean"
           }
         },
