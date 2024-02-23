@@ -1,7 +1,7 @@
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { css, html, customElement, property, repeat, state, query } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DOCUMENT_TYPE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -33,9 +33,6 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	@state()
 	private _customFields: Array<UmbPropertyTypeModel> = [];
-
-	@query('uui-combobox')
-	private _combobox!: UUIComboboxElement;
 
 	private _systemFields = [
 		{ value: 'sortOrder', name: this.localize.term('general_sort'), group: 'System Fields' },
@@ -70,7 +67,6 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 	#changeFieldType() {
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
 			if (modalManager) {
-				// TODO: Make as mode for the Picker Modal, so the click to select immediately submits the modal(And in that mode we do not want to see a Submit button).
 				const modalContext = modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 					data: {
 						hideTreeRoot: true,
@@ -96,38 +92,42 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-ref-node
-				@open=${this.#changeFieldType}
-				.name=${this._documentTypeName ?? 'System Field'}
-				@change=${this.#onChange}>
-				<uui-icon name=${this._documentTypeIcon ?? 'icon-database'} slot="icon"></uui-icon>
-				<uui-combobox slot="tag" .value=${this.value}>
-					<uui-combobox-list>
-						${this.documentTypeUnique
-							? repeat(
-									this._customFields,
-									(item) => item.id,
-									(item) =>
-										html`<uui-combobox-list-option .value=${item.alias}>${item.alias}</uui-combobox-list-option>`,
-							  )
-							: repeat(
-									this._systemFields,
-									(item) => item.value,
-									(item) =>
-										html`<uui-combobox-list-option .value=${item.value}>${item.name}</uui-combobox-list-option>`,
-							  )}
-					</uui-combobox-list>
-				</uui-combobox>
-			</uui-ref-node>
+			<uui-button look="outline" @click=${this.#changeFieldType} compact>
+				<uui-icon
+					.name=${this.documentTypeUnique
+						? this._documentTypeIcon
+							? this._documentTypeIcon
+							: 'icon-circle-dotted'
+						: 'icon-database'}></uui-icon>
+				${this.documentTypeUnique ? this._documentTypeName : this.localize.term('formSettings_systemFields')}
+			</uui-button>
+
+			<uui-combobox slot="tag" .value=${this.value} @change=${this.#onChange}>
+				<uui-combobox-list>
+					${this.documentTypeUnique
+						? repeat(
+								this._customFields,
+								(item) => item.id,
+								(item) => html`<uui-combobox-list-option .value=${item.alias}>${item.alias}</uui-combobox-list-option>`,
+						  )
+						: repeat(
+								this._systemFields,
+								(item) => item.value,
+								(item) => html`<uui-combobox-list-option .value=${item.value}>${item.name}</uui-combobox-list-option>`,
+						  )}
+				</uui-combobox-list>
+			</uui-combobox>
 		`;
 	}
 
 	static styles = [
 		css`
-			uui-ref-node {
-				width: auto;
+			:host {
+				display: flex;
 			}
-
+			:host > * {
+				flex: 1;
+			}
 			uui-combobox-list-option {
 				padding: calc(var(--uui-size-2, 6px) + 1px);
 			}
