@@ -32,7 +32,7 @@ import type { ManifestWorkspaceAction } from './workspace-action.model.js';
 import type { ManifestWorkspaceContext } from './workspace-context.model.js';
 import type { ManifestWorkspaceFooterApp } from './workspace-footer-app.model.js';
 import type { ManifestWorkspaceView } from './workspace-view.model.js';
-import type { ManifestEntityUserPermission } from './user-permission.model.js';
+import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
 import type {
@@ -72,7 +72,7 @@ export type * from './tinymce-plugin.model.js';
 export type * from './tree-item.model.js';
 export type * from './tree.model.js';
 export type * from './user-granular-permission.model.js';
-export type * from './user-permission.model.js';
+export type * from './entity-user-permission.model.js';
 export type * from './user-profile-app.model.js';
 export type * from './workspace-action.model.js';
 export type * from './workspace-context.model.js';

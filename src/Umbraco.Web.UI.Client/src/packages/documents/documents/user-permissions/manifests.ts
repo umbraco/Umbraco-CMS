@@ -204,6 +204,8 @@ export const granularPermissions: Array<ManifestGranularUserPermission> = [
 		element: () => import('./document-granular-user-permission/document-granular-user-permission.element.js'),
 		meta: {
 			schemaType: 'DocumentPermissionPresentationModel',
+			label: 'Documents',
+			description: 'Assign permissions to specific documents',
 		},
 	},
 ];

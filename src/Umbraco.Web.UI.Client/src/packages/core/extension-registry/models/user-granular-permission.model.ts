@@ -7,4 +7,8 @@ export interface ManifestGranularUserPermission extends ManifestElement {
 
 export interface MetaGranularUserPermission {
 	schemaType: string;
+	label?: string;
+	labelKey?: string;
+	description?: string;
+	descriptionKey?: string;
 }

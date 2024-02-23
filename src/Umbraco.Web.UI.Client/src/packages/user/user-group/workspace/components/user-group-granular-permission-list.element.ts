@@ -83,7 +83,21 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	};
 
 	render() {
-		return html`${this._extensionElements.map((element) => html`${element}`)}`;
+		return html`${this._extensionElements.map((element) => this.#renderProperty(element))}`;
+	}
+
+	#renderProperty(element: any) {
+		const manifest = element.manifest as ManifestGranularUserPermission;
+		const label = manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label;
+		const description = manifest.meta.descriptionKey
+			? this.localize.term(manifest.meta.descriptionKey)
+			: manifest.meta.description;
+
+		return html`
+			<umb-property-layout .label=${label || ''} .description=${description || ''}>
+				<div slot="editor">${element}</div>
+			</umb-property-layout>
+		`;
 	}
 
 	disconnectedCallback(): void {
