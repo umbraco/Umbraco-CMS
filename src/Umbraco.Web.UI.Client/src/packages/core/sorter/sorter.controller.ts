@@ -1,12 +1,9 @@
+import { isWithinRect } from '@umbraco-cms/backoffice/utils';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;
-
-function isWithinRect(x: number, y: number, rect: DOMRect, modifier = 0) {
-	return x > rect.left - modifier && x < rect.right + modifier && y > rect.top - modifier && y < rect.bottom + modifier;
-}
 
 function getParentScrollElement(el: Element, includeSelf: boolean) {
 	if (!el || !el.getBoundingClientRect) return null;
@@ -71,6 +68,8 @@ export type resolveVerticalDirectionArgs<T, ElementType extends HTMLElement> = {
 	relatedRect: DOMRect;
 	placeholderIsInThisRow: boolean;
 	horizontalPlaceAfter: boolean;
+	pointerX: number;
+	pointerY: number;
 };
 
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
@@ -617,6 +616,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 						relatedRect: foundElDragRect,
 						placeholderIsInThisRow: placeholderIsInThisRow,
 						horizontalPlaceAfter: placeAfter,
+						pointerX: this.#dragX,
+						pointerY: this.#dragY,
 				  })
 				: true;
 

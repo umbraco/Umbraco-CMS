@@ -6,7 +6,6 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { componentHasManifestProperty } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-workspace-editor
@@ -63,8 +62,8 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 					path: `view/${manifest.meta.pathname}`,
 					component: () => createExtensionElement(manifest),
 					setup: (component) => {
-						if (component && componentHasManifestProperty(component)) {
-							component.manifest = manifest;
+						if (component) {
+							(component as any).manifest = manifest;
 						}
 					},
 				} as UmbRoute;
