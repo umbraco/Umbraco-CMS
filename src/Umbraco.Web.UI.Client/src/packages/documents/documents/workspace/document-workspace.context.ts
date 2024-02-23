@@ -63,7 +63,7 @@ export class UmbDocumentWorkspaceContext
 					isMandatory: language.isMandatory,
 					culture: language.unique,
 					segment: null,
-					name: '',
+					name: language.name,
 					createDate: '',
 					publishDate: '',
 					updateDate: '',

@@ -95,7 +95,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 					return {
 						culture: variant.culture,
 						segment: variant.segment,
-						title: `${variant.name ?? ''} (${variant.culture})` + (variant.segment ? ` — ${variant.segment}` : ''),
+						title: variant.name + (variant.segment ? ` — ${variant.segment}` : ''),
 						displayName: variant.name + (variant.segment ? ` — ${variant.segment}` : ''),
 						state: (variant as UmbDocumentVariantModel).state ?? DocumentVariantStateModel.NOT_CREATED,
 					};
