@@ -1,7 +1,4 @@
 export * from './data-source/index.js';
-export * from './detail/detail-repository.interface.js';
-export * from './collection-repository.interface.js';
-export * from './move/move-repository.interface.js';
 export * from './repository-items.manager.js';
 export * from './repository-base.js';
 
