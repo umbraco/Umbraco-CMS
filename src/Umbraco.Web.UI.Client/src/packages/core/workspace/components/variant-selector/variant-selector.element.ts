@@ -11,8 +11,19 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, combineObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+
+type UmbDocumentVariantOption = {
+	culture: string | null;
+	segment: string | null;
+	title: string;
+	displayName: string;
+	state: DocumentVariantStateModel;
+};
+
+type UmbDocumentVariantOptions = Array<UmbDocumentVariantOption>;
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -20,7 +31,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	private _popoverElement?: UUIPopoverContainerElement;
 
 	@state()
-	_variants: Array<UmbDocumentVariantModel> = [];
+	private _variants: UmbDocumentVariantOptions = [];
 
 	// TODO: Stop using document context specific ActiveVariant type.
 	@state()
@@ -37,30 +48,17 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	private _name?: string;
 
-	private _languageName?: string | null;
-	private _culture?: string | null;
-	private _segment?: string | null;
+	@state()
+	private _variantDisplayName = '';
 
 	@state()
-	private get _variantDisplayName() {
-		return (this._languageName ? this._languageName : '') + (this._segment ? ' — ' + this._segment : '');
-	}
-
-	@state()
-	private get _variantTitleName() {
-		return (
-			(this._languageName ? this._languageName + ` (${this._culture})` : '') +
-			(this._segment ? ' — ' + this._segment : '')
-		);
-	}
+	private _variantTitleName = '';
 
 	@state()
 	private _variantSelectorOpen = false;
 
 	#languageRepository = new UmbLanguageCollectionRepository(this);
-
-	@state()
-	private _languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 
 	constructor() {
 		super();
@@ -81,28 +79,54 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	private async _loadLanguages() {
 		const { data: languages } = await this.#languageRepository.requestCollection({});
 		if (!languages) return;
-		this._languages.setValue(languages.items);
-		this.requestUpdate('_languages');
+		this.#languages.setValue(languages.items);
 	}
 
 	private async _observeVariants() {
 		if (!this.#splitViewContext) return;
 
 		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
-		if (workspaceContext) {
-			this.observe(
-				workspaceContext.variants,
-				(variants) => {
-					if (variants) {
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						// TODO: figure out what we do with the different variant models. Document has a state, but the variant model does not.
-						this._variants = variants;
-					}
-				},
-				'_observeVariants',
-			);
-		}
+		if (!workspaceContext) throw new Error('Split View Workspace context not found');
+
+		const combinedVariantOptions: Observable<UmbDocumentVariantOptions> = combineObservables(
+			[workspaceContext.variants, this.#languages.asObservable()],
+			([variants, languages]) => {
+				const variantOptions: UmbDocumentVariantOptions = variants.map((variant) => {
+					const language = languages.find((lang) => lang.unique === variant.culture);
+					return {
+						culture: variant.culture,
+						segment: variant.segment,
+						title:
+							`${variant.name ?? language?.name ?? ''} (${variant.culture})` +
+							(variant.segment ? ` — ${variant.segment}` : ''),
+						displayName: (language ? language.name : '') + (variant.segment ? ` — ${variant.segment}` : ''),
+						state: (variant as UmbDocumentVariantModel).state ?? DocumentVariantStateModel.NOT_CREATED,
+					};
+				});
+
+				const missingLanguages: UmbDocumentVariantOptions = languages
+					.filter((language) => !variants.some((variant) => variant.culture === language.unique))
+					.map((language) => {
+						return {
+							culture: language.unique,
+							segment: null,
+							title: `${language.name} (${language.unique})`,
+							displayName: language.name,
+							state: DocumentVariantStateModel.NOT_CREATED,
+						};
+					});
+
+				return [...variantOptions, ...missingLanguages];
+			},
+		);
+
+		this.observe(
+			combinedVariantOptions,
+			(variants) => {
+				this._variants = variants;
+			},
+			'_observeVariants',
+		);
 	}
 
 	private async _observeActiveVariants() {
@@ -127,13 +151,16 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 		const variantId = this.#variantContext.getVariantId();
 
-		this._culture = variantId.culture;
-		this._segment = variantId.segment;
+		const culture = variantId.culture;
+		const segment = variantId.segment;
 
 		this.observe(
-			this._languages.asObservable(),
+			this.#languages.asObservable(),
 			(languages) => {
-				this._languageName = languages.find((language) => language.unique === variantId.culture)?.name ?? '';
+				const languageName = languages.find((language) => language.unique === variantId.culture)?.name ?? '';
+				this._variantDisplayName = (languageName ? languageName : '') + (segment ? ' — ' + segment : '');
+				this._variantTitleName =
+					(languageName ? `${languageName} (${culture})` : '') + (segment ? ' — ' + segment : '');
 			},
 			'_languages',
 		);
@@ -162,11 +189,11 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private _switchVariant(variant: UmbDocumentVariantModel) {
+	private _switchVariant(variant: UmbDocumentVariantOption) {
 		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
 	}
 
-	private _openSplitView(variant: UmbDocumentVariantModel) {
+	private _openSplitView(variant: UmbDocumentVariantOption) {
 		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
 	}
 
@@ -174,12 +201,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		this.#splitViewContext?.closeSplitView();
 	}
 
-	private _isVariantActive(culture: string) {
-		return this._activeVariantsCultures.includes(culture);
+	private _isVariantActive(culture: string | null) {
+		return culture !== null ? this._activeVariantsCultures.includes(culture) : true;
 	}
 
-	private _isNotPublishedMode(culture: string, state: DocumentVariantStateModel) {
-		return state !== DocumentVariantStateModel.PUBLISHED && !this._isVariantActive(culture!);
+	private _isNotPublishedMode(culture: string | null, state: DocumentVariantStateModel) {
+		return state !== DocumentVariantStateModel.PUBLISHED && !this._isVariantActive(culture);
 	}
 
 	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -235,22 +262,21 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 										<ul>
 											${this._variants.map(
 												(variant) => html`
-													<li class="${this._isVariantActive(variant.culture!) ? 'selected' : ''}">
+													<li class="${this._isVariantActive(variant.culture) ? 'selected' : ''}">
 														<button
 															class="variant-selector-switch-button
-																	${this._isNotPublishedMode(variant.culture!, variant.state!) ? 'add-mode' : ''}"
+																	${this._isNotPublishedMode(variant.culture, variant.state) ? 'add-mode' : ''}"
 															@click=${() => this._switchVariant(variant)}>
-															${this._isNotPublishedMode(variant.culture!, variant.state!)
+															${this._isNotPublishedMode(variant.culture, variant.state)
 																? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
 																: nothing}
 															<div>
-																${variant.name ||
-																this._languages.getValue().find((x) => x.unique === variant.culture)?.name}
+																${variant.title}
 																<i>(${variant.culture})</i> ${variant.segment}
 																<div class="variant-selector-state">${variant.state}</div>
 															</div>
 														</button>
-														${this._isVariantActive(variant.culture!)
+														${this._isVariantActive(variant.culture)
 															? nothing
 															: html`
 																	<uui-button
