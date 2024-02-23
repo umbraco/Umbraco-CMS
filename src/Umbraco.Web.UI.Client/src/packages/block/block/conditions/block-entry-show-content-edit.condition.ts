@@ -29,5 +29,7 @@ export class UmbBlockEntryShowContentEditCondition extends UmbBaseController imp
 	}
 }
 
+export default UmbBlockEntryShowContentEditCondition;
+
 export type BlockEntryShowContentEditConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockEntryShowContentEdit'>;

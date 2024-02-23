@@ -29,5 +29,7 @@ export class UmbBlockWorkspaceHasSettingsCondition extends UmbBaseController imp
 	}
 }
 
+export default UmbBlockWorkspaceHasSettingsCondition;
+
 export type BlockWorkspaceHasSettingsConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasSettings'>;
