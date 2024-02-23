@@ -88,10 +88,6 @@ export class UmbDocumentWorkspaceContext
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 
 		this.loadLanguages();
-
-		/*
-		TODO: Make something to ensure all variants are present in data? Seems like a good idea?.
-		*/
 	}
 
 	async loadLanguages() {
