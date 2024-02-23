@@ -618,7 +618,7 @@ public class MemberControllerUnitTests
             (IMemberManager)membersUserManager,
             dataTypeService,
             backOfficeSecurityAccessor,
-            new ConfigurationEditorJsonSerializer(),
+            new SystemTextConfigurationEditorJsonSerializer(),
             passwordChanger,
             scopeProvider,
             twoFactorLoginService);

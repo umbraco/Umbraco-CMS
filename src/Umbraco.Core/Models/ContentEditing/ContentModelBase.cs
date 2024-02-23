@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿namespace Umbraco.Cms.Core.Models.ContentEditing;
 
 public abstract class ContentModelBase<TValueModel, TVariantModel>
     where TValueModel : ValueModelBase

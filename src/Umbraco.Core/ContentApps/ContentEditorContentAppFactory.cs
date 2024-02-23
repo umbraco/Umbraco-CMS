@@ -27,7 +27,7 @@ public class ContentEditorContentAppFactory : IContentAppFactory
                     Weight = Weight,
                 };
 
-            case IMedia media when !media.ContentType.IsContainer || media.Properties.Count > 0:
+            case IMedia media when media.ContentType.ListView is null || media.Properties.Count > 0:
                 return _mediaApp ??= new ContentApp
                 {
                     Alias = "umbContent",

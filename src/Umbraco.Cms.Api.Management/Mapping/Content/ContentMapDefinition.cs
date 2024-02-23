@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 

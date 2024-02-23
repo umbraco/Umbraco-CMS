@@ -100,7 +100,7 @@ public class MemberTypeBuilderTests
         Assert.AreEqual(testIcon, memberType.Icon);
         Assert.AreEqual(testThumbnail, memberType.Thumbnail);
         Assert.AreEqual(testTrashed, memberType.Trashed);
-        Assert.IsFalse(memberType.IsContainer);
+        Assert.IsNull(memberType.ListView);
         Assert.AreEqual(3, memberType.PropertyTypes.Count()); // 1 from membership properties group, 2 custom
 
         var propertyTypeIds = memberType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();

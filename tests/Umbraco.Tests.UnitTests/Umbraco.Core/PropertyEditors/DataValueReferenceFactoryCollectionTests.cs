@@ -4,6 +4,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -30,12 +31,12 @@ public class DataValueReferenceFactoryCollectionTests
                  Mock.Of<IJsonSerializer>(),
                  Mock.Of<IIOHelper>(),
                  new DataEditorAttribute("a"),
-                 Mock.Of<IDataTypeService>(),
                  Mock.Of<IMediaImportService>(),
                  Mock.Of<IMediaService>(),
                  Mock.Of<ITemporaryFileService>(),
                  Mock.Of<IScopeProvider>(),
-                 Mock.Of<IBackOfficeSecurityAccessor>()));
+                 Mock.Of<IBackOfficeSecurityAccessor>(),
+                 Mock.Of<IDataTypeConfigurationCache>()));
 
     private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
 
@@ -55,7 +56,7 @@ public class DataValueReferenceFactoryCollectionTests
         var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var property =
             new Property(
                 new PropertyType(ShortStringHelper, new DataType(labelEditor, serializer))
@@ -99,7 +100,7 @@ public class DataValueReferenceFactoryCollectionTests
         var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var property =
             new Property(
                 new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
@@ -143,7 +144,7 @@ public class DataValueReferenceFactoryCollectionTests
         var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
         var trackedUdi4 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var property =
             new Property(new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
             {
@@ -192,7 +193,7 @@ public class DataValueReferenceFactoryCollectionTests
 
         var labelPropertyEditor = new LabelPropertyEditor(DataValueEditorFactory, IOHelper);
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelPropertyEditor.Yield()));
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
 
         var result = collection.GetAllAutomaticRelationTypesAliases(propertyEditors).ToArray();
 

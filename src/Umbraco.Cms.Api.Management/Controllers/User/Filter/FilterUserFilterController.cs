@@ -11,16 +11,16 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.User;
+namespace Umbraco.Cms.Api.Management.Controllers.User.Filter;
 
 [ApiVersion("1.0")]
-public class FilterUserController : UserControllerBase
+public class FilterUserFilterController : UserFilterControllerBase
 {
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUserPresentationFactory _userPresentationFactory;
 
-    public FilterUserController(
+    public FilterUserFilterController(
         IUserService userService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IUserPresentationFactory userPresentationFactory)
@@ -41,7 +41,7 @@ public class FilterUserController : UserControllerBase
     /// <param name="userStates">User states to include in the result.</param>
     /// <param name="filter">A string that must be present in the users name or username.</param>
     /// <returns>A paged result of the users matching the query.</returns>
-    [HttpGet("filter")]
+    [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<UserResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

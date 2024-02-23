@@ -36,6 +36,8 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
     {
         base.Map(originalProp, dest, context);
 
+        // v13 to v14 merge note: because of changes in the IDataType we can not use the optimized IDataTypeConfigurationCache here
+        // todo: make sure this (possible) performance degradation isn't serious
         IDataType? dataType = DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId);
 
         // TODO: IDataValueEditor configuration - general issue
