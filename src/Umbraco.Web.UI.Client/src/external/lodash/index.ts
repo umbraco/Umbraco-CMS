@@ -1,1 +1,1 @@
-export { debounce, clamp, camelCase, groupBy } from 'lodash-es';
+export { debounce, clamp, camelCase } from 'lodash-es';
