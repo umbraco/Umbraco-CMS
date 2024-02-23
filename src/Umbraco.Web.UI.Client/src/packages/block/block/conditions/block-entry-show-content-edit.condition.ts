@@ -1,4 +1,4 @@
-import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_ENTRY_CONTEXT } from '../context/block-entry.context-token.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type {
 	ManifestCondition,
