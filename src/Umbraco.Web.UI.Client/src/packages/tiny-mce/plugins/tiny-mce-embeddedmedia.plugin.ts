@@ -1,13 +1,10 @@
-import type { TinyMcePluginArguments} from '@umbraco-cms/backoffice/components';
-import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
 import type {
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalValue,
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_EMBEDDED_MEDIA_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
+	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
+import { UMB_EMBEDDED_MEDIA_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalManagerContext;

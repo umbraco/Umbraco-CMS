@@ -1,13 +1,6 @@
-import type { TinyMcePluginArguments} from '@umbraco-cms/backoffice/components';
-import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
-import type {
-	UmbLinkPickerModalValue,
-	UmbLinkPickerLink,
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_LINK_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-} from '@umbraco-cms/backoffice/modal';
+import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
+import type { UmbLinkPickerModalValue, UmbLinkPickerLink, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_LINK_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type AnchorElementAttributes = {
 	href?: string | null;
@@ -193,7 +186,11 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 			}
 		}
 
-		if (!this.#linkPickerData?.link.url && !this.#linkPickerData?.link.queryString && !this.#linkPickerData?.link.unique) {
+		if (
+			!this.#linkPickerData?.link.url &&
+			!this.#linkPickerData?.link.queryString &&
+			!this.#linkPickerData?.link.unique
+		) {
 			this.editor.execCommand('unlink');
 			return;
 		}

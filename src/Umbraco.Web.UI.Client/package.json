@@ -76,6 +76,7 @@
 		"./template": "./dist-cms/packages/templating/templates/index.js",
 		"./temporary-file": "./dist-cms/packages/core/temporary-file/index.js",
 		"./themes": "./dist-cms/packages/core/themes/index.js",
+		"./tiny-mce": "./dist-cms/packages/tiny-mce/index.js",
 		"./tree": "./dist-cms/packages/core/tree/index.js",
 		"./user-group": "./dist-cms/packages/user/user-group/index.js",
 		"./user-permission": "./dist-cms/packages/user/user-permission/index.js",

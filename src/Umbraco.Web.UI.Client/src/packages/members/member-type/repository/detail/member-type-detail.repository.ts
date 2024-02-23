@@ -20,3 +20,5 @@ export class UmbMemberTypeDetailRepository extends UmbDetailRepositoryBase<UmbMe
 		super(host, UmbMemberTypeServerDataSource, UMB_MEMBER_TYPE_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbMemberTypeDetailRepository;

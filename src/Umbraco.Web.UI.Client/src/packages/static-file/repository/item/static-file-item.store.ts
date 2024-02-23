@@ -21,4 +21,6 @@ export class UmbStaticFileItemStore extends UmbItemStoreBase<UmbStaticFileItemMo
 	}
 }
 
+export default UmbStaticFileItemStore;
+
 export const UMB_STATIC_FILE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbStaticFileItemStore>('UmbStaticFileItemStore');

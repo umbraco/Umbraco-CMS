@@ -63,3 +63,5 @@ export class UmbPackageStore extends UmbStoreBase {
 		this.#migrations.append(migrations);
 	}
 }
+
+export default UmbPackageStore;

@@ -25,3 +25,5 @@ export class UmbUserCollectionRepository extends UmbUserRepositoryBase implement
 		return { data, error, asObservable: () => this.detailStore!.all() };
 	}
 }
+
+export default UmbUserCollectionRepository;

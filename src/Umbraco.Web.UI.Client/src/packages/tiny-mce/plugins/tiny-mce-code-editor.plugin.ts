@@ -1,13 +1,10 @@
-import type { TinyMcePluginArguments} from '@umbraco-cms/backoffice/components';
-import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
 import type {
 	UmbCodeEditorModalData,
 	UmbCodeEditorModalValue,
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_CODE_EDITOR_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
+	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
+import { UMB_CODE_EDITOR_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 	#modalContext?: UmbModalManagerContext;

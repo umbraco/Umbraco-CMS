@@ -20,4 +20,6 @@ export class UmbMemberDetailStore extends UmbDetailStoreBase<UmbMemberDetailMode
 	}
 }
 
+export default UmbMemberDetailStore;
+
 export const UMB_MEMBER_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbMemberDetailStore>('UmbMemberDetailStore');

@@ -27,3 +27,5 @@ export class UmbChangeUserPasswordRepository extends UmbUserRepositoryBase {
 		return { data, error };
 	}
 }
+
+export default UmbChangeUserPasswordRepository;
