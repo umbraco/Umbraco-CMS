@@ -26,7 +26,7 @@ export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
 	}
 
 	async #observeLanguages() {
-		const { data } = await this.#languageCollectionRepository.requestCollection({ skip: 0, take: 100 });
+		const { data } = await this.#languageCollectionRepository.requestCollection({});
 
 		// TODO: make this observable / update when languages are added/removed/updated
 		if (data) {
