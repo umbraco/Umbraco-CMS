@@ -18,6 +18,18 @@ export class UmbUserGroupWorkspaceContext
 	#data = new UmbObjectState<UmbUserGroupDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
+	readonly name = this.#data.asObservablePart((data) => data?.name || '');
+	readonly icon = this.#data.asObservablePart((data) => data?.icon || null);
+	readonly sections = this.#data.asObservablePart((data) => data?.sections || []);
+	readonly languages = this.#data.asObservablePart((data) => data?.languages || []);
+	readonly hasAccessToAllLanguages = this.#data.asObservablePart((data) => data?.hasAccessToAllLanguages || false);
+	readonly documentStartNode = this.#data.asObservablePart((data) => data?.documentStartNode || null);
+	readonly documentRootAccess = this.#data.asObservablePart((data) => data?.documentRootAccess || false);
+	readonly mediaStartNode = this.#data.asObservablePart((data) => data?.mediaStartNode || null);
+	readonly mediaRootAccess = this.#data.asObservablePart((data) => data?.mediaRootAccess || false);
+	readonly fallbackPermissions = this.#data.asObservablePart((data) => data?.fallbackPermissions || []);
+	readonly permissions = this.#data.asObservablePart((data) => data?.permissions || []);
+
 	#userUniques = new UmbArrayState<string>([], (x) => x);
 	userUniques = this.#userUniques.asObservable();
 
@@ -114,6 +126,23 @@ export class UmbUserGroupWorkspaceContext
 	 */
 	setPermissions(permissions: Array<UmbUserPermissionModel>) {
 		this.#data.update({ permissions: permissions });
+	}
+
+	/**
+	 * Gets the user group fallback permissions.
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	getFallbackPermissions() {
+		return this.#data.getValue()?.fallbackPermissions ?? [];
+	}
+
+	/**
+	 * Sets the user group fallback permissions.
+	 * @param {Array<string>} fallbackPermissions
+	 * @memberof UmbUserGroupWorkspaceContext
+	 */
+	setFallbackPermissions(fallbackPermissions: Array<string>) {
+		this.#data.update({ fallbackPermissions });
 	}
 }
 
