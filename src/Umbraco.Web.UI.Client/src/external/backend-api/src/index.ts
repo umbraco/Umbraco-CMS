@@ -142,7 +142,6 @@ export type { DynamicRootResponseModel } from './models/DynamicRootResponseModel
 export type { EnableTwoFactorRequestModel } from './models/EnableTwoFactorRequestModel';
 export type { EnableUserRequestModel } from './models/EnableUserRequestModel';
 export type { EntityTreeItemResponseModel } from './models/EntityTreeItemResponseModel';
-export type { FallbackPermissionPresentationModel } from './models/FallbackPermissionPresentationModel';
 export type { FieldPresentationModel } from './models/FieldPresentationModel';
 export type { FileSystemCreateRequestModelBaseModel } from './models/FileSystemCreateRequestModelBaseModel';
 export type { FileSystemFileCreateRequestModelBaseModel } from './models/FileSystemFileCreateRequestModelBaseModel';

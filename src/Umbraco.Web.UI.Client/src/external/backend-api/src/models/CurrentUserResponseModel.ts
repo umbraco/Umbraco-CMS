@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 import type { DocumentPermissionPresentationModel } from './DocumentPermissionPresentationModel';
-import type { FallbackPermissionPresentationModel } from './FallbackPermissionPresentationModel';
 import type { UnknownTypePermissionPresentationModel } from './UnknownTypePermissionPresentationModel';
 
 export type CurrentUserResponseModel = {
@@ -18,6 +17,6 @@ export type CurrentUserResponseModel = {
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
-    permissions: Array<(DocumentPermissionPresentationModel | FallbackPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
 };
 
