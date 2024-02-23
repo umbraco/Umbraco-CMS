@@ -121,13 +121,13 @@ export class UmbResourceController extends UmbBaseController {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController
 	 */
-	cancel() {
+	cancel(): void {
 		if (isCancelablePromise(this.#promise)) {
 			this.#promise.cancel();
 		}
 	}
 
-	destroy() {
+	destroy(): void {
 		super.destroy();
 		this.cancel();
 	}
