@@ -1,9 +1,9 @@
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UMB_COPY_DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/copy/manifests.js';
 import { UmbCopyDataTypeEntityAction } from './copy.action.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
+const entityActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.DataType.Copy',

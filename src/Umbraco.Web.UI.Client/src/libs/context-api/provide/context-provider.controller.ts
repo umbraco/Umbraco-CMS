@@ -13,7 +13,7 @@ export class UmbContextProviderController<
 	#host: UmbControllerHost;
 	#controllerAlias: string;
 
-	public get controllerAlias() {
+	public get controllerAlias(): string {
 		return this.#controllerAlias;
 	}
 
@@ -46,7 +46,7 @@ export class UmbContextProviderController<
 		}
 	}
 
-	public destroy() {
+	public destroy(): void {
 		if (this.#host) {
 			this.#host.removeController(this);
 			(this.#host as any) = undefined;
