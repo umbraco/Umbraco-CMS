@@ -21,7 +21,7 @@ export class UmbUserPermissionCondition extends UmbBaseController implements Umb
 			this.observe(
 				context.currentUser,
 				(currentUser) => {
-					this.permitted = currentUser?.permissions?.includes(this.config.match) || false;
+					//this.permitted = currentUser?.permissions?.includes(this.config.match) || false;
 					this.#onChange();
 				},
 				'umbUserPermissionConditionObserver',

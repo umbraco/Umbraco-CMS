@@ -48,6 +48,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			documentRootAccess: false,
 			mediaStartNode: null,
 			mediaRootAccess: false,
+			fallbackPermissions: [],
 			permissions: [],
 		};
 
@@ -83,6 +84,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			documentRootAccess: data.documentRootAccess,
 			mediaStartNode: data.mediaStartNode ? { unique: data.mediaStartNode.id } : null,
 			mediaRootAccess: data.mediaRootAccess,
+			fallbackPermissions: data.fallbackPermissions,
 			permissions: data.permissions,
 		};
 
@@ -109,6 +111,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			documentRootAccess: model.documentRootAccess,
 			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
 			mediaRootAccess: model.mediaRootAccess,
+			fallbackPermissions: model.fallbackPermissions,
 			permissions: model.permissions,
 		};
 

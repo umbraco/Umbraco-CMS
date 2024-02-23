@@ -1,4 +1,3 @@
-import type { UmbUserPermissionModel } from '../user-permission/types.js';
 import type { UmbUserGroupEntityType } from './entity.js';
 
 export interface UmbUserGroupDetailModel {
@@ -15,5 +14,6 @@ export interface UmbUserGroupDetailModel {
 	mediaStartNode: { unique: string } | null;
 	mediaRootAccess: boolean;
 	fallbackPermissions: Array<string>;
-	permissions: Array<UmbUserPermissionModel>;
+	// TODO: add type
+	permissions: Array<any>;
 }

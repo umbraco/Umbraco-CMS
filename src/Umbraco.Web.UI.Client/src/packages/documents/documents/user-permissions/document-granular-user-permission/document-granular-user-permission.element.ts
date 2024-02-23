@@ -86,7 +86,6 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 			this.#documentPickerModalContext?.reject();
 
 			const permissionItem: UmbDocumentUserPermissionModel = {
-				id: UmbId.new(),
 				$type: 'DocumentPermissionPresentationModel',
 				document: { id: unique },
 				verbs: result,
@@ -135,7 +134,7 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 		const permission = this.#getPermissionForDocument(item.unique);
 		if (!permission) return;
 
-		this.value = this._value.filter((p) => p.id !== permission.id);
+		this.value = this._value.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
