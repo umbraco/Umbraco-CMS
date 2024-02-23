@@ -67,6 +67,7 @@ export type resolveVerticalDirectionArgs<T, ElementType extends HTMLElement> = {
 	element: ElementType;
 	elementRect: DOMRect;
 	relatedElement: ElementType;
+	relatedModel: T;
 	relatedRect: DOMRect;
 	placeholderIsInThisRow: boolean;
 	horizontalPlaceAfter: boolean;
@@ -136,7 +137,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 * This callback is executed when an item is hovered within this container.
 	 * The callback should return true if the item should be placed after based on a vertical logic. Other wise false for horizontal. True is default.
 	 */
-	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => boolean;
+	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => boolean | null;
 	/**
 	 * This callback is executed when an item is moved within this container.
 	 */
@@ -574,14 +575,14 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		let lastDistance = Infinity;
-		let foundEl: Element | null = null;
+		let foundEl: HTMLElement | undefined = undefined;
 		let foundElDragRect!: DOMRect;
 		let placeAfter = false;
 		elementsInSameRow.forEach((sameRow) => {
 			const centerX = sameRow.dragRect.left + sameRow.dragRect.width * 0.5;
 			const distance = Math.abs(this.#dragX - centerX);
 			if (distance < lastDistance) {
-				foundEl = sameRow.el;
+				foundEl = sameRow.el as HTMLElement;
 				foundElDragRect = sameRow.dragRect;
 				lastDistance = distance;
 				placeAfter = this.#dragX > centerX;
@@ -594,12 +595,17 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				return;
 			}
 
+			const foundModel = this.getItemOfElement(foundEl);
+			if (!foundModel) {
+				throw new Error('Could not find model of found element');
+			}
+
 			// Indication if drop is good:
 			if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
 				return;
 			}
 
-			const verticalDirection = this.#config.resolveVerticalDirection
+			const verticalDirection: boolean | null = this.#config.resolveVerticalDirection
 				? this.#config.resolveVerticalDirection({
 						containerElement: this.#containerElement,
 						containerRect: currentContainerRect,
@@ -607,11 +613,17 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 						element: UmbSorterController.activeElement as ElementType,
 						elementRect: currentElementRect,
 						relatedElement: foundEl,
+						relatedModel: foundModel,
 						relatedRect: foundElDragRect,
 						placeholderIsInThisRow: placeholderIsInThisRow,
 						horizontalPlaceAfter: placeAfter,
 				  })
 				: true;
+
+			if (verticalDirection === null) {
+				// The resolveVerticalDirection has chosen to back out of this move.
+				return;
+			}
 
 			if (verticalDirection) {
 				placeAfter = this.#dragY > foundElDragRect.top + foundElDragRect.height * 0.5;

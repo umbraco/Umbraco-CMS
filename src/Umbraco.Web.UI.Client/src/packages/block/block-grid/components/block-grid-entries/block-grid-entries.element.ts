@@ -14,6 +14,15 @@ import {
 // Utils:
 // TODO: Move these methods into their own files:
 
+function expandRect(rect: DOMRect, verticalAdd: number, horizontalAdd: number) {
+	return new DOMRect(
+		rect.left - horizontalAdd,
+		rect.top - verticalAdd,
+		rect.width + verticalAdd * 2,
+		rect.height + horizontalAdd * 2,
+	);
+}
+
 function getInterpolatedIndexOfPositionInWeightMap(target: number, weights: Array<number>) {
 	const map = [0];
 	weights.reduce((a, b, i) => {
@@ -56,6 +65,11 @@ function getAccumulatedValueOfIndex(index: number, weights: Array<number>) {
 function resolveVerticalDirectionAsGrid(
 	args: resolveVerticalDirectionArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>,
 ) {
+	// If this has areas, we do not want to move:
+	if (args.relatedModel.areas.length > 0 && expandRect(args.relatedRect, 0, 0)) {
+		return null;
+	}
+
 	/** We need some data about the grid to figure out if there is room to be placed next to the found element */
 	const approvedContainerComputedStyles = getComputedStyle(args.containerElement);
 	const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split('px')[0]) || 0;
@@ -209,7 +223,7 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	render() {
 		return html`
 			${this._styleElement}
-			<div class="umb-block-grid__layout-container">
+			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
 					(x) => x.contentUdi,
@@ -284,6 +298,10 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 				display: grid;
 				grid-template-columns: 1fr auto;
 			}
+
+			/*.umb-block-grid__layout-container[data-area-length='0'] {
+				min-height: 100px;
+			}*/
 		`,
 	];
 }
