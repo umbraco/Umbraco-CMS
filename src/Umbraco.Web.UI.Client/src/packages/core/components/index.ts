@@ -5,7 +5,6 @@ export * from './backoffice-notification-container/backoffice-notification-conta
 export * from './body-layout/body-layout.element.js';
 export * from './code-block/index.js';
 export * from './dropdown/index.js';
-export * from './empty-state/index.js';
 export * from './entity-actions-bundle/index.js';
 export * from './extension-slot/index.js';
 export * from './footer-layout/index.js';
