@@ -1,7 +1,7 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Rich Text Editor';
+const dataTypeName = 'Richtext editor';
 test.describe(`${dataTypeName} tests`, () => {
   let dataTypeDefaultData = null;
   let dataTypeData = null;
@@ -22,12 +22,12 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can select ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "multiple",
-      value: false,
+      alias: "ignoreUserStartNodes",
+      value: true,
     };
 
     // Act
-    await umbracoUi.dataType.clickPickMultipleItemsSlider();
+    await umbracoUi.dataType.clickIgnoreUserStartNodesCamelSlider();
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -37,13 +37,14 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test('can enable all toolbar options', async ({umbracoApi, umbracoUi}) => {
     // Arrange
+    const toolbarValues: string[] = ['undo', 'redo', 'cut', 'copy'];
     const expectedDataTypeValues = {
-      alias: "multiple",
-      value: false,
+      "alias": "toolbar",
+      "value": toolbarValues
     };
 
     // Act
-    await umbracoUi.dataType.clickPickMultipleItemsSlider();
+    await umbracoUi.dataType.pickTheToolbarOptionByValue(toolbarValues);
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -53,13 +54,40 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
     // Arrange
+    const stylesheetName = 'StylesheetForDataType.css';
+    await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
+    const stylesheetPath = await umbracoApi.stylesheet.create(stylesheetName, 'content');
+    await umbracoUi.reloadPage();
+
     const expectedDataTypeValues = {
-      alias: "multiple",
-      value: false,
+      alias: "stylesheets",
+      value: [stylesheetPath],
     };
 
     // Act
-    await umbracoUi.dataType.clickPickMultipleItemsSlider();
+    await umbracoUi.dataType.addStylesheet(stylesheetName);
+    await umbracoUi.dataType.clickSaveButton();
+
+    // Assert
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+
+    // Clean
+    await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
+  });
+
+  // TODO: remove .skip and update expectedDataTypeValues when the frontend is ready. Currently the added dimesions are not saved.
+  test.skip('can add dimensions', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const width = 100;
+    const height = 10;
+    const expectedDataTypeValues = {
+      alias: "dimensions",
+      value: [width, height],
+    };
+
+    // Act
+    await umbracoUi.dataType.enterDimensionsValue(width.toString(), height.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -67,31 +95,17 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  test('can add dimensions', async ({umbracoApi, umbracoUi}) => {
+  // TODO: remove .skip and update expectedDataTypeValues when the frontend is ready. Currently the added maximum size are not saved.
+  test.skip('can add maximum size for inserted images', async ({umbracoApi, umbracoUi}) => {
     // Arrange
+    const maxImageSize = 0;
     const expectedDataTypeValues = {
-      alias: "multiple",
-      value: false,
+      alias: "maxImageSize",
+      value: maxImageSize,
     };
 
     // Act
-    await umbracoUi.dataType.clickPickMultipleItemsSlider();
-    await umbracoUi.dataType.clickSaveButton();
-
-    // Assert
-    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-  });
-
-  test('can add maximum size for inserted images', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const expectedDataTypeValues = {
-      alias: "multiple",
-      value: false,
-    };
-
-    // Act
-    await umbracoUi.dataType.clickPickMultipleItemsSlider();
+    await umbracoUi.dataType.enterMaximumSizeForImages(maxImageSize.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -101,13 +115,14 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test('can select overlay size', async ({umbracoApi, umbracoUi}) => {
     // Arrange
+    const overlaySizeValue = 'large';
     const expectedDataTypeValues = {
-      alias: "multiple",
-      value: false,
+      alias: "overlaySize",
+      value: overlaySizeValue,
     };
 
     // Act
-    await umbracoUi.dataType.clickPickMultipleItemsSlider();
+    await umbracoUi.dataType.chooseOverlaySizeByValue(overlaySizeValue);
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -118,12 +133,12 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can enable hide label', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "multiple",
-      value: false,
+      alias: "hideLabel",
+      value: true,
     };
 
     // Act
-    await umbracoUi.dataType.clickPickMultipleItemsSlider();
+    await umbracoUi.dataType.clickHideLabelSlider();
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -132,7 +147,7 @@ test.describe(`${dataTypeName} tests`, () => {
   });
 
   // TODO: implement this test when the frontend is ready
-  test.skip('can add Image upload folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can add image upload folder', async ({umbracoApi, umbracoUi}) => {
 
   });
 
