@@ -11,7 +11,7 @@ export * from './string/generate-umbraco-alias.function.js';
 export * from './string/increment-string.function.js';
 export * from './string/split-string-to-array.js';
 export * from './type/diff.type.js';
-export * from './to-camel-case/to-camel-case.js';
+export * from './string/to-camel-case/to-camel-case.js';
 
 declare global {
 	interface Window {
