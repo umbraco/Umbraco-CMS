@@ -4,7 +4,8 @@ import { html, css, customElement, property, state } from '@umbraco-cms/backoffi
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
-import type { UmbBlockListLayoutModel, UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockListLayoutModel } from '@umbraco-cms/backoffice/block-list';
 
 /**
  * @element umb-block-list-entry

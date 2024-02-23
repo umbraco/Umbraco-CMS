@@ -1,5 +1,5 @@
-import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block';
-import { UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
+import { UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block-type';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';

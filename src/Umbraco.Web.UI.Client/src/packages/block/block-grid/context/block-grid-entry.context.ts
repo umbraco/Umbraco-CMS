@@ -5,11 +5,8 @@ import {
 	type UmbBlockGridScalableContext,
 	UmbBlockGridScaleManager,
 } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
-import {
-	UmbBlockEntryContext,
-	type UmbBlockGridTypeModel,
-	type UmbBlockGridLayoutModel,
-} from '@umbraco-cms/backoffice/block';
+import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
