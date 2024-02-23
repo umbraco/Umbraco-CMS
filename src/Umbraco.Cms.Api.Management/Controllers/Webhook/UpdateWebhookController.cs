@@ -47,7 +47,7 @@ public class UpdateWebhookController : WebhookControllerBase
 
         IWebhook updated = _umbracoMapper.Map(updateWebhookRequestModel, current);
 
-        Attempt<IWebhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(updated); //, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IWebhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(updated);
 
         return result.Success
             ? Ok()
