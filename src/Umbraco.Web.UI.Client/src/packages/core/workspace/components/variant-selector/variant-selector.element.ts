@@ -12,6 +12,7 @@ import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/back
 import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -273,6 +274,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	static styles = [
+		UmbTextStyles,
 		css`
 			#name-input {
 				width: 100%;
@@ -344,12 +346,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				font-size: 14px;
 				cursor: pointer;
 				border-bottom: 1px solid var(--uui-color-divider-standalone);
-				font-family:
-					Lato,
-					Helvetica Neue,
-					Helvetica,
-					Arial,
-					sans-serif;
 			}
 
 			.variant-selector-switch-button:hover {
