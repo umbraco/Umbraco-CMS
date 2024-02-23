@@ -44,6 +44,8 @@ export const uriAttributeSanitizer = (editor: Editor) => {
 		};
 	})();
 
+	// TODO: sanitizeTinyMce is not defined in the global scope, so this will not work. Instead we need to get this setting from somewhere else:
+	/*
 	if (window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce) {
 		uriAttributesToSanitize.forEach((attribute) => {
 			editor.serializer.addAttributeFilter(attribute, (nodes: AstNode[]) => {
@@ -57,4 +59,5 @@ export const uriAttributeSanitizer = (editor: Editor) => {
 			});
 		});
 	}
+	*/
 };

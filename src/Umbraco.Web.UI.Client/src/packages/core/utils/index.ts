@@ -11,9 +11,3 @@ export * from './string/generate-umbraco-alias.function.js';
 export * from './string/increment-string.function.js';
 export * from './string/split-string-to-array.js';
 export * from './type/diff.type.js';
-
-declare global {
-	interface Window {
-		Umbraco: any;
-	}
-}
