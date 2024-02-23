@@ -24,10 +24,6 @@ public class BackOfficeDefaultController : Controller
         ViewResult defaultView = DefaultView();
 
         return defaultView;
-
-        // return await RenderDefaultOrProcessExternalLoginAsync(
-        //     result,
-        //     () => defaultView);
     }
 
     /// <summary>
