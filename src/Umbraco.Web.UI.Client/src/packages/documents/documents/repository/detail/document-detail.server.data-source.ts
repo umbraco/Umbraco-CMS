@@ -9,7 +9,6 @@ import type {
 import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -19,7 +18,6 @@ import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/languag
  */
 export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocumentDetailModel> {
 	#host: UmbControllerHost;
-	#languageRepository;
 
 	/**
 	 * Creates an instance of UmbDocumentServerDataSource.
@@ -28,7 +26,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
-		this.#languageRepository = new UmbLanguageCollectionRepository(host);
 	}
 
 	/**
@@ -126,28 +123,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			},
 			isTrashed: data.isTrashed,
 		};
-
-		// Add missing languages as variants to the document if the document allows variants
-		const { data: languages } = await this.#languageRepository.requestCollection({});
-		if (!languages) return { data: document };
-
-		const allowVariants = document.variants.length > 1 || document.variants[0].culture !== null;
-		if (!allowVariants) return { data: document };
-
-		const missingLanguages = languages.items.filter(
-			(language) => !document.variants.some((variant) => variant.culture === language.unique),
-		);
-		document.variants = document.variants.concat(
-			missingLanguages.map((language) => {
-				const scaffold = this.createVariantScaffold();
-				return {
-					...scaffold,
-					languageName: language.name,
-					culture: language.unique,
-					isMandatory: language.isMandatory,
-				};
-			}),
-		);
 
 		return { data: document };
 	}

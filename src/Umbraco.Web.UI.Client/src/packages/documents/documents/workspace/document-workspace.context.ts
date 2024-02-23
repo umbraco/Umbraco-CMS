@@ -2,7 +2,7 @@ import { UmbDocumentTypeDetailRepository } from '../../document-types/repository
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
-import type { UmbDocumentDetailModel } from '../types.js';
+import { UmbDocumentVariantState, type UmbDocumentDetailModel, type UmbDocumentVariantModel } from '../types.js';
 import type { UmbDocumentVariantPickerModalData } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT } from '../global-contexts/document-variant-manager.context.js';
@@ -15,8 +15,16 @@ import {
 	type UmbVariantableWorkspaceContextInterface,
 	type UmbPublishableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
-import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import {
+	appendToFrozenArray,
+	combineObservables,
+	partialUpdateFrozenArray,
+	UmbArrayState,
+	UmbObjectState,
+} from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -32,6 +40,10 @@ export class UmbDocumentWorkspaceContext
 	 */
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 	#getDataPromise?: Promise<any>;
+	#variantManagerContext?: typeof UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT.TYPE;
+	#languageRepository = new UmbLanguageCollectionRepository(this);
+	#languageCollection = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+
 	public isLoaded() {
 		return this.#getDataPromise;
 	}
@@ -41,14 +53,34 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 
-	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
+	readonly variants: Observable<UmbDocumentVariantModel[]> = combineObservables(
+		[this.#currentData.asObservablePart((data) => data?.variants ?? []), this.#languageCollection.asObservable()],
+		([variants, languages]) => {
+			const missingLanguages = languages.filter(
+				(language) => !variants.some((variant) => variant.culture === language.unique),
+			);
+			return variants.concat(
+				missingLanguages.map((language) => {
+					return {
+						name: '',
+						createDate: '',
+						publishDate: '',
+						updateDate: '',
+						state: UmbDocumentVariantState.NOT_CREATED,
+						segment: null,
+						culture: language.unique,
+						languageName: language.name,
+						isMandatory: language.isMandatory,
+					};
+				}),
+			);
+		},
+	);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly splitView = new UmbWorkspaceSplitViewManager();
-
-	#variantManagerContext?: typeof UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
@@ -59,9 +91,17 @@ export class UmbDocumentWorkspaceContext
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 
+		this.loadLanguages();
+
 		/*
 		TODO: Make something to ensure all variants are present in data? Seems like a good idea?.
 		*/
+	}
+
+	async loadLanguages() {
+		const { data } = await this.#languageRepository.requestCollection({});
+		const languages = data?.items || [];
+		this.#languageCollection.setValue(languages);
 	}
 
 	async load(unique: string) {
