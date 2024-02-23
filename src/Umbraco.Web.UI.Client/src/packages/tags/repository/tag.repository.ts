@@ -1,5 +1,5 @@
 import { UmbTagServerDataSource } from './sources/tag.server.data.js';
-import type { UmbTagStore} from './tag.store.js';
+import type { UmbTagStore } from './tag.store.js';
 import { UMB_TAG_STORE_CONTEXT } from './tag.store.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
@@ -60,3 +60,5 @@ export class UmbTagRepository extends UmbBaseController implements UmbApi {
 		return this.requestTags(tagGroupName, culture, { skip, take, query });
 	}
 }
+
+export default UmbTagRepository;

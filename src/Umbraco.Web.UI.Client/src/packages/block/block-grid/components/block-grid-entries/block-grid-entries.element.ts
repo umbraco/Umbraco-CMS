@@ -6,7 +6,7 @@ import {
 import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
 import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';

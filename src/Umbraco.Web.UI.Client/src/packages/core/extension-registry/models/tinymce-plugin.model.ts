@@ -1,4 +1,4 @@
-import type { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import type { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/tiny-mce';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface MetaTinyMcePlugin {

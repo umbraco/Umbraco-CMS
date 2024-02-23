@@ -26,3 +26,5 @@ export class UmbPartialViewTreeRepository
 		return { data };
 	}
 }
+
+export default UmbPartialViewTreeRepository;

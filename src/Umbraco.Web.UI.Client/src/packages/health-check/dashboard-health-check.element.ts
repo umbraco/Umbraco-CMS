@@ -1,6 +1,5 @@
 import type { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element.js';
 import { UmbHealthCheckDashboardContext, UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from './health-check-dashboard.context.js';
-import { UmbHealthCheckContext } from './health-check.context.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { HealthCheckGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
@@ -59,7 +58,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 				weight: 500,
 				meta: {
 					label: group.name || '',
-					api: UmbHealthCheckContext,
+					api: () => import('./health-check.context.js'),
 				},
 			};
 		});

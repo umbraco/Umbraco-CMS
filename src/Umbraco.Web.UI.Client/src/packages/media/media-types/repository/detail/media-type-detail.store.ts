@@ -20,6 +20,8 @@ export class UmbMediaTypeDetailStore extends UmbDetailStoreBase<UmbMediaTypeDeta
 	}
 }
 
+export default UmbMediaTypeDetailStore;
+
 export const UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbMediaTypeDetailStore>(
 	'UmbMediaTypeDetailStore',
 );

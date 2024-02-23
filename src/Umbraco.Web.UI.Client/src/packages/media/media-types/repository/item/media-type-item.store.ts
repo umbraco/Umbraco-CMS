@@ -21,4 +21,6 @@ export class UmbMediaTypeItemStore extends UmbItemStoreBase<UmbMediaTypeItemMode
 	}
 }
 
+export default UmbMediaTypeItemStore;
+
 export const UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbMediaTypeItemStore>('UmbMediaTypeItemStore');
