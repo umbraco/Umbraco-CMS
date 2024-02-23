@@ -8,7 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 @customElement('umb-user-group-entity-user-permission-list')
 export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 	@state()
-	private _allowedVerbs?: Array<string>;
+	private _fallBackPermissions?: Array<string>;
 
 	@state()
 	private _entityTypes: Array<string> = [];
@@ -23,15 +23,9 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#userGroupWorkspaceContext = instance;
 			this.observe(
-				this.#userGroupWorkspaceContext.data,
-				(userGroup) => {
-					const allAllowedVerbs =
-						userGroup?.permissions
-							.filter((permission) => permission.$type === 'FallbackPermissionPresentationModel')
-							.flatMap((permission) => permission.verbs) || [];
-
-					// make a unique list of allowed verbs
-					this._allowedVerbs = [...new Set(allAllowedVerbs)];
+				this.#userGroupWorkspaceContext.fallbackPermissions,
+				(fallbackPermissions) => {
+					this._fallBackPermissions = fallbackPermissions;
 				},
 				'umbUserGroupEntityUserPermissionsObserver',
 			);
@@ -50,9 +44,9 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 
 	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
 		const target = event.target as any;
-		const selection = target.allowedVerbs;
-		debugger;
-		//this.#userGroupWorkspaceContext?.setPermissions(selection);
+		const verbs = target.allowedVerbs;
+		if (verbs === undefined || verbs === null) throw new Error('The verbs are not defined');
+		this.#userGroupWorkspaceContext?.setFallbackPermissions(verbs);
 	}
 
 	render() {
@@ -64,7 +58,7 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 			<h4><umb-localize .key=${`user_permissionsEntityGroup_${entityType}`}>${entityType}</umb-localize></h4>
 			<umb-entity-user-permission-settings-list
 				.entityType=${entityType}
-				.allowedVerbs=${this._allowedVerbs || []}
+				.allowedVerbs=${this._fallBackPermissions || []}
 				@selection-change=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>
 		`;
 	}
