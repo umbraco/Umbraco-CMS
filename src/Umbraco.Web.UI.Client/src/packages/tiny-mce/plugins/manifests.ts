@@ -1,6 +1,6 @@
 import type { ManifestTinyMcePlugin } from '@umbraco-cms/backoffice/extension-registry';
 
-const pluginManifests: Array<ManifestTinyMcePlugin> = [
+export const manifests: Array<ManifestTinyMcePlugin> = [
 	{
 		type: 'tinyMcePlugin',
 		alias: 'Umb.TinyMcePlugin.CodeEditor',
@@ -67,5 +67,3 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 		},
 	},
 ];
-
-export const manifests = [...pluginManifests];
