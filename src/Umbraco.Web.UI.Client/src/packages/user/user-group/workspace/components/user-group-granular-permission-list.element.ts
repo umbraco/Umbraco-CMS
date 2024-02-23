@@ -3,10 +3,9 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestGranularUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { appendToFrozenArray, filterFrozenArray } from '@umbraco-cms/backoffice/observable-api';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { filterFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-user-group-granular-permission-list')
 export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
@@ -91,8 +90,6 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 		this._extensionElements.forEach((element) => element.removeEventListener(UmbChangeEvent.TYPE, this.#onValueChange));
 		super.disconnectedCallback();
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbUserGroupGranularPermissionListElement;

@@ -4,17 +4,17 @@ import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension
 export const createManifest: ManifestCollectionAction = {
 	type: 'collectionAction',
 	kind: 'button',
-	name: 'Create Dictionary Collection Action',
-	alias: 'Umb.CollectionAction.Dictionary.Create',
-	weight: 200,
+	name: 'Create Media Collection Action',
+	alias: 'Umb.CollectionAction.Media.Create',
+	element: () => import('./create-media-collection-action.element.js'),
+	weight: 100,
 	meta: {
 		label: 'Create',
-		href: 'section/dictionary/workspace/dictionary/create/null',
 	},
 	conditions: [
 		{
 			alias: UMB_COLLECTION_ALIAS_CONDITION,
-			match: 'Umb.Collection.Dictionary',
+			match: 'Umb.Collection.Media',
 		},
 	],
 };

@@ -1,4 +1,5 @@
-import type { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;
@@ -163,7 +164,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
  */
-export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> implements UmbController {
+export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> extends UmbBaseController {
 	//
 	// The sorter who last indicated that it was okay or not okay to drop here:
 	static lastIndicationSorter?: UmbSorterController<unknown>;
@@ -199,15 +200,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#dragX = 0;
 	#dragY = 0;
 
-	public get controllerAlias() {
-		// We only support one Sorter Controller pr. Controller Host.
-		return 'umbSorterController';
-	}
 	public get identifier() {
 		return this.#config.identifier;
 	}
 
 	constructor(host: UmbControllerHostElement, config: UmbSorterConfig<T, ElementType>) {
+		super(host);
 		this.#host = host;
 
 		// Set defaults:
@@ -920,6 +918,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	destroy() {
+		super.destroy();
+
 		// Do something when host element is destroyed.
 		if (UmbSorterController.activeElement) {
 			this.#handleDragEnd();

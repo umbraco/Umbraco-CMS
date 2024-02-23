@@ -207,7 +207,7 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 
 		// Register that the path has changed so the correct route can be loaded.
 		if (navigate) {
-			this.render().then();
+			this.render();
 		}
 	}
 
@@ -259,6 +259,8 @@ export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouter
 	 */
 	protected clearChildren() {
 		while (this.firstChild != null) {
+			// If our route-component has a destroy method, then call it.
+			(this.firstChild as any).destroy?.();
 			this.firstChild.parentNode!.removeChild(this.firstChild);
 		}
 	}

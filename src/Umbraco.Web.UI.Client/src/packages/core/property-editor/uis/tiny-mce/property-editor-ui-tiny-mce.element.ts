@@ -1,4 +1,3 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -41,8 +40,6 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 			.configuration=${this.#configuration}
 			.value=${this.value?.markup ?? ''}></umb-input-tiny-mce>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITinyMceElement;

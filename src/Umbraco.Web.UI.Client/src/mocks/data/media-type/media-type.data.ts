@@ -67,7 +67,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 				sortOrder: 0,
 			},
 		],
-		allowedAsRoot: false,
+		allowedAsRoot: true,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,

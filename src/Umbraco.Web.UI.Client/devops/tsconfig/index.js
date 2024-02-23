@@ -1,5 +1,5 @@
 import { writeFileSync } from 'fs';
-import { format } from 'prettier';
+import { format, resolveConfig } from 'prettier';
 import { createImportMap } from '../importmap/index.js';
 
 const tsconfigPath = 'tsconfig.json';
@@ -55,8 +55,8 @@ for (const [key, value] of Object.entries(importmap.imports)) {
 tsConfigBase.compilerOptions.paths = paths;
 
 const content = tsconfigComment + JSON.stringify(tsConfigBase, null, '  ');
-const formattedContent = await format(content, {
-	parser: 'json',
-});
+
+const config = await resolveConfig('./.prettierrc.json');
+const formattedContent = await format(content, { ...config, parser: 'json' });
 
 writeFileSync(tsconfigPath, formattedContent);

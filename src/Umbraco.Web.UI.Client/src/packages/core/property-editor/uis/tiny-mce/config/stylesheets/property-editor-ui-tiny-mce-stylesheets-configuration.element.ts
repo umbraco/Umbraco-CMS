@@ -1,6 +1,5 @@
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -40,8 +39,6 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 	render() {
 		return html`<umb-stylesheet-input @change=${this.#onChange} .selectedIds=${this._value}></umb-stylesheet-input>`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbPropertyEditorUITinyMceStylesheetsConfigurationElement;

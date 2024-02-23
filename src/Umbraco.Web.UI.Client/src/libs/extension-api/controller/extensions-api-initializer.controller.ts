@@ -1,4 +1,4 @@
-import type { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import {
 	type PermittedControllerType,
 	UmbBaseExtensionsInitializer,
@@ -21,7 +21,7 @@ TODO: Correct this, start using builder pattern:
  */
 export class UmbExtensionsApiInitializer<
 	ManifestTypes extends ManifestApi,
-	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string = string,
+	ManifestTypeName extends string = string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ManifestTypeAsApi extends ManifestApi = ManifestType extends ManifestApi ? ManifestType : never,
 	ControllerType extends UmbExtensionApiInitializer<ManifestTypeAsApi> = UmbExtensionApiInitializer<ManifestTypeAsApi>,

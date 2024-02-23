@@ -2,7 +2,7 @@ import type { UmbDocumentCollectionItemModel } from '../types.js';
 
 export { UMB_DOCUMENT_GRID_COLLECTION_VIEW_ALIAS, UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS } from './manifests.js';
 
-export function getPropertyValueByAlias(item: UmbDocumentCollectionItemModel, alias: string) {
+export function getPropertyValueByAlias(sortOrder: number, item: UmbDocumentCollectionItemModel, alias: string) {
 	switch (alias) {
 		case 'createDate':
 			return item.createDate.toLocaleString();
@@ -14,6 +14,8 @@ export function getPropertyValueByAlias(item: UmbDocumentCollectionItemModel, al
 			return item.creator;
 		case 'published':
 			return item.state !== 'Draft' ? 'True' : 'False';
+		case 'sortOrder':
+			return sortOrder;
 		case 'updateDate':
 			return item.updateDate.toLocaleString();
 		case 'updater':

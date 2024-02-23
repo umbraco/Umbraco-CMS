@@ -1,5 +1,5 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../ref-list-block/index.js';
