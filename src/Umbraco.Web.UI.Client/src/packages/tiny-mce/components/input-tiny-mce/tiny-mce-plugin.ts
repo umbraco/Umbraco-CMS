@@ -1,4 +1,4 @@
-import type { UmbInputTinyMceElement } from '@umbraco-cms/backoffice/components';
+import type { UmbInputTinyMceElement } from './input-tiny-mce.element.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';

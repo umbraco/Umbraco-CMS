@@ -1,4 +1,4 @@
-import type { AstNode, Editor } from '@umbraco-cms/backoffice/external/tinymce';
+import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 
 /** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
  * https://github.com/advisories/GHSA-w7jx-j77m-wp65
