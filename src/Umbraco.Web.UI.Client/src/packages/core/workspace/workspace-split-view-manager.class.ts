@@ -25,7 +25,7 @@ export class UmbWorkspaceSplitViewManager {
 	}
 
 	setActiveVariant(index: number, culture: string | null, segment: string | null) {
-		this.#activeVariantsInfo.appendOne({ index, culture, segment });
+		this.#activeVariantsInfo.appendOne({ index, culture: culture || null, segment: segment || null });
 	}
 
 	getActiveVariants() {
