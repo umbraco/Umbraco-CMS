@@ -8,7 +8,7 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_BLOCK_GRID_TYPE, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_GRID_TYPE, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
