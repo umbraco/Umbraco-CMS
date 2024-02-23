@@ -28,7 +28,7 @@ public class ByKeyWebhookController : WebhookControllerBase
     public async Task<IActionResult> ByKey(Guid id)
     {
         IWebhook? webhook = await _webhookService.GetAsync(id);
-        if (webhook == null)
+        if (webhook is null)
         {
             return WebhookOperationStatusResult(WebhookOperationStatus.NotFound);
         }
