@@ -14,5 +14,6 @@ export interface UmbUserGroupDetailModel {
 	documentRootAccess: boolean;
 	mediaStartNode: { unique: string } | null;
 	mediaRootAccess: boolean;
+	fallbackPermissions: Array<string>;
 	permissions: Array<UmbUserPermissionModel>;
 }

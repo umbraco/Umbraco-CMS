@@ -6,7 +6,6 @@ import { data } from './user-group.data.js';
 import type {
 	CreateUserGroupRequestModel,
 	DocumentPermissionPresentationModel,
-	FallbackPermissionPresentationModel,
 	UnknownTypePermissionPresentationModel,
 	UserGroupItemResponseModel,
 	UserGroupResponseModel,
@@ -29,9 +28,7 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	 */
 	getPermissions(
 		userGroupIds: string[],
-	): Array<
-		FallbackPermissionPresentationModel | DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel
-	> {
+	): Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel> {
 		const permissions = this.data
 			.filter((userGroup) => userGroupIds.includes(userGroup.id))
 			.map((userGroup) => (userGroup.permissions?.length ? userGroup.permissions : []))
@@ -63,6 +60,7 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 		mediaRootAccess: item.mediaRootAccess,
 		mediaStartNode: item.mediaStartNode,
 		name: item.name,
+		fallbackPermissions: item.fallbackPermissions,
 		permissions: item.permissions,
 		sections: item.sections,
 	};
@@ -80,6 +78,7 @@ const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseMod
 		mediaRootAccess: item.mediaRootAccess,
 		mediaStartNode: item.mediaStartNode,
 		name: item.name,
+		fallbackPermissions: item.fallbackPermissions,
 		permissions: item.permissions,
 		sections: item.sections,
 	};

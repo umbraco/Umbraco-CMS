@@ -146,6 +146,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			documentRootAccess: model.documentRootAccess,
 			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
 			mediaRootAccess: model.mediaRootAccess,
+			fallbackPermissions: model.fallbackPermissions,
 			permissions: model.permissions,
 		};
 
