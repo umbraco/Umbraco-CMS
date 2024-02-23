@@ -10,7 +10,7 @@ import { setCustomElements } from '@storybook/web-components';
 import { startMockServiceWorker } from '../src/mocks';
 
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext } from '../src/packages/core/modal';
-import { UmbDataTypeTreeStore } from '../src/packages/core/data-type/tree/data-type-tree.store';
+import { UmbDataTypeTreeStore } from '../src/packages/data-type/tree/data-type-tree.store';
 import { UmbDocumentDetailStore } from '../src/packages/documents/documents/repository/detail/document-detail.store';
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/tree/document-tree.store';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
@@ -77,12 +77,7 @@ const documentTreeStoreProvider = (story) => html`
 `;
 
 // Provide the MSW addon decorator globally
-export const decorators = [
-	storybookProvider,
-	documentStoreProvider,
-	documentTreeStoreProvider,
-	dataTypeStoreProvider,
-];
+export const decorators = [storybookProvider, documentStoreProvider, documentTreeStoreProvider, dataTypeStoreProvider];
 
 export const parameters = {
 	options: {

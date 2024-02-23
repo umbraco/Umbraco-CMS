@@ -1,7 +1,9 @@
 import { manifest as blockRteTypeManifest } from './block-configuration/manifests.js';
+import { manifest as tinyMceManifest } from './tiny-mce/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const configurationManifests: Array<ManifestPropertyEditorUi> = [
+export const manifests: Array<ManifestPropertyEditorUi> = [
+	tinyMceManifest,
 	blockRteTypeManifest,
 	{
 		type: 'propertyEditorUi',
@@ -52,5 +54,3 @@ const configurationManifests: Array<ManifestPropertyEditorUi> = [
 		},
 	},
 ];
-
-export const manifests = [...configurationManifests];
