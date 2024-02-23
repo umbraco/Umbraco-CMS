@@ -1,5 +1,5 @@
 import type { Meta, Story } from '@storybook/web-components';
-import icons from '../../../src/shared/icon-registry/icons/icons.json';
+import icons from './icons/icons.json';
 import { html, repeat } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
