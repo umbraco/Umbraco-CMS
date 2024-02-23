@@ -49,7 +49,7 @@ export class UmbDocumentVariantManagerContext
 	async pickVariants(
 		availableVariants: Array<UmbDocumentVariantModel>,
 		type: UmbDocumentVariantPickerModalData['type'],
-		activeVariantCulture?: string,
+		activeVariantCultures?: Array<string>,
 	): Promise<UmbVariantId[]> {
 		// If there is only one variant, we don't need to select anything.
 		if (availableVariants.length === 1) {
@@ -65,7 +65,7 @@ export class UmbDocumentVariantManagerContext
 
 		const modalContext = this.#modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
 			data: modalData,
-			value: { selection: activeVariantCulture ? [activeVariantCulture] : [] },
+			value: { selection: activeVariantCultures ?? [] },
 		});
 
 		const result = await modalContext.onSubmit().catch(() => undefined);
@@ -89,7 +89,11 @@ export class UmbDocumentVariantManagerContext
 	async publish(documentUnique: string) {
 		const { data } = await this.#documentRepository.requestByUnique(documentUnique);
 		if (!data) throw new Error('Document not found');
-		const variantIds = await this.pickVariants(data.variants, 'publish', this.#appLanguageCulture);
+		const variantIds = await this.pickVariants(
+			data.variants,
+			'publish',
+			this.#appLanguageCulture ? [this.#appLanguageCulture] : undefined,
+		);
 		if (variantIds.length) {
 			await this.#publishingRepository.publish(documentUnique, variantIds);
 		}
@@ -106,7 +110,11 @@ export class UmbDocumentVariantManagerContext
 		// Only show published variants
 		const variants = data.variants.filter((variant) => variant.state === UmbDocumentVariantState.PUBLISHED);
 
-		const variantIds = await this.pickVariants(variants, 'unpublish', this.#appLanguageCulture);
+		const variantIds = await this.pickVariants(
+			variants,
+			'unpublish',
+			this.#appLanguageCulture ? [this.#appLanguageCulture] : undefined,
+		);
 
 		if (variantIds.length) {
 			await this.#publishingRepository.unpublish(documentUnique, variantIds);
