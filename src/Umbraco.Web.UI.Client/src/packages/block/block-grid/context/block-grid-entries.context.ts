@@ -289,4 +289,12 @@ export class UmbBlockGridEntriesContext
 				.indexOf(content.contentTypeKey) !== -1
 		);
 	}
+
+	onDragStart() {
+		this._manager?.onDragStart();
+	}
+
+	onDragEnd() {
+		this._manager?.onDragEnd();
+	}
 }

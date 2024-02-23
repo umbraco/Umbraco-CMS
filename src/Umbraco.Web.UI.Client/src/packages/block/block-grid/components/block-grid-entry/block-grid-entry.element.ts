@@ -25,7 +25,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return this._contentUdi;
 	}
 	public set contentUdi(value: string | undefined) {
-		if (!value) return;
+		if (!value || value === this._contentUdi) return;
 		this._contentUdi = value;
 		this._blockViewProps.contentUdi = value;
 		this.setAttribute('data-element-udi', value);
