@@ -53,6 +53,14 @@ export class UmbBlockGridManagerContext<
 
 		return true;
 	}
+
+	onDragStart() {
+		(this.getHostElement() as HTMLElement).style.setProperty('--umb-block-grid--is-dragging', ' ');
+	}
+
+	onDragEnd() {
+		(this.getHostElement() as HTMLElement).style.removeProperty('--umb-block-grid--is-dragging');
+	}
 }
 
 // TODO: Make discriminator method for this:

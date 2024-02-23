@@ -157,3 +157,66 @@ export function calculateExtrapolatedValue(initialValue: number, increaseFactor:
 
 	return initialValue / (1 - increaseFactor);
 }
+
+/**
+ * Find the index for a target value on an array of individual values.
+ * @param {number} target - The target value to interpolate to.
+ * @param {Array<number>} weights - An array of values to interpolate between.
+ * @returns
+ */
+export function getInterpolatedIndexOfPositionInWeightMap(target: number, weights: Array<number>): number {
+	const map = [0];
+	weights.reduce((a, b, i) => {
+		return (map[i + 1] = a + b);
+	}, 0);
+	const foundValue = map.reduce((a, b) => {
+		const aDiff = Math.abs(a - target);
+		const bDiff = Math.abs(b - target);
+
+		if (aDiff === bDiff) {
+			return a < b ? a : b;
+		} else {
+			return bDiff < aDiff ? b : a;
+		}
+	});
+	const foundIndex = map.indexOf(foundValue);
+	const targetDiff = target - foundValue;
+	let interpolatedIndex = foundIndex;
+	if (targetDiff < 0 && foundIndex === 0) {
+		// Don't adjust.
+	} else if (targetDiff > 0 && foundIndex === map.length - 1) {
+		// Don't adjust.
+	} else {
+		const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex - 1];
+		interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : targetDiff / foundInterpolationWeight;
+	}
+	return interpolatedIndex;
+}
+
+/**
+ * Combine the values of an array up to a certain index.
+ * @param {number} index - The index to accumulate to, everything after this index will not be accumulated.
+ * @param {Array<number>} weights - An array of values to accumulate.
+ * @returns
+ */
+export function getAccumulatedValueOfIndex(index: number, weights: Array<number>): number {
+	const len = Math.min(index, weights.length);
+	let i = 0,
+		calc = 0;
+	while (i < len) {
+		calc += weights[i++];
+	}
+	return calc;
+}
+
+/**
+ *
+ * @param {number} x - The x coordinate.
+ * @param {number} y - The y coordinate.
+ * @param {DOMRect} rect - The rectangle to check.
+ * @param {number} expand - The amount to expand or contract the rectangle.
+ * @returns
+ */
+export function isWithinRect(x: number, y: number, rect: DOMRect, expand = 0) {
+	return x > rect.left - expand && x < rect.right + expand && y > rect.top - expand && y < rect.bottom + expand;
+}

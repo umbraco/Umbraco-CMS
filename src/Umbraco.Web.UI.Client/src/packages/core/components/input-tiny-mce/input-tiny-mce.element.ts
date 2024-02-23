@@ -1,21 +1,49 @@
+import { getProcessedImageUrl } from '@umbraco-cms/backoffice/utils';
 import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
+import type { EditorEvent, Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+
+/**
+ * Handles the resize event
+ */
+// TODO: This does somehow not belong as a utility method as it is very specific to this implementation. [NL]
+async function onResize(
+	e: EditorEvent<{
+		target: HTMLElement;
+		width: number;
+		height: number;
+		origin: string;
+	}>,
+) {
+	const srcAttr = e.target.getAttribute('src');
+
+	if (!srcAttr) {
+		return;
+	}
+
+	const path = srcAttr.split('?')[0];
+	const resizedPath = await getProcessedImageUrl(path, {
+		width: e.width,
+		height: e.height,
+		mode: 'max',
+	});
+
+	e.target.setAttribute('data-mce-src', resizedPath);
+}
 
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
@@ -27,7 +55,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 	#renderEditor?: typeof import('@umbraco-cms/backoffice/external/tinymce').renderEditor;
-	#mediaHelper = new UmbMediaHelper();
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
 	#stylesheetRepository: UmbStylesheetDetailRepository;
@@ -303,7 +330,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		});
 
 		editor.on('ObjectResized', (e) => {
-			this.#mediaHelper.onResize(e);
+			onResize(e);
 			this.#onChange(editor.getContent());
 		});
 
@@ -338,7 +365,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	/**
-	 * Nothing rendered by default - TinyMCE initialisation creates
+	 * Nothing rendered by default - TinyMCE initialization creates
 	 * a target div and binds the RTE to that element
 	 */
 	render() {
