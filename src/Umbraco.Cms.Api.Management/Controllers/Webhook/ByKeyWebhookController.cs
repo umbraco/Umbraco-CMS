@@ -34,6 +34,6 @@ public class ByKeyWebhookController : WebhookControllerBase
         }
 
         WebhookResponseModel model = _umbracoMapper.Map<WebhookResponseModel>(webhook)!;
-        return await Task.FromResult(Ok(model));
+        return Ok(model);
     }
 }
