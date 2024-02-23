@@ -9,7 +9,7 @@ test.describe('Health Check Dashboard tests', () => {
     await umbracoUi.healthCheck.clickHealthCheckTab();
   });
 
-  test("can perform all health checks", async ({ umbracoApi, umbracoUi }) => {
+  test('can perform all health checks', async ({ umbracoApi, umbracoUi }) => {
     // Arrange
     const allHealthChecksData = await umbracoApi.healthCheck.getAll();
     const healthCheckGroupCount = allHealthChecksData.total;
@@ -37,7 +37,7 @@ test.describe('Health Check Dashboard tests', () => {
     }
   });
 
-  test("can view the details of a health check", async ({ umbracoApi, umbracoUi }) => {
+  test('can view the details of a health check', async ({ umbracoApi, umbracoUi }) => {
     // Arrange
     const allHealthChecksData = await umbracoApi.healthCheck.getAll();
     if (allHealthChecksData !== undefined) {
