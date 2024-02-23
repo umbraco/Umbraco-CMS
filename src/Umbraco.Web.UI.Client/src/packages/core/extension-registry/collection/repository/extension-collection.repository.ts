@@ -1,7 +1,8 @@
 import { umbExtensionsRegistry } from '../../registry.js';
 import type { ManifestTypes } from '../../models/index.js';
-import { UmbRepositoryBase, type UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 
 export interface UmbExtensionCollectionFilter {
 	skip: number;

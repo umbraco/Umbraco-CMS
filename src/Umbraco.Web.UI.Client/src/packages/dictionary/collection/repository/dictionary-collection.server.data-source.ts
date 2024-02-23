@@ -1,6 +1,6 @@
 import type { UmbDictionaryCollectionFilterModel, UmbDictionaryCollectionModel } from '../types.js';
 import { UMB_DICTIONARY_ENTITY_TYPE } from '../../entity.js';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import { DictionaryResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
