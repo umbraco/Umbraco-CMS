@@ -72,5 +72,6 @@ public class UserGroupBase
     /// <summary>
     /// List of permissions provided, and maintained by the front-end. The server has no concept all of them, but some can be used on the server.
     /// </summary>
+    public required ISet<string> FallbackPermissions { get; init; }
     public required ISet<IPermissionPresentationModel> Permissions { get; init; }
 }

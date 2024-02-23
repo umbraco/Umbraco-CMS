@@ -57,19 +57,16 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = MapPermissions(userGroup.Permissions, userGroup.GranularPermissions),
+            FallbackPermissions = userGroup.Permissions,
+            Permissions = MapPermissions(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
             IsSystemGroup = userGroup.IsSystemUserGroup()
         };
     }
 
-    private static HashSet<IPermissionPresentationModel> MapPermissions(ISet<string> permissions, ISet<IGranularPermission> granularPermissions)
+    private static HashSet<IPermissionPresentationModel> MapPermissions(ISet<IGranularPermission> granularPermissions)
     {
         var result = new HashSet<IPermissionPresentationModel> { };
-        if (permissions.Any())
-        {
-            result.Add(new FallbackPermissionPresentationModel() { Verbs = permissions });
-        }
 
         IEnumerable<IGrouping<string, IGranularPermission>> contexts = granularPermissions.GroupBy(x => x.Context);
 
@@ -120,7 +117,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = MapPermissions(userGroup.Permissions, userGroup.GranularPermissions),
+            FallbackPermissions = userGroup.Permissions,
+            Permissions = MapPermissions(userGroup.GranularPermissions),
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
         };
     }
@@ -153,16 +151,14 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
     {
         var cleanedName = requestModel.Name.CleanForXss('[', ']', '(', ')', ':');
 
-        GetPermissionSets(requestModel, out HashSet<string> permissions, out HashSet<IGranularPermission> granularPermissions);
-
         var group = new UserGroup(_shortStringHelper)
         {
             Name = cleanedName,
             Alias = cleanedName,
             Icon = requestModel.Icon,
             HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
-            Permissions = permissions,
-            GranularPermissions =granularPermissions
+            Permissions = requestModel.FallbackPermissions,
+            GranularPermissions = GetPermissionSets(requestModel)
         };
 
         Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(requestModel, group);
@@ -221,18 +217,16 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
 
-        GetPermissionSets(request, out HashSet<string> permissions, out HashSet<IGranularPermission> granularPermissions);
-
-        current.Permissions = permissions;
-        current.GranularPermissions = granularPermissions;
+        current.Permissions = request.FallbackPermissions;
+        current.GranularPermissions = GetPermissionSets(request);
 
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);
     }
 
-    private static void GetPermissionSets(UserGroupBase request, out HashSet<string> permissions, out HashSet<IGranularPermission> granularPermissions)
+    private static HashSet<IGranularPermission> GetPermissionSets(UserGroupBase request)
     {
-        permissions = new HashSet<string>();
-        granularPermissions = new HashSet<IGranularPermission>();
+
+        var granularPermissions = new HashSet<IGranularPermission>();
         foreach (IPermissionPresentationModel permissionViewModel in request.Permissions)
         {
             if (permissionViewModel is DocumentPermissionPresentationModel documentPermissionViewModel)
@@ -256,17 +250,9 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
                         Permission = verb
                     });
                 }
-
-
-            }
-            else
-            {
-                foreach (var verb in permissionViewModel.Verbs)
-                {
-                    permissions.Add(verb);
-                }
             }
         }
+        return granularPermissions;
     }
 
     private async Task<Attempt<IEnumerable<string>, UserGroupOperationStatus>> MapLanguageIdsToIsoCodeAsync(IEnumerable<int> ids)
