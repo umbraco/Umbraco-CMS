@@ -1,4 +1,4 @@
-import type { UmbCopyDataTypeRepository } from '../../data-type/repository/copy/data-type-copy.repository.js';
+import type { UmbCopyDataTypeRepository } from '../../../data-type/repository/copy/data-type-copy.repository.js';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from './reload-tree-item-children-request.event.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

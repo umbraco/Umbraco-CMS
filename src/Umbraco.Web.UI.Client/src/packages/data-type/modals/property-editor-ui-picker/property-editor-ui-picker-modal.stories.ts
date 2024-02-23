@@ -4,7 +4,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUIPickerModalValue } from '@umbraco-cms/backoffice/modal';
 
 import './property-editor-ui-picker-modal.element.js';
-import '../../../components/body-layout/body-layout.element.js';
+import '../../../core/components/body-layout/body-layout.element.js';
 
 export default {
 	title: 'API/Modals/Layouts/Property Editor UI Picker',

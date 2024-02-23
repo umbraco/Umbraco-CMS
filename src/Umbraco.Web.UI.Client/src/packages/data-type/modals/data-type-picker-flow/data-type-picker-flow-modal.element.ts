@@ -1,5 +1,6 @@
 import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
 import type { UmbDataTypeTreeItemModel } from '../../tree/types.js';
+import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/data-type-workspace.modal-token.js';
 import { css, html, repeat, customElement, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -15,7 +16,6 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_DATATYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/data-type';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;

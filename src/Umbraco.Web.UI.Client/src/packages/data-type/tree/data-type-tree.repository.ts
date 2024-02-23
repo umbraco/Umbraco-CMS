@@ -1,4 +1,4 @@
-import { UmbTreeRepositoryBase } from '../../tree/tree-repository-base.js';
+import { UmbTreeRepositoryBase } from '../../core/tree/tree-repository-base.js';
 import { UMB_DATA_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbDataTypeTreeServerDataSource } from './data-type-tree.server.data-source.js';
 import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from './data-type-tree.store.js';

@@ -1,5 +1,5 @@
-import { UmbStoreConnector } from '../../store/store-connector.js';
-import { UmbUniqueTreeStore } from '../../tree/unique-tree-store.js';
+import { UmbStoreConnector } from '../../core/store/store-connector.js';
+import { UmbUniqueTreeStore } from '../../core/tree/unique-tree-store.js';
 import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT } from '../repository/detail/data-type-detail.store.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
 import type { UmbDataTypeTreeItemModel } from './types.js';

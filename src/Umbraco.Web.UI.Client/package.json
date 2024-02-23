@@ -27,7 +27,7 @@
 		"./content-type": "./dist-cms/packages/core/content-type/index.js",
 		"./culture": "./dist-cms/packages/core/culture/index.js",
 		"./current-user": "./dist-cms/packages/user/current-user/index.js",
-		"./data-type": "./dist-cms/packages/core/data-type/index.js",
+		"./data-type": "./dist-cms/packages/data-type/index.js",
 		"./debug": "./dist-cms/packages/core/debug/index.js",
 		"./dictionary": "./dist-cms/packages/dictionary/index.js",
 		"./document-blueprint": "./dist-cms/packages/documents/document-blueprints/index.js",

@@ -1,8 +1,8 @@
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../workspace/data-type-workspace.context-token.js';
 import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 
 /**
  * @element umb-property-editor-config

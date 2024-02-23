@@ -45,7 +45,7 @@
 			"@umbraco-cms/backoffice/content-type": ["./src/packages/core/content-type/index.ts"],
 			"@umbraco-cms/backoffice/culture": ["./src/packages/core/culture/index.ts"],
 			"@umbraco-cms/backoffice/current-user": ["./src/packages/user/current-user/index.ts"],
-			"@umbraco-cms/backoffice/data-type": ["./src/packages/core/data-type/index.ts"],
+			"@umbraco-cms/backoffice/data-type": ["./src/packages/data-type/index.ts"],
 			"@umbraco-cms/backoffice/debug": ["./src/packages/core/debug/index.ts"],
 			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/index.ts"],
 			"@umbraco-cms/backoffice/document-blueprint": ["./src/packages/documents/document-blueprints/index.ts"],
