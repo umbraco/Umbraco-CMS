@@ -12,7 +12,7 @@ export interface UmbVariantableWorkspaceContextInterface extends UmbSaveableWork
 
 	// Variant:
 	variants: Observable<Array<UmbVariantModel>>;
-	variantsWithLanguages: Observable<Array<UmbVariantModel>>;
+	allowedVariants: Observable<Array<UmbVariantModel>>;
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): UmbVariantModel | undefined;
 

@@ -53,7 +53,7 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
-	readonly variantsWithLanguages = combineObservables(
+	readonly allowedVariants = combineObservables(
 		[this.variants, this.#languageCollection.asObservable()],
 		([variants, languages]) => {
 			const missingLanguages = languages.filter((x) => !variants.some((v) => v.culture === x.unique));

@@ -89,7 +89,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (!workspaceContext) throw new Error('Split View Workspace context not found');
 
 		this.observe(
-			workspaceContext.variantsWithLanguages,
+			workspaceContext.allowedVariants,
 			(variants) => {
 				this._variants = variants.map<UmbDocumentVariantOption>((variant) => {
 					return {

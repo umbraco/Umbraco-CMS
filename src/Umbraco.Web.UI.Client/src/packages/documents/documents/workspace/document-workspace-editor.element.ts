@@ -42,7 +42,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	#observeVariants() {
 		if (!this.#workspaceContext) return;
 		this.observe(
-			this.#workspaceContext.variantsWithLanguages,
+			this.#workspaceContext.allowedVariants,
 			(variants) => {
 				this._availableVariants = variants;
 				this._generateRoutes();

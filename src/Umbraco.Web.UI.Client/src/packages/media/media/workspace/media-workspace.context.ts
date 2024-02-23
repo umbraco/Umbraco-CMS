@@ -43,7 +43,7 @@ export class UmbMediaWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.mediaType.unique);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
-	readonly variantsWithLanguages = combineObservables(
+	readonly allowedVariants = combineObservables(
 		[this.variants, this.#languageCollection.asObservable()],
 		([variants, languages]) => {
 			const missingLanguages = languages.filter((x) => !variants.some((v) => v.culture === x.unique));
