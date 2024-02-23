@@ -30,4 +30,3 @@ export * from './multiple-color-picker-input/index.js';
 export * from './multiple-text-string-input/index.js';
 export * from './popover-layout/index.js';
 export * from './table/index.js';
-export * from './tooltip-menu/index.js';
