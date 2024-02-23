@@ -1,9 +1,9 @@
 const { rest } = window.MockServiceWorker;
-import { umbracoPath } from 'src/packages/core/utils/index.js';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
-	ProblemDetails,
+	type ProblemDetails,
 	RuntimeLevelModel,
-	ServerStatusResponseModel,
+	type ServerStatusResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { expect, test } from './test.js';
 
