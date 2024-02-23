@@ -7,7 +7,7 @@ import type { UmbDocumentVariantPickerModalData } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT } from '../global-contexts/document-variant-manager.context.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
@@ -24,7 +24,7 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -72,6 +72,7 @@ export class UmbDocumentWorkspaceContext
 			return newVariants;
 		},
 	);
+	readonly changedVariants = new UmbArrayState<UmbVariantId>([], (x) => x.compare);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
@@ -213,6 +214,7 @@ export class UmbDocumentWorkspaceContext
 				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
 			);
 			this.#currentData.update({ values });
+			this.changedVariants.appendOne(variantId);
 		}
 	}
 
@@ -225,11 +227,45 @@ export class UmbDocumentWorkspaceContext
 		const activeVariants = this.splitView.getActiveVariants();
 		const activeVariant = activeVariants.length ? activeVariants[0] : undefined;
 
-		const selectedVariants = await this.#variantManagerContext.pickVariants(
-			data.variants, // TODO: Add a filter function to only show variants that have been changed
-			type,
-			activeVariant?.culture ?? undefined,
-		);
+		// Calculate variants
+		const pickedVariants: string[] = [];
+		const availableVariants = await firstValueFrom(this.allowedVariants);
+		let allowedVariants = data.variants;
+
+		// Make sure that the active variant is in the allowed variants
+		if (activeVariant) {
+			const activeVariantInAvailableVariants = availableVariants.find(
+				(x) => x.culture === activeVariant.culture && x.segment === activeVariant.segment,
+			);
+			if (activeVariantInAvailableVariants) {
+				pickedVariants.push(activeVariantInAvailableVariants.culture!);
+				allowedVariants = appendToFrozenArray(
+					allowedVariants,
+					activeVariantInAvailableVariants,
+					(x) =>
+						x.culture === activeVariantInAvailableVariants.culture &&
+						x.segment === activeVariantInAvailableVariants.segment,
+				);
+			}
+		}
+
+		// Make sure the changed variants are in the allowed variants
+		const changedVariants = this.changedVariants.getValue();
+		if (changedVariants.length) {
+			pickedVariants.push(...changedVariants.map((x) => x.culture!));
+			const changedVariantsInAvailableVariants = availableVariants.filter((x) =>
+				changedVariants.some((y) => y.equal(new UmbVariantId(x))),
+			);
+			for (const changedVariant of changedVariantsInAvailableVariants) {
+				allowedVariants = appendToFrozenArray(
+					allowedVariants,
+					changedVariant,
+					(x) => changedVariant.culture === x.culture && changedVariant.segment === x.segment,
+				);
+			}
+		}
+
+		const selectedVariants = await this.#variantManagerContext.pickVariants(allowedVariants, type, pickedVariants);
 
 		// If no variants are selected, we don't save anything.
 		if (!selectedVariants.length) return [];
