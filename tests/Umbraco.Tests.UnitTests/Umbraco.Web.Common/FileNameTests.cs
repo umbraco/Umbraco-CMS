@@ -36,20 +36,6 @@ internal class FileNameTests
 
     [Test]
     [AutoMoqData]
-    public async Task InstallViewExists(
-        [Frozen] IHostingEnvironment hostingEnvironment,
-        BackOfficeDefaultController sut)
-    {
-        Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute(It.IsAny<string>())).Returns("http://localhost/");
-        var viewResult = await sut.Index() as ViewResult;
-        var fileName = GetViewName(viewResult, Path.DirectorySeparatorChar.ToString());
-
-        var views = GetUiFiles(new[] { "umbraco", "UmbracoInstall" });
-        Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
-    }
-
-    [Test]
-    [AutoMoqData]
     public void BackOfficeDefaultExists(BackOfficeDefaultController sut)
     {
         var viewResult = sut.DefaultView();

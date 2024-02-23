@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
+using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
@@ -28,6 +29,7 @@ internal class UmbracoCustomizations : ICustomization
 
         fixture
             .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
+            .Customize(new ConstructorCustomization(typeof(BackOfficeDefaultController), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()))
             .Customize(new ConstructorCustomization(typeof(InstallHelper), new GreedyConstructorQuery()))
