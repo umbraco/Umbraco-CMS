@@ -3,7 +3,7 @@ import { UmbMediaPropertyDataContext } from '../property-dataset-context/media-p
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import type { UmbMediaDetailModel } from '../types.js';
-import type { UmbVariantId, UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
@@ -18,8 +18,7 @@ import {
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { Observable } from 'rxjs';
-import { UmbLanguageCollectionRepository, UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
