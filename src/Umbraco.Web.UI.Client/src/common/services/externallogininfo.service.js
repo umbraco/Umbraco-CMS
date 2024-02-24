@@ -14,27 +14,27 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
   }
 
   function getLoginProviderView(provider) {
-    if (provider && provider.properties && provider.properties.CustomBackOfficeView) {
-      return umbRequestHelper.convertVirtualToAbsolutePath(provider.properties.CustomBackOfficeView);
+    if (provider && provider.options && provider.options.customBackOfficeView) {
+      return umbRequestHelper.convertVirtualToAbsolutePath(provider.options.customBackOfficeView);
     }
     return null;
   }
 
   /**
-   * Returns true if any provider denies local login if `provider` is null, else whether the passed 
+   * Returns true if any provider denies local login if `provider` is null, else whether the passed
    * @param {any} provider
    */
   function hasDenyLocalLogin(provider) {
     if (!provider) {
-      return _.some(externalLoginInfo.providers, x => x.properties && (x.properties.DenyLocalLogin === true));
+      return _.some(externalLoginInfo.providers, x => x.options.denyLocalLogin === true);
     }
     else {
-      return provider && provider.properties && (provider.properties.DenyLocalLogin === true);
+      return provider && provider.options.denyLocalLogin === true;
     }
   }
 
   /**
-   * Returns all login providers    
+   * Returns all login providers
    */
   function getLoginProviders() {
     return externalLoginInfo.providers;
@@ -49,12 +49,8 @@ function externalLoginInfoService(externalLoginInfo, umbRequestHelper) {
       if (x.customView) {
         return true;
       }
-      else if (x.properties.AutoLinkOptions) {
-        return x.properties.AutoLinkOptions.AllowManualLinking;
-      }
-      else {
-        return false;
-      }
+
+      return x.options.allowManualLinking;
     });
     return providers;
   }

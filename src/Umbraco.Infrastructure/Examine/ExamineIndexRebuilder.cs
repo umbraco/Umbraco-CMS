@@ -10,6 +10,7 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
+[Obsolete("This will be removed in Umbraco 15. Use IIndexRebuilder instead.")] // Main reason for this is to remove it form the service container. Maybe even make this internal
 public class ExamineIndexRebuilder : IIndexRebuilder
 {
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
@@ -66,7 +67,17 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             _logger.LogInformation("Starting async background thread for rebuilding index {indexName}.", indexName);
 
             _backgroundTaskQueue.QueueBackgroundWorkItem(
-                cancellationToken => Task.Run(() => RebuildIndex(indexName, delay.Value, cancellationToken)));
+                cancellationToken =>
+                {
+                    // Do not flow AsyncLocal to the child thread
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        Task.Run(() => RebuildIndex(indexName, delay.Value, cancellationToken));
+
+                        // immediately return so the queue isn't waiting.
+                        return Task.CompletedTask;
+                    }
+                });
         }
         else
         {
@@ -96,12 +107,16 @@ public class ExamineIndexRebuilder : IIndexRebuilder
             _backgroundTaskQueue.QueueBackgroundWorkItem(
                 cancellationToken =>
                 {
-                    // This is a fire/forget task spawned by the background thread queue (which means we
-                    // don't need to worry about ExecutionContext flowing).
-                    Task.Run(() => RebuildIndexes(onlyEmptyIndexes, delay.Value, cancellationToken));
+                    // Do not flow AsyncLocal to the child thread
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        // This is a fire/forget task spawned by the background thread queue (which means we
+                        // don't need to worry about ExecutionContext flowing).
+                        Task.Run(() => RebuildIndexes(onlyEmptyIndexes, delay.Value, cancellationToken));
 
-                    // immediately return so the queue isn't waiting.
-                    return Task.CompletedTask;
+                        // immediately return so the queue isn't waiting.
+                        return Task.CompletedTask;
+                    }
                 });
         }
         else
