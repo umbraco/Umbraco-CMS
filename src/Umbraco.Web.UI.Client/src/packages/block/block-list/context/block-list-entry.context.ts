@@ -41,4 +41,6 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	}
 
 	_gotEntries() {}
+
+	_gotContentType() {}
 }

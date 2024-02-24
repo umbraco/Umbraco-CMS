@@ -6,12 +6,14 @@ import {
 	UmbBlockGridScaleManager,
 } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
 	UmbBooleanState,
 	UmbNumberState,
+	UmbObjectState,
 	appendToFrozenArray,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
@@ -53,6 +55,9 @@ export class UmbBlockGridEntryContext
 	readonly areaGridColumns = this.#areaGridColumns.asObservable();
 
 	readonly showContentEdit = this._blockType.asObservablePart((x) => !x?.forceHideContentEditorInOverlay);
+
+	#firstPropertyType = new UmbObjectState<UmbPropertyTypeModel | undefined>(undefined);
+	readonly firstPropertyType = this.#firstPropertyType.asObservable();
 
 	readonly scaleManager = new UmbBlockGridScaleManager(this);
 
@@ -172,5 +177,9 @@ export class UmbBlockGridEntryContext
 			},
 			'observeColumnSpanValidation',
 		);
+	}
+
+	_gotContentType(contentType: UmbContentTypeModel | undefined) {
+		this.#firstPropertyType.setValue(contentType?.properties[0]);
 	}
 }
