@@ -38,6 +38,7 @@ export class UmbBlockGridEntryContext
 		const x = this._blockType.getValue();
 		return [x?.rowMinSpan ?? 1, x?.rowMaxSpan ?? 1];
 	}
+	readonly inlineEditingMode = this._blockType.asObservablePart((x) => x?.inlineEditing === true);
 
 	#relevantColumnSpanOptions = new UmbArrayState<number>([], (x) => x);
 	readonly relevantColumnSpanOptions = this.#relevantColumnSpanOptions.asObservable();
@@ -127,19 +128,7 @@ export class UmbBlockGridEntryContext
 		return this._layout.getValue()?.rowSpan;
 	}
 
-	_gotManager() {
-		if (this._manager) {
-			/*this.observe(
-				this._manager.inlineEditingMode,
-				(inlineEditingMode) => {
-					this.#inlineEditingMode.setValue(inlineEditingMode);
-				},
-				'observeInlineEditingMode',
-			);*/
-		} else {
-			//this.removeControllerByAlias('observeInlineEditingMode');
-		}
-	}
+	_gotManager() {}
 
 	_gotEntries() {
 		this.scaleManager.setEntriesContext(this._entries);
