@@ -55,7 +55,6 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 		this.observe(this.#itemManager.items, (items) => {
 			const item = items[0];
 			if (item) {
-				console.log('got item', item);
 				this._fallbackIcon = item.icon;
 				this._fallbackName = item.name;
 			}
