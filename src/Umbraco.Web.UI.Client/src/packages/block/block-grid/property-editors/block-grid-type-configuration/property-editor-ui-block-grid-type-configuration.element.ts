@@ -23,7 +23,7 @@ import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@u
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
-interface MappedGroupWithBlockTypes extends Partial<UmbBlockGridTypeGroupType> {
+interface MappedGroupWithBlockTypes extends UmbBlockGridTypeGroupType {
 	blocks: Array<UmbBlockTypeWithGroupKey>;
 }
 
@@ -39,8 +39,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	#sorter = new UmbSorterController<MappedGroupWithBlockTypes, HTMLElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-group-key'),
 		getUniqueOfModel: (modelEntry) => modelEntry.key!,
-		identifier: 'block-grid-block-groups-sorter',
-		itemSelector: '.group-handle',
+		itemSelector: '.group',
+		draggableSelector: '.group-handle',
 		containerSelector: '#groups',
 		onChange: ({ model }) => {
 			this._groupsWithBlockTypes = model;
@@ -79,7 +79,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	private _groupsWithBlockTypes: Array<MappedGroupWithBlockTypes> = [];
 
 	@state()
-	private _noGroupBlockTypes: Array<MappedGroupWithBlockTypes> = [];
+	private _notGroupedBlockTypes: Array<UmbBlockTypeWithGroupKey> = [];
 
 	@state()
 	private _workspacePath?: string;
@@ -117,10 +117,9 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#mapValuesToBlockGroups() {
 		// Map blocks that are not in any group, or in a group that does not exist
-		const valuesWithNoGroup = this._value.filter(
+		this._notGroupedBlockTypes = this._value.filter(
 			(block) => !block.groupKey || !this._blockGroups.find((group) => group.key === block.groupKey),
 		);
-		this._noGroupBlockTypes = [{ blocks: valuesWithNoGroup }];
 
 		// Map blocks to the group they belong to
 		this._groupsWithBlockTypes = this._blockGroups.map((group) => {
@@ -165,25 +164,23 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	render() {
 		return html`<div id="groups">
-			${repeat(
-				this._noGroupBlockTypes,
-				(group) =>
-					html`<umb-input-block-type
-						.value=${group.blocks}
+			${this._notGroupedBlockTypes
+				? html`<umb-input-block-type
+						.value=${this._notGroupedBlockTypes}
 						.workspacePath=${this._workspacePath}
-						@create=${(e: CustomEvent) => this.#onCreate(e, group.key ?? null)}
-						@change=${(e: CustomEvent) => this.#onChange(e, group.key)}></umb-input-block-type>`,
-			)}
+						@create=${(e: CustomEvent) => this.#onCreate(e, undefined)}
+						@change=${(e: CustomEvent) => this.#onChange(e, undefined)}></umb-input-block-type>`
+				: ''}
 			${repeat(
 				this._groupsWithBlockTypes,
 				(group) => group.key,
 				(group) =>
-					html`<div class="group">
+					html`<div class="group" data-umb-group-key=${ifDefined(group.key)}>
 						${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
 						<umb-input-block-type
 							.value=${group.blocks}
 							.workspacePath=${this._workspacePath}
-							@create=${(e: CustomEvent) => this.#onCreate(e, group.key ?? null)}
+							@create=${(e: CustomEvent) => this.#onCreate(e, group.key)}
 							@change=${(e: CustomEvent) => this.#onChange(e, group.key)}></umb-input-block-type>
 					</div>`,
 			)}
@@ -191,7 +188,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	}
 
 	#renderGroupInput(groupKey: string, groupName?: string) {
-		return html`<div class="group-handle" data-umb-group-key=${ifDefined(groupKey)}>
+		return html`<div class="group-handle">
 			<uui-input
 				auto-width
 				label="Group"
