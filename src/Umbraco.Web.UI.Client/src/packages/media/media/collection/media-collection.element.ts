@@ -1,6 +1,8 @@
 import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 
+import './media-collection-toolbar.element.js';
+
 @customElement('umb-media-collection')
 export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	constructor() {
@@ -37,7 +39,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 
 	protected renderToolbar() {
 		return html`
-			<umb-collection-toolbar slot="header"></umb-collection-toolbar>
+			<umb-media-collection-toolbar slot="header"></umb-media-collection-toolbar>
 			<!-- TODO: Add the Media Upload dropzone component in here. [LK] -->
 			<uui-file-dropzone
 				id="dropzone"

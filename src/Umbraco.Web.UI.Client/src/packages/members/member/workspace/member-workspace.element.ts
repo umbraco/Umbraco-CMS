@@ -1,6 +1,5 @@
 import { UmbMemberWorkspaceContext } from './member-workspace.context.js';
 import { UmbMemberWorkspaceEditorElement } from './member-workspace-editor.element.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -40,8 +39,6 @@ export class UmbMemberWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbMemberWorkspaceElement;

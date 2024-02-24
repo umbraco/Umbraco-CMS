@@ -1,15 +1,16 @@
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
 import '../../components/block-list-entry/index.js';
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
 import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
 import { UmbBlockListEntriesContext } from '../../context/block-list-entries.context.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbBlockLayoutBaseModel, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -90,7 +91,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
 		this.#managerContext.setInlineEditingMode(useInlineEditingAsDefault);
 		// TODO:
-		//config.useSingleBlockMode, not done jey
+		//config.useSingleBlockMode, not done jet
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 
 		this.#managerContext.setEditorConfiguration(config);

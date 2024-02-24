@@ -12,6 +12,8 @@ export class UmbScriptFolderRepository extends UmbFolderRepositoryBase<UmbScript
 	}
 }
 
+export default UmbScriptFolderRepository;
+
 const folderToScriptTreeItemFolder = (folder: UmbFolderModel): UmbScriptTreeItemModel => {
 	return {
 		unique: folder.unique,

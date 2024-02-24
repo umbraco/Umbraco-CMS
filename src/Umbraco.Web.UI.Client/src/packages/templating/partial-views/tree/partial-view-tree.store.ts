@@ -54,6 +54,8 @@ export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 	};
 }
 
+export default UmbPartialViewTreeStore;
+
 export const UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT = new UmbContextToken<UmbPartialViewTreeStore>(
 	'UmbPartialViewTreeStore',
 );

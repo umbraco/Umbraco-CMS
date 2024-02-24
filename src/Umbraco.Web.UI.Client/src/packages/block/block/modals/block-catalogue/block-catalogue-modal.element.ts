@@ -1,11 +1,7 @@
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
-import type {
-	UmbBlockCatalogueModalData,
-	UmbBlockCatalogueModalValue,
-	UmbBlockTypeGroup,
-	UmbBlockTypeWithGroupKey,
-} from '@umbraco-cms/backoffice/block';
-import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
+import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UMB_MODAL_CONTEXT,
 	UmbModalBaseElement,
@@ -58,7 +54,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 		const noGroupBlocks = blocks.filter((block) => !blockGroups.find((group) => group.key === block.groupKey));
 		const grouped = blockGroups.map((group) => ({
-			name: group.name ?? '',
+			name: group.name,
 			blocks: blocks.filter((block) => block.groupKey === group.key),
 		}));
 
@@ -87,26 +83,28 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderCreateEmpty() {
 		return html`
-			${this._groupedBlocks.map(
-				(group) => html`
-					${group.name ? html`<h4>${group.name}</h4>` : nothing}
-					<div class="blockGroup">
-						${repeat(
-							group.blocks,
-							(block) => block.contentElementTypeKey,
-							(block) => html`
-								<uui-card-block-type
-									name=${ifDefined(block.label)}
-									background=${ifDefined(block.backgroundColor)}
-									style="color: ${block.iconColor}"
-									href="${this._workspacePath}create/${block.contentElementTypeKey}">
-									<uui-icon .name=${block.icon ?? ''}></uui-icon>
-								</uui-card-block-type>
-							`,
-						)}
-					</div>
-				`,
-			)}
+			${this._groupedBlocks
+				? this._groupedBlocks.map(
+						(group) => html`
+							${group.name && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
+							<div class="blockGroup">
+								${repeat(
+									group.blocks,
+									(block) => block.contentElementTypeKey,
+									(block) => html`
+										<umb-block-type-card
+											.name=${block.label}
+											.iconColor=${block.iconColor}
+											.backgroundColor=${block.backgroundColor}
+											.contentElementTypeKey=${block.contentElementTypeKey}
+											.href="${this._workspacePath}create/${block.contentElementTypeKey}">
+										</umb-block-type-card>
+									`,
+								)}
+							</div>
+						`,
+				  )
+				: ''}
 		`;
 	}
 

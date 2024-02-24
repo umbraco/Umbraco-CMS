@@ -2,8 +2,7 @@ import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/i
 import { UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL } from '../snippet-modal/create-from-snippet-modal.token.js';
 import type { UmbPartialViewCreateOptionsModalData } from './index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
@@ -93,8 +92,6 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPartialViewCreateOptionsModalElement;

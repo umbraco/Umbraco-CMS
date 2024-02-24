@@ -5,7 +5,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
-import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 import type { UUIComboboxElement, UUIComboboxEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-property-editor-ui-block-grid-area-type-permission')

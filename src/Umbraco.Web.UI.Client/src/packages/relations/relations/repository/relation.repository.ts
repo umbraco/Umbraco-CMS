@@ -1,7 +1,7 @@
 import { UmbRelationServerDataSource } from './sources/relation.server.data.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
@@ -52,3 +52,5 @@ export class UmbRelationRepository extends UmbBaseController implements UmbApi {
 		return { data, error };
 	}
 }
+
+export default UmbRelationRepository;

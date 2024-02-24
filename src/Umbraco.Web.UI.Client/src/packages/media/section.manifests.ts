@@ -1,5 +1,5 @@
 import { UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_MENU_ALIAS } from './media/index.js';
-import type { ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestSection, ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Media';
 
@@ -15,7 +15,7 @@ const section: ManifestSection = {
 	conditions: [],
 };
 
-const menuSectionSidebarApp: ManifestTypes = {
+const menuSectionSidebarApp: ManifestSectionSidebarApp = {
 	type: 'sectionSidebarApp',
 	kind: 'menuWithEntityActions',
 	alias: 'Umb.SectionSidebarMenu.Media',

@@ -1,7 +1,6 @@
 import type { UmbInputRadioButtonListElement } from '../../../components/input-radio-button-list/input-radio-button-list.element.js';
 import '../../../components/input-radio-button-list/input-radio-button-list.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -57,8 +56,6 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 			.selectedKey="${this.#value}"
 			.list="${this._list}"></umb-input-radio-button-list>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIRadioButtonListElement;

@@ -17,6 +17,8 @@ export class UmbStylesheetFolderRepository extends UmbFolderRepositoryBase<UmbSt
 	}
 }
 
+export default UmbStylesheetFolderRepository;
+
 const folderToStylesheetTreeItemFolder = (folder: UmbFolderModel): UmbStylesheetTreeItemModel => {
 	return {
 		unique: folder.unique,

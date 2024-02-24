@@ -1,5 +1,4 @@
 import { UMB_SCRIPT_ENTITY_TYPE } from '../../entity.js';
-import { UmbRenameScriptRepository } from './rename-script.repository.js';
 import { UmbRenameEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -11,7 +10,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'repository',
 		alias: UMB_RENAME_SCRIPT_REPOSITORY_ALIAS,
 		name: 'Rename Script Repository',
-		api: UmbRenameScriptRepository,
+		api: () => import('./rename-script.repository.js'),
 	},
 	{
 		type: 'entityAction',

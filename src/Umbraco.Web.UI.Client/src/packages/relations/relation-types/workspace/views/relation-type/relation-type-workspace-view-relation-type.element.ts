@@ -10,6 +10,7 @@ import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoff
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import '@umbraco-cms/backoffice/object-type';
 
 @customElement('umb-relation-type-workspace-view-relation-type')
 export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitElement implements UmbWorkspaceViewElement {

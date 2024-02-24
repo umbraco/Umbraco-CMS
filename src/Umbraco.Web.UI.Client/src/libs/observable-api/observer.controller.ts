@@ -6,7 +6,7 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 	#host: UmbControllerHost;
 	#alias?: UmbControllerAlias;
 
-	public get controllerAlias() {
+	public get controllerAlias(): UmbControllerAlias {
 		return this.#alias;
 	}
 

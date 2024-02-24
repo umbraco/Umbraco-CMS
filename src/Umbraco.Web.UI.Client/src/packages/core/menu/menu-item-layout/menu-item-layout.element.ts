@@ -1,72 +1,55 @@
-import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbSectionContext } from '@umbraco-cms/backoffice/section';
-import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+/**
+ * @element umb-menu-item-layout
+ * @description
+ * A menu item layout to render he backoffice menu item look.
+ * This supports nested menu items, and if a `entityType` is provided, it will render the entity actions for it.
+ */
 @customElement('umb-menu-item-layout')
 export class UmbMenuItemLayoutElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
 	public entityType?: string;
 
+	/**
+	 * The icon name for the icon to show in this menu item.
+	 */
 	@property({ type: String, attribute: 'icon-name' })
 	public iconName = '';
 
+	/**
+	 * The label for this menu item.
+	 */
 	@property({ type: String })
 	public label = '';
 
+	/**
+	 * Declare if this item has children, this will show the expand symbol.
+	 */
 	@property({ type: Boolean, attribute: 'has-children' })
 	public hasChildren = false;
 
-	@state()
-	private _href?: string;
-
-	#sectionContext?: UmbSectionContext;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_SECTION_CONTEXT, (sectionContext) => {
-			this.#sectionContext = sectionContext;
-			this._observeSection();
-		});
-	}
-
-	private _observeSection() {
-		if (!this.#sectionContext) return;
-
-		this.observe(this.#sectionContext?.pathname, (pathname) => {
-			if (!pathname) return;
-			this._href = this._constructPath(pathname);
-		});
-	}
-
-	// TODO: how do we handle this?
-	// TODO: use router context
-	private _constructPath(sectionPathname: string) {
-		return `section/${sectionPathname}/workspace/${this.entityType}`;
-	}
+	/**
+	 * Define a href for this menu item.
+	 */
+	@property({ type: String })
+	public href?: string;
 
 	render() {
-		return html`<uui-menu-item href="${ifDefined(this._href)}" label=${this.label} ?has-children=${this.hasChildren}
-			>${this.#renderIcon()}${this.#renderActions()}<slot></slot
-		></uui-menu-item>`;
+		return html`<uui-menu-item href="${ifDefined(this.href)}" label=${this.label} ?has-children=${this.hasChildren}>
+			<uui-icon slot="icon" name=${this.iconName}></uui-icon>
+			${this.entityType
+				? html`<umb-entity-actions-bundle
+						slot="actions"
+						.entityType=${this.entityType}
+						.unique=${null}
+						.label=${this.label}>
+				  </umb-entity-actions-bundle>`
+				: ''}
+			<slot></slot>
+		</uui-menu-item>`;
 	}
-
-	#renderIcon() {
-		return html` <uui-icon slot="icon" name=${this.iconName}></uui-icon> `;
-	}
-
-	#renderActions() {
-		return html`<umb-entity-actions-bundle
-			slot="actions"
-			.entityType=${this.entityType}
-			.unique=${null}
-			.label=${this.label}>
-		</umb-entity-actions-bundle>`;
-	}
-
-	static styles = [UmbTextStyles];
 }
 
 declare global {

@@ -78,7 +78,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 						`,
 					)}
 				</uui-box>
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}">Cancel</uui-button>
+				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
 			</umb-body-layout>
 		`;
 	}

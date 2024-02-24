@@ -27,3 +27,5 @@ export class UmbRelationTypeTreeRepository
 		return { data };
 	}
 }
+
+export default UmbRelationTypeTreeRepository;

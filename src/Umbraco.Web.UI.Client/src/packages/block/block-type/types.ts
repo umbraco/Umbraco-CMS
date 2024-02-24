@@ -9,12 +9,11 @@ export interface UmbBlockTypeBaseModel {
 	iconColor?: string;
 	backgroundColor?: string;
 	editorSize?: UUIModalSidebarSize;
-	icon?: string; // remove later
 	forceHideContentEditorInOverlay: boolean;
 }
 
 export interface UmbBlockTypeGroup {
-	name?: string | null;
+	name?: string;
 	key: string;
 }
 
