@@ -26,3 +26,5 @@ export class UmbDocumentTreeRepository
 		return { data };
 	}
 }
+
+export default UmbDocumentTreeRepository;

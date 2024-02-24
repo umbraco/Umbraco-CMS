@@ -1,7 +1,6 @@
-import { UMB_BLOCK_ENTRY_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_ENTRY_CONTEXT } from '../context/block-entry.context-token.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type {
-	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
@@ -30,12 +29,7 @@ export class UmbBlockEntryShowContentEditCondition extends UmbBaseController imp
 	}
 }
 
+export default UmbBlockEntryShowContentEditCondition;
+
 export type BlockEntryShowContentEditConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockEntryShowContentEdit'>;
-
-export const manifest: ManifestCondition = {
-	type: 'condition',
-	name: 'Block Show Content Edit Condition',
-	alias: 'Umb.Condition.BlockEntryShowContentEdit',
-	api: UmbBlockEntryShowContentEditCondition,
-};

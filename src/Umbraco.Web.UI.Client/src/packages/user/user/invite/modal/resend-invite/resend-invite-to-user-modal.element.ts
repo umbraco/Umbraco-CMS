@@ -3,8 +3,7 @@ import type {
 	UmbResendInviteToUserModalData,
 	UmbResendInviteToUserModalValue,
 } from './resend-invite-to-user-modal.token.js';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-resend-invite-to-user-modal')
@@ -63,8 +62,6 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 			</form>
 		</uui-form>`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbResendInviteToUserModalElement;

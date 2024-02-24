@@ -1,4 +1,16 @@
-import { manifest as blockEntryShowContentConditionManifest } from './block-entry-show-content-edit.condition.js';
-import { manifest as blockWorkspaceHasSettingsConditionManifest } from './block-workspace-has-settings.condition.js';
+import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
-export const manifests = [blockEntryShowContentConditionManifest, blockWorkspaceHasSettingsConditionManifest];
+export const manifests: Array<ManifestCondition> = [
+	{
+		type: 'condition',
+		name: 'Block Has Settings Condition',
+		alias: 'Umb.Condition.BlockWorkspaceHasSettings',
+		api: () => import('./block-workspace-has-settings.condition.js'),
+	},
+	{
+		type: 'condition',
+		name: 'Block Show Content Edit Condition',
+		alias: 'Umb.Condition.BlockEntryShowContentEdit',
+		api: () => import('./block-entry-show-content-edit.condition.js'),
+	},
+];

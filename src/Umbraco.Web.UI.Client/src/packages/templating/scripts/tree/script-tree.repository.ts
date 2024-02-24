@@ -23,3 +23,5 @@ export class UmbScriptTreeRepository extends UmbTreeRepositoryBase<UmbScriptTree
 		return { data };
 	}
 }
+
+export default UmbScriptTreeRepository;

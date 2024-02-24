@@ -1,6 +1,6 @@
 import type { UmbBlockGridTypeAreaTypePermission } from '../../index.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, css, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -63,7 +63,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 				@click=${this.#addNewPermission}></uui-button>`;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIBlockGridAreaTypePermissionElement;

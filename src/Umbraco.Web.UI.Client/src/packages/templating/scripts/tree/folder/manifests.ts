@@ -1,5 +1,4 @@
 import { UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UmbScriptFolderRepository } from './script-folder.repository.js';
 import { UmbDeleteFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -9,7 +8,7 @@ const folderRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS,
 	name: 'Script Folder Repository',
-	api: UmbScriptFolderRepository,
+	api: () => import('./script-folder.repository.js'),
 };
 
 export const UMB_DELETE_SCRIPT_FOLDER_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.Script.Folder.Delete';

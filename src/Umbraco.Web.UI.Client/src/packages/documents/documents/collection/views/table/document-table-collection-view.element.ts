@@ -59,6 +59,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
+	@state()
+	private _skip: number = 0;
+
 	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
 
 	constructor() {
@@ -97,6 +100,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			},
 			'umbCollectionSelectionObserver',
 		);
+
+		this.observe(
+			this.#collectionContext.pagination.skip,
+			(skip) => {
+				this._skip = skip;
+			},
+			'umbCollectionSkipObserver',
+		);
 	}
 
 	#createTableHeadings() {
@@ -115,14 +126,16 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
-		this._tableItems = items.map((item) => {
+		this._tableItems = items.map((item, rowIndex) => {
 			if (!item.unique) throw new Error('Item id is missing.');
+
+			const sortOrder = this._skip + rowIndex;
 
 			const data =
 				this._tableColumns?.map((column) => {
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? item : getPropertyValueByAlias(item, column.alias),
+						value: column.elementName ? item : getPropertyValueByAlias(sortOrder, item, column.alias),
 					};
 				}) ?? [];
 

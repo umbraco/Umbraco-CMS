@@ -1,6 +1,6 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspaceFooterApp } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestTypes> = [
+export const manifests: Array<ManifestWorkspaceFooterApp> = [
 	{
 		type: 'workspaceFooterApp',
 		alias: 'Umb.WorkspaceFooterApp.Document.Breadcrumb',

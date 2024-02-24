@@ -42,7 +42,7 @@ export class UmbMediaTreeStore extends UmbUniqueTreeStore {
 			hasChildren: false,
 			variants: item.variants,
 			isTrashed: item.isTrashed,
-			mediaType: { unique: item.mediaType.unique, icon: '', hasListView: false },
+			mediaType: { unique: item.mediaType.unique, icon: '' },
 			noAccess: false,
 		};
 
@@ -56,5 +56,7 @@ export class UmbMediaTreeStore extends UmbUniqueTreeStore {
 		};
 	};
 }
+
+export default UmbMediaTreeStore;
 
 export const UMB_MEDIA_TREE_STORE_CONTEXT = new UmbContextToken<UmbMediaTreeStore>('UmbMediaTreeStore');

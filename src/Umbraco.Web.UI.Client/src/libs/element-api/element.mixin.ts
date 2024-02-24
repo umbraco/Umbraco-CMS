@@ -50,7 +50,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbObserverController} Reference to a Observer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		observe<T>(source: Observable<T>, callback: ObserverCallback<T>, unique?: string) {
+		observe<T>(source: Observable<T>, callback: ObserverCallback<T>, unique?: string): UmbObserverController<T> {
 			return new UmbObserverController<T>(this, source, callback, unique);
 		}
 

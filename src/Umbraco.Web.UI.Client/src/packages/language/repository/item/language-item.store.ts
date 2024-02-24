@@ -21,4 +21,6 @@ export class UmbLanguageItemStore extends UmbItemStoreBase<UmbLanguageItemModel>
 	}
 }
 
+export default UmbLanguageItemStore;
+
 export const UMB_LANGUAGE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbLanguageItemStore>('UmbLanguageItemStore');

@@ -1,5 +1,5 @@
+import { umbExtensionsRegistry } from '../../extension-registry/index.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { type ManifestTypes, umbExtensionsRegistry } from '../../extension-registry/index.js';
 import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { css, repeat, customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import {
@@ -21,7 +21,7 @@ import {
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
 	#attached = false;
-	#extensionsController?: UmbExtensionsElementInitializer<ManifestTypes>;
+	#extensionsController?: UmbExtensionsElementInitializer;
 
 	@state()
 	private _permittedExts: Array<UmbExtensionElementInitializer> = [];
@@ -80,7 +80,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	 * <umb-extension-slot type="my-extension-type" .props=${{foo: 'bar'}}></umb-extension-slot>
 	 */
 	@property({ type: Object, attribute: false })
-	get props() {
+	get props(): Record<string, unknown> | undefined {
 		return this.#props;
 	}
 	set props(newVal: Record<string, unknown> | undefined) {
@@ -104,7 +104,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		this.#attached = true;
 	}
 
-	private _observeExtensions() {
+	private _observeExtensions(): void {
 		this.#extensionsController?.destroy();
 		if (this.#type) {
 			this.#extensionsController = new UmbExtensionsElementInitializer(

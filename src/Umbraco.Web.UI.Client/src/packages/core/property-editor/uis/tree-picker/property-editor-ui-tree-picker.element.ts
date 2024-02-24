@@ -1,6 +1,5 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -107,7 +106,6 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 			@change=${this.#onChange}></umb-input-tree>`;
 	}
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITreePickerElement;

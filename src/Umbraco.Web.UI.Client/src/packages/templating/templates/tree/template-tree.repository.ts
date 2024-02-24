@@ -26,3 +26,5 @@ export class UmbTemplateTreeRepository
 		return { data };
 	}
 }
+
+export default UmbTemplateTreeRepository;

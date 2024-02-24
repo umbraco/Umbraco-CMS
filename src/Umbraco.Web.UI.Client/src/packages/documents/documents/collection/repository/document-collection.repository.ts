@@ -1,6 +1,6 @@
 import type { UmbDocumentCollectionFilterModel } from '../types.js';
 import { UmbDocumentCollectionServerDataSource } from './document-collection.server.data-source.js';
-import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentCollectionRepository implements UmbCollectionRepository {

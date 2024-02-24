@@ -1,4 +1,5 @@
 import type { UmbVariantId } from '../../variant/variant-id.class.js';
+import type { UmbContext } from '@umbraco-cms/backoffice/class-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
@@ -15,7 +16,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
  * Others might have saved publishing status.
  * Also setting the name is an additional feature.
  */
-export interface UmbPropertyDatasetContext {
+export interface UmbPropertyDatasetContext extends UmbContext {
 	getEntityType(): string;
 	getUnique(): string | undefined;
 	getVariantId: () => UmbVariantId;
@@ -25,8 +26,6 @@ export interface UmbPropertyDatasetContext {
 
 	// Should it be possible to get the properties as a list of property aliases?
 	//readonly properties: Observable<Array<string>>;
-
-	destroy(): void;
 
 	// Property methods:
 	propertyVariantId?: (propertyAlias: string) => Promise<Observable<UmbVariantId | undefined>>;

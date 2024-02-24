@@ -1,5 +1,5 @@
 import type { UmbBlockTypeBaseModel } from '../block-type/index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '../index.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 
 export const UMB_BLOCK_LIST_TYPE = 'block-list-type';
 

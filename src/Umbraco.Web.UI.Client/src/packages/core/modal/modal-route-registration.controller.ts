@@ -170,6 +170,10 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	}
 
 	public destroy(): void {
-		this.hostDisconnected();
+		this.#host?.removeController(this);
+		this.#host = undefined as any;
+		this.#modalRegistration = undefined;
+		this.#uniquePaths = undefined as any;
+		this.#routeContext = undefined;
 	}
 }

@@ -1,5 +1,5 @@
-import { umbExtensionsRegistry, type ManifestTypes } from '../../index.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { umbExtensionsRegistry } from '../../index.js';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -8,7 +8,7 @@ import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backo
 @customElement('umb-extension-table-action-column-layout')
 export class UmbExtensionTableActionColumnLayoutElement extends UmbLitElement {
 	@property({ attribute: false })
-	value!: ManifestTypes;
+	value!: ManifestBase;
 
 	#modalContext?: UmbModalManagerContext;
 
@@ -40,8 +40,6 @@ export class UmbExtensionTableActionColumnLayoutElement extends UmbLitElement {
 			</uui-button>
 		`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 declare global {

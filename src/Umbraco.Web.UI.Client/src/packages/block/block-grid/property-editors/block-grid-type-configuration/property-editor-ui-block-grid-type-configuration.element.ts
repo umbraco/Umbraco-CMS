@@ -17,15 +17,15 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import {
-	UMB_BLOCK_GRID_TYPE,
-	type UmbBlockGridTypeGroupType,
-	type UmbBlockGridGroupTypeConfiguration,
-} from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_GRID_TYPE, type UmbBlockGridTypeGroupType } from '@umbraco-cms/backoffice/block-grid';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+interface MappedGroupWithBlockTypes extends Partial<UmbBlockGridTypeGroupType> {
+	blocks: Array<UmbBlockTypeWithGroupKey>;
+}
 
 /**
  * @element umb-property-editor-ui-block-grid-type-configuration
@@ -35,15 +35,15 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	#model: Array<UmbBlockGridGroupTypeConfiguration> = [];
-	#sorter = new UmbSorterController<UmbBlockGridGroupTypeConfiguration, HTMLElement>(this, {
+	#model: Array<MappedGroupWithBlockTypes> = [];
+	#sorter = new UmbSorterController<MappedGroupWithBlockTypes, HTMLElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-group-key'),
 		getUniqueOfModel: (modelEntry) => modelEntry.key!,
 		identifier: 'block-grid-block-groups-sorter',
 		itemSelector: '.group-handle',
 		containerSelector: '#groups',
 		onChange: ({ model }) => {
-			this._mappedValuesWithGroup = model;
+			this._groupsWithBlockTypes = model;
 			this.#model = model;
 		},
 		onEnd: () => {
@@ -76,10 +76,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	private _blockGroups: Array<UmbBlockGridTypeGroupType> = [];
 
 	@state()
-	private _mappedValuesWithGroup: Array<UmbBlockGridGroupTypeConfiguration> = [];
+	private _groupsWithBlockTypes: Array<MappedGroupWithBlockTypes> = [];
 
 	@state()
-	private _mappedValuesNoGroup: Array<UmbBlockGridGroupTypeConfiguration> = [];
+	private _noGroupBlockTypes: Array<MappedGroupWithBlockTypes> = [];
 
 	@state()
 	private _workspacePath?: string;
@@ -120,14 +120,14 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		const valuesWithNoGroup = this._value.filter(
 			(block) => !block.groupKey || !this._blockGroups.find((group) => group.key === block.groupKey),
 		);
-		this._mappedValuesNoGroup = [{ blocks: valuesWithNoGroup }];
+		this._noGroupBlockTypes = [{ blocks: valuesWithNoGroup }];
 
 		// Map blocks to the group they belong to
-		this._mappedValuesWithGroup = this._blockGroups.map((group) => {
+		this._groupsWithBlockTypes = this._blockGroups.map((group) => {
 			return { name: group.name, key: group.key, blocks: this._value.filter((value) => value.groupKey === group.key) };
 		});
 
-		this.#sorter.setModel(this._mappedValuesWithGroup);
+		this.#sorter.setModel(this._groupsWithBlockTypes);
 	}
 
 	#onChange(e: CustomEvent, groupKey?: string) {
@@ -144,14 +144,15 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		}
 	}
 
+	// TODO: Implement confirm dialog
 	#deleteGroup(groupKey: string) {
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
 			this._blockGroups.filter((group) => group.key !== groupKey),
 		);
 
-		// Should blocks that belonged to the removed group be deleted as well?
-		this.value = this._value.filter((block) => block.groupKey !== groupKey);
+		// If a group is deleted, Move the blocks to no group:
+		this.value = this._value.map((block) => (block.groupKey === groupKey ? { ...block, groupKey: undefined } : block));
 	}
 
 	#changeGroupName(e: UUIInputEvent, groupKey: string) {
@@ -165,8 +166,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	render() {
 		return html`<div id="groups">
 			${repeat(
-				this._mappedValuesNoGroup,
-				() => '',
+				this._noGroupBlockTypes,
 				(group) =>
 					html`<umb-input-block-type
 						.value=${group.blocks}
@@ -175,7 +175,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 						@change=${(e: CustomEvent) => this.#onChange(e, group.key)}></umb-input-block-type>`,
 			)}
 			${repeat(
-				this._mappedValuesWithGroup,
+				this._groupsWithBlockTypes,
 				(group) => group.key,
 				(group) =>
 					html`<div class="group">

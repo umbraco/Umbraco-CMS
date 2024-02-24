@@ -1,14 +1,12 @@
+import { closestColumnSpanOption } from '../utils/index.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import { UMB_BLOCK_GRID_ENTRIES_CONTEXT } from './block-grid-entries.context-token.js';
 import {
 	type UmbBlockGridScalableContext,
 	UmbBlockGridScaleManager,
 } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
-import {
-	UmbBlockEntryContext,
-	type UmbBlockGridTypeModel,
-	type UmbBlockGridLayoutModel,
-} from '@umbraco-cms/backoffice/block';
+import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
@@ -17,28 +15,6 @@ import {
 	appendToFrozenArray,
 } from '@umbraco-cms/backoffice/observable-api';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
-
-function closestColumnSpanOption(target: number, map: Array<number>, max: number) {
-	if (map.length > 0) {
-		const result = map.reduce((a, b) => {
-			if (a > max) {
-				return b;
-			}
-			const aDiff = Math.abs(a - target);
-			const bDiff = Math.abs(b - target);
-
-			if (aDiff === bDiff) {
-				return a < b ? a : b;
-			} else {
-				return bDiff < aDiff ? b : a;
-			}
-		});
-		if (result) {
-			return result;
-		}
-	}
-	return;
-}
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -184,7 +160,6 @@ export class UmbBlockGridEntryContext
 				const hasRelevantColumnSpanOptions = relevantColumnSpanOptions.length > 1;
 				const hasRowSpanOptions = minMaxRowSpan[0] !== minMaxRowSpan[1];
 				const canScale = hasRelevantColumnSpanOptions || hasRowSpanOptions;
-				console.log('canScale calc:', canScale);
 
 				this.#canScale.setValue(canScale);
 			},
