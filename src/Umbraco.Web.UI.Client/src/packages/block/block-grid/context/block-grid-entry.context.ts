@@ -13,8 +13,8 @@ import {
 	UmbBooleanState,
 	UmbNumberState,
 	appendToFrozenArray,
+	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -136,7 +136,7 @@ export class UmbBlockGridEntryContext
 		if (!this._entries) return;
 
 		this.observe(
-			combineLatest([this.minMaxRowSpan, this.columnSpanOptions, this._entries.layoutColumns]),
+			observeMultiple([this.minMaxRowSpan, this.columnSpanOptions, this._entries.layoutColumns]),
 			([minMaxRowSpan, columnSpanOptions, layoutColumns]) => {
 				if (!layoutColumns) return;
 				const relevantColumnSpanOptions = columnSpanOptions
@@ -156,7 +156,7 @@ export class UmbBlockGridEntryContext
 		);
 
 		this.observe(
-			combineLatest([this.areaTypeGridColumns, this._entries.layoutColumns]),
+			observeMultiple([this.areaTypeGridColumns, this._entries.layoutColumns]),
 			([areaTypeGridColumns, layoutColumns]) => {
 				this.#areaGridColumns.setValue(areaTypeGridColumns ?? layoutColumns);
 			},
@@ -164,7 +164,7 @@ export class UmbBlockGridEntryContext
 		);
 
 		this.observe(
-			combineLatest([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
+			observeMultiple([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
 			([columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
 				if (!columnSpan || !layoutColumns) return;
 				if (relevantColumnSpanOptions.length > 0) {

@@ -2,7 +2,7 @@ import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context.js'
 import { UMB_BLOCK_LIST_ENTRIES_CONTEXT } from './block-list-entries.context-token.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBooleanState, combineObservables } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT.TYPE,
@@ -15,7 +15,7 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 		(x) => !!x?.forceHideContentEditorInOverlay,
 	);
 
-	readonly showContentEdit = combineObservables(
+	readonly showContentEdit = mergeObservables(
 		[this.forceHideContentEditorInOverlay, this.inlineEditingMode],
 		([forceHide, inlineMode]): boolean => {
 			return !forceHide && !inlineMode;
