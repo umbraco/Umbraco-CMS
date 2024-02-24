@@ -35,7 +35,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	#model: Array<MappedGroupWithBlockTypes> = [];
 	#sorter = new UmbSorterController<MappedGroupWithBlockTypes, HTMLElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-group-key'),
 		getUniqueOfModel: (modelEntry) => modelEntry.key!,
@@ -44,12 +43,11 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		containerSelector: '#groups',
 		onChange: ({ model }) => {
 			this._groupsWithBlockTypes = model;
-			this.#model = model;
 		},
 		onEnd: () => {
 			this.#datasetContext?.setPropertyValue(
 				'blockGroups',
-				this.#model.map((group) => ({ key: group.key, name: group.name })),
+				this._groupsWithBlockTypes.map((group) => ({ key: group.key, name: group.name })),
 			);
 		},
 	});
@@ -136,10 +134,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onCreate(e: CustomEvent, groupKey: string | null) {
+	#onCreate(e: CustomEvent, groupKey?: string) {
 		const selectedElementType = e.detail.contentElementTypeKey;
 		if (selectedElementType) {
-			this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/' + selectedElementType + '/' + groupKey);
+			this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/' + selectedElementType + '/' + (groupKey ?? null));
 		}
 	}
 
