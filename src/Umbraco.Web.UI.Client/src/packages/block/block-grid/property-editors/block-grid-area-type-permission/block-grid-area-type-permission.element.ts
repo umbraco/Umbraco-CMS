@@ -68,7 +68,7 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 				: { elementTypeKey: optionKey, groupKey: undefined }
 			: { elementTypeKey: undefined, groupKey: undefined };
 
-		this.value = value.map((area, i) => (i === index ? { ...area, ...setting } : area));
+		this.value = value.map((permission, i) => (i === index ? { ...permission, ...setting } : permission));
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -76,14 +76,18 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		const value = [...this.value];
 		const input = e.target.value as string;
 
-		this.value = value.map((area, i) => (i === index ? { ...area, minAllowed: parseInt(input) ?? 0 } : area));
+		this.value = value.map((permission, i) =>
+			i === index ? { ...permission, minAllowed: parseInt(input) ?? 0 } : permission,
+		);
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 	#setPermissionMaximumRange(e: UUIInputEvent, index: number) {
 		const value = [...this.value];
 		const input = e.target.value as string;
 
-		this.value = value.map((area, i) => (i === index ? { ...area, maxAllowed: parseInt(input) ?? undefined } : area));
+		this.value = value.map((permission, i) =>
+			i === index ? { ...permission, maxAllowed: parseInt(input) ?? undefined } : permission,
+		);
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -96,19 +100,19 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 		return html`<div id="permissions">
 				${repeat(
 					this._value,
-					(area) => area,
-					(area, index) => {
+					(permission) => permission,
+					(permission, index) => {
 						const showCategoryHeader = this._blockGroups.length && this._blockTypes.length;
 
 						return html`<div class="permission-setting">
 							<uui-combobox
 								@change=${(e: UUIComboboxEvent) => this.#setPermissionKey(e, index)}
-								.value=${area.elementTypeKey ?? area.groupKey ?? ''}>
+								.value=${permission.elementTypeKey ?? permission.groupKey ?? ''}>
 								<uui-combobox-list>
 									${showCategoryHeader ? html`<strong>${this.localize.term('general_groups')}</strong>` : nothing}
-									${this.#renderBlockGroups(area)}
+									${this.#renderBlockGroups(permission)}
 									${showCategoryHeader ? html`<strong>${this.localize.term('general_elements')}</strong>` : nothing}
-									${this.#renderBlockTypes(area)}
+									${this.#renderBlockTypes(permission)}
 								</uui-combobox-list>
 							</uui-combobox>
 							<span>
@@ -116,14 +120,14 @@ export class UmbPropertyEditorUIBlockGridAreaTypePermissionElement
 									type="number"
 									placeholder="0"
 									min="0"
-									.value=${area.minAllowed}
+									.value=${permission.minAllowed}
 									@change=${(e: UUIInputEvent) => this.#setPermissionMinimumRange(e, index)}></uui-input>
 								-
 								<uui-input
 									type="number"
 									placeholder="&infin;"
 									min="0"
-									.value=${area.maxAllowed}
+									.value=${permission.maxAllowed}
 									@change=${(e: UUIInputEvent) => this.#setPermissionMaximumRange(e, index)}></uui-input>
 								<uui-button
 									label=${this.localize.term('general_remove')}
