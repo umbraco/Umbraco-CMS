@@ -96,21 +96,8 @@ export class UmbBlockGridEntryContext
 		if (!this._entries) return;
 		const layoutColumns = this._entries.getLayoutColumns();
 		if (!layoutColumns) return;
-		/*
-		const oldColumnSpan = this._layout.getValue()?.columnSpan;
-		if (!oldColumnSpan) {
-			// Some fallback solution, to reset it so something that makes sense.
-			return;
-		}
-		*/
 
 		columnSpan = Math.max(1, Math.min(columnSpan, layoutColumns));
-
-		/*
-		const columnSpanOptions = this.#relevantColumnSpanOptions.getValue();
-		if (columnSpanOptions.length > 0) {
-			columnSpan = closestColumnSpanOption(columnSpan, columnSpanOptions, layoutColumns) ?? layoutColumns;
-		}*/
 		this._layout.update({ columnSpan });
 	}
 	getColumnSpan() {
