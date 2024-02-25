@@ -17,6 +17,7 @@ export type CurrentUserResponseModel = {
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
+    fallbackPermissions: Array<string>;
     permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
 };
 
