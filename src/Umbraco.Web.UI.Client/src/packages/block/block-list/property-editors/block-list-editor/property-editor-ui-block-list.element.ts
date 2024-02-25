@@ -1,3 +1,4 @@
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation-api';
 import { UmbBlockListManagerContext } from '../../context/block-list-manager.context.js';
 import '../../components/block-list-entry/index.js';
 import type { UmbBlockListEntryElement } from '../../components/block-list-entry/index.js';
@@ -33,7 +34,10 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryE
  * @element umb-property-editor-ui-block-list
  */
 @customElement('umb-property-editor-ui-block-list')
-export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIBlockListElement
+	extends UmbFormControlMixin(UmbLitElement)
+	implements UmbPropertyEditorUiElement
+{
 	//
 	#sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbBlockListEntryElement>(this, {
 		...SORTER_CONFIG,
@@ -117,17 +121,17 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	constructor() {
 		super();
 
-		/*
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
-			this.observe(
-				propertyContext?.alias,
-				(alias) => {
-					this.#catalogueModal.setUniquePathValue('propertyAlias', alias);
-				},
-				'observePropertyAlias',
-			);
-		});
-		*/
+		this.addValidator(
+			'rangeUnderflow',
+			() => this.localize.term('validation_entriesShort'),
+			() => !!this._limitMin && this.#entriesContext.getLength() < this._limitMin,
+		);
+
+		this.addValidator(
+			'rangeOverflow',
+			() => this.localize.term('validation_entriesExceed'),
+			() => !!this._limitMax && this.#entriesContext.getLength() > this._limitMax,
+		);
 
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#managerContext.layouts, (layouts) => {
@@ -183,6 +187,10 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				this._catalogueRouteBuilder = routeBuilder;
 			});
 			*/
+	}
+
+	protected getFormElement() {
+		return undefined;
 	}
 
 	render() {
