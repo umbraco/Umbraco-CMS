@@ -31,6 +31,7 @@
 			"@umbraco-cms/backoffice/extension-api": ["./src/libs/extension-api/index.ts"],
 			"@umbraco-cms/backoffice/localization-api": ["./src/libs/localization-api/index.ts"],
 			"@umbraco-cms/backoffice/observable-api": ["./src/libs/observable-api/index.ts"],
+			"@umbraco-cms/backoffice/validation-api": ["./src/libs/validation-api/index.ts"],
 			"@umbraco-cms/backoffice/action": ["./src/packages/core/action/index.ts"],
 			"@umbraco-cms/backoffice/audit-log": ["./src/packages/audit-log/index.ts"],
 			"@umbraco-cms/backoffice/auth": ["./src/packages/core/auth/index.ts"],

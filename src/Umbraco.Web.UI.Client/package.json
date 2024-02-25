@@ -13,6 +13,7 @@
 		"./extension-api": "./dist-cms/libs/extension-api/index.js",
 		"./localization-api": "./dist-cms/libs/localization-api/index.js",
 		"./observable-api": "./dist-cms/libs/observable-api/index.js",
+		"./validation-api": "./dist-cms/libs/validation-api/index.js",
 		"./action": "./dist-cms/packages/core/action/index.js",
 		"./audit-log": "./dist-cms/packages/audit-log/index.js",
 		"./auth": "./dist-cms/packages/core/auth/index.js",
