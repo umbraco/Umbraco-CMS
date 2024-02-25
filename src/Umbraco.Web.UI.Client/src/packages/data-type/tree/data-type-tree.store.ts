@@ -1,8 +1,8 @@
-import { UmbStoreConnector } from '../../core/store/store-connector.js';
-import { UmbUniqueTreeStore } from '../../core/tree/unique-tree-store.js';
-import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT } from '../repository/detail/data-type-detail.store.js';
+import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT } from '../repository/index.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
 import type { UmbDataTypeTreeItemModel } from './types.js';
+import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
+import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 

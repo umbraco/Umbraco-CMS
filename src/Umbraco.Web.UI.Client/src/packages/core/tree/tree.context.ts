@@ -1,6 +1,6 @@
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from './reload-tree-item-children/index.js';
 import type { UmbTreeItemModelBase } from './types.js';
-import type { UmbTreeRepository } from './tree-repository.interface.js';
+import type { UmbTreeRepository } from './data/tree-repository.interface.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';

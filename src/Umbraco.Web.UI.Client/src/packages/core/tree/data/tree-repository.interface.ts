@@ -1,4 +1,4 @@
-import type { UmbTreeItemModelBase } from './types.js';
+import type { UmbTreeItemModelBase } from '../types.js';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
