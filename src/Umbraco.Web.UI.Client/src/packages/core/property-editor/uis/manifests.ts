@@ -24,7 +24,6 @@ import { manifest as valueType } from './value-type/manifests.js';
 import { manifests as collectionView } from './collection-view/manifests.js';
 import { manifests as numbers } from './number/manifests.js';
 import { manifests as textBoxes } from './text-box/manifests.js';
-import { manifests as tinyMCE } from './tiny-mce/manifests.js';
 import { manifests as treePicker } from './tree-picker/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -55,6 +54,5 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 	...collectionView,
 	...numbers,
 	...textBoxes,
-	...tinyMCE,
 	...treePicker,
 ];

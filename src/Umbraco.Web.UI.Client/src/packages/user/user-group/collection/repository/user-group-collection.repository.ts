@@ -34,3 +34,5 @@ export class UmbUserGroupCollectionRepository extends UmbBaseController implemen
 		return { data, error, asObservable: () => this.#detailStore!.all() };
 	}
 }
+
+export default UmbUserGroupCollectionRepository;

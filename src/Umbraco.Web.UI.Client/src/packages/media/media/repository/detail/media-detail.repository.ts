@@ -9,3 +9,5 @@ export class UmbMediaDetailRepository extends UmbDetailRepositoryBase<UmbMediaDe
 		super(host, UmbMediaServerDataSource, UMB_MEDIA_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbMediaDetailRepository;

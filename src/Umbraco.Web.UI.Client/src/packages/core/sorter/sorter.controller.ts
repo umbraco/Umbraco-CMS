@@ -333,9 +333,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
 			// Idea: to make sure on does not get initialized twice: if ((element as HTMLElement).draggable === true) return;
-			(element as HTMLElement).draggable = true;
-			element.addEventListener('dragstart', this.#handleDragStart);
-			element.addEventListener('dragend', this.#handleDragEnd);
+			const draggableElement = this.#config.draggableSelector
+				? (element.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element
+				: element;
+			(draggableElement as HTMLElement).draggable = true;
+			draggableElement.addEventListener('dragstart', this.#handleDragStart);
+			draggableElement.addEventListener('dragend', this.#handleDragEnd);
 		}
 
 		// If we have a currentItem and the element matches, we should set the currentElement to this element.
@@ -354,10 +357,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			destroyIgnorerElements(element, this.#config.ignorerSelector);
 		}
 
-		element.removeEventListener('dragstart', this.#handleDragStart);
+		const draggableElement = this.#config.draggableSelector
+			? (element.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element
+			: element;
+		draggableElement.removeEventListener('dragstart', this.#handleDragStart);
 		// We are not ready to remove the dragend or drop, as this is might be the active one just moving container:
-		//element.removeEventListener('dragend', this.#handleDragEnd);
-		//element.addEventListener('drop', this.#handleDrop);
+		//draggableElement.removeEventListener('dragend', this.#handleDragEnd);
 	}
 
 	#setupPlaceholderStyle() {

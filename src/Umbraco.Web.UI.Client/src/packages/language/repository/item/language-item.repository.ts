@@ -9,3 +9,4 @@ export class UmbLanguageItemRepository extends UmbItemRepositoryBase<UmbLanguage
 		super(host, UmbLanguageItemServerDataSource, UMB_LANGUAGE_ITEM_STORE_CONTEXT);
 	}
 }
+export default UmbLanguageItemRepository;

@@ -15,3 +15,5 @@ export class UmbDocumentPermissionRepository extends UmbBaseController {
 		return this.#permissionSource.requestPermissions(id);
 	}
 }
+
+export default UmbDocumentPermissionRepository;

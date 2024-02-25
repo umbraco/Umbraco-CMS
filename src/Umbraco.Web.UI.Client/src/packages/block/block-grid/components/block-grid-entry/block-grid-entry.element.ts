@@ -4,7 +4,8 @@ import { html, css, customElement, property, state } from '@umbraco-cms/backoffi
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../block-grid-block-view/index.js';
 import '../block-scale-handler/index.js';
-import type { UmbBlockGridLayoutModel, UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 /**
  * @element umb-block-grid-entry

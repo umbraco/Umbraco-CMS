@@ -1,5 +1,5 @@
-import type { UmbBlockTypeWithGroupKey } from '../block-type/index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '../index.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 
 export const UMB_BLOCK_GRID_TYPE = 'block-grid-type';
 

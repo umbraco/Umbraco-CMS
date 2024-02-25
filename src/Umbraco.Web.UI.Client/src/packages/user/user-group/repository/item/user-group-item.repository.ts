@@ -9,3 +9,5 @@ export class UmbUserGroupItemRepository extends UmbItemRepositoryBase<UmbUserGro
 		super(host, UmbUserGroupItemServerDataSource, UMB_USER_GROUP_ITEM_STORE_CONTEXT);
 	}
 }
+
+export default UmbUserGroupItemRepository;

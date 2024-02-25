@@ -35,3 +35,5 @@ export class UmbMediaTrackedReferenceRepository extends UmbBaseController {
 		return this.#trackedReferenceSource.getTrackedReferenceItem(uniques, skip, take, filterMustBeIsDependency);
 	}
 }
+
+export default UmbMediaTrackedReferenceRepository;

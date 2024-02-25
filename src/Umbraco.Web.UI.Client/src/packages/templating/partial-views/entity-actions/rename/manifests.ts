@@ -1,5 +1,4 @@
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../../entity.js';
-import { UmbRenamePartialViewRepository } from './rename-partial-view.repository.js';
 import { UmbRenameEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -11,7 +10,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'repository',
 		alias: UMB_RENAME_PARTIAL_VIEW_REPOSITORY_ALIAS,
 		name: 'Rename PartialView Repository',
-		api: UmbRenamePartialViewRepository,
+		api: () => import('./rename-partial-view.repository.js'),
 	},
 	{
 		type: 'entityAction',

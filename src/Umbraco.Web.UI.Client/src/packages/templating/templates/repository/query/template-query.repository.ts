@@ -19,3 +19,5 @@ export class UmbTemplateQueryRepository extends UmbRepositoryBase {
 		return this.#querySource.executeTemplateQuery(args);
 	}
 }
+
+export default UmbTemplateQueryRepository;

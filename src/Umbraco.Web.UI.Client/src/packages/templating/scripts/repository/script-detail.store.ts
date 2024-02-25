@@ -20,4 +20,6 @@ export class UmbScriptDetailStore extends UmbDetailStoreBase<UmbScriptDetailMode
 	}
 }
 
+export default UmbScriptDetailStore;
+
 export const UMB_SCRIPT_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbScriptDetailStore>('UmbScriptDetailStore');

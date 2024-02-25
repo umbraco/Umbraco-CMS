@@ -9,3 +9,4 @@ export class UmbUserGroupDetailRepository extends UmbDetailRepositoryBase<UmbUse
 		super(host, UmbUserGroupServerDataSource, UMB_USER_GROUP_DETAIL_STORE_CONTEXT);
 	}
 }
+export default UmbUserGroupDetailRepository;

@@ -9,3 +9,5 @@ export class UmbRenameScriptRepository extends UmbRenameRepositoryBase<UmbScript
 		super(host, UmbRenameScriptServerDataSource, UMB_SCRIPT_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbRenameScriptRepository;
