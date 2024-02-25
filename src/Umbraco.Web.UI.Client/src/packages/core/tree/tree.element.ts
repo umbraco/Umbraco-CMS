@@ -4,7 +4,7 @@ import { html, nothing, customElement, property, state, repeat } from '@umbraco-
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-import './tree-item-default/tree-item.element.js';
+import './tree-item/tree-item.element.js';
 import './tree-item-base/tree-item-base.element.js';
 
 export type UmbTreeSelectionConfiguration = {
@@ -121,7 +121,7 @@ export class UmbTreeElement extends UmbLitElement {
 
 	#renderTreeRoot() {
 		if (this.hideTreeRoot || this._treeRoot === undefined) return nothing;
-		return html` <umb-tree-item-default .item=${this._treeRoot}></umb-tree-item-default> `;
+		return html` <umb-tree-item .item=${this._treeRoot}></umb-tree-item> `;
 	}
 
 	#renderRootItems() {
@@ -131,7 +131,7 @@ export class UmbTreeElement extends UmbLitElement {
 				this._items,
 				// TODO: use unique here:
 				(item, index) => item.name + '___' + index,
-				(item) => html`<umb-tree-item-default .item=${item}></umb-tree-item-default>`,
+				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`,
 			)}
 		`;
 	}

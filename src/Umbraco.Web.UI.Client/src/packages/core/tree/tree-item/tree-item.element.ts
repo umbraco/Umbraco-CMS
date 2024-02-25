@@ -4,8 +4,8 @@ import { css, html, nothing, customElement, property } from '@umbraco-cms/backof
 import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-tree-item-default')
-export class UmbTreeItemDefaultElement extends UmbLitElement {
+@customElement('umb-tree-item')
+export class UmbTreeItemElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	item?: UmbTreeItemModelBase;
 
@@ -31,6 +31,6 @@ export class UmbTreeItemDefaultElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-item-default': UmbTreeItemDefaultElement;
+		'umb-tree-item': UmbTreeItemElement;
 	}
 }

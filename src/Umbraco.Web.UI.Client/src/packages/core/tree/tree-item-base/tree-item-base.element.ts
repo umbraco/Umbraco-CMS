@@ -1,4 +1,4 @@
-import type { UmbTreeItemContext } from '../tree-item-default/index.js';
+import type { UmbTreeItemContext } from '../tree-item/index.js';
 import type { UmbTreeItemModelBase } from '../types.js';
 import { UMB_TREE_ITEM_CONTEXT } from './tree-item-base.context.js';
 import { html, nothing, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
