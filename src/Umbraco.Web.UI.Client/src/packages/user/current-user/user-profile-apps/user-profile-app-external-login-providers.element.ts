@@ -1,4 +1,4 @@
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -13,7 +13,7 @@ export class UmbUserProfileAppExternalLoginProvidersElement extends UmbLitElemen
 		`;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbUserProfileAppExternalLoginProvidersElement;

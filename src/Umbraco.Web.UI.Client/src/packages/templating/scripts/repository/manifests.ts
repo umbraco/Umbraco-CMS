@@ -1,5 +1,3 @@
-import { UmbScriptDetailRepository } from './script-detail.repository.js';
-import { UmbScriptDetailStore } from './script-detail.store.js';
 import type { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS = 'Umb.Repository.Script.Detail';
@@ -9,14 +7,14 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS,
 	name: 'Script Detail Repository',
-	api: UmbScriptDetailRepository,
+	api: () => import('./script-detail.repository.js'),
 };
 
 const store: ManifestStore = {
 	type: 'store',
 	alias: UMB_SCRIPT_DETAIL_STORE_ALIAS,
 	name: 'Script Detail Store',
-	api: UmbScriptDetailStore,
+	api: () => import('./script-detail.store.js'),
 };
 
 export const manifests = [repository, store];

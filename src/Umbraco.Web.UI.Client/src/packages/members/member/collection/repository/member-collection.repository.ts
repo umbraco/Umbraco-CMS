@@ -1,7 +1,7 @@
 import type { UmbMemberCollectionFilterModel } from '../types.js';
 import { UmbMemberCollectionServerDataSource } from './member-collection.server.data-source.js';
 import type { UmbMemberCollectionDataSource } from './types.js';
-import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbMemberCollectionRepository implements UmbCollectionRepository {

@@ -11,7 +11,7 @@ import {
 	queryAssignedElements,
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
-import { clamp } from '@umbraco-cms/backoffice/external/lodash';
+import { clamp } from '@umbraco-cms/backoffice/utils';
 
 export interface Circle {
 	color: string;

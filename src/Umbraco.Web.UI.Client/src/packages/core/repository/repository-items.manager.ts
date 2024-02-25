@@ -64,19 +64,19 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		});
 	}
 
-	getUniques() {
+	getUniques(): Array<string> {
 		return this.#uniques.value;
 	}
 
-	setUniques(uniques: string[]) {
+	setUniques(uniques: string[]): void {
 		this.#uniques.setValue(uniques);
 	}
 
-	getItems() {
+	getItems(): Array<ItemType> {
 		return this.#items.value;
 	}
 
-	async #requestItems() {
+	async #requestItems(): Promise<void> {
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
 
@@ -95,7 +95,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 		}
 	}
 
-	#sortByUniques(data: Array<ItemType>) {
+	#sortByUniques(data: Array<ItemType>): Array<ItemType> {
 		const uniques = this.getUniques();
 		return [...data].sort((a, b) => {
 			const aIndex = uniques.indexOf(this.#getUnique(a) ?? '');

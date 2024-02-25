@@ -3,7 +3,7 @@ import type { UmbUserGroupDetailStore } from '../../repository/index.js';
 import { UMB_USER_GROUP_DETAIL_STORE_CONTEXT } from '../../repository/index.js';
 import type { UmbUserGroupCollectionFilterModel } from '../types.js';
 import { UmbUserGroupCollectionServerDataSource } from './user-group-collection.server.data-source.js';
-import type { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
@@ -34,3 +34,5 @@ export class UmbUserGroupCollectionRepository extends UmbBaseController implemen
 		return { data, error, asObservable: () => this.#detailStore!.all() };
 	}
 }
+
+export default UmbUserGroupCollectionRepository;

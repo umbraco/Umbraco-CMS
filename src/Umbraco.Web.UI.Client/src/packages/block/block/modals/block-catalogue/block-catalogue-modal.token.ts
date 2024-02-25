@@ -1,4 +1,5 @@
-import type { UmbBlockTypeBaseModel, UmbBlockTypeGroup, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel, UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockCatalogueModalData {

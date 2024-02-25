@@ -4,7 +4,8 @@ import { html, css, customElement, property, state } from '@umbraco-cms/backoffi
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import '../block-grid-block-view/index.js';
 import '../block-scale-handler/index.js';
-import type { UmbBlockGridLayoutModel, UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 
 /**
  * @element umb-block-grid-entry
@@ -25,7 +26,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return this._contentUdi;
 	}
 	public set contentUdi(value: string | undefined) {
-		if (!value) return;
+		if (!value || value === this._contentUdi) return;
 		this._contentUdi = value;
 		this._blockViewProps.contentUdi = value;
 		this.setAttribute('data-element-udi', value);

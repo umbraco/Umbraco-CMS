@@ -14,7 +14,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
+		memberType: { id: 'member-type-1-id', icon: '' },
 		username: 'member1',
 		values: [],
 		variants: [
@@ -38,7 +38,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
+		memberType: { id: 'member-type-1-id', icon: '' },
 		username: 'member2',
 		values: [],
 		variants: [
@@ -62,7 +62,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastLockoutDate: null,
 		lastLoginDate: null,
 		lastPasswordChangeDate: null,
-		memberType: { id: 'member-type-1-id', icon: '', hasListView: false },
+		memberType: { id: 'member-type-1-id', icon: '' },
 		username: 'member3',
 		values: [],
 		variants: [

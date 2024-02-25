@@ -29,3 +29,5 @@ export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 		return { data, error };
 	}
 }
+
+export default UmbUnlockUserRepository;

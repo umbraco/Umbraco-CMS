@@ -121,7 +121,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		});
 	}
 
-	private _onPropertyEditorChange = (e: CustomEvent) => {
+	private _onPropertyEditorChange = (e: CustomEvent): void => {
 		const target = e.composedPath()[0] as any;
 
 		//this.value = target.value; // Sets value in context.
@@ -129,7 +129,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		e.stopPropagation();
 	};
 
-	private _observePropertyEditorUI() {
+	private _observePropertyEditorUI(): void {
 		this.observe(
 			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
 			(manifest) => {
@@ -139,7 +139,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		);
 	}
 
-	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null) {
+	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {
 		this.#propertyContext.setEditor(undefined);
 
 		if (!manifest) {

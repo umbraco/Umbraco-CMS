@@ -9,3 +9,5 @@ export class UmbScriptDetailRepository extends UmbDetailRepositoryBase<UmbScript
 		super(host, UmbScriptDetailServerDataSource, UMB_SCRIPT_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbScriptDetailRepository;

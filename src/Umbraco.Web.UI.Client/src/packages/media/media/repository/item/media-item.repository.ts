@@ -9,3 +9,5 @@ export class UmbMediaItemRepository extends UmbItemRepositoryBase<UmbMediaItemMo
 		super(host, UmbMediaItemServerDataSource, UMB_MEDIA_ITEM_STORE_CONTEXT);
 	}
 }
+
+export default UmbMediaItemRepository;

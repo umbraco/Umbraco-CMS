@@ -1,7 +1,6 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../workspace/block-workspace.context-token.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type {
-	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
@@ -30,12 +29,7 @@ export class UmbBlockWorkspaceHasSettingsCondition extends UmbBaseController imp
 	}
 }
 
+export default UmbBlockWorkspaceHasSettingsCondition;
+
 export type BlockWorkspaceHasSettingsConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasSettings'>;
-
-export const manifest: ManifestCondition = {
-	type: 'condition',
-	name: 'Block Has Settings Condition',
-	alias: 'Umb.Condition.BlockWorkspaceHasSettings',
-	api: UmbBlockWorkspaceHasSettingsCondition,
-};

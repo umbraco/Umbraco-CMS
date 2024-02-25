@@ -1,4 +1,3 @@
-import { UmbCurrentUserContext } from './current-user.context.js';
 import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as userProfileAppsManifests } from './user-profile-apps/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
@@ -14,7 +13,7 @@ export const headerApps: Array<ManifestTypes> = [
 		type: 'globalContext',
 		alias: 'Umb.GlobalContext.CurrentUser',
 		name: 'Current User',
-		api: UmbCurrentUserContext,
+		api: () => import('./current-user.context.js'),
 	},
 	{
 		type: 'headerApp',
