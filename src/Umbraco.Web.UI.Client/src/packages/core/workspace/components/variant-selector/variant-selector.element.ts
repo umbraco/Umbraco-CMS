@@ -211,7 +211,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 									id="variant-selector-toggle"
 									slot="append"
 									popovertarget="variant-selector-popover"
-									title=${ifDefined(this._variantTitleName)}>
+									title=${this._variantTitleName}>
 									${this._variantDisplayName}
 									<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 								</uui-button>
