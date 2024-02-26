@@ -3,7 +3,7 @@ import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/exten
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
+import type { UmbUserPermissionVerbElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
@@ -50,7 +50,7 @@ export class UmbInputEntityUserPermissionElement extends FormControlMixin(UmbLit
 
 	#onChangeUserPermission(event: UmbChangeEvent, permissionVerbs: Array<string>) {
 		event.stopPropagation();
-		const target = event.target as UmbUserPermissionSettingElement;
+		const target = event.target as UmbUserPermissionVerbElement;
 		target.allowed ? this.#addUserPermission(permissionVerbs) : this.#removeUserPermission(permissionVerbs);
 	}
 
@@ -91,14 +91,14 @@ export class UmbInputEntityUserPermissionElement extends FormControlMixin(UmbLit
 	}
 
 	#renderPermission(manifest: ManifestEntityUserPermission) {
-		return html` <umb-user-permission-setting
+		return html` <umb-input-user-permission-verb
 			label=${ifDefined(manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label)}
 			description=${ifDefined(
 				manifest.meta.descriptionKey ? this.localize.term(manifest.meta.descriptionKey) : manifest.meta.description,
 			)}
 			?allowed=${this.#isAllowed(manifest.meta.verbs)}
 			@change=${(event: UmbChangeEvent) =>
-				this.#onChangeUserPermission(event, manifest.meta.verbs)}></umb-user-permission-setting>`;
+				this.#onChangeUserPermission(event, manifest.meta.verbs)}></umb-input-user-permission-verb>`;
 	}
 
 	disconnectedCallback() {
