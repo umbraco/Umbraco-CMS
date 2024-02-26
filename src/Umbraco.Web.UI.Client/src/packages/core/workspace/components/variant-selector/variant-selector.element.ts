@@ -43,7 +43,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	#splitViewContext?: typeof UMB_WORKSPACE_SPLIT_VIEW_CONTEXT.TYPE;
-	#variantContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
+	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	@state()
 	private _name?: string;
@@ -69,14 +69,14 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			this._observeActiveVariants();
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
-			this.#variantContext = instance;
-			this._observeVariantContext();
+			this.#datasetContext = instance;
+			this.#observeDatasetContext();
 		});
 
-		this._loadLanguages();
+		this.#loadLanguages();
 	}
 
-	private async _loadLanguages() {
+	async #loadLanguages() {
 		const { data: languages } = await this.#languageRepository.requestCollection({});
 		if (!languages) return;
 		this.#languages.setValue(languages.items);
@@ -122,10 +122,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private async _observeVariantContext() {
-		if (!this.#variantContext) return;
+	async #observeDatasetContext() {
+		if (!this.#datasetContext) return;
 
-		const variantId = this.#variantContext.getVariantId();
+		const variantId = this.#datasetContext.getVariantId();
 
 		const culture = variantId.culture;
 		const segment = variantId.segment;
@@ -142,7 +142,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		);
 
 		this.observe(
-			this.#variantContext.name,
+			this.#datasetContext.name,
 			(name) => {
 				this._name = name;
 			},
@@ -157,10 +157,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 			if (
 				typeof target?.value === 'string' &&
-				this.#variantContext &&
-				isNameablePropertyDatasetContext(this.#variantContext)
+				this.#datasetContext &&
+				isNameablePropertyDatasetContext(this.#datasetContext)
 			) {
-				this.#variantContext.setName(target.value);
+				this.#datasetContext.setName(target.value);
 			}
 		}
 	}
