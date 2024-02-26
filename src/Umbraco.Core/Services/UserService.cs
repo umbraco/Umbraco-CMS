@@ -897,7 +897,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (existingUser is null)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, existingUser);
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, existingUser);
         }
 
         IUser? performingUser = await userStore.GetAsync(userKey);
