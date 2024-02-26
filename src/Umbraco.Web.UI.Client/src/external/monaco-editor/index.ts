@@ -1,6 +1,6 @@
 /* eslint-disable */
 // @ts-ignore
-import styles from 'monaco-editor/min/vs/editor/editor.main.css';
+import styles from 'monaco-editor/min/vs/editor/editor.main.css?inline';
 // @ts-ignore
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker.js?worker';
 // @ts-ignore

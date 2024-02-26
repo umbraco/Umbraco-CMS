@@ -1,11 +1,11 @@
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type {
 	UmbNotificationColor,
 	UmbNotificationOptions,
 	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/notification';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-story-notification-default-example')
 export class UmbStoryNotificationDefaultExampleElement extends UmbLitElement {
@@ -14,7 +14,7 @@ export class UmbStoryNotificationDefaultExampleElement extends UmbLitElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 			this._notificationContext = instance;
 		});
 	}

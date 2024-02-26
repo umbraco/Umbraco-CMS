@@ -1,16 +1,10 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import {
-	css,
-	html,
-	PropertyValueMap,
-	customElement,
-	property,
-	query,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
-import { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import type { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, toQueryString } from '@umbraco-cms/backoffice/router';
 
 //TODO: check how to display EventId field in the message properties
@@ -58,7 +52,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 		});
 	}
@@ -95,18 +89,18 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			label: 'Search Umbraco Source',
 			title: 'Search within Umbraco source code on Github',
 			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/search?q=${
-					this.properties.find((property) => property.name === 'SourceContext')?.value
-				}`,
+				`https://github.com/umbraco/Umbraco-CMS/search?q=${this.properties.find(
+					(property) => property.name === 'SourceContext',
+				)?.value}`,
 			icon: 'https://github.githubassets.com/favicon.ico',
 		},
 		{
 			label: 'Search Umbraco Issues',
 			title: 'Search Umbraco Issues on Github',
 			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/issues?q=${
-					this.properties.find((property) => property.name === 'SourceContext')?.value
-				}`,
+				`https://github.com/umbraco/Umbraco-CMS/issues?q=${this.properties.find(
+					(property) => property.name === 'SourceContext',
+				)?.value}`,
 			icon: 'https://github.githubassets.com/favicon.ico',
 		},
 	];
@@ -170,33 +164,31 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 												look="secondary"
 												label="Find logs with ${property.name}"
 												title="Find logs with ${property.name}"
-												href=${`section/settings/workspace/logviewer/search/?${this._findLogsWithProperty(property)}`}>
+												href=${`section/settings/workspace/logviewer/view/search/?${this._findLogsWithProperty(
+													property,
+												)}`}>
 												<uui-icon name="icon-search"></uui-icon>
 										  </uui-button>`
 										: ''}
 								</div>
-							</li>`
+							</li>`,
 					)}
 				</ul>
-				<umb-button-with-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
-					<uui-icon name="icon-search"></uui-icon>Search
-					<ul id="search-menu" slot="dropdown">
-						${this._searchMenuData.map(
-							(menuItem) => html`
-								<li>
-									<uui-menu-item
-										class="search-item"
-										href="${menuItem.href()}"
-										target="_blank"
-										label="${menuItem.label}"
-										title="${menuItem.title}">
-										<img slot="icon" src="${menuItem.icon}" width="16" height="16" alt="" />
-									</uui-menu-item>
-								</li>
-							`
-						)}
-					</ul>
-				</umb-button-with-dropdown>
+				<umb-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
+					<span slot="label"><uui-icon name="icon-search"></uui-icon> Search</span>
+					${this._searchMenuData.map(
+						(menuItem) => html`
+							<uui-menu-item
+								class="search-item"
+								href="${menuItem.href()}"
+								target="_blank"
+								label="${menuItem.label}"
+								title="${menuItem.title}">
+								<img slot="icon" src="${menuItem.icon}" width="16" height="16" alt="" />
+							</uui-menu-item>
+						`,
+					)}
+				</umb-dropdown>
 			</details>
 		`;
 	}
@@ -253,7 +245,12 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				border-left: 4px solid #d42054;
 				color: #303033;
 				display: block;
-				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-family:
+					Lato,
+					Helvetica Neue,
+					Helvetica,
+					Arial,
+					sans-serif;
 				line-height: 20px;
 				overflow-x: auto;
 				padding: 9.5px;
@@ -274,6 +271,10 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			#level,
 			#machine {
 				flex: 1 0 14ch;
+			}
+
+			uui-menu-item {
+				--uui-menu-item-flat-structure: 1;
 			}
 
 			#message {
@@ -297,19 +298,6 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 			.property-value {
 				flex: 3 0 20ch;
-			}
-
-			#search-menu {
-				margin: 0;
-				padding: 0;
-				margin-top: var(--uui-size-space-3);
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				max-width: 25%;
-			}
-
-			#search-menu > li {
-				padding: 0;
 			}
 
 			.search-item {

@@ -1,32 +1,25 @@
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_COLLECTION_REPOSITORY_ALIAS } from './repository/index.js';
+import { manifests as collectionActionManifests } from './action/manifests.js';
+import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
+import { manifests as collectionViewManifests } from './views/manifests.js';
+import { UmbDocumentCollectionContext } from './document-collection.context.js';
+import { UMB_DOCUMENT_COLLECTION_ALIAS } from './index.js';
+import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
 
-export const UMB_DOCUMENT_COLLECTION_ALIAS = 'document';
+const collectionManifest: ManifestCollection = {
+	type: 'collection',
+	alias: UMB_DOCUMENT_COLLECTION_ALIAS,
+	name: 'Document Collection',
+	api: UmbDocumentCollectionContext,
+	element: () => import('./document-collection.element.js'),
+	meta: {
+		repositoryAlias: UMB_DOCUMENT_COLLECTION_REPOSITORY_ALIAS,
+	},
+};
 
-export const manifests: Array<ManifestTypes> = [
-	// TODO: temp registration, missing collection repository
-	{
-		type: 'collection',
-		kind: 'default',
-		alias: 'Umb.Collection.Document',
-		name: 'Document Collection',
-	},
-	{
-		type: 'collectionView',
-		alias: 'Umb.CollectionView.Document.Table',
-		name: 'Document Table Collection View',
-		js: () => import('./views/table/document-table-collection-view.element.js'),
-		weight: 200,
-		meta: {
-			label: 'Table',
-			icon: 'icon-box',
-			pathName: 'table',
-		},
-		conditions: [
-			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: UMB_DOCUMENT_COLLECTION_ALIAS,
-			},
-		],
-	},
+export const manifests = [
+	collectionManifest,
+	...collectionActionManifests,
+	...collectionRepositoryManifests,
+	...collectionViewManifests,
 ];

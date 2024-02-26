@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type DeleteUsersRequestModel = {
-    userIds?: Array<string>;
+    userIds: Array<string>;
 };
 

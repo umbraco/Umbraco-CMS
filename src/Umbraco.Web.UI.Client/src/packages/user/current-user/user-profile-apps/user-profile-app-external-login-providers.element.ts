@@ -1,6 +1,6 @@
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-user-profile-app-external-login-providers')
 export class UmbUserProfileAppExternalLoginProvidersElement extends UmbLitElement {
@@ -13,7 +13,7 @@ export class UmbUserProfileAppExternalLoginProvidersElement extends UmbLitElemen
 		`;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [UmbTextStyles];
 }
 
 export default UmbUserProfileAppExternalLoginProvidersElement;

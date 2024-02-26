@@ -1,8 +1,8 @@
 import { UMB_CONTENT_MENU_ALIAS } from '../menu.manifests.js';
 import { UMB_DOCUMENT_TREE_ALIAS } from '../tree/index.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenuItemTreeKind } from '@umbraco-cms/backoffice/extension-registry';
 
-const menuItem: ManifestTypes = {
+const menuItem: ManifestMenuItemTreeKind = {
 	type: 'menuItem',
 	kind: 'tree',
 	alias: 'Umb.MenuItem.Document',
@@ -10,7 +10,6 @@ const menuItem: ManifestTypes = {
 	weight: 200,
 	meta: {
 		label: 'Documents',
-		icon: 'icon-folder',
 		menus: [UMB_CONTENT_MENU_ALIAS],
 		treeAlias: UMB_DOCUMENT_TREE_ALIAS,
 		hideTreeRoot: true,

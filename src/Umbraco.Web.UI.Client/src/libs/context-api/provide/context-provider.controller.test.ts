@@ -1,7 +1,7 @@
 import { expect, fixture, defineCE } from '@open-wc/testing';
 import { UmbContextConsumer } from '../consume/context-consumer.js';
 import { UmbContextProviderController } from './context-provider.controller.js';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 class UmbTestContextProviderControllerClass {
 	prop = 'value from provider';
@@ -46,7 +46,7 @@ describe('UmbContextProviderController', () => {
 				expect(_instance?.prop).to.eq('value from provider');
 				done();
 				localConsumer.hostDisconnected();
-			}
+			},
 		);
 		localConsumer.hostConnected();
 	});

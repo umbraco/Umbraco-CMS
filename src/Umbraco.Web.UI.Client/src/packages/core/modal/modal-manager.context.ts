@@ -1,11 +1,10 @@
 import type { UmbModalToken } from './token/modal-token.js';
-import { UmbModalContext, UmbModalContextClass } from './index.js';
-import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
+import { UmbModalContext, type UmbModalContextClassArgs } from './modal.context.js';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
-import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -15,40 +14,39 @@ export interface UmbModalConfig {
 	size?: UUIModalSidebarSize;
 }
 
-export class UmbModalManagerContext {
-	host: UmbControllerHostElement;
+export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContext> {
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
-	#modals = new BehaviorSubject(<Array<UmbModalContext>>[]);
+	#modals = new UmbBasicState(<Array<UmbModalContext>>[]);
 	public readonly modals = this.#modals.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		this.host = host;
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_MODAL_MANAGER_CONTEXT);
 	}
 
 	/**
 	 * Opens a modal or sidebar modal
 	 * @public
 	 * @param {(string | UmbModalToken)} modalAlias
-	 * @param {ModalData} data
-	 * @param {UmbModalConfig} config
-	 * @param {IRouterSlot | null} router
+	 * @param {UmbModalContextClassArgs} args
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalManagerContext
 	 */
-	public open<ModalData extends object = object, ModalValue = unknown>(
-		modalAlias: string | UmbModalToken<ModalData, ModalValue>,
-		data?: ModalData,
-		config?: UmbModalConfig,
-		router: IRouterSlot | null = null,
+	public open<
+		ModalData extends object = object,
+		ModalValue = unknown,
+		ModalAliasTypeAsToken extends UmbModalToken = UmbModalToken<ModalData, ModalValue>,
+	>(
+		modalAlias: UmbModalToken<ModalData, ModalValue> | string,
+		args: UmbModalContextClassArgs<ModalAliasTypeAsToken> = {},
 	) {
-		const modalContext = new UmbModalContextClass(router, modalAlias, data, config) as unknown as UmbModalContext<
-			ModalData,
-			ModalValue
-		>;
+		const modalContext = new UmbModalContext(modalAlias, args);
 
-		this.#modals.next(
-			appendToFrozenArray(this.#modals.getValue(), modalContext, (entry) => entry.key === modalContext.key),
+		// Append to store:
+		this.#modals.setValue(
+			appendToFrozenArray(this.#modals.value, modalContext, (entry) => entry.key === modalContext.key),
 		);
+
+		// Return to implementor:
 		return modalContext;
 	}
 
@@ -66,8 +64,10 @@ export class UmbModalManagerContext {
 	}
 
 	public remove(key: string) {
-		this.#modals.next(this.#modals.getValue().filter((modal) => modal.key !== key));
+		this.#modals.setValue(this.#modals.getValue().filter((modal) => modal.key !== key));
 	}
 }
 
-export const UMB_MODAL_MANAGER_CONTEXT_TOKEN = new UmbContextToken<UmbModalManagerContext>('UmbModalManagerContext');
+export const UMB_MODAL_MANAGER_CONTEXT = new UmbContextToken<UmbModalManagerContext, UmbModalManagerContext>(
+	'UmbModalManagerContext',
+);

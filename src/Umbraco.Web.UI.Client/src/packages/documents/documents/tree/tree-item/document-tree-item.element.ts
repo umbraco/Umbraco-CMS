@@ -1,18 +1,18 @@
+import type { UmbDocumentTreeItemModel } from '../types.js';
 import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTreeItemElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbTreeItemElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-tree-item')
 export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
-	private _item?: DocumentTreeItemResponseModel;
+	private _item?: UmbDocumentTreeItemModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
 		return this._item;
 	}
-	public set item(value: DocumentTreeItemResponseModel | undefined) {
+	public set item(value: UmbDocumentTreeItemModel | undefined) {
 		this._item = value;
 		this.#context.setTreeItem(value);
 	}
@@ -30,9 +30,10 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 	#renderIconWithStatusSymbol() {
 		return html`
 			<span id="icon-container" slot="icon">
-				${this.item?.icon
+				${this.item?.documentType.icon
 					? html`
-							<uui-icon id="icon" slot="icon" name="${this.item.icon}"></uui-icon> <span id="status-symbol"></span>
+							<uui-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></uui-icon>
+							<span id="status-symbol"></span>
 					  `
 					: nothing}
 			</span>
@@ -40,8 +41,9 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 	}
 
 	// TODO: lower opacity if item is not published
+	// TODO: get correct variant name
 	#renderLabel() {
-		return html` <span id="label" slot="label">${this.item?.name}</span> `;
+		return html` <span id="label" slot="label">${this.item?.variants[0].name}</span> `;
 	}
 
 	static styles = [

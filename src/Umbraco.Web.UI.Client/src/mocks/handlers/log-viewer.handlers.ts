@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbLogViewerData } from '../data/log-viewer.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { SavedLogSearchRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { SavedLogSearchRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	//#region Searches

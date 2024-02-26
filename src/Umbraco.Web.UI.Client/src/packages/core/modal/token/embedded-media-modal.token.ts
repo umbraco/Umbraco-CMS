@@ -1,4 +1,4 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
 
 export enum OEmbedStatus {
 	NotSupported,
@@ -31,7 +31,9 @@ export interface UmbEmbeddedMediaModalValue extends UmbEmbeddedMediaModalData {
 export const UMB_EMBEDDED_MEDIA_MODAL = new UmbModalToken<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue>(
 	'Umb.Modal.EmbeddedMedia',
 	{
-		type: 'sidebar',
-		size: 'medium',
+		modal: {
+			type: 'sidebar',
+			size: 'medium',
+		},
 	},
 );

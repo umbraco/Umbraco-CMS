@@ -1,8 +1,8 @@
 import { UMB_USER_GROUP_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-user-group-section-view')
 export class UmbUserGroupSectionViewElement extends UmbLitElement {

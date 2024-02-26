@@ -1,8 +1,9 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 	// TODO: Refactor: use the split view context token:
@@ -28,7 +29,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			(variants) => {
 				this._variants = variants;
 			},
-			'_observeActiveVariantsInfo'
+			'_observeActiveVariantsInfo',
 		);
 	}
 
@@ -44,13 +45,11 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 									alias="Umb.Workspace.Document"
 									.splitViewIndex=${view.index}
 									.displayNavigation=${view.index === this._variants!.length - 1}></umb-workspace-split-view>
-							`
+							`,
 						)}
 					</div>
 
-					<umb-workspace-footer alias="Umb.Workspace.Document">
-						<div id="breadcrumbs">Breadcrumbs</div>
-					</umb-workspace-footer>`
+					<umb-workspace-footer alias="Umb.Workspace.Document"></umb-workspace-footer>`
 			: nothing;
 	}
 

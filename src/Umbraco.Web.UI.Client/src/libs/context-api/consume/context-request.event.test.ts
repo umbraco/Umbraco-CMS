@@ -1,9 +1,9 @@
 import { expect } from '@open-wc/testing';
-import { UmbContextRequestEventImplementation, UmbContextRequestEvent } from './context-request.event.js';
+import type { UmbContextRequestEvent } from './context-request.event.js';
+import { UmbContextRequestEventImplementation } from './context-request.event.js';
 
 describe('UmbContextRequestEvent', () => {
 	const contextRequestCallback = () => {
-		console.log('hello from callback');
 		return true;
 	};
 
@@ -23,6 +23,10 @@ describe('UmbContextRequestEvent', () => {
 
 	it('has a callback', () => {
 		expect(event.callback).to.eq(contextRequestCallback);
+	});
+
+	it('has stopAtContextMatch, which defaults to true', () => {
+		expect(event.stopAtContextMatch).to.eq(true);
 	});
 
 	it('bubbles', () => {

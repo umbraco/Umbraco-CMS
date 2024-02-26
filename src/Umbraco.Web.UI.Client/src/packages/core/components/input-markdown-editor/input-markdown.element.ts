@@ -1,18 +1,20 @@
 import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
-import { UmbCodeEditorController, UmbCodeEditorElement, loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import type { UmbCodeEditorController, UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, customElement, query, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUIModalSidebarSize, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, type UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_LINK_PICKER_MODAL,
 	UMB_MEDIA_TREE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
  * @element umb-input-markdown
@@ -46,7 +48,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 		this.#loadCodeEditor();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
@@ -66,7 +68,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				folding: false,
 			}); // Prefer to update options before showing the editor, to avoid seeing the changes in the UI.
 
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 			this.#loadActions();
 		} catch (error) {
 			console.error(error);
@@ -179,38 +181,44 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 
 	private _insertLink() {
 		const selection = this.#editor?.getSelections()[0];
-		if (!selection) return;
+		if (!selection || !this._modalContext) return;
 
 		const selectedValue = this.#editor?.getValueInRange(selection);
 
 		this._focusEditor(); // Focus before opening modal
-		const modalContext = this._modalContext?.open(UMB_LINK_PICKER_MODAL, {
-			index: null,
-			link: { name: selectedValue },
-			config: { overlaySize: this.overlaySize },
+		const modalContext = this._modalContext.open(UMB_LINK_PICKER_MODAL, {
+			data: {
+				index: null,
+				config: { overlaySize: this.overlaySize },
+			},
+			value: {
+				link: { name: selectedValue },
+			},
 		});
 
 		modalContext
 			?.onSubmit()
-			.then((data) => {
+			.then((value) => {
+				if (!value) return;
+
 				const name = this.localize.term('general_name');
 				const url = this.localize.term('general_url');
 
 				this.#editor?.monacoEditor?.executeEdits('', [
-					{ range: selection, text: `[${data.link.name || name}](${data.link.url || url})` },
+					{ range: selection, text: `[${value.link.name || name}](${value.link.url || url})` },
 				]);
 
-				if (!data.link.name) {
+				if (!value.link.name) {
 					this.#editor?.select({
 						startColumn: selection.startColumn + 1,
 						endColumn: selection.startColumn + 1 + name.length,
 						endLineNumber: selection.startLineNumber,
 						startLineNumber: selection.startLineNumber,
 					});
-				} else if (!data.link.url) {
+				} else if (!value.link.url) {
 					this.#editor?.select({
-						startColumn: selection.startColumn + 3 + data.link.name.length,
-						endColumn: selection.startColumn + 3 + data.link.name.length + url.length,
+						startColumn: selection.startColumn + 3 + value.link.name.length,
+						endColumn: selection.startColumn + 3 + value.link.name.length + url.length,
 						endLineNumber: selection.startLineNumber,
 						startLineNumber: selection.startLineNumber,
 					});
@@ -227,12 +235,13 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		const alt = this.#editor?.getValueInRange(selection) || 'alt text';
 
 		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
-		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {});
+		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL);
 
 		modalContext
 			?.onSubmit()
-			.then((data) => {
-				const imgUrl = data.selection[0];
+			.then((value) => {
+				if (!value) return;
+				const imgUrl = value.selection[0];
 				this.#editor?.monacoEditor?.executeEdits('', [
 					//TODO: Get the correct media URL
 					{
@@ -547,13 +556,13 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	renderPreview(markdown: string) {
-		const markdownAsHtml = marked.parse(markdown);
+		const markdownAsHtml = marked.parse(markdown) as string;
 		const sanitizedHtml = markdownAsHtml ? DOMPurify.sanitize(markdownAsHtml) : '';
 		return html`<uui-scroll-container id="preview"> ${unsafeHTML(sanitizedHtml)} </uui-scroll-container>`;
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;

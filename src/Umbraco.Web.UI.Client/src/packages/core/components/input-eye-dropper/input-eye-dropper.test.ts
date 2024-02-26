@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbInputEyeDropperElement } from './input-eye-dropper.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 describe('UmbInputEyeDropperElement', () => {
 	let element: UmbInputEyeDropperElement;
 
@@ -12,7 +12,9 @@ describe('UmbInputEyeDropperElement', () => {
 		expect(element).to.be.instanceOf(UmbInputEyeDropperElement);
 	});
 
-	it('passes the a11y audit', async () => {
-		await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
-	});
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		it('passes the a11y audit', async () => {
+			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
+		});
+	}
 });

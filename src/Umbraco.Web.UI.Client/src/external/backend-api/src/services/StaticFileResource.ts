@@ -15,16 +15,19 @@ export class StaticFileResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getStaticFileItem({
+    public static getItemStaticFile({
         path,
     }: {
         path?: Array<string>,
     }): CancelablePromise<Array<StaticFileItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/static-file/item',
+            url: '/umbraco/management/api/v1/item/static-file',
             query: {
                 'path': path,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -34,11 +37,11 @@ export class StaticFileResource {
      * @throws ApiError
      */
     public static getTreeStaticFileChildren({
-        path,
+        parentPath,
         skip,
         take = 100,
     }: {
-        path?: string,
+        parentPath?: string,
         skip?: number,
         take?: number,
     }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
@@ -46,9 +49,12 @@ export class StaticFileResource {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/static-file/children',
             query: {
-                'path': path,
+                'parentPath': parentPath,
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -70,6 +76,9 @@ export class StaticFileResource {
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

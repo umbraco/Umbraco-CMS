@@ -1,8 +1,10 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { css, CSSResultGroup, html, LitElement, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import {
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type {
 	ManifestHeaderAppButtonKind,
-	UmbBackofficeManifestKind,
+	UmbBackofficeManifestKind} from '@umbraco-cms/backoffice/extension-registry';
+import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 

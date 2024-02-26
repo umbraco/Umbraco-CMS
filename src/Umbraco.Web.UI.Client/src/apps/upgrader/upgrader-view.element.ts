@@ -1,13 +1,6 @@
-import {
-	css,
-	CSSResultGroup,
-	html,
-	LitElement,
-	customElement,
-	property,
-	ifDefined,
-} from '@umbraco-cms/backoffice/external/lit';
-import { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type { UpgradeSettingsResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * @element umb-upgrader-view

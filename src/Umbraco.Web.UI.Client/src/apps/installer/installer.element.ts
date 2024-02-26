@@ -1,6 +1,6 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from './installer.context.js';
-import { css, CSSResultGroup, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT } from './installer.context.js';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './consent/installer-consent.element.js';
 import './database/installer-database.element.js';
@@ -18,7 +18,7 @@ export class UmbInstallerElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.provideContext(UMB_INSTALLER_CONTEXT_TOKEN, this._umbInstallerContext);
+		this.provideContext(UMB_INSTALLER_CONTEXT, this._umbInstallerContext);
 	}
 
 	connectedCallback(): void {
@@ -56,8 +56,6 @@ export class UmbInstallerElement extends UmbLitElement {
 	render() {
 		return html`<umb-installer-layout data-test="installer">${this._renderSection()}</umb-installer-layout> `;
 	}
-
-	static styles: CSSResultGroup = [css``];
 }
 
 export default UmbInstallerElement;

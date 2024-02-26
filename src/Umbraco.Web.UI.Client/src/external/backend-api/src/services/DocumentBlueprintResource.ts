@@ -15,16 +15,19 @@ export class DocumentBlueprintResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDocumentBlueprintItem({
+    public static getItemDocumentBlueprint({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<DocumentBlueprintResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/document-blueprint/item',
+            url: '/umbraco/management/api/v1/item/document-blueprint',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -46,6 +49,9 @@ export class DocumentBlueprintResource {
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

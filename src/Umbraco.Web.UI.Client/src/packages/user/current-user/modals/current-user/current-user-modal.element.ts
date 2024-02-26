@@ -1,11 +1,12 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.js';
-import { type UmbCurrentUser } from '../../types.js';
+import type { UmbCurrentUserModel } from '../../types.js';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {
@@ -13,11 +14,10 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	modalContext?: UmbModalContext;
 
 	@state()
-	private _currentUser?: UmbCurrentUser;
+	private _currentUser?: UmbCurrentUserModel;
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-	#appContext?: typeof UMB_APP_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -29,10 +29,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this.#authContext = instance;
-		});
-
-		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
-			this.#appContext = instance;
 		});
 	}
 
@@ -54,10 +50,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 	private async _logout() {
 		if (!this.#authContext) return;
-		await this.#authContext.signOut();
-		let newUrl = this.#appContext ? `${this.#appContext.getBackofficePath()}/login` : '/';
-		newUrl = newUrl.replace(/\/\//g, '/');
-		location.href = newUrl;
+		this.#authContext.signOut();
 	}
 
 	render() {

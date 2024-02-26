@@ -36,6 +36,9 @@ export class TrackedReferenceResource {
                 'take': take,
                 'filterMustBeIsDependency': filterMustBeIsDependency,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -65,6 +68,9 @@ export class TrackedReferenceResource {
                 'take': take,
                 'filterMustBeIsDependency': filterMustBeIsDependency,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -91,6 +97,9 @@ export class TrackedReferenceResource {
                 'skip': skip,
                 'take': take,
                 'filterMustBeIsDependency': filterMustBeIsDependency,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

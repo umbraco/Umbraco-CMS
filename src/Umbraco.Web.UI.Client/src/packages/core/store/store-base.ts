@@ -1,27 +1,18 @@
-import { UmbStore } from './store.interface.js';
+import type { UmbStore } from './store.interface.js';
 import { UmbStoreRemoveEvent } from './events/store-remove.event.js';
 import { UmbStoreUpdateEvent } from './events/store-update.event.js';
 import { UmbStoreAppendEvent } from './events/store-append.event.js';
-import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbStoreBase<StoreItemType = any> extends EventTarget implements UmbStore<StoreItemType>, UmbApi {
-	#provider;
-
-	protected _host: UmbControllerHost;
+export class UmbStoreBase<StoreItemType = any> extends UmbContextBase<any> implements UmbStore<StoreItemType>, UmbApi {
 	protected _data: UmbArrayState<StoreItemType>;
 
-	public readonly storeAlias: string;
-
-	constructor(_host: UmbControllerHost, storeAlias: string, data: UmbArrayState<StoreItemType>) {
-		super();
-		this._host = _host;
-		this.storeAlias = storeAlias;
+	constructor(host: UmbControllerHost, storeAlias: string, data: UmbArrayState<StoreItemType>) {
+		super(host, storeAlias);
 		this._data = data;
-
-		this.#provider = new UmbContextProviderController(_host, storeAlias, this);
 	}
 
 	/**
@@ -93,9 +84,5 @@ export class UmbStoreBase<StoreItemType = any> extends EventTarget implements Um
 	 */
 	all() {
 		return this._data.asObservable();
-	}
-
-	destroy() {
-		this.#provider.destroy();
 	}
 }

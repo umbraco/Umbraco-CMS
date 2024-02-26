@@ -7,24 +7,28 @@ import type { CreateInitialPasswordUserRequestModel } from '../models/CreateInit
 import type { CreateUserRequestModel } from '../models/CreateUserRequestModel';
 import type { CreateUserResponseModel } from '../models/CreateUserResponseModel';
 import type { CurrentUserResponseModel } from '../models/CurrentUserResponseModel';
+import type { CurrenUserConfigurationResponseModel } from '../models/CurrenUserConfigurationResponseModel';
 import type { DeleteUsersRequestModel } from '../models/DeleteUsersRequestModel';
 import type { DirectionModel } from '../models/DirectionModel';
 import type { DisableUserRequestModel } from '../models/DisableUserRequestModel';
+import type { EnableTwoFactorRequestModel } from '../models/EnableTwoFactorRequestModel';
 import type { EnableUserRequestModel } from '../models/EnableUserRequestModel';
 import type { InviteUserRequestModel } from '../models/InviteUserRequestModel';
 import type { LinkedLoginsRequestModel } from '../models/LinkedLoginsRequestModel';
+import type { NoopSetupTwoFactorModel } from '../models/NoopSetupTwoFactorModel';
 import type { PagedUserResponseModel } from '../models/PagedUserResponseModel';
 import type { ResendInviteUserRequestModel } from '../models/ResendInviteUserRequestModel';
 import type { SetAvatarRequestModel } from '../models/SetAvatarRequestModel';
 import type { UnlockUsersRequestModel } from '../models/UnlockUsersRequestModel';
 import type { UpdateUserGroupsOnUserRequestModel } from '../models/UpdateUserGroupsOnUserRequestModel';
 import type { UpdateUserRequestModel } from '../models/UpdateUserRequestModel';
-import type { UserDataResponseModel } from '../models/UserDataResponseModel';
+import type { UserConfigurationResponseModel } from '../models/UserConfigurationResponseModel';
 import type { UserItemResponseModel } from '../models/UserItemResponseModel';
 import type { UserOrderModel } from '../models/UserOrderModel';
 import type { UserPermissionsResponseModel } from '../models/UserPermissionsResponseModel';
 import type { UserResponseModel } from '../models/UserResponseModel';
 import type { UserStateModel } from '../models/UserStateModel';
+import type { UserTwoFactorProviderModel } from '../models/UserTwoFactorProviderModel';
 import type { VerifyInviteUserRequestModel } from '../models/VerifyInviteUserRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -32,6 +36,68 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class UserResource {
+
+    /**
+     * @returns PagedUserResponseModel Success
+     * @throws ApiError
+     */
+    public static getFilterUser({
+        skip,
+        take = 100,
+        orderBy,
+        orderDirection,
+        userGroupIds,
+        userStates,
+        filter = '',
+    }: {
+        skip?: number,
+        take?: number,
+        orderBy?: UserOrderModel,
+        orderDirection?: DirectionModel,
+        userGroupIds?: Array<string>,
+        userStates?: Array<UserStateModel>,
+        filter?: string,
+    }): CancelablePromise<PagedUserResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/filter/user',
+            query: {
+                'skip': skip,
+                'take': take,
+                'orderBy': orderBy,
+                'orderDirection': orderDirection,
+                'userGroupIds': userGroupIds,
+                'userStates': userStates,
+                'filter': filter,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemUser({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<UserItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/user',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
 
     /**
      * @returns any Success
@@ -49,6 +115,7 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -69,6 +136,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -91,6 +160,9 @@ export class UserResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -110,6 +182,8 @@ export class UserResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -129,6 +203,10 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/{id}',
             path: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -152,6 +230,59 @@ export class UserResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserById2Fa({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<Array<UserTwoFactorProviderModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/{id}/2fa',
+            path: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteUserById2FaByProviderName({
+        id,
+        providerName,
+    }: {
+        id: string,
+        providerName: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/user/{id}/2fa/{providerName}',
+            path: {
+                'id': id,
+                'providerName': providerName,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
         });
     }
 
@@ -169,6 +300,10 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/avatar/{id}',
             path: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -194,6 +329,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -217,6 +354,23 @@ export class UserResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserConfiguration(): CancelablePromise<UserConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -228,6 +382,102 @@ export class UserResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/current',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrent2Fa(): CancelablePromise<Array<UserTwoFactorProviderModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/current/2fa',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteUserCurrent2FaByProviderName({
+        providerName,
+        code,
+    }: {
+        providerName: string,
+        code?: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/user/current/2fa/{providerName}',
+            path: {
+                'providerName': providerName,
+            },
+            query: {
+                'code': code,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postUserCurrent2FaByProviderName({
+        providerName,
+        requestBody,
+    }: {
+        providerName: string,
+        requestBody?: EnableTwoFactorRequestModel,
+    }): CancelablePromise<NoopSetupTwoFactorModel> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user/current/2fa/{providerName}',
+            path: {
+                'providerName': providerName,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrent2FaByProviderName({
+        providerName,
+    }: {
+        providerName: string,
+    }): CancelablePromise<NoopSetupTwoFactorModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/current/2fa/{providerName}',
+            path: {
+                'providerName': providerName,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
         });
     }
 
@@ -245,6 +495,10 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/current/avatar',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+            },
         });
     }
 
@@ -262,6 +516,9 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/current/change-password',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -269,10 +526,13 @@ export class UserResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getUserCurrentData(): CancelablePromise<UserDataResponseModel> {
+    public static getUserCurrentConfiguration(): CancelablePromise<CurrenUserConfigurationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/user/current/data',
+            url: '/umbraco/management/api/v1/user/current/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -284,6 +544,9 @@ export class UserResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/current/logins',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -301,6 +564,9 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/current/permissions',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -320,23 +586,8 @@ export class UserResource {
             query: {
                 'id': id,
             },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getUserCurrentPermissionsDocument1({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v2/user/current/permissions/document',
-            query: {
-                'id': id,
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -356,23 +607,8 @@ export class UserResource {
             query: {
                 'id': id,
             },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getUserCurrentPermissionsMedia1({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v2/user/current/permissions/media',
-            query: {
-                'id': id,
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -393,6 +629,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -413,42 +651,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getUserFilter({
-        skip,
-        take = 100,
-        orderBy,
-        orderDirection,
-        userGroupIds,
-        userStates,
-        filter = '',
-    }: {
-        skip?: number,
-        take?: number,
-        orderBy?: UserOrderModel,
-        orderDirection?: DirectionModel,
-        userGroupIds?: Array<string>,
-        userStates?: Array<UserStateModel>,
-        filter?: string,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/user/filter',
-            query: {
-                'skip': skip,
-                'take': take,
-                'orderBy': orderBy,
-                'orderDirection': orderDirection,
-                'userGroupIds': userGroupIds,
-                'userStates': userStates,
-                'filter': filter,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -467,7 +671,10 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/invite',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -486,6 +693,7 @@ export class UserResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -507,6 +715,7 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -526,25 +735,8 @@ export class UserResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getUserItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<UserItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/user/item',
-            query: {
-                'id': id,
             },
         });
     }
@@ -563,6 +755,10 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/set-user-groups',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+            },
         });
     }
 
@@ -582,6 +778,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }

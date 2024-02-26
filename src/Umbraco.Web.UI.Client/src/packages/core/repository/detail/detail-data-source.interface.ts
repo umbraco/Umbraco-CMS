@@ -1,5 +1,5 @@
-import { DataSourceResponse } from '../data-source/index.js';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { DataSourceResponse } from '../data-source-response.interface.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbDetailDataSourceConstructor<DetailType = any> {
 	new (host: UmbControllerHost): UmbDetailDataSource<DetailType>;

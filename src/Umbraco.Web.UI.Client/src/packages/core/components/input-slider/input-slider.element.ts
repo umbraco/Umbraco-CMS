@@ -1,6 +1,7 @@
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-slider')
 export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
@@ -28,7 +29,7 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 
 	#onChange(e: UUISliderEvent) {
 		e.stopPropagation();
-		super.value = e.target.value;
+		this.value = e.target.value;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 

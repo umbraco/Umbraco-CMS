@@ -9,7 +9,6 @@ const menuItem: ManifestTypes = {
 	weight: 800,
 	meta: {
 		label: 'Media Types',
-		icon: 'icon-folder',
 		treeAlias: UMB_MEDIA_TYPE_TREE_ALIAS,
 		menus: ['Umb.Menu.Settings'],
 	},

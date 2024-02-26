@@ -1,4 +1,5 @@
-import { LogLevelModel, LogMessageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const allLogs = [
 	{

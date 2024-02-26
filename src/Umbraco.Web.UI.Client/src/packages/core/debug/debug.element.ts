@@ -1,26 +1,12 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import {
-	css,
-	html,
-	nothing,
-	TemplateResult,
-	customElement,
-	property,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 
-import {
-	contextData,
-	DebugContextData,
-	DebugContextItemData,
-	UmbContextDebugRequest,
-} from '@umbraco-cms/backoffice/context-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	UmbModalManagerContext,
-	UMB_CONTEXT_DEBUGGER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-} from '@umbraco-cms/backoffice/modal';
+import type { DebugContextData, DebugContextItemData } from '@umbraco-cms/backoffice/context-api';
+import { contextData, UmbContextDebugRequest } from '@umbraco-cms/backoffice/context-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONTEXT_DEBUGGER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-debug')
 export class UmbDebugElement extends UmbLitElement {
@@ -40,14 +26,20 @@ export class UmbDebugElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
+	render() {
+		if (this.visible) {
+			return this.dialog ? this._renderDialog() : this._renderPanel();
+		} else {
+			return nothing;
+		}
+	}
 
+	private _update() {
 		// Dispatch it
 		this.dispatchEvent(
 			new UmbContextDebugRequest((contexts: Map<any, any>) => {
@@ -60,25 +52,23 @@ export class UmbDebugElement extends UmbLitElement {
 				// Massage the data into a simplier array of objects
 				// From a function in the context-api '
 				this.contextData = contextData(contexts);
-			})
+				this.requestUpdate('contextData');
+			}),
 		);
-	}
-
-	render() {
-		if (this.visible) {
-			return this.dialog ? this._renderDialog() : this._renderPanel();
-		} else {
-			return nothing;
-		}
 	}
 
 	private _toggleDebugPane() {
 		this._debugPaneOpen = !this._debugPaneOpen;
+		if (this._debugPaneOpen) {
+			this._update();
+		}
 	}
 
 	private _openDialog() {
 		this._modalContext?.open(UMB_CONTEXT_DEBUGGER_MODAL, {
-			content: html`${this._renderContextAliases()}`,
+			data: {
+				content: html`${this._renderContextAliases()}`,
+			},
 		});
 	}
 
@@ -108,21 +98,19 @@ export class UmbDebugElement extends UmbLitElement {
 	}
 
 	private _renderContextAliases() {
-		const contextsTemplates: TemplateResult[] = [];
-
-		this.contextData.forEach((contextData) => {
-			contextsTemplates.push(
-				html` <li>
+		return repeat(
+			this.contextData,
+			(contextData) => contextData.alias,
+			(contextData) => {
+				return html` <li>
 					Context: <strong>${contextData.alias}</strong>
 					<em>(${contextData.type})</em>
 					<ul>
 						${this._renderInstance(contextData.data)}
 					</ul>
-				</li>`
-			);
-		});
-
-		return contextsTemplates;
+				</li>`;
+			},
+		);
 	}
 
 	private _renderInstance(instance: DebugContextItemData) {
@@ -132,16 +120,14 @@ export class UmbDebugElement extends UmbLitElement {
 			return instanceTemplates.push(html`<li>Callable Function</li>`);
 		} else if (instance.type === 'object') {
 			if (instance.methods?.length) {
-				instanceTemplates.push(
-					html`
-						<li>
-							<strong>Methods</strong>
-							<ul>
-								${instance.methods?.map((methodName) => html`<li>${methodName}</li>`)}
-							</ul>
-						</li>
-					`
-				);
+				instanceTemplates.push(html`
+					<li>
+						<strong>Methods</strong>
+						<ul>
+							${instance.methods?.map((methodName) => html`<li>${methodName}</li>`)}
+						</ul>
+					</li>
+				`);
 			}
 
 			const props: TemplateResult[] = [];

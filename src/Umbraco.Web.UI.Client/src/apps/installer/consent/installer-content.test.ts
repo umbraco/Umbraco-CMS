@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
 import { UmbInstallerConsentElement } from './installer-consent.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 // TODO: Write tests
 describe('UmbInstallerConsentElement', () => {
@@ -15,7 +15,9 @@ describe('UmbInstallerConsentElement', () => {
 		expect(element).to.be.instanceOf(UmbInstallerConsentElement);
 	});
 
-	it('passes the a11y audit', async () => {
-		await expect(element).to.be.accessible(defaultA11yConfig);
-	});
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		it('passes the a11y audit', async () => {
+			await expect(element).to.be.accessible(defaultA11yConfig);
+		});
+	}
 });

@@ -1,23 +1,17 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_EXAMINE_FIELDS_SETTINGS_MODAL,
-} from '@umbraco-cms/backoffice/modal';
-import {
-	SearchResultResponseModel,
-	SearcherResource,
-	FieldPresentationModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_EXAMINE_FIELDS_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { SearchResultResponseModel, FieldPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { SearcherResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 import './modal-views/fields-viewer.element.js';
-import './modal-views/fields-settings.element.js';
+import './modal-views/fields-settings-modal.element.js';
 
 interface ExposedSearchResultField {
-	name?: string | null;
+	name: string;
 	exposed: boolean;
 }
 
@@ -42,7 +36,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -67,7 +61,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 				term: this._searchInput.value,
 				take: 100,
 				skip: 0,
-			})
+			}),
 		);
 
 		this._searchResults = data?.items ?? [];
@@ -82,9 +76,10 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 			});
 			if (document) {
 				const newFieldNames = document.map((field) => {
-					return field.name;
+					return field.name ?? '';
 				});
 
+				// TODO: I don't get this code, not sure what the purpose is, it seems like a mistake:
 				this._exposedFields = this._exposedFields
 					? this._exposedFields.filter((field) => {
 							return { name: field.name, exposed: field.exposed };
@@ -98,11 +93,10 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	private _onFieldFilterClick() {
 		const modalContext = this._modalContext?.open(UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
-			...this._exposedFields,
+			value: { fields: this._exposedFields ?? [] },
 		});
-		modalContext?.onSubmit().then(({ fields } = {}) => {
-			if (!fields) return;
-			this._exposedFields = fields;
+		modalContext?.onSubmit().then((value) => {
+			this._exposedFields = value.fields;
 		});
 	}
 
@@ -163,8 +157,10 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 									label="Open sidebar to see all fields"
 									@click="${() =>
 										this._modalContext?.open('umb-modal-element-fields-viewer', {
-											type: 'sidebar',
-											size: 'medium',
+											modal: {
+												type: 'sidebar',
+												size: 'medium',
+											},
 											data: { ...rowData, name: this.getSearchResultNodeName(rowData) },
 										})}">
 									${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
@@ -197,7 +193,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 								compact
 								@click="${() => {
 									this._exposedFields = this._exposedFields?.map((f) => {
-										return f.name == field.name ? { name: f.name, exposed: false } : f;
+										return f.name === field.name ? { name: f.name, exposed: false } : f;
 									});
 								}}"
 								>x</uui-button

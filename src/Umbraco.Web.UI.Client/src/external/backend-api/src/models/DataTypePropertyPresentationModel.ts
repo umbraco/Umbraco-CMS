@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type DataTypePropertyPresentationModel = {
-    alias?: string;
+    alias: string;
     value?: any;
 };
 

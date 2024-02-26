@@ -1,5 +1,5 @@
 import { css, customElement, html, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * This element allows you to localize a date
@@ -16,23 +16,21 @@ export class UmbLocalizeDateElement extends UmbLitElement {
 	@property()
 	date!: string | Date;
 
-    /**
+	/**
 	 * Formatting options
 	 * @attr
 	 * @example options={ dateStyle: 'full', timeStyle: 'long', timeZone: 'Australia/Sydney' }
 	 */
-	@property() 
+	@property()
 	options?: Intl.DateTimeFormatOptions;
-	
+
 	@state()
 	protected get text(): string {
-	    return this.localize.date(this.date, this.options);
+		return this.localize.date(this.date, this.options);
 	}
 
 	protected render() {
-		return this.date 
-            ? html`${unsafeHTML(this.text)}`
-            : html`<slot></slot>`
+		return this.date ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
 	}
 
 	static styles = [

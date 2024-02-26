@@ -1,8 +1,10 @@
-import type { UmbUserGroupCollectionFilterModel } from '../../types.js';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbUserGroupCollectionFilterModel } from '../types.js';
+import type { UmbUserGroupDetailModel } from '../../types.js';
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
+import { UserGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UserGroupResponseModel, UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * A data source for the UserGroup that fetches data from the server
@@ -10,7 +12,7 @@ import { UserGroupResponseModel, UserGroupResource } from '@umbraco-cms/backoffi
  * @class UmbUserGroupCollectionServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbUserGroupCollectionServerDataSource implements UmbCollectionDataSource<UserGroupResponseModel> {
+export class UmbUserGroupCollectionServerDataSource implements UmbCollectionDataSource<UmbUserGroupDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -22,8 +24,35 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 		this.#host = host;
 	}
 
-	getCollection(filter: UmbUserGroupCollectionFilterModel) {
-		// TODO: Switch this to the filter endpoint when available
-		return tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroup({}));
+	async getCollection(filter: UmbUserGroupCollectionFilterModel) {
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			UserGroupResource.getUserGroup({ skip: filter.skip, take: filter.take }),
+		);
+
+		if (data) {
+			const mappedItems = data.items.map((item) => {
+				const userGroup: UmbUserGroupDetailModel = {
+					unique: item.id,
+					entityType: UMB_USER_GROUP_ENTITY_TYPE,
+					isSystemGroup: item.isSystemGroup,
+					name: item.name,
+					icon: item.icon || null,
+					sections: item.sections,
+					languages: item.languages,
+					hasAccessToAllLanguages: item.hasAccessToAllLanguages,
+					documentStartNode: item.documentStartNode ? { unique: item.documentStartNode.id } : null,
+					documentRootAccess: item.documentRootAccess,
+					mediaStartNode: item.mediaStartNode ? { unique: item.mediaStartNode.id } : null,
+					mediaRootAccess: item.mediaRootAccess,
+					permissions: item.permissions,
+				};
+				return userGroup;
+			});
+
+			return { data: { items: mappedItems, total: data.total } };
+		}
+
+		return { error };
 	}
 }

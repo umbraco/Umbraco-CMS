@@ -1,8 +1,10 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UUIScrollContainerElement, UUIPaginationElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import type { UUIScrollContainerElement, UUIPaginationElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DirectionModel, LogMessageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-log-viewer-messages-list')
 export class UmbLogViewerMessagesListElement extends UmbLitElement {
@@ -25,7 +27,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeLogs();
 		});
@@ -79,49 +81,53 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	#renderLogs() {
 		return html`${this._logs.length > 0
 			? html` ${this._logs.map(
-					(log) => html`<umb-log-viewer-message
-						.timestamp=${log.timestamp ?? ''}
-						.level=${log.level ?? ''}
-						.renderedMessage=${log.renderedMessage ?? ''}
-						.properties=${log.properties ?? []}
-						.exception=${log.exception ?? ''}
-						.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
+					(log) =>
+						html`<umb-log-viewer-message
+							.timestamp=${log.timestamp ?? ''}
+							.level=${log.level ?? ''}
+							.renderedMessage=${log.renderedMessage ?? ''}
+							.properties=${log.properties ?? []}
+							.exception=${log.exception ?? ''}
+							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`,
 			  )}`
-			: html`<umb-empty-state size="small"
-					><span id="empty">
+			: html`
+					<span id="empty">
 						<uui-icon name="icon-search"></uui-icon>Sorry, we cannot find what you are looking for.
-					</span></umb-empty-state
-			  >`}`;
+					</span>
+			  `}`;
 	}
 
 	render() {
 		// TODO: the table should scroll instead of the whole main div
-		return html`
-			<div id="header" slot="header">
-				<div id="timestamp">
-					Timestamp
-					<uui-button compact @click=${this.#sortLogs} label="Sort logs">
-						<uui-symbol-sort
-							?descending=${this._sortingDirection === DirectionModel.DESCENDING}
-							active></uui-symbol-sort>
-					</uui-button>
+		return html`<uui-box>
+				<div id="header" slot="header">
+					<div id="timestamp">
+						Timestamp
+						<uui-button compact @click=${this.#sortLogs} label="Sort logs">
+							<uui-symbol-sort
+								?descending=${this._sortingDirection === DirectionModel.DESCENDING}
+								active></uui-symbol-sort>
+						</uui-button>
+					</div>
+					<div id="level">Level</div>
+					<div id="machine">Machine name</div>
+					<div id="message">Message</div>
 				</div>
-				<div id="level">Level</div>
-				<div id="machine">Machine name</div>
-				<div id="message">Message</div>
-			</div>
-			<div id="main">
-				${this._isLoading
-					? html`<umb-empty-state size="small"
-							><span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span></umb-empty-state
-					  >`
-					: html`${this.#renderLogs()}${this._renderPagination()}`}
-			</div>
-		`;
+				<div id="main">
+					${this._isLoading
+						? html` <span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span> `
+						: html`${this.#renderLogs()}`}
+				</div>
+			</uui-box>
+			${this._renderPagination()} `;
 	}
 
 	static styles = [
 		css`
+			uui-box {
+				--uui-box-default-padding: 0;
+			}
+
 			:host {
 				height: 100%;
 				display: flex;
@@ -164,10 +170,12 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				justify-content: center;
 				align-items: center;
 				gap: var(--uui-size-space-3);
+				margin: var(--uui-size-space-5) 0;
 			}
 
 			#pagination {
-				margin: var(--uui-size-space-5, 18px) 0;
+				display: block;
+				margin: var(--uui-size-space-5) 0;
 			}
 		`,
 	];

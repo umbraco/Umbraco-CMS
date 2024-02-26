@@ -1,5 +1,5 @@
 import { css, customElement, html, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * This element allows you to localize a number
@@ -16,23 +16,21 @@ export class UmbLocalizeNumberElement extends UmbLitElement {
 	@property()
 	number!: number | string;
 
-    /**
+	/**
 	 * Formatting options
 	 * @attr
 	 * @example options={ style: 'currency', currency: 'EUR' }
 	 */
-	@property() 
+	@property()
 	options?: Intl.NumberFormatOptions;
-	
+
 	@state()
 	protected get text(): string {
-	    return this.localize.number(this.number, this.options);
+		return this.localize.number(this.number, this.options);
 	}
 
 	protected render() {
-		return this.number 
-            ? html`${unsafeHTML(this.text)}`
-            : html`<slot></slot>`
+		return this.number ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
 	}
 
 	static styles = [

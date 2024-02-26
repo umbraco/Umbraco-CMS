@@ -1,12 +1,10 @@
-import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CONFIRM_MODAL,
-} from '@umbraco-cms/backoffice/modal';
-import { HealthStatusModel, IndexResponseModel, IndexerResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { IndexResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthStatusModel, IndexerResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 import './section-view-examine-searchers.js';
@@ -31,7 +29,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (_instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (_instance) => {
 			this._modalContext = _instance;
 		});
 	}
@@ -44,7 +42,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 	private async _getIndexData() {
 		const { data } = await tryExecuteAndNotify(
 			this,
-			IndexerResource.getIndexerByIndexName({ indexName: this.indexName })
+			IndexerResource.getIndexerByIndexName({ indexName: this.indexName }),
 		);
 		this._indexData = data;
 
@@ -58,15 +56,17 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 
 	private async _onRebuildHandler() {
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: `Rebuild ${this.indexName}`,
-			content: html`
-				This will cause the index to be rebuilt.<br />
-				Depending on how much content there is in your site this could take a while.<br />
-				It is not recommended to rebuild an index during times of high website traffic or when editors are editing
-				content.
-			`,
-			color: 'danger',
-			confirmLabel: 'Rebuild',
+			data: {
+				headline: `Rebuild ${this.indexName}`,
+				content: html`
+					This will cause the index to be rebuilt.<br />
+					Depending on how much content there is in your site this could take a while.<br />
+					It is not recommended to rebuild an index during times of high website traffic or when editors are editing
+					content.
+				`,
+				color: 'danger',
+				confirmLabel: 'Rebuild',
+			},
 		});
 		modalContext?.onSubmit().then(() => {
 			this._rebuild();
@@ -76,7 +76,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 		this._buttonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
-			IndexerResource.postIndexerByIndexNameRebuild({ indexName: this.indexName })
+			IndexerResource.postIndexerByIndexNameRebuild({ indexName: this.indexName }),
 		);
 		if (error) {
 			this._buttonState = 'failed';
@@ -151,7 +151,7 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 				look="primary"
 				.state="${this._buttonState}"
 				@click="${this._onRebuildHandler}"
-				.disabled="${!this._indexData?.canRebuild ?? true}"
+				.disabled="${this._indexData?.canRebuild ? false : true}"
 				label="Rebuild index">
 				Rebuild
 			</uui-button>

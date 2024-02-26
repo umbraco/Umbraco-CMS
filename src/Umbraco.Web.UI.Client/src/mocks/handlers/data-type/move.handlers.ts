@@ -1,18 +1,19 @@
 const { rest } = window.MockServiceWorker;
-import { umbDataTypeData } from '../../data/data-type.data.js';
+import { umbDataTypeMockDb } from '../../data/data-type/data-type.db.js';
 import { UMB_SLUG } from './slug.js';
+import type { MoveDataTypeRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const moveHandlers = [
 	rest.post(umbracoPath(`${UMB_SLUG}/:id/move`), async (req, res, ctx) => {
 		const id = req.params.id as string;
-		if (!id) return;
+		if (!id) return res(ctx.status(400));
 
-		const data = await req.json();
-		if (!data) return;
+		const requestBody = (await req.json()) as MoveDataTypeRequestModel;
+		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		if (!requestBody.target?.id) return res(ctx.status(400, 'no targetId found'));
 
-		umbDataTypeData.move([id], data.targetId);
-
+		umbDataTypeMockDb.tree.move([id], requestBody.target.id);
 		return res(ctx.status(200));
 	}),
 ];

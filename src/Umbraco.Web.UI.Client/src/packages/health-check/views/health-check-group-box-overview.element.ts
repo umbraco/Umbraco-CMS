@@ -1,14 +1,13 @@
-import { UmbHealthCheckContext } from '../health-check.context.js';
-import {
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
-	UmbHealthCheckDashboardContext,
-} from '../health-check-dashboard.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import type { UmbHealthCheckContext } from '../health-check.context.js';
+import type { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context.js';
+import { UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from '../health-check-dashboard.context.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { ensureSlash, path } from '@umbraco-cms/backoffice/router';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
-import { HealthCheckGroupWithResultResponseModel, StatusResultTypeModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { HealthCheckGroupWithResultResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-health-check-group-box-overview')
 export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
@@ -28,15 +27,19 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT, (instance) => {
 			this._healthCheckContext = instance;
 			if (!this._healthCheckContext || !this.manifest?.meta.label) return;
 			this._api = this._healthCheckContext?.apis.get(this.manifest?.meta.label);
 
-			if(this._api) {
-				this.observe(this._api.results, (results) => {
-					this._keyResults = results;
-				}, '_observeApiResults');
+			if (this._api) {
+				this.observe(
+					this._api.results,
+					(results) => {
+						this._keyResults = results;
+					},
+					'_observeApiResults',
+				);
 			}
 		});
 	}

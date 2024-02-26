@@ -1,44 +1,43 @@
-import { UmbTemplateRepository } from '../repository/index.js';
-import { UmbTemplateTreeRepository } from '../tree/index.js';
+import type { UmbTemplateDetailModel } from '../types.js';
+import type { UmbTemplateItemModel } from '../repository/index.js';
+import { UmbTemplateDetailRepository, UmbTemplateItemRepository } from '../repository/index.js';
+import { UMB_TEMPLATE_WORKSPACE_ALIAS } from './manifests.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import {
-	UmbSaveableWorkspaceContextInterface,
-	UmbEditableWorkspaceContextBase,
-} from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbDeepState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbTemplateRepository, TemplateResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbTemplateDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	#data = new UmbDeepState<TemplateResponseModel | undefined>(undefined);
+	public readonly detailRepository = new UmbTemplateDetailRepository(this);
+	public readonly itemRepository = new UmbTemplateItemRepository(this);
+
+	#data = new UmbObjectState<UmbTemplateDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
-	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
+	#masterTemplate = new UmbObjectState<UmbTemplateItemModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
 	alias = this.#data.asObservablePart((data) => data?.alias);
 	content = this.#data.asObservablePart((data) => data?.content);
-	id = this.#data.asObservablePart((data) => data?.id);
-	masterTemplateID = this.#data.asObservablePart((data) => data?.masterTemplateId);
+	unique = this.#data.asObservablePart((data) => data?.unique);
+	masterTemplateUnique = this.#data.asObservablePart((data) => data?.masterTemplate?.unique);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	// TODO: temp solution until we have automatic tree updates
-	#treeRepository = new UmbTemplateTreeRepository(this.host);
-
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Template', new UmbTemplateRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_TEMPLATE_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
 	}
 
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -49,7 +48,7 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.id || '';
+		return this.getData()?.unique;
 	}
 
 	getData() {
@@ -57,15 +56,15 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	setName(value: string) {
-		this.#data.next({ ...this.#data.value, name: value });
+		this.#data.update({ name: value });
 	}
 
 	setAlias(value: string) {
-		this.#data.next({ ...this.#data.value, alias: value });
+		this.#data.update({ alias: value });
 	}
 
 	setContent(value: string) {
-		this.#data.next({ ...this.#data.value, content: value });
+		this.#data.update({ content: value });
 	}
 
 	getLayoutBlockRegexPattern() {
@@ -76,25 +75,25 @@ export class UmbTemplateWorkspaceContext
 		return this.getData()?.content ? this.getLayoutBlockRegexPattern().test(this.getData()?.content as string) : false;
 	}
 
-	async load(entityId: string) {
-		const { data } = await this.repository.requestById(entityId);
+	async load(unique: string) {
+		const { data } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			this.setMasterTemplate(data.masterTemplateId ?? null);
-			this.#data.next(data);
+			this.setMasterTemplate(data.masterTemplate?.unique ?? null);
+			this.#data.setValue(data);
 		}
 	}
 
 	async setMasterTemplate(id: string | null) {
 		if (id === null) {
-			this.#masterTemplate.next(null);
+			this.#masterTemplate.setValue(null);
 			this.#updateMasterTemplateLayoutBlock();
 			return null;
 		}
 
-		const { data } = await this.repository.requestItems([id]);
+		const { data } = await this.itemRepository.requestItems([id]);
 		if (data) {
-			this.#masterTemplate.next(data[0]);
+			this.#masterTemplate.setValue(data[0]);
 			this.#updateMasterTemplateLayoutBlock();
 			return data[0];
 		}
@@ -130,41 +129,33 @@ ${currentContent}`;
 		this.setContent(string);
 	};
 
-	public async save() {
-		const template = this.#data.getValue();
-		const isNew = this.getIsNew();
-
-		if (isNew && template) {
-			await this.repository.create({
-				name: template.name,
-				content: template.content,
-				alias: template.alias,
-			});
-			if (this.#masterTemplate.value?.id) {
-				this.#treeRepository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? '');
-			} else {
-				this.#treeRepository.requestRootTreeItems();
-			}
-			return;
-		}
-
-		if (template?.id) {
-			await this.repository.save(template.id, {
-				name: template.name,
-				content: template.content,
-				alias: template.alias,
-			});
-			this.#treeRepository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? null);
-		}
-	}
-
-	async create(parentId: string | null = null) {
-		const { data } = await this.repository.createScaffold(parentId);
+	async create(parentUnique: string | null, preset?: Partial<UmbTemplateDetailModel>) {
+		const { data } = await this.detailRepository.createScaffold(parentUnique, preset);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next({ ...data, id: '', name: '', alias: '' });
-		if (!parentId) return;
-		await this.setMasterTemplate(parentId);
+		this.#data.setValue(data);
+
+		if (!parentUnique) return;
+		await this.setMasterTemplate(parentUnique);
+	}
+
+	async save() {
+		if (!this.#data.value) throw new Error('Data is missing');
+
+		let newData = undefined;
+
+		if (this.getIsNew()) {
+			const { data } = await this.detailRepository.create(this.#data.value);
+			newData = data;
+		} else {
+			const { data } = await this.detailRepository.save(this.#data.value);
+			newData = data;
+		}
+
+		if (newData) {
+			this.#data.setValue(newData);
+			this.saveComplete(newData);
+		}
 	}
 
 	public destroy() {

@@ -1,20 +1,17 @@
-import { UmbHealthCheckContext } from '../health-check.context.js';
-import {
-	UmbHealthCheckDashboardContext,
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
-} from '../health-check-dashboard.context.js';
-import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbHealthCheckContext } from '../health-check.context.js';
+import type { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context.js';
+import { UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from '../health-check-dashboard.context.js';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
-import {
+import type {
 	HealthCheckActionRequestModel,
 	HealthCheckGroupPresentationModel,
 	HealthCheckModel,
-	HealthCheckResource,
 	HealthCheckWithResultPresentationModel,
-	StatusResultTypeModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthCheckResource, StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import './health-check-action.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -42,12 +39,12 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT, (instance) => {
 			this._healthCheckContext = instance;
 
 			this._api = this._healthCheckContext?.apis.get(this.groupName);
 
-			if(this._api) {
+			if (this._api) {
 				this._api.getGroupChecks(this.groupName);
 
 				this.observe(this._api.checks, (group) => {
@@ -58,7 +55,6 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				this.observe(this._api.results, (results) => {
 					this._idResults = results?.checks;
 				});
-
 			}
 		});
 	}
@@ -161,7 +157,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 					(action) =>
 						html`<umb-dashboard-health-check-action
 							.action=${action}
-							@action-executed=${() => this._buttonHandler()}></umb-dashboard-health-check-action>`
+							@action-executed=${() => this._buttonHandler()}></umb-dashboard-health-check-action>`,
 				)}
 			</div>`;
 		else return nothing;

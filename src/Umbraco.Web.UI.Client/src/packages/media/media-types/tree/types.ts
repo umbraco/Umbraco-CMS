@@ -1,5 +1,10 @@
-import type { MediaTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbEntityTreeItemModel, UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbMediaTypeEntityType, UmbMediaTypeFolderEntityType, UmbMediaTypeRootEntityType } from '../entity.js';
+import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export type UmbMediaTypeTreeItemModel = MediaTypeTreeItemResponseModel & UmbEntityTreeItemModel;
-export type UmbMediaTypeTreeRootModel = MediaTypeTreeItemResponseModel & UmbEntityTreeRootModel;
+export interface UmbMediaTypeTreeItemModel extends UmbUniqueTreeItemModel {
+	entityType: UmbMediaTypeEntityType | UmbMediaTypeFolderEntityType;
+}
+
+export interface UmbMediaTypeTreeRootModel extends UmbUniqueTreeRootModel {
+	entityType: UmbMediaTypeRootEntityType;
+}

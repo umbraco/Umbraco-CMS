@@ -1,9 +1,10 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import type { UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
-import { debounce } from '@umbraco-cms/backoffice/external/lodash';
-import { LogLevelModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { debounce } from '@umbraco-cms/backoffice/utils';
+import { LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { path, query, toQueryString } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-log-viewer-log-level-filter-menu')
@@ -18,7 +19,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeLogLevelFilter();
 		});
@@ -64,7 +65,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 
 	#renderLogLevelSelector() {
 		return html`
-			<div slot="dropdown" id="log-level-selector" @change=${this.setLogLevelDebounce}>
+			<div id="log-level-selector" @change=${this.setLogLevelDebounce}>
 				${Object.values(LogLevelModel).map(
 					(logLevel) =>
 						html`<uui-checkbox
@@ -73,7 +74,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 							.value=${logLevel}
 							label="${logLevel}">
 							<umb-log-viewer-level-tag .level=${logLevel}></umb-log-viewer-level-tag>
-						</uui-checkbox>`
+						</uui-checkbox>`,
 				)}
 				<uui-button class="log-level-menu-item" @click=${this.#selectAllLogLevels} label="Select all"
 					>Select all</uui-button
@@ -87,13 +88,15 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-button-with-dropdown label="Select log levels">
-				Log Level:
-				${this._logLevelFilter.length > 0
-					? this._logLevelFilter.map((level) => html`<span class="log-level-button-indicator">${level}</span>`)
-					: 'All'}
+			<umb-dropdown label="Select log levels">
+				<span slot="label">
+					Log Level:
+					${this._logLevelFilter.length > 0
+						? this._logLevelFilter.map((level) => html`<span class="log-level-button-indicator">${level}</span>`)
+						: 'All'}
+				</span>
 				${this.#renderLogLevelSelector()}
-			</umb-button-with-dropdown>
+			</umb-dropdown>
 		`;
 	}
 

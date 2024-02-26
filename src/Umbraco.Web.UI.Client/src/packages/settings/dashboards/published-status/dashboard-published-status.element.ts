@@ -1,13 +1,10 @@
-import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CONFIRM_MODAL,
-} from '@umbraco-cms/backoffice/modal';
-import { PublishedCacheResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { PublishedCacheResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-published-status')
@@ -32,7 +29,7 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -72,10 +69,12 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 	private async _onReloadCacheHandler() {
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Reload',
-			content: html` Trigger a in-memory and local file cache reload on all servers.`,
-			color: 'danger',
-			confirmLabel: 'Continue',
+			data: {
+				headline: 'Reload',
+				content: html` Trigger a in-memory and local file cache reload on all servers.`,
+				color: 'danger',
+				confirmLabel: 'Continue',
+			},
 		});
 		modalContext?.onSubmit().then(() => {
 			this._reloadMemoryCache();
@@ -95,10 +94,12 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 
 	private async _onRebuildCacheHandler() {
 		const modalContex = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Rebuild',
-			content: html` Rebuild content in cmsContentNu database table. Expensive.`,
-			color: 'danger',
-			confirmLabel: 'Continue',
+			data: {
+				headline: 'Rebuild',
+				content: html` Rebuild content in cmsContentNu database table. Expensive.`,
+				color: 'danger',
+				confirmLabel: 'Continue',
+			},
 		});
 		modalContex?.onSubmit().then(() => {
 			this._rebuildDatabaseCache();
@@ -118,10 +119,12 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 
 	private async _onSnapshotCacheHandler() {
 		const modalContex = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Snapshot',
-			content: html` Trigger a NuCache snapshots collection.`,
-			color: 'danger',
-			confirmLabel: 'Continue',
+			data: {
+				headline: 'Snapshot',
+				content: html` Trigger a NuCache snapshots collection.`,
+				color: 'danger',
+				confirmLabel: 'Continue',
+			},
 		});
 		modalContex?.onSubmit().then(() => {
 			this._cacheCollect();

@@ -1,8 +1,9 @@
+import type { UmbUserItemModel } from '../../repository/index.js';
 import { UmbUserPickerContext } from './user-input.context.js';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-user-input')
 export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
@@ -62,11 +63,11 @@ export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = idsString.split(/[ ,]+/);
+		this.selectedIds = splitStringToArray(idsString);
 	}
 
 	@state()
-	private _items?: Array<UserItemResponseModel>;
+	private _items?: Array<UmbUserItemModel>;
 
 	#pickerContext = new UmbUserPickerContext(this);
 
@@ -85,8 +86,16 @@ export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')), 'umbUserInputSelectionObserver');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), 'umbUserInputItemsObserver');
+		this.observe(
+			this.#pickerContext.selection,
+			(selection) => (super.value = selection.join(',')),
+			'umbUserInputSelectionObserver',
+		);
+		this.observe(
+			this.#pickerContext.selectedItems,
+			(selectedItems) => (this._items = selectedItems),
+			'umbUserInputItemsObserver',
+		);
 	}
 
 	protected getFormElement() {
@@ -102,12 +111,12 @@ export class UmbUserInputElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderItem(item: UserItemResponseModel) {
-		if (!item.id) return;
+	private _renderItem(item: UmbUserItemModel) {
+		if (!item.unique) return;
 		return html`
 			<uui-ref-node-user name=${ifDefined(item.name)}>
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.id!)} label="Remove ${item.name}"
+					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique)} label="Remove ${item.name}"
 						>Remove</uui-button
 					>
 				</uui-action-bar>

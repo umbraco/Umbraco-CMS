@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateRelationTypeRequestModel } from '../models/CreateRelationTypeRequestModel';
-import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { RelationTypeItemResponseModel } from '../models/RelationTypeItemResponseModel';
 import type { RelationTypeResponseModel } from '../models/RelationTypeResponseModel';
 import type { UpdateRelationTypeRequestModel } from '../models/UpdateRelationTypeRequestModel';
@@ -13,6 +13,27 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class RelationTypeResource {
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemRelationType({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<RelationTypeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/relation-type',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
 
     /**
      * @returns string Created
@@ -28,9 +49,10 @@ export class RelationTypeResource {
             url: '/umbraco/management/api/v1/relation-type',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -51,6 +73,7 @@ export class RelationTypeResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -72,6 +95,7 @@ export class RelationTypeResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -98,31 +122,14 @@ export class RelationTypeResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getRelationTypeItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<RelationTypeItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/relation-type/item',
-            query: {
-                'id': id,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeRelationTypeRoot({
@@ -131,13 +138,16 @@ export class RelationTypeResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/relation-type/root',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

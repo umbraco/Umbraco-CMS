@@ -1,34 +1,20 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
+import type { UmbUserDetailModel } from '../../../types.js';
 import { html, customElement, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
 
 @customElement('umb-user-workspace-profile-settings')
 export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	@state()
-	private _user?: UserResponseModel;
+	private _user?: UmbUserDetailModel;
 
-	@state()
-	private _currentUser?: UmbCurrentUser;
-
-	@state()
-	private languages: Array<{ name: string; value: string; selected: boolean }> = [];
-
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#userWorkspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
-			this.#currentUserContext = instance;
-			this.#observeCurrentUser();
-		});
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
@@ -36,55 +22,12 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 		});
 	}
 
-	#onLanguageChange(event: Event) {
-		const target = event.composedPath()[0] as UUISelectElement;
+	#onLanguageChange(event: UmbChangeEvent) {
+		const target = event.target as UmbUiCultureInputElement;
 
 		if (typeof target?.value === 'string') {
 			this.#userWorkspaceContext?.updateProperty('languageIsoCode', target.value);
 		}
-	}
-
-	#observeCurrentUser() {
-		if (!this.#currentUserContext) return;
-		this.observe(
-			this.#currentUserContext.currentUser,
-			async (currentUser) => {
-				this._currentUser = currentUser;
-
-				if (!currentUser) {
-					return;
-				}
-
-				// Find all translations and make a unique list of iso codes
-				const translations = await firstValueFrom(umbExtensionsRegistry.extensionsOfType('localization'));
-
-				this.languages = translations
-					.filter((isoCode) => isoCode !== undefined)
-					.map((translation) => ({
-						value: translation.meta.culture.toLowerCase(),
-						name: translation.name,
-						selected: false,
-					}));
-
-				const currentUserLanguageCode = currentUser.languageIsoCode?.toLowerCase();
-
-				// Set the current user's language as selected
-				const currentUserLanguage = this.languages.find((language) => language.value === currentUserLanguageCode);
-
-				if (currentUserLanguage) {
-					currentUserLanguage.selected = true;
-				} else {
-					// If users language code did not fit any of the options. We will create an option that fits, named unknown.
-					// In this way the user can keep their choice though a given language was not present at this time.
-					this.languages.push({
-						value: currentUserLanguageCode ?? 'en-us',
-						name: currentUserLanguageCode ? `${currentUserLanguageCode} (unknown)` : 'Unknown',
-						selected: true,
-					});
-				}
-			},
-			'umbUserObserver',
-		);
 	}
 
 	render() {
@@ -96,30 +39,29 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 
 	#renderEmailProperty() {
 		return html`
-			<umb-workspace-property-layout label="${this.localize.term('general_email')}">
+			<umb-property-layout label="${this.localize.term('general_email')}">
 				<uui-input
 					slot="editor"
 					name="email"
 					label="${this.localize.term('general_email')}"
 					readonly
 					value=${ifDefined(this._user?.email)}></uui-input>
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 		`;
 	}
 
 	#renderUILanguageProperty() {
 		return html`
-			<umb-workspace-property-layout
+			<umb-property-layout
 				label="${this.localize.term('user_language')}"
 				description=${this.localize.term('user_languageHelp')}>
-				<uui-select
+				<umb-ui-culture-input
 					slot="editor"
+					value=${ifDefined(this._user?.languageIsoCode)}
+					@change="${this.#onLanguageChange}"
 					name="language"
-					label="${this.localize.term('user_language')}"
-					.options=${this.languages}
-					@change="${this.#onLanguageChange}">
-				</uui-select>
-			</umb-workspace-property-layout>
+					label="${this.localize.term('user_language')}"></umb-ui-culture-input>
+			</umb-property-layout>
 		`;
 	}
 

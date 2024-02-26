@@ -4,8 +4,8 @@
 /* eslint-disable */
 
 export type TemplateModelBaseModel = {
-    name?: string;
-    alias?: string;
+    name: string;
+    alias: string;
     content?: string | null;
 };
 

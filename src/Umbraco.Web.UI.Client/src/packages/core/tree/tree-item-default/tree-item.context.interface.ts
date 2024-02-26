@@ -1,10 +1,11 @@
+import type { UmbTreeItemModelBase } from '../types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
-export interface UmbTreeItemContext<TreeItemType extends TreeItemPresentationModel> {
+export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModelBase> {
 	unique?: string | null;
-	type?: string;
+	entityType?: string;
 	treeItem: Observable<TreeItemType | undefined>;
 	hasChildren: Observable<boolean>;
 	isLoading: Observable<boolean>;
@@ -17,7 +18,7 @@ export interface UmbTreeItemContext<TreeItemType extends TreeItemPresentationMod
 
 	setTreeItem(treeItem: TreeItemType | undefined): void;
 	requestChildren(): Promise<{
-		data?: UmbPagedData<TreeItemType> | undefined;
+		data?: UmbPagedModel<TreeItemType> | undefined;
 		error?: ProblemDetails | undefined;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;

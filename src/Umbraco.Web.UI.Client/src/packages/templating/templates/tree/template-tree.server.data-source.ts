@@ -1,7 +1,9 @@
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
-import { EntityTreeItemResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
+import type { UmbTemplateTreeItemModel } from './types.js';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
+import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { TemplateResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Template tree that fetches data from the server
@@ -9,50 +11,46 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbTemplateTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbTemplateTreeServerDataSource implements UmbTreeDataSource<EntityTreeItemResponseModel> {
-	#host: UmbControllerHost;
-
+export class UmbTemplateTreeServerDataSource extends UmbTreeServerDataSourceBase<
+	NamedEntityTreeItemResponseModel,
+	UmbTemplateTreeItemModel
+> {
 	/**
 	 * Creates an instance of UmbTemplateTreeServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the root items for the tree from the server
-	 * @return {*}
-	 * @memberof UmbTemplateTreeServerDataSource
-	 */
-	async getRootItems() {
-		return tryExecuteAndNotify(this.#host, TemplateResource.getTreeTemplateRoot({}));
-	}
-
-	/**
-	 * Fetches the children of a given parent id from the server
-	 * @param {(string)} parentId
-	 * @return {*}
-	 * @memberof UmbTemplateTreeServerDataSource
-	 */
-	async getChildrenOf(parentId: string | null): Promise<any> {
-		/* TODO: should we make getRootItems() internal
-		so it only is a server concern that there are two endpoints? */
-		if (parentId === null) {
-			return this.getRootItems();
-		} else {
-			return tryExecuteAndNotify(
-				this.#host,
-				TemplateResource.getTreeTemplateChildren({
-					parentId,
-				}),
-			);
-		}
-	}
-
-	// TODO: remove when interface is cleaned up
-	async getItems(unique: Array<string>): Promise<any> {
-		throw new Error('Dot not use this method. Use the item source instead');
+		super(host, {
+			getRootItems,
+			getChildrenOf,
+			mapper,
+		});
 	}
 }
+
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => TemplateResource.getTreeTemplateRoot({});
+
+const getChildrenOf = (parentUnique: string | null) => {
+	if (parentUnique === null) {
+		return getRootItems();
+	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		return TemplateResource.getTreeTemplateChildren({
+			parentId: parentUnique,
+		});
+	}
+};
+
+const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemModel => {
+	return {
+		unique: item.id,
+		parentUnique: item.parent ? item.parent.id : null,
+		name: item.name,
+		entityType: UMB_TEMPLATE_ENTITY_TYPE,
+		hasChildren: item.hasChildren,
+		isFolder: false,
+		icon: 'icon-newspaper',
+	};
+};

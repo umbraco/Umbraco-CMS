@@ -1,25 +1,23 @@
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbStylesheetWorkspaceEditorElement } from './stylesheet-workspace-editor.element.js';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { IRoutingInfo, PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
-import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-stylesheet-workspace')
 export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbStylesheetWorkspaceContext(this);
+	#createElement = () => new UmbStylesheetWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create/:path',
-			component: import('./stylesheet-workspace-editor.element.js'),
-			setup: async (_component, info) => {
-				const path = info.match.params.path === 'null' ? null : info.match.params.path;
-				const serverPath = path === null ? null : decodeFilePath(path);
-				await this.#workspaceContext.create(serverPath);
-				await this.#workspaceContext.setRules([]);
+			path: 'create/:parentUnique',
+			component: this.#createElement,
+			setup: async (component: PageComponent, info: IRoutingInfo) => {
+				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+				await this.#workspaceContext.create(parentUnique);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
@@ -29,31 +27,18 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 			},
 		},
 		{
-			path: 'edit/:path',
-			component: import('./stylesheet-workspace-editor.element.js'),
-			setup: (_component, info) => {
-				this.removeControllerByAlias('_observeIsNew');
-				const path = info.match.params.path;
-				const serverPath = decodeFilePath(path);
-				this.#workspaceContext.load(serverPath);
+			path: 'edit/:unique',
+			component: this.#createElement,
+			setup: (component: PageComponent, info: IRoutingInfo) => {
+				const unique = info.match.params.unique;
+				this.#workspaceContext.load(unique);
 			},
 		},
 	];
 
 	render() {
-		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
+		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
-
-	static styles = [
-		UmbTextStyles,
-		css`
-			:host {
-				display: block;
-				width: 100%;
-				height: 100%;
-			}
-		`,
-	];
 }
 
 export default UmbStylesheetWorkspaceElement;

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './tree.element.js';
 import type { UmbTreeElement } from './tree.element.js';
 
@@ -14,6 +14,5 @@ type Story = StoryObj<UmbTreeElement>;
 export const Overview: Story = {
 	args: {
 		alias: 'Umb.Tree.Document',
-		selectable: true,
 	},
 };

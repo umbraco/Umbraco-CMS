@@ -1,12 +1,9 @@
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import {
-	ManifestWorkspace,
-	UmbSectionViewElement,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace, UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-created-packages-section-view')
 export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewElement {
@@ -17,7 +14,8 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 
 	constructor() {
 		super();
-		this.observe(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
+		// TODO: Do not implement all workspaces at this point. We should only implement the 'package-builder' workspace.
+		this.observe(umbExtensionsRegistry?.byType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
 			this._createRoutes();
 		});

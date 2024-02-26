@@ -1,24 +1,20 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
+import type { UmbDocumentTypeDetailModel } from '../types.js';
+import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbEditableWorkspaceContextBase,
-	UmbSaveableWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
-import type {
-	ContentTypeCompositionModel,
-	ContentTypeSortModel,
-	DocumentTypeResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-type EntityType = DocumentTypeResponseModel;
+type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDocumentTypeDetailRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
+	extends UmbEditableWorkspaceContextBase<EntityType>
+	implements UmbSaveableWorkspaceContextInterface
 {
-	// Draft is located in structure manager
+	//
+	readonly repository = new UmbDocumentTypeDetailRepository(this);
+	// Data/Draft is located in structure manager
 
 	// General for content types:
 	readonly data;
@@ -36,18 +32,16 @@ export class UmbDocumentTypeWorkspaceContext
 
 	// Document type specific:
 	readonly allowedTemplateIds;
-	readonly defaultTemplateId;
+	readonly defaultTemplate;
 	readonly cleanup;
 
-	readonly structure;
+	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.DocumentType', new UmbDocumentTypeDetailRepository(host));
-
-		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
+		super(host, 'Umb.Workspace.DocumentType');
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;
@@ -63,9 +57,9 @@ export class UmbDocumentTypeWorkspaceContext
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 
 		// Document type specific:
-		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplateIds);
-		this.defaultTemplateId = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplateId);
-		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplateId);
+		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplates);
+		this.defaultTemplate = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
+		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
 	}
 
 	getIsSorting() {
@@ -73,15 +67,15 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	setIsSorting(isSorting: boolean) {
-		this.#isSorting.next(isSorting);
+		this.#isSorting.setValue(isSorting);
 	}
 
 	getData() {
-		return this.structure.getOwnerContentType() || {};
+		return this.structure.getOwnerContentType();
 	}
 
 	getEntityId() {
-		return this.getData().id;
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
@@ -115,23 +109,23 @@ export class UmbDocumentTypeWorkspaceContext
 	setIsElement(isElement: boolean) {
 		this.structure.updateOwnerContentType({ isElement });
 	}
-	setAllowedContentTypes(allowedContentTypes: Array<ContentTypeSortModel>) {
+	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
 		this.structure.updateOwnerContentType({ allowedContentTypes });
 	}
-	setCompositions(compositions: Array<ContentTypeCompositionModel>) {
+	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
 		this.structure.updateOwnerContentType({ compositions });
 	}
 
 	// Document type specific:
-	setAllowedTemplateIds(allowedTemplateIds: Array<string>) {
-		this.structure.updateOwnerContentType({ allowedTemplateIds });
+	setAllowedTemplateIds(allowedTemplates: Array<{ id: string }>) {
+		this.structure.updateOwnerContentType({ allowedTemplates });
 	}
-	setDefaultTemplateId(defaultTemplateId: string) {
-		this.structure.updateOwnerContentType({ defaultTemplateId });
+	setDefaultTemplate(defaultTemplate: { id: string }) {
+		this.structure.updateOwnerContentType({ defaultTemplate });
 	}
 
-	async create(parentId: string | null) {
-		const { data } = await this.structure.createScaffold(parentId);
+	async create(parentUnique: string | null) {
+		const { data } = await this.structure.createScaffold(parentUnique);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -140,8 +134,8 @@ export class UmbDocumentTypeWorkspaceContext
 		return { data } || undefined;
 	}
 
-	async load(entityId: string) {
-		const { data } = await this.structure.loadType(entityId);
+	async load(unique: string) {
+		const { data } = await this.structure.loadType(unique);
 		if (!data) return undefined;
 
 		this.setIsNew(false);
@@ -154,6 +148,9 @@ export class UmbDocumentTypeWorkspaceContext
 	 * Save or creates the document type, based on wether its a new one or existing.
 	 */
 	async save() {
+		const data = this.getData();
+		if (data === undefined) throw new Error('Cannot save, no data');
+
 		if (this.getIsNew()) {
 			if ((await this.structure.create()) === true) {
 				this.setIsNew(false);
@@ -162,7 +159,7 @@ export class UmbDocumentTypeWorkspaceContext
 			await this.structure.save();
 		}
 
-		this.saveComplete(this.getData());
+		this.saveComplete(data);
 	}
 
 	public destroy(): void {
@@ -170,12 +167,3 @@ export class UmbDocumentTypeWorkspaceContext
 		super.destroy();
 	}
 }
-
-export const UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbDocumentTypeWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbDocumentTypeWorkspaceContext => context.getEntityType?.() === 'document-type',
-);

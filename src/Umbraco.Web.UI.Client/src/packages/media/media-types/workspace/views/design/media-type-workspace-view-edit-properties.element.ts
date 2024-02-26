@@ -1,24 +1,22 @@
-import { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
+import type { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
 import './media-type-workspace-view-edit-property.element.js';
+import type { UmbMediaTypeDetailModel } from '../../../types.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
-import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	MediaTypePropertyTypeResponseModel,
-	MediaTypeResponseModel,
-	PropertyTypeModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
-const SORTER_CONFIG: UmbSorterConfig<MediaTypePropertyTypeResponseModel> = {
-	compareElementToModel: (element: HTMLElement, model: MediaTypePropertyTypeResponseModel) => {
-		return element.getAttribute('data-umb-property-id') === model.id;
+const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel> = {
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-tabs-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: MediaTypePropertyTypeResponseModel) => {
-		return container.querySelector('data-umb-property-id=[' + modelEntry.id + ']');
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
 	},
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',
@@ -45,6 +43,19 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 		performItemRemove: (args) => {
 			return this._propertyStructureHelper.removeProperty(args.item.id!);
 		},
+		performItemMove: (args) => {
+			this._propertyStructureHelper.removeProperty(args.item.id!);
+			let sortOrder = 0;
+			if (this._propertyStructure.length > 0) {
+				if (args.newIndex === 0) {
+					sortOrder = (this._propertyStructure[0].sortOrder ?? 0) - 1;
+				} else {
+					sortOrder =
+						(this._propertyStructure[Math.min(args.newIndex, this._propertyStructure.length - 1)].sortOrder ?? 0) + 1;
+				}
+			}
+			return this._propertyStructureHelper.insertProperty(args.item, sortOrder);
+		},
 	});
 
 	private _containerId: string | undefined;
@@ -69,20 +80,20 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 	}
 
 	@property({ type: String, attribute: 'container-type', reflect: false })
-	public get containerType(): PropertyContainerTypes | undefined {
+	public get containerType(): UmbPropertyContainerTypes | undefined {
 		return this._propertyStructureHelper.getContainerType();
 	}
-	public set containerType(value: PropertyContainerTypes | undefined) {
+	public set containerType(value: UmbPropertyContainerTypes | undefined) {
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
+	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbMediaTypeDetailModel>(this);
 
 	@state()
-	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
+	_propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	@state()
-	_ownerMediaTypes?: MediaTypeResponseModel[];
+	_ownerMediaTypes?: UmbMediaTypeDetailModel[];
 
 	@state()
 	protected _modalRouteNewProperty?: string;
@@ -93,7 +104,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this._propertyStructureHelper.setStructureManager((workspaceContext as UmbMediaTypeWorkspaceContext).structure);
 			this.observe(
 				(workspaceContext as UmbMediaTypeWorkspaceContext).isSorting,
@@ -102,6 +113,16 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 					this.#setModel(isSorting);
 				},
 				'_observeIsSorting',
+			);
+
+			const mediaTypesObservable = await this._propertyStructureHelper.ownerDocumentTypes();
+			if (!mediaTypesObservable) return;
+			this.observe(
+				mediaTypesObservable,
+				(medias) => {
+					this._ownerMediaTypes = medias;
+				},
+				'observeOwnerMediaTypes',
 			);
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
@@ -114,14 +135,17 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 			.onSetup(async () => {
 				const mediaTypeId = this._ownerMediaTypes?.find(
 					(types) => types.containers?.find((containers) => containers.id === this.containerId),
-				)?.id;
+				)?.unique;
 				if (mediaTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
-				return { propertyData, documentTypeId: mediaTypeId }; //TODO: Should we have a separate modal for mediaTypes?
+				return { data: { documentTypeId: mediaTypeId }, value: propertyData }; //TODO: Should we have a separate modal for mediaTypes?
 			})
-			.onSubmit((result) => {
-				this.#addProperty(result);
+			.onSubmit((value) => {
+				if (!value.dataType) {
+					throw new Error('No data type selected');
+				}
+				this.#addProperty(value as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteNewProperty = routeBuilder(null);
@@ -136,20 +160,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 		}
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		const mediaTypes = this._propertyStructureHelper.ownerDocumentTypes; //TODO: Should we have a separate propertyStructureHelper for mediaTypes?
-		if (!mediaTypes) return;
-		this.observe(
-			mediaTypes,
-			(medias) => {
-				this._ownerMediaTypes = medias;
-			},
-			'observeOwnerMediaTypes',
-		);
-	}
-
-	async #addProperty(propertyData: PropertyTypeModelBaseModel) {
+	async #addProperty(propertyData: UmbPropertyTypeModel) {
 		const propertyPlaceholder = await this._propertyStructureHelper.addProperty(this._containerId);
 		if (!propertyPlaceholder) return;
 
@@ -160,18 +171,18 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 		return html`<div id="property-list">
 				${repeat(
 					this._propertyStructure,
-					(property) => property.id ?? '' + property.containerId ?? '' + property.sortOrder ?? '',
+					(property) => property.id ?? '' + property.container?.id ?? '' + property.sortOrder ?? '',
 					(property) => {
 						// Note: This piece might be moved into the property component
 						const inheritedFromMedia = this._ownerMediaTypes?.find(
-							(types) => types.containers?.find((containers) => containers.id === property.containerId),
+							(types) => types.containers?.find((containers) => containers.id === property.container?.id),
 						);
 
-						return html`<media-type-workspace-view-edit-property
+						return html`<umb-media-type-workspace-view-edit-property
 							data-umb-property-id=${ifDefined(property.id)}
-							owner-media-type-id=${ifDefined(inheritedFromMedia?.id)}
+							owner-media-type-id=${ifDefined(inheritedFromMedia?.unique)}
 							owner-media-type-name=${ifDefined(inheritedFromMedia?.name)}
-							?inherited=${property.containerId !== this.containerId}
+							?inherited=${property.container?.id !== this.containerId}
 							?sort-mode-active=${this._sortModeActive}
 							.property=${property}
 							@partial-property-update=${(event: CustomEvent) => {
@@ -180,7 +191,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 							@property-delete=${() => {
 								this._propertyStructureHelper.removeProperty(property.id!);
 							}}>
-						</media-type-workspace-view-edit-property>`;
+						</umb-media-type-workspace-view-edit-property>`;
 					},
 				)}
 			</div>

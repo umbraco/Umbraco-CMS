@@ -16,6 +16,9 @@ export class PublishedCacheResource {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/published-cache/collect',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -27,6 +30,9 @@ export class PublishedCacheResource {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/published-cache/rebuild',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -38,6 +44,9 @@ export class PublishedCacheResource {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/published-cache/reload',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -49,6 +58,9 @@ export class PublishedCacheResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/published-cache/status',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 

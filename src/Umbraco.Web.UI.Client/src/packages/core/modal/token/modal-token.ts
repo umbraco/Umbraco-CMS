@@ -1,4 +1,10 @@
-import { UmbModalConfig } from '../modal-manager.context.js';
+import type { UmbModalConfig } from '../modal-manager.context.js';
+
+export interface UmbModalTokenDefaults<ModalDataType extends object = object, ModalValueType = unknown> {
+	modal?: UmbModalConfig;
+	data?: ModalDataType;
+	value?: ModalValueType;
+}
 
 export class UmbModalToken<ModalDataType extends object = object, ModalValueType = unknown> {
 	/**
@@ -13,26 +19,27 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 	readonly DATA: ModalDataType = undefined as never;
 
 	/**
-	 * Get the result type of the token
+	 * Get the value type of the token
 	 *
 	 * @public
 	 * @type      {ModalValueType}
 	 * @memberOf  UmbModalToken
-	 * @example   `typeof MyModal.RESULT`
+	 * @example   `typeof MyModal.VALUE`
 	 * @returns   undefined
 	 */
-	readonly RESULT: ModalValueType = undefined as never;
+	readonly VALUE: ModalValueType = undefined as never;
+
+	#alias;
+	#defaults;
 
 	/**
 	 * @param alias   Unique identifier for the token,
-	 * @param defaultConfig  Default configuration for the modal,
-	 * @param defaultData  Default data for the modal,
+	 * @param defaults  Defaults for the modal,
 	 */
-	constructor(
-		protected alias: string,
-		protected defaultConfig?: UmbModalConfig,
-		protected defaultData?: ModalDataType,
-	) {}
+	constructor(alias: string, defaults?: UmbModalTokenDefaults<ModalDataType, ModalValueType>) {
+		this.#alias = alias;
+		this.#defaults = defaults;
+	}
 
 	/**
 	 * This method must always return the unique alias of the token since that
@@ -41,14 +48,18 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 	 * @returns the unique alias of the token
 	 */
 	toString(): string {
-		return this.alias;
+		return this.#alias;
 	}
 
-	public getDefaultConfig(): UmbModalConfig | undefined {
-		return this.defaultConfig;
+	public getDefaultModal(): UmbModalConfig | undefined {
+		return this.#defaults?.modal;
 	}
 
 	public getDefaultData(): ModalDataType | undefined {
-		return this.defaultData;
+		return this.#defaults?.data;
+	}
+
+	public getDefaultValue(): ModalValueType | undefined {
+		return this.#defaults?.value;
 	}
 }

@@ -1,10 +1,10 @@
-import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-type-workspace-view-settings')
 export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -43,7 +43,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	render() {
 		return html`
 			<uui-box headline="Data variations">
-				<umb-workspace-property-layout alias="VaryByCulture" label="Allow vary by culture">
+				<umb-property-layout alias="VaryByCulture" label="Allow vary by culture">
 					<div slot="description">Allow editors to create content of different languages.</div>
 					<div slot="editor">
 						<uui-toggle
@@ -53,8 +53,8 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							}}
 							label="Vary by culture"></uui-toggle>
 					</div>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout alias="VaryBySegments" label="Allow segmentation">
+				</umb-property-layout>
+				<umb-property-layout alias="VaryBySegments" label="Allow segmentation">
 					<div slot="description">Allow editors to segment their content.</div>
 					<div slot="editor">
 						<uui-toggle
@@ -64,8 +64,8 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							}}
 							label="Vary by segments"></uui-toggle>
 					</div>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout alias="ElementType" label="Is an Element Type">
+				</umb-property-layout>
+				<umb-property-layout alias="ElementType" label="Is an Element Type">
 					<div slot="description">
 						An Element Type is used for content instances in Property Editors, like the Block Editors.
 					</div>
@@ -77,10 +77,10 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 							}}
 							label="Element type"></uui-toggle>
 					</div>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 			</uui-box>
 			<uui-box headline="History cleanup">
-				<umb-workspace-property-layout alias="HistoryCleanup" label="History cleanup">
+				<umb-property-layout alias="HistoryCleanup" label="History cleanup">
 					<div slot="description">
 						Allow overriding the global history cleanup settings. (TODO: this ui is not working.. )
 					</div>
@@ -92,7 +92,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 						<uui-label for="latest-version-per-day-days">Keep latest version per day for X days</uui-label>
 						<umb-property-editor-ui-number id="latest-version-per-day-days"></umb-property-editor-ui-number>
 					</div>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 			</uui-box>
 		`;
 	}

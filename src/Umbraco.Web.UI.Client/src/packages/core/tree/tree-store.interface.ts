@@ -1,10 +1,28 @@
-import { UmbStore } from '@umbraco-cms/backoffice/store';
+import type { UmbTreeItemModelBase } from './types.js';
+import type { UmbStore } from '@umbraco-cms/backoffice/store';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbTreeStore<T = any> extends UmbStore<T>, UmbApi {
-	rootItems: Observable<Array<T>>;
-	childrenOf: (parentUnique: string | null) => Observable<Array<T>>;
-	// TODO: remove this one when all repositories are using an item store
-	items: (uniques: Array<string>) => Observable<Array<T>>;
+/**
+ * Interface for a tree store.
+ * @export
+ * @interface UmbTreeStore
+ * @extends {UmbStore<TreeItemType>}
+ * @extends {UmbApi}
+ * @template TreeItemType
+ */
+export interface UmbTreeStore<TreeItemType extends UmbTreeItemModelBase> extends UmbStore<TreeItemType>, UmbApi {
+	/**
+	 * Returns an observable of the root items of the tree.
+	 * @type {Observable<Array<TreeItemType>>}
+	 * @memberof UmbTreeStore
+	 */
+	rootItems: Observable<Array<TreeItemType>>;
+
+	/**
+	 * Returns an observable of the children of the given parent item.
+	 * @param {(string | null)} parentUnique
+	 * @memberof UmbTreeStore
+	 */
+	childrenOf: (parentUnique: string | null) => Observable<Array<TreeItemType>>;
 }

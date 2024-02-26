@@ -6,7 +6,7 @@
 import type { PublicAccessBaseModel } from './PublicAccessBaseModel';
 
 export type PublicAccessRequestModel = (PublicAccessBaseModel & {
-    memberUserNames?: Array<string>;
-    memberGroupNames?: Array<string>;
+    memberUserNames: Array<string>;
+    memberGroupNames: Array<string>;
 });
 

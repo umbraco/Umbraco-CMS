@@ -3,10 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type DictionaryOverviewResponseModel = {
     name?: string | null;
-    id?: string;
-    parentId?: string | null;
-    translatedIsoCodes?: Array<string>;
+    id: string;
+    parent?: ReferenceByIdModel | null;
+    translatedIsoCodes: Array<string>;
 };
 

@@ -36,6 +36,9 @@ export class RelationResource {
                 'take': take,
                 'relationTypeAlias': relationTypeAlias,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -63,6 +66,7 @@ export class RelationResource {
                 'take': take,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });

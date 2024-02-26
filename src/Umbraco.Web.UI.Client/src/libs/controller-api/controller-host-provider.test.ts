@@ -1,6 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbControllerHostProviderElement } from './controller-host-provider.element.js';
-import { UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
+import type { UmbControllerHostElement} from './controller-host-element.mixin.js';
+import { UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
@@ -38,8 +39,11 @@ describe('UmbControllerHostTestElement', () => {
 		expect(element).to.be.instanceOf(UmbControllerHostProviderElement);
 	});
 
-	it('provides the context', () => {
+	it('provides the context', async () => {
+		await Promise.resolve();
 		// Potentially we need to wait a bit here, cause the value might not be set already? as of the context consumption...
+		expect(consumer).to.be.instanceOf(UmbTestControllerHostInitializerConsumerElement);
+		expect(consumer.value).to.not.be.null;
 		expect(consumer.value).to.equal(contextValue);
 	});
 });

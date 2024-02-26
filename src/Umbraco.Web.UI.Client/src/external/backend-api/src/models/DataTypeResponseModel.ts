@@ -4,9 +4,12 @@
 /* eslint-disable */
 
 import type { DataTypeModelBaseModel } from './DataTypeModelBaseModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type DataTypeResponseModel = (DataTypeModelBaseModel & {
-    id?: string;
-    parentId?: string | null;
+    id: string;
+    parent?: ReferenceByIdModel | null;
+    isDeletable: boolean;
+    canIgnoreStartNodes: boolean;
 });
 

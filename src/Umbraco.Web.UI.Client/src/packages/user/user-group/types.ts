@@ -1,32 +1,17 @@
-import {
-	CreateUserGroupRequestModel,
-	UpdateUserGroupRequestModel,
-	UserGroupResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbUserGroupEntityType } from './entity.js';
 
-export interface UserGroupEntity extends UmbEntityBase {
-	type: 'user-group';
-	icon?: string;
-}
-
-export interface UserGroupDetails extends UserGroupEntity {
+export interface UmbUserGroupDetailModel {
+	unique: string;
+	entityType: UmbUserGroupEntityType;
+	isSystemGroup: boolean;
+	name: string;
+	icon: string | null;
 	sections: Array<string>;
-	contentStartNode?: string;
-	mediaStartNode?: string;
+	languages: Array<string>;
+	hasAccessToAllLanguages: boolean;
+	documentStartNode: { unique: string } | null;
+	documentRootAccess: boolean;
+	mediaStartNode: { unique: string } | null;
+	mediaRootAccess: boolean;
 	permissions: Array<string>;
 }
-
-export interface UmbUserGroupCollectionFilterModel {
-	skip?: number;
-	take?: number;
-}
-
-//TODO Which model should we use instead of "any"?
-export type UmbUserGroupDetailDataSource = UmbDataSource<
-	CreateUserGroupRequestModel,
-	any,
-	UpdateUserGroupRequestModel,
-	UserGroupResponseModel
->;

@@ -1,12 +1,10 @@
-import { UmbMediaTypeWorkspaceContext } from './media-type-workspace.context.js';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbMediaTypeWorkspaceContext } from './media-type-workspace.context.js';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	UMB_ICON_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-media-type-workspace-editor')
@@ -39,7 +37,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 			this.#observeMediaType();
 		});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -102,12 +100,14 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 
 	private async _handleIconClick() {
 		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
-			icon: this._icon,
-			color: this._iconColorAlias,
+			value: {
+				icon: this._icon,
+				color: this._iconColorAlias,
+			},
 		});
 
-		modalContext?.onSubmit().then((saved) => {
-			if (saved.icon) this.#workspaceContext?.updateProperty('icon', saved.icon);
+		modalContext?.onSubmit().then((value) => {
+			if (value.icon) this.#workspaceContext?.updateProperty('icon', value.icon);
 			// TODO: save color ALIAS as well
 		});
 	}

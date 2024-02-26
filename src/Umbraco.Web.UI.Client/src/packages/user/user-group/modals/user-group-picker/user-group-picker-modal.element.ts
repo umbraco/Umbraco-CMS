@@ -1,26 +1,31 @@
 import { UmbUserGroupCollectionRepository } from '../../collection/repository/index.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbUserGroupDetailModel } from '../../types.js';
+import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-user-group-picker-modal')
-export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any> {
+export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
+	(typeof UMB_USER_GROUP_PICKER_MODAL)['DATA'],
+	(typeof UMB_USER_GROUP_PICKER_MODAL)['VALUE']
+> {
 	@state()
-	private _userGroups: Array<UserGroupResponseModel> = [];
+	private _userGroups: Array<UmbUserGroupDetailModel> = [];
 
-	#selectionManager = new UmbSelectionManager();
+	#selectionManager = new UmbSelectionManager(this);
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
 		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
+		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
-		this.#selectionManager.setSelection(this.data?.selection ?? []);
+		this.#selectionManager.setSelection(this.value?.selection ?? []);
+		this.observe(this.#selectionManager.selection, (selection) => this.updateValue({ selection }), 'selectionObserver');
 	}
 
 	protected firstUpdated(): void {
@@ -33,34 +38,25 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 		this.observe(asObservable(), (items) => (this._userGroups = items), 'umbUserGroupsObserver');
 	}
 
-	#onSelected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {
-		if (!item.id) throw new Error('User group id is required');
+	#onSelected(event: UUIMenuItemEvent, item: UmbUserGroupDetailModel) {
+		if (!item.unique) throw new Error('User group unique is required');
 		event.stopPropagation();
-		this.#selectionManager.select(item.id);
-		this.#updateSelectionValue();
+		this.#selectionManager.select(item.unique);
 		this.requestUpdate();
-		this.modalContext?.dispatchEvent(new UmbSelectedEvent(item.id));
+		this.modalContext?.dispatchEvent(new UmbSelectedEvent(item.unique));
 	}
 
-	#onDeselected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {
-		if (!item.id) throw new Error('User group id is required');
+	#onDeselected(event: UUIMenuItemEvent, item: UmbUserGroupDetailModel) {
+		if (!item.unique) throw new Error('User group unique is required');
 		event.stopPropagation();
-		this.#selectionManager.deselect(item.id);
-		this.#updateSelectionValue();
+		this.#selectionManager.deselect(item.unique);
 		this.requestUpdate();
-		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.id));
+		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(item.unique));
 	}
 
-	#updateSelectionValue() {
-		this.modalContext?.updateValue({ selection: this.#selectionManager.getSelection() });
-	}
-
-	#submit() {
-		this.modalContext?.submit(this._value);
-	}
-
-	#close() {
-		this.modalContext?.reject();
+	#onSubmit() {
+		this.updateValue({ selection: this.#selectionManager.getSelection() });
+		this._submitModal();
 	}
 
 	render() {
@@ -74,21 +70,19 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 								selectable
 								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, item)}
 								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, item)}
-								?selected=${this.#selectionManager.isSelected(item.id!)}>
+								?selected=${this.#selectionManager.isSelected(item.unique)}>
 								<uui-icon .name=${item.icon || null} slot="icon"></uui-icon>
 							</uui-menu-item>
 						`,
 					)}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this.#close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
+					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.#onSubmit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbUserGroupPickerModalElement;

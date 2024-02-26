@@ -1,8 +1,9 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbExtensionSlotElement } from './extension-slot.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { ManifestDashboard, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-test-extension-slot-manifest-element')
 class UmbTestExtensionSlotManifestElement extends HTMLElement {}
@@ -27,9 +28,11 @@ describe('UmbExtensionSlotElement', () => {
 
 		/*
 		// This test fails offen on FireFox, there is no real need for this test. So i have chosen to skip it.
-		it('passes the a11y audit', async () => {
-			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
-		});
+		if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
+			it('passes the a11y audit', async () => {
+				await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
+			});
+		}
 		*/
 
 		describe('properties', () => {
@@ -67,7 +70,7 @@ describe('UmbExtensionSlotElement', () => {
 		it('renders a manifest element', async () => {
 			element = await fixture(html`<umb-extension-slot type="dashboard"></umb-extension-slot>`);
 
-			await sleep(0);
+			await sleep(20);
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
@@ -76,10 +79,10 @@ describe('UmbExtensionSlotElement', () => {
 			element = await fixture(
 				html`<umb-extension-slot
 					type="dashboard"
-					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`
+					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`,
 			);
 
-			await sleep(0);
+			await sleep(20);
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
@@ -90,14 +93,14 @@ describe('UmbExtensionSlotElement', () => {
 					type="dashboard"
 					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
 					.renderMethod=${(controller: UmbExtensionElementInitializer) => html`<bla>${controller.component}</bla>`}>
-				</umb-extension-slot>`
+				</umb-extension-slot>`,
 			);
 
-			await sleep(0);
+			await sleep(20);
 
 			expect(element.shadowRoot!.firstElementChild?.nodeName).to.be.equal('BLA');
 			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(
-				UmbTestExtensionSlotManifestElement
+				UmbTestExtensionSlotManifestElement,
 			);
 		});
 
@@ -107,10 +110,10 @@ describe('UmbExtensionSlotElement', () => {
 					type="dashboard"
 					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
 					.props=${{ testProp: 'fooBar' }}>
-				</umb-extension-slot>`
+				</umb-extension-slot>`,
 			);
 
-			await sleep(0);
+			await sleep(20);
 
 			expect((element.shadowRoot!.firstElementChild as any).testProp).to.be.equal('fooBar');
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);

@@ -1,12 +1,9 @@
 import type { UmbPropertyAction } from '../../shared/property-action/property-action.interface.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbNotificationDefaultData,
-	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
-} from '@umbraco-cms/backoffice/notification';
-//import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbNotificationDefaultData, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+//import { UMB_WORKSPACE_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-property-action-copy')
 export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPropertyAction {
@@ -18,12 +15,12 @@ export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPr
 	constructor() {
 		super();
 
-		//this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (property) => {
-			//console.log('Got a reference to the editor element', property.getEditor());
-			// Be aware that the element might switch, so using the direct reference is not recommended, instead observe the .element Observable()
+		//this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT, (property) => {
+		//console.log('Got a reference to the editor element', property.getEditor());
+		// Be aware that the element might switch, so using the direct reference is not recommended, instead observe the .element Observable()
 		//});
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 			this._notificationContext = instance;
 		});
 	}

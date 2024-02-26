@@ -1,13 +1,13 @@
 import { logs } from './logs.data.js';
-import { UmbData } from './data.js';
-import {
+import { UmbMockDBBase } from './utils/mock-db-base.js';
+import type {
 	LogMessageResponseModel,
 	LogTemplateResponseModel,
 	SavedLogSearchResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 // Temp mocked database
-class UmbLogViewerSearchesData extends UmbData<SavedLogSearchResponseModel> {
+class UmbLogViewerSearchesData extends UmbMockDBBase<SavedLogSearchResponseModel> {
 	constructor(data: SavedLogSearchResponseModel[]) {
 		super(data);
 	}
@@ -22,7 +22,7 @@ class UmbLogViewerSearchesData extends UmbData<SavedLogSearchResponseModel> {
 	}
 }
 
-class UmbLogViewerTemplatesData extends UmbData<LogTemplateResponseModel> {
+class UmbLogViewerTemplatesData extends UmbMockDBBase<LogTemplateResponseModel> {
 	constructor(data: LogTemplateResponseModel[]) {
 		super(data);
 	}
@@ -33,8 +33,8 @@ class UmbLogViewerTemplatesData extends UmbData<LogTemplateResponseModel> {
 	}
 }
 
-class UmbLogViewerMessagesData extends UmbData<LogMessageResponseModel> {
-	constructor(data: LogTemplateResponseModel[]) {
+class UmbLogViewerMessagesData extends UmbMockDBBase<LogMessageResponseModel> {
+	constructor(data: LogMessageResponseModel[]) {
 		super(data);
 	}
 

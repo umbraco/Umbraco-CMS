@@ -1,13 +1,13 @@
 import { html, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import {
+import type {
 	UmbModalManagerContext,
 	UmbModalToken,
 	UmbModalType,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /** TODO: Make use of UUI FORM Mixin, to make it easily take part of a form. */
 export class UmbInputListBaseElement extends UmbLitElement {
@@ -29,7 +29,7 @@ export class UmbInputListBaseElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -38,8 +38,10 @@ export class UmbInputListBaseElement extends UmbLitElement {
 		if (!this.pickerToken) return;
 
 		const modalContext = this._modalContext?.open(this.pickerToken, {
-			multiple: this.multiple,
-			selection: this.value,
+			data: {
+				multiple: this.multiple,
+				selection: this.value,
+			},
 		});
 
 		modalContext?.onSubmit().then((data: UmbPickerModalValue) => {

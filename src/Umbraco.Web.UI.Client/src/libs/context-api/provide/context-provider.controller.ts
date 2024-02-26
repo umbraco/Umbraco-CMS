@@ -1,20 +1,27 @@
-import { UmbContextToken } from '../token/context-token.js';
+import type { UmbContextToken } from '../token/context-token.js';
 import { UmbContextProvider } from './context-provider.js';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbContextProviderController<
-	BaseType = unknown,
-	ResultType extends BaseType = BaseType,
-	InstanceType extends ResultType = ResultType
-> extends UmbContextProvider<BaseType, ResultType> implements UmbController {
+		BaseType = unknown,
+		ResultType extends BaseType = BaseType,
+		InstanceType extends ResultType = ResultType,
+	>
+	extends UmbContextProvider<BaseType, ResultType>
+	implements UmbController
+{
 	#host: UmbControllerHost;
-	#controllerAlias:string;
+	#controllerAlias: string;
 
-	public get controllerAlias() {
+	public get controllerAlias(): string {
 		return this.#controllerAlias;
 	}
 
-	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType) {
+	constructor(
+		host: UmbControllerHost,
+		contextAlias: string | UmbContextToken<BaseType, ResultType>,
+		instance: InstanceType,
+	) {
 		super(host.getHostElement(), contextAlias, instance);
 		this.#host = host;
 		// Makes the controllerAlias unique for this instance, this enables multiple Contexts to be provided under the same name. (This only makes sense cause of Context Token Discriminators)
@@ -30,16 +37,19 @@ export class UmbContextProviderController<
 			// This just an additional awareness feature to make devs Aware, the alternative would be adding it anyway, but that would destroy existing controller of this alias.
 			// Back out, this instance is already provided, by another controller.
 			throw new Error(
-				`Context API: The context of '${this.controllerAlias}' and instance '${(instance as any).constructor?.name ?? 'unnamed'}' is already provided by another Context Provider Controller.`
+				`Context API: The context of '${this.controllerAlias}' and instance '${
+					(instance as any).constructor?.name ?? 'unnamed'
+				}' is already provided by another Context Provider Controller.`,
 			);
 		} else {
 			host.addController(this);
 		}
 	}
 
-	public destroy() {
+	public destroy(): void {
 		if (this.#host) {
 			this.#host.removeController(this);
+			(this.#host as any) = undefined;
 		}
 		super.destroy();
 	}

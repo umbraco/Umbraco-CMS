@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { TemporaryFileConfigurationResponseModel } from '../models/TemporaryFileConfigurationResponseModel';
 import type { TemporaryFileResponseModel } from '../models/TemporaryFileResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -14,7 +15,7 @@ export class TemporaryFileResource {
      * @returns string Created
      * @throws ApiError
      */
-    public static postTemporaryfile({
+    public static postTemporaryFile({
         formData,
     }: {
         formData?: {
@@ -24,12 +25,13 @@ export class TemporaryFileResource {
     }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/umbraco/management/api/v1/temporaryfile',
+            url: '/umbraco/management/api/v1/temporary-file',
             formData: formData,
             mediaType: 'multipart/form-data',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -38,19 +40,20 @@ export class TemporaryFileResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTemporaryfileById({
+    public static getTemporaryFileById({
         id,
     }: {
         id: string,
     }): CancelablePromise<TemporaryFileResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/temporaryfile/{id}',
+            url: '/umbraco/management/api/v1/temporary-file/{id}',
             path: {
                 'id': id,
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -60,20 +63,35 @@ export class TemporaryFileResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteTemporaryfileById({
+    public static deleteTemporaryFileById({
         id,
     }: {
         id: string,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/umbraco/management/api/v1/temporaryfile/{id}',
+            url: '/umbraco/management/api/v1/temporary-file/{id}',
             path: {
                 'id': id,
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTemporaryFileConfiguration(): CancelablePromise<TemporaryFileConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/temporary-file/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

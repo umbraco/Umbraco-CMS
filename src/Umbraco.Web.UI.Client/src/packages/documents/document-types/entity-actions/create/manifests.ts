@@ -2,10 +2,10 @@ import {
 	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-} from '../../index.js';
+} from '../../entity.js';
 import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbCreateDataTypeEntityAction } from './create.action.js';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{

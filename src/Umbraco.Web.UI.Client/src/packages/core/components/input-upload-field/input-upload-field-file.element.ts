@@ -1,55 +1,105 @@
-import { css, html, nothing, until, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
-type FileItem = {
-	name: string;
-	src: string;
-};
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-input-upload-field-file')
 export class UmbInputUploadFieldFileElement extends UmbLitElement {
+	@property({ type: String })
+	path: string = '';
+
 	/**
 	 * @description The file to be rendered.
 	 * @type {File}
 	 * @required
 	 */
-	@property({ type: File, attribute: false })
-	set file(value: File) {
-		this.#fileItem = new Promise((resolve) => {
-			/**
-			 * If the mimetype of the file is an image, we want to render a thumbnail of the image.
-			 */
-			if (value.type && /image\/.*/.test(value.type)) {
-				const reader = new FileReader();
+	@property({ attribute: false })
+	file?: File;
 
-				reader.readAsDataURL(value);
+	@state()
+	extension = '';
 
-				reader.onload = (event) => {
-					resolve({
-						name: value.name,
-						src: event.target?.result as string,
-					});
-				};
-			} else {
-				resolve({
-					name: value.name,
-					src: '',
-				});
+	@state()
+	label = '';
+
+	#serverUrl = '';
+	#serverUrlPromise;
+
+	/**
+	 *
+	 */
+	constructor() {
+		super();
+		this.#serverUrlPromise = this.consumeContext(UMB_APP_CONTEXT, (instance) => {
+			this.#serverUrl = instance.getServerUrl();
+		}).asPromise();
+	}
+
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('file')) {
+			this.extension = this.file?.name.split('.').pop() || '';
+			this.label = this.file?.name || 'loading...';
+		}
+
+		if (_changedProperties.has('path')) {
+			if (this.#serverUrl) {
+				if (this.file) return;
+
+				this.extension = this.path.split('.').pop() || '';
+				this.label = this.#serverUrl ? this.path.substring(this.#serverUrl.length) : 'loading...';
 			}
-		});
+		}
 	}
 
-	#fileItem!: Promise<FileItem>;
+	#renderLabel() {
+		if (this.path) return html`<a id="label" href=${this.path}>${this.label}</a>`;
 
-	render = () => until(this.#renderFileItem(), html`<uui-loader></uui-loader>`);
-
-	async #renderFileItem() {
-		const fileItem = await this.#fileItem;
-		return html`<uui-symbol-file-thumbnail
-			src=${fileItem.src}
-			title=${fileItem.name}
-			alt=${fileItem.name}></uui-symbol-file-thumbnail>`;
+		return html`<span id="label">${this.label}</span>`;
 	}
+
+	render() {
+		if (!this.label && !this.extension) return html`<uui-loader></uui-loader>`;
+
+		return html`
+			<div id="main">
+				<uui-symbol-file id="file-symbol" .type=${this.extension}></uui-symbol-file>
+				${this.#renderLabel()}
+			</div>
+		`;
+	}
+
+	static styles = [
+		css`
+			#main {
+				display: grid;
+				grid-template-rows: 150px auto;
+				box-sizing: border-box;
+				color: var(--uui-color-text);
+			}
+			#file-symbol {
+				aspect-ratio: 1 / 1;
+				margin: auto;
+				max-width: 100%;
+				max-height: 100%;
+			}
+			#label {
+				text-align: center;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				color: var(--uui-color-text);
+			}
+			a#label {
+				text-decoration: none;
+				color: var(--uui-color-interactive);
+			}
+			a#label:hover {
+				text-decoration: underline;
+				color: var(--uui-color-interactive-emphasis);
+			}
+		`,
+	];
 }
 
 declare global {

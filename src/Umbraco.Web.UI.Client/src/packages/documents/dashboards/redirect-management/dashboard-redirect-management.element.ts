@@ -1,16 +1,10 @@
-import { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CONFIRM_MODAL,
-} from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	RedirectManagementResource,
-	RedirectStatusModel,
-	RedirectUrlResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { RedirectUrlResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { RedirectManagementResource, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -47,7 +41,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (_instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (_instance) => {
 			this._modalContext = _instance;
 		});
 	}
@@ -89,16 +83,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	#onRequestDelete(data: RedirectUrlResponseModel) {
 		if (!data.id) return;
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Delete',
-			content: html`
-				<div style="width:300px">
-					<p>${this.localize.term('redirectUrls_redirectRemoveWarning')}</p>
-					${this.localize.term('redirectUrls_originalUrl')}: <strong>${data.originalUrl}</strong><br />
-					${this.localize.term('redirectUrls_redirectedTo')}: <strong>${data.destinationUrl}</strong>
-				</div>
-			`,
-			color: 'danger',
-			confirmLabel: 'Delete',
+			data: {
+				headline: 'Delete',
+				content: html`
+					<div style="width:300px">
+						<p>${this.localize.term('redirectUrls_redirectRemoveWarning')}</p>
+						${this.localize.term('redirectUrls_originalUrl')}: <strong>${data.originalUrl}</strong><br />
+						${this.localize.term('redirectUrls_redirectedTo')}: <strong>${data.destinationUrl}</strong>
+					</div>
+				`,
+				color: 'danger',
+				confirmLabel: 'Delete',
+			},
 		});
 
 		modalContext
@@ -136,10 +132,12 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		}
 
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: `${this.localize.term('redirectUrls_disableUrlTracker')}`,
-			content: `${this.localize.term('redirectUrls_confirmDisable')}`,
-			color: 'danger',
-			confirmLabel: 'Disable',
+			data: {
+				headline: `${this.localize.term('redirectUrls_disableUrlTracker')}`,
+				content: `${this.localize.term('redirectUrls_confirmDisable')}`,
+				color: 'danger',
+				confirmLabel: 'Disable',
+			},
 		});
 		modalContext
 			?.onSubmit()

@@ -1,4 +1,4 @@
-import { RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
+import { RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
@@ -56,7 +56,7 @@ export class UmbServerConnection {
 			throw error;
 		}
 
-		this.#isConnected.next(true);
+		this.#isConnected.setValue(true);
 		this.#status = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
 	}
 }

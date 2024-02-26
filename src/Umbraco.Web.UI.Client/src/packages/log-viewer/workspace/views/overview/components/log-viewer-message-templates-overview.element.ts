@@ -1,8 +1,12 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PagedLogTemplateResponseModel, SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type {
+	PagedLogTemplateResponseModel,
+	SavedLogSearchResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 //TODO: fix pagination bug when API is fixed
 @customElement('umb-log-viewer-message-templates-overview')
@@ -13,7 +17,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#logViewerContext?.getMessageTemplates(0, 10);
 			this.#observeStuff();
@@ -37,7 +41,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 			<uui-button
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
-				href=${`section/settings/workspace/logviewer/search/?lq=${searchListItem.query}`}>
+				href=${`section/settings/workspace/logviewer/view/search/?lq=${searchListItem.query}`}>
 				<uui-icon name="icon-search"></uui-icon>${searchListItem.name}
 			</uui-button>
 		</li>`;
@@ -59,13 +63,13 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 									html`<uui-table-row>
 										<uui-table-cell>
 											<a
-												href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
-													`@MessageTemplate='${template.messageTemplate}'`
+												href=${`section/settings/workspace/logviewer/view/search/?lq=${encodeURIComponent(
+													`@MessageTemplate='${template.messageTemplate}'`,
 												)}`}>
 												<span>${template.messageTemplate}</span> <span>${template.count}</span>
 											</a>
 										</uui-table-cell>
-									</uui-table-row>`
+									</uui-table-row>`,
 						  )
 						: ''}
 				</uui-table>

@@ -1,5 +1,10 @@
-import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbFileSystemTreeItemModel, UmbFileSystemTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbPartialViewEntityType, UmbPartialViewFolderEntityType, UmbPartialViewRootEntityType } from '../entity.js';
+import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export type UmbPartialViewTreeItemModel = FileSystemTreeItemPresentationModel & UmbFileSystemTreeItemModel;
-export type UmbPartialViewTreeRootModel = FileSystemTreeItemPresentationModel & UmbFileSystemTreeRootModel;
+export interface UmbPartialViewTreeItemModel extends UmbUniqueTreeItemModel {
+	entityType: UmbPartialViewEntityType | UmbPartialViewFolderEntityType;
+}
+
+export interface UmbPartialViewTreeRootModel extends UmbUniqueTreeRootModel {
+	entityType: UmbPartialViewRootEntityType;
+}

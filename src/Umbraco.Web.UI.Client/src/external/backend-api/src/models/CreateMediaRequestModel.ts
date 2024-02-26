@@ -4,8 +4,9 @@
 /* eslint-disable */
 
 import type { CreateContentForMediaRequestModel } from './CreateContentForMediaRequestModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type CreateMediaRequestModel = (CreateContentForMediaRequestModel & {
-    contentTypeId?: string;
+    mediaType: ReferenceByIdModel;
 });
 

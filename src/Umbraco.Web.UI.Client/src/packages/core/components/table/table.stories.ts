@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './table.element.js';
 import type { UmbTableElement, UmbTableColumn, UmbTableConfig, UmbTableItem } from './table.element.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -97,6 +97,17 @@ export const WithHiddenIcons: Story = {
 		columns: columns,
 		config: {
 			allowSelection: true,
+			hideIcon: true,
+		},
+	},
+};
+
+export const WithHiddenIconsAndDisallowedSelections: Story = {
+	args: {
+		items: items,
+		columns: columns,
+		config: {
+			allowSelection: false,
 			hideIcon: true,
 		},
 	},

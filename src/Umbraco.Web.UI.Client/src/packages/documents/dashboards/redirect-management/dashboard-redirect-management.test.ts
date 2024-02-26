@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 
 import { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbDashboardRedirectManagement', () => {
 	let element: UmbDashboardRedirectManagementElement;
@@ -14,7 +14,9 @@ describe('UmbDashboardRedirectManagement', () => {
 		expect(element).to.be.instanceOf(UmbDashboardRedirectManagementElement);
 	});
 
-	it('passes the a11y audit', async () => {
-		await expect(element).to.be.accessible(defaultA11yConfig);
-	});
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		it('passes the a11y audit', async () => {
+			await expect(element).to.be.accessible(defaultA11yConfig);
+		});
+	}
 });

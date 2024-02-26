@@ -1,11 +1,10 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbConfirmModalData, UmbConfirmModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbConfirmModalData, UmbConfirmModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-confirm-modal')
 export class UmbConfirmModalElement extends UmbLitElement {
-
 	@property({ attribute: false })
 	modalContext?: UmbModalContext<UmbConfirmModalData, UmbConfirmModalValue>;
 
@@ -25,7 +24,7 @@ export class UmbConfirmModalElement extends UmbLitElement {
 			<uui-dialog-layout class="uui-text" .headline=${this.data?.headline || null}>
 				${this.data?.content}
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
+				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}"></uui-button>
 				<uui-button
 					slot="actions"
 					id="confirm"

@@ -1,11 +1,11 @@
 const { rest } = window.MockServiceWorker;
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import {
+import type {
 	ModelsBuilderResponseModel,
-	ModelsModeModel,
 	OutOfDateStatusResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { ModelsModeModel, OutOfDateTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.post(umbracoPath('/models-builder/build'), async (_req, res, ctx) => {
@@ -14,7 +14,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json({})
+			ctx.json({}),
 		);
 	}),
 
@@ -26,7 +26,9 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<OutOfDateStatusResponseModel>({})
+			ctx.json<OutOfDateStatusResponseModel>({
+				status: OutOfDateTypeModel.CURRENT,
+			}),
 		);
 	}),
 ];

@@ -1,42 +1,43 @@
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_PROPERTY_SETTINGS_MODAL,
 	UMB_WORKSPACE_MODAL,
-	UmbConfirmModalData,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
- *  @element media-type-workspace-view-edit-property
+ *  @element umb-media-type-workspace-view-edit-property
  *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
  */
-@customElement('media-type-workspace-view-edit-property')
+@customElement('umb-media-type-workspace-view-edit-property')
 export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
-	private _property?: PropertyTypeModelBaseModel | undefined;
+	private _property?: UmbPropertyTypeModel | undefined;
 	/**
 	 * Property, the data object for the property.
-	 * @type {PropertyTypeModelBaseModel}
+	 * @type {UmbPropertyTypeModel}
 	 * @attr
 	 * @default undefined
 	 */
 	@property({ type: Object })
-	public get property(): PropertyTypeModelBaseModel | undefined {
+	public get property(): UmbPropertyTypeModel | undefined {
 		return this._property;
 	}
-	public set property(value: PropertyTypeModelBaseModel | undefined) {
+	public set property(value: UmbPropertyTypeModel | undefined) {
 		const oldValue = this._property;
 		this._property = value;
 		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
-		this.setDataType(this._property?.dataTypeId);
+		this.setDataType(this._property?.dataType.unique);
 		this.requestUpdate('property', oldValue);
 	}
 
@@ -56,7 +57,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
 	#modalRegistration;
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
+	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	@state()
 	protected _modalRoute?: string;
@@ -92,10 +93,13 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 				if (mediaTypeId === undefined) return false;
 				const propertyData = this.property;
 				if (propertyData === undefined) return false;
-				return { propertyData, documentTypeId: mediaTypeId }; //TODO: Should we have a separate modal for mediaTypes?
+				return { data: { documentTypeId: mediaTypeId }, value: propertyData }; //TODO: Should we have a separate modal for mediaTypes?
 			})
 			.onSubmit((result) => {
-				this._partialUpdate(result);
+				if (!result.dataType) {
+					throw new Error('No dataType found on property');
+				}
+				this._partialUpdate(result as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder(null);
@@ -104,18 +108,18 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('media-type')
 			.onSetup(() => {
-				return { entityType: 'media-type', preset: {} };
+				return { data: { entityType: 'media-type', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editMediaTypePath = routeBuilder({});
 			});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 			this._modalManagerContext = context;
 		});
 	}
 
-	_partialUpdate(partialObject: PropertyTypeModelBaseModel) {
+	_partialUpdate(partialObject: UmbPropertyTypeModel) {
 		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
 	}
 
@@ -138,7 +142,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 		e.stopImmediatePropagation();
 		if (!this.property || !this.property.id) return;
 
-		const Message: UmbConfirmModalData = {
+		const modalData: UmbConfirmModalData = {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
 				this.property.name || this.property.id,
@@ -150,7 +154,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 			color: 'danger',
 		};
 
-		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, Message);
+		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, { data: modalData });
 
 		modalHandler
 			?.onSubmit()
@@ -214,7 +218,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 						.value=${this.property.name}
 						@input=${this.#onNameChange}></uui-input>
 					${this.renderPropertyAlias()}
-					<slot name="property-action-menu"></slot>
+					<slot name="action-menu"></slot>
 					<p>
 						<uui-textarea
 							label="description"
@@ -294,7 +298,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 	renderPropertyTags() {
 		return this.property
 			? html`<div class="types">
-					${this.property.dataTypeId ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
+					${this.property.dataType?.unique ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
@@ -303,6 +307,11 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
+						  </uui-tag>`
+						: nothing}
+					${this.property.validation.mandatory === true
+						? html`<uui-tag look="default">
+								<span>* ${this.localize.term('general_mandatory')}</span>
 						  </uui-tag>`
 						: nothing}
 			  </div>`
@@ -473,6 +482,6 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'media-type-workspace-view-edit-property': UmbMediaTypeWorkspacePropertyElement;
+		'umb-media-type-workspace-view-edit-property': UmbMediaTypeWorkspacePropertyElement;
 	}
 }

@@ -1,6 +1,10 @@
 const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { ProblemDetails, RuntimeLevelModel, ServerStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	type ProblemDetails,
+	RuntimeLevelModel,
+	type ServerStatusResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { expect, test } from './test.js';
 
 test.describe('upgrader tests', () => {
@@ -13,9 +17,9 @@ test.describe('upgrader tests', () => {
 					ctx.status(200),
 					ctx.json<ServerStatusResponseModel>({
 						serverStatus: RuntimeLevelModel.UPGRADE,
-					})
+					}),
 				);
-			})
+			}),
 		);
 
 		await page.goto('/upgrade');
@@ -47,9 +51,9 @@ test.describe('upgrader tests', () => {
 						status: 400,
 						type: 'error',
 						detail: 'Something went wrong',
-					})
+					}),
 				);
-			})
+			}),
 		);
 
 		await page.click('[data-test="continue-button"]');

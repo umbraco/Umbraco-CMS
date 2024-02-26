@@ -1,9 +1,11 @@
-import { UmbChangeEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { css, html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { ManifestUserPermission } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-entity-user-permission-settings-list')
 export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
@@ -34,7 +36,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		this.#manifestObserver?.destroy();
 
 		this.#manifestObserver = this.observe(
-			umbExtensionsRegistry.extensionsOfType('userPermission'),
+			umbExtensionsRegistry.byType('userPermission'),
 			(userPermissionManifests) => {
 				this._manifests = userPermissionManifests.filter((manifest) => manifest.meta.entityType === this.entityType);
 			},
@@ -97,8 +99,6 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 		super.disconnectedCallback();
 		this.#manifestObserver?.destroy();
 	}
-
-	static styles = [css``];
 }
 
 export default UmbEntityUserPermissionSettingsListElement;

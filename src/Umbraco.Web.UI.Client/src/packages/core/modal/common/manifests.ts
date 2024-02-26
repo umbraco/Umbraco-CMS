@@ -9,12 +9,6 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.Folder',
-		name: 'Folder Modal',
-		js: () => import('./folder/folder-modal.element.js'),
-	},
-	{
-		type: 'modal',
 		alias: 'Umb.Modal.IconPicker',
 		name: 'Icon Picker Modal',
 		js: () => import('./icon-picker/icon-picker-modal.element.js'),
@@ -36,12 +30,6 @@ const modals: Array<ManifestModal> = [
 		alias: 'Umb.Modal.SectionPicker',
 		name: 'Section Picker Modal',
 		js: () => import('./section-picker/section-picker-modal.element.js'),
-	},
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.Template',
-		name: 'Template Modal',
-		js: () => import('./template/template-modal.element.js'),
 	},
 	{
 		type: 'modal',

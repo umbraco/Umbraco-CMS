@@ -1,13 +1,14 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context.js';
+import type { UmbLogViewerWorkspaceContext } from '../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../logviewer.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { LogLevelCountsReponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 //TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
 @customElement('umb-log-viewer-overview-view')
 export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	@state()
-	private _errorCount = 0;
+	private _errorCount?: number;
 
 	@state()
 	private _logLevelCount: LogLevelCountsReponseModel | null = null;
@@ -18,7 +19,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeErrorCount();
 			this.#observeCanShowLogs();
@@ -30,7 +31,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		if (!this.#logViewerContext) return;
 
 		this.observe(this.#logViewerContext.logCount, (logLevelCount) => {
-			this._errorCount = logLevelCount?.error ?? 0;
+			this._errorCount = logLevelCount?.error;
 		});
 	}
 
@@ -52,11 +53,13 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 					<uui-box id="errors" headline="Number of Errors">
 						<uui-button
 							label="Show error logs"
-							href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
-								`@Level='Fatal' or @Level='Error' or Has(@Exception)`
+							href=${`section/settings/workspace/logviewer/view/search/?lq=${encodeURIComponent(
+								`@Level='Fatal' or @Level='Error' or Has(@Exception)`,
 							)}`}>
-							<h2 id="error-count">${this._errorCount}</h2></uui-button
-						>
+							<h2 id="error-count">
+								${this._errorCount === undefined ? html`<uui-loader></uui-loader>` : this._errorCount}
+							</h2>
+						</uui-button>
 					</uui-box>
 
 					<uui-box id="level" headline="Log level">

@@ -1,6 +1,6 @@
-import { UmbModalContext } from './modal.context.js';
-import { UmbModalConfig, UmbModalManagerContext } from './modal-manager.context.js';
-import { UmbModalToken } from './token/modal-token.js';
+import type { UmbModalContext } from './modal.context.js';
+import type { UmbModalConfig, UmbModalManagerContext } from './modal-manager.context.js';
+import type { UmbModalToken } from './token/modal-token.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -8,30 +8,48 @@ import type { Params } from '@umbraco-cms/backoffice/router';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
-export class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenResult = any> {
+export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = UmbModalTokenValue extends undefined
+	? {
+			modal?: UmbModalConfig;
+			data: UmbModalTokenData;
+			value?: UmbModalTokenValue;
+	  }
+	: {
+			modal?: UmbModalConfig;
+			data: UmbModalTokenData;
+			value: UmbModalTokenValue;
+	  };
+
+export class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenValue = any> {
 	#key: string;
 	#path: string | null;
-	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string;
-	#modalConfig?: UmbModalConfig;
+	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string;
 
-	#onSetupCallback?: (routingInfo: Params) => Promise<UmbModalTokenData | false> | UmbModalTokenData | false;
-	#onSubmitCallback?: (data: UmbModalTokenResult) => void;
+	#onSetupCallback?: (
+		routingInfo: Params,
+	) =>
+		| Promise<UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> | false>
+		| UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue>
+		| false;
+	#onSubmitCallback?: (data: UmbModalTokenValue) => void;
 	#onRejectCallback?: () => void;
 
-	#modalManagerContext: UmbModalContext<UmbModalTokenData, UmbModalTokenResult> | undefined;
+	#modalContext: UmbModalContext<UmbModalTokenData, UmbModalTokenValue> | undefined;
 	#routeBuilder?: UmbModalRouteBuilder;
 	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
+	/**
+	 * Should returns the host element of the modal, but this simple registration is not capable of that. So it has to be overwritten by a more specific implementation.
+	 */
+	protected getControllerHostElement(): Element | undefined {
+		return undefined;
+	}
+
 	// Notice i removed the key in the transferring to this class.
-	constructor(
-		modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string,
-		path: string | null = null,
-		modalConfig?: UmbModalConfig,
-	) {
-		this.#key = modalConfig?.key || UmbId.new();
+	constructor(modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string, path: string | null = null) {
+		this.#key = UmbId.new();
 		this.#modalAlias = modalAlias;
 		this.#path = path;
-		this.#modalConfig = { ...modalConfig, key: this.#key };
 	}
 
 	public get key() {
@@ -54,15 +72,11 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		this.#path = path;
 	}
 
-	public get modalConfig() {
-		return this.#modalConfig;
-	}
-
 	/**
 	 * Returns true if the modal is currently active.
 	 */
 	public get active() {
-		return !!this.#modalManagerContext;
+		return !!this.#modalContext;
 	}
 
 	public open(params: { [key: string]: string | number }, prepend?: string) {
@@ -75,7 +89,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	 * Returns the modal handler if the modal is currently active. Otherwise its undefined.
 	 */
 	public get modalContext() {
-		return this.#modalManagerContext;
+		return this.#modalContext;
 	}
 
 	public observeRouteBuilder(callback: (urlBuilder: UmbModalRouteBuilder) => void) {
@@ -87,11 +101,18 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		this.#urlBuilderCallback?.(urlBuilder);
 	}
 
-	public onSetup(callback: (routingInfo: Params) => Promise<UmbModalTokenData | false> | UmbModalTokenData | false) {
+	public onSetup(
+		callback: (
+			routingInfo: Params,
+		) =>
+			| Promise<UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> | false>
+			| UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue>
+			| false,
+	) {
 		this.#onSetupCallback = callback;
 		return this;
 	}
-	public onSubmit(callback: (data: UmbModalTokenResult) => void) {
+	public onSubmit(callback: (value: UmbModalTokenValue) => void) {
 		this.#onSubmitCallback = callback;
 		return this;
 	}
@@ -100,13 +121,13 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		return this;
 	}
 
-	#onSubmit = (data: UmbModalTokenResult) => {
+	#onSubmit = (data: UmbModalTokenValue) => {
 		this.#onSubmitCallback?.(data);
-		this.#modalManagerContext = undefined;
+		this.#modalContext = undefined;
 	};
 	#onReject = () => {
 		this.#onRejectCallback?.();
-		this.#modalManagerContext = undefined;
+		this.#modalContext = undefined;
 	};
 
 	async routeSetup(router: IRouterSlot, modalManagerContext: UmbModalManagerContext, params: Params) {
@@ -115,9 +136,17 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
-			this.#modalManagerContext = modalManagerContext.open(this.#modalAlias, modalData, this.modalConfig, router);
-			this.#modalManagerContext.onSubmit().then(this.#onSubmit, this.#onReject);
-			return this.#modalManagerContext;
+			const args = {
+				modal: {},
+				...modalData,
+				router,
+				originTarget: this.getControllerHostElement(),
+			};
+			args.modal.key = this.#key;
+
+			this.#modalContext = modalManagerContext.open(this.#modalAlias, args);
+			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);
+			return this.#modalContext;
 		}
 		return null;
 	}

@@ -1,10 +1,10 @@
-import type { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export const UMB_TAG_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTagStore>('UmbTagStore');
+export const UMB_TAG_STORE_CONTEXT = new UmbContextToken<UmbTagStore>('UmbTagStore');
 /**
  * @export
  * @class UmbTagStore
@@ -20,7 +20,7 @@ export class UmbTagStore extends UmbStoreBase {
 	 * @memberof UmbTagStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_TAG_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<TagResponseModel>([], (x) => x.id));
+		super(host, UMB_TAG_STORE_CONTEXT.toString(), new UmbArrayState<TagResponseModel>([], (x) => x.id));
 	}
 
 	/**
@@ -43,7 +43,7 @@ export class UmbTagStore extends UmbStoreBase {
 
 	items(group: TagResponseModel['group'], culture: string) {
 		return this._data.asObservablePart((items) =>
-			items.filter((item) => item.group === group && item.culture === culture)
+			items.filter((item) => item.group === group && item.culture === culture),
 		);
 	}
 
@@ -59,8 +59,8 @@ export class UmbTagStore extends UmbStoreBase {
 				(item) =>
 					item.group === group &&
 					item.culture === culture &&
-					item.query?.toLocaleLowerCase().includes(query.toLocaleLowerCase())
-			)
+					item.query?.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
+			),
 		);
 	}
 
@@ -73,3 +73,5 @@ export class UmbTagStore extends UmbStoreBase {
 		this._data.remove(uniques);
 	}
 }
+
+export default UmbTagStore;

@@ -1,8 +1,8 @@
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UUIModalSidebarSize, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-overlay-size
@@ -10,16 +10,35 @@ import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/prope
 @customElement('umb-property-editor-ui-overlay-size')
 export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property()
-	value = '';
+	value: UUIModalSidebarSize | string = '';
+
+	@state()
+	private _list: Array<Option> = [
+		{ value: 'small', name: 'Small', selected: true },
+		{ value: 'medium', name: 'Medium' },
+		{ value: 'large', name: 'Large' },
+		{ value: 'full', name: 'Full' },
+	];
 
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	render() {
-		return html`<div>umb-property-editor-ui-overlay-size</div>`;
+	firstUpdated() {
+		if (!this.value) return;
+		this._list = this._list.map((option) => ({
+			...option,
+			selected: option.value === this.value,
+		}));
 	}
 
-	static styles = [UmbTextStyles];
+	#onChange(event: UUISelectEvent) {
+		this.value = event.target.value as string;
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
+
+	render() {
+		return html`<uui-select .options=${this._list} @change=${this.#onChange}></uui-select>`;
+	}
 }
 
 export default UmbPropertyEditorUIOverlaySizeElement;

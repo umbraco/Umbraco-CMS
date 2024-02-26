@@ -1,4 +1,4 @@
-import { Observable, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 
 export type ObserverCallbackStack<T> = {
 	next: (_value: T) => void;
@@ -53,8 +53,9 @@ export class UmbObserver<T> {
 	}
 
 	hostDisconnected() {
-		// No cause then it cant re-connect, if the same element just was moved in DOM.
-		//this.#subscription.unsubscribe();
+		// No cause then it cant re-connect, if the same element just was moved in DOM. [NL]
+		// I do not agree with my self anymore ^^. I think we should unsubscribe here, to help garbage collector and prevent unforeseen side effects of observations continuing while element are out of the DOM. [NL]
+		this.#subscription?.unsubscribe();
 	}
 
 	destroy(): void {

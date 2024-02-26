@@ -1,12 +1,12 @@
-import { UmbUserCollectionFilterModel } from '../../types.js';
 import { UmbUserRepositoryBase } from '../../repository/user-repository-base.js';
+import type { UmbUserCollectionFilterModel } from '../types.js';
 import { UmbUserCollectionServerDataSource } from './user-collection.server.data-source.js';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbUserCollectionDataSource } from './types.js';
+import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserCollectionRepository extends UmbUserRepositoryBase implements UmbCollectionRepository {
-	#collectionSource: UmbCollectionDataSource<UserResponseModel, UmbUserCollectionFilterModel>;
+	#collectionSource: UmbUserCollectionDataSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -25,3 +25,5 @@ export class UmbUserCollectionRepository extends UmbUserRepositoryBase implement
 		return { data, error, asObservable: () => this.detailStore!.all() };
 	}
 }
+
+export default UmbUserCollectionRepository;

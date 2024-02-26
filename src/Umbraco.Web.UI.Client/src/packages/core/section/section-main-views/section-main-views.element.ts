@@ -1,15 +1,15 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import {
+import type {
 	ManifestDashboard,
 	ManifestSectionView,
 	UmbDashboardElement,
 	UmbSectionViewElement,
-	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
 // TODO: this might need a new name, since it's both views and dashboards
@@ -102,7 +102,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	#renderDashboards() {
-		return this._dashboards.length > 0
+		// Only show dashboards if there are more than one dashboard or if there are both dashboards and views
+		return (this._dashboards.length > 0 && this._views.length > 0) || this._dashboards.length > 1
 			? html`
 					<uui-tab-group slot="header" id="dashboards">
 						${this._dashboards.map((dashboard) => {
@@ -121,7 +122,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	#renderViews() {
-		return this._views.length > 0
+		// Only show views if there are more than one view or if there are both dashboards and views
+		return (this._views.length > 0 && this._dashboards.length > 0) || this._views.length > 1
 			? html`
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {

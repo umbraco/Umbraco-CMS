@@ -1,10 +1,11 @@
+import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
+import type { UmbDocumentItemModel } from '../../repository/index.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_DOCUMENT_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
-import { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbDocumentPickerContext extends UmbPickerInputContext<DocumentItemResponseModel> {
+export class UmbDocumentPickerContext extends UmbPickerInputContext<UmbDocumentItemModel> {
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Repository.Document', UMB_DOCUMENT_PICKER_MODAL);
+		super(host, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_PICKER_MODAL, (entry) => entry.unique);
 	}
 }

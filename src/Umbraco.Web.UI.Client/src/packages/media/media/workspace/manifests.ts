@@ -1,10 +1,9 @@
-import { UMB_MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEDIA_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/media-workspace-has-collection.condition.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
-	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspace = {
@@ -21,9 +20,26 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Media.Collection',
+		name: 'Media Workspace Collection View',
+		element: () => import('./views/collection/media-workspace-view-collection.element.js'),
+		weight: 300,
+		meta: {
+			label: 'Collection',
+			pathname: 'collection',
+			icon: 'icon-grid',
+		},
+		conditions: [
+			{
+				alias: UMB_MEDIA_WORKSPACE_HAS_COLLECTION_CONDITION,
+			},
+		],
+	},
+	{
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',
-		js: () => import('./views/edit/media-edit-workspace-view.element.js'),
+		js: () => import('./views/edit/media-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Media',
@@ -41,34 +57,12 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Media.Info',
 		name: 'Media Workspace Info View',
-		js: () => import('./views/info/media-info-workspace-view.element.js'),
+		js: () => import('./views/info/media-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Info',
 			pathname: 'info',
 			icon: 'info',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
-];
-
-const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
-	{
-		type: 'workspaceViewCollection',
-		alias: 'Umb.WorkspaceView.Media.Collection',
-		name: 'Media Workspace Collection View',
-		weight: 300,
-		meta: {
-			label: 'Media',
-			pathname: 'collection',
-			icon: 'icon-grid',
-			entityType: 'media',
-			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -99,4 +93,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

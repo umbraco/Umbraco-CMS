@@ -7,14 +7,14 @@ import {
 	healthGroupsWithoutResult,
 } from '../data/health-check.data.js';
 
-import {
+import type {
 	HealthCheckActionRequestModel,
 	HealthCheckGroupResponseModel,
 	HealthCheckGroupWithResultResponseModel,
 	HealthCheckResultResponseModel,
 	PagedHealthCheckGroupResponseModel,
-	StatusResultTypeModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
@@ -22,7 +22,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedHealthCheckGroupResponseModel>({ total: 9999, items: healthGroupsWithoutResult })
+			ctx.json<PagedHealthCheckGroupResponseModel>({ total: 9999, items: healthGroupsWithoutResult }),
 		);
 	}),
 
@@ -54,7 +54,7 @@ export const handlers = [
 
 	rest.post<HealthCheckActionRequestModel>(umbracoPath('/health-check/execute-action'), async (req, res, ctx) => {
 		const body = await req.json<HealthCheckActionRequestModel>();
-		const healthCheckId = body.healthCheckId;
+		const healthCheckId = body.healthCheck.id;
 		// Find the health check based on the healthCheckId from the healthGroups[].checks
 		const healthCheck = healthGroups.flatMap((group) => group.checks).find((check) => check?.id === healthCheckId);
 
@@ -74,7 +74,7 @@ export const handlers = [
 			// Respond with a 200 status code
 			ctx.delay(1000),
 			ctx.status(200),
-			ctx.json<HealthCheckResultResponseModel>(result)
+			ctx.json<HealthCheckResultResponseModel>(result),
 		);
 	}),
 ];

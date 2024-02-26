@@ -6,7 +6,7 @@
 import type { TemplateQueryPropertyTypeModel } from './TemplateQueryPropertyTypeModel';
 
 export type TemplateQueryPropertyPresentationModel = {
-    alias?: string;
-    type?: TemplateQueryPropertyTypeModel;
+    alias: string;
+    type: TemplateQueryPropertyTypeModel;
 };
 

@@ -9,14 +9,13 @@ import { setCustomElements } from '@storybook/web-components';
 
 import { startMockServiceWorker } from '../src/mocks';
 
-import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/packages/core/modal';
-import { UmbDataTypeTreeStore } from '../src/packages/core/data-type/tree/data-type.tree.store';
-import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store';
-import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store';
-import { UmbDocumentTypeDetailStore } from '../src/packages/documents/document-types/repository/detail/document-type-detail.store';
+import { UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext } from '../src/packages/core/modal';
+import { UmbDataTypeTreeStore } from '../src/packages/data-type/tree/data-type-tree.store';
+import { UmbDocumentDetailStore } from '../src/packages/documents/documents/repository/detail/document-detail.store';
+import { UmbDocumentTreeStore } from '../src/packages/documents/documents/tree/document-tree.store';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
-import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
-import { UmbLitElement } from '../src/shared/lit-element';
+import { UmbIconRegistry } from '../src/packages/core/icon-registry/icon.registry';
+import { UmbLitElement } from '../src/packages/core/lit-element';
 import { umbLocalizationRegistry } from '../src/packages/core/localization';
 import customElementManifests from '../dist-cms/custom-elements.json';
 
@@ -36,7 +35,7 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		this._umbIconRegistry.attach(this);
 		this._registerExtensions(documentManifests);
-		this.provideContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, new UmbModalManagerContext(this));
+		this.provideContext(UMB_MODAL_MANAGER_CONTEXT, new UmbModalManagerContext(this));
 
 		this._registerExtensions(localizationManifests);
 		umbLocalizationRegistry.loadLanguage('en-us'); // register default language
@@ -65,14 +64,8 @@ const dataTypeStoreProvider = (story) => html`
 	>
 `;
 
-const documentTypeStoreProvider = (story) => html`
-	<umb-controller-host-provider .create=${(host) => new UmbDocumentTypeStore(host)}
-		>${story()}</umb-controller-host-provider
-	>
-`;
-
 const documentStoreProvider = (story) => html`
-	<umb-controller-host-provider .create=${(host) => new UmbDocumentStore(host)}
+	<umb-controller-host-provider .create=${(host) => new UmbDocumentDetailStore(host)}
 		>${story()}</umb-controller-host-provider
 	>
 `;
@@ -84,13 +77,7 @@ const documentTreeStoreProvider = (story) => html`
 `;
 
 // Provide the MSW addon decorator globally
-export const decorators = [
-	storybookProvider,
-	documentStoreProvider,
-	documentTreeStoreProvider,
-	dataTypeStoreProvider,
-	documentTypeStoreProvider,
-];
+export const decorators = [storybookProvider, documentStoreProvider, documentTreeStoreProvider, dataTypeStoreProvider];
 
 export const parameters = {
 	options: {

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './input-tree.element.js';
 import type { UmbInputTreeElement } from './input-tree.element.js';
 

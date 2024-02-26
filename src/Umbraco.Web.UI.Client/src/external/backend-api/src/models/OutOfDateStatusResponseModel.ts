@@ -6,6 +6,6 @@
 import type { OutOfDateTypeModel } from './OutOfDateTypeModel';
 
 export type OutOfDateStatusResponseModel = {
-    status?: OutOfDateTypeModel;
+    status: OutOfDateTypeModel;
 };
 

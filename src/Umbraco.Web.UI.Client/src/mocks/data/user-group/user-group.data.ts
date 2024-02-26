@@ -1,48 +1,80 @@
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
 	UMB_USER_PERMISSION_DOCUMENT_READ,
 } from '@umbraco-cms/backoffice/document';
 
-export const data: Array<UserGroupResponseModel> = [
+export type UmbMockUserGroupModel = UserGroupResponseModel & UserGroupItemResponseModel;
+
+export const data: Array<UmbMockUserGroupModel> = [
 	{
 		id: 'user-group-administrators-id',
 		name: 'Administrators',
 		icon: 'icon-medal',
-		documentStartNodeId: 'all-property-editors-document-id',
+		documentStartNode: { id: 'all-property-editors-document-id' },
 		permissions: [
 			UMB_USER_PERMISSION_DOCUMENT_READ,
 			UMB_USER_PERMISSION_DOCUMENT_CREATE,
 			UMB_USER_PERMISSION_DOCUMENT_DELETE,
 		],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: true,
 	},
 	{
 		id: 'user-group-editors-id',
 		name: 'Editors',
 		icon: 'icon-tools',
-		documentStartNodeId: 'all-property-editors-document-id',
+		documentStartNode: { id: 'all-property-editors-document-id' },
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: true,
 	},
 	{
 		id: 'user-group-sensitive-data-id',
 		name: 'Sensitive data',
 		icon: 'icon-lock',
-		documentStartNodeId: 'all-property-editors-document-id',
+		documentStartNode: { id: 'all-property-editors-document-id' },
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: true,
 	},
 	{
 		id: 'user-group-translators-id',
 		name: 'Translators',
 		icon: 'icon-globe',
-		documentStartNodeId: 'all-property-editors-document-id',
+		documentStartNode: { id: 'all-property-editors-document-id' },
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: true,
 	},
 	{
 		id: 'user-group-writers-id',
 		name: 'Writers',
 		icon: 'icon-edit',
-		documentStartNodeId: 'all-property-editors-document-id',
+		documentStartNode: { id: 'all-property-editors-document-id' },
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: false,
 	},
 ];

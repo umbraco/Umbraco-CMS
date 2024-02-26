@@ -6,6 +6,6 @@
 import type { LinkedLoginModel } from './LinkedLoginModel';
 
 export type LinkedLoginsRequestModel = {
-    linkedLogins?: Array<LinkedLoginModel>;
+    linkedLogins: Array<LinkedLoginModel>;
 };
 

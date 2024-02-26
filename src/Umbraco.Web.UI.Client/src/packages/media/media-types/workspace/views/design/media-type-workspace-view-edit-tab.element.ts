@@ -1,20 +1,22 @@
-import { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
+import type { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
+import type { UmbMediaTypeDetailModel } from '../../../types.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 import './media-type-workspace-view-edit-properties.element.js';
 
 const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-	compareElementToModel: (element: HTMLElement, model: PropertyTypeContainerModelBaseModel) => {
-		return element.getAttribute('data-umb-group-id') === model.id;
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-group-id');
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: PropertyTypeContainerModelBaseModel) => {
-		return container.querySelector('data-umb-group-id=[' + modelEntry.id + ']');
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
 	},
 	identifier: 'content-type-group-sorter',
 	itemSelector: '[data-umb-group-id]',
@@ -28,6 +30,7 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 		...SORTER_CONFIG,
+		// TODO: Missing handlers to work properly: performItemMove and performItemRemove
 		performItemInsert: async (args) => {
 			if (!this._groups) return false;
 			const oldIndex = this._groups.findIndex((group) => group.id! === args.item.id);
@@ -92,7 +95,7 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		this._groupStructureHelper.setIsRoot(value);
 	}
 
-	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	_groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbMediaTypeDetailModel>(this);
 
 	@state()
 	_groups: Array<PropertyTypeContainerModelBaseModel> = [];
@@ -169,7 +172,11 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 													value=${group.name ?? ''}
 													@change=${(e: InputEvent) => {
 														const newName = (e.target as HTMLInputElement).value;
-														this._groupStructureHelper.updateContainerName(group.id!, group.parentId ?? null, newName);
+														this._groupStructureHelper.updateContainerName(
+															group.id!,
+															group.parent?.id ?? null,
+															newName,
+														);
 													}}>
 												</uui-input>
 											</div>
@@ -203,7 +210,6 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						id="add"
 						look="placeholder"
 						@click=${this.#onAddGroup}>
-						${this.localize.term('contentTypeEditor_addGroup')}
 				  </uui-button>`
 				: ''}
 		`;

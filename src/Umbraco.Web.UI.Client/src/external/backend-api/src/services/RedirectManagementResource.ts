@@ -35,6 +35,7 @@ export class RedirectManagementResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -62,6 +63,9 @@ export class RedirectManagementResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -80,6 +84,9 @@ export class RedirectManagementResource {
             path: {
                 'id': id,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -91,6 +98,9 @@ export class RedirectManagementResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management/status',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -108,6 +118,9 @@ export class RedirectManagementResource {
             url: '/umbraco/management/api/v1/redirect-management/status',
             query: {
                 'status': status,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

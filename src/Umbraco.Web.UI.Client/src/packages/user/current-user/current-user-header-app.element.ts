@@ -1,17 +1,16 @@
+import { UMB_CURRENT_USER_MODAL } from './modals/current-user/current-user-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, CSSResultGroup, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CURRENT_USER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	@state()
-	private _currentUser?: UmbCurrentUser;
+	private _currentUser?: UmbCurrentUserModel;
 
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#modalManagerContext?: UmbModalManagerContext;
@@ -19,7 +18,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 		});
 

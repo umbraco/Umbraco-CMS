@@ -1,4 +1,4 @@
-import { GLOBAL_ROUTER_EVENTS_TARGET, ROUTER_SLOT_TAG_NAME } from "./config.js";
+import { GLOBAL_ROUTER_EVENTS_TARGET, ROUTER_SLOT_TAG_NAME } from './config.js';
 import {
 	Cancel,
 	EventListenerSubscription,
@@ -11,7 +11,7 @@ import {
 	Params,
 	PathFragment,
 	RouterSlotEvent,
-} from "./model.js";
+} from './model.js';
 import {
 	addListener,
 	constructAbsolutePath,
@@ -28,9 +28,9 @@ import {
 	removeListeners,
 	resolvePageComponent,
 	shouldNavigate,
-} from "./util.js";
+} from './util.js';
 
-const template = document.createElement("template");
+const template = document.createElement('template');
 template.innerHTML = `<slot></slot>`;
 
 // Patches the history object and ensures the correct events.
@@ -44,10 +44,7 @@ ensureAnchorHistory();
  * @slot - Default content.
  * @event changestate - Dispatched when the router slot state changes.
  */
-export class RouterSlot<D = any, P = any>
-	extends HTMLElement
-	implements IRouterSlot<D, P>
-{
+export class RouterSlot<D = any, P = any> extends HTMLElement implements IRouterSlot<D, P> {
 	/**
 	 * Listeners on the router.
 	 */
@@ -131,7 +128,7 @@ export class RouterSlot<D = any, P = any>
 	constructor() {
 		super();
 
-		this.addEventListener("router-slot:capture-parent", (e: any) => {
+		this.addEventListener('router-slot:capture-parent', (e: any) => {
 			e.stopPropagation();
 			e.detail.parent = this;
 		});
@@ -139,7 +136,7 @@ export class RouterSlot<D = any, P = any>
 		this.render = this.render.bind(this);
 
 		// Attach the template
-		const shadow = this.attachShadow({ mode: "open" });
+		const shadow = this.attachShadow({ mode: 'open' });
 		shadow.appendChild(template.content.cloneNode(true));
 	}
 
@@ -149,7 +146,7 @@ export class RouterSlot<D = any, P = any>
 	connectedCallback() {
 		// Do not query a parent if the parent has been set from the outside.
 		if (!this._lockParent) {
-			const captureParentEvent = new CustomEvent("router-slot:capture-parent", {
+			const captureParentEvent = new CustomEvent('router-slot:capture-parent', {
 				composed: true,
 				bubbles: true,
 				detail: { parent: null },
@@ -210,7 +207,7 @@ export class RouterSlot<D = any, P = any>
 
 		// Register that the path has changed so the correct route can be loaded.
 		if (navigate) {
-			this.render().then();
+			this.render();
 		}
 	}
 
@@ -237,9 +234,7 @@ export class RouterSlot<D = any, P = any>
 		// Either choose the parent fragment or the current path if no parent exists.
 		// The root router slot will always use the entire path.
 		const pathFragment =
-			this.parent != null && this.parent.fragments != null
-				? this.parent.fragments.rest
-				: pathWithoutBasePath();
+			this.parent != null && this.parent.fragments != null ? this.parent.fragments.rest : pathWithoutBasePath();
 
 		// Route to the path
 		await this.renderPath(pathFragment);
@@ -253,17 +248,9 @@ export class RouterSlot<D = any, P = any>
 		this.listeners.push(
 			this.parent != null
 				? // Attach child router listeners
-				  addListener<Event, RouterSlotEvent>(
-						this.parent,
-						"changestate",
-						this.render
-				  )
+				  addListener<Event, RouterSlotEvent>(this.parent, 'changestate', this.render)
 				: // Add global listeners.
-				  addListener<Event, GlobalRouterEvent>(
-						GLOBAL_ROUTER_EVENTS_TARGET,
-						"changestate",
-						this.render
-				  )
+				  addListener<Event, GlobalRouterEvent>(GLOBAL_ROUTER_EVENTS_TARGET, 'changestate', this.render),
 		);
 	}
 
@@ -272,6 +259,8 @@ export class RouterSlot<D = any, P = any>
 	 */
 	protected clearChildren() {
 		while (this.firstChild != null) {
+			// If our route-component has a destroy method, then call it.
+			(this.firstChild as any).destroy?.();
 			this.firstChild.parentNode!.removeChild(this.firstChild);
 		}
 	}
@@ -328,12 +317,14 @@ export class RouterSlot<D = any, P = any>
 				// while we are about to navigate we have to cancel.
 				let navigationInvalidated = false;
 				const cancelNavigation = () => (navigationInvalidated = true);
-				const removeChangeListener: EventListenerSubscription = addListener<
-					Event,
-					GlobalRouterEvent
-				>(GLOBAL_ROUTER_EVENTS_TARGET, "changestate", cancelNavigation, {
-					once: true,
-				});
+				const removeChangeListener: EventListenerSubscription = addListener<Event, GlobalRouterEvent>(
+					GLOBAL_ROUTER_EVENTS_TARGET,
+					'changestate',
+					cancelNavigation,
+					{
+						once: true,
+					},
+				);
 
 				// Cleans up the routing by removing listeners and restoring the match from before
 				const cleanup = () => {
@@ -343,13 +334,13 @@ export class RouterSlot<D = any, P = any>
 				// Cleans up and dispatches a global event that a navigation was cancelled.
 				const cancel: Cancel = () => {
 					cleanup();
-					dispatchGlobalRouterEvent("navigationcancel", info);
-					dispatchGlobalRouterEvent("navigationend", info);
+					dispatchGlobalRouterEvent('navigationcancel', info);
+					dispatchGlobalRouterEvent('navigationend', info);
 					return false;
 				};
 
 				// Dispatch globally that a navigation has started
-				dispatchGlobalRouterEvent("navigationstart", info);
+				dispatchGlobalRouterEvent('navigationstart', info);
 
 				// Check whether the guards allow us to go to the new route.
 				if (route.guards != null) {
@@ -395,7 +386,7 @@ export class RouterSlot<D = any, P = any>
 					// We do this to ensure that we can find the match in the connectedCallback of the page.
 					this._routeMatch = match;
 
-					if(page) {
+					if (page) {
 						// Append the new page
 						this.appendChild(page);
 					}
@@ -413,14 +404,14 @@ export class RouterSlot<D = any, P = any>
 
 			// Dispatch globally that a navigation has ended.
 			if (navigate) {
-				dispatchGlobalRouterEvent("navigationsuccess", info);
-				dispatchGlobalRouterEvent("navigationend", info);
+				dispatchGlobalRouterEvent('navigationsuccess', info);
+				dispatchGlobalRouterEvent('navigationend', info);
 			}
 
 			return navigate;
 		} catch (e) {
-			dispatchGlobalRouterEvent("navigationerror", info);
-			dispatchGlobalRouterEvent("navigationend", info);
+			dispatchGlobalRouterEvent('navigationerror', info);
+			dispatchGlobalRouterEvent('navigationend', info);
 			throw e;
 		}
 	}
@@ -430,6 +421,6 @@ window.customElements.define(ROUTER_SLOT_TAG_NAME, RouterSlot);
 
 declare global {
 	interface HTMLElementTagNameMap {
-		"router-slot": RouterSlot;
+		'router-slot': RouterSlot;
 	}
 }

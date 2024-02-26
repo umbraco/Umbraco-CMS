@@ -1,6 +1,6 @@
-import { property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import type { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 export abstract class UmbModalBaseElement<
@@ -11,21 +11,51 @@ export abstract class UmbModalBaseElement<
 	extends UmbLitElement
 	implements UmbModalExtensionElement<ModalDataType, ModalValueType, ModalManifestType>
 {
+	#value: ModalValueType = {} as ModalValueType;
+
 	@property({ type: Object, attribute: false })
 	public manifest?: ModalManifestType;
 
 	@property({ attribute: false })
-	public modalContext?: UmbModalContext<ModalDataType, ModalValueType>;
-
-	@property({ type: Object, attribute: false })
-	public data?: ModalDataType;
-
-	@state()
-	public get _value(): ModalValueType {
-		return this.modalContext?.getValue() ?? ({} as ModalValueType);
+	public get modalContext(): UmbModalContext<ModalDataType, ModalValueType> | undefined {
+		return this.#modalContext;
 	}
-	public set _value(value: ModalValueType) {
-		this.modalContext?.setValue(value);
+	public set modalContext(context: UmbModalContext<ModalDataType, ModalValueType> | undefined) {
+		this.#modalContext = context;
+		if (context) {
+			this.observe(
+				context.value,
+				(value) => {
+					const oldValue = this.#value;
+					this.#value = value;
+					this.requestUpdate('value', oldValue);
+					// Idea: we could implement a callback method on class.
+				},
+				'observeModalContextValue',
+			);
+		}
+	}
+	#modalContext?: UmbModalContext<ModalDataType, ModalValueType> | undefined;
+
+	@property({ attribute: false })
+	public get data(): ModalDataType | undefined {
+		return this._data;
+	}
+	public set data(value: ModalDataType | undefined) {
+		this._data = value;
+	}
+	private _data?: ModalDataType | undefined;
+
+	@property({ attribute: false })
+	public get value(): ModalValueType {
+		return this.#value;
+	}
+	public set value(value: ModalValueType) {
+		this.#modalContext?.setValue(value);
+	}
+
+	public updateValue(partialValue: Partial<ModalValueType>) {
+		this.#modalContext?.updateValue(partialValue);
 	}
 
 	/**
@@ -34,7 +64,7 @@ export abstract class UmbModalBaseElement<
 	 * @memberof UmbModalBaseElement
 	 */
 	protected _submitModal() {
-		this.modalContext?.submit(this._value);
+		this.#modalContext?.submit();
 	}
 
 	/**
@@ -43,6 +73,6 @@ export abstract class UmbModalBaseElement<
 	 * @memberof UmbModalBaseElement
 	 */
 	protected _rejectModal() {
-		this.modalContext?.reject();
+		this.#modalContext?.reject();
 	}
 }

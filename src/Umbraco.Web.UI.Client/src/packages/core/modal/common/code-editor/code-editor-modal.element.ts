@@ -1,6 +1,7 @@
 import { css, html, ifDefined, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { loadCodeEditor, type UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import { UmbCodeEditorModalData, UmbCodeEditorModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbCodeEditorModalData, UmbCodeEditorModalValue} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-code-editor-modal')
@@ -17,7 +18,8 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 	}
 
 	#handleConfirm() {
-		this.modalContext?.submit({ content: this._codeEditor?.editor?.monacoEditor?.getValue() ?? '' });
+		this.value = { content: this._codeEditor?.editor?.monacoEditor?.getValue() ?? '' };
+		this.modalContext?.submit();
 	}
 
 	#handleCancel() {
@@ -27,7 +29,7 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}

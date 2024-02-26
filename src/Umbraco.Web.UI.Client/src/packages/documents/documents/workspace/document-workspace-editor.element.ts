@@ -1,12 +1,13 @@
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	//private _defaultVariant?: VariantViewModelBaseModel;
@@ -18,7 +19,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	_routes?: Array<UmbRoute>;
 
 	@state()
-	_availableVariants: Array<VariantModelBaseModel> = [];
+	_availableVariants: Array<UmbVariantModel> = [];
 
 	@state()
 	_workspaceSplitViews: Array<ActiveVariant> = [];
@@ -43,7 +44,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				this._availableVariants = variants;
 				this._generateRoutes();
 			},
-			'_observeVariants'
+			'_observeVariants',
 		);
 	}
 
@@ -54,7 +55,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			(variants) => {
 				this._workspaceSplitViews = variants;
 			},
-			'_observeSplitViews'
+			'_observeSplitViews',
 		);
 	}
 

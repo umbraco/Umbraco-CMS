@@ -1,53 +1,48 @@
 import { UmbTreeContextBase } from './tree.context.js';
+import type { UmbTreeItemModelBase } from './types.js';
 import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 import './tree-item-default/tree-item.element.js';
 import './tree-item-base/tree-item-base.element.js';
 
+export type UmbTreeSelectionConfiguration = {
+	multiple?: boolean;
+	selectable?: boolean;
+	selection?: Array<string | null>;
+};
+
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {
 	@property({ type: String, reflect: true })
-	get alias() {
-		return this.#treeContext.getTreeAlias();
-	}
 	set alias(newVal) {
 		this.#treeContext.setTreeAlias(newVal);
 	}
-
-	@property({ type: Boolean, reflect: true })
-	get selectable() {
-		return this.#treeContext.getSelectable();
-	}
-	set selectable(newVal) {
-		this.#treeContext.setSelectable(newVal);
+	get alias() {
+		return this.#treeContext.getTreeAlias();
 	}
 
-	@property({ type: Array })
-	get selection() {
-		return this.#treeContext.getSelection();
-	}
-	set selection(newVal) {
-		if (!Array.isArray(newVal)) return;
-		this.#treeContext?.setSelection(newVal);
-	}
+	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
+		multiple: false,
+		selectable: true,
+		selection: [],
+	};
 
-	@property({ type: Boolean, reflect: true })
-	get multiple() {
-		return this.#treeContext.getMultiple();
+	@property({ type: Object })
+	set selectionConfiguration(config: UmbTreeSelectionConfiguration) {
+		this._selectionConfiguration = config;
+		this.#treeContext.selection.setMultiple(config.multiple ?? false);
+		this.#treeContext.selection.setSelectable(config.selectable ?? true);
+		this.#treeContext.selection.setSelection(config.selection ?? []);
 	}
-	set multiple(newVal) {
-		this.#treeContext.setMultiple(newVal);
+	get selectionConfiguration(): UmbTreeSelectionConfiguration {
+		return this._selectionConfiguration;
 	}
 
 	// TODO: what is the best name for this functionality?
 	private _hideTreeRoot = false;
 	@property({ type: Boolean, attribute: 'hide-tree-root' })
-	get hideTreeRoot() {
-		return this._hideTreeRoot;
-	}
 	set hideTreeRoot(newVal: boolean) {
 		const oldVal = this._hideTreeRoot;
 		this._hideTreeRoot = newVal;
@@ -57,35 +52,48 @@ export class UmbTreeElement extends UmbLitElement {
 
 		this.requestUpdate('hideTreeRoot', oldVal);
 	}
+	get hideTreeRoot() {
+		return this._hideTreeRoot;
+	}
 
 	@property()
-	get selectableFilter() {
-		return this.#treeContext.selectableFilter;
-	}
 	set selectableFilter(newVal) {
 		this.#treeContext.selectableFilter = newVal;
 	}
+	get selectableFilter() {
+		return this.#treeContext.selectableFilter;
+	}
+
+	@property()
+	set filter(newVal) {
+		this.#treeContext.filter = newVal;
+	}
+	get filter() {
+		return this.#treeContext.filter;
+	}
 
 	@state()
-	private _items: TreeItemPresentationModel[] = [];
+	private _items: UmbTreeItemModelBase[] = [];
 
 	@state()
-	private _treeRoot?: TreeItemPresentationModel;
+	private _treeRoot?: UmbTreeItemModelBase;
 
-	#treeContext = new UmbTreeContextBase<TreeItemPresentationModel>(this);
-
-	#rootItemsObserver?: UmbObserverController<Array<TreeItemPresentationModel>>;
+	#treeContext = new UmbTreeContextBase<UmbTreeItemModelBase>(this);
+	#rootItemsObserver?: UmbObserverController<Array<UmbTreeItemModelBase>>;
 
 	constructor() {
 		super();
-		this.#requestTreeRoot();
+		this.#observeTreeRoot();
 	}
 
-	async #requestTreeRoot() {
-		if (!this.#treeContext?.requestTreeRoot) throw new Error('Tree does not support root');
-
-		const { data } = await this.#treeContext.requestTreeRoot();
-		this._treeRoot = data;
+	#observeTreeRoot() {
+		this.observe(
+			this.#treeContext.treeRoot,
+			(treeRoot) => {
+				this._treeRoot = treeRoot;
+			},
+			'umbTreeRootObserver',
+		);
 	}
 
 	async #observeRootItems() {
@@ -101,6 +109,10 @@ export class UmbTreeElement extends UmbLitElement {
 				this.requestUpdate('_items', oldValue);
 			});
 		}
+	}
+
+	getSelection() {
+		return this.#treeContext.selection.getSelection();
 	}
 
 	render() {

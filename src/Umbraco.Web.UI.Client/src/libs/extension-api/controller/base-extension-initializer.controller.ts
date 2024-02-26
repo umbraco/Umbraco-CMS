@@ -1,14 +1,14 @@
+import { createExtensionApi } from '../functions/index.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import {
-	type ManifestCondition,
-	type ManifestWithDynamicConditions,
-	type UmbExtensionRegistry,
-	createExtensionApi,
+import type {
 	UmbConditionConfigBase,
+	ManifestCondition,
+	ManifestWithDynamicConditions,
+	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * This abstract Controller holds the core to manage a single Extension.
@@ -73,8 +73,8 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 	protected _init() {
 		this.#manifestObserver = this.observe(
-			this.#extensionRegistry.getByAlias<ManifestType>(this.#alias),
-			async (extensionManifest) => {
+			this.#extensionRegistry.byAlias<ManifestType>(this.#alias),
+			(extensionManifest) => {
 				this.#clearPermittedState();
 				this.#manifest = extensionManifest;
 				if (extensionManifest) {
@@ -102,14 +102,15 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 
 	#cleanConditions() {
-		if (this.#conditionControllers.length === 0) return;
+		if (this.#conditionControllers === undefined || this.#conditionControllers.length === 0) return;
 		this.#conditionControllers.forEach((controller) => controller.destroy());
 		this.#conditionControllers = [];
 		this.removeControllerByAlias('_observeConditions');
 	}
 
 	#gotManifest() {
-		const conditionConfigs = this.#manifest?.conditions ?? [];
+		if (!this.#manifest) return;
+		const conditionConfigs = this.#manifest.conditions ?? [];
 
 		// As conditionConfigs might have been configured as something else than an array, then we ignorer them.
 		if (conditionConfigs.length === 0) {
@@ -143,7 +144,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (conditionConfigs.length > 0) {
 			// Observes the conditions and initialize as they come in.
 			this.observe(
-				this.#extensionRegistry.getByTypeAndAliases('condition', conditionAliases),
+				this.#extensionRegistry.byTypeAndAliases('condition', conditionAliases),
 				this.#gotConditions,
 				'_observeConditions',
 			);
@@ -162,7 +163,8 @@ export abstract class UmbBaseExtensionInitializer<
 	};
 
 	#gotCondition = async (conditionManifest: ManifestCondition) => {
-		const conditionConfigs = this.#manifest?.conditions ?? [];
+		if (!this.#manifest) return;
+		const conditionConfigs = this.#manifest.conditions ?? [];
 		//
 		// Get just the conditions that uses this condition alias:
 		const configsOfThisType = conditionConfigs.filter(
@@ -237,11 +239,14 @@ export abstract class UmbBaseExtensionInitializer<
 
 		this._isConditionsPositive = isPositive;
 
-		if (isPositive) {
+		if (isPositive === true) {
 			if (this.#isPermitted !== true) {
 				const newPermission = await this._conditionsAreGood();
 				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time.
-				if (newPermission === false) {
+				if (newPermission === false || this._isConditionsPositive === false) {
+					console.warn(
+						'If this happens then please inform Niels Lyngsø on CMS Team. We are still investigating wether this is a situation we should handle. Ref. No.: 1.',
+					);
 					return;
 				}
 				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
@@ -250,11 +255,21 @@ export abstract class UmbBaseExtensionInitializer<
 			}
 		} else if (this.#isPermitted !== false) {
 			// Clean up:
-			this.#isPermitted = false;
 			await this._conditionsAreBad();
+
+			// Only continue if we are still negative, otherwise it means that something changed in the mean time.
+			if (this._isConditionsPositive === true) {
+				console.warn(
+					'If this happens then please inform Niels Lyngsø on CMS Team. We are still investigating wether this is a situation we should handle. Ref. No.: 2.',
+				);
+				return;
+			}
+			// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
+			oldValue = this.#isPermitted ?? false;
+			this.#isPermitted = false;
 		}
 		if (oldValue !== this.#isPermitted && this.#isPermitted !== undefined) {
-			if (this.#isPermitted) {
+			if (this.#isPermitted === true) {
 				this.#promiseResolvers.forEach((x) => x());
 				this.#promiseResolvers = [];
 			}
@@ -275,17 +290,17 @@ export abstract class UmbBaseExtensionInitializer<
 		super.hostConnected();
 		//this.#onConditionsChangedCallback();
 	}
+	*/
 
 	public hostDisconnected(): void {
 		super.hostDisconnected();
-		this._runtimePositive = false;
+		this._isConditionsPositive = false;
 		if (this.#isPermitted === true) {
-			this.#isPermitted = false;
 			this._conditionsAreBad();
+			this.#isPermitted = false;
 			this.#onPermissionChanged?.(false, this as any);
 		}
 	}
-	*/
 
 	#clearPermittedState() {
 		if (this.#isPermitted === true) {
@@ -297,6 +312,7 @@ export abstract class UmbBaseExtensionInitializer<
 
 	public destroy(): void {
 		if (!this.#extensionRegistry) return;
+		this.#manifest = undefined;
 		this.#promiseResolvers = [];
 		this.#clearPermittedState(); // This fires the callback as not permitted, if it was permitted before.
 		this.#isPermitted = undefined;
@@ -306,6 +322,6 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#onPermissionChanged = undefined;
 		(this.#extensionRegistry as any) = undefined;
 		super.destroy();
-		// Destroy the conditions controllers, are begin destroyed cause they are controllers.
+		// Destroy the conditions controllers, they are begin destroyed cause they are controllers...
 	}
 }

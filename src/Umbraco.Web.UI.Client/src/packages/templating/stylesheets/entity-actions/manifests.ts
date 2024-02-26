@@ -1,101 +1,24 @@
-import {
-	UMB_STYLESHEET_ENTITY_TYPE,
-	UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
-	UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
-	UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-} from '../entity.js';
+import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
+import { UMB_STYLESHEET_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { manifests as createManifests } from './create/manifests.js';
+import { manifests as renameManifests } from './rename/manifests.js';
+import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
-import { UMB_STYLESHEET_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UmbCreateRTFStylesheetAction } from './create/create-rtf.action.js';
-import { UmbCreateStylesheetAction } from './create/create.action.js';
-import {
-	UmbCreateFolderEntityAction,
-	UmbDeleteEntityAction,
-	UmbDeleteFolderEntityAction,
-} from '@umbraco-cms/backoffice/entity-action';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-
-//TODO: this is temporary until we have a proper way of registering actions for folder types in a specific tree
-
-//Actions for partial view files
 const stylesheetActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Stylesheet.Delete',
 		name: 'Delete Stylesheet Entity Action',
 		api: UmbDeleteEntityAction,
+		weight: 100,
 		meta: {
 			icon: 'icon-trash',
-			label: 'Delete',
-			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
+			label: 'Delete...',
+			repositoryAlias: UMB_STYLESHEET_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_STYLESHEET_ENTITY_TYPE],
 		},
 	},
 ];
 
-//TODO: add create folder action when the generic folder action is implemented
-//Actions for directories
-const stylesheetFolderActions: Array<ManifestEntityAction> = [
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Stylesheet.Folder.Create',
-		name: 'Create Stylesheet Entity Under Directory Action',
-		api: UmbCreateStylesheetAction,
-		meta: {
-			icon: 'icon-script',
-			label: 'New stylesheet file',
-			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [
-				UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
-				UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
-				UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-			],
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Stylesheet.Folder.Create.RTF',
-		name: 'Create RTF Stylesheet Entity Under Directory Action',
-		api: UmbCreateRTFStylesheetAction,
-		meta: {
-			icon: 'icon-script',
-			label: 'New Rich Text Editor style sheet file',
-			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [
-				UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
-				UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
-				UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-			],
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Stylesheet.Folder.DeleteFolder',
-		name: 'Remove empty folder',
-		api: UmbDeleteFolderEntityAction,
-		meta: {
-			icon: 'icon-trash',
-			label: 'Remove folder',
-			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE],
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Stylesheet.Folder.CreateFolder',
-		name: 'Create empty folder',
-		api: UmbCreateFolderEntityAction,
-		meta: {
-			icon: 'icon-add',
-			label: 'Create folder',
-			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [
-				UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
-				UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
-				UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-			],
-		},
-	},
-];
-
-export const manifests = [...stylesheetActions, ...stylesheetFolderActions];
+export const manifests = [...stylesheetActions, ...createManifests, ...renameManifests];

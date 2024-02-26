@@ -1,14 +1,13 @@
-import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../../repository/index.js';
-import { UmbMediaTypeCreateOptionsModalData } from './index.js';
+import { UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
+import type { UmbMediaTypeCreateOptionsModalData } from './index.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
-	UmbModalManagerContext,
-	UmbModalContext,
-	UMB_FOLDER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	type UmbModalManagerContext,
+	type UmbModalContext,
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_FOLDER_CREATE_MODAL } from '@umbraco-cms/backoffice/tree';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-media-type-create-options-modal')
 export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
@@ -22,15 +21,20 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
 		});
 	}
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
-		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
-			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+		if (this.data?.parentKey === undefined) throw new Error('A parent unique is required to create a folder');
+
+		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
+			data: {
+				folderRepositoryAlias: UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS,
+				parentUnique: this.data?.parentKey,
+			},
 		});
 		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());
 	}
@@ -63,8 +67,6 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbDataTypeCreateOptionsModalElement;

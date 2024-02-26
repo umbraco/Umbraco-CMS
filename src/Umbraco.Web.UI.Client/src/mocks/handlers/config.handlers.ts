@@ -7,7 +7,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<ServertimeOffset>({ offset: -120 })
+			ctx.json<ServertimeOffset>({ offset: -120 }),
 		);
 	}),
 ];

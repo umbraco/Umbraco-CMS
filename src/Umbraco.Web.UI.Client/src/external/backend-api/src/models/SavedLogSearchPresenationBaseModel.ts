@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type SavedLogSearchPresenationBaseModel = {
-    name?: string;
-    query?: string;
+    name: string;
+    query: string;
 };
 

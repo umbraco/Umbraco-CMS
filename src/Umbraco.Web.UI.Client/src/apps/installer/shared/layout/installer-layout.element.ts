@@ -1,4 +1,5 @@
-import { css, CSSResultGroup, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-installer-layout')
 export class UmbInstallerLayoutElement extends LitElement {
@@ -60,8 +61,11 @@ export class UmbInstallerLayoutElement extends LitElement {
 				max-width: 1200px;
 				height: 100%;
 				max-height: 900px;
-				box-shadow: 0px 1.1px 3.7px rgba(0, 0, 0, 0.091), 0px 3.1px 10.1px rgba(0, 0, 0, 0.13),
-					0px 7.5px 24.4px rgba(0, 0, 0, 0.169), 0px 25px 81px rgba(0, 0, 0, 0.26);
+				box-shadow:
+					0px 1.1px 3.7px rgba(0, 0, 0, 0.091),
+					0px 3.1px 10.1px rgba(0, 0, 0, 0.13),
+					0px 7.5px 24.4px rgba(0, 0, 0, 0.169),
+					0px 25px 81px rgba(0, 0, 0, 0.26);
 			}
 
 			#grid {

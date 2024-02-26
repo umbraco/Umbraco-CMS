@@ -1,11 +1,10 @@
-import { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
-import { type PermittedControllerType, UmbBaseExtensionsInitializer } from './base-extensions-initializer.controller.js';
-import { UmbExtensionApiInitializer } from './extension-api-initializer.controller.js';
+import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import {
-	type UmbExtensionRegistry,
-	ManifestApi,
-	ManifestBase,
-} from '@umbraco-cms/backoffice/extension-api';
+	type PermittedControllerType,
+	UmbBaseExtensionsInitializer,
+} from './base-extensions-initializer.controller.js';
+import { UmbExtensionApiInitializer } from './extension-api-initializer.controller.js';
+import type { ManifestApi, ManifestBase, UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -22,11 +21,11 @@ TODO: Correct this, start using builder pattern:
  */
 export class UmbExtensionsApiInitializer<
 	ManifestTypes extends ManifestApi,
-	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string = string,
+	ManifestTypeName extends string = string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ManifestTypeAsApi extends ManifestApi = ManifestType extends ManifestApi ? ManifestType : never,
 	ControllerType extends UmbExtensionApiInitializer<ManifestTypeAsApi> = UmbExtensionApiInitializer<ManifestTypeAsApi>,
-	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
+	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
 > extends UmbBaseExtensionsInitializer<
 	ManifestTypes,
 	ManifestTypeName,
@@ -59,9 +58,10 @@ export class UmbExtensionsApiInitializer<
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		constructorArguments: Array<unknown> | undefined,
 		filter?: undefined | null | ((manifest: ManifestTypeAsApi) => boolean),
-		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void
+		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
+		controllerAlias?: string,
 	) {
-		super(host, extensionRegistry, type, filter, onChange);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
 		this.#extensionRegistry = extensionRegistry;
 		this.#constructorArgs = constructorArguments;
 		this._init();
@@ -73,9 +73,15 @@ export class UmbExtensionsApiInitializer<
 			this.#extensionRegistry,
 			manifest.alias,
 			this.#constructorArgs,
-			this._extensionChanged
+			this._extensionChanged,
 		) as ControllerType;
 
 		return extController;
+	}
+
+	public destroy(): void {
+		super.destroy();
+		this.#constructorArgs = undefined;
+		(this.#extensionRegistry as any) = undefined;
 	}
 }

@@ -2,19 +2,19 @@ const { rest } = window.MockServiceWorker;
 import { searchResultMockData, getIndexByName, PagedIndexers } from '../data/examine.data.js';
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import {
+import type {
 	IndexResponseModel,
 	PagedIndexResponseModel,
 	PagedSearcherResponseModel,
 	PagedSearchResultResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/indexer'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedIndexResponseModel>(PagedIndexers)
+			ctx.json<PagedIndexResponseModel>(PagedIndexers),
 		);
 	}),
 
@@ -51,7 +51,7 @@ export const handlers = [
 			ctx.json<PagedSearcherResponseModel>({
 				total: 0,
 				items: [{ name: 'ExternalSearcher' }, { name: 'InternalSearcher' }, { name: 'InternalMemberSearcher' }],
-			})
+			}),
 		);
 	}),
 
@@ -69,7 +69,7 @@ export const handlers = [
 				ctx.json<PagedSearchResultResponseModel>({
 					total: 0,
 					items: searchResultMockData,
-				})
+				}),
 			);
 		} else {
 			return res(ctx.status(404));

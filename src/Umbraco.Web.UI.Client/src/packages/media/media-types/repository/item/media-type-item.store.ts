@@ -1,36 +1,26 @@
-import { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbMediaTypeItemModel } from './index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbItemStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export
  * @class UmbMediaTypeItemStore
- * @extends {UmbStoreBase}
+ * @extends {UmbItemStoreBase}
  * @description - Data Store for Media Type items
  */
 
-export class UmbMediaTypeItemStore
-	extends UmbStoreBase<MediaTypeItemResponseModel>
-	implements UmbItemStore<MediaTypeItemResponseModel>
-{
+export class UmbMediaTypeItemStore extends UmbItemStoreBase<UmbMediaTypeItemModel> {
 	/**
 	 * Creates an instance of UmbMediaTypeItemStore.
 	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbMediaTypeItemStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(
-			host,
-			UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT.toString(),
-			new UmbArrayState<MediaTypeItemResponseModel>([], (x) => x.id),
-		);
-	}
-
-	items(ids: Array<string>) {
-		return this._data.asObservablePart((items) => items.filter((item) => ids.includes(item.id ?? '')));
+		super(host, UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT.toString());
 	}
 }
+
+export default UmbMediaTypeItemStore;
 
 export const UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbMediaTypeItemStore>('UmbMediaTypeItemStore');

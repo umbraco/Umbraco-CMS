@@ -1,10 +1,10 @@
 import { UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbTemplateTreeServerDataSource } from './template-tree.server.data-source.js';
-import { UmbTemplateTreeItemModel, UmbTemplateTreeRootModel } from './types.js';
+import type { UmbTemplateTreeItemModel, UmbTemplateTreeRootModel } from './types.js';
 import { UMB_TEMPLATE_TREE_STORE_CONTEXT } from './template-tree.store.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbTemplateTreeRepository
 	extends UmbTreeRepositoryBase<UmbTemplateTreeItemModel, UmbTemplateTreeRootModel>
@@ -15,14 +15,16 @@ export class UmbTemplateTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
-			id: null,
-			type: UMB_TEMPLATE_ROOT_ENTITY_TYPE,
+		const data: UmbTemplateTreeRootModel = {
+			unique: null,
+			entityType: UMB_TEMPLATE_ROOT_ENTITY_TYPE,
 			name: 'Templates',
-			icon: 'icon-folder',
 			hasChildren: true,
+			isFolder: true,
 		};
 
 		return { data };
 	}
 }
+
+export default UmbTemplateTreeRepository;

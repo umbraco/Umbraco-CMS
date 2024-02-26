@@ -1,12 +1,9 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbSectionPickerModalData,
-	UmbSectionPickerModalValue,
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbSectionPickerModalData, UmbSectionPickerModalValue } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-section-picker-modal')
 export class UmbSectionPickerModalElement extends UmbModalBaseElement<
@@ -16,17 +13,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _sections: Array<ManifestSection> = [];
 
-	#selectionManager = new UmbSelectionManager();
-
-	#submit() {
-		this.modalContext?.submit({
-			selection: this.#selectionManager.getSelection(),
-		});
-	}
-
-	#close() {
-		this.modalContext?.reject();
-	}
+	#selectionManager = new UmbSelectionManager(this);
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -36,9 +23,15 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelection(this.data?.selection ?? []);
 
 		this.observe(
-			umbExtensionsRegistry.extensionsOfType('section'),
+			umbExtensionsRegistry.byType('section'),
 			(sections: Array<ManifestSection>) => (this._sections = sections),
-		), 'umbSectionsObserver';
+		),
+			'umbSectionsObserver';
+	}
+
+	#submit() {
+		this.value = { selection: this.#selectionManager.getSelection() };
+		this._submitModal();
 	}
 
 	render() {
@@ -57,14 +50,12 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 					)}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this.#close}></uui-button>
+					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbSectionPickerModalElement;

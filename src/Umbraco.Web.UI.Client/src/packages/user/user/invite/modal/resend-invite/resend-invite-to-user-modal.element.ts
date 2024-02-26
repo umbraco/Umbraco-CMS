@@ -1,10 +1,9 @@
 import { UmbInviteUserRepository } from '../../repository/invite-user.repository.js';
-import {
+import type {
 	UmbResendInviteToUserModalData,
 	UmbResendInviteToUserModalValue,
 } from './resend-invite-to-user-modal.token.js';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-resend-invite-to-user-modal')
@@ -17,7 +16,7 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 	async #onSubmitForm(e: Event) {
 		e.preventDefault();
 
-		if (!this.modalContext?.data.userId) throw new Error('User id is missing');
+		if (!this.modalContext?.data.user.unique) throw new Error('User unique is missing');
 
 		const form = e.target as HTMLFormElement;
 		if (!form) return;
@@ -29,7 +28,9 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 		const message = formData.get('message') as string;
 
 		await this.#userInviteUserRepository.resendInvite({
-			userId: this.modalContext.data.userId,
+			user: {
+				unique: this.modalContext.data.user.unique,
+			},
 			message,
 		});
 
@@ -61,8 +62,6 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 			</form>
 		</uui-form>`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbResendInviteToUserModalElement;

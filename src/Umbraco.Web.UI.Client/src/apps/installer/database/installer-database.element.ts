@@ -1,24 +1,16 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
-import { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	CSSResultGroup,
-	html,
-	nothing,
-	customElement,
-	property,
-	query,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { UmbInstallerContext } from '../installer.context.js';
+import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
+import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 
-import {
-	ApiError,
-	DatabaseInstallResponseModel,
+import type {
+	DatabaseInstallRequestModel,
 	DatabaseSettingsPresentationModel,
-	InstallResource,
 	ProblemDetails,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { ApiError, InstallResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-installer-database')
@@ -27,7 +19,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	private _installButton!: UUIButtonElement;
 
 	@property({ attribute: false })
-	public databaseFormData!: DatabaseInstallResponseModel;
+	public databaseFormData!: DatabaseInstallRequestModel;
 
 	@state()
 	private _options: Option[] = [];
@@ -46,7 +38,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallerSettings();
 			this._observeInstallerData();
@@ -77,8 +69,10 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
 			if (this._preConfiguredDatabase) {
 				this._setDatabase({
-					id: this._preConfiguredDatabase.id!,
-					providerName: this._preConfiguredDatabase.providerName!,
+					id: this._preConfiguredDatabase.id,
+					providerName: this._preConfiguredDatabase.providerName,
+					useIntegratedAuthentication: false,
+					trustServerCertificate: false,
 				});
 			} else {
 				this._options = this._databases
@@ -109,17 +103,17 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
 
 		// TODO: Mark id and providerName as non-optional in schema
-		const database: DatabaseInstallResponseModel = {
+		const database = {
 			id: '0',
 			providerName: '',
 			...this._installerContext?.getData().database,
 			...value,
-		};
+		} as DatabaseInstallRequestModel;
 
 		this._setDatabase(database);
 	}
 
-	private _setDatabase(database: DatabaseInstallResponseModel) {
+	private _setDatabase(database: DatabaseInstallRequestModel) {
 		this._installerContext?.appendData({ database });
 	}
 
@@ -157,7 +151,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			}
 
 			if (selectedDatabase.requiresConnectionTest) {
-				const databaseDetails: DatabaseInstallResponseModel = {
+				const databaseDetails: DatabaseInstallRequestModel = {
 					id,
 					username,
 					password,
@@ -166,10 +160,11 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 					name,
 					connectionString,
 					providerName: selectedDatabase.providerName,
+					trustServerCertificate: false,
 				};
 
 				const { error } = await tryExecute(
-					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails })
+					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails }),
 				);
 
 				if (error) {
@@ -181,7 +176,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				}
 			}
 
-			const database: DatabaseInstallResponseModel = {
+			const database: DatabaseInstallRequestModel = {
 				...this._installerContext?.getData().database,
 				id,
 				username,
@@ -199,7 +194,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		this._installerContext.nextStep();
 
 		const { error } = await tryExecute(
-			InstallResource.postInstallSetup({ requestBody: this._installerContext.getData() })
+			InstallResource.postInstallSetup({ requestBody: this._installerContext.getData() }),
 		);
 
 		if (error) {
@@ -243,7 +238,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		}
 
 		result.push(
-			this._renderDatabaseName(this.databaseFormData.name ?? this._selectedDatabase.defaultDatabaseName ?? 'umbraco')
+			this._renderDatabaseName(this.databaseFormData.name ?? this._selectedDatabase.defaultDatabaseName ?? 'umbraco'),
 		);
 
 		if (this._selectedDatabase.requiresCredentials) {
@@ -271,19 +266,20 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		</uui-form-layout-item>
 	`;
 
-	private _renderDatabaseName = (value: string) => html` <uui-form-layout-item>
-		<uui-label for="database-name" slot="label" required>Database Name</uui-label>
-		<uui-input
-			type="text"
-			.value=${value}
-			id="database-name"
-			name="name"
-			label="Database name"
-			@input=${this._handleChange}
-			placeholder="umbraco"
-			required
-			required-message="Database name is required"></uui-input>
-	</uui-form-layout-item>`;
+	private _renderDatabaseName = (value: string) =>
+		html` <uui-form-layout-item>
+			<uui-label for="database-name" slot="label" required>Database Name</uui-label>
+			<uui-input
+				type="text"
+				.value=${value}
+				id="database-name"
+				name="name"
+				label="Database name"
+				@input=${this._handleChange}
+				placeholder="umbraco"
+				required
+				required-message="Database name is required"></uui-input>
+		</uui-form-layout-item>`;
 
 	private _renderCredentials = () => html`
 		<h2 class="uui-h4">Credentials</h2>

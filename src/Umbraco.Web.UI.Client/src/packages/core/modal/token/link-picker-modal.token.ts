@@ -1,13 +1,12 @@
+import { UmbModalToken } from './modal-token.js';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbLinkPickerModalData {
-	index: number | null;
-	link: UmbLinkPickerLink;
 	config: UmbLinkPickerConfig;
+	index: number | null;
 }
 
-export type UmbLinkPickerModalValue = { index: number | null; link: UmbLinkPickerLink };
+export type UmbLinkPickerModalValue = { link: UmbLinkPickerLink };
 
 export interface UmbLinkPickerLink {
 	icon?: string | null;
@@ -16,9 +15,12 @@ export interface UmbLinkPickerLink {
 	queryString?: string | null;
 	target?: string | null;
 	trashed?: boolean | null;
-	udi?: string | null;
+	type?: UmbLinkPickerLinkType | null;
+	unique?: string | null;
 	url?: string | null;
 }
+
+export type UmbLinkPickerLinkType = 'document' | 'external' | 'media';
 
 // TODO: investigate: this looks more like a property editor configuration. Is this used in the correct way?
 export interface UmbLinkPickerConfig {
@@ -30,7 +32,9 @@ export interface UmbLinkPickerConfig {
 export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(
 	'Umb.Modal.LinkPicker',
 	{
-		type: 'sidebar',
-		size: 'small',
+		modal: {
+			type: 'sidebar',
+			size: 'small',
+		},
 	},
 );

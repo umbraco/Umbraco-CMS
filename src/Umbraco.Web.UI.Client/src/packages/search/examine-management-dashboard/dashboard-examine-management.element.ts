@@ -1,9 +1,9 @@
-import { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers.js';
-import { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers.js';
+import type { UmbDashboardExamineIndexElement } from './views/section-view-examine-indexers.js';
+import type { UmbDashboardExamineSearcherElement } from './views/section-view-examine-searchers.js';
 import { html, css, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-dashboard-examine-management')
 export class UmbDashboardExamineManagementElement extends UmbLitElement {

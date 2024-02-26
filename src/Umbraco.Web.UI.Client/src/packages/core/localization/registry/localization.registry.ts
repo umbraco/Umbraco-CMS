@@ -1,127 +1,111 @@
-import {
+import type {
+	UmbLocalizationSetBase,
 	UmbLocalizationDictionary,
 	UmbLocalizationFlatDictionary,
-	LocalizationSet,
-	registerLocalization,
-	localizations,
 } from '@umbraco-cms/backoffice/localization-api';
+import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
+import type { ManifestLocalization, UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	BehaviorSubject,
-	Subject,
-	combineLatest,
-	map,
-	distinctUntilChanged,
-	filter,
-	startWith,
-} from '@umbraco-cms/backoffice/external/rxjs';
+
+function addOrUpdateDictionary(
+	innerDictionary: UmbLocalizationFlatDictionary,
+	dictionaryName: string,
+	dictionary: UmbLocalizationDictionary['value'],
+) {
+	for (const [key, value] of Object.entries(dictionary)) {
+		innerDictionary[`${dictionaryName}_${key}`] = value;
+	}
+}
 
 export class UmbLocalizationRegistry {
+	#currentLanguage = new UmbStringState(document.documentElement.lang ?? 'en-us');
+	readonly currentLanguage = this.#currentLanguage.asObservable();
+
+	#loadedExtAliases: Array<string> = [];
+
 	/**
 	 * Get the current registered translations.
 	 */
 	get localizations() {
-		return localizations;
+		return umbLocalizationManager.localizations;
 	}
-
-	get isDefaultLoaded() {
-		return this.#isDefaultLoaded.asObservable();
-	}
-
-	#currentLanguage = new Subject<string>();
-	#isDefaultLoaded = new BehaviorSubject(false);
 
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
-		const currentLanguage$ = this.#currentLanguage.pipe(
-			startWith(document.documentElement.lang || 'en-us'),
-			map((x) => x.toLowerCase()),
-			distinctUntilChanged(),
-		);
+		combineLatest([this.currentLanguage, extensionRegistry.byType('localization')]).subscribe(
+			async ([currentLanguage, extensions]) => {
+				const locale = new Intl.Locale(currentLanguage);
+				const filteredExt = extensions.filter(
+					(ext) =>
+						ext.meta.culture.toLowerCase() === locale.baseName.toLowerCase() ||
+						ext.meta.culture.toLowerCase() === locale.language.toLowerCase(),
+				);
 
-		const currentExtensions$ = extensionRegistry.extensionsOfType('localization').pipe(
-			filter((x) => x.length > 0),
-			distinctUntilChanged((prev, curr) => prev.length === curr.length && prev.every((x) => curr.includes(x))),
-		);
+				// Only get the extensions that are not already loading/loaded:
+				const diff = filteredExt.filter((ext) => !this.#loadedExtAliases.includes(ext.alias));
+				if (diff.length !== 0) {
+					// got new localizations to load:
+					const translations = await Promise.all(diff.map(this.#loadExtension));
 
-		combineLatest([currentLanguage$, currentExtensions$]).subscribe(async ([userCulture, extensions]) => {
-			const locale = new Intl.Locale(userCulture);
-			const translations = await Promise.all(
-				extensions
-					.filter(
-						(x) =>
-							x.meta.culture.toLowerCase() === locale.baseName.toLowerCase() ||
-							x.meta.culture.toLowerCase() === locale.language.toLowerCase(),
-					)
-					.map(async (extension) => {
-						const innerDictionary: UmbLocalizationFlatDictionary = {};
+					if (translations.length) {
+						umbLocalizationManager.registerManyLocalizations(translations);
 
-						// If extension contains a dictionary, add it to the inner dictionary.
-						if (extension.meta.localizations) {
-							for (const [dictionaryName, dictionary] of Object.entries(extension.meta.localizations)) {
-								this.#addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
-							}
+						// Set the document language
+						const newLang = locale.baseName.toLowerCase();
+						if (document.documentElement.lang.toLowerCase() !== newLang) {
+							document.documentElement.lang = newLang;
 						}
 
-						// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
-						if(extension.js) {
-							const loadedExtension = await loadManifestPlainJs(extension.js);
-
-							if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
-								for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
-									this.#addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
-								}
-							}
+						// Set the document direction to the direction of the primary language
+						const newDir = translations[0].$dir ?? 'ltr';
+						if (document.documentElement.dir !== newDir) {
+							document.documentElement.dir = newDir;
 						}
-
-						// Notify subscribers that the inner dictionary has changed.
-						return {
-							$code: extension.meta.culture.toLowerCase(),
-							$dir: extension.meta.direction ?? 'ltr',
-							...innerDictionary,
-						} satisfies LocalizationSet;
-					}),
-			);
-
-			if (translations.length) {
-				registerLocalization(...translations);
-
-				// Set the document language
-				const newLang = locale.baseName.toLowerCase();
-				if (document.documentElement.lang.toLowerCase() !== newLang) {
-					document.documentElement.lang = newLang;
+					}
 				}
-
-				// Set the document direction to the direction of the primary language
-				const newDir = translations[0].$dir ?? 'ltr';
-				if (document.documentElement.dir !== newDir) {
-					document.documentElement.dir = newDir;
-				}
-			}
-
-			if (!this.#isDefaultLoaded.value) {
-				this.#isDefaultLoaded.next(true);
-				this.#isDefaultLoaded.complete();
-			}
-		});
+			},
+		);
 	}
+
+	#loadExtension = async (extension: ManifestLocalization) => {
+		this.#loadedExtAliases.push(extension.alias);
+
+		const innerDictionary: UmbLocalizationFlatDictionary = {};
+
+		// If extension contains a dictionary, add it to the inner dictionary.
+		if (extension.meta.localizations) {
+			for (const [dictionaryName, dictionary] of Object.entries(extension.meta.localizations)) {
+				addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+			}
+		}
+
+		// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
+		if (extension.js) {
+			const loadedExtension = await loadManifestPlainJs(extension.js);
+
+			if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
+				for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
+					addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+				}
+			}
+		}
+
+		// Notify subscribers that the inner dictionary has changed.
+		return {
+			$code: extension.meta.culture.toLowerCase(),
+			$dir: extension.meta.direction ?? 'ltr',
+			...innerDictionary,
+		} satisfies UmbLocalizationSetBase;
+	};
 
 	/**
 	 * Load a language from the extension registry.
 	 * @param locale The locale to load.
 	 */
 	loadLanguage(locale: string) {
-		this.#currentLanguage.next(locale);
-	}
-
-	#addOrUpdateDictionary(
-		innerDictionary: UmbLocalizationFlatDictionary,
-		dictionaryName: string,
-		dictionary: UmbLocalizationDictionary['value'],
-	) {
-		for (const [key, value] of Object.entries(dictionary)) {
-			innerDictionary[`${dictionaryName}_${key}`] = value;
-		}
+		this.#currentLanguage.setValue(locale.toLowerCase());
 	}
 }
 

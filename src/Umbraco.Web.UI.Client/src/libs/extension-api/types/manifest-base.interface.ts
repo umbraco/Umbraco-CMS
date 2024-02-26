@@ -1,4 +1,3 @@
-
 export interface ManifestBase {
 	/**
 	 * The type of extension such as dashboard etc...

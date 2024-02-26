@@ -1,4 +1,5 @@
 import { partialUpdateFrozenArray } from '../utils/partial-update-frozen-array.function.js';
+import { pushAtToUniqueArray } from '../utils/push-at-to-unique-array.function.js';
 import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
 import { UmbDeepState } from './deep-state.js';
 
@@ -22,7 +23,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 
 	/**
 	 * @method sortBy
-	 * @param {(a: T, b: T) => number} sortMethod - A method to be used for sorting everytime data is set.
+	 * @param {(a: T, b: T) => number} sortMethod - A method to be used for sorting every time data is set.
 	 * @description - A sort method to this Subject.
 	 * @example <caption>Example add sort method</caption>
 	 * const data = [
@@ -37,13 +38,28 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 		return this;
 	}
 
-	next(value: T[]) {
+	/**
+	 * @method setValue
+	 * @param {T} data - The next data for this state to hold.
+	 * @description - Set the data of this state, if sortBy has been defined for this state the data will be sorted before set. If data is different than current this will trigger observations to update.
+	 * @example <caption>Example change the data of a state</caption>
+	 * const myState = new UmbArrayState('Good morning');
+	 * // myState.value is equal 'Good morning'.
+	 * myState.setValue('Goodnight')
+	 * // myState.value is equal 'Goodnight'.
+	 */
+	setValue(value: T[]) {
 		if (this.#sortMethod) {
-			super.next(value.sort(this.#sortMethod));
+			super.setValue(value.sort(this.#sortMethod));
 		} else {
-			super.next(value);
+			super.setValue(value);
 		}
 	}
+
+	/**
+	 * @deprecated - Use `setValue` instead.
+	 */
+	next = this.setValue;
 
 	/**
 	 * @method remove
@@ -69,7 +85,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 				});
 			});
 
-			this.next(next);
+			this.setValue(next);
 		}
 		return this;
 	}
@@ -96,7 +112,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 				return this.getUniqueMethod(x) !== unique;
 			});
 
-			this.next(next);
+			this.setValue(next);
 		}
 		return this;
 	}
@@ -123,7 +139,7 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 *
 	 */
 	filter(predicate: (value: T, index: number, array: T[]) => boolean) {
-		this.next(this.getValue().filter(predicate));
+		this.setValue(this.getValue().filter(predicate));
 		return this;
 	}
 
@@ -147,7 +163,34 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 		} else {
 			next.push(entry);
 		}
-		this.next(next);
+		this.setValue(next);
+		return this;
+	}
+
+	/**
+	 * @method appendOneAt
+	 * @param {T} entry - new data to be added in this Subject.
+	 * @param {T} index - index of where to append this data into the Subject.
+	 * @return {UmbArrayState<T>} Reference to it self.
+	 * @description - Append some new data to this Subject.
+	 * @example <caption>Example append some data.</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 3, value: 'bar'}
+	 * ];
+	 * const myState = new UmbArrayState(data);
+	 * myState.appendOneAt({ key: 2, value: 'in-between'}, 1);
+	 */
+	appendOneAt(entry: T, index: number) {
+		const next = [...this.getValue()];
+		if (this.getUniqueMethod) {
+			pushAtToUniqueArray(next, entry, this.getUniqueMethod, index);
+		} else if (index === -1 || index >= next.length) {
+			next.push(entry);
+		} else {
+			next.splice(index, 0, entry);
+		}
+		this.setValue(next);
 		return this;
 	}
 
@@ -173,9 +216,9 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 			entries.forEach((entry) => {
 				pushToUniqueArray(next, entry, this.getUniqueMethod!);
 			});
-			this.next(next);
+			this.setValue(next);
 		} else {
-			this.next([...this.getValue(), ...entries]);
+			this.setValue([...this.getValue(), ...entries]);
 		}
 		return this;
 	}
@@ -198,7 +241,13 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 		if (!this.getUniqueMethod) {
 			throw new Error("Can't partial update an ArrayState without a getUnique method provided when constructed.");
 		}
-		this.next(partialUpdateFrozenArray(this.getValue(), entry, (x) => unique === this.getUniqueMethod!(x)));
+		this.setValue(partialUpdateFrozenArray(this.getValue(), entry, (x) => unique === this.getUniqueMethod!(x)));
 		return this;
+	}
+
+	destroy() {
+		super.destroy();
+		this.#sortMethod = undefined;
+		(this.getUniqueMethod as any) = undefined;
 	}
 }

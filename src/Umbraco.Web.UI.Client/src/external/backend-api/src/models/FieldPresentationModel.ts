@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type FieldPresentationModel = {
-    name?: string;
-    values?: Array<string>;
+    name: string;
+    values: Array<string>;
 };
 

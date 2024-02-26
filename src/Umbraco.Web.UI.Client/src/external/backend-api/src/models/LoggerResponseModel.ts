@@ -6,7 +6,7 @@
 import type { LogLevelModel } from './LogLevelModel';
 
 export type LoggerResponseModel = {
-    name?: string;
-    level?: LogLevelModel;
+    name: string;
+    level: LogLevelModel;
 };
 

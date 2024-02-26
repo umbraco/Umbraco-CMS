@@ -1,8 +1,9 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import type { UmbLogViewerWorkspaceContext } from '../../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 //TODO: implement the saved searches pagination when the API total bug is fixed
 @customElement('umb-log-viewer-saved-searches-overview')
@@ -14,7 +15,7 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#logViewerContext?.getSavedSearches();
 			this.#observeStuff();
@@ -33,7 +34,9 @@ export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 			<uui-menu-item
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
-				href=${`section/settings/workspace/logviewer/view/search/?lq=${encodeURIComponent(searchListItem.query ?? '')}`}>
+				href=${`section/settings/workspace/logviewer/view/search/?lq=${encodeURIComponent(
+					searchListItem.query ?? '',
+				)}`}>
 				<uui-icon slot="icon" name="icon-search"></uui-icon>${searchListItem.name}
 			</uui-menu-item>
 		</li>`;

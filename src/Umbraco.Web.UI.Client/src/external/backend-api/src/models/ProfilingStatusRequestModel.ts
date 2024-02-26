@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type ProfilingStatusRequestModel = {
-    enabled?: boolean;
+    enabled: boolean;
 };
 

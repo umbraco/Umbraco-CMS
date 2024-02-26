@@ -1,10 +1,9 @@
-import { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
+import type { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-tags
@@ -36,7 +35,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.variantId, (id) => {
 				if (id && id.culture !== undefined) {
 					this._culture = id.culture;
@@ -57,8 +56,6 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 			.items=${this.value}
 			@change=${this._onChange}></umb-tags-input>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITagsElement;

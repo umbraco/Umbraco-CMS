@@ -29,6 +29,9 @@ export class SearcherResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -59,6 +62,7 @@ export class SearcherResource {
                 'take': take,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });

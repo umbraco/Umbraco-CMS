@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreatePackageRequestModel } from '../models/CreatePackageRequestModel';
+import type { PackageConfigurationResponseModel } from '../models/PackageConfigurationResponseModel';
 import type { PackageDefinitionResponseModel } from '../models/PackageDefinitionResponseModel';
 import type { PackageManifestResponseModel } from '../models/PackageManifestResponseModel';
 import type { PagedPackageDefinitionResponseModel } from '../models/PagedPackageDefinitionResponseModel';
@@ -31,8 +32,23 @@ export class PackageResource {
                 'name': name,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
                 409: `Conflict`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getPackageConfiguration(): CancelablePromise<PackageConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/package/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -55,6 +71,9 @@ export class PackageResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -72,9 +91,10 @@ export class PackageResource {
             url: '/umbraco/management/api/v1/package/created',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -96,6 +116,7 @@ export class PackageResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -117,6 +138,7 @@ export class PackageResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -142,6 +164,7 @@ export class PackageResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -163,6 +186,7 @@ export class PackageResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -176,6 +200,9 @@ export class PackageResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/manifest',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -196,6 +223,9 @@ export class PackageResource {
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

@@ -1,13 +1,8 @@
-import { type UmbTreeStore } from './tree-store.interface.js';
+import type { UmbTreeStore } from './tree-store.interface.js';
+import type { UmbUniqueTreeItemModel } from './types.js';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-
-// temp model until cleanup is in place
-interface TreeItemModel {
-	unique: string;
-	parentUnique: string | null;
-}
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: remove Unique from name when we have switched to uniques
 /**
@@ -16,9 +11,12 @@ interface TreeItemModel {
  * @extends {UmbStoreBase}
  * @description - Entity Tree Store
  */
-export class UmbUniqueTreeStore extends UmbStoreBase<TreeItemModel> implements UmbTreeStore<TreeItemModel> {
+export class UmbUniqueTreeStore
+	extends UmbStoreBase<UmbUniqueTreeItemModel>
+	implements UmbTreeStore<UmbUniqueTreeItemModel>
+{
 	constructor(host: UmbControllerHostElement, storeAlias: string) {
-		super(host, storeAlias, new UmbArrayState<TreeItemModel>([], (x) => x.unique));
+		super(host, storeAlias, new UmbArrayState<UmbUniqueTreeItemModel>([], (x) => x.unique));
 	}
 
 	/**
@@ -44,6 +42,6 @@ export class UmbUniqueTreeStore extends UmbStoreBase<TreeItemModel> implements U
 	 * @memberof UmbUniqueTreeStore
 	 */
 	items(uniques: Array<string | null>) {
-		return this._data.asObservablePart((items) => items.filter((item) => uniques.includes(item.unique ?? '')));
+		return this._data.asObservablePart((items) => items.filter((item) => uniques.includes(item.unique)));
 	}
 }

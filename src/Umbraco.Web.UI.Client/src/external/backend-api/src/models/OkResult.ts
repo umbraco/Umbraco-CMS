@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type OkResult = {
-    statusCode?: number;
+    statusCode: number;
 };
 

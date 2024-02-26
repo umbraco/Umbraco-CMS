@@ -3,9 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
+import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
 
-export type DataTypeItemResponseModel = (ItemResponseModelBaseModel & {
+export type DataTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
     editorUiAlias?: string | null;
+    isDeletable: boolean;
 });
 

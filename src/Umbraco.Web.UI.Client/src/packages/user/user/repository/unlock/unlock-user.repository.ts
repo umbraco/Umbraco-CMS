@@ -1,7 +1,7 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbUnlockUserServerDataSource } from './unlock-user.server.data-source.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 	#source: UmbUnlockUserServerDataSource;
@@ -19,7 +19,7 @@ export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 
 		if (!error) {
 			ids.forEach((id) => {
-				this.detailStore?.updateItem(id, { state: UserStateModel.ACTIVE, failedPasswordAttempts: 0 });
+				this.detailStore?.updateItem(id, { state: UserStateModel.ACTIVE, failedLoginAttempts: 0 });
 			});
 
 			const notification = { data: { message: `User unlocked` } };
@@ -29,3 +29,5 @@ export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 		return { data, error };
 	}
 }
+
+export default UmbUnlockUserRepository;

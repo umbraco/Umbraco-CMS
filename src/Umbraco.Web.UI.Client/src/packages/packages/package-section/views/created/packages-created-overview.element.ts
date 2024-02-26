@@ -1,13 +1,11 @@
 import { html, css, nothing, ifDefined, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { PackageDefinitionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CONFIRM_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-packages-created-overview')
 export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
@@ -35,7 +33,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 		super.connectedCallback();
 		this.#getPackages();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -70,7 +68,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 				${repeat(
 					this._createdPackages,
 					(item) => item.id,
-					(item) => this.#renderPackageItem(item)
+					(item) => this.#renderPackageItem(item),
 				)}
 			</uui-ref-list>
 		</uui-box>`;
@@ -109,10 +107,12 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	async #deletePackage(p: PackageDefinitionResponseModel) {
 		if (!p.id) return;
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Remove ${p.name}?`,
-			content: 'Are you sure you want to delete this package',
-			confirmLabel: 'Delete',
+			data: {
+				color: 'danger',
+				headline: `Remove ${p.name}?`,
+				content: 'Are you sure you want to delete this package',
+				confirmLabel: 'Delete',
+			},
 		});
 
 		await modalContext?.onSubmit();

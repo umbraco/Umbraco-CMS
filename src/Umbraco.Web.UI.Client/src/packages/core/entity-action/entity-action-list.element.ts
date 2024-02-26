@@ -1,6 +1,6 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-entity-action-list')
 export class UmbEntityActionListElement extends UmbLitElement {
@@ -30,10 +30,18 @@ export class UmbEntityActionListElement extends UmbLitElement {
 						type="entityAction"
 						default-element="umb-entity-action"
 						.filter=${this._filter}
-						.props=${{ unique: this.unique }}></umb-extension-slot>
+						.props=${{ unique: this.unique, entityType: this.entityType }}></umb-extension-slot>
 			  `
 			: '';
 	}
+
+	static styles = [
+		css`
+			:host {
+				--uui-menu-item-flat-structure: 1;
+			}
+		`,
+	];
 }
 
 declare global {

@@ -18,6 +18,10 @@ export const plugins: PluginOption[] = [
 				dest: 'App_Plugins/custom-bundle-package',
 			},
 			{
+				src: 'src/css/*.css',
+				dest: 'umbraco/backoffice/css',
+			},
+			{
 				src: 'src/assets/*.svg',
 				dest: 'umbraco/backoffice/assets',
 			},
@@ -32,7 +36,7 @@ export const plugins: PluginOption[] = [
 			{
 				src: 'node_modules/msw/lib/iife/**/*',
 				dest: 'umbraco/backoffice/msw',
-			}
+			},
 		],
 	}),
 	viteTSConfigPaths(),
@@ -42,6 +46,11 @@ export const plugins: PluginOption[] = [
 export default defineConfig({
 	build: {
 		sourcemap: true,
+		rollupOptions: {
+			input: {
+				main: new URL('index.html', import.meta.url).pathname, // Vite should only load the main index.html file
+			},
+		},
 	},
 	plugins,
 });

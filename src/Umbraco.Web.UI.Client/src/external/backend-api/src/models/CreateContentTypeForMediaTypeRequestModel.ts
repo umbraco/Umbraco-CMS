@@ -3,25 +3,23 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeCompositionModel } from './ContentTypeCompositionModel';
-import type { ContentTypeSortModel } from './ContentTypeSortModel';
 import type { CreateMediaTypePropertyTypeContainerRequestModel } from './CreateMediaTypePropertyTypeContainerRequestModel';
 import type { CreateMediaTypePropertyTypeRequestModel } from './CreateMediaTypePropertyTypeRequestModel';
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 
 export type CreateContentTypeForMediaTypeRequestModel = {
-    alias?: string;
-    name?: string;
+    alias: string;
+    name: string;
     description?: string | null;
-    icon?: string;
-    allowedAsRoot?: boolean;
-    variesByCulture?: boolean;
-    variesBySegment?: boolean;
-    isElement?: boolean;
-    properties?: Array<CreateMediaTypePropertyTypeRequestModel>;
-    containers?: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
-    allowedContentTypes?: Array<ContentTypeSortModel>;
-    compositions?: Array<ContentTypeCompositionModel>;
+    icon: string;
+    allowedAsRoot: boolean;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    collection?: ReferenceByIdModel | null;
+    isElement: boolean;
+    properties: Array<CreateMediaTypePropertyTypeRequestModel>;
+    containers: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
     id?: string | null;
-    containerId?: string | null;
+    folder?: ReferenceByIdModel | null;
 };
 

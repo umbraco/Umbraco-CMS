@@ -1,6 +1,6 @@
 const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { PagedTagResponseModel, TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PagedTagResponseModel, TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/tag'), (_req, res, ctx) => {

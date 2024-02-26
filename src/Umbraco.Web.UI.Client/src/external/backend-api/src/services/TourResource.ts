@@ -19,6 +19,9 @@ export class TourResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tour',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -36,6 +39,9 @@ export class TourResource {
             url: '/umbraco/management/api/v1/tour',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 

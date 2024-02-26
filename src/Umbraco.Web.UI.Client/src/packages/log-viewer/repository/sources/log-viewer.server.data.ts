@@ -1,10 +1,10 @@
-import { LogMessagesDataSource, LogSearchDataSource } from './index.js';
-import {
+import type { LogMessagesDataSource, LogSearchDataSource } from './index.js';
+import type {
 	DirectionModel,
 	LogLevelModel,
-	LogViewerResource,
 	SavedLogSearchResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { LogViewerResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -57,7 +57,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			LogViewerResource.postLogViewerSavedSearch({ requestBody: { name, query } })
+			LogViewerResource.postLogViewerSavedSearch({ requestBody: { name, query } }),
 		);
 	}
 	/**
@@ -114,7 +114,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 			LogViewerResource.getLogViewerLevelCount({
 				startDate,
 				endDate,
-			})
+			}),
 		);
 	}
 	/**
@@ -167,7 +167,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 				logLevel,
 				startDate,
 				endDate,
-			})
+			}),
 		);
 	}
 	/**
@@ -205,7 +205,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 				take,
 				startDate,
 				endDate,
-			})
+			}),
 		);
 	}
 
@@ -215,7 +215,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 			LogViewerResource.getLogViewerValidateLogsSize({
 				startDate,
 				endDate,
-			})
+			}),
 		);
 	}
 }

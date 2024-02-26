@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type SetAvatarRequestModel = {
-    fileId?: string;
+    file: ReferenceByIdModel;
 };
 

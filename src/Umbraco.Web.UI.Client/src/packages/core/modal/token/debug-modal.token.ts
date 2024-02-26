@@ -1,11 +1,13 @@
-import { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 
 export interface UmbContextDebuggerModalData {
 	content: TemplateResult | string;
 }
 
 export const UMB_CONTEXT_DEBUGGER_MODAL = new UmbModalToken<UmbContextDebuggerModalData>('Umb.Modal.ContextDebugger', {
-	type: 'sidebar',
-	size: 'small',
+	modal: {
+		type: 'sidebar',
+		size: 'small',
+	},
 });

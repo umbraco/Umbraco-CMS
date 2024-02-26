@@ -4,8 +4,8 @@
 /* eslint-disable */
 
 export type PackageManifestResponseModel = {
-    name?: string;
+    name: string;
     version?: string | null;
-    extensions?: Array<any>;
+    extensions: Array<any>;
 };
 

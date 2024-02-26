@@ -7,7 +7,7 @@ import type {
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
 	SavedLogSearchResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
 export interface LogSearchDataSource {
@@ -40,7 +40,7 @@ export interface LogMessagesDataSource {
 	}): Promise<DataSourceResponse<LogLevelCountsReponseModel>>;
 	getLogViewerLogs({
 		skip,
-		take = 100,
+		take,
 		orderDirection,
 		filterExpression,
 		logLevel,
@@ -57,7 +57,7 @@ export interface LogMessagesDataSource {
 	}): Promise<DataSourceResponse<PagedLogMessageResponseModel>>;
 	getLogViewerMessageTemplate({
 		skip,
-		take = 100,
+		take,
 		startDate,
 		endDate,
 	}: {

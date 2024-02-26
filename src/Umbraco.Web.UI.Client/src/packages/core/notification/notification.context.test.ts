@@ -1,12 +1,18 @@
 import { expect } from '@open-wc/testing';
 
-import { UmbNotificationHandler, UmbNotificationContext } from './index.js';
+import type { UmbNotificationHandler} from './index.js';
+import { UmbNotificationContext } from './index.js';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
+
+@customElement('umb-test-controller-host')
+export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 describe('UmbNotificationContext', () => {
 	let notificationContext: UmbNotificationContext;
 
 	beforeEach(async () => {
-		notificationContext = new UmbNotificationContext();
+		notificationContext = new UmbNotificationContext(new UmbTestControllerHostElement());
 	});
 
 	describe('Public API', () => {

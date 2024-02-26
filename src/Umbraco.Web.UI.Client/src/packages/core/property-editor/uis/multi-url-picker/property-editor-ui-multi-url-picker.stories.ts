@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIMultiUrlPickerElement } from './property-editor-ui-multi-url-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

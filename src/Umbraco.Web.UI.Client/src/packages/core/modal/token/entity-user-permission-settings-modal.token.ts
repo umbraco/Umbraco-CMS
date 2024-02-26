@@ -1,4 +1,4 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
 
 export interface UmbEntityUserPermissionSettingsModalData {
 	unique: string;
@@ -15,5 +15,7 @@ export const UMB_ENTITY_USER_PERMISSION_MODAL = new UmbModalToken<
 	UmbEntityUserPermissionSettingsModalData,
 	UmbEntityUserPermissionSettingsModalValue
 >('Umb.Modal.EntityUserPermissionSettings', {
-	type: 'sidebar',
+	modal: {
+		type: 'sidebar',
+	},
 });

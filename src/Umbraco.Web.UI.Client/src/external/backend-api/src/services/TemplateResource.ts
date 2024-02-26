@@ -3,13 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateTemplateRequestModel } from '../models/CreateTemplateRequestModel';
-import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
+import type { TemplateConfigurationResponseModel } from '../models/TemplateConfigurationResponseModel';
 import type { TemplateItemResponseModel } from '../models/TemplateItemResponseModel';
 import type { TemplateQueryExecuteModel } from '../models/TemplateQueryExecuteModel';
 import type { TemplateQueryResultResponseModel } from '../models/TemplateQueryResultResponseModel';
 import type { TemplateQuerySettingsResponseModel } from '../models/TemplateQuerySettingsResponseModel';
 import type { TemplateResponseModel } from '../models/TemplateResponseModel';
-import type { TemplateScaffoldResponseModel } from '../models/TemplateScaffoldResponseModel';
 import type { UpdateTemplateRequestModel } from '../models/UpdateTemplateRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -17,6 +17,27 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class TemplateResource {
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getItemTemplate({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<TemplateItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/item/template',
+            query: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
 
     /**
      * @returns string Created
@@ -32,9 +53,10 @@ export class TemplateResource {
             url: '/umbraco/management/api/v1/template',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -56,6 +78,7 @@ export class TemplateResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -78,6 +101,7 @@ export class TemplateResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -104,6 +128,7 @@ export class TemplateResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -113,16 +138,12 @@ export class TemplateResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTemplateItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<TemplateItemResponseModel>> {
+    public static getTemplateConfiguration(): CancelablePromise<TemplateConfigurationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/template/item',
-            query: {
-                'id': id,
+            url: '/umbraco/management/api/v1/template/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -141,6 +162,9 @@ export class TemplateResource {
             url: '/umbraco/management/api/v1/template/query/execute',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -152,32 +176,14 @@ export class TemplateResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/query/settings',
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTemplateScaffold({
-        masterTemplateId,
-    }: {
-        masterTemplateId?: string,
-    }): CancelablePromise<TemplateScaffoldResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/template/scaffold',
-            query: {
-                'masterTemplateId': masterTemplateId,
-            },
             errors: {
-                404: `Not Found`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
 
     /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeTemplateChildren({
@@ -188,7 +194,7 @@ export class TemplateResource {
         parentId?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/children',
@@ -197,11 +203,14 @@ export class TemplateResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
     /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeTemplateRoot({
@@ -210,13 +219,16 @@ export class TemplateResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/template/root',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

@@ -1,12 +1,8 @@
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
-import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import {
-	TelemetryResponseModel,
-	TelemetryLevelModel,
-	TelemetryResource,
-	ApiError,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { TelemetryResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { TelemetryLevelModel, TelemetryResource, ApiError } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
@@ -105,7 +101,9 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box class="uui-text">
-				<h1 class="uui-h2"><umb-localize key="analytics_consentForAnalytics">Consent for telemetry data</umb-localize></h1>
+				<h1 class="uui-h2">
+					<umb-localize key="analytics_consentForAnalytics">Consent for telemetry data</umb-localize>
+				</h1>
 				<div style="max-width:75ch">
 					<umb-localize key="analytics_analyticsDescription"></umb-localize>
 					${this._renderSettingSlider()}

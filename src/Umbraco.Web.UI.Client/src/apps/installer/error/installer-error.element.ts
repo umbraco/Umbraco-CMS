@@ -1,7 +1,9 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
-import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbInstallerContext } from '../installer.context.js';
+import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-installer-error')
 export class UmbInstallerErrorElement extends UmbLitElement {
@@ -13,7 +15,7 @@ export class UmbInstallerErrorElement extends UmbLitElement {
 	connectedCallback() {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallStatus();
 		});

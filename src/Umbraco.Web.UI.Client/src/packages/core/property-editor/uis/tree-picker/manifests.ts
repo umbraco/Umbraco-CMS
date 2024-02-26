@@ -1,11 +1,12 @@
-import { manifest as startNode } from './config/start-node/manifests.js';
+import { manifest as sourcePicker } from './config/source-picker/manifests.js';
+import { manifest as sourceTypePicker } from './config/source-type-picker/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.TreePicker',
 	name: 'Tree Picker Property Editor UI',
-	js: () => import('./property-editor-ui-tree-picker.element.js'),
+	element: () => import('./property-editor-ui-tree-picker.element.js'),
 	meta: {
 		label: 'Tree Picker',
 		icon: 'icon-page-add',
@@ -17,13 +18,13 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'startNode',
 					label: 'Node type',
 					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.StartNode',
+					propertyEditorUiAlias: sourcePicker.alias,
 				},
 				{
 					alias: 'filter',
 					label: 'Allow items of type',
-					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+					description: 'Select the applicable types',
+					propertyEditorUiAlias: sourceTypePicker.alias,
 				},
 				{
 					alias: 'showOpenButton',
@@ -36,6 +37,6 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-const config: Array<ManifestPropertyEditorUi> = [startNode];
+const config: Array<ManifestPropertyEditorUi> = [sourcePicker, sourceTypePicker];
 
 export const manifests = [manifest, ...config];

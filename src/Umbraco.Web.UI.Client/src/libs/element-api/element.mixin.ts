@@ -1,15 +1,11 @@
-import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UmbContextToken,
-	UmbContextCallback,
-	UmbContextConsumerController,
-	UmbContextProviderController,
-} from '@umbraco-cms/backoffice/context-api';
-import { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbContextToken, UmbContextCallback } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import type { ObserverCallback } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export declare class UmbElement extends UmbControllerHostElement {
 	/**
@@ -22,27 +18,30 @@ export declare class UmbElement extends UmbControllerHostElement {
 	observe<T>(
 		source: Observable<T> | { asObservable: () => Observable<T> },
 		callback: ObserverCallback<T>,
-		unique?: string
+		unique?: string,
 	): UmbObserverController<T>;
 	provideContext<
 		BaseType = unknown,
 		ResultType extends BaseType = BaseType,
-		InstanceType extends ResultType = ResultType
-	>(alias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, ResultType, InstanceType>;
+		InstanceType extends ResultType = ResultType,
+	>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
+		instance: InstanceType,
+	): UmbContextProviderController<BaseType, ResultType, InstanceType>;
 	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
-		callback: UmbContextCallback<ResultType>
+		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
 	/**
 	 * Use the UmbLocalizeController to localize your element.
-	 * @see UmbLocalizeController
+	 * @see UmbLocalizationController
 	 */
-	localize: UmbLocalizeController;
+	localize: UmbLocalizationController;
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
 	class UmbElementMixinClass extends UmbControllerHostElementMixin(superClass) implements UmbElement {
-		localize: UmbLocalizeController = new UmbLocalizeController(this);
+		localize: UmbLocalizationController = new UmbLocalizationController(this);
 
 		/**
 		 * @description Observe a RxJS source of choice.
@@ -51,7 +50,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 * @return {UmbObserverController} Reference to a Observer Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		observe<T>(source: Observable<T>, callback: ObserverCallback<T>, unique?: string) {
+		observe<T>(source: Observable<T>, callback: ObserverCallback<T>, unique?: string): UmbObserverController<T> {
 			return new UmbObserverController<T>(this, source, callback, unique);
 		}
 
@@ -65,9 +64,11 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		provideContext<
 			BaseType = unknown,
 			ResultType extends BaseType = BaseType,
-			InstanceType extends ResultType = ResultType
-		>
-		(alias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, ResultType, InstanceType> {
+			InstanceType extends ResultType = ResultType,
+		>(
+			alias: string | UmbContextToken<BaseType, ResultType>,
+			instance: InstanceType,
+		): UmbContextProviderController<BaseType, ResultType, InstanceType> {
 			return new UmbContextProviderController(this, alias, instance);
 		}
 
@@ -80,9 +81,14 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 */
 		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			alias: string | UmbContextToken<BaseType, ResultType>,
-			callback: UmbContextCallback<ResultType>
+			callback: UmbContextCallback<ResultType>,
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, alias, callback);
+		}
+
+		destroy(): void {
+			super.destroy();
+			(this.localize as any) = undefined;
 		}
 	}
 

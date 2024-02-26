@@ -1,6 +1,7 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbContextDebuggerModalData, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbContextDebuggerModalData} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-context-debugger-modal')
 export default class UmbContextDebuggerModalElement extends UmbModalBaseElement<UmbContextDebuggerModalData> {

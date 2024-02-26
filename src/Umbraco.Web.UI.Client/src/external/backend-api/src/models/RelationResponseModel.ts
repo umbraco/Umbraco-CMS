@@ -4,11 +4,11 @@
 /* eslint-disable */
 
 export type RelationResponseModel = {
-    parentId?: string;
+    parentId: string;
     parentName?: string | null;
-    childId?: string;
+    childId: string;
     childName?: string | null;
-    createDate?: string;
+    createDate: string;
     comment?: string | null;
 };
 

@@ -1,4 +1,4 @@
-import { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	ManifestBase,
@@ -6,7 +6,7 @@ import type {
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
@@ -22,7 +22,7 @@ export type PermittedControllerType<ControllerType extends { manifest: any }> = 
  */
 export abstract class UmbBaseExtensionsInitializer<
 	ManifestTypes extends ManifestBase,
-	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
+	ManifestTypeName extends string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
@@ -33,22 +33,25 @@ export abstract class UmbBaseExtensionsInitializer<
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
 	#onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void;
 	protected _extensions: Array<ControllerType> = [];
-	private _permittedExts: Array<MyPermittedControllerType> = [];
+	#permittedExts: Array<MyPermittedControllerType> = [];
+	#exposedPermittedExts: Array<MyPermittedControllerType> = [];
+	#changeDebounce?: number;
 
 	asPromise(): Promise<void> {
 		return new Promise((resolve) => {
-			this._permittedExts.length > 0 ? resolve() : this.#promiseResolvers.push(resolve);
+			this.#permittedExts.length > 0 ? resolve() : this.#promiseResolvers.push(resolve);
 		});
 	}
 
 	constructor(
 		host: UmbControllerHost,
-		extensionRegistry: UmbExtensionRegistry<ManifestType>,
+		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
+		controllerAlias?: string,
 	) {
-		super(host, 'extensionsInitializer_' + (Array.isArray(type) ? type.join('_') : type));
+		super(host, controllerAlias ?? 'extensionsInitializer_' + (Array.isArray(type) ? type.join('_') : type));
 		this.#extensionRegistry = extensionRegistry;
 		this.#type = type;
 		this.#filter = filter;
@@ -56,8 +59,8 @@ export abstract class UmbBaseExtensionsInitializer<
 	}
 	protected _init() {
 		let source = Array.isArray(this.#type)
-			? this.#extensionRegistry.extensionsOfTypes<ManifestType>(this.#type as string[])
-			: this.#extensionRegistry.extensionsOfType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
+			? this.#extensionRegistry.byTypes<ManifestType>(this.#type as string[])
+			: this.#extensionRegistry.byType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
 		if (this.#filter) {
 			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(this.#filter!)));
 		}
@@ -72,6 +75,7 @@ export abstract class UmbBaseExtensionsInitializer<
 			});
 			this._extensions.length = 0;
 			// _permittedExts should have been cleared via the destroy callbacks.
+			this.#permittedExts.length = 0;
 			return;
 		}
 
@@ -103,43 +107,54 @@ export abstract class UmbBaseExtensionsInitializer<
 
 	protected _extensionChanged = (isPermitted: boolean, controller: ControllerType) => {
 		let hasChanged = false;
-		const existingIndex = this._permittedExts.indexOf(controller as unknown as MyPermittedControllerType);
+		// This might be called after this is destroyed, so we need to check if the _permittedExts is still available:
+		const existingIndex = this.#permittedExts?.indexOf(controller as unknown as MyPermittedControllerType);
 		if (isPermitted) {
 			if (existingIndex === -1) {
-				this._permittedExts.push(controller as unknown as MyPermittedControllerType);
+				this.#permittedExts.push(controller as unknown as MyPermittedControllerType);
 				hasChanged = true;
 			}
 		} else {
-			if (existingIndex !== -1) {
-				this._permittedExts.splice(existingIndex, 1);
+			if (existingIndex >= 0) {
+				this.#permittedExts.splice(existingIndex, 1);
 				hasChanged = true;
 			}
 		}
 
 		if (hasChanged) {
-			// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly.
-			const exposedPermittedExts = [...this._permittedExts];
-
-			// Removal of overwritten extensions:
-			this._permittedExts.forEach((extCtrl) => {
-				// Check if it overwrites another extension:
-				// if so, look up the extension it overwrites, and remove it from the list. and check that for if it overwrites another extension and so on.
-				if (extCtrl.overwrites.length > 0) {
-					extCtrl.overwrites.forEach((overwrite) => {
-						this.#removeOverwrittenExtensions(exposedPermittedExts, overwrite);
-					});
-				}
-			});
-
-			// Sorting:
-			exposedPermittedExts.sort((a, b) => b.weight - a.weight);
-
-			if (exposedPermittedExts.length > 0) {
-				this.#promiseResolvers.forEach((x) => x());
-				this.#promiseResolvers = [];
+			if (!this.#changeDebounce) {
+				this.#changeDebounce = requestAnimationFrame(this.#notifyChange);
 			}
-			this.#onChange?.(exposedPermittedExts);
 		}
+	};
+
+	#notifyChange = () => {
+		this.#changeDebounce = undefined;
+
+		// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly.
+		this.#exposedPermittedExts = [...this.#permittedExts];
+
+		// Removal of overwritten extensions:
+		this.#permittedExts.forEach((extCtrl) => {
+			// Check if it overwrites another extension:
+			// if so, look up the extension it overwrites, and remove it from the list. and check that for if it overwrites another extension and so on.
+			if (extCtrl.overwrites.length > 0) {
+				extCtrl.overwrites.forEach((overwrite) => {
+					this.#removeOverwrittenExtensions(this.#exposedPermittedExts, overwrite);
+				});
+			}
+		});
+
+		// Sorting:
+		this.#exposedPermittedExts.sort((a, b) => b.weight - a.weight);
+
+		if (this.#exposedPermittedExts.length > 0) {
+			this.#promiseResolvers.forEach((x) => x());
+			this.#promiseResolvers = [];
+		}
+
+		// Collect change calls.
+		this.#onChange?.(this.#exposedPermittedExts);
 	};
 
 	#removeOverwrittenExtensions(list: Array<MyPermittedControllerType>, alias: string) {
@@ -157,16 +172,30 @@ export abstract class UmbBaseExtensionsInitializer<
 		}
 	}
 
+	hostDisconnected(): void {
+		super.hostDisconnected();
+		if (this.#changeDebounce) {
+			this.#notifyChange();
+		}
+	}
+
 	public destroy() {
 		// The this.#extensionRegistry is an indication of wether this is already destroyed.
 		if (!this.#extensionRegistry) return;
 
-		const oldPermittedExtsLength = this._permittedExts.length;
-		this._extensions.length = 0;
-		this._permittedExts.length = 0;
-		if (oldPermittedExtsLength > 0) {
-			this.#onChange?.(this._permittedExts);
+		const oldPermittedExtsLength = this.#exposedPermittedExts.length;
+		(this._extensions as any) = undefined;
+		(this.#permittedExts as any) = undefined;
+		this.#exposedPermittedExts.length = 0;
+		if (this.#changeDebounce) {
+			cancelAnimationFrame(this.#changeDebounce);
+			this.#changeDebounce = undefined;
 		}
+		if (oldPermittedExtsLength > 0) {
+			this.#onChange?.(this.#exposedPermittedExts);
+		}
+		this.#promiseResolvers.length = 0;
+		this.#filter = undefined;
 		this.#onChange = undefined;
 		(this.#extensionRegistry as any) = undefined;
 		super.destroy();

@@ -4,8 +4,11 @@
 /* eslint-disable */
 
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
+import type { MemberTypeReferenceResponseModel } from './MemberTypeReferenceResponseModel';
+import type { VariantItemResponseModel } from './VariantItemResponseModel';
 
 export type MemberItemResponseModel = (ItemResponseModelBaseModel & {
-    icon?: string | null;
+    memberType: MemberTypeReferenceResponseModel;
+    variants: Array<VariantItemResponseModel>;
 });
 

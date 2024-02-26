@@ -1,1 +1,1 @@
-export * from './input-content-type/index.js';
+export * from './property-type-based-property/index.js';

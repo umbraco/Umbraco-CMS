@@ -1,8 +1,8 @@
-import {
+import type {
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
-	StatusResultTypeModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export function getGroupByName(name: string) {
 	return healthGroupsWithoutResult.find((group) => group.name?.toLowerCase() == name.toLowerCase());
@@ -16,25 +16,6 @@ export const healthGroups: Array<HealthCheckGroupWithResultResponseModel & { nam
 	{
 		name: 'Configuration',
 		checks: [
-			{
-				results: [
-					{
-						message: `MacroErrors are set to 'Throw' which will prevent some or all pages in your site from loading
-						completely if there are any errors in macros. Rectifying this will set the value to 'Inline'. `,
-						resultType: StatusResultTypeModel.ERROR,
-						readMoreLink: 'https://umbra.co/healthchecks-macro-errors',
-						actions: [
-							{
-								healthCheckId: 'id123',
-								name: 'Action name',
-								alias: 'Action alias',
-								description: 'Action description',
-								valueRequired: true,
-							},
-						],
-					},
-				],
-			},
 			{
 				id: '3e2f7b14-4b41-452b-9a30-e67fbc8e1206',
 				results: [
@@ -215,12 +196,6 @@ export const healthGroupsWithoutResult: HealthCheckGroupPresentationModel[] = [
 	{
 		name: 'Configuration',
 		checks: [
-			{
-				id: 'd0f7599e-9b2a-4d9e-9883-81c7edc5616f',
-				name: 'Macro errors',
-				description:
-					'Checks to make sure macro errors are not set to throw a YSOD (yellow screen of death), which would prevent certain or all pages from loading completely.',
-			},
 			{
 				id: '3e2f7b14-4b41-452b-9a30-e67fbc8e1206',
 				name: 'Notification Email Settings',

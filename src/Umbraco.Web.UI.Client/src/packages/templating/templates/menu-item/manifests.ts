@@ -9,7 +9,6 @@ const menuItem: ManifestTypes = {
 	weight: 40,
 	meta: {
 		label: 'Templates',
-		icon: 'icon-folder',
 		entityType: 'template',
 		treeAlias: UMB_TEMPLATE_TREE_ALIAS,
 		menus: ['Umb.Menu.Templating'],

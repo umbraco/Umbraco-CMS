@@ -6,13 +6,11 @@ import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
  * @description - State ensures the data is unique, not updating any Observes unless there is an actual change of the value using `===`.
  */
 export class UmbBasicState<T> {
-
-	protected _subject:BehaviorSubject<T>;
+	protected _subject: BehaviorSubject<T>;
 
 	constructor(initialData: T) {
 		this._subject = new BehaviorSubject(initialData);
 	}
-
 
 	/**
 	 * @method asObservable
@@ -22,7 +20,7 @@ export class UmbBasicState<T> {
 	 * const myState = new UmbArrayState('Hello world');
 	 *
 	 * this.observe(myState, (latestStateValue) => console.log("Value is: ", latestStateValue));
-   */
+	 */
 	public asObservable(): ReturnType<BehaviorSubject<T>['asObservable']> {
 		return this._subject.asObservable();
 	}
@@ -32,11 +30,11 @@ export class UmbBasicState<T> {
 	 * @description - Holds the current data of this state.
 	 * @example <caption>Example retrieve the current data of a state</caption>
 	 * const myState = new UmbArrayState('Hello world');
-	 * console.log("Value is: ", myState.getValue());
-   */
+	 * console.log("Value is: ", myState.value);
+	 */
 	public get value(): BehaviorSubject<T>['value'] {
 		return this._subject.value;
-	};
+	}
 
 	/**
 	 * @method getValue
@@ -45,7 +43,7 @@ export class UmbBasicState<T> {
 	 * @example <caption>Example retrieve the current data of a state</caption>
 	 * const myState = new UmbArrayState('Hello world');
 	 * console.log("Value is: ", myState.value);
-   */
+	 */
 	public getValue(): ReturnType<BehaviorSubject<T>['getValue']> {
 		return this._subject.getValue();
 	}
@@ -53,24 +51,30 @@ export class UmbBasicState<T> {
 	/**
 	 * @method destroy
 	 * @description - Destroys this state and completes all observations made to it.
-   */
+	 */
 	public destroy(): void {
-		this._subject.complete();
+		this._subject?.complete();
+		(this._subject as any) = undefined;
 	}
 
 	/**
-	 * @method next
-	 * @param {T} data - The next set of data for this state to hold.
+	 * @method setValue
+	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
-	 * @example <caption>Example retrieve the current data of a state</caption>
+	 * @example <caption>Example change the data of a state</caption>
 	 * const myState = new UmbArrayState('Good morning');
 	 * // myState.value is equal 'Good morning'.
-	 * myState.next('Goodnight')
+	 * myState.setValue('Goodnight')
 	 * // myState.value is equal 'Goodnight'.
-   */
-	next(newData: T): void {
-		if (newData !== this._subject.getValue()) {
-			this._subject.next(newData);
+	 */
+	setValue(data: T): void {
+		if (this._subject && data !== this._subject.getValue()) {
+			this._subject.next(data);
 		}
 	}
+
+	/**
+	 * @deprecated - Use `setValue` instead.
+	 */
+	next = this.setValue;
 }

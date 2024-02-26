@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIOverlaySizeElement } from './property-editor-ui-overlay-size.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIOverlaySizeElement', () => {
 	let element: UmbPropertyEditorUIOverlaySizeElement;
@@ -13,7 +13,9 @@ describe('UmbPropertyEditorUIOverlaySizeElement', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUIOverlaySizeElement);
 	});
 
-	it('passes the a11y audit', async () => {
-		await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
-	});
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		it('passes the a11y audit', async () => {
+			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
+		});
+	}
 });

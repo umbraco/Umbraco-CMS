@@ -1,5 +1,15 @@
-import type { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbEntityTreeItemModel, UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbDocumentTypeEntityType,
+	UmbDocumentTypeFolderEntityType,
+	UmbDocumentTypeRootEntityType,
+} from '../entity.js';
+import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export type UmbDocumentTypeTreeItemModel = DocumentTypeTreeItemResponseModel & UmbEntityTreeItemModel;
-export type UmbDocumentTypeTreeRootModel = DocumentTypeTreeItemResponseModel & UmbEntityTreeRootModel;
+export interface UmbDocumentTypeTreeItemModel extends UmbUniqueTreeItemModel {
+	entityType: UmbDocumentTypeEntityType | UmbDocumentTypeFolderEntityType;
+	isElement: boolean;
+}
+
+export interface UmbDocumentTypeTreeRootModel extends UmbUniqueTreeRootModel {
+	entityType: UmbDocumentTypeRootEntityType;
+}

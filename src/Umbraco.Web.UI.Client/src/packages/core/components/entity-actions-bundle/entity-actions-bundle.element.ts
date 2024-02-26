@@ -1,8 +1,8 @@
-import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
+import { UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-actions-bundle')
@@ -35,7 +35,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT_TOKEN, (sectionContext) => {
+		this.consumeContext(UMB_SECTION_SIDEBAR_CONTEXT, (sectionContext) => {
 			this.#sectionSidebarContext = sectionContext;
 		});
 	}
@@ -43,12 +43,12 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 	#observeEntityActions() {
 		this.observe(
 			umbExtensionsRegistry
-				.extensionsOfType('entityAction')
+				.byType('entityAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this._hasActions = actions.length > 0;
 			},
-			'umbEntityActionsObserver'
+			'umbEntityActionsObserver',
 		);
 	}
 
@@ -71,8 +71,6 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 				: nothing}
 		`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 declare global {

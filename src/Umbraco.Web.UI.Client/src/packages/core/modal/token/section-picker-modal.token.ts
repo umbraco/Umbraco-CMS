@@ -1,4 +1,4 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
 
 export interface UmbSectionPickerModalData {
 	multiple: boolean;
@@ -12,7 +12,9 @@ export interface UmbSectionPickerModalValue {
 export const UMB_SECTION_PICKER_MODAL = new UmbModalToken<UmbSectionPickerModalData, UmbSectionPickerModalValue>(
 	'Umb.Modal.SectionPicker',
 	{
-		type: 'sidebar',
-		size: 'small',
+		modal: {
+			type: 'sidebar',
+			size: 'small',
+		},
 	},
 );

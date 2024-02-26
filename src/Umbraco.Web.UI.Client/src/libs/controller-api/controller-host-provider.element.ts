@@ -1,5 +1,8 @@
-import { UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
+import type { UmbControllerHostElement } from './controller-host-element.mixin.js';
+import { UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
+@customElement('umb-controller-host-provider')
 export class UmbControllerHostProviderElement
 	extends UmbControllerHostElementMixin(HTMLElement)
 	implements UmbControllerHostElement
@@ -24,8 +27,6 @@ export class UmbControllerHostProviderElement
 		}
 	}
 }
-
-customElements.define('umb-controller-host-provider', UmbControllerHostProviderElement);
 
 declare global {
 	interface HTMLElementTagNameMap {

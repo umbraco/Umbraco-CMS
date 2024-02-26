@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
@@ -54,14 +54,11 @@ export class UmbCodeBlockElement extends LitElement {
 							: ''}
 				  </div>`
 				: ''}
-			<pre style="${this.language ? 'border-top: 1px solid var(--uui-color-divider-emphasis);' : ''}">
-				<uui-scroll-container>
-					<code>
-						<slot></slot>
-					</code>
-					</uui-scroll-container>
-				</pre>
-		`;
+			<pre
+				style="${this.language
+					? 'border-top: 1px solid var(--uui-color-divider-emphasis);'
+					: ''}"><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>
+		`; // Avoid breaks between elements of <pre></pre>
 	}
 
 	static styles = [
@@ -84,7 +81,12 @@ export class UmbCodeBlockElement extends LitElement {
 				background-color: var(--uui-color-surface-alt);
 				color: #303033;
 				display: block;
-				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-family:
+					Lato,
+					Helvetica Neue,
+					Helvetica,
+					Arial,
+					sans-serif;
 				margin: 0;
 				overflow-x: auto;
 				padding: 9.5px;

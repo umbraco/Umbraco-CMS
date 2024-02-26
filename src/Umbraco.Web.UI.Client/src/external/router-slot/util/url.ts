@@ -1,13 +1,13 @@
-import { ISlashOptions, Params, Query } from "../model";
+import { ISlashOptions, Params, Query } from '../model';
 
-const $anchor = document.createElement("a");
+const $anchor = document.createElement('a');
 
 /**
  * The current path of the location.
  * As default slashes are included at the start and end.
  * @param options
  */
-export function path (options: Partial<ISlashOptions> = {}): string {
+export function path(options: Partial<ISlashOptions> = {}): string {
 	return slashify(window.location.pathname, options);
 }
 
@@ -15,7 +15,7 @@ export function path (options: Partial<ISlashOptions> = {}): string {
  * Returns the path without the base path.
  * @param options
  */
-export function pathWithoutBasePath (options: Partial<ISlashOptions> = {}): string {
+export function pathWithoutBasePath(options: Partial<ISlashOptions> = {}): string {
 	return slashify(stripStart(path(), basePath()), options);
 }
 
@@ -30,8 +30,8 @@ export function pathWithoutBasePath (options: Partial<ISlashOptions> = {}): stri
  * To make this method more performant we could cache the anchor element.
  * As default it will return the base path with slashes in front and at the end.
  */
-export function basePath (options: Partial<ISlashOptions> = {}): string {
-	return constructPathWithBasePath(".", options);
+export function basePath(options: Partial<ISlashOptions> = {}): string {
+	return constructPathWithBasePath('.', options);
 }
 
 /**
@@ -44,7 +44,7 @@ export function basePath (options: Partial<ISlashOptions> = {}): string {
  * @param path
  * @param options
  */
-export function constructPathWithBasePath (path: string, options: Partial<ISlashOptions> = {}) {
+export function constructPathWithBasePath(path: string, options: Partial<ISlashOptions> = {}) {
 	$anchor.href = path;
 	return slashify($anchor.pathname, options);
 }
@@ -54,14 +54,14 @@ export function constructPathWithBasePath (path: string, options: Partial<ISlash
  * @param path
  * @param part
  */
-export function stripStart (path: string, part: string) {
-	return path.replace(new RegExp(`^${part}`), "");
+export function stripStart(path: string, part: string) {
+	return path.replace(new RegExp(`^${part}`), '');
 }
 
 /**
  * Returns the query string.
  */
-export function queryString (): string {
+export function queryString(): string {
 	return window.location.search;
 }
 
@@ -69,7 +69,7 @@ export function queryString (): string {
  * Returns the params for the current path.
  * @returns Params
  */
-export function query (): Query {
+export function query(): Query {
 	return toQuery(queryString().substr(1));
 }
 
@@ -77,16 +77,16 @@ export function query (): Query {
  * Strips the slash from the start and end of a path.
  * @param path
  */
-export function stripSlash (path: string): string {
-	return slashify(path, {start: false, end: false});
+export function stripSlash(path: string): string {
+	return slashify(path, { start: false, end: false });
 }
 
 /**
  * Ensures the path starts and ends with a slash
  * @param path
  */
-export function ensureSlash (path: string): string {
-	return slashify(path, {start: true, end: true});
+export function ensureSlash(path: string): string {
+	return slashify(path, { start: true, end: true });
 }
 
 /**
@@ -95,9 +95,9 @@ export function ensureSlash (path: string): string {
  * @param start
  * @param end
  */
-export function slashify (path: string, {start = true, end = true}: Partial<ISlashOptions> = {}): string {
-	path = start && !path.startsWith("/") ? `/${path}` : (!start && path.startsWith("/") ? path.slice(1) : path);
-	return end && !path.endsWith("/") ? `${path}/` : (!end && path.endsWith("/") ? path.slice(0, path.length - 1) : path);
+export function slashify(path: string, { start = true, end = true }: Partial<ISlashOptions> = {}): string {
+	path = start && !path.startsWith('/') ? `/${path}` : !start && path.startsWith('/') ? path.slice(1) : path;
+	return end && !path.endsWith('/') ? `${path}/` : !end && path.endsWith('/') ? path.slice(0, path.length - 1) : path;
 }
 
 /**
@@ -105,31 +105,33 @@ export function slashify (path: string, {start = true, end = true}: Partial<ISla
  * @param {string} queryString (example: ("test=123&hejsa=LOL&wuhuu"))
  * @returns {Query}
  */
-export function toQuery (queryString: string): Query {
-
+export function toQuery(queryString: string): Query {
 	// If the query does not contain anything, return an empty object.
 	if (queryString.length === 0) {
 		return {};
 	}
 
 	// Grab the atoms (["test=123", "hejsa=LOL", "wuhuu"])
-	const atoms = queryString.split("&");
+	const atoms = queryString.split('&');
 
 	// Split by the values ([["test", "123"], ["hejsa", "LOL"], ["wuhuu"]])
-	const arrayMap = atoms.map(atom => atom.split("="));
+	const arrayMap = atoms.map((atom) => atom.split('='));
 
 	// Assign the values to an object ({ test: "123", hejsa: "LOL", wuhuu: "" })
-	return Object.assign({}, ...arrayMap.map(arr => ({
-		[decodeURIComponent(arr[0])]: (arr.length > 1 ? decodeURIComponent(arr[1]) : "")
-	})));
+	return Object.assign(
+		{},
+		...arrayMap.map((arr) => ({
+			[decodeURIComponent(arr[0])]: arr.length > 1 ? decodeURIComponent(arr[1]) : '',
+		})),
+	);
 }
 
 /**
  * Turns a query object into a string query.
  * @param query
  */
-export function toQueryString (query: Query): string {
+export function toQueryString(query: Query): string {
 	return Object.entries(query)
-	             .map(([key, value]) => `${key}${value != "" ? `=${encodeURIComponent(value)}` : ""}`)
-	             .join("&");
+		.map(([key, value]) => `${key}${value != '' ? `=${encodeURIComponent(value)}` : ''}`)
+		.join('&');
 }

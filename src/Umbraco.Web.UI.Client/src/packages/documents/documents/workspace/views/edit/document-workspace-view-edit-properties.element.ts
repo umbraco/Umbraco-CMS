@@ -1,9 +1,10 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	@property({ type: String, attribute: 'container-name', reflect: false })
@@ -15,17 +16,17 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 	}
 
 	@property({ type: String, attribute: 'container-type', reflect: false })
-	public get containerType(): PropertyContainerTypes | undefined {
+	public get containerType(): UmbPropertyContainerTypes | undefined {
 		return this._propertyStructureHelper.getContainerType();
 	}
-	public set containerType(value: PropertyContainerTypes | undefined) {
+	public set containerType(value: UmbPropertyContainerTypes | undefined) {
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
+	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<any>(this);
 
 	@state()
-	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
+	_propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	constructor() {
 		super();
@@ -42,7 +43,10 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
-			(property) => html`<umb-property-type-based-property class="property" .property=${property}></umb-property-type-based-property> `
+			(property) =>
+				html`<umb-property-type-based-property
+					class="property"
+					.property=${property}></umb-property-type-based-property> `,
 		);
 	}
 

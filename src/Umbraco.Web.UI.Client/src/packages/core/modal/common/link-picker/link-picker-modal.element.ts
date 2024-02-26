@@ -1,35 +1,33 @@
-import { UmbTreeElement } from '../../../tree/tree.element.js';
+import type { UmbTreeElement, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 import { css, html, nothing, customElement, query, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
-import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import {
+import type { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import type {
 	UmbLinkPickerConfig,
 	UmbLinkPickerLink,
+	UmbLinkPickerLinkType,
 	UmbLinkPickerModalData,
 	UmbLinkPickerModalValue,
-	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
 	@state()
+	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
+		multiple: false,
+		selectable: true,
+		selection: [],
+	};
+
+	@state()
 	_selectedKey?: string;
 
+	/**
+	 * The link object, notice this is frozen, as it comes directly from the State. So it cannot be manipulated.
+	 */
 	@state()
-	_index: number | null = null;
-
-	@state()
-	_link: UmbLinkPickerLink = {
-		icon: null,
-		name: null,
-		published: true,
-		queryString: null,
-		target: null,
-		trashed: false,
-		udi: null,
-		url: null,
-	};
+	readonly _link: UmbLinkPickerLink = {};
 
 	@state()
 	_layout: UmbLinkPickerConfig = {
@@ -55,58 +53,58 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
-		this._index = this.data?.index;
-		this._link = this.data?.link;
-		this._layout = this.data?.config;
 
-		if (!this._link.udi) return;
-		this._selectedKey = getKeyFromUdi(this._link.udi);
+		if (this.modalContext) {
+			this.observe(this.modalContext.value, (value) => {
+				(this._link as any) = value.link;
+				this._selectedKey = this._link?.unique ?? undefined;
+				this._selectionConfiguration.selection = this._selectedKey ? [this._selectedKey] : [];
+			});
+		}
+		this._layout = this.data?.config;
 	}
 
-	private _handleQueryString() {
+	#handleQueryString() {
 		if (!this._linkQueryInput) return;
 		const query = this._linkQueryInput.value as string;
 
 		if (query.startsWith('#') || query.startsWith('?')) {
-			this._link.queryString = query;
+			this.#partialUpdateLink({ queryString: query });
 			return;
 		}
 
 		if (query.includes('=')) {
-			this._link.queryString = `?${query}`;
+			this.#partialUpdateLink({ queryString: `#${query}` });
 		} else {
-			this._link.queryString = `#${query}`;
+			this.#partialUpdateLink({ queryString: `#${query}` });
 		}
 	}
 
-	private _handleSelectionChange(e: CustomEvent, entityType: string) {
+	#handleSelectionChange(e: CustomEvent, entityType: string) {
 		//TODO: Update icon, published, trashed
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		const selectedKey = element.selection[element.selection.length - 1];
+		const selection = element.getSelection();
+		const selectedKey = selection[selection.length - 1];
 
 		if (!selectedKey) {
-			this._link.url = '';
-			this._link.udi = undefined;
+			this.#partialUpdateLink({ type: undefined, unique: '', url: undefined });
 			this._selectedKey = undefined;
+			this._selectionConfiguration.selection = [];
 			this.requestUpdate();
 			return;
 		}
 
-		const udi = buildUdi(entityType, selectedKey);
+		const linkType = (entityType as UmbLinkPickerLinkType) ?? 'external';
 
 		this._selectedKey = selectedKey;
-		this._link.udi = udi;
-		this._link.url = udi;
+		this._selectionConfiguration.selection = [this._selectedKey];
+		this.#partialUpdateLink({ type: linkType, unique: selectedKey, url: selectedKey });
 		this.requestUpdate();
 	}
 
-	private _submit() {
-		this.modalContext?.submit({ index: this._index, link: this._link });
-	}
-
-	private _close() {
-		this.modalContext?.reject();
+	#partialUpdateLink(linkObject: Partial<UmbLinkPickerLink>) {
+		this.modalContext?.updateValue({ link: { ...this._link, ...linkObject } });
 	}
 
 	render() {
@@ -120,7 +118,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 						id="link-title-input"
 						placeholder=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
 						label=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
-						@input=${() => (this._link.name = this._linkTitleInput.value as string)}
+						@input=${() => this.#partialUpdateLink({ name: this._linkTitleInput.value as string })}
 						.value="${this._link.name ?? ''}"></uui-input>
 
 					<uui-label>${this.localize.term('content_target')}</uui-label>
@@ -129,7 +127,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 						label=${this.localize.term('defaultdialogs_openInNewWindow')}
 						.checked="${this._link.target === '_blank' ? true : false}"
 						@change="${(e: UUIBooleanInputEvent) =>
-							e.target.checked ? (this._link.target = '_blank') : (this._link.target = '')}">
+							this.#partialUpdateLink({ target: e.target.checked ? '_blank' : '' })}">
 						${this.localize.term('defaultdialogs_openInNewWindow')}
 					</uui-toggle>
 
@@ -138,12 +136,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					${this._renderTrees()}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label=${this.localize.term('general_close')} @click=${this._close}></uui-button>
+					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
 						label=${this.localize.term('general_submit')}
 						look="primary"
 						color="positive"
-						@click=${this._submit}></uui-button>
+						@click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -156,9 +154,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				id="link-input"
 				placeholder=${this.localize.term('general_url')}
 				label=${this.localize.term('general_url')}
-				.value="${this._link.udi ?? this._link.url ?? ''}"
-				@input=${() => (this._link.url = this._linkInput.value as string)}
-				?disabled="${this._link.udi ? true : false}"></uui-input>
+				.value="${this._link.unique ?? this._link.url ?? ''}"
+				@input=${() => this.#partialUpdateLink({ type: 'external', url: this._linkInput.value as string })}
+				?disabled="${this._link.unique ? true : false}"></uui-input>
 		</span>`;
 	}
 
@@ -170,7 +168,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				id="anchor-input"
 				placeholder=${this.localize.term('placeholders_anchor')}
 				label=${this.localize.term('placeholders_anchor')}
-				@input=${this._handleQueryString}
+				@input=${this.#handleQueryString}
 				.value="${this._link.queryString ?? ''}"></uui-input>
 		</span>`;
 	}
@@ -190,11 +188,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					label=${this.localize.term('placeholders_search')}></uui-input>
 				<umb-tree
 					?hide-tree-root=${true}
-					?multiple=${false}
 					alias=${UMB_DOCUMENT_TREE_ALIAS}
-					@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
-					.selection=${[this._selectedKey ?? '']}
-					selectable></umb-tree>
+					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'document')}
+					.selectionConfiguration=${this._selectionConfiguration}></umb-tree>
 			</div>
 			<hr />
 			<uui-symbol-expand
@@ -205,11 +201,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<div style="${styleMap({ display: !this.mediaExpanded ? 'block' : 'none' })}">
 				<umb-tree
 					?hide-tree-root=${true}
-					?multiple=${false}
 					alias="Umb.Tree.Media"
-					@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'media')}
-					.selection=${[this._selectedKey ?? '']}
-					selectable></umb-tree>
+					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'media')}
+					.selectionConfiguration=${this._selectionConfiguration}></umb-tree>
 			</div>
 		`;
 	}

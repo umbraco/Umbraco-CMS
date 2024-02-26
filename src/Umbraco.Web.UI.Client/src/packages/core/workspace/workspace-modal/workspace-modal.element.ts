@@ -1,11 +1,12 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { css, CSSResultGroup, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbWorkspaceData } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbWorkspaceData } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-workspace-modal')
 export class UmbWorkspaceModalElement extends UmbLitElement {
-	@property()
+	@property({ attribute: false })
 	data?: UmbWorkspaceData;
 
 	/**
@@ -13,7 +14,7 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 	 *
 	 */
 	render() {
-		return html`<umb-workspace .entityType=${this.data?.entityType}></umb-workspace>`;
+		return this.data ? html`<umb-workspace .entityType=${this.data.entityType}></umb-workspace>` : '';
 	}
 
 	static styles: CSSResultGroup = [

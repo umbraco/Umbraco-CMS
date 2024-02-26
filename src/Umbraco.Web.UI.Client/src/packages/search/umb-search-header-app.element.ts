@@ -1,7 +1,9 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { css, CSSResultGroup, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-search-header-app')
 export class UmbSearchHeaderAppElement extends UmbLitElement {
@@ -10,7 +12,7 @@ export class UmbSearchHeaderAppElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (_instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (_instance) => {
 			this._modalContext = _instance;
 		});
 	}

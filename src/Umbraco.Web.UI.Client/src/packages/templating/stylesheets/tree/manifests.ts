@@ -1,6 +1,10 @@
-import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbStylesheetTreeRepository } from './stylesheet-tree.repository.js';
-import { UmbStylesheetTreeStore } from './stylesheet-tree.store.js';
+import {
+	UMB_STYLESHEET_ENTITY_TYPE,
+	UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
+	UMB_STYLESHEET_ROOT_ENTITY_TYPE,
+} from '../entity.js';
+import { manifests as folderManifests } from './folder/manifests.js';
+import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -16,14 +20,14 @@ const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_STYLESHEET_TREE_REPOSITORY_ALIAS,
 	name: 'Stylesheet Tree Repository',
-	api: UmbStylesheetTreeRepository,
+	api: () => import('./stylesheet-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_STYLESHEET_TREE_STORE_ALIAS,
 	name: 'Stylesheet Tree Store',
-	api: UmbStylesheetTreeStore,
+	api: () => import('./stylesheet-tree.store.js'),
 };
 
 const tree: ManifestTree = {
@@ -38,12 +42,19 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'fileSystem',
+	kind: 'unique',
 	alias: 'Umb.TreeItem.Stylesheet',
 	name: 'Stylesheet Tree Item',
 	meta: {
-		entityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_ENTITY_TYPE],
+		entityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests = [
+	treeRepository,
+	treeStore,
+	tree,
+	treeItem,
+	...folderManifests,
+	...reloadTreeItemChildrenManifest,
+];

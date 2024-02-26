@@ -1,11 +1,19 @@
 import { UmbRepositoryBase } from '../repository-base.js';
-import { UmbDetailDataSource, UmbDetailDataSourceConstructor } from './detail-data-source.interface.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbDetailStore } from '@umbraco-cms/backoffice/store';
+import type { UmbDetailDataSource, UmbDetailDataSourceConstructor } from './detail-data-source.interface.js';
+import type { UmbDetailRepository } from './detail-repository.interface.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: string }> extends UmbRepositoryBase {
+export abstract class UmbDetailRepositoryBase<
+		DetailModelType extends { unique: string; entityType: string; parentUnique?: string | null },
+	>
+	extends UmbRepositoryBase
+	implements UmbDetailRepository<DetailModelType>, UmbApi
+{
 	#init: Promise<unknown>;
 
 	#detailStore?: UmbDetailStore<DetailModelType>;
@@ -15,18 +23,18 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	constructor(
 		host: UmbControllerHost,
 		detailSource: UmbDetailDataSourceConstructor<DetailModelType>,
-		itemStoreContextAlias: string | UmbContextToken<any, any>,
+		detailStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);
 
 		this.#detailSource = new detailSource(host);
 
 		this.#init = Promise.all([
-			this.consumeContext(itemStoreContextAlias, (instance) => {
+			this.consumeContext(detailStoreContextAlias, (instance) => {
 				this.#detailStore = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);
@@ -38,9 +46,9 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	 * @return {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(parentUnique: string | null, preset?: Partial<DetailModelType>) {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
-		return this.#detailSource.createScaffold(parentUnique);
+		return this.#detailSource.createScaffold(parentUnique, preset);
 	}
 
 	/**
@@ -50,7 +58,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async requestByUnique(unique: string) {
-		if (!unique) throw new Error('Key is missing');
+		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
 		const { data, error } = await this.#detailSource.read(unique);
@@ -70,7 +78,6 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	 */
 	async create(data: DetailModelType) {
 		if (!data) throw new Error('Data is missing');
-		if (!data.unique) throw new Error('Unique is missing');
 		await this.#init;
 
 		const { data: createdData, error } = await this.#detailSource.create(data);
@@ -83,7 +90,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 			this.#notificationContext!.peek('positive', notification);
 		}
 
-		return { error };
+		return { data: createdData, error };
 	}
 
 	/**

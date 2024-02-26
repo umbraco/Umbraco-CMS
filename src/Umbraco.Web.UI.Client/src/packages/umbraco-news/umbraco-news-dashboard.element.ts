@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
@@ -48,6 +48,9 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			:host {
 				display: block;
 				padding: var(--uui-size-layout-1);
+			}
+			p {
+				position: relative;
 			}
 		`,
 	];

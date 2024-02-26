@@ -1,16 +1,22 @@
-import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
+import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 
 export type UmbPropertySettingsModalData = {
 	documentTypeId: string;
-	propertyData: PropertyTypeModelBaseModel;
 };
-export type UmbPropertySettingsModalValue = PropertyTypeModelBaseModel;
+export type UmbPropertySettingsModalValue = UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel;
 
 export const UMB_PROPERTY_SETTINGS_MODAL = new UmbModalToken<
 	UmbPropertySettingsModalData,
 	UmbPropertySettingsModalValue
 >('Umb.Modal.PropertySettings', {
-	type: 'sidebar',
-	size: 'small',
+	modal: {
+		type: 'sidebar',
+		size: 'small',
+	},
+	value: {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		validation: {},
+	},
 });

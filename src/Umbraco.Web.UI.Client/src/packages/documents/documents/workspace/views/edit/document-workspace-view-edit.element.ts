@@ -1,28 +1,27 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import type { UmbDocumentWorkspaceViewEditTabElement } from './document-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import {
-	encodeFolderName,
-	UmbRoute,
-	UmbRouterSlotChangeEvent,
-	UmbRouterSlotInitEvent,
-} from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
+import { encodeFolderName } from '@umbraco-cms/backoffice/router';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
+	//@state()
 	//private _hasRootProperties = false;
+
+	@state()
 	private _hasRootGroups = false;
 
 	@state()
 	private _routes: UmbRoute[] = [];
 
 	@state()
-	_tabs?: Array<PropertyTypeContainerModelBaseModel>;
+	private _tabs?: Array<PropertyTypeContainerModelBaseModel>;
 
 	@state()
 	private _routerPath?: string;
@@ -32,7 +31,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 
 	private _workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
 
 	constructor() {
 		super();
@@ -81,7 +80,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 						// TODO: Consider if we can link these more simple, and not parse this on.
 						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
 						(component as UmbDocumentWorkspaceViewEditTabElement).ownerTabId =
-							this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
+							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});

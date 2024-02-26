@@ -1,13 +1,12 @@
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbUserGroupDetailModel } from '../../types.js';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-user-group-granular-permission-list')
 export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	@state()
-	private _userGroup?: UserGroupResponseModel;
+	private _userGroup?: UmbUserGroupDetailModel;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -23,8 +22,6 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 	render() {
 		return html`<umb-extension-slot type="userGranularPermission"></umb-extension-slot>`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbUserGroupGranularPermissionListElement;

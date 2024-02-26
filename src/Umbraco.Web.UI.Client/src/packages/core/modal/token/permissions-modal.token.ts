@@ -1,4 +1,4 @@
-import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from './modal-token.js';
 
 export interface UmbPermissionsModalData {
 	unique: string;
@@ -10,6 +10,8 @@ export type UmbPermissionsModalValue = undefined;
 export const UMB_PERMISSIONS_MODAL = new UmbModalToken<UmbPermissionsModalData, UmbPermissionsModalValue>(
 	'Umb.Modal.Permissions',
 	{
-		type: 'sidebar',
+		modal: {
+			type: 'sidebar',
+		},
 	},
 );

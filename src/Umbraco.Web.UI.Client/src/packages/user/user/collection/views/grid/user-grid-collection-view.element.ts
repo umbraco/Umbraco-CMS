@@ -1,11 +1,12 @@
 import { getDisplayStateFromUserStatus } from '../../../../utils.js';
-import { UmbUserCollectionContext } from '../../user-collection.context.js';
-import { type UmbUserDetailModel } from '../../../types.js';
+import type { UmbUserCollectionContext } from '../../user-collection.context.js';
+import type { UmbUserDetailModel } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserGroupResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-grid-collection-view')
@@ -19,14 +20,14 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	@state()
 	private _loading = false;
 
-	#userGroups: Array<UserGroupResponseModel> = [];
+	#userGroups: Array<UmbUserGroupDetailModel> = [];
 	#collectionContext?: UmbUserCollectionContext;
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 			this.observe(
 				this.#collectionContext.selection.selection,
@@ -54,11 +55,11 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#onSelect(user: UmbUserDetailModel) {
-		this.#collectionContext?.selection.select(user.id ?? '');
+		this.#collectionContext?.selection.select(user.unique ?? '');
 	}
 
 	#onDeselect(user: UmbUserDetailModel) {
-		this.#collectionContext?.selection.deselect(user.id ?? '');
+		this.#collectionContext?.selection.deselect(user.unique ?? '');
 	}
 
 	render() {
@@ -67,7 +68,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 			<div id="user-grid">
 				${repeat(
 					this._users,
-					(user) => user.id,
+					(user) => user.unique,
 					(user) => this.#renderUserCard(user),
 				)}
 			</div>
@@ -80,8 +81,8 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				.name=${user.name ?? 'Unnamed user'}
 				selectable
 				?select-only=${this._selection.length > 0}
-				?selected=${this.#collectionContext?.selection.isSelected(user.id ?? '')}
-				@open=${() => this._handleOpenCard(user.id ?? '')}
+				?selected=${this.#collectionContext?.selection.isSelected(user.unique)}
+				@open=${() => this._handleOpenCard(user.unique)}
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>
 				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
@@ -94,19 +95,19 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 			return nothing;
 		}
 
-		const statusLook = getDisplayStateFromUserStatus(user.state);
+		const statusLook = user.state ? getDisplayStateFromUserStatus(user.state) : undefined;
 		return html`<uui-tag
 			slot="tag"
 			size="s"
 			look="${ifDefined(statusLook?.look)}"
 			color="${ifDefined(statusLook?.color)}">
-			<umb-localize key=${'user_' + statusLook.key}></umb-localize>
+			<umb-localize key=${'user_' + statusLook?.key}></umb-localize>
 		</uui-tag>`;
 	}
 
 	#renderUserGroupNames(user: UmbUserDetailModel) {
 		const userGroupNames = this.#userGroups
-			.filter((userGroup) => user.userGroupIds?.includes(userGroup.id!))
+			.filter((userGroup) => user.userGroupUniques?.includes(userGroup.unique))
 			.map((userGroup) => userGroup.name)
 			.join(', ');
 

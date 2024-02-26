@@ -1,10 +1,9 @@
 import { fixture, expect, html } from '@open-wc/testing';
-import {
-	UmbNotificationLayoutDefaultElement,
-	UmbNotificationDefaultData,
-} from './notification-layout-default.element.js';
-import { UUIToastNotificationLayoutElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbNotificationDefaultData } from './notification-layout-default.element.js';
+import { UmbNotificationLayoutDefaultElement } from './notification-layout-default.element.js';
+import type { UUIToastNotificationLayoutElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbNotificationHandler } from '@umbraco-cms/backoffice/notification';
+import type { UmbTestRunnerWindow } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbNotificationLayoutDefault', () => {
 	let element: UmbNotificationLayoutDefaultElement;
@@ -23,7 +22,7 @@ describe('UmbNotificationLayoutDefault', () => {
 		element = await fixture(
 			html`<umb-notification-layout-default
 				.notificationHandler=${notificationHandler}
-				.data=${options.data}></umb-notification-layout-default>`
+				.data=${options.data}></umb-notification-layout-default>`,
 		);
 	});
 
@@ -31,9 +30,11 @@ describe('UmbNotificationLayoutDefault', () => {
 		expect(element).to.be.instanceOf(UmbNotificationLayoutDefaultElement);
 	});
 
-	it('passes the a11y audit', async () => {
-		await expect(element).to.be.accessible();
-	});
+	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		it('passes the a11y audit', async () => {
+			await expect(element).to.be.accessible();
+		});
+	}
 
 	describe('Public API', () => {
 		describe('properties', () => {

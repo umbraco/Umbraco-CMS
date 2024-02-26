@@ -1,13 +1,13 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type {
 	ManifestMenu,
 	ManifestSectionSidebarAppBaseMenu,
 	ManifestSectionSidebarAppMenuKind,
 	UmbBackofficeManifestKind,
-	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // TODO: Move to separate file:
 const manifest: UmbBackofficeManifestKind = {
@@ -24,7 +24,7 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement<
-	ManifestType extends ManifestSectionSidebarAppBaseMenu = ManifestSectionSidebarAppMenuKind
+	ManifestType extends ManifestSectionSidebarAppBaseMenu = ManifestSectionSidebarAppMenuKind,
 > extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	manifest?: ManifestType;

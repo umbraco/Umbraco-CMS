@@ -1,11 +1,11 @@
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
-import {
+import type {
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
-	HealthCheckResource,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbHealthCheckContext {
@@ -34,7 +34,7 @@ export class UmbHealthCheckContext {
 	async checkGroup(name: string) {
 		const { data } = await tryExecuteAndNotify(
 			this.host,
-			HealthCheckResource.postHealthCheckGroupByNameCheck({ name })
+			HealthCheckResource.postHealthCheckGroupByNameCheck({ name }),
 		);
 
 		if (data) {
@@ -45,4 +45,6 @@ export class UmbHealthCheckContext {
 	}
 }
 
-export const UMB_HEALTHCHECK_CONTEXT_TOKEN = new UmbContextToken<UmbHealthCheckContext>('UmbHealthCheckContext');
+export default UmbHealthCheckContext;
+
+export const UMB_HEALTHCHECK_CONTEXT = new UmbContextToken<UmbHealthCheckContext>('UmbHealthCheckContext');

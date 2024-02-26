@@ -1,18 +1,11 @@
-import { UmbData } from './data.js';
+import { UmbMockDBBase } from './utils/mock-db-base.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 
 // Temp mocked database
-export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
+export class UmbEntityData<T extends UmbEntityBase> extends UmbMockDBBase<T> {
 	constructor(data: Array<T>) {
 		super(data);
-	}
-
-	getAll() {
-		return {
-			total: this.data.length,
-			items: this.data,
-		};
 	}
 
 	getList(skip: number, take: number) {
@@ -43,8 +36,6 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 		}
 
 		this.data.push(item);
-
-		return item;
 	}
 
 	save(id: string, saveItem: T) {
@@ -60,8 +51,6 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 			// new
 			this.data.push(saveItem);
 		}
-
-		return saveItem;
 	}
 
 	trash(ids: Array<string>) {
@@ -88,7 +77,7 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 		});
 	}
 
-	updateData(updateItem: T) {
+	updateData(updateItem: Partial<T>) {
 		const itemIndex = this.data.findIndex((item) => item.id === updateItem.id);
 		const item = this.data[itemIndex];
 		if (!item) return;

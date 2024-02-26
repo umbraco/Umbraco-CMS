@@ -1,6 +1,6 @@
 import './story-notification-default-example.element.js';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import { UmbNotificationContext } from '../notification.context.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
@@ -9,7 +9,9 @@ export default {
 	component: 'umb-notification-layout-default',
 	decorators: [
 		(story) =>
-			html`<umb-context-provider key="UmbNotificationContext" .value=${new UmbNotificationContext()}>
+			html`<umb-context-provider
+				key="UmbNotificationContext"
+				.create=${(host: any) => new UmbNotificationContext(host)}>
 				${story()}
 			</umb-context-provider>`,
 	],

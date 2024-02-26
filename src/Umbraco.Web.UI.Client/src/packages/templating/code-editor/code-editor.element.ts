@@ -1,19 +1,11 @@
 import { UmbCodeEditorController } from './code-editor.controller.js';
 import type { CodeEditorLanguage, CodeEditorSearchOptions, UmbCodeEditorHost } from './code-editor.model.js';
 import { CodeEditorTheme } from './code-editor.model.js';
-import { UMB_THEME_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/themes';
+import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import { monacoEditorStyles, monacoJumpingCursorHack } from '@umbraco-cms/backoffice/external/monaco-editor';
-import {
-	css,
-	html,
-	PropertyValues,
-	createRef,
-	Ref,
-	ref,
-	customElement,
-	property,
-} from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { PropertyValues, Ref } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, createRef, ref, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * A custom element that renders a code editor. Code editor is based on the Monaco Editor library.
@@ -98,10 +90,14 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_THEME_CONTEXT_TOKEN, (instance) => {
-			this.observe(instance.theme, (themeAlias) => {
-				this.theme = themeAlias ? this.#translateTheme(themeAlias) : CodeEditorTheme.Light;
-			}, '_observeTheme');
+		this.consumeContext(UMB_THEME_CONTEXT, (instance) => {
+			this.observe(
+				instance.theme,
+				(themeAlias) => {
+					this.theme = themeAlias ? this.#translateTheme(themeAlias) : CodeEditorTheme.Light;
+				},
+				'_observeTheme',
+			);
 		});
 	}
 

@@ -1,8 +1,8 @@
 import { expect } from '@open-wc/testing';
 import { type UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 import { UmbControllerHostMixin } from './controller-host.mixin.js';
-import { type UmbControllerAlias } from './controller-alias.type.js';
-import { type UmbControllerHost } from './controller-host.interface.js';
+import type { UmbControllerAlias } from './controller-alias.type.js';
+import type { UmbControllerHost } from './controller-host.interface.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('test-my-controller-host')
@@ -22,7 +22,7 @@ export class UmbTestControllerImplementation extends UmbControllerHostMixin(clas
 		this._host.addController(this);
 	}
 
-	getHostElement(): EventTarget {
+	getHostElement() {
 		// Different from class.mixin implementation is that we here have a ? to make sure the bad test can run.
 		return this._host?.getHostElement();
 	}

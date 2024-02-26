@@ -1,7 +1,8 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../logviewer.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import type { UmbLogViewerWorkspaceContext } from '../../logviewer.context.js';
+import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../logviewer.context.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-log-viewer-search-view')
@@ -15,7 +16,7 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeCanShowLogs();
 		});
@@ -46,12 +47,9 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 					</div>
 				</div>
 
-				<uui-box>
-					${this._canShowLogs
-						? html`<umb-log-viewer-messages-list></umb-log-viewer-messages-list>`
-						: html`<umb-log-viewer-to-many-logs-warning
-								id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
-				</uui-box>
+				${this._canShowLogs
+					? html`<umb-log-viewer-messages-list></umb-log-viewer-messages-list>`
+					: html`<umb-log-viewer-to-many-logs-warning id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
 			</umb-body-layout>
 		`;
 	}

@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIColorPickerElement } from './property-editor-ui-color-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

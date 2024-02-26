@@ -1,17 +1,20 @@
-import { UmbContextDiscriminator, UmbContextToken } from '../token/context-token.js';
+import type { UmbContextDiscriminator, UmbContextToken } from '../token/context-token.js';
 import {
 	isUmbContextProvideEventType,
 	//isUmbContextUnprovidedEventType,
 	UMB_CONTEXT_PROVIDE_EVENT_TYPE,
 	//umbContextUnprovidedEventType,
 } from '../provide/context-provide.event.js';
-import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event.js';
+import type { UmbContextCallback } from './context-request.event.js';
+import { UmbContextRequestEventImplementation } from './context-request.event.js';
 
 /**
  * @export
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
+	#skipOrigin?: boolean;
+	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
 	#promise?: Promise<ResultType>;
 	#promiseResolver?: (instance: ResultType) => void;
@@ -28,13 +31,13 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
-	 * @param {EventTarget} hostElement
+	 * @param {Element} element
 	 * @param {string} contextIdentifier
 	 * @param {UmbContextCallback} callback
 	 * @memberof UmbContextConsumer
 	 */
 	constructor(
-		protected hostElement: EventTarget,
+		protected element: Element,
 		contextIdentifier: string | UmbContextToken<BaseType, ResultType>,
 		callback?: UmbContextCallback<ResultType>,
 	) {
@@ -43,6 +46,25 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		this.#apiAlias = idSplit[1] ?? 'default';
 		this.#callback = callback;
 		this.#discriminator = (contextIdentifier as UmbContextToken<BaseType, ResultType>).getDiscriminator?.();
+	}
+
+	/**
+	 * @public
+	 * @memberof UmbContextConsumer
+	 * @description Skip the contexts provided by the requesting element.
+	 */
+	public skipOrigin(): void {
+		this.#skipOrigin = true;
+	}
+
+	/**
+	 * @public
+	 * @memberof UmbContextConsumer
+	 * @description Pass beyond any context aliases that matches this.
+	 * The default behavior is to stop at first Context Alias match, this is to avoid receiving unforeseen descending contexts.
+	 */
+	public passContextAliasMatches(): void {
+		this.#stopAtContextMatch = false;
 	}
 
 	protected _onResponse = (instance: BaseType): boolean => {
@@ -62,7 +84,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		return false;
 	};
 
-	protected setInstance(instance: ResultType) {
+	protected setInstance(instance: ResultType): void {
 		this.#instance = instance;
 		this.#callback?.(instance);
 		if (instance !== undefined) {
@@ -76,7 +98,7 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextConsumer
 	 * @description Get the context as a promise.
 	 */
-	public asPromise() {
+	public asPromise(): Promise<ResultType> {
 		return (
 			this.#promise ??
 			(this.#promise = new Promise<ResultType>((resolve) => {
@@ -90,25 +112,30 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextConsumer
 	 * @description Request the context from the host element.
 	 */
-	public request() {
-		const event = new UmbContextRequestEventImplementation(this.#contextAlias, this.#apiAlias, this._onResponse);
-		this.hostElement.dispatchEvent(event);
+	public request(): void {
+		const event = new UmbContextRequestEventImplementation(
+			this.#contextAlias,
+			this.#apiAlias,
+			this._onResponse,
+			this.#stopAtContextMatch,
+		);
+		(this.#skipOrigin ? this.element.parentNode : this.element)?.dispatchEvent(event);
 	}
 
-	public hostConnected() {
+	public hostConnected(): void {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
 		//window.addEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
 		this.request();
 	}
 
-	public hostDisconnected() {
+	public hostDisconnected(): void {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
 		window.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
 		//window.removeEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
 	}
 
-	#handleNewProvider = (event: Event) => {
+	#handleNewProvider = (event: Event): void => {
 		// Does seem a bit unnecessary, we could just assume the type via type casting...
 		if (!isUmbContextProvideEventType(event)) return;
 
@@ -136,11 +163,12 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	}
 	*/
 
-	public destroy() {
+	public destroy(): void {
 		this.hostDisconnected();
 		this.#callback = undefined;
 		this.#promise = undefined;
 		this.#promiseResolver = undefined;
 		this.#instance = undefined;
+		this.#discriminator = undefined;
 	}
 }

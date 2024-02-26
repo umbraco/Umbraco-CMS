@@ -1,17 +1,16 @@
 import { html, css, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CONFIRM_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestPackageView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { ManifestPackageView } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 @customElement('umb-installed-packages-section-view-item')
 export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
@@ -49,20 +48,20 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 			this.#notificationContext = instance;
 		});
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
 		});
 	}
 
 	#observePackageView() {
 		this.observe(
-			umbExtensionsRegistry.extensionsOfType('packageView').pipe(
+			umbExtensionsRegistry.byType('packageView').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.packageName === this.#name);
-				})
+				}),
 			),
 			(manifests) => {
 				if (manifests.length === 0) {
@@ -71,17 +70,19 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 				}
 				this._packageView = manifests[0];
 			},
-			'_observePackageViewExtension'
+			'_observePackageViewExtension',
 		);
 	}
 
 	async _onMigration() {
 		if (!this.name) return;
 		const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-			color: 'positive',
-			headline: `Run migrations for ${this.name}?`,
-			content: `Do you want to start run migrations for ${this.name}`,
-			confirmLabel: 'Run migrations',
+			data: {
+				color: 'positive',
+				headline: `Run migrations for ${this.name}?`,
+				content: `Do you want to start run migrations for ${this.name}`,
+				confirmLabel: 'Run migrations',
+			},
 		});
 
 		await modalContext?.onSubmit();
@@ -89,7 +90,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		this._migrationButtonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
-			PackageResource.postPackageByNameRunMigration({ name: this.name })
+			PackageResource.postPackageByNameRunMigration({ name: this.name }),
 		);
 		if (error) return;
 		this.#notificationContext?.peek('positive', { data: { message: 'Migrations completed' } });

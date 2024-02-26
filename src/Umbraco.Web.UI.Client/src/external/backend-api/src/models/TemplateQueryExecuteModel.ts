@@ -3,14 +3,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 import type { TemplateQueryExecuteFilterPresentationModel } from './TemplateQueryExecuteFilterPresentationModel';
 import type { TemplateQueryExecuteSortModel } from './TemplateQueryExecuteSortModel';
 
 export type TemplateQueryExecuteModel = {
-    rootContentId?: string | null;
-    contentTypeAlias?: string | null;
+    rootDocument?: ReferenceByIdModel | null;
+    documentTypeAlias?: string | null;
     filters?: Array<TemplateQueryExecuteFilterPresentationModel> | null;
     sort?: TemplateQueryExecuteSortModel | null;
-    take?: number;
+    take: number;
 };
 

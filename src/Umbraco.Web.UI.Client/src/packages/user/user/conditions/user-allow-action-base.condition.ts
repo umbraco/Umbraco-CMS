@@ -1,8 +1,8 @@
-import { UmbUserDetailModel } from '../types.js';
-import { UmbUserWorkspaceContext } from '../workspace/user-workspace.context.js';
+import type { UmbUserDetailModel } from '../types.js';
+import type { UmbUserWorkspaceContext } from '../workspace/user-workspace.context.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { isCurrentUser } from '@umbraco-cms/backoffice/current-user';
-import {
+import type {
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
@@ -40,7 +40,7 @@ export class UmbUserActionConditionBase extends UmbBaseController implements Umb
 	 * @memberof UmbUserActionConditionBase
 	 */
 	protected async isCurrentUser() {
-		return this.userData?.id ? isCurrentUser(this._host, this.userData.id) : false;
+		return this.userData?.unique ? isCurrentUser(this._host, this.userData.unique) : false;
 	}
 
 	/**

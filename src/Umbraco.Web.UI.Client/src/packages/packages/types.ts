@@ -1,4 +1,4 @@
-import { PackageManifestResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PackageManifestResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type UmbPackage = PackageManifestResponseModel;
 

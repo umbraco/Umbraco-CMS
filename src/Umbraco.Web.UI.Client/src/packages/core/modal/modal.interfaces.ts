@@ -1,8 +1,8 @@
-export interface UmbPickerModalData<ItemType> {
+export interface UmbPickerModalData<TreeItemType> {
 	multiple?: boolean;
-	selection?: Array<string | null>;
-	filter?: (item: ItemType) => boolean;
-	pickableFilter?: (item: ItemType) => boolean;
+	hideTreeRoot?: boolean;
+	filter?: (item: TreeItemType) => boolean;
+	pickableFilter?: (item: TreeItemType) => boolean;
 }
 export interface UmbPickerModalValue {
 	selection: Array<string | null>;

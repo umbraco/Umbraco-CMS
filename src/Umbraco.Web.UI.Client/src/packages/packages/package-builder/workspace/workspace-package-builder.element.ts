@@ -1,11 +1,7 @@
 import type { UmbInputDocumentElement } from '../../../documents/documents/components/input-document/input-document.element.js';
 import type { UmbInputMediaElement } from '../../../media/media/components/input-media/input-media.element.js';
-import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element.js';
-import {
-	UUIBooleanInputEvent,
-	UUIInputElement,
-	UUIInputEvent,
-} from '@umbraco-cms/backoffice/external/uui';
+import type { UmbInputLanguageElement } from '../../../language/components/input-language/input-language.element.js';
+import type { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -17,10 +13,12 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 // TODO: update to module imports when ready
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PackageDefinitionResponseModel, PackageResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { PackageDefinitionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { PackageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-workspace-package-builder')
@@ -29,6 +27,8 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	entityId?: string;
 
 	@state()
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	private _package: PackageDefinitionResponseModel = {};
 
 	@query('#package-name-input')
@@ -38,7 +38,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 			this._notificationContext = instance;
 		});
 	}
@@ -70,9 +70,11 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		if (!this.#nameDefined()) return;
 		const response = await tryExecuteAndNotify(
 			this,
-			PackageResource.postPackageCreated({ requestBody: this._package })
+			PackageResource.postPackageCreated({ requestBody: this._package }),
 		);
 		if (!response.data || response.error) return;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._package = response.data as PackageDefinitionResponseModel;
 		this.#navigateBack();
 	}
@@ -82,7 +84,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		if (!this._package?.id) return;
 		const response = await tryExecuteAndNotify(
 			this,
-			PackageResource.putPackageCreatedById({ id: this._package.id, requestBody: this._package })
+			PackageResource.putPackageCreatedById({ id: this._package.id, requestBody: this._package }),
 		);
 
 		if (response.error) return;
@@ -136,49 +138,35 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	#renderEditors() {
-		return html`<umb-workspace-property-layout label="Content" description="">
+		return html`<umb-property-layout label="Content" description="">
 				${this.#renderContentSection()}
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 
-			<umb-workspace-property-layout label="Media" description=""
-				>${this.#renderMediaSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Media" description="">${this.#renderMediaSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Document Types" description="">
+			<umb-property-layout label="Document Types" description="">
 				${this.#renderDocumentTypeSection()}
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 
-			<umb-workspace-property-layout label="Media Types" description="">
-				${this.#renderMediaTypeSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Media Types" description=""> ${this.#renderMediaTypeSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Languages" description="">
-				${this.#renderLanguageSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Languages" description=""> ${this.#renderLanguageSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Dictionary" description="">
-				${this.#renderDictionarySection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Dictionary" description=""> ${this.#renderDictionarySection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Data Types" description="">
-				${this.#renderDataTypeSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Data Types" description=""> ${this.#renderDataTypeSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Templates" description="">
-				${this.#renderTemplateSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Templates" description=""> ${this.#renderTemplateSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Stylesheets" description="">
+			<umb-property-layout label="Stylesheets" description="">
 				${this.#renderStylesheetsSection()}
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 
-			<umb-workspace-property-layout label="Scripts" description="">
-				${this.#renderScriptsSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Scripts" description=""> ${this.#renderScriptsSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Partial Views" description="">
+			<umb-property-layout label="Partial Views" description="">
 				${this.#renderPartialViewSection()}
-			</umb-workspace-property-layout>`;
+			</umb-property-layout>`;
 	}
 
 	#renderContentSection() {
@@ -231,11 +219,11 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 
 	#renderLanguageSection() {
 		return html`<div slot="editor">
-			<umb-input-language-picker
+			<umb-input-language
 				.value="${this._package.languages?.join(',') ?? ''}"
 				@change="${(e: CustomEvent) => {
-					this._package.languages = (e.target as UmbInputLanguagePickerElement).selectedIsoCodes;
-				}}"></umb-input-language-picker>
+					this._package.languages = (e.target as UmbInputLanguageElement).selectedUniques;
+				}}"></umb-input-language>
 		</div>`;
 	}
 

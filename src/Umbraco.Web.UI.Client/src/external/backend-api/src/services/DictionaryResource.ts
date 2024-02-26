@@ -8,7 +8,7 @@ import type { DictionaryItemResponseModel } from '../models/DictionaryItemRespon
 import type { ImportDictionaryRequestModel } from '../models/ImportDictionaryRequestModel';
 import type { MoveDictionaryRequestModel } from '../models/MoveDictionaryRequestModel';
 import type { PagedDictionaryOverviewResponseModel } from '../models/PagedDictionaryOverviewResponseModel';
-import type { PagedEntityTreeItemResponseModel } from '../models/PagedEntityTreeItemResponseModel';
+import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { UpdateDictionaryItemRequestModel } from '../models/UpdateDictionaryItemRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -35,6 +35,9 @@ export class DictionaryResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -52,9 +55,11 @@ export class DictionaryResource {
             url: '/umbraco/management/api/v1/dictionary',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
                 409: `Conflict`,
             },
@@ -77,6 +82,7 @@ export class DictionaryResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -99,6 +105,7 @@ export class DictionaryResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -125,6 +132,8 @@ export class DictionaryResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -151,6 +160,7 @@ export class DictionaryResource {
                 'includeChildren': includeChildren,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -160,7 +170,7 @@ export class DictionaryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static postDictionaryByIdMove({
+    public static putDictionaryByIdMove({
         id,
         requestBody,
     }: {
@@ -168,7 +178,7 @@ export class DictionaryResource {
         requestBody?: MoveDictionaryRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'PUT',
             url: '/umbraco/management/api/v1/dictionary/{id}/move',
             path: {
                 'id': id,
@@ -177,6 +187,7 @@ export class DictionaryResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -196,9 +207,10 @@ export class DictionaryResource {
             url: '/umbraco/management/api/v1/dictionary/import',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -208,22 +220,25 @@ export class DictionaryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getDictionaryItem({
+    public static getItemDictionary({
         id,
     }: {
         id?: Array<string>,
     }): CancelablePromise<Array<DictionaryItemItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/dictionary/item',
+            url: '/umbraco/management/api/v1/item/dictionary',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
 
     /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDictionaryChildren({
@@ -234,7 +249,7 @@ export class DictionaryResource {
         parentId?: string,
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/children',
@@ -243,11 +258,14 @@ export class DictionaryResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
     /**
-     * @returns PagedEntityTreeItemResponseModel Success
+     * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
      */
     public static getTreeDictionaryRoot({
@@ -256,13 +274,16 @@ export class DictionaryResource {
     }: {
         skip?: number,
         take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+    }): CancelablePromise<PagedNamedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/dictionary/root',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

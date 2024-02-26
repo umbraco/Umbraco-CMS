@@ -1,6 +1,7 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbCodeEditorElement } from './code-editor.element.js';
-import { CodeEditorLanguage, CodeEditorTheme } from './code-editor.model.js';
+import type { CodeEditorLanguage} from './code-editor.model.js';
+import { CodeEditorTheme } from './code-editor.model.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './code-editor.element.js';
@@ -221,7 +222,7 @@ const [Javascript, Css, Html, Razor, Markdown, Typescript, Json]: Story[] = Obje
 				code: codeSnippets[language as CodeEditorLanguage],
 			},
 		};
-	}
+	},
 );
 
 const Themes: Story = {

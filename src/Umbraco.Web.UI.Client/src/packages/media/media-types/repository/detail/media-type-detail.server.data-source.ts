@@ -1,13 +1,15 @@
-import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import {
+import type { UmbMediaTypeDetailModel } from '../../types.js';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type {
 	CreateMediaTypeRequestModel,
-	MediaTypeResource,
-	MediaTypeResponseModel,
 	UpdateMediaTypeRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
  * A data source for the Media Type that fetches data from the server
@@ -15,133 +17,253 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
  * @class UmbMediaTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbMediaTypeServerDataSource
-	implements UmbDataSource<CreateMediaTypeRequestModel, any, UpdateMediaTypeRequestModel, MediaTypeResponseModel>
-{
+export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMediaTypeDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of UmbMediaServerDataSource.
+	 * Creates an instance of UmbMediaTypeServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof UmbMediaServerDataSource
+	 * @memberof UmbMediaTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
 	/**
-	 * Fetches a Media with the given id from the server
-	 * @param {string} id
-	 * @return {*}
+	 * Creates a new Media Type scaffold
+	 * @param {(string | null)} parentUnique
+	 * @return { CreateMediaTypeRequestModel }
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
-	async read(id: string) {
-		if (!id) {
-			throw new Error('Id is missing');
-		}
-
-		return tryExecuteAndNotify(
-			this.#host,
-			MediaTypeResource.getMediaTypeById({
-				id: id,
-			}),
-		);
-	}
-
-	/**
-	 * Creates a new Media scaffold
-	 * @param {(string | null)} parentId
-	 * @return {*}
-	 * @memberof UmbMediaTypeServerDataSource
-	 */
-	async createScaffold(parentId: string | null) {
-		//, parentId: string | null
-		const data: MediaTypeResponseModel = {
-			id: UmbId.new(),
-			//parentId: parentId,
+	async createScaffold(parentUnique: string | null) {
+		const data: UmbMediaTypeDetailModel = {
+			entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+			unique: UmbId.new(),
+			parentUnique,
 			name: '',
 			alias: '',
 			description: '',
-			icon: 'icon-picture',
+			icon: '',
 			allowedAsRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
-			allowedContentTypes: [],
-			compositions: [],
 			properties: [],
 			containers: [],
+			allowedContentTypes: [],
+			compositions: [],
+			collection: null,
 		};
 
 		return { data };
 	}
 
 	/**
-	 * Creates a new Media Type on the server
-	 * @param {CreateMediaTypeRequestModel} mediaType
+	 * Fetches a Media Type with the given id from the server
+	 * @param {string} unique
 	 * @return {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
-	async create(mediaType: CreateMediaTypeRequestModel) {
-		if (!mediaType) throw new Error('Media Type is missing');
-		return tryExecuteAndNotify(
-			this.#host,
-			MediaTypeResource.postMediaType({
-				requestBody: mediaType,
-			}),
-		);
-	}
+	async read(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 
-	/**
-	 * Updates a Media Type on the server
-	 * @param {string} id
-	 * @param {Media} mediaType
-	 * @return {*}
-	 * @memberof UmbMediaTypeServerDataSource
-	 */
-	async update(id: string, mediaType: UpdateMediaTypeRequestModel) {
-		if (!id) throw new Error('Id is missing');
+		const { data, error } = await tryExecuteAndNotify(this.#host, MediaTypeResource.getMediaTypeById({ id: unique }));
 
-		mediaType = { ...mediaType };
-
-		// TODO: Hack to remove some props that ruins the media-type post end-point.
-		(mediaType as any).id = undefined;
-
-		return tryExecuteAndNotify(this.#host, MediaTypeResource.putMediaTypeById({ id, requestBody: mediaType }));
-	}
-
-	/**
-	 * Deletes a Template on the server
-	 * @param {string} id
-	 * @return {*}
-	 * @memberof UmbMediaTypeServerDataSource
-	 */
-	async delete(id: string) {
-		if (!id) {
-			throw new Error('Id is missing');
+		if (error || !data) {
+			return { error };
 		}
 
-		// TODO: Hack the type to avoid type-error here:
-		return tryExecuteAndNotify(this.#host, MediaTypeResource.deleteMediaTypeById({ id })) as any;
+		// TODO: make data mapper to prevent errors
+		const mediaType: UmbMediaTypeDetailModel = {
+			entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
+			unique: data.id,
+			parentUnique: null, // TODO: map to parent/folder id
+			name: data.name,
+			alias: data.alias,
+			description: data.description || null,
+			icon: data.icon,
+			allowedAsRoot: data.allowedAsRoot,
+			variesByCulture: data.variesByCulture,
+			variesBySegment: data.variesBySegment,
+			isElement: data.isElement,
+			properties: data.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { unique: property.dataType.id },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
+			containers: data.containers as UmbPropertyTypeContainerModel[],
+			allowedContentTypes: data.allowedMediaTypes.map((allowedMediaType) => {
+				return {
+					contentType: { unique: allowedMediaType.mediaType.id },
+					sortOrder: allowedMediaType.sortOrder,
+				};
+			}),
+			compositions: data.compositions.map((composition) => {
+				return {
+					contentType: { unique: composition.mediaType.id },
+					compositionType: composition.compositionType,
+				};
+			}),
+			collection: data.collection ? { unique: data.collection.id } : null,
+		};
+
+		return { data: mediaType };
 	}
 
 	/**
-	 * Get the allowed media types for a given parent id
-	 * @param {string} id
+	 * Inserts a new Media Type on the server
+	 * @param {UmbMediaTypeDetailModel} model
 	 * @return {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
-	async getAllowedChildrenOf(id: string) {
-		if (!id) throw new Error('Id is missing');
+	async create(model: UmbMediaTypeDetailModel) {
+		if (!model) throw new Error('Media Type is missing');
+		if (!model.unique) throw new Error('Media Type unique is missing');
+
+		// TODO: make data mapper to prevent errors
+		const requestBody: CreateMediaTypeRequestModel = {
+			alias: model.alias,
+			name: model.name,
+			description: model.description,
+			icon: model.icon,
+			allowedAsRoot: model.allowedAsRoot,
+			variesByCulture: model.variesByCulture,
+			variesBySegment: model.variesBySegment,
+			isElement: model.isElement,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
+			containers: model.containers,
+			allowedMediaTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					mediaType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					mediaType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
+			id: model.unique,
+			folder: model.parentUnique ? { id: model.parentUnique } : null,
+		};
+
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			MediaTypeResource.postMediaType({
+				requestBody,
+			}),
+		);
+
+		if (data) {
+			return this.read(data);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Updates a MediaType on the server
+	 * @param {UmbMediaTypeDetailModel} MediaType
+	 * @return {*}
+	 * @memberof UmbMediaTypeServerDataSource
+	 */
+	async update(model: UmbMediaTypeDetailModel) {
+		if (!model.unique) throw new Error('Unique is missing');
+
+		// TODO: make data mapper to prevent errors
+		const requestBody: UpdateMediaTypeRequestModel = {
+			alias: model.alias,
+			name: model.name,
+			description: model.description,
+			icon: model.icon,
+			allowedAsRoot: model.allowedAsRoot,
+			variesByCulture: model.variesByCulture,
+			variesBySegment: model.variesBySegment,
+			isElement: model.isElement,
+			properties: model.properties.map((property) => {
+				return {
+					id: property.id,
+					container: property.container,
+					sortOrder: property.sortOrder,
+					alias: property.alias,
+					name: property.name,
+					description: property.description,
+					dataType: { id: property.dataType.unique },
+					variesByCulture: property.variesByCulture,
+					variesBySegment: property.variesBySegment,
+					validation: property.validation,
+					appearance: property.appearance,
+				};
+			}),
+			containers: model.containers,
+			allowedMediaTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					mediaType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					mediaType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
+		};
+
+		const { error } = await tryExecuteAndNotify(
+			this.#host,
+			MediaTypeResource.putMediaTypeById({
+				id: model.unique,
+				requestBody,
+			}),
+		);
+
+		if (!error) {
+			return this.read(model.unique);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Deletes a Media Type on the server
+	 * @param {string} unique
+	 * @return {*}
+	 * @memberof UmbMediaTypeServerDataSource
+	 */
+	async delete(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/media-type/allowed-children-of/${id}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}).then((res) => res.json()),
+			MediaTypeResource.deleteMediaTypeById({
+				id: unique,
+			}),
 		);
 	}
 }

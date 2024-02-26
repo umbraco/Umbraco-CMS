@@ -1,4 +1,4 @@
-import { ConditionTypes } from '../conditions/types.js';
+import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbDashboardElement } from '../interfaces/index.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 

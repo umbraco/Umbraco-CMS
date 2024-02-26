@@ -1,15 +1,17 @@
-import { UmbUserCollectionContext } from './user-collection.context.js';
-import {
+import type { UmbUserCollectionContext } from './user-collection.context.js';
+import type {
 	UUIBooleanInputEvent,
 	UUICheckboxElement,
 	UUIRadioGroupElement,
 	UUIRadioGroupEvent,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UserGroupResponseModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import type { UserOrderModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-collection-header')
@@ -21,16 +23,13 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	private _stateFilterSelection: Array<UserStateModel> = [];
 
 	@state()
-	private _orderByOptions: Array<UserOrderModel> = Object.values(UserOrderModel);
-
-	@state()
 	private _orderBy?: UserOrderModel;
 
 	@state()
-	private _userGroups: Array<UserGroupResponseModel> = [];
+	private _userGroups: Array<UmbUserGroupDetailModel> = [];
 
 	@state()
-	private _userGroupFilterSelection: Array<UserGroupResponseModel> = [];
+	private _userGroupFilterSelection: Array<UmbUserGroupDetailModel> = [];
 
 	#modalContext?: UmbModalManagerContext;
 	#collectionContext?: UmbUserCollectionContext;
@@ -42,7 +41,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 		});
 	}
@@ -109,18 +108,18 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	#onUserGroupFilterChange(event: UUIBooleanInputEvent) {
 		const target = event.currentTarget as UUICheckboxElement;
-		const item = this._userGroups.find((group) => group.id === target.value);
+		const item = this._userGroups.find((group) => group.unique === target.value);
 
 		if (!item) return;
 
 		if (target.checked) {
 			this._userGroupFilterSelection = [...this._userGroupFilterSelection, item];
 		} else {
-			this._userGroupFilterSelection = this._userGroupFilterSelection.filter((group) => group.id !== item.id);
+			this._userGroupFilterSelection = this._userGroupFilterSelection.filter((group) => group.unique !== item.unique);
 		}
 
-		const ids = this._userGroupFilterSelection.map((group) => group.id!);
-		this.#collectionContext?.setUserGroupFilter(ids);
+		const uniques = this._userGroupFilterSelection.map((group) => group.unique);
+		this.#collectionContext?.setUserGroupFilter(uniques);
 	}
 
 	#getUserGroupFilterLabel() {
@@ -156,7 +155,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			<uui-button popovertarget="popover-user-status-filter" label="status">
 				<umb-localize key="general_status"></umb-localize>: <b>${this.#getStatusFilterLabel()}</b>
 			</uui-button>
-			<uui-popover-container id="popover-user-status-filter" popover placement="bottom">
+			<uui-popover-container id="popover-user-status-filter" placement="bottom">
 				<umb-popover-layout>
 					<div class="filter-dropdown">
 						${this._stateFilterOptions.map(
@@ -178,16 +177,16 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			<uui-button popovertarget="popover-user-group-filter" label=${this.localize.term('general_groups')}>
 				<umb-localize key="general_groups"></umb-localize>: <b>${this.#getUserGroupFilterLabel()}</b>
 			</uui-button>
-			<uui-popover-container id="popover-user-group-filter" popover placement="bottom">
+			<uui-popover-container id="popover-user-group-filter" placement="bottom">
 				<umb-popover-layout>
 					<div class="filter-dropdown">
 						${repeat(
 							this._userGroups,
-							(group) => group.id,
+							(group) => group.unique,
 							(group) => html`
 								<uui-checkbox
 									label=${ifDefined(group.name)}
-									value=${ifDefined(group.id)}
+									value=${ifDefined(group.unique)}
 									@change=${this.#onUserGroupFilterChange}></uui-checkbox>
 							`,
 						)}
