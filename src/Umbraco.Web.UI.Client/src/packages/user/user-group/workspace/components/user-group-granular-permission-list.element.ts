@@ -53,7 +53,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 				element.manifest = manifest;
 				element.addEventListener(UmbChangeEvent.TYPE, this.#onValueChange);
 			},
-			'umbUserGroupPermissionObserver',
+			'umbUserGroupGranularPermissionObserver',
 		);
 
 		this._extensionElements.push(element);
@@ -76,8 +76,8 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 			(x) => x.$type !== schemaType,
 		);
 
-		const value = target.value || [];
-		const newCombinedValue = [...storedValueWithoutSchemaTypeItems, ...value];
+		const permissions = target.permissions || [];
+		const newCombinedValue = [...storedValueWithoutSchemaTypeItems, ...permissions];
 
 		this.#workspaceContext?.setPermissions(newCombinedValue);
 	};
