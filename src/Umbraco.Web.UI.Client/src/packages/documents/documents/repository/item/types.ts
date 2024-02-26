@@ -1,5 +1,5 @@
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbReferenceById } from '@umbraco-cms/backoffice/models';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbDocumentItemModel {
 	name: string; // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
@@ -9,7 +9,7 @@ export interface UmbDocumentItemModel {
 	documentType: {
 		unique: string;
 		icon: string;
-		collection?: UmbReferenceById;
+		collection?: UmbReferenceByUnique;
 	};
 	variants: Array<UmbDocumentItemVariantModel>;
 }

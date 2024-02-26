@@ -1,4 +1,4 @@
-import type { UmbReferenceById } from '@umbraco-cms/backoffice/models';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbMediaItemModel {
 	unique: string;
@@ -6,7 +6,7 @@ export interface UmbMediaItemModel {
 	mediaType: {
 		unique: string;
 		icon: string;
-		collection?: UmbReferenceById;
+		collection?: UmbReferenceByUnique;
 	};
 	variants: Array<UmbMediaItemVariantModel>;
 	name: string; // TODO: get correct variant name
