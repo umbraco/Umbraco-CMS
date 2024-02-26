@@ -127,6 +127,7 @@
 		"example": "node ./devops/example-runner/index.js",
 		"format:fix": "npm run format -- --write",
 		"format": "prettier 'src/**/*.ts' -- check",
+		"generate:api-local": "openapi --input ../Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
 		"generate:api-dev": "openapi --input http://localhost:11000/umbraco/swagger/management/swagger.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
 		"generate:api": "openapi --input https://raw.githubusercontent.com/umbraco/Umbraco-CMS/v14/dev/src/Umbraco.Cms.Api.Management/OpenApi.json --output src/external/backend-api/src --postfixServices Resource --useOptions",
 		"generate:icons": "node ./devops/icons/index.js",

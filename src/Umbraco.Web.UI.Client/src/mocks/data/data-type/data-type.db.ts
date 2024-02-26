@@ -51,6 +51,7 @@ const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDat
 		isFolder: false,
 		hasChildren: false,
 		isDeletable: true,
+		canIgnoreStartNodes: false,
 	};
 };
 
