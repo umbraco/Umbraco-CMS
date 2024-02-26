@@ -42,7 +42,8 @@ export class UmbDocumentWorkspaceContext
 	#getDataPromise?: Promise<any>;
 	#variantManagerContext?: typeof UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT.TYPE;
 	#languageRepository = new UmbLanguageCollectionRepository(this);
-	#languageCollection = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	public readonly languages = this.#languages.asObservable();
 
 	public isLoaded() {
 		return this.#getDataPromise;
@@ -53,25 +54,22 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
-	readonly allowedVariants = combineObservables(
-		[this.variants, this.#languageCollection.asObservable()],
-		([variants, languages]) => {
-			const missingLanguages = languages.filter((x) => !variants.some((v) => v.culture === x.unique));
-			const newVariants = variants.concat(
-				missingLanguages.map<UmbDocumentVariantModel>((language) => ({
-					state: UmbDocumentVariantState.NOT_CREATED,
-					isMandatory: language.isMandatory,
-					culture: language.unique,
-					segment: null,
-					name: language.name,
-					createDate: '',
-					publishDate: '',
-					updateDate: '',
-				})),
-			);
-			return newVariants;
-		},
-	);
+	readonly allowedVariants = combineObservables([this.variants, this.languages], ([variants, languages]) => {
+		const missingLanguages = languages.filter((x) => !variants.some((v) => v.culture === x.unique));
+		const newVariants = variants.concat(
+			missingLanguages.map<UmbDocumentVariantModel>((language) => ({
+				state: UmbDocumentVariantState.NOT_CREATED,
+				isMandatory: language.isMandatory,
+				culture: language.unique,
+				segment: null,
+				name: language.name,
+				createDate: '',
+				publishDate: '',
+				updateDate: '',
+			})),
+		);
+		return newVariants;
+	});
 	readonly changedVariants = new UmbArrayState<UmbVariantId>([], (x) => x.compare);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
@@ -93,8 +91,7 @@ export class UmbDocumentWorkspaceContext
 
 	async loadLanguages() {
 		const { data } = await this.#languageRepository.requestCollection({});
-		const languages = data?.items || [];
-		this.#languageCollection.setValue(languages);
+		this.#languages.setValue(data?.items ?? []);
 	}
 
 	async load(unique: string) {
