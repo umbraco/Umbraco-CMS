@@ -1,11 +1,11 @@
 import type { UmbTreeItemContext } from '../tree-item/index.js';
 import type { UmbTreeItemModelBase } from '../types.js';
-import { UMB_TREE_ITEM_CONTEXT } from './tree-item-base.context.js';
-import { html, nothing, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
+import { html, nothing, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-tree-item-base')
-export class UmbTreeItemBaseElement extends UmbLitElement {
+// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
+export abstract class UmbTreeItemElementBase extends UmbLitElement {
 	@state()
 	private _item?: UmbTreeItemModelBase;
 
@@ -163,11 +163,5 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				  )
 				: ''}
 		`;
-	}
-}
-
-declare global {
-	interface HTMLElementTagNameMap {
-		'umb-tree-item-base': UmbTreeItemBaseElement;
 	}
 }

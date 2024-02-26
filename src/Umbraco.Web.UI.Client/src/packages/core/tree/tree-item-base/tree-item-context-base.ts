@@ -17,7 +17,7 @@ export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase>
 	x: TreeItemType,
 ) => string | null | undefined;
 
-export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
+export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	extends UmbBaseController
 	implements UmbTreeItemContext<TreeItemType>
 {
