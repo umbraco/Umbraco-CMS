@@ -16,6 +16,7 @@ export const data: Array<UmbMockMemberModel> = [
 		lastPasswordChangeDate: null,
 		memberType: { id: 'member-type-1-id', icon: '' },
 		username: 'member1',
+		values: [],
 		variants: [
 			{
 				culture: 'en-us',
