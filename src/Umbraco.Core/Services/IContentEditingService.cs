@@ -34,4 +34,6 @@ public interface IContentEditingService
     /// Deletes a Content Item whether it is in the recycle bin or not.
     /// </summary>
     Task<Attempt<IContent?, ContentEditingOperationStatus>> DeleteAsync(Guid key, Guid userKey);
+
+    Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey);
 }
