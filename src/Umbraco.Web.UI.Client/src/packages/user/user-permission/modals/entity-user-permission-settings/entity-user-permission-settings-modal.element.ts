@@ -1,5 +1,5 @@
-import { html, customElement, css, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement, css, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbEntityUserPermissionSettingsModalData,
 	UmbEntityUserPermissionSettingsModalValue,
@@ -24,7 +24,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	@state()
 	_entityType?: string;
 
-	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
+	#onPermissionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as any;
 		this.updateValue({ allowedVerbs: target.allowedVerbs });
 	}
@@ -37,7 +37,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 						? html` <umb-input-entity-user-permission
 								.entityType=${this._entityType}
 								.allowedVerbs=${this.value?.allowedVerbs ?? []}
-								@selection-change=${this.#onSelectedUserPermission}></umb-input-entity-user-permission>`
+								@change=${this.#onPermissionChange}></umb-input-entity-user-permission>`
 						: nothing}
 				</uui-box>
 

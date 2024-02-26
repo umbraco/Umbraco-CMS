@@ -1,14 +1,14 @@
-import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-entity-user-permission')
-export class UmbInputEntityUserPermissionElement extends UmbLitElement {
+export class UmbInputEntityUserPermissionElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType(): string {
 		return this._entityType;
@@ -27,6 +27,10 @@ export class UmbInputEntityUserPermissionElement extends UmbLitElement {
 	private _manifests: Array<ManifestEntityUserPermission> = [];
 
 	#manifestObserver?: UmbObserverController<Array<ManifestEntityUserPermission>>;
+
+	protected getFormElement() {
+		return undefined;
+	}
 
 	#isAllowed(permissionVerbs: Array<string>) {
 		return permissionVerbs.every((verb) => this.allowedVerbs.includes(verb));
@@ -54,12 +58,12 @@ export class UmbInputEntityUserPermissionElement extends UmbLitElement {
 		const verbs = [...this.allowedVerbs, ...permissionVerbs];
 		// ensure we only have unique verbs
 		this.allowedVerbs = [...new Set(verbs)];
-		this.dispatchEvent(new UmbSelectionChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#removeUserPermission(permissionVerbs: Array<string>) {
 		this.allowedVerbs = this.allowedVerbs.filter((p) => !permissionVerbs.includes(p));
-		this.dispatchEvent(new UmbSelectionChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {

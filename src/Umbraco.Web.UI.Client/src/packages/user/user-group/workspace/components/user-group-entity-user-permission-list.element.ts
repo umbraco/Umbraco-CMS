@@ -42,7 +42,8 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 		);
 	}
 
-	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
+	#onPermissionChange(event: UmbSelectionChangeEvent) {
+		event.stopPropagation();
 		const target = event.target as any;
 		const verbs = target.allowedVerbs;
 		if (verbs === undefined || verbs === null) throw new Error('The verbs are not defined');
@@ -59,7 +60,7 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 			<umb-input-entity-user-permission
 				.entityType=${entityType}
 				.allowedVerbs=${this._fallBackPermissions || []}
-				@selection-change=${this.#onSelectedUserPermission}></umb-input-entity-user-permission>
+				@change=${this.#onPermissionChange}></umb-input-entity-user-permission>
 		`;
 	}
 
