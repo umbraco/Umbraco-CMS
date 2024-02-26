@@ -9,3 +9,5 @@ export class UmbTemplateItemRepository extends UmbItemRepositoryBase<UmbTemplate
 		super(host, UmbTemplateItemServerDataSource, UMB_TEMPLATE_ITEM_STORE_CONTEXT);
 	}
 }
+
+export default UmbTemplateItemRepository;

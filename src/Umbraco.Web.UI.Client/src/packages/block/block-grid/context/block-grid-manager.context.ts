@@ -1,10 +1,9 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
-import { UmbBlockManagerContext } from '../../block/context/block-manager.context.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
-import type { UmbBlockTypeGroup } from '../../block-type/types.js';
-import type { UmbBlockDataType } from '../../block/types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
 
 export const UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET = '/umbraco/backoffice/css/umbraco-blockgridlayout.css';
 
@@ -52,6 +51,14 @@ export class UmbBlockGridManagerContext<
 		this.insertBlockData(layoutEntry, content, settings, modalData);
 
 		return true;
+	}
+
+	onDragStart() {
+		(this.getHostElement() as HTMLElement).style.setProperty('--umb-block-grid--is-dragging', ' ');
+	}
+
+	onDragEnd() {
+		(this.getHostElement() as HTMLElement).style.removeProperty('--umb-block-grid--is-dragging');
 	}
 }
 

@@ -53,4 +53,6 @@ export class UmbTemplateTreeStore extends UmbUniqueTreeStore {
 	};
 }
 
+export default UmbTemplateTreeStore;
+
 export const UMB_TEMPLATE_TREE_STORE_CONTEXT = new UmbContextToken<UmbTemplateTreeStore>('UmbTemplateTreeStore');

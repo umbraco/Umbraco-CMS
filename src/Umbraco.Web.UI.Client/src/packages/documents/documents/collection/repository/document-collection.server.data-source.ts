@@ -2,7 +2,7 @@ import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel }
 import { DirectionModel, DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { DocumentCollectionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataSource<UmbDocumentCollectionItemModel> {
@@ -36,7 +36,6 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 
 		if (data) {
 			const items = data.items.map((item: DocumentCollectionResponseModel) => {
-
 				// TODO: [LK] Temp solution, review how to get the name from the corresponding variant.
 				const variant = item.variants[0];
 
@@ -49,7 +48,9 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 					state: variant.state,
 					updateDate: new Date(variant.updateDate),
 					updater: item.updater,
-					values: item.values.map((item) => { return { alias: item.alias, value: item.value }; }),
+					values: item.values.map((item) => {
+						return { alias: item.alias, value: item.value };
+					}),
 				};
 				return model;
 			});

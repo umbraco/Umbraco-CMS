@@ -8,7 +8,8 @@ import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbBlockGridTypeModel, UmbBlockGridValueModel, UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
+import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import '../../components/block-grid-entries/index.js';
 

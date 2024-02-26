@@ -1,12 +1,9 @@
+import { isWithinRect } from '@umbraco-cms/backoffice/utils';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;
-
-function isWithinRect(x: number, y: number, rect: DOMRect, modifier = 0) {
-	return x > rect.left - modifier && x < rect.right + modifier && y > rect.top - modifier && y < rect.bottom + modifier;
-}
 
 function getParentScrollElement(el: Element, includeSelf: boolean) {
 	if (!el || !el.getBoundingClientRect) return null;
@@ -67,9 +64,12 @@ export type resolveVerticalDirectionArgs<T, ElementType extends HTMLElement> = {
 	element: ElementType;
 	elementRect: DOMRect;
 	relatedElement: ElementType;
+	relatedModel: T;
 	relatedRect: DOMRect;
 	placeholderIsInThisRow: boolean;
 	horizontalPlaceAfter: boolean;
+	pointerX: number;
+	pointerY: number;
 };
 
 type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
@@ -136,7 +136,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 * This callback is executed when an item is hovered within this container.
 	 * The callback should return true if the item should be placed after based on a vertical logic. Other wise false for horizontal. True is default.
 	 */
-	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => boolean;
+	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => boolean | null;
 	/**
 	 * This callback is executed when an item is moved within this container.
 	 */
@@ -333,9 +333,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
 			// Idea: to make sure on does not get initialized twice: if ((element as HTMLElement).draggable === true) return;
-			(element as HTMLElement).draggable = true;
-			element.addEventListener('dragstart', this.#handleDragStart);
-			element.addEventListener('dragend', this.#handleDragEnd);
+			const draggableElement = this.#config.draggableSelector
+				? (element.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element
+				: element;
+			(draggableElement as HTMLElement).draggable = true;
+			draggableElement.addEventListener('dragstart', this.#handleDragStart);
+			draggableElement.addEventListener('dragend', this.#handleDragEnd);
 		}
 
 		// If we have a currentItem and the element matches, we should set the currentElement to this element.
@@ -354,10 +357,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			destroyIgnorerElements(element, this.#config.ignorerSelector);
 		}
 
-		element.removeEventListener('dragstart', this.#handleDragStart);
+		const draggableElement = this.#config.draggableSelector
+			? (element.querySelector(this.#config.draggableSelector) as HTMLElement | undefined) ?? element
+			: element;
+		draggableElement.removeEventListener('dragstart', this.#handleDragStart);
 		// We are not ready to remove the dragend or drop, as this is might be the active one just moving container:
-		//element.removeEventListener('dragend', this.#handleDragEnd);
-		//element.addEventListener('drop', this.#handleDrop);
+		//draggableElement.removeEventListener('dragend', this.#handleDragEnd);
 	}
 
 	#setupPlaceholderStyle() {
@@ -574,14 +579,14 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		let lastDistance = Infinity;
-		let foundEl: Element | null = null;
+		let foundEl: HTMLElement | undefined = undefined;
 		let foundElDragRect!: DOMRect;
 		let placeAfter = false;
 		elementsInSameRow.forEach((sameRow) => {
 			const centerX = sameRow.dragRect.left + sameRow.dragRect.width * 0.5;
 			const distance = Math.abs(this.#dragX - centerX);
 			if (distance < lastDistance) {
-				foundEl = sameRow.el;
+				foundEl = sameRow.el as HTMLElement;
 				foundElDragRect = sameRow.dragRect;
 				lastDistance = distance;
 				placeAfter = this.#dragX > centerX;
@@ -594,12 +599,17 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				return;
 			}
 
+			const foundModel = this.getItemOfElement(foundEl);
+			if (!foundModel) {
+				throw new Error('Could not find model of found element');
+			}
+
 			// Indication if drop is good:
 			if (this.updateAllowIndication(UmbSorterController.activeItem) === false) {
 				return;
 			}
 
-			const verticalDirection = this.#config.resolveVerticalDirection
+			const verticalDirection: boolean | null = this.#config.resolveVerticalDirection
 				? this.#config.resolveVerticalDirection({
 						containerElement: this.#containerElement,
 						containerRect: currentContainerRect,
@@ -607,11 +617,19 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 						element: UmbSorterController.activeElement as ElementType,
 						elementRect: currentElementRect,
 						relatedElement: foundEl,
+						relatedModel: foundModel,
 						relatedRect: foundElDragRect,
 						placeholderIsInThisRow: placeholderIsInThisRow,
 						horizontalPlaceAfter: placeAfter,
+						pointerX: this.#dragX,
+						pointerY: this.#dragY,
 				  })
 				: true;
+
+			if (verticalDirection === null) {
+				// The resolveVerticalDirection has chosen to back out of this move.
+				return;
+			}
 
 			if (verticalDirection) {
 				placeAfter = this.#dragY > foundElDragRect.top + foundElDragRect.height * 0.5;

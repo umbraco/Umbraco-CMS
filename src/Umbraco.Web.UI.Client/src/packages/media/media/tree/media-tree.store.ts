@@ -57,4 +57,6 @@ export class UmbMediaTreeStore extends UmbUniqueTreeStore {
 	};
 }
 
+export default UmbMediaTreeStore;
+
 export const UMB_MEDIA_TREE_STORE_CONTEXT = new UmbContextToken<UmbMediaTreeStore>('UmbMediaTreeStore');

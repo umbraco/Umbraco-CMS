@@ -25,3 +25,5 @@ export class UmbStylesheetTreeRepository extends UmbTreeRepositoryBase<
 		return { data };
 	}
 }
+
+export default UmbStylesheetTreeRepository;

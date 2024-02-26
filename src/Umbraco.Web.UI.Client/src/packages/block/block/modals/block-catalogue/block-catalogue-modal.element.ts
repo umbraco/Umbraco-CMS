@@ -1,10 +1,6 @@
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
-import type {
-	UmbBlockCatalogueModalData,
-	UmbBlockCatalogueModalValue,
-	UmbBlockTypeGroup,
-	UmbBlockTypeWithGroupKey,
-} from '@umbraco-cms/backoffice/block';
+import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UMB_MODAL_CONTEXT,
