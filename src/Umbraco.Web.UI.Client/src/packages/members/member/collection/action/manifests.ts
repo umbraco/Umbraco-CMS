@@ -11,6 +11,7 @@ export const createManifest: ManifestTypes = {
 		label: 'Create',
 		href: 'section/member-management/workspace/member/create/member-type-1-id', // TODO: remove hardcoded member type id
 	},
+	js: () => import('./create-member-collection-action.element.js'),
 	conditions: [
 		{
 			alias: UMB_COLLECTION_ALIAS_CONDITION,
