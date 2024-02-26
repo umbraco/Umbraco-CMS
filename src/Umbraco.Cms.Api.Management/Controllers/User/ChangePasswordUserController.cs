@@ -28,7 +28,7 @@ public class ChangePasswordUserController : UserControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost("change-password/{id:guid}")]
+    [HttpPost("{id:guid}/change-password")]
     [MapToApiVersion("1.0")]
     [ProducesErrorResponseType(typeof(ChangePasswordUserResponseModel))]
     public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordUserRequestModel model)
