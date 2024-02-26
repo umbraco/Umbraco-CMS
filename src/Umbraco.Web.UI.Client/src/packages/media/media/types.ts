@@ -1,5 +1,5 @@
 import type { UmbMediaEntityType } from './entity.js';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { MediaUrlInfoModel, MediaValueModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export interface UmbMediaDetailModel {
@@ -12,3 +12,5 @@ export interface UmbMediaDetailModel {
 	values: Array<MediaValueModel>;
 	variants: Array<UmbVariantModel>;
 }
+
+export interface UmbMediaVariantOptionModel extends UmbVariantOptionModel<UmbVariantModel> {}

@@ -2,7 +2,7 @@ import { UmbMediaTypeDetailRepository } from '../../media-types/repository/detai
 import { UmbMediaPropertyDataContext } from '../property-dataset-context/media-property-dataset-context.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
-import type { UmbMediaDetailModel } from '../types.js';
+import type { UmbMediaDetailModel, UmbMediaVariantOptionModel } from '../types.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
@@ -33,8 +33,11 @@ export class UmbMediaWorkspaceContext
 	 */
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 	#getDataPromise?: Promise<any>;
+	// TODo: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
-	#languageCollection = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
+	public readonly languages = this.#languages.asObservable();
+
 	public isLoaded() {
 		return this.#getDataPromise;
 	}
@@ -43,22 +46,16 @@ export class UmbMediaWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.mediaType.unique);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
-	readonly allowedVariants = combineObservables(
-		[this.variants, this.#languageCollection.asObservable()],
-		([variants, languages]) => {
-			const missingLanguages = languages.filter((x) => !variants.some((v) => v.culture === x.unique));
-			const newVariants = variants.concat(
-				missingLanguages.map((x) => ({
-					culture: x.unique,
-					segment: null,
-					name: x.name,
-					createDate: '',
-					updateDate: '',
-				})),
-			);
-			return newVariants;
-		},
-	);
+	readonly variantOptions = combineObservables([this.variants, this.languages], ([variants, languages]) => {
+		return languages.map((language) => {
+			return {
+				variant: variants.find((x) => x.culture === language.unique),
+				language,
+				// TODO: When including segments, this should be updated to include the segment as well. [NL]
+				unique: language.unique, // This must be a variantId string!
+			} as UmbMediaVariantOptionModel;
+		});
+	});
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbMediaTypeDetailRepository(this));
@@ -73,7 +70,7 @@ export class UmbMediaWorkspaceContext
 
 	async loadLanguages() {
 		const { data } = await this.#languageRepository.requestCollection({});
-		this.#languageCollection.setValue(data?.items ?? []);
+		this.#languages.setValue(data?.items ?? []);
 	}
 
 	async load(unique: string) {

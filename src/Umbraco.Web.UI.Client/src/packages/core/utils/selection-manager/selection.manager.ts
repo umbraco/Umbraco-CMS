@@ -8,11 +8,11 @@ import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observab
  * @export
  * @class UmbSelectionManager
  */
-export class UmbSelectionManager extends UmbBaseController {
+export class UmbSelectionManager<ValueType = string | null> extends UmbBaseController {
 	#selectable = new UmbBooleanState(false);
 	public readonly selectable = this.#selectable.asObservable();
 
-	#selection = new UmbArrayState(<Array<string | null>>[], (x) => x);
+	#selection = new UmbArrayState(<Array<ValueType>>[], (x) => x);
 	public readonly selection = this.#selection.asObservable();
 
 	#multiple = new UmbBooleanState(false);
@@ -51,10 +51,10 @@ export class UmbSelectionManager extends UmbBaseController {
 
 	/**
 	 * Sets the current selection.
-	 * @param {Array<string | null>} value
+	 * @param {Array<ValueType>} value
 	 * @memberof UmbSelectionManager
 	 */
-	public setSelection(value: Array<string | null>) {
+	public setSelection(value: Array<ValueType>) {
 		if (this.getSelectable() === false) return;
 		if (value === undefined) throw new Error('Value cannot be undefined');
 		const newSelection = this.getMultiple() ? value : value.slice(0, 1);
@@ -87,20 +87,20 @@ export class UmbSelectionManager extends UmbBaseController {
 
 	/**
 	 * Toggles the given unique id in the current selection.
-	 * @param {(string | null)} unique
+	 * @param {(ValueType)} unique
 	 * @memberof UmbSelectionManager
 	 */
-	public toggleSelect(unique: string | null) {
+	public toggleSelect(unique: ValueType) {
 		if (this.getSelectable() === false) return;
 		this.isSelected(unique) ? this.deselect(unique) : this.select(unique);
 	}
 
 	/**
 	 * Appends the given unique id to the current selection.
-	 * @param {(string | null)} unique
+	 * @param {(ValueType)} unique
 	 * @memberof UmbSelectionManager
 	 */
-	public select(unique: string | null) {
+	public select(unique: ValueType) {
 		if (this.getSelectable() === false) return;
 		if (this.isSelected(unique)) return;
 		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
@@ -110,10 +110,10 @@ export class UmbSelectionManager extends UmbBaseController {
 
 	/**
 	 * Removes the given unique id from the current selection.
-	 * @param {(string | null)} unique
+	 * @param {(ValueType)} unique
 	 * @memberof UmbSelectionManager
 	 */
-	public deselect(unique: string | null) {
+	public deselect(unique: ValueType) {
 		if (this.getSelectable() === false) return;
 		const newSelection = this.getSelection().filter((x) => x !== unique);
 		this.#selection.setValue(newSelection);
@@ -122,11 +122,11 @@ export class UmbSelectionManager extends UmbBaseController {
 
 	/**
 	 * Returns true if the given unique id is selected.
-	 * @param {(string | null)} unique
+	 * @param {(ValueType)} unique
 	 * @return {*}
 	 * @memberof UmbSelectionManager
 	 */
-	public isSelected(unique: string | null) {
+	public isSelected(unique: ValueType) {
 		return this.getSelection().includes(unique);
 	}
 

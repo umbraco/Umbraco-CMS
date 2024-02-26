@@ -1,4 +1,4 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantModel } from '../types.js';
+import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../types.js';
 import { UmbDocumentDetailRepository } from '../repository/detail/document-detail.repository.js';
 import {
 	UMB_DOCUMENT_LANGUAGE_PICKER_MODAL,
@@ -47,9 +47,9 @@ export class UmbDocumentVariantManagerContext
 	 * @returns The selected variants to perform the operation on.
 	 */
 	async pickVariants(
-		availableVariants: Array<UmbDocumentVariantModel>,
 		type: UmbDocumentVariantPickerModalData['type'],
-		activeVariantCultures?: Array<string>,
+		availableVariants: Array<UmbDocumentVariantOptionModel>,
+		activeVariantCultures?: Array<UmbVariantId>,
 	): Promise<UmbVariantId[]> {
 		// If there is only one variant, we don't need to select anything.
 		if (availableVariants.length === 1) {
@@ -60,7 +60,7 @@ export class UmbDocumentVariantManagerContext
 
 		const modalData: UmbDocumentVariantPickerModalData = {
 			type,
-			variants: availableVariants,
+			options: availableVariants,
 		};
 
 		const modalContext = this.#modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
@@ -75,6 +75,7 @@ export class UmbDocumentVariantManagerContext
 		const selectedVariants = result.selection.map((x) => x?.toLowerCase() ?? '');
 
 		// Match the result to the available variants.
+		// Why would this be needed if the modal is only showing available variants? [NL]
 		const variantIds = availableVariants
 			.filter((x) => selectedVariants.includes(x.culture!))
 			.map((x) => UmbVariantId.Create(x));
@@ -90,8 +91,8 @@ export class UmbDocumentVariantManagerContext
 		const { data } = await this.#documentRepository.requestByUnique(documentUnique);
 		if (!data) throw new Error('Document not found');
 		const variantIds = await this.pickVariants(
-			data.variants,
 			'publish',
+			data.variants,
 			this.#appLanguageCulture ? [this.#appLanguageCulture] : undefined,
 		);
 		if (variantIds.length) {
@@ -111,8 +112,8 @@ export class UmbDocumentVariantManagerContext
 		const variants = data.variants.filter((variant) => variant.state === UmbDocumentVariantState.PUBLISHED);
 
 		const variantIds = await this.pickVariants(
-			variants,
 			'unpublish',
+			variants,
 			this.#appLanguageCulture ? [this.#appLanguageCulture] : undefined,
 		);
 

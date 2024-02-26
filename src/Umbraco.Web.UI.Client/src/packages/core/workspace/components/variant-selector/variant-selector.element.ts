@@ -5,15 +5,12 @@ import {
 	UUIInputEvent,
 	type UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing, customElement, state, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
-import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { UmbArrayState, combineObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 
 type UmbDocumentVariantOption = {
 	culture: string | null;
@@ -38,9 +35,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	_activeVariants: Array<ActiveVariant> = [];
 
 	@state()
-	get _activeVariantsCultures(): string[] {
-		return this._activeVariants.map((el) => el.culture ?? '') ?? [];
-	}
+	_activeVariantsCultures: string[] = [];
 
 	#splitViewContext?: typeof UMB_WORKSPACE_SPLIT_VIEW_CONTEXT.TYPE;
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
@@ -57,9 +52,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	private _variantSelectorOpen = false;
 
-	#languageRepository = new UmbLanguageCollectionRepository(this);
-	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
-
 	constructor() {
 		super();
 
@@ -67,37 +59,36 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			this.#splitViewContext = instance;
 			this.#observeVariants();
 			this.#observeActiveVariants();
+			this.#observeCurrentVariant();
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
 			this.#datasetContext = instance;
 			this.#observeDatasetContext();
+			this.#observeCurrentVariant();
 		});
-
-		this.#loadLanguages();
-	}
-
-	async #loadLanguages() {
-		const { data: languages } = await this.#languageRepository.requestCollection({});
-		if (!languages) return;
-		this.#languages.setValue(languages.items);
 	}
 
 	async #observeVariants() {
 		if (!this.#splitViewContext) return;
 
-		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
+		// NOTICE: This is dirty (the TypeScript casting), we can only accept doing this so far because we currently only use the Variant Selector on Document Workspace. [NL]
+		// This would need a refactor to enable the code below to work with different ContentTypes. Main problem here is the state, which is not generic for them all. [NL]
+		const workspaceContext = this.#splitViewContext.getWorkspaceContext() as UmbDocumentWorkspaceContext;
 		if (!workspaceContext) throw new Error('Split View Workspace context not found');
 
 		this.observe(
-			workspaceContext.allowedVariants,
-			(variants) => {
-				this._variants = variants.map<UmbDocumentVariantOption>((variant) => {
+			workspaceContext.variantOptions,
+			(options) => {
+				this._variants = options.map<UmbDocumentVariantOption>((option) => {
+					const name = option.variant?.name ?? option.language.name;
+					const segment = option.variant?.segment ?? null;
 					return {
-						culture: variant.culture,
-						segment: variant.segment,
-						title: variant.name + (variant.segment ? ` — ${variant.segment}` : ''),
-						displayName: variant.name + (variant.segment ? ` — ${variant.segment}` : ''),
-						state: (variant as UmbDocumentVariantModel).state ?? DocumentVariantStateModel.NOT_CREATED,
+						// Notice the option object has a unique property, but it's not used here. (Its equivalent to a UmbVariantId string) [NL]
+						culture: option.language.unique,
+						segment: segment,
+						title: name + (segment ? ` — ${segment}` : ''),
+						displayName: name + (segment ? ` — ${segment}` : ''),
+						state: option.variant?.state ?? DocumentVariantStateModel.NOT_CREATED,
 					};
 				});
 			},
@@ -115,6 +106,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				(activeVariants) => {
 					if (activeVariants) {
 						this._activeVariants = activeVariants;
+						this._activeVariantsCultures = this._activeVariants.map((el) => el.culture ?? '') ?? [];
 					}
 				},
 				'_observeActiveVariants',
@@ -124,30 +116,36 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	async #observeDatasetContext() {
 		if (!this.#datasetContext) return;
-
-		const variantId = this.#datasetContext.getVariantId();
-
-		const culture = variantId.culture;
-		const segment = variantId.segment;
-
-		this.observe(
-			this.#languages.asObservablePart(
-				(languages) => languages.find((language) => language.unique === variantId.culture)?.name ?? '',
-			),
-			(languageName) => {
-				this._variantDisplayName = (languageName ? languageName : '') + (segment ? ' — ' + segment : '');
-				this._variantTitleName =
-					(languageName ? `${languageName} (${culture})` : '') + (segment ? ' — ' + segment : '');
-			},
-			'_languages',
-		);
-
 		this.observe(
 			this.#datasetContext.name,
 			(name) => {
 				this._name = name;
 			},
 			'_name',
+		);
+	}
+
+	async #observeCurrentVariant() {
+		if (!this.#datasetContext || !this.#splitViewContext) return;
+		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
+		if (!workspaceContext) return;
+
+		const variantId = this.#datasetContext.getVariantId();
+		// Find the variant option matching this, to get the language name...
+
+		const culture = variantId.culture;
+		const segment = variantId.segment;
+
+		this.observe(
+			workspaceContext.variantOptions,
+			(options) => {
+				const option = options.find((option) => option.language.unique === culture);
+				const languageName = option?.language.name;
+				this._variantDisplayName = (languageName ? languageName : '') + (segment ? ` — ${segment}` : '');
+				this._variantTitleName =
+					(languageName ? `${languageName} (${culture})` : '') + (segment ? ` — ${segment}` : '');
+			},
+			'_currentLanguage',
 		);
 	}
 

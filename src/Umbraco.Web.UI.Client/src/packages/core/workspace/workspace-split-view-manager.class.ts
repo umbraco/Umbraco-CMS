@@ -70,7 +70,7 @@ export class UmbWorkspaceSplitViewManager {
 		const currentVariant = this.getActiveVariants()[0];
 		const workspaceRoute = this.getWorkspaceRoute();
 		if (currentVariant && workspaceRoute) {
-			history.pushState(null, '', `${workspaceRoute}/${new UmbVariantId(currentVariant)}_&_${newVariant.toString()}`);
+			history.pushState(null, '', `${workspaceRoute}/${UmbVariantId.Create(currentVariant)}_&_${newVariant}`);
 			return true;
 		}
 		return false;
@@ -83,7 +83,7 @@ export class UmbWorkspaceSplitViewManager {
 			if (activeVariants && index < activeVariants.length) {
 				const newVariants = activeVariants.filter((x) => x.index !== index);
 
-				const variantPart: string = newVariants.map((v) => new UmbVariantId(v).toString()).join('_&_');
+				const variantPart: string = newVariants.map((v) => UmbVariantId.Create(v)).join('_&_');
 
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
 				return true;

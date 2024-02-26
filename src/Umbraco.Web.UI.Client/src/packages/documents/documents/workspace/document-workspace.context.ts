@@ -2,12 +2,15 @@ import { UmbDocumentTypeDetailRepository } from '../../document-types/repository
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
-import { UmbDocumentVariantState, type UmbDocumentDetailModel, type UmbDocumentVariantModel } from '../types.js';
-import type { UmbDocumentVariantPickerModalData } from '../modals/index.js';
+import type { UmbDocumentDetailModel, UmbDocumentVariantModel, UmbDocumentVariantOptionModel } from '../types.js';
+import { UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, type UmbDocumentVariantPickerModalData } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
-import { UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT } from '../global-contexts/document-variant-manager.context.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import {
+	type UmbObjectWithVariantProperties,
+	UmbVariantId,
+	variantPropertiesObjectToString,
+} from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
@@ -25,11 +28,12 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
+	implements UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>, UmbPublishableWorkspaceContextInterface
 {
 	//
 	public readonly repository = new UmbDocumentDetailRepository(this);
@@ -40,7 +44,7 @@ export class UmbDocumentWorkspaceContext
 	 */
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 	#getDataPromise?: Promise<any>;
-	#variantManagerContext?: typeof UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT.TYPE;
+	// TODo: Optimize this so it uses either a App Language Context? [NL]
 	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 	public readonly languages = this.#languages.asObservable();
@@ -54,26 +58,18 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
-	readonly allowedVariants = combineObservables([this.variants, this.languages], ([variants, languages]) => {
-		const missingLanguages = languages.filter((x) => !variants.some((v) => v.culture === x.unique));
-		const newVariants = variants.concat(
-			missingLanguages.map(
-				(language) =>
-					({
-						state: UmbDocumentVariantState.NOT_CREATED,
-						isMandatory: language.isMandatory,
-						culture: language.unique,
-						segment: null,
-						name: language.name,
-						createDate: null,
-						publishDate: null,
-						updateDate: null,
-					}) as UmbDocumentVariantModel,
-			),
-		);
-		return newVariants;
+	readonly variantOptions = combineObservables([this.variants, this.languages], ([variants, languages]) => {
+		return languages.map((language) => {
+			return {
+				variant: variants.find((x) => x.culture === language.unique),
+				language,
+				// TODO: When including segments, this should be updated to include the segment as well. [NL]
+				unique: language.unique, // This must be a variantId string!
+			} as UmbDocumentVariantOptionModel;
+		});
 	});
-	readonly changedVariants = new UmbArrayState<UmbVariantId>([], (x) => x.compare);
+
+	readonly changedVariants = new UmbArrayState<UmbObjectWithVariantProperties>([], variantPropertiesObjectToString);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
@@ -83,16 +79,13 @@ export class UmbDocumentWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
-		this.consumeContext(UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT, (instance) => {
-			this.#variantManagerContext = instance;
-		});
-
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 
 		this.loadLanguages();
 	}
 
 	async loadLanguages() {
+		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
 		const { data } = await this.#languageRepository.requestCollection({});
 		this.#languages.setValue(data?.items ?? []);
 	}
@@ -222,50 +215,13 @@ export class UmbDocumentWorkspaceContext
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		if (!data.unique) throw new Error('Unique is missing');
-		if (!this.#variantManagerContext) throw new Error('Variant manager context is missing');
 
 		const activeVariants = this.splitView.getActiveVariants();
-		const activeVariant = activeVariants.length ? activeVariants[0] : undefined;
 
-		// Calculate variants
-		const pickedVariants: string[] = [];
-		const availableVariants = await firstValueFrom(this.allowedVariants);
-		let allowedVariants = data.variants;
+		const pickedVariants = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant).toString());
+		const allowedVariants = await firstValueFrom(this.variantOptions);
 
-		// Make sure that the active variant is in the allowed variants
-		if (activeVariant) {
-			const activeVariantInAvailableVariants = availableVariants.find(
-				(x) => x.culture === activeVariant.culture && x.segment === activeVariant.segment,
-			);
-			if (activeVariantInAvailableVariants) {
-				pickedVariants.push(activeVariantInAvailableVariants.culture!);
-				allowedVariants = appendToFrozenArray(
-					allowedVariants,
-					activeVariantInAvailableVariants,
-					(x) =>
-						x.culture === activeVariantInAvailableVariants.culture &&
-						x.segment === activeVariantInAvailableVariants.segment,
-				);
-			}
-		}
-
-		// Make sure the changed variants are in the allowed variants
-		const changedVariants = this.changedVariants.getValue();
-		if (changedVariants.length) {
-			pickedVariants.push(...changedVariants.map((x) => x.culture!));
-			const changedVariantsInAvailableVariants = availableVariants.filter((x) =>
-				changedVariants.some((y) => y.equal(new UmbVariantId(x))),
-			);
-			for (const changedVariant of changedVariantsInAvailableVariants) {
-				allowedVariants = appendToFrozenArray(
-					allowedVariants,
-					changedVariant,
-					(x) => changedVariant.culture === x.culture && changedVariant.segment === x.segment,
-				);
-			}
-		}
-
-		const selectedVariants = await this.#variantManagerContext.pickVariants(allowedVariants, type, pickedVariants);
+		const selectedVariants = await this.pickVariants(type, allowedVariants, pickedVariants);
 
 		// If no variants are selected, we don't save anything.
 		if (!selectedVariants.length) return [];
@@ -279,6 +235,35 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		return selectedVariants;
+	}
+
+	// TODO: refactor this part so it can be utilized by others? [NL]
+	async pickVariants(
+		type: UmbDocumentVariantPickerModalData['type'],
+		availableVariants: Array<UmbDocumentVariantOptionModel>,
+		selectedVariants?: Array<string>,
+	): Promise<UmbVariantId[]> {
+		// If there is only one variant, we don't need to select anything.
+		if (availableVariants.length === 1) {
+			// TODO: we are missing a good way to make a variantId from a variantOptionModel. [NL]
+			return [new UmbVariantId(availableVariants[0].language.unique, null)];
+		}
+
+		const modalManagerContext = await this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, () => {}).asPromise();
+
+		const modalData: UmbDocumentVariantPickerModalData = {
+			type,
+			options: availableVariants,
+		};
+
+		const modalContext = modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
+			data: modalData,
+			value: { selection: selectedVariants?.map((x) => x.toString()) ?? [] },
+		});
+
+		const result = await modalContext.onSubmit().catch(() => undefined);
+
+		return result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 	}
 
 	async save() {
@@ -304,9 +289,11 @@ export class UmbDocumentWorkspaceContext
 		const unique = this.getEntityId();
 
 		if (!unique) throw new Error('Unique is missing');
-		if (!this.#variantManagerContext) throw new Error('Variant manager context is missing');
+		//if (!this.#variantManagerContext) throw new Error('Variant manager context is missing');
 
-		this.#variantManagerContext.unpublish(unique);
+		//this.#variantManagerContext.unpublish(unique);
+		alert('not implemented');
+		throw new Error('Not implemented');
 	}
 
 	async delete() {

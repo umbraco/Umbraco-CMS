@@ -46,7 +46,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			},
 			isTrashed: false,
 			values: [],
-			variants: [this.createVariantScaffold()],
+			variants: [],
 			...preset,
 		};
 
@@ -57,6 +57,8 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 	 * Creates a new variant scaffold.
 	 * @returns A new variant scaffold.
 	 */
+	/*
+	// TDOD: remove if not used
 	createVariantScaffold(): UmbDocumentVariantModel {
 		return {
 			state: null,
@@ -66,9 +68,9 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			publishDate: null,
 			createDate: null,
 			updateDate: null,
-			isMandatory: false,
 		};
 	}
+	*/
 
 	/**
 	 * Fetches a Document with the given id from the server
@@ -107,7 +109,6 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 					publishDate: variant.publishDate || null,
 					createDate: variant.createDate,
 					updateDate: variant.updateDate,
-					isMandatory: false, // TODO: this is not correct. It will be solved when we know where to get the isMandatory from
 				};
 			}),
 			urls: data.urls.map((url) => {

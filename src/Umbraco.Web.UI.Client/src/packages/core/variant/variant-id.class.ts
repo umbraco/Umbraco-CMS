@@ -10,6 +10,10 @@ export function variantPropertiesObjectToString(variant: UmbObjectWithVariantPro
 
 export const UMB_INVARIANT_CULTURE = 'invariant';
 
+/**
+ * An identifier representing a Variant. This is at current state a culture and a segment.
+ * The identifier is not specific for ContentType Variants, but is used for many type of identification of a culture and a segment. One case is any property of a ContentType can be resolved into a VariantId depending on their structural settings such as Vary by Culture and Vary by Segmentation.
+ */
 export class UmbVariantId {
 	public static Create(variantData: UmbObjectWithVariantProperties): UmbVariantId {
 		return Object.freeze(new UmbVariantId(variantData.culture, variantData.segment));
@@ -30,7 +34,7 @@ export class UmbVariantId {
 	public readonly segment: string | null = null;
 	public readonly schedule: { publishTime?: string | null; unpublishTime?: string | null } | null = null;
 
-	constructor(culture: string | null, segment: string | null) {
+	constructor(culture?: string | null, segment?: string | null) {
 		this.culture = (culture === UMB_INVARIANT_CULTURE ? null : culture?.toLowerCase()) ?? null;
 		this.segment = segment ?? null;
 	}

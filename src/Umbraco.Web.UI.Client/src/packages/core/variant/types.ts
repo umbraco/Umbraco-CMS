@@ -11,4 +11,8 @@ export interface UmbVariantModel {
 export interface UmbVariantOptionModel<VariantType extends UmbVariantModel = UmbVariantModel> {
 	variant?: VariantType;
 	language: UmbLanguageDetailModel;
+	/**
+	 * The unique identifier is a VariantId string.
+	 */
+	unique: string;
 }
