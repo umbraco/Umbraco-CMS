@@ -1,6 +1,6 @@
 import type { UmbAction } from '../action/index.js';
 import { UmbActionBase } from '../action/index.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbEntityAction<RepositoryType> extends UmbAction<RepositoryType> {
 	unique: string;
@@ -15,7 +15,7 @@ export abstract class UmbEntityActionBase<RepositoryType>
 	unique: string;
 	repositoryAlias: string;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+	constructor(host: UmbControllerHost, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias);
 		this.entityType = entityType;
 		this.unique = unique;
