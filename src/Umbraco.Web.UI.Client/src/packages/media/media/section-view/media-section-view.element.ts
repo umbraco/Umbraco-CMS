@@ -1,22 +1,21 @@
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
-import type { UmbCollectionBulkActionPermissions, UmbCollectionConfiguration } from '../../../core/collection/types.js';
+import { UmbMediaCollectionRepository } from '../collection/repository/index.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
+import type {
+	UmbCollectionBulkActionPermissions,
+	UmbCollectionConfiguration,
+} from '@umbraco-cms/backoffice/collection';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-media-section-view')
 export class UmbMediaSectionViewElement extends UmbLitElement {
-	// TODO: [LK] Check if we can get the default data-type ID (for the Media ListView) from the server.
-	//private readonly defaultDataTypeId: string = '3a0156c4-3b8c-4803-bdc1-6871faa83fff';
-	private readonly defaultDataTypeUnique: string = 'dt-collectionView';
-
-	#dataTypeUnique: string = this.defaultDataTypeUnique;
-
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+	#mediaCollectionRepository = new UmbMediaCollectionRepository(this);
 
 	@state()
 	private _routes?: UmbRoute[];
@@ -28,10 +27,12 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 	}
 
 	async #defineRoutes() {
-		await this.#dataTypeDetailRepository.requestByUnique(this.#dataTypeUnique);
+		const config = await this.#mediaCollectionRepository.getDefaultConfiguration();
+
+		await this.#dataTypeDetailRepository.requestByUnique(config.defaultDataTypeId);
 
 		this.observe(
-			await this.#dataTypeDetailRepository.byUnique(this.#dataTypeUnique),
+			await this.#dataTypeDetailRepository.byUnique(config.defaultDataTypeId),
 			(dataType) => {
 				if (!dataType) return;
 
