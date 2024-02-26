@@ -10,4 +10,5 @@ export interface UmbCurrentUserModel {
 	languages: Array<string>;
 	hasAccessToAllLanguages: boolean;
 	permissions: Array<string>;
+	sections: Array<string>;
 }

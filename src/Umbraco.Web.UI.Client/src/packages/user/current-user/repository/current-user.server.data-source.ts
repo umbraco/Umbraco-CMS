@@ -41,6 +41,7 @@ export class UmbCurrentUserServerDataSource {
 				languages: data.languages,
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,
 				permissions: data.permissions,
+				sections: data.sections,
 			};
 			return { data: user };
 		}
