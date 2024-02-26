@@ -194,7 +194,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<UriUtility>();
 
-            Services.AddUnique<IDashboardService, DashboardService>();
             Services.AddSingleton<IMetricsConsentService, MetricsConsentService>();
 
             // will be injected in controllers when needed to invoke rest endpoints on Our
@@ -218,7 +217,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            Services.AddUnique<ISectionService, SectionService>();
 
             Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
             Services.AddUnique<IEmailSender, NotImplementedEmailSender>();
@@ -371,7 +369,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
-            
+
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
             Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();

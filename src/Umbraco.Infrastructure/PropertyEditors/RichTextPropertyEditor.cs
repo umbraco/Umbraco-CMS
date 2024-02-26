@@ -150,7 +150,7 @@ public class RichTextPropertyEditor : DataEditor
                 .WhereNotNull()
                 .Select(udi => new UmbracoEntityReference(udi)));
 
-            // references from blocks
+            // references from blocksIg
             if (richTextEditorValue.Blocks is not null)
             {
                 BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);

@@ -98,6 +98,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddPolicy(AuthorizationPolicies.TreeAccessScripts, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.TreeAccessStylesheets, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.TreeAccessTemplates, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessWebhooks, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
 
         // Contextual permissions
         // TODO: Rename policies once we have the old ones removed

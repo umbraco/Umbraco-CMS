@@ -134,13 +134,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<DatabaseBuilder>();
 
         // register manifest parser, will be injected in collection builders where needed
-        builder.Services.AddSingleton<ILegacyManifestParser, LegacyManifestParser>();
         builder.Services.AddSingleton<IPackageManifestReader, BackOfficePackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestReader, AppPluginsPackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestService, PackageManifestService>();
-
-        // register the manifest filter collection builder (collection is empty by default)
-        builder.ManifestFilters();
 
         builder.MediaUrlGenerators()
             .Add<FileUploadPropertyEditor>()

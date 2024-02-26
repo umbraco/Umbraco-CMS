@@ -94,6 +94,9 @@ stages:
           - script: npm ci --no-fund --no-audit --prefer-offline
             displayName: Run npm ci (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client
+          - script: npm run generate:api-local
+            displayName: Generate API models (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
           - script: npm run build:for:cms
             displayName: Run build (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client

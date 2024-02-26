@@ -59,6 +59,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddScripts()
                 .AddPartialViews()
                 .AddStylesheets()
+                .AddWebhooks()
                 .AddServer()
                 .AddCorsPolicy()
                 .AddWebhooks()
