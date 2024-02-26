@@ -75,7 +75,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		this._availableVariants.forEach((variantA) => {
 			this._availableVariants.forEach((variantB) => {
 				routes.push({
-					path: new UmbVariantId(variantA).toString() + '_&_' + new UmbVariantId(variantB).toString(),
+					path: UmbVariantId.Create(variantA).toString() + '_&_' + UmbVariantId.Create(variantB).toString(),
 					component: this.splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
@@ -91,7 +91,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		// Single view:
 		this._availableVariants.forEach((variant) => {
 			routes.push({
-				path: new UmbVariantId(variant).toString(),
+				path: UmbVariantId.Create(variant).toString(),
 				component: this.splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.

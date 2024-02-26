@@ -53,7 +53,7 @@ export class UmbWorkspaceSplitViewManager {
 				const newVariants = [...activeVariants];
 				newVariants[index] = { index, culture: variantId.culture, segment: variantId.segment };
 
-				const variantPart: string = newVariants.map((v) => new UmbVariantId(v).toString()).join('_&_');
+				const variantPart: string = newVariants.map((v) => UmbVariantId.Create(v).toString()).join('_&_');
 
 				history.pushState(null, '', `${workspaceRoute}/${variantPart}`);
 				return true;
