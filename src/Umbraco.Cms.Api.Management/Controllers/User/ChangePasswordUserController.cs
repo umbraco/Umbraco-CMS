@@ -38,7 +38,7 @@ public class ChangePasswordUserController : UserControllerBase
 
     [HttpPost("{id:guid}/change-password")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PasswordChangedModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ChangePasswordUserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordUserRequestModel model)
