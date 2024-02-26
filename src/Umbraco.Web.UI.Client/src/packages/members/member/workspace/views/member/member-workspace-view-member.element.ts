@@ -41,8 +41,6 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			return;
 		}
 
-		this._newPasswordError = '';
-
 		this._workspaceContext?.set('newPassword', newPassword);
 	};
 

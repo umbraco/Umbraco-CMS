@@ -1,39 +1,48 @@
-import type { UmbMemberDetailModel } from '../types.js';
-import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context.js';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-member-workspace-editor')
 export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	@property({ attribute: false })
 	manifest?: ManifestWorkspace;
 
-	@state()
-	private _data?: UmbMemberDetailModel;
-
 	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
+
+	@state()
+	private _name: string = '';
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			this.#observeData();
+			if (this.#workspaceContext) {
+				this._name = this.#workspaceContext.getName() || '';
+			}
 		});
 	}
 
-	// Only for CRUD demonstration purposes
-	#observeData() {
-		this.observe(this.#workspaceContext!.data, (data) => {
-			this._data = data;
-			console.log(data);
-		});
+	#onInput(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+				this.#workspaceContext?.setName(target.value);
+			}
+		}
 	}
 
 	render() {
-		return html` <umb-workspace-editor alias="Umb.Workspace.Member"></umb-workspace-editor> `;
+		return html`
+			<umb-workspace-editor alias="Umb.Workspace.Member">
+				<uui-input slot="header" id="name-input" .value=${this._name} @input="${this.#onInput}"></uui-input>
+			</umb-workspace-editor>
+		`;
 	}
 
 	static styles = [

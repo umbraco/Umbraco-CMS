@@ -49,7 +49,15 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			lastPasswordChangeDate: null,
 			groups: [],
 			values: [],
-			variants: [],
+			variants: [
+				{
+					name: '',
+					culture: null,
+					segment: null,
+					createDate: new Date().toISOString(),
+					updateDate: new Date().toISOString(),
+				},
+			],
 			...preset,
 		};
 

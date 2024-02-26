@@ -8,8 +8,9 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbMemberWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberDetailModel>
@@ -36,6 +37,7 @@ export class UmbMemberWorkspaceContext
 		value: UmbMemberDetailModel[PropertyName],
 	) {
 		this.#data.update({ [propertyName]: value });
+		console.log('set', propertyName, value, this.#data.getValue());
 	}
 
 	async load(unique: string) {
@@ -90,6 +92,27 @@ export class UmbMemberWorkspaceContext
 
 	getEntityType() {
 		return 'member';
+	}
+
+	getName(variantId?: UmbVariantId) {
+		const variants = this.#data.getValue()?.variants;
+		if (!variants) return;
+		if (variantId) {
+			return variants.find((x) => variantId.compare(x))?.name;
+		} else {
+			return variants[0]?.name;
+		}
+	}
+
+	setName(name: string, variantId?: UmbVariantId) {
+		const oldVariants = this.#data.getValue()?.variants || [];
+		const variants = partialUpdateFrozenArray(
+			oldVariants,
+			{ name },
+			variantId ? (x) => variantId.compare(x) : () => true,
+		);
+		console.log('setName', oldVariants, variants);
+		this.#data.update({ variants });
 	}
 
 	get email() {
