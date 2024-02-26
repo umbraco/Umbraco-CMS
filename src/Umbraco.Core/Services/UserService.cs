@@ -1109,9 +1109,10 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
         }
 
+        // require old password for self change when outside of invite or resetByToken flows
         if (performingUser.UserState != UserState.Invited && performingUser.Username == user.Username && string.IsNullOrEmpty(model.OldPassword) && string.IsNullOrEmpty(model.ResetPasswordToken))
         {
-            return Attempt.FailWithStatus(UserOperationStatus.OldPasswordRequired, new PasswordChangedModel());
+            return Attempt.FailWithStatus(UserOperationStatus.SelfOldPasswordRequired, new PasswordChangedModel());
         }
 
         if (performingUser.IsAdmin() is false && user.IsAdmin())
@@ -2103,6 +2104,40 @@ internal class UserService : RepositoryService, IUserService
         return changePasswordAttempt;
     }
 
+    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid performingUserKey, Guid userKey)
+    {
+        if (performingUserKey.Equals(userKey))
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.SelfPasswordResetNotAllowed, new PasswordChangedModel());
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+
+        ICoreBackOfficeUserManager backOfficeUserManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
+
+        var generatedPassword = backOfficeUserManager.GeneratePassword();
+
+        Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt =
+            await ChangePasswordAsync(performingUserKey, new ChangeUserPasswordModel
+            {
+                NewPassword = backOfficeUserManager.GeneratePassword(),
+                UserKey = userKey,
+            });
+
+        scope.Complete();
+
+        // todo tidy this up
+        // this should be part of the result of the ChangePasswordAsync() method
+        // but the model requires NewPassword
+        // and the passwordChanger does not have a codePath that deals with generating
+        if (changePasswordAttempt.Success)
+        {
+            changePasswordAttempt.Result.ResetPassword = generatedPassword;
+        }
+
+        return changePasswordAttempt;
+    }
 
 
     /// <summary>

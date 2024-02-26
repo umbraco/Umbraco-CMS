@@ -406,4 +406,6 @@ public interface IUserService : IMembershipUserService
     Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail);
 
     Task<Attempt<UserInvitationResult, UserOperationStatus>> ResendInvitationAsync(Guid performingUserKey, UserResendInviteModel model);
+
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid performingUserKey, Guid userKey);
 }
