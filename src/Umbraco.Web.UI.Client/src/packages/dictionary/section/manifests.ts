@@ -13,6 +13,12 @@ const section: ManifestSection = {
 		label: 'Dictionary',
 		pathname: 'dictionary',
 	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionUserPermission',
+			match: UMB_DICTIONARY_SECTION_ALIAS,
+		},
+	],
 };
 
 const menuSectionSidebarApp: ManifestSectionSidebarApp = {

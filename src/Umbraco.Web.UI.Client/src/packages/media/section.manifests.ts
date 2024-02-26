@@ -5,14 +5,19 @@ const sectionAlias = 'Umb.Section.Media';
 
 const section: ManifestSection = {
 	type: 'section',
-	alias: sectionAlias,
+	alias: 'Umb.Section.Media',
 	name: 'Media Section',
 	weight: 500,
 	meta: {
 		label: 'Media',
 		pathname: 'media-management',
 	},
-	conditions: [],
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionUserPermission',
+			match: sectionAlias,
+		},
+	],
 };
 
 const menuSectionSidebarApp: ManifestSectionSidebarApp = {

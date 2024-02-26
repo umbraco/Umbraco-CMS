@@ -8,13 +8,19 @@ const sectionAlias = 'Umb.Section.Content';
 
 const section: ManifestSection = {
 	type: 'section',
-	alias: sectionAlias,
+	alias: 'Umb.Section.Content',
 	name: 'Content Section',
 	weight: 600,
 	meta: {
 		label: 'Content',
 		pathname: 'content',
 	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionUserPermission',
+			match: sectionAlias,
+		},
+	],
 };
 
 const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind = {
