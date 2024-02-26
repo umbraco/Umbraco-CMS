@@ -5,7 +5,7 @@ export interface UmbMemberItemModel {
 	memberType: {
 		unique: string;
 		icon: string;
-		collection?: UmbReferenceByUnique;
+		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbMemberVariantItemModel>;
 }

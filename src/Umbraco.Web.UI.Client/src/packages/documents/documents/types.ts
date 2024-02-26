@@ -7,7 +7,7 @@ export { UmbDocumentVariantState };
 export interface UmbDocumentDetailModel {
 	documentType: {
 		unique: string;
-		collection?: UmbReferenceByUnique;
+		collection: UmbReferenceByUnique | null;
 	};
 	entityType: UmbDocumentEntityType;
 	isTrashed: boolean;

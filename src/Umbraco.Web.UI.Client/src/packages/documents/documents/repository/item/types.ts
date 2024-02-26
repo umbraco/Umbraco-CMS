@@ -9,7 +9,7 @@ export interface UmbDocumentItemModel {
 	documentType: {
 		unique: string;
 		icon: string;
-		collection?: UmbReferenceByUnique;
+		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbDocumentItemVariantModel>;
 }

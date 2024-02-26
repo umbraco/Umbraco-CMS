@@ -6,7 +6,7 @@ export interface UmbMediaItemModel {
 	mediaType: {
 		unique: string;
 		icon: string;
-		collection?: UmbReferenceByUnique;
+		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbMediaItemVariantModel>;
 	name: string; // TODO: get correct variant name

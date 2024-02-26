@@ -9,7 +9,7 @@ export interface UmbMediaTreeItemModel extends UmbUniqueTreeItemModel {
 	mediaType: {
 		unique: string;
 		icon: string;
-		collection?: UmbReferenceByUnique;
+		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbMediaTreeItemVariantModel>;
 }

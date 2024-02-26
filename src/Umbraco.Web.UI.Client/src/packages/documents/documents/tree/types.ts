@@ -11,7 +11,7 @@ export interface UmbDocumentTreeItemModel extends UmbUniqueTreeItemModel {
 	documentType: {
 		unique: string;
 		icon: string;
-		collection?: UmbReferenceByUnique;
+		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbDocumentTreeItemVariantModel>;
 }
