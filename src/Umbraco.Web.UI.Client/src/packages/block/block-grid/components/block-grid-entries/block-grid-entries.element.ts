@@ -1,10 +1,11 @@
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation-api';
+import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
+import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import {
 	getAccumulatedValueOfIndex,
 	getInterpolatedIndexOfPositionInWeightMap,
 	isWithinRect,
 } from '@umbraco-cms/backoffice/utils';
-import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
-import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
@@ -104,7 +105,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
  * @element umb-block-grid-entries
  */
 @customElement('umb-block-grid-entries')
-export class UmbBlockGridEntriesElement extends UmbLitElement {
+export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElement) {
 	//
 	// TODO: Make sure Sorter callbacks handles columnSpan when retrieving a new entry.
 
@@ -161,10 +162,24 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		this.addValidator(
+			'rangeUnderflow',
+			() => this.localize.term('validation_entriesShort'),
+			() => !!this.#context.getMinAllowed() && this.#context.getLength() < this.#context.getMinAllowed(),
+		);
+
+		this.addValidator(
+			'rangeOverflow',
+			() => this.localize.term('validation_entriesExceed'),
+			() => !!this.#context.getMaxAllowed() && this.#context.getLength() > this.#context.getMaxAllowed(),
+		);
+
 		this.observe(this.#context.layoutEntries, (layoutEntries) => {
 			const oldValue = this._layoutEntries;
 			this.#sorter.setModel(layoutEntries);
 			this._layoutEntries = layoutEntries;
+			this._runValidators();
 			this.requestUpdate('layoutEntries', oldValue);
 		});
 
@@ -180,6 +195,10 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 				'observeStylesheet',
 			);
 		});
+	}
+
+	protected getFormElement(): HTMLElement | undefined {
+		return undefined;
 	}
 
 	// TODO: Missing ability to jump directly to creating a Block, when there is only one Block Type.

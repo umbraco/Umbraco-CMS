@@ -4,6 +4,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
+import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 export const UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET = '/umbraco/backoffice/css/umbraco-blockgridlayout.css';
 
@@ -30,6 +31,16 @@ export class UmbBlockGridManagerContext<
 	}
 	getBlockGroups() {
 		return this.#blockGroups.value;
+	}
+
+	getMinAllowed() {
+		return this._editorConfiguration.getValue()?.getValueByAlias<NumberRangeValueType>('validationLimit')?.min ?? 0;
+	}
+
+	getMaxAllowed() {
+		return (
+			this._editorConfiguration.getValue()?.getValueByAlias<NumberRangeValueType>('validationLimit')?.max ?? Infinity
+		);
 	}
 
 	create(

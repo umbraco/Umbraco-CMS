@@ -49,6 +49,20 @@ export class UmbBlockGridEntriesContext
 		return this.#layoutColumns.getValue();
 	}
 
+	getMinAllowed() {
+		if (this.#areaKey) {
+			return this.#areaType?.minAllowed ?? 0;
+		}
+		return this._manager?.getMinAllowed() ?? 0;
+	}
+
+	getMaxAllowed() {
+		if (this.#areaKey) {
+			return this.#areaType?.minAllowed ?? Infinity;
+		}
+		return this._manager?.getMinAllowed() ?? Infinity;
+	}
+
 	getLayoutContainerElement() {
 		return this.getHostElement().shadowRoot?.querySelector('.umb-block-grid__layout-container') as
 			| HTMLElement
