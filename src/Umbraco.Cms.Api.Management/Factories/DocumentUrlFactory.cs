@@ -48,7 +48,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
-        UrlInfo[] urlInfos = (await content.GetContentUrlsAsync(
+        IEnumerable<UrlInfo> urlInfos = await content.GetContentUrlsAsync(
             _publishedRouter,
             umbracoContext,
             _languageService,
@@ -57,7 +57,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
             _variationContextAccessor,
             _loggerFactory.CreateLogger<IContent>(),
             _uriUtility,
-            _publishedUrlProvider)).ToArray();
+            _publishedUrlProvider);
 
         return urlInfos
             .Where(urlInfo => urlInfo.IsUrl)
