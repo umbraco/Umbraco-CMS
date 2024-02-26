@@ -315,8 +315,9 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     public bool Exists(IEnumerable<Guid> keys)
     {
-        Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => keys.Contains(x.UniqueId));
-        return Database.ExecuteScalar<int>(sql) == keys.Count();
+        var distictKeys = keys.Distinct();
+        Sql<ISqlContext> sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => distictKeys.Contains(x.UniqueId));
+        return Database.ExecuteScalar<int>(sql) == distictKeys.Count();
     }
 
     /// <inheritdoc />
