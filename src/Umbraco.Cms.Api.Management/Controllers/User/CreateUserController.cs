@@ -44,7 +44,7 @@ public class CreateUserController : UserControllerBase
         Attempt<UserCreationResult, UserOperationStatus> result = await _userService.CreateAsync(CurrentUserKey(_backOfficeSecurityAccessor), createModel, true);
 
         return result.Success
-            ? Ok(_mapper.Map<CreateUserResponseModel>(result.Result))
+            ? CreatedAtId<ByKeyUserController>(controller => nameof(controller.ByKey), result.Result.CreatedUser!.Key)
             : UserOperationStatusResult(result.Status, result.Result);
     }
 }
