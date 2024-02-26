@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Webhook;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -13,12 +14,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 public class ByKeyWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IWebhookPresentationFactory _webhookPresentationFactory;
 
-    public ByKeyWebhookController(IWebhookService webhookService, IUmbracoMapper umbracoMapper)
+    public ByKeyWebhookController(IWebhookService webhookService, IWebhookPresentationFactory webhookPresentationFactory)
     {
         _webhookService = webhookService;
-        _umbracoMapper = umbracoMapper;
+        _webhookPresentationFactory = webhookPresentationFactory;
     }
 
     [HttpGet("{id:guid}")]
@@ -33,7 +34,7 @@ public class ByKeyWebhookController : WebhookControllerBase
             return WebhookOperationStatusResult(WebhookOperationStatus.NotFound);
         }
 
-        WebhookResponseModel model = _umbracoMapper.Map<WebhookResponseModel>(webhook)!;
+        WebhookResponseModel model = _webhookPresentationFactory.CreateResponseModel(webhook);
         return Ok(model);
     }
 }

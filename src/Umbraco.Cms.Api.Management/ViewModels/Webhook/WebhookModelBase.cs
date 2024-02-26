@@ -1,14 +1,15 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Umbraco.Cms.Api.Management.ViewModels.Webhook;
 
 public class WebhookModelBase
 {
     public bool Enabled { get; set; } = true;
 
-    public string Name { get; set; } = string.Empty;
+    [Required]
+    public string Url { get; set; } = string.Empty;
 
-    public string? Events { get; set; }
+    public Guid[] ContentTypeKeys { get; set; } = Array.Empty<Guid>();
 
-    public string? Url { get; set; }
-
-    public string? Types { get; set; }
+    public IDictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 }

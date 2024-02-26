@@ -20,19 +20,16 @@ public class UpdateWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateWebhookController(
         IWebhookService webhookService,
-        IUmbracoMapper umbracoMapper,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IUmbracoMapper umbracoMapper)
     {
         _webhookService = webhookService;
         _umbracoMapper = umbracoMapper;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut($"{{{nameof(id)}}}")]
+    [HttpPut("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

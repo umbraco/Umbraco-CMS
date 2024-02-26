@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Webhook;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -14,15 +13,6 @@ public class WebhookMapDefinition : IMapDefinition
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizedTextService _localizedTextService;
 
-    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 15.")]
-    public WebhookMapDefinition() : this(
-        StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>(),
-        StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>()
-        )
-    {
-
-    }
-
     public WebhookMapDefinition(IHostingEnvironment hostingEnvironment, ILocalizedTextService localizedTextService)
     {
         _hostingEnvironment = hostingEnvironment;
@@ -31,29 +21,39 @@ public class WebhookMapDefinition : IMapDefinition
 
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<WebhookViewModel, IWebhook>((_, _) => new Webhook(string.Empty), Map);
-        mapper.Define<IWebhookEvent, WebhookEventViewModel>((_, _) => new WebhookEventViewModel(), Map);
+        mapper.Define<IWebhookEvent, WebhookEventResponseModel>((_, _) => new WebhookEventResponseModel(), Map);
         mapper.Define<WebhookLog, WebhookLogViewModel>((_, _) => new WebhookLogViewModel(), Map);
-    }
-
-    // Umbraco.Code.MapAll -CreateDate -DeleteDate -Id -Key -UpdateDate
-    private void Map(WebhookViewModel source, IWebhook target, MapperContext context)
-    {
-        target.ContentTypeKeys = source.ContentTypeKeys;
-        target.Events = source.Events.Select(x => x.Alias).ToArray();
-        target.Url = source.Url;
-        target.Enabled = source.Enabled;
-        target.Id = source.Id;
-        target.Key = source.Key ?? Guid.NewGuid();
-        target.Headers = source.Headers;
+        mapper.Define<CreateWebhookRequestModel, IWebhook>((_, _) => new Webhook(string.Empty), Map);
+        mapper.Define<UpdateWebhookRequestModel, IWebhook>((_, _) => new Webhook(string.Empty), Map);
     }
 
     // Umbraco.Code.MapAll
-    private void Map(IWebhookEvent source, WebhookEventViewModel target, MapperContext context)
+    private void Map(IWebhookEvent source, WebhookEventResponseModel target, MapperContext context)
     {
         target.EventName = source.EventName;
         target.EventType = source.EventType;
         target.Alias = source.Alias;
+    }
+
+    // Umbraco.Code.MapAll -CreateDate -DeleteDate -Id -UpdateDate
+    private void Map(CreateWebhookRequestModel source, IWebhook target, MapperContext context)
+    {
+        target.Url = source.Url;
+        target.Enabled = source.Enabled;
+        target.ContentTypeKeys = source.ContentTypeKeys;
+        target.Events = source.Events;
+        target.Headers = source.Headers;
+        target.Key = source.Id ?? Guid.NewGuid();
+    }
+
+    // Umbraco.Code.MapAll -CreateDate -DeleteDate -Id -UpdateDate -Key
+    private void Map(UpdateWebhookRequestModel source, IWebhook target, MapperContext context)
+    {
+        target.Url = source.Url;
+        target.Enabled = source.Enabled;
+        target.ContentTypeKeys = source.ContentTypeKeys;
+        target.Events = source.Events;
+        target.Headers = source.Headers;
     }
 
     // Umbraco.Code.MapAll
