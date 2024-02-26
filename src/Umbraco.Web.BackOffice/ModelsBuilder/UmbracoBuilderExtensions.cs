@@ -1,5 +1,4 @@
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -45,7 +44,6 @@ public static class UmbracoBuilderExtensions
     /// </summary>
     public static IUmbracoBuilder RemoveModelsBuilderDashboard(this IUmbracoBuilder builder)
     {
-        builder.Dashboards().Remove<ModelsBuilderDashboard>();
         builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>().Remove<ModelsBuilderDashboardController>();
 
         return builder;

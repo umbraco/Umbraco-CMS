@@ -139,7 +139,6 @@ internal class ContentMapDefinition : IMapDefinition
         target.AllowedActions = source.AllowedActions;
         target.AllowedTemplates = source.AllowedTemplates;
         target.AllowPreview = source.AllowPreview;
-        target.ContentApps = source.ContentApps;
         target.ContentDto = source.ContentDto;
         target.ContentTypeAlias = source.ContentTypeAlias;
         target.ContentTypeId = source.ContentTypeId;
@@ -218,7 +217,6 @@ internal class ContentMapDefinition : IMapDefinition
         target.AllowedActions = source.AllowedActions;
         target.AllowedTemplates = source.AllowedTemplates;
         target.AllowPreview = source.AllowPreview;
-        target.ContentApps = source.ContentApps;
         target.ContentDto = source.ContentDto;
         target.ContentTypeAlias = source.ContentTypeAlias;
         target.ContentTypeId = source.ContentTypeId;
@@ -272,7 +270,6 @@ internal class ContentMapDefinition : IMapDefinition
 
         target.AllowedActions = GetActions(source, parent, context);
         target.AllowedTemplates = GetAllowedTemplates(source);
-        target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
         target.ContentTypeId = source.ContentType.Id;
         target.ContentTypeKey = source.ContentType.Key;
         target.ContentTypeAlias = source.ContentType.Alias;

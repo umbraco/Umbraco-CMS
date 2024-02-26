@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Trees;
-using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.BackOffice.Controllers;
@@ -27,7 +26,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees;
 public class ApplicationTreeController : UmbracoAuthorizedApiController
 {
     private readonly ITreeService _treeService;
-    private readonly ISectionService _sectionService;
     private readonly ILocalizedTextService _localizedTextService;
     private readonly IControllerFactory _controllerFactory;
     private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
@@ -37,13 +35,11 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
     /// </summary>
     public ApplicationTreeController(
         ITreeService treeService,
-        ISectionService sectionService,
         ILocalizedTextService localizedTextService,
         IControllerFactory controllerFactory,
         IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
     {
         _treeService = treeService;
-        _sectionService = sectionService;
         _localizedTextService = localizedTextService;
         _controllerFactory = controllerFactory;
         _actionDescriptorCollectionProvider = actionDescriptorCollectionProvider;
@@ -61,12 +57,6 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
         application = application?.CleanForXss();
 
         if (string.IsNullOrEmpty(application))
-        {
-            return NotFound();
-        }
-
-        ISection? section = _sectionService.GetByAlias(application);
-        if (section == null)
         {
             return NotFound();
         }

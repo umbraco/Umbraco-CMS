@@ -9,14 +9,12 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Notifications;
@@ -342,11 +340,6 @@ public class ContentController : ContentControllerBase
     /// <returns></returns>
     public ActionResult<ContentItemDisplay> GetRecycleBin()
     {
-        var apps = new List<ContentApp>
-        {
-            ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "content", Constants.DataTypes.DefaultMembersListView)
-        };
-        apps[0].Active = true;
         var display = new ContentItemDisplay
         {
             Id = Constants.System.RecycleBinContent,
@@ -361,8 +354,7 @@ public class ContentController : ContentControllerBase
                     CreateDate = DateTime.Now,
                     Name = _localizedTextService.Localize("general", "recycleBin")
                 }
-            },
-            ContentApps = apps
+            }
         };
 
         return display;
@@ -545,9 +537,6 @@ public class ContentController : ContentControllerBase
                 _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, display.DocumentType.Description);
         }
 
-        //remove the listview app if it exists
-        display.ContentApps = display.ContentApps.Where(x => x.Alias != "umbListView").ToList();
-
         return display;
     }
 
@@ -663,12 +652,6 @@ public class ContentController : ContentControllerBase
 
 
         ContentItemDisplay? mapped = _umbracoMapper.Map<ContentItemDisplay>(scaffold);
-
-        if (mapped is not null)
-        {
-            //remove the listview app if it exists
-            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
-        }
 
         return mapped;
     }
