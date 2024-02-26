@@ -4,6 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbEntityAction<RepositoryType> extends UmbAction<RepositoryType> {
 	unique: string;
+	getHref(): Promise<string | null | undefined>;
 	execute(): Promise<void>;
 }
 
@@ -22,5 +23,10 @@ export abstract class UmbEntityActionBase<RepositoryType>
 		this.repositoryAlias = repositoryAlias;
 	}
 
-	abstract execute(): Promise<void>;
+	public getHref(): Promise<string | null | undefined> {
+		return Promise.resolve(undefined);
+	}
+	public execute(): Promise<void> {
+		return Promise.resolve();
+	}
 }
