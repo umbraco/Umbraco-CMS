@@ -31,9 +31,9 @@ export class UmbWebhookCollectionServerDataSource implements UmbCollectionDataSo
 	 * @memberof UmbWebhookeCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbWebhookCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookResource.getWebhook(filter));
+		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookResource.getWebhookItem({ ids: [""] })); //WebhookResource.getWebhook(filter));
 
-		if (data) {
+		/*if (data) {
 			const items = data.items.map((item) => {
 				const model: UmbWebhookDetailModel = {
 					unique: '', //item.id.toLowerCase(),
@@ -49,7 +49,7 @@ export class UmbWebhookCollectionServerDataSource implements UmbCollectionDataSo
 			});
 
 			return { data: { items, total: data.total } };
-		}
+		}*/
 
 		return { error };
 	}
