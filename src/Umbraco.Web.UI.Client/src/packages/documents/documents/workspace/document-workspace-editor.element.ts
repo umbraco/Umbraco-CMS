@@ -42,6 +42,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 	#observeVariants() {
 		if (!this.#workspaceContext) return;
 		this.observe(
+			// Merge with languages here..
 			this.#workspaceContext.allowedVariants,
 			(variants) => {
 				this._availableVariants = variants;
