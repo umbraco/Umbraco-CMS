@@ -65,8 +65,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, (instance) => {
 			this.#splitViewContext = instance;
-			this._observeVariants();
-			this._observeActiveVariants();
+			this.#observeVariants();
+			this.#observeActiveVariants();
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
 			this.#datasetContext = instance;
@@ -82,7 +82,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		this.#languages.setValue(languages.items);
 	}
 
-	private async _observeVariants() {
+	async #observeVariants() {
 		if (!this.#splitViewContext) return;
 
 		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
@@ -105,7 +105,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		);
 	}
 
-	private async _observeActiveVariants() {
+	async #observeActiveVariants() {
 		if (!this.#splitViewContext) return;
 
 		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
@@ -150,8 +150,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		);
 	}
 
-	// TODO: find a way where we don't have to do this for all workspaces.
-	private _handleInput(event: UUIInputEvent) {
+	#handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
@@ -165,24 +164,24 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private _switchVariant(variant: UmbDocumentVariantOption) {
+	#switchVariant(variant: UmbDocumentVariantOption) {
 		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
 	}
 
-	private _openSplitView(variant: UmbDocumentVariantOption) {
+	#openSplitView(variant: UmbDocumentVariantOption) {
 		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
 	}
 
-	private _closeSplitView() {
+	#closeSplitView() {
 		this.#splitViewContext?.closeSplitView();
 	}
 
-	private _isVariantActive(culture: string | null) {
+	#isVariantActive(culture: string | null) {
 		return culture !== null ? this._activeVariantsCultures.includes(culture) : true;
 	}
 
-	private _isNotPublishedMode(culture: string | null, state: DocumentVariantStateModel) {
-		return state !== DocumentVariantStateModel.PUBLISHED && !this._isVariantActive(culture);
+	#isNotPublishedMode(culture: string | null, state: DocumentVariantStateModel) {
+		return state !== DocumentVariantStateModel.PUBLISHED && !this.#isVariantActive(culture);
 	}
 
 	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -197,12 +196,13 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (!isOpen) return;
 
 		const host = this.getBoundingClientRect();
+		// TODO: Ideally this is kept updated while open, but for now we just set it once:
 		this._popoverElement.style.width = `${host.width}px`;
 	}
 
 	render() {
 		return html`
-			<uui-input id="name-input" .value=${this._name} @input="${this._handleInput}">
+			<uui-input id="name-input" .value=${this._name} @input="${this.#handleInput}">
 				${
 					this._variants?.length
 						? html`
@@ -216,7 +216,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 								</uui-button>
 								${this._activeVariants.length > 1
 									? html`
-											<uui-button slot="append" compact id="variant-close" @click=${this._closeSplitView}>
+											<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
 												<uui-icon name="remove"></uui-icon>
 											</uui-button>
 									  `
@@ -238,12 +238,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 										<ul>
 											${this._variants.map(
 												(variant) => html`
-													<li class="${this._isVariantActive(variant.culture) ? 'selected' : ''}">
+													<li class="${this.#isVariantActive(variant.culture) ? 'selected' : ''}">
 														<button
 															class="variant-selector-switch-button
-																	${this._isNotPublishedMode(variant.culture, variant.state) ? 'add-mode' : ''}"
-															@click=${() => this._switchVariant(variant)}>
-															${this._isNotPublishedMode(variant.culture, variant.state)
+																	${this.#isNotPublishedMode(variant.culture, variant.state) ? 'add-mode' : ''}"
+															@click=${() => this.#switchVariant(variant)}>
+															${this.#isNotPublishedMode(variant.culture, variant.state)
 																? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
 																: nothing}
 															<div>
@@ -252,12 +252,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																<div class="variant-selector-state">${variant.state}</div>
 															</div>
 														</button>
-														${this._isVariantActive(variant.culture)
+														${this.#isVariantActive(variant.culture)
 															? nothing
 															: html`
 																	<uui-button
 																		class="variant-selector-split-view"
-																		@click=${() => this._openSplitView(variant)}>
+																		@click=${() => this.#openSplitView(variant)}>
 																		Split view
 																	</uui-button>
 															  `}
