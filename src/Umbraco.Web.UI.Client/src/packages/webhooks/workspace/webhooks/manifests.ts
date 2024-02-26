@@ -37,8 +37,8 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.LogViewer.Search',
-		name: 'LogViewer Root Workspace Search View',
+		alias: 'Umb.WorkspaceView.Webhooks.Search',
+		name: 'Webhooks Root Workspace Logs View',
 		js: () => import('../views/logs/index.js'),
 		weight: 200,
 		meta: {
