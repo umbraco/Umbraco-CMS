@@ -6,8 +6,7 @@ import type {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbFieldDropdownListElement } from '@umbraco-cms/backoffice/components';
+import type { UmbFieldDropdownListElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-templating-page-field-builder-modal')
 export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseElement<
