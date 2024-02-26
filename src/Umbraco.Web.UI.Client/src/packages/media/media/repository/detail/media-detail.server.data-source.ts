@@ -28,17 +28,19 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Creates a new Media scaffold
 	 * @param {(string | null)} parentUnique
+	 * @param {(string)} mediaTypeUnique
 	 * @return { UmbMediaDetailModel }
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(parentUnique: string | null, mediaType: UmbMediaDetailModel['mediaType']) {
 		const data: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: UmbId.new(),
 			parentUnique,
 			urls: [],
 			mediaType: {
-				unique: 'mediaTypeId',
+				unique: mediaType.unique,
+				collection: mediaType.collection || null,
 			},
 			isTrashed: false,
 			values: [],
@@ -88,7 +90,10 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 				};
 			}),
 			urls: data.urls,
-			mediaType: { unique: data.mediaType.id },
+			mediaType: {
+				unique: data.mediaType.id,
+				collection: data.mediaType.collection || null,
+			},
 			isTrashed: data.isTrashed,
 		};
 

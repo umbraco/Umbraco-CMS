@@ -3,8 +3,6 @@ import {
 	UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE,
 	UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE,
 } from '../entity.js';
-import { UmbMediaTypeTreeRepository } from './media-type-tree.repository.js';
-import { UmbMediaTypeTreeStore } from './media-type-tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import type {
@@ -22,14 +20,14 @@ const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
 	name: 'Media Type Tree Repository',
-	api: UmbMediaTypeTreeRepository,
+	api: () => import('./media-type-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_MEDIA_TYPE_TREE_STORE_ALIAS,
 	name: 'Media Type Tree Store',
-	api: UmbMediaTypeTreeStore,
+	api: () => import('./media-type-tree.store.js'),
 };
 
 const tree: ManifestTree = {

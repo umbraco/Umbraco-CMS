@@ -1,11 +1,13 @@
 import type { UmbDocumentEntityType } from './entity.js';
 import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
-import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbReferenceById } from '@umbraco-cms/backoffice/models';
+import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+export { UmbDocumentVariantState };
 
 export interface UmbDocumentDetailModel {
 	documentType: {
 		unique: string;
-		hasCollection: boolean;
+		collection?: UmbReferenceById;
 	};
 	entityType: UmbDocumentEntityType;
 	isTrashed: boolean;
@@ -18,8 +20,9 @@ export interface UmbDocumentDetailModel {
 }
 
 export interface UmbDocumentVariantModel extends UmbVariantModel {
-	state: DocumentVariantStateModel | null;
+	state: UmbDocumentVariantState | null;
 	publishDate: string | null;
+	isMandatory: boolean;
 }
 
 export interface UmbDocumentUrlInfoModel {

@@ -4,7 +4,7 @@ import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/query-builder/index.
 import { getQuerySnippet } from '../../utils/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
+import { toCamelCase } from '@umbraco-cms/backoffice/utils';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -75,7 +75,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue) => {
 				this.#templateWorkspaceContext?.setName(nameInputValue);
-				if (this.#isNew) this.#templateWorkspaceContext?.setAlias(camelCase(nameInputValue));
+				if (this.#isNew) this.#templateWorkspaceContext?.setAlias(toCamelCase(nameInputValue));
 			});
 		});
 	}
@@ -109,6 +109,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	#openInsertSectionModal() {
 		const sectionModal = this._modalContext?.open(UMB_TEMPLATING_SECTION_PICKER_MODAL);
+
 		sectionModal?.onSubmit().then((insertSectionModalValue) => {
 			if (insertSectionModalValue?.value) {
 				this._codeEditor?.insert(insertSectionModalValue.value);

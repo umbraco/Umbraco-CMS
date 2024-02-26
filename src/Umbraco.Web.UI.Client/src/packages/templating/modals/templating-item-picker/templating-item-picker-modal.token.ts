@@ -1,4 +1,5 @@
 import type { CodeSnippetType } from '../../types.js';
+import type { UmbPartialViewPickerModalValue, UmbTemplatingPageFieldBuilderModalValue } from '../index.js';
 import { type UmbDictionaryItemPickerModalValue, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbTemplatingItemPickerModalData {
@@ -6,7 +7,7 @@ export interface UmbTemplatingItemPickerModalData {
 }
 
 export type UmbTemplatingItemPickerModalValue = {
-	value: string | UmbDictionaryItemPickerModalValue;
+	value: string;
 	type: CodeSnippetType;
 };
 

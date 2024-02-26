@@ -9,3 +9,5 @@ export class UmbUserDetailRepository extends UmbDetailRepositoryBase<UmbUserDeta
 		super(host, UmbUserServerDataSource, UMB_USER_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbUserDetailRepository;

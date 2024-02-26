@@ -1,10 +1,11 @@
 import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
-import { UmbBlockManagerContext } from '../../block/context/block-manager.context.js';
 import type { UmbBlockGridWorkspaceData } from '../index.js';
-import type { UmbBlockTypeGroup } from '../../block-type/types.js';
-import type { UmbBlockDataType } from '../../block/types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { type UmbBlockDataType, UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
+
+export const UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET = '/umbraco/backoffice/css/umbraco-blockgridlayout.css';
 
 /**
  * A implementation of the Block Manager specifically for the Block Grid Editor.
@@ -13,9 +14,16 @@ export class UmbBlockGridManagerContext<
 	BlockLayoutType extends UmbBlockGridLayoutModel = UmbBlockGridLayoutModel,
 > extends UmbBlockManagerContext<UmbBlockGridTypeModel, UmbBlockGridLayoutModel> {
 	//
-	//
 	#blockGroups = new UmbArrayState(<Array<UmbBlockTypeGroup>>[], (x) => x.key);
 	public readonly blockGroups = this.#blockGroups.asObservable();
+
+	layoutStylesheet = this._editorConfiguration.asObservablePart(
+		(x) => (x?.getValueByAlias('layoutStylesheet') as string) ?? UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET,
+	);
+	gridColumns = this._editorConfiguration.asObservablePart((x) => {
+		const value = x?.getValueByAlias('gridColumns') as string | undefined;
+		return parseInt(value && value !== '' ? value : '12');
+	});
 
 	setBlockGroups(blockGroups: Array<UmbBlockTypeGroup>) {
 		this.#blockGroups.setValue(blockGroups);
@@ -43,6 +51,14 @@ export class UmbBlockGridManagerContext<
 		this.insertBlockData(layoutEntry, content, settings, modalData);
 
 		return true;
+	}
+
+	onDragStart() {
+		(this.getHostElement() as HTMLElement).style.setProperty('--umb-block-grid--is-dragging', ' ');
+	}
+
+	onDragEnd() {
+		(this.getHostElement() as HTMLElement).style.removeProperty('--umb-block-grid--is-dragging');
 	}
 }
 

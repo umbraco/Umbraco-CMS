@@ -1,16 +1,20 @@
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
+import type { UmbBlockWorkspaceData } from '../workspace/index.js';
+import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
-import type { UmbBlockTypeBaseModel, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
-import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+
+function buildUdi(entityType: string, guid: string) {
+	return `umb://${entityType}/${guid.replace(/-/g, '')}`;
+}
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -36,8 +40,8 @@ export abstract class UmbBlockManagerContext<
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
 	public readonly blockTypes = this.#blockTypes.asObservable();
 
-	#editorConfiguration = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
-	public readonly editorConfiguration = this.#editorConfiguration.asObservable();
+	protected _editorConfiguration = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
+	public readonly editorConfiguration = this._editorConfiguration.asObservable();
 
 	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentUdi);
 	public readonly layouts = this._layouts.asObservable();
@@ -51,7 +55,6 @@ export abstract class UmbBlockManagerContext<
 	// TODO: maybe its bad to consume Property Context, and instead wire this up manually in the property editor? With these: (and one for variant-id..)
 	/*setPropertyAlias(alias: string) {
 		this.#propertyAlias.setValue(alias);
-		console.log('!!!!!manager got alias: ', alias);
 		this.#workspaceModal.setUniquePathValue('propertyAlias', alias);
 	}
 	getPropertyAlias() {
@@ -59,7 +62,7 @@ export abstract class UmbBlockManagerContext<
 	}*/
 
 	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
-		this.#editorConfiguration.setValue(configs);
+		this._editorConfiguration.setValue(configs);
 	}
 
 	setBlockTypes(blockTypes: Array<BlockType>) {
@@ -120,9 +123,8 @@ export abstract class UmbBlockManagerContext<
 		return data;
 	}
 
-	contentTypeOf(contentTypeUdi: string) {
-		const contentTypeUnique = getKeyFromUdi(contentTypeUdi);
-		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeUnique));
+	contentTypeOf(contentTypeKey: string) {
+		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey));
 	}
 	contentTypeNameOf(contentTypeKey: string) {
 		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.unique === contentTypeKey)?.name);
@@ -141,6 +143,13 @@ export abstract class UmbBlockManagerContext<
 	}
 	settingsOf(udi: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
+	}
+
+	getBlockTypeOf(contentTypeKey: string) {
+		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);
+	}
+	getContentOf(contentUdi: string) {
+		return this.#contents.value.find((x) => x.udi === contentUdi);
 	}
 
 	/*setOneLayout(layoutData: BlockLayoutType) {

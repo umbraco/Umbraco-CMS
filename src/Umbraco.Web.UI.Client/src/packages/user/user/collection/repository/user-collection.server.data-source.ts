@@ -1,7 +1,7 @@
 import type { UmbUserDetailModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbUserCollectionFilterModel } from '../types.js';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UserResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -32,10 +32,14 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbUserCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserFilter(filter));
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getFilterUser(filter));
 
 		if (error) {
 			return { error };
+		}
+
+		if (!data) {
+			return { data: { items: [], total: 0 } };
 		}
 
 		const { items, total } = data;

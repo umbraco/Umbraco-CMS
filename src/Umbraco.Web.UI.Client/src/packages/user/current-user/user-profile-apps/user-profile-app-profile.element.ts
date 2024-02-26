@@ -1,5 +1,4 @@
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_CHANGE_PASSWORD_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -69,8 +68,6 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 			</uui-box>
 		`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbUserProfileAppProfileElement;

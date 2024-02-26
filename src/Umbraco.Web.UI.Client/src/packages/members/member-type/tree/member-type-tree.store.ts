@@ -48,8 +48,11 @@ export class UmbMemberTypeTreeStore extends UmbUniqueTreeStore {
 	#updateTreeItemMapper = (item: UmbMemberTypeDetailModel) => {
 		return {
 			name: item.name,
+			icon: item.icon,
 		};
 	};
 }
+
+export default UmbMemberTypeTreeStore;
 
 export const UMB_MEMBER_TYPE_TREE_STORE_CONTEXT = new UmbContextToken<UmbMemberTypeTreeStore>('UmbMemberTypeTreeStore');

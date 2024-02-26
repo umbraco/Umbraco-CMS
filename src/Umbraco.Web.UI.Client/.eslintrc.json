@@ -1,7 +1,7 @@
 {
 	"ignorePatterns": ["vite.*.ts"],
 	"root": true,
-	"plugins": ["eslint-plugin-local-rules"],
+	"plugins": ["import", "eslint-plugin-local-rules"],
 	"parserOptions": {
 		"ecmaVersion": "latest"
 	},

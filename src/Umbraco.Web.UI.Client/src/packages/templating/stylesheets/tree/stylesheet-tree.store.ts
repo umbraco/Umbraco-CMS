@@ -40,6 +40,7 @@ export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 			name: item.name,
 			hasChildren: false,
 			isFolder: false,
+			icon: 'icon-brush-alt',
 		};
 
 		return treeItem;
@@ -52,5 +53,7 @@ export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 		};
 	};
 }
+
+export default UmbStylesheetTreeStore;
 
 export const UMB_STYLESHEET_TREE_STORE_CONTEXT = new UmbContextToken<UmbStylesheetTreeStore>('UmbStylesheetTreeStore');

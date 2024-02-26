@@ -76,6 +76,7 @@ export type { CreateTemplateRequestModel } from './models/CreateTemplateRequestM
 export type { CreateUserGroupRequestModel } from './models/CreateUserGroupRequestModel';
 export type { CreateUserRequestModel } from './models/CreateUserRequestModel';
 export type { CreateUserResponseModel } from './models/CreateUserResponseModel';
+export type { CultureAndScheduleRequestModel } from './models/CultureAndScheduleRequestModel';
 export type { CultureReponseModel } from './models/CultureReponseModel';
 export type { CurrentUserResponseModel } from './models/CurrentUserResponseModel';
 export type { CurrenUserConfigurationResponseModel } from './models/CurrenUserConfigurationResponseModel';
@@ -321,6 +322,7 @@ export { RuntimeModeModel } from './models/RuntimeModeModel';
 export type { SavedLogSearchPresenationBaseModel } from './models/SavedLogSearchPresenationBaseModel';
 export type { SavedLogSearchRequestModel } from './models/SavedLogSearchRequestModel';
 export type { SavedLogSearchResponseModel } from './models/SavedLogSearchResponseModel';
+export type { ScheduleRequestModel } from './models/ScheduleRequestModel';
 export type { ScriptFolderResponseModel } from './models/ScriptFolderResponseModel';
 export type { ScriptItemResponseModel } from './models/ScriptItemResponseModel';
 export type { ScriptResponseModel } from './models/ScriptResponseModel';
@@ -359,6 +361,7 @@ export type { TemplateQueryResultItemPresentationModel } from './models/Template
 export type { TemplateQueryResultResponseModel } from './models/TemplateQueryResultResponseModel';
 export type { TemplateQuerySettingsResponseModel } from './models/TemplateQuerySettingsResponseModel';
 export type { TemplateResponseModel } from './models/TemplateResponseModel';
+export type { TemporaryFileConfigurationResponseModel } from './models/TemporaryFileConfigurationResponseModel';
 export type { TemporaryFileResponseModel } from './models/TemporaryFileResponseModel';
 export type { TourStatusModel } from './models/TourStatusModel';
 export type { TreeItemPresentationModel } from './models/TreeItemPresentationModel';

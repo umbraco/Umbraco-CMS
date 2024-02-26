@@ -1,18 +1,16 @@
 import { UmbBlockGridManagerContext } from '../../context/block-grid-manager.context.js';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS } from './manifests.js';
-import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { html, customElement, property, state, css, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type {
-	UmbBlockGridLayoutModel,
-	UmbBlockGridTypeModel,
-	UmbBlockGridValueModel,
-	UmbBlockTypeGroup,
-} from '@umbraco-cms/backoffice/block';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
+import type { UmbBlockTypeGroup } from '@umbraco-cms/backoffice/block-type';
+import type { UmbBlockGridTypeModel, UmbBlockGridValueModel } from '@umbraco-cms/backoffice/block-grid';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import '../../components/block-grid-entries/index.js';
 
 /**
@@ -54,6 +52,8 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	private _limitMin?: number;
 	@state()
 	private _limitMax?: number;
+	@state()
+	private _layoutColumns?: number;
 
 	@property({ attribute: false })
 	public get value(): UmbBlockGridValueModel {
@@ -71,37 +71,39 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		this.#context.setSettings(buildUpValue.settingsData);
 	}
 
-	@state()
-	private _rootLayouts: Array<UmbBlockGridLayoutModel> = [];
-
 	constructor() {
 		super();
 
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#context.layouts, (layouts) => {
 			this._value = { ...this._value, layout: { [UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS]: layouts } };
-			// Notify that the value has changed.
-			//console.log('layout changed', this._value);
-			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
-			this._rootLayouts = layouts;
-			this.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
 		});
 		this.observe(this.#context.contents, (contents) => {
 			this._value = { ...this._value, contentData: contents };
-			// Notify that the value has changed.
-			//console.log('content changed', this._value);
-			this.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
 		});
 		this.observe(this.#context.settings, (settings) => {
 			this._value = { ...this._value, settingsData: settings };
-			// Notify that the value has changed.
-			//console.log('settings changed', this._value);
-			this.dispatchEvent(new UmbChangeEvent());
+			this.dispatchEvent(new UmbPropertyValueChangeEvent());
+		});
+	}
+
+	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+
+		this.observe(this.#context.gridColumns, (gridColumns) => {
+			if (gridColumns) {
+				this._layoutColumns = gridColumns;
+				this.style.setProperty('--umb-block-grid--grid-columns', gridColumns.toString());
+			}
 		});
 	}
 
 	render() {
-		return html`<umb-block-grid-entries .areaKey=${null}></umb-block-grid-entries>`;
+		return html`<umb-block-grid-entries
+			.areaKey=${null}
+			.layoutColumns=${this._layoutColumns}></umb-block-grid-entries>`;
 	}
 
 	static styles = [

@@ -22,14 +22,12 @@ export * from './picker-input/index.js';
 export * from './property-action/index.js';
 export * from './property-editor/index.js';
 export * from './section/index.js';
-export * from './sorter/index.js';
 export * from './store/index.js';
 export * from './tree/index.js';
 export * from './variant/index.js';
 export * from './workspace/index.js';
 export * from './culture/index.js';
 export * from './temporary-file/index.js';
-export * from './object-type/index.js';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);

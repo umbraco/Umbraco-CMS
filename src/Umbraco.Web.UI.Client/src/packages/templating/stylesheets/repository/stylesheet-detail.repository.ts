@@ -9,3 +9,5 @@ export class UmbStylesheetDetailRepository extends UmbDetailRepositoryBase<UmbSt
 		super(host, UmbStylesheetDetailServerDataSource, UMB_STYLESHEET_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbStylesheetDetailRepository;

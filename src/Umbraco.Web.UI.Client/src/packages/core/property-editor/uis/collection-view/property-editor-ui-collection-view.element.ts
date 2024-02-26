@@ -5,10 +5,13 @@ import type {
 import type { UmbPropertyEditorConfigCollection } from '../../config/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/document';
+import { UMB_MEDIA_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/media';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import type { UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * @element umb-property-editor-ui-collection-view
@@ -17,6 +20,9 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document
 export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property()
 	value?: string;
+
+	@state()
+	private _collectionAlias: string = UMB_DOCUMENT_COLLECTION_ALIAS;
 
 	@state()
 	private _config?: UmbCollectionConfiguration;
@@ -31,17 +37,25 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 
 		// Gets the Data Type ID for the current property.
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
-			// TODO: [LK:2024-02-01] Replace `UMB_DOCUMENT_WORKSPACE_CONTEXT`
-			// with an abstracted context that supports both document and media workspaces.
-			this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
-				this.observe(workspaceContext.unique, (unique) => {
+			this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
+				// TODO: [LK:2024-02-22] We need a solution that will allow the Collection property-editor
+				// to work in any workspace (that supports `unique` and `structure.getPropertyStructureByAlias`).
+				const entityType = workspaceContext.getEntityType();
+				const contentWorkspaceContext =
+					entityType === 'media'
+						? (workspaceContext as UmbMediaWorkspaceContext)
+						: (workspaceContext as UmbDocumentWorkspaceContext);
+
+				this._collectionAlias = entityType === 'media' ? UMB_MEDIA_COLLECTION_ALIAS : UMB_DOCUMENT_COLLECTION_ALIAS;
+
+				this.observe(contentWorkspaceContext.unique, (unique) => {
 					if (this._config) {
 						this._config.unique = unique;
 					}
 				});
 				this.observe(propertyContext.alias, async (propertyAlias) => {
 					if (propertyAlias) {
-						const property = await workspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
+						const property = await contentWorkspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
 						if (property && this._config) {
 							this._config.dataTypeId = property.dataType.unique;
 							this.requestUpdate('_config');
@@ -67,7 +81,7 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 
 	render() {
 		if (!this._config?.unique || !this._config?.dataTypeId) return html`<uui-loader></uui-loader>`;
-		return html`<umb-collection alias="Umb.Collection.Document" .config=${this._config}></umb-collection>`;
+		return html`<umb-collection .alias=${this._collectionAlias} .config=${this._config}></umb-collection>`;
 	}
 }
 

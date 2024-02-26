@@ -4,17 +4,20 @@ import { UmbMockEntityDetailManager } from '../utils/entity/entity-detail.manage
 import { umbDocumentTypeMockDb } from '../document-type/document-type.db.js';
 import { UmbEntityMockDbBase } from '../utils/entity/entity-base.js';
 import { UmbEntityRecycleBin } from '../utils/entity/entity-recycle-bin.js';
-import type { UmbMockDocumentModel } from './document.data.js';
 import { data } from './document.data.js';
+import { UmbMockDocumentCollectionManager } from './document-collection.manager.js';
 import { UmbMockDocumentPublishingManager } from './document-publishing.manager.js';
-import {
-	DocumentVariantStateModel,
-	type CreateDocumentRequestModel,
-	type DocumentItemResponseModel,
-	type DocumentResponseModel,
-	type DocumentTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbMockDocumentModel } from './document.data.js';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import type {
+	DocumentCollectionResponseModel,
+	CreateDocumentRequestModel,
+	DocumentItemResponseModel,
+	DocumentResponseModel,
+	DocumentTreeItemResponseModel,
+	DomainsResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDocumentModel>(this, treeItemMapper);
@@ -22,6 +25,7 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	detail = new UmbMockEntityDetailManager<UmbMockDocumentModel>(this, createMockDocumentMapper, detailResponseMapper);
 	recycleBin = new UmbEntityRecycleBin<UmbMockDocumentModel>(this.data, treeItemMapper);
 	publishing = new UmbMockDocumentPublishingManager(this);
+	collection = new UmbMockDocumentCollectionManager(this, collectionMapper);
 
 	constructor(data: Array<UmbMockDocumentModel>) {
 		super(data);
@@ -31,6 +35,10 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	getUserPermissionsForDocument(id: string): Array<any> {
 		return [];
 	}
+
+	getDomainsForDocument(id: string): DomainsResponseModel {
+		return { defaultIsoCode: 'en-us', domains: [] };
+	}
 }
 
 const treeItemMapper = (model: UmbMockDocumentModel): Omit<DocumentTreeItemResponseModel, 'type'> => {
@@ -39,7 +47,6 @@ const treeItemMapper = (model: UmbMockDocumentModel): Omit<DocumentTreeItemRespo
 
 	return {
 		documentType: {
-			hasListView: false,
 			icon: documentType.icon,
 			id: documentType.id,
 		},
@@ -63,7 +70,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 		documentType: {
 			id: documentType.id,
 			icon: documentType.icon,
-			hasListView: false, // TODO: get list from doc type when ready
+			collection: undefined, // TODO: get list from doc type when ready
 		},
 		hasChildren: false,
 		id: request.id ? request.id : UmbId.new(),
@@ -102,13 +109,29 @@ const detailResponseMapper = (model: UmbMockDocumentModel): DocumentResponseMode
 const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 	return {
 		documentType: {
-			hasListView: model.documentType.hasListView,
+			collection: model.documentType.collection,
 			icon: model.documentType.icon,
 			id: model.documentType.id,
 		},
 		id: model.id,
 		isProtected: model.isProtected,
 		isTrashed: model.isTrashed,
+		variants: model.variants,
+	};
+};
+
+const collectionMapper = (model: UmbMockDocumentModel): DocumentCollectionResponseModel => {
+	return {
+		creator: null,
+		documentType: {
+			id: model.documentType.id,
+			alias: '',
+			icon: model.documentType.icon,
+		},
+		id: model.id,
+		sortOrder: 0,
+		updater: null,
+		values: model.values,
 		variants: model.variants,
 	};
 };

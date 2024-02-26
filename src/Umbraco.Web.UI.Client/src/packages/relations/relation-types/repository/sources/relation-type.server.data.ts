@@ -1,4 +1,3 @@
-import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	RelationTypeResponseModel,
 	CreateRelationTypeRequestModel,
@@ -15,10 +14,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
  * @class UmbRelationTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbRelationTypeServerDataSource
-	implements
-		UmbDataSource<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
-{
+export class UmbRelationTypeServerDataSource {
 	#host: UmbControllerHost;
 
 	/**

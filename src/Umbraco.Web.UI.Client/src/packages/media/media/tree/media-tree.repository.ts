@@ -26,3 +26,5 @@ export class UmbMediaTreeRepository
 		return { data };
 	}
 }
+
+export default UmbMediaTreeRepository;

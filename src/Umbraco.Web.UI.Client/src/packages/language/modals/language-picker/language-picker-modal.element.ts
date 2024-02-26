@@ -1,8 +1,7 @@
 import { UmbLanguageCollectionRepository } from '../../collection/index.js';
 import type { UmbLanguageItemModel } from '../../repository/index.js';
 import type { UmbLanguagePickerModalValue, UmbLanguagePickerModalData } from './language-picker-modal.token.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
@@ -25,7 +24,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	}
 
 	async firstUpdated() {
-		const { data } = await this.#collectionRepository.requestCollection({ skip: 0, take: 1000 });
+		const { data } = await this.#collectionRepository.requestCollection({});
 		this._languages = data?.items ?? [];
 	}
 
@@ -70,8 +69,6 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 			</div>
 		</umb-body-layout> `;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbLanguagePickerModalElement;

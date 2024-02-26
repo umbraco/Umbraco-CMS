@@ -118,3 +118,5 @@ export class UmbPackageRepository extends UmbBaseController implements UmbApi {
 		return this.#packageStore!.migrations;
 	}
 }
+
+export default UmbPackageRepository;

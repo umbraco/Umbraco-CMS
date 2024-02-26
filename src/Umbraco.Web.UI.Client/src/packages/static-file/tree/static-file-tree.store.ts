@@ -19,4 +19,6 @@ export class UmbStaticFileTreeStore extends UmbUniqueTreeStore {
 	}
 }
 
+export default UmbStaticFileTreeStore;
+
 export const UMB_STATIC_FILE_TREE_STORE_CONTEXT = new UmbContextToken<UmbStaticFileTreeStore>('UmbStaticFileTreeStore');

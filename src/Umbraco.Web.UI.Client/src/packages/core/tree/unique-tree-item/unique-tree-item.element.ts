@@ -1,7 +1,6 @@
 import type { UmbUniqueTreeItemModel } from '../types.js';
 import { UmbUniqueTreeItemContext } from './unique-tree-item.context.js';
-import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBackofficeManifestKind, UmbTreeItemElement } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -37,8 +36,6 @@ export class UmbUniqueTreeItemElement extends UmbLitElement implements UmbTreeIt
 		if (!this.item) return nothing;
 		return html`<umb-tree-item-base></umb-tree-item-base>`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 declare global {
