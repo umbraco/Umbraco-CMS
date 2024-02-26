@@ -32,12 +32,6 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
-	// Only for CRUD demonstration purposes
-	#onChange = (e: Event) => {
-		const input = e.target as HTMLInputElement;
-		this.#workspaceContext!.updateData({ email: input.value });
-	};
-
 	render() {
 		return html` <umb-workspace-editor alias="Umb.Workspace.Member"></umb-workspace-editor> `;
 	}

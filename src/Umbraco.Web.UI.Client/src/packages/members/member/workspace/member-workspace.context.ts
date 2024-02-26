@@ -35,14 +35,11 @@ export class UmbMemberWorkspaceContext
 		propertyName: PropertyName,
 		value: UmbMemberDetailModel[PropertyName],
 	) {
-		this.structure.updateOwnerContentType({ [propertyName]: value });
-		console.log('set', propertyName, value);
+		this.#data.update({ [propertyName]: value });
 	}
 
 	async load(unique: string) {
 		const { data } = await this.repository.requestByUnique(unique);
-
-		console.log('data', data);
 
 		if (data) {
 			this.setIsNew(false);
