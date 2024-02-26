@@ -281,7 +281,6 @@ public class ContentTypeMapDefinition : IMapDefinition
 
         target.AllowCultureVariant = source.VariesByCulture();
         target.AllowSegmentVariant = source.VariesBySegment();
-        target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
         target.Variations = source.Variations;
 
         // sync templates
@@ -368,7 +367,7 @@ public class ContentTypeMapDefinition : IMapDefinition
 
         target.Trashed = source.Trashed;
         target.Id = source.Id;
-        target.IsContainer = source.IsContainer;
+        target.ListView = source.ListView;
         target.IsElement = source.IsElement;
         target.Key = source.Key;
         target.Name = source.Name;
@@ -572,7 +571,7 @@ public class ContentTypeMapDefinition : IMapDefinition
         target.Alias = source.Alias;
         target.Description = source.Description;
         target.Icon = source.Icon;
-        target.IsContainer = source.IsContainer;
+        target.ListView = source.ListView;
         target.IsElement = source.IsElement;
         target.Key = source.Key;
         target.Name = source.Name;
@@ -696,7 +695,7 @@ public class ContentTypeMapDefinition : IMapDefinition
             ? string.Empty
             : $"{_globalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith("/")}images/umbraco/{source.Icon}";
         target.Id = source.Id;
-        target.IsContainer = source.IsContainer;
+        target.ListView = source.ListView;
         target.IsElement = source.IsElement;
         target.Key = source.Key;
         target.Name = source.Name;
@@ -752,7 +751,7 @@ public class ContentTypeMapDefinition : IMapDefinition
             ? string.Empty
             : $"{_globalSettings.GetBackOfficePath(_hostingEnvironment).EnsureEndsWith("/")}images/umbraco/{source.Icon}";
         target.Id = source.Id;
-        target.IsContainer = source.IsContainer;
+        target.ListView = source.ListView;
         target.IsElement = source.IsElement;
         target.Key = source.Key;
         target.Name = source.Name;

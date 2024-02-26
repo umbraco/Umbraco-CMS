@@ -59,7 +59,6 @@ public class MediaMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsContainer
     private void Map(IMedia source, MediaItemDisplay target, MapperContext context)
     {
-        target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
         target.ContentType = _commonMapper.GetContentType(source, context);
         target.ContentTypeId = source.ContentType.Id;
         target.ContentTypeAlias = source.ContentType.Alias;
@@ -110,6 +109,6 @@ public class MediaMapDefinition : IMapDefinition
     {
         // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
         IMedia? parent = _mediaService.GetParent(source);
-        return parent != null && (parent.ContentType.IsContainer || _mediaTypeService.HasContainerInPath(parent.Path));
+        return parent != null && (parent.ContentType.ListView is not null || _mediaTypeService.HasContainerInPath(parent.Path));
     }
 }

@@ -30,6 +30,8 @@ public abstract class ContentTypeEditingModelBase<TPropertyType, TPropertyTypeCo
 
     public bool IsElement { get; set; }
 
+    public Guid? ListView { get; set; }
+
     public IEnumerable<TPropertyType> Properties { get; set; } = Array.Empty<TPropertyType>();
 
     public IEnumerable<TPropertyTypeContainer> Containers { get; set; } = Array.Empty<TPropertyTypeContainer>();

@@ -31,7 +31,7 @@ public class ExportDictionaryController : DictionaryControllerBase
         IDictionaryItem? dictionaryItem = await _dictionaryItemService.GetAsync(id);
         if (dictionaryItem is null)
         {
-            return DictionaryNotFound();
+            return DictionaryItemNotFound();
         }
 
         XElement xml = _entityXmlSerializer.Serialize(dictionaryItem, includeChildren);

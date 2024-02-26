@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -13,7 +14,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
-    private readonly IDataTypeService _dataTypeService;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly ILogger _logger;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactoryCollection;
@@ -21,7 +22,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     protected BlockValuePropertyValueEditorBase(
         DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
+        IDataTypeConfigurationCache dataTypeConfigurationCache,
         ILocalizedTextService textService,
         ILogger logger,
         IShortStringHelper shortStringHelper,
@@ -31,7 +32,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
         : base(textService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _propertyEditors = propertyEditors;
-        _dataTypeService = dataTypeService;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
         _logger = logger;
         _dataValueReferenceFactoryCollection = dataValueReferenceFactoryCollection;
     }
@@ -78,6 +79,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
     protected IEnumerable<ITag> GetBlockValueTags(TValue blockValue, int? languageId)
     {
         var result = new List<ITag>();
+
         // loop through all content and settings data
         foreach (BlockItemData row in blockValue.ContentData.Concat(blockValue.SettingsData))
         {
@@ -91,7 +93,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
                     continue;
                 }
 
-                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
+                object? configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
 
                 result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
             }
@@ -114,7 +116,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
 
     private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
     {
-        var valEditors = new Dictionary<int, IDataValueEditor>();
+        var valEditors = new Dictionary<Guid, IDataValueEditor>();
 
         foreach (BlockItemData row in items)
         {
@@ -136,25 +138,13 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
                     continue;
                 }
 
-                IDataType? dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
-                if (dataType == null)
+                Guid dataTypeKey = prop.Value.PropertyType.DataTypeKey;
+                if (!valEditors.TryGetValue(dataTypeKey, out IDataValueEditor? valEditor))
                 {
-                    // deal with weird situations by ignoring them (no comment)
-                    row.PropertyValues.Remove(prop.Key);
-                    _logger.LogWarning(
-                        "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
-                        prop.Key,
-                        row.Key,
-                        property.PropertyType.Alias);
-                    continue;
-                }
+                    var configuration = _dataTypeConfigurationCache.GetConfiguration(dataTypeKey);
+                    valEditor = propEditor.GetValueEditor(configuration);
 
-                if (!valEditors.TryGetValue(dataType.Id, out IDataValueEditor? valEditor))
-                {
-                    var tempConfig = dataType.ConfigurationObject;
-                    valEditor = propEditor.GetValueEditor(tempConfig);
-
-                    valEditors.Add(dataType.Id, valEditor);
+                    valEditors.Add(dataTypeKey, valEditor);
                 }
 
                 var convValue = valEditor.ToEditor(tempProp);
@@ -172,7 +162,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
             {
                 // Fetch the property types prevalue
-                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.ConfigurationObject;
+                var configuration = _dataTypeConfigurationCache.GetConfiguration(prop.Value.PropertyType.DataTypeKey);
 
                 // Lookup the property editor
                 IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
@@ -182,7 +172,7 @@ internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : Dat
                 }
 
                 // Create a fake content property data object
-                var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
+                var contentPropData = new ContentPropertyData(prop.Value.Value, configuration);
 
                 // Get the property editor to do it's conversion
                 var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);

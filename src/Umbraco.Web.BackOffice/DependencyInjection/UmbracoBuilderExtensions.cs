@@ -94,8 +94,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BackOfficeServerVariables>();
         builder.Services.AddScoped<BackOfficeSessionIdValidator>();
         builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<WebhookMapDefinition>();
-
         // register back office trees
         // the collection builder only accepts types inheriting from TreeControllerBase
         // and will filter out those that are not attributed with TreeAttribute
@@ -122,7 +120,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
         builder.Services.AddTransient<BlockGridSampleHelper>();
-        builder.Services.AddUnique<IWebhookPresentationFactory, WebhookPresentationFactory>();
 
         return builder;
     }

@@ -56,7 +56,7 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
     // Duplicate code copied between Management API and Delivery API.
     protected IActionResult Forbidden() => new StatusCodeResult(StatusCodes.Status403Forbidden);
 
-    protected IActionResult OperationStatusResult<TEnum>(TEnum status, Func<ProblemDetailsBuilder, IActionResult> result)
+    protected static IActionResult OperationStatusResult<TEnum>(TEnum status, Func<ProblemDetailsBuilder, IActionResult> result)
         where TEnum : Enum
         => result(new ProblemDetailsBuilder().WithOperationStatus(status));
 }

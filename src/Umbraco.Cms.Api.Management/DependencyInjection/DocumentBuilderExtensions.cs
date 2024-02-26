@@ -15,6 +15,7 @@ internal static class DocumentBuilderExtensions
         builder.Services.AddTransient<IDocumentUrlFactory, DocumentUrlFactory>();
         builder.Services.AddTransient<IDocumentEditingPresentationFactory, DocumentEditingPresentationFactory>();
         builder.Services.AddTransient<IPublicAccessPresentationFactory, PublicAccessPresentationFactory>();
+        builder.Services.AddTransient<IDomainPresentationFactory, DomainPresentationFactory>();
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<DocumentMapDefinition>()
