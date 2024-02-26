@@ -57,16 +57,19 @@ export class UmbDocumentWorkspaceContext
 	readonly allowedVariants = combineObservables([this.variants, this.languages], ([variants, languages]) => {
 		const missingLanguages = languages.filter((x) => !variants.some((v) => v.culture === x.unique));
 		const newVariants = variants.concat(
-			missingLanguages.map<UmbDocumentVariantModel>((language) => ({
-				state: UmbDocumentVariantState.NOT_CREATED,
-				isMandatory: language.isMandatory,
-				culture: language.unique,
-				segment: null,
-				name: language.name,
-				createDate: '',
-				publishDate: '',
-				updateDate: '',
-			})),
+			missingLanguages.map(
+				(language) =>
+					({
+						state: UmbDocumentVariantState.NOT_CREATED,
+						isMandatory: language.isMandatory,
+						culture: language.unique,
+						segment: null,
+						name: language.name,
+						createDate: null,
+						publishDate: null,
+						updateDate: null,
+					}) as UmbDocumentVariantModel,
+			),
 		);
 		return newVariants;
 	});
