@@ -16,7 +16,6 @@
 @inject IOptions<GlobalSettings> globalSettings
 @inject IRuntimeMinifier runtimeMinifier
 @inject IProfilerHtml profilerHtml
-@inject IBackOfficeExternalLoginProviders externalLogins
 @{
     bool.TryParse(Context.Request.Query["umbDebug"], out bool isDebug);
     var backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
@@ -37,10 +36,6 @@
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
     @Html.Raw(await runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoInitCssBundleName))
-
-    <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true" />
-    <script type="module" src="~/umbraco/login/external.js" asp-append-version="true"></script>
-    <script type="module" src="~/umbraco/login/index.js" asp-append-version="true"></script>
 </head>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
     <noscript>
@@ -118,8 +113,6 @@
 
     <script>
         document.angularReady = function(app) {
-            @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors()!)
-            @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode]!)
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";

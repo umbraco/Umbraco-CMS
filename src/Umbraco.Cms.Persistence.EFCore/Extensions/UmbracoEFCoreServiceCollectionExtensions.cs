@@ -1,14 +1,10 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Persistence.EFCore.Factories;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 
@@ -22,13 +18,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     public static IServiceCollection AddUmbracoEFCoreContext<T>(this IServiceCollection services, DefaultEFCoreOptionsAction? defaultEFCoreOptionsAction = null)
         where T : DbContext
     {
-        var optionsBuilder = new DbContextOptionsBuilder<T>();
-        services.TryAddSingleton<IDbContextFactory<T>>(
-            sp =>
-            {
-                SetupDbContext(defaultEFCoreOptionsAction, sp, optionsBuilder);
-                return new UmbracoPooledDbContextFactory<T>(sp.GetRequiredService<IRuntimeState>(), optionsBuilder.Options);
-            });
         services.AddPooledDbContextFactory<T>((provider, builder) => SetupDbContext(defaultEFCoreOptionsAction, provider, builder));
         services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 
@@ -52,13 +41,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             connectionString = connectionString.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
         }
 
-        var optionsBuilder = new DbContextOptionsBuilder<T>();
-        services.TryAddSingleton<IDbContextFactory<T>>(
-            sp =>
-            {
-                defaultEFCoreOptionsAction?.Invoke(optionsBuilder, providerName, connectionString);
-                return new UmbracoPooledDbContextFactory<T>(sp.GetRequiredService<IRuntimeState>(), optionsBuilder.Options);
-            });
         services.AddPooledDbContextFactory<T>(options => defaultEFCoreOptionsAction?.Invoke(options, providerName, connectionString));
         services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 
@@ -99,13 +81,6 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     {
         optionsAction ??= (sp, options) => { };
 
-        var optionsBuilder = new DbContextOptionsBuilder<T>();
-
-        services.TryAddSingleton<IDbContextFactory<T>>(sp =>
-        {
-            optionsAction.Invoke(sp, optionsBuilder);
-            return new UmbracoPooledDbContextFactory<T>(sp.GetRequiredService<IRuntimeState>(), optionsBuilder.Options);
-        });
         services.AddPooledDbContextFactory<T>(optionsAction);
         services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 

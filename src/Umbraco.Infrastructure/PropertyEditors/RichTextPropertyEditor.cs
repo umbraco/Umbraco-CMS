@@ -4,6 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -176,7 +177,7 @@ public class RichTextPropertyEditor : DataEditor
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
-            IDataTypeService dataTypeService,
+            IDataTypeConfigurationCache dataTypeReadCache,
             ILogger<RichTextPropertyValueEditor> logger,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             ILocalizedTextService localizedTextService,
@@ -189,8 +190,9 @@ public class RichTextPropertyEditor : DataEditor
             IHtmlSanitizer htmlSanitizer,
             IHtmlMacroParameterParser macroParameterParser,
             IContentTypeService contentTypeService,
-            IPropertyValidationService propertyValidationService)
-            : base(attribute, propertyEditors, dataTypeService, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            IPropertyValidationService propertyValidationService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactoryCollection)
+            : base(attribute, propertyEditors, dataTypeReadCache, localizedTextService, logger, shortStringHelper, jsonSerializer, ioHelper, dataValueReferenceFactoryCollection)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _imageSourceParser = imageSourceParser;

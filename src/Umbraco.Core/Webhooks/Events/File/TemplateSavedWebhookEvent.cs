@@ -18,7 +18,7 @@ public class TemplateSavedWebhookEvent : WebhookEventBase<TemplateSavedNotificat
     {
     }
 
-    public override string Alias => "templateSaved";
+    public override string Alias => Constants.WebhookEvents.Aliases.TemplateSaved;
 
     public override object? ConvertNotificationToRequestPayload(TemplateSavedNotification notification)
     {
