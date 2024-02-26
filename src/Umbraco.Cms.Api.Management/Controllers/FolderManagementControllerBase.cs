@@ -1,8 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
