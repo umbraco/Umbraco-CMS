@@ -65,4 +65,6 @@ export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext>
 	}
 }
 
+export default UmbCurrentUserContext;
+
 export const UMB_CURRENT_USER_CONTEXT = new UmbContextToken<UmbCurrentUserContext>('UmbCurrentUserContext');

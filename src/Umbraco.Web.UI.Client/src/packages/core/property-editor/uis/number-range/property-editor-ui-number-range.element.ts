@@ -1,6 +1,5 @@
 import type { UmbInputNumberRangeElement } from '../../../components/input-number-range/input-number-range.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -46,8 +45,6 @@ export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement impleme
 			.maxValue=${this._maxValue}
 			@change=${this._onChange}></umb-input-number-range>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUINumberRangeElement;

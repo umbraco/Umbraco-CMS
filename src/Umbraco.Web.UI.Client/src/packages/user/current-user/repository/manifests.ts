@@ -1,4 +1,3 @@
-import { UmbCurrentUserRepository } from './current-user.repository.js';
 import { UmbCurrentUserStore } from './current-user.store.js';
 import type { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -8,7 +7,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_CURRENT_USER_REPOSITORY_ALIAS,
 	name: 'Current User Repository',
-	api: UmbCurrentUserRepository,
+	api: () => import('./current-user.repository.js'),
 };
 
 const store: ManifestStore = {

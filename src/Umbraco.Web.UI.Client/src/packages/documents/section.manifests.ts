@@ -1,12 +1,12 @@
 import { UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_CONTENT_MENU_ALIAS } from './documents/index.js';
 import type {
+	ManifestSection,
 	ManifestSectionSidebarAppMenuWithEntityActionsKind,
-	ManifestTypes,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Content';
 
-const section: ManifestTypes = {
+const section: ManifestSection = {
 	type: 'section',
 	alias: sectionAlias,
 	name: 'Content Section',

@@ -1,6 +1,6 @@
 import type { ManifestBase } from './manifest-base.interface.js';
 
-export type ManifestTypeMap<ManifestTypes extends ManifestBase> = {
+type ManifestTypeMapGenerator<ManifestTypes extends ManifestBase> = {
 	[Manifest in ManifestTypes as Manifest['type']]: Manifest;
 } & {
 	[key: string]: ManifestBase;
@@ -8,5 +8,6 @@ export type ManifestTypeMap<ManifestTypes extends ManifestBase> = {
 
 export type SpecificManifestTypeOrManifestBase<
 	ManifestTypes extends ManifestBase,
-	T extends keyof ManifestTypeMap<ManifestTypes> | string,
-> = T extends keyof ManifestTypeMap<ManifestTypes> ? ManifestTypeMap<ManifestTypes>[T] : ManifestBase;
+	T extends string,
+	ManifestTypeMapType = ManifestTypeMapGenerator<ManifestTypes>,
+> = T extends keyof ManifestTypeMapType ? ManifestTypeMapType[T] : ManifestBase;

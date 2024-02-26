@@ -99,19 +99,19 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 			}
 		}
 
-		hostConnected() {
+		hostConnected(): void {
 			this.#attached = true;
 			// Note: this might not be optimal, as if hostDisconnected remove one of the controllers, then the next controller will be skipped.
 			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostConnected());
 		}
 
-		hostDisconnected() {
+		hostDisconnected(): void {
 			this.#attached = false;
 			// Note: this might not be optimal, as if hostDisconnected remove one of the controllers, then the next controller will be skipped.
 			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostDisconnected());
 		}
 
-		destroy() {
+		destroy(): void {
 			let ctrl: UmbController | undefined;
 			let prev = null;
 			// Note: A very important way of doing this loop, as foreach will skip over the next item if the current item is removed.

@@ -4,9 +4,9 @@ import { manifests as collectionRepositoryManifests } from './repository/manifes
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { UmbDocumentCollectionContext } from './document-collection.context.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from './index.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
 
-const collectionManifest: ManifestTypes = {
+const collectionManifest: ManifestCollection = {
 	type: 'collection',
 	alias: UMB_DOCUMENT_COLLECTION_ALIAS,
 	name: 'Document Collection',

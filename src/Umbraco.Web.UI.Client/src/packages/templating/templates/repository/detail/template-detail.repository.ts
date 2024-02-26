@@ -9,3 +9,5 @@ export class UmbTemplateDetailRepository extends UmbDetailRepositoryBase<UmbTemp
 		super(host, UmbTemplateServerDataSource, UMB_TEMPLATE_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbTemplateDetailRepository;

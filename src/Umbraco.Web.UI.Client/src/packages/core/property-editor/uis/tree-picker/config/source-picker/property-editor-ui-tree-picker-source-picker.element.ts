@@ -5,7 +5,6 @@ import {
 	type UmbPropertyEditorConfigCollection,
 	UmbPropertyValueChangeEvent,
 } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -41,8 +40,6 @@ export class UmbPropertyEditorUITreePickerSourcePickerElement
 			.nodeId=${this.value?.id}
 			.dynamicRoot=${this.value?.dynamicRoot}></umb-input-tree-picker-source>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITreePickerSourcePickerElement;

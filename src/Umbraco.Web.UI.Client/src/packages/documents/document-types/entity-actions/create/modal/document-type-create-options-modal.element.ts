@@ -1,7 +1,6 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
 import type { UmbDocumentTypeCreateOptionsModalData } from './index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
@@ -60,8 +59,6 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbDataTypeCreateOptionsModalElement;

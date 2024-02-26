@@ -9,3 +9,5 @@ export class UmbUserItemRepository extends UmbItemRepositoryBase<UmbUserItemMode
 		super(host, UmbUserItemServerDataSource, UMB_USER_ITEM_STORE_CONTEXT);
 	}
 }
+
+export default UmbUserItemRepository;

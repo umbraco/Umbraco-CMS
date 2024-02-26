@@ -9,3 +9,5 @@ export class UmbStylesheetItemRepository extends UmbItemRepositoryBase<UmbStyles
 		super(host, UmbStylesheetItemServerDataSource, UMB_STYLESHEET_ITEM_STORE_CONTEXT);
 	}
 }
+
+export default UmbStylesheetItemRepository;

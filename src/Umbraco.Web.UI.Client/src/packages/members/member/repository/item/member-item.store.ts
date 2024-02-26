@@ -21,4 +21,6 @@ export class UmbMemberItemStore extends UmbItemStoreBase<UmbMemberItemModel> {
 	}
 }
 
+export default UmbMemberItemStore;
+
 export const UMB_MEMBER_ITEM_STORE_CONTEXT = new UmbContextToken<UmbMemberItemStore>('UmbMemberItemStore');

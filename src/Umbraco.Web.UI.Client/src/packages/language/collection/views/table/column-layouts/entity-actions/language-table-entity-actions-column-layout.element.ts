@@ -1,5 +1,4 @@
 import type { UmbLanguageDetailModel } from '../../../../../types.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -30,8 +29,6 @@ export class UmbLanguageTableEntityActionsColumnLayoutElement extends UmbLitElem
 			</umb-dropdown>
 		`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 declare global {

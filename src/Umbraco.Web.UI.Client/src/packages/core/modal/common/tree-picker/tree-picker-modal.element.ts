@@ -1,5 +1,4 @@
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -60,8 +59,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbTreePickerModalElement;

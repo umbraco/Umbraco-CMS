@@ -9,7 +9,8 @@ import { html, customElement, property, state, repeat, css } from '@umbraco-cms/
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import type { UmbBlockLayoutBaseModel, UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';

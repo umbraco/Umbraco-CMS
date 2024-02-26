@@ -3,9 +3,8 @@ import { UMB_BLOCK_GRID_DEFAULT_LAYOUT_STYLESHEET } from '../../context/block-gr
 import { UMB_BLOCK_GRID_AREA_TYPE_WORKSPACE_MODAL } from '../../components/block-grid-area-config-entry/index.js';
 import { UmbBlockGridAreaTypeEntriesContext } from './block-grid-area-type-entries.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { html, customElement, property, css, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import {
 	UmbPropertyValueChangeEvent,
@@ -143,8 +142,6 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 					<uui-button id="add-button" look="placeholder" label=${'Add area'} @click=${this.#addNewArea}></uui-button>`
 			: '';
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbPropertyEditorUIBlockGridAreasConfigElement;

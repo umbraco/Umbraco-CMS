@@ -19,6 +19,8 @@ export class UmbRelationTypeTreeStore extends UmbUniqueTreeStore {
 	}
 }
 
+export default UmbRelationTypeTreeStore;
+
 export const UMB_RELATION_TYPE_TREE_STORE_CONTEXT = new UmbContextToken<UmbRelationTypeTreeStore>(
 	'UmbRelationTypeTreeStore',
 );

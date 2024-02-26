@@ -1,9 +1,9 @@
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
-import { UmbBlockManagerContext } from '../../block/context/block-manager.context.js';
 import type { UmbBlockListWorkspaceData } from '../index.js';
 import type { UmbBlockDataType } from '../../block/types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 
 /**
  * A implementation of the Block Manager specifically for the Block List Editor.
