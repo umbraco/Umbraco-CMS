@@ -1,7 +1,7 @@
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceEditorView,
+	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspaceAlias = 'Umb.Workspace.Webhooks';
@@ -10,23 +10,23 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: workspaceAlias,
 	name: 'Webhooks Root Workspace',
-	loader: () => import('./webhooks-workspace.element.js'),
+	js: () => import('./webhooks-workspace.element.js'),
 	meta: {
 		entityType: 'webhooks',
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceEditorView> = [
+const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
-		type: 'workspaceEditorView',
-		alias: 'Umb.WorkspaceView.Webhooks.Overview',
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Webhook.Overview',
 		name: 'Webhooks Root Workspace Overview View',
-		loader: () => import('../views/overview/index.js'),
+		js: () => import('../views/webhook-details-workspace-view.js'),
 		weight: 300,
 		meta: {
 			label: 'Webhooks',
 			pathname: 'webhooks',
-			icon: 'umb:anchor',
+			icon: 'anchor',
 		},
 		conditions: [
 			{
@@ -36,15 +36,15 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		],
 	},
 	{
-		type: 'workspaceEditorView',
-		alias: 'Umb.WorkspaceView.Webhooks.Logs',
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Webhook.Logs',
 		name: 'Webhooks Root Workspace Logs View',
-		loader: () => import('../views/logs/index.js'),
+		js: () => import('../views/logs/index.js'),
 		weight: 200,
 		meta: {
 			label: 'Logs',
 			pathname: 'logs',
-			icon: 'umb:box-alt',
+			icon: 'box-alt',
 		},
 		conditions: [
 			{
