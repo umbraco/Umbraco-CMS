@@ -12,15 +12,16 @@ import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-document-granular-user-permission')
-export class UmbInputDocumentGranularUserPermissionElement extends UmbLitElement {
-	_value: Array<UmbDocumentUserPermissionModel> = [];
-	public get value(): Array<UmbDocumentUserPermissionModel> {
-		return this._value;
+export class UmbInputDocumentGranularUserPermissionElement extends FormControlMixin(UmbLitElement) {
+	_permissions: Array<UmbDocumentUserPermissionModel> = [];
+	public get permissions(): Array<UmbDocumentUserPermissionModel> {
+		return this._permissions;
 	}
-	public set value(value: Array<UmbDocumentUserPermissionModel>) {
-		this._value = value;
+	public set permissions(value: Array<UmbDocumentUserPermissionModel>) {
+		this._permissions = value;
 		const uniques = value.map((item) => item.document.id);
 		this.#observePickedDocuments(uniques);
 	}
@@ -39,6 +40,10 @@ export class UmbInputDocumentGranularUserPermissionElement extends UmbLitElement
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => (this.#modalManagerContext = instance));
 	}
 
+	protected getFormElement() {
+		return undefined;
+	}
+
 	async #observePickedDocuments(uniques: Array<string>) {
 		const { asObservable } = await this.#documentItemRepository.requestItems(uniques);
 		this.observe(asObservable(), (items) => (this._items = items));
@@ -51,7 +56,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UmbLitElement
 		if (JSON.stringify(result) === JSON.stringify(currentPermissionVerbs)) return;
 
 		// update permission with new verbs
-		this.value = this._value.map((permission) => {
+		this.permissions = this._permissions.map((permission) => {
 			if (permission.document.id === item.unique) {
 				return {
 					...permission,
@@ -90,7 +95,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UmbLitElement
 				verbs: result,
 			};
 
-			this.value = [...this._value, permissionItem];
+			this.permissions = [...this._permissions, permissionItem];
 			this.dispatchEvent(new UmbChangeEvent());
 		});
 	}
@@ -133,7 +138,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UmbLitElement
 		const permission = this.#getPermissionForDocument(item.unique);
 		if (!permission) return;
 
-		this.value = this._value.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
+		this.permissions = this._permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -201,7 +206,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UmbLitElement
 	}
 
 	#getPermissionForDocument(unique: string) {
-		return this._value?.find((permission) => permission.document.id === unique);
+		return this._permissions?.find((permission) => permission.document.id === unique);
 	}
 
 	#getPermissionNamesForDocument(unique: string) {

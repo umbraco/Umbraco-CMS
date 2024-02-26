@@ -49,7 +49,7 @@ export class UmbUserGroupGranularPermissionListElement extends UmbLitElement {
 				const permissionsForSchemaType =
 					userGroup.permissions.filter((permission) => permission.$type === schemaType) || [];
 
-				element.value = permissionsForSchemaType;
+				element.permissions = permissionsForSchemaType;
 				element.manifest = manifest;
 				element.addEventListener(UmbChangeEvent.TYPE, this.#onValueChange);
 			},
