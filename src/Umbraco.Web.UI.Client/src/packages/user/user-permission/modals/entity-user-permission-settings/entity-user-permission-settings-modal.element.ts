@@ -34,10 +34,10 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 			<umb-body-layout headline=${this._headline}>
 				<uui-box>
 					${this._entityType
-						? html` <umb-entity-user-permission-settings-list
+						? html` <umb-input-entity-user-permission
 								.entityType=${this._entityType}
 								.allowedVerbs=${this.value?.allowedVerbs ?? []}
-								@selection-change=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>`
+								@selection-change=${this.#onSelectedUserPermission}></umb-input-entity-user-permission>`
 						: nothing}
 				</uui-box>
 

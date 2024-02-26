@@ -1,7 +1,7 @@
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.context.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -56,10 +56,10 @@ export class UmbUserGroupEntityUserPermissionListElement extends UmbLitElement {
 	#renderPermissionsByEntityType(entityType: string) {
 		return html`
 			<h4><umb-localize .key=${`user_permissionsEntityGroup_${entityType}`}>${entityType}</umb-localize></h4>
-			<umb-entity-user-permission-settings-list
+			<umb-input-entity-user-permission
 				.entityType=${entityType}
 				.allowedVerbs=${this._fallBackPermissions || []}
-				@selection-change=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>
+				@selection-change=${this.#onSelectedUserPermission}></umb-input-entity-user-permission>
 		`;
 	}
 

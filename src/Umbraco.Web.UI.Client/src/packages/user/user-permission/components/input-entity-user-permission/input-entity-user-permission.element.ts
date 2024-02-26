@@ -1,4 +1,3 @@
-import type { UmbUserPermissionModel } from '../../types.js';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
@@ -8,8 +7,8 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 import type { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-entity-user-permission-settings-list')
-export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
+@customElement('umb-input-entity-user-permission')
+export class UmbInputEntityUserPermissionElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType(): string {
 		return this._entityType;
@@ -104,10 +103,10 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	}
 }
 
-export default UmbEntityUserPermissionSettingsListElement;
+export default UmbInputEntityUserPermissionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-entity-user-permission-settings-list': UmbEntityUserPermissionSettingsListElement;
+		'umb-input-entity-user-permission': UmbInputEntityUserPermissionElement;
 	}
 }
