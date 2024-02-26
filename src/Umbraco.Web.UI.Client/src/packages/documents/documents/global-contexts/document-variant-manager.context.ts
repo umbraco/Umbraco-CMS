@@ -11,7 +11,11 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import {
+	UMB_APP_LANGUAGE_CONTEXT,
+	UmbLanguageCollectionRepository,
+	type UmbLanguageDetailModel,
+} from '@umbraco-cms/backoffice/language';
 
 export class UmbDocumentVariantManagerContext
 	extends UmbContextBase<UmbDocumentVariantManagerContext>
@@ -19,8 +23,10 @@ export class UmbDocumentVariantManagerContext
 {
 	#publishingRepository = new UmbDocumentPublishingRepository(this);
 	#documentRepository = new UmbDocumentDetailRepository(this);
+	#languageRepository = new UmbLanguageCollectionRepository(this);
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#appLanguageCulture?: string;
+	#languageCollection: Array<UmbLanguageDetailModel> = [];
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_VARIANT_MANAGER_CONTEXT);
@@ -33,6 +39,10 @@ export class UmbDocumentVariantManagerContext
 			this.observe(appLanguageContext.appLanguageCulture, (culture) => {
 				this.#appLanguageCulture = culture?.toLowerCase();
 			});
+		});
+
+		this.#languageRepository.requestCollection({}).then(({ data }) => {
+			this.#languageCollection = data?.items ?? [];
 		});
 	}
 
@@ -110,6 +120,66 @@ export class UmbDocumentVariantManagerContext
 
 		if (variantIds.length) {
 			await this.#publishingRepository.unpublish(documentUnique, variantIds);
+		}
+	}
+
+	/**
+	 * Publish the latest version of documents indescriminately allowing the user to choose between all languages.
+	 * @param documentUniques The unique identifiers of the documents.
+	 */
+	async publishIndescriminate(documentUniques: Array<string>) {
+		// Map to UmbDocumentVariantModel for now, until we have a proper variant model for the variant picker.
+		const variants: Array<UmbDocumentVariantModel> = this.#languageCollection.map((x) => ({
+			culture: x.unique,
+			segment: null,
+			name: x.name,
+			isMandatory: x.isMandatory,
+			state: UmbDocumentVariantState.PUBLISHED,
+			createDate: '',
+			updateDate: '',
+			publishDate: '',
+		}));
+
+		const variantIds = await this.pickVariants(
+			variants,
+			'publish',
+			this.#appLanguageCulture ? [this.#appLanguageCulture] : undefined,
+		);
+
+		if (variantIds.length) {
+			for (const documentUnique of documentUniques) {
+				await this.#publishingRepository.publish(documentUnique, variantIds);
+			}
+		}
+	}
+
+	/**
+	 * Unpublish the latest version of documents indescriminately allowing the user to choose between all languages.
+	 * @param documentUniques The unique identifiers of the documents.
+	 */
+	async unpublishIndescriminate(documentUniques: Array<string>) {
+		// Map to UmbDocumentVariantModel for now, until we have a proper variant model for the variant picker.
+		const variants: Array<UmbDocumentVariantModel> = this.#languageCollection.map((x) => ({
+			culture: x.unique,
+			segment: null,
+			name: x.name,
+			isMandatory: x.isMandatory,
+			state: UmbDocumentVariantState.PUBLISHED,
+			createDate: '',
+			updateDate: '',
+			publishDate: '',
+		}));
+
+		const variantIds = await this.pickVariants(
+			variants,
+			'unpublish',
+			this.#appLanguageCulture ? [this.#appLanguageCulture] : undefined,
+		);
+
+		if (variantIds.length) {
+			for (const documentUnique of documentUniques) {
+				await this.#publishingRepository.unpublish(documentUnique, variantIds);
+			}
 		}
 	}
 }
