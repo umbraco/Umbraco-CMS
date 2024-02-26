@@ -24,10 +24,10 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	private _workspacePath?: string;
 
 	@state()
-	private _filtered?: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }>;
+	private _filtered: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
 
 	@state()
-	private _search?: string;
+	private _search = '';
 
 	constructor() {
 		super();
@@ -66,6 +66,23 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		}));
 
 		this._groupedBlocks = [{ blocks: noGroupBlocks }, ...grouped];
+		this.#onFilter();
+	}
+
+	#onFilter() {
+		if (this._search.length < 3) {
+			this._filtered = this._groupedBlocks;
+		} else {
+			const search = this._search.toLowerCase();
+			this._filtered = this._groupedBlocks.filter((group) => {
+				return group.blocks.find((block) => block.label?.toLocaleLowerCase().includes(search)) ? true : false;
+			});
+		}
+	}
+
+	#onSearch(e: UUIInputEvent) {
+		this._search = e.target.value as string;
+		this.#onFilter();
 	}
 
 	render() {
@@ -86,10 +103,6 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderClipboard() {
 		return html`Clipboard`;
-	}
-
-	#onSearch(e: UUIInputEvent) {
-		console.log('on search change', e.target.value);
 	}
 
 	#renderCreateEmpty() {
