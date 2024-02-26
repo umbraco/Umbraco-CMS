@@ -146,7 +146,7 @@ public class ContentTypeTests
         Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
         Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
         Assert.AreEqual(clone.Icon, contentType.Icon);
-        Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
+        Assert.AreEqual(clone.ListView, contentType.ListView);
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
@@ -225,7 +225,7 @@ public class ContentTypeTests
         Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
         Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
         Assert.AreEqual(clone.Icon, contentType.Icon);
-        Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
+        Assert.AreEqual(clone.ListView, contentType.ListView);
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();
@@ -288,7 +288,7 @@ public class ContentTypeTests
         Assert.AreEqual(clone.UpdateDate, contentType.UpdateDate);
         Assert.AreEqual(clone.Thumbnail, contentType.Thumbnail);
         Assert.AreEqual(clone.Icon, contentType.Icon);
-        Assert.AreEqual(clone.IsContainer, contentType.IsContainer);
+        Assert.AreEqual(clone.ListView, contentType.ListView);
 
         // This double verifies by reflection
         var allProps = clone.GetType().GetProperties();

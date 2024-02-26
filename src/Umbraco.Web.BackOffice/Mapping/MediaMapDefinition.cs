@@ -109,6 +109,6 @@ public class MediaMapDefinition : IMapDefinition
     {
         // map the IsChildOfListView (this is actually if it is a descendant of a list view!)
         IMedia? parent = _mediaService.GetParent(source);
-        return parent != null && (parent.ContentType.IsContainer || _mediaTypeService.HasContainerInPath(parent.Path));
+        return parent != null && (parent.ContentType.ListView is not null || _mediaTypeService.HasContainerInPath(parent.Path));
     }
 }

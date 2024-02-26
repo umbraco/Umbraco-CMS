@@ -32,27 +32,29 @@ public class UpdateDomainsController : DocumentControllerBase
 
         Attempt<IEnumerable<IDomain>, DomainOperationStatus> result = await _domainService.UpdateDomainsAsync(id, domainsUpdateModel);
 
-        return result.Status switch
-        {
-            DomainOperationStatus.Success => Ok(),
-            DomainOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Cancelled by notification")
-                .WithDetail("A notification handler prevented the domain update operation.")
-                .Build()),
-            DomainOperationStatus.ContentNotFound => NotFound(new ProblemDetailsBuilder()
+        return result.Success
+            ? Ok()
+            : OperationStatusResult(result.Status, problemDetailsBuilder => result.Status switch
+            {
+                DomainOperationStatus.Success => Ok(),
+                DomainOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
+                    .WithTitle("Cancelled by notification")
+                    .WithDetail("A notification handler prevented the domain update operation.")
+                    .Build()),
+                DomainOperationStatus.ContentNotFound => NotFound(problemDetailsBuilder
                     .WithTitle("The targeted content item was not found.")
                     .Build()),
-            DomainOperationStatus.LanguageNotFound => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid language specified")
-                .WithDetail("One or more of the specified language ISO codes could not be found.")
-                .Build()),
-            DomainOperationStatus.DuplicateDomainName => Conflict(new ProblemDetailsBuilder()
-                .WithTitle("Duplicate domain name detected")
-                .WithDetail("One or more of the specified domain names were duplicates, possibly of assignments to other content items.")
-                .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
-                .WithTitle("Unknown domain update operation status.")
-                .Build()),
-        };
+                DomainOperationStatus.LanguageNotFound => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid language specified")
+                    .WithDetail("One or more of the specified language ISO codes could not be found.")
+                    .Build()),
+                DomainOperationStatus.DuplicateDomainName => Conflict(problemDetailsBuilder
+                    .WithTitle("Duplicate domain name detected")
+                    .WithDetail("One or more of the specified domain names were duplicates, possibly of assignments to other content items.")
+                    .Build()),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                    .WithTitle("Unknown domain update operation status.")
+                    .Build()),
+            });
     }
 }
