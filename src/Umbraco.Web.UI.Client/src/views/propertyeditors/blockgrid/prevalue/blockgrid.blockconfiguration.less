@@ -1,32 +1,29 @@
 .umb-block-grid-block-configuration {
+  margin-bottom: 20px;
 
-    margin-bottom: 20px;
+  uui-button {
+    --uui-button-border-radius: 6px;
+    font-weight: 700;
+    min-height: 80px;
+  }
 
-    uui-button {
-        font-weight: 700;
-        --uui-button-border-radius: 6px;
-        min-height: 80px;
+  .__get-sample-box {
+    position: relative;
+    border: 1px solid @gray-10;
+    border-radius: 6px;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, .07);
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-top: 15px;
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+    max-width: 480px;
+
+    umb-button {
+      margin-left: auto;
+      margin-right: 0;
+      display: block;
+      width: fit-content;
     }
-
-    .__get-sample-box {
-        position:relative;
-        border: 1px solid @gray-10;
-        border-radius: 6px;
-        box-shadow: 3px 3px 6px rgba(0, 0, 0, .07);
-
-        padding-left: 40px;
-        padding-right: 40px;
-        padding-top: 15px;
-        padding-bottom: 20px;
-        margin-bottom: 40px;
-        max-width: 480px;
-
-        umb-button {
-            margin-left: auto;
-            margin-right: 0;
-            display: block;
-            width: fit-content;
-        }
-    }
-
+  }
 }

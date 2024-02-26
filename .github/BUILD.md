@@ -40,17 +40,21 @@ You can also run the tasks manually on the command line:
 
 ```
 cd src\Umbraco.Web.UI.Client
-npm install
+npm i
 npm run dev
 ```
 
-or
+If you just want to build the UI Client to `Umbraco.Web.UI` then instead of running `dev`, you can do: `npm run build`.
+
+The login screen is a different frontend build, for that one you can run it as follows:
 
 ```
-cd src\Umbraco.Web.UI.Client
-npm install
-gulp dev
+cd src\Umbraco.Web.UI.Login
+npm i
+npm run dev
 ```
+
+If you just want to build the Login screen to `Umbraco.Web.UI` then instead of running `dev`, you can do: `npm run build`.
 
 **The initial Gulp build might take a long time - don't worry, this will be faster on subsequent runs.**
 

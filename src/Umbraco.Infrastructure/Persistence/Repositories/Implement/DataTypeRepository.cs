@@ -1,5 +1,6 @@
 using System.Data;
 using System.Globalization;
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -17,6 +19,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Constants.SqlTemplates;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -123,6 +126,84 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
                 .EnsureClosed(),
             x => (IEnumerable<string>)x.PropertyTypes.Select(p => p.Alias).ToList());
     }
+
+    public IReadOnlyDictionary<Udi, IEnumerable<string>> FindListViewUsages(int id)
+    {
+        var usages = new Dictionary<Udi, IEnumerable<string>>();
+
+        if (id == default)
+        {
+            return usages;
+        }
+
+        IDataType? dataType = Get(id);
+
+        if (dataType != null && dataType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ListView))
+        {
+            // Get All contentTypes where isContainer (list view enabled) is set to true
+            Sql<ISqlContext> sql = Sql()
+           .Select<ContentTypeDto>(ct => ct.Select(node => node.NodeDto))
+           .From<ContentTypeDto>()
+           .InnerJoin<NodeDto>().On<NodeDto, ContentTypeDto>(n => n.NodeId, ct => ct.NodeId)
+           .Where<ContentTypeDto>(ct => ct.IsContainer == true);
+
+            List<ContentTypeDto> ctds = Database.Fetch<ContentTypeDto>(sql);
+
+            // If there are not any ContentTypes with a ListView return.
+            if (!ctds.Any())
+            {
+                return usages;
+            }
+
+            // First check if it is a custom list view
+            ContentTypeDto? customListView = ctds.Where(x => (Constants.Conventions.DataTypes.ListViewPrefix + x.Alias).Equals(dataType.Name)).FirstOrDefault();
+
+            if (customListView != null)
+            {
+                // Add usages as customListView
+                usages.Add(
+                    new GuidUdi(ObjectTypes.GetUdiType(customListView.NodeDto.NodeObjectType!.Value), customListView.NodeDto.UniqueId),
+                    new List<string> { dataType.Name! });
+            }
+            else
+            {
+                // It is not a custom ListView, so check the default ones.
+                foreach (ContentTypeDto contentWithListView in ctds)
+                {
+                    var customListViewName = Constants.Conventions.DataTypes.ListViewPrefix + contentWithListView.Alias;
+                    IDataType? clv = Get(Query<IDataType>().Where(x => x.Name == customListViewName))?.FirstOrDefault();
+
+                    // Check if the content type has a custom listview (extra check to prevent duplicates)
+                    if (clv == null)
+                    {
+                        // ContentType has no custom listview so it uses the default one
+                        var udi = new GuidUdi(ObjectTypes.GetUdiType(contentWithListView.NodeDto.NodeObjectType!.Value), contentWithListView.NodeDto.UniqueId);
+                        var listViewType = new List<string>();
+
+                        if (dataType.Id.Equals(Constants.DataTypes.DefaultContentListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.DocumentType))
+                            listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Content");
+                        else if (dataType.Id.Equals(Constants.DataTypes.DefaultMediaListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.MediaType))
+                            listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Media");
+                        else if (dataType.Id.Equals(Constants.DataTypes.DefaultMembersListView) && udi.EntityType == ObjectTypes.GetUdiType(UmbracoObjectTypes.MemberType))
+                            listViewType.Add(Constants.Conventions.DataTypes.ListViewPrefix + "Members");
+
+                        if (listViewType.Any())
+                        {
+                            var added = usages.TryAdd(udi, listViewType);
+                            if (!added)
+                            {
+                                usages[udi] = usages[udi].Append(dataType.Name!);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return usages;
+    }
+
 
     #region Overrides of RepositoryBase<int,DataTypeDefinition>
 

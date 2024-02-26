@@ -30,9 +30,7 @@ Use this directive to render an avatar.
             var vm = this;
 
             vm.avatar = [
-                { value: "assets/logo.png" },
-                { value: "assets/logo@2x.png" },
-                { value: "assets/logo@3x.png" }
+                { value: "assets/img/application/logo.svg" }
             ];
 
         }
@@ -55,7 +53,7 @@ Use this directive to render an avatar.
     function AvatarDirective(localizationService) {
 
         function link(scope, element, attrs, ctrl) {
-            
+
             var eventBindings = [];
             scope.initials = "";
             scope.avatarAlt = "";

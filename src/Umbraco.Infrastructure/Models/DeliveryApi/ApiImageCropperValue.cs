@@ -1,10 +1,8 @@
-using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
-
 namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
 internal sealed class ApiImageCropperValue
 {
-    public ApiImageCropperValue(string url, ImageCropperValue.ImageCropperFocalPoint? focalPoint, IEnumerable<ImageCropperValue.ImageCropperCrop>? crops)
+    public ApiImageCropperValue(string url, ImageFocalPoint? focalPoint, IEnumerable<ImageCrop>? crops)
     {
         Url = url;
         FocalPoint = focalPoint;
@@ -13,7 +11,7 @@ internal sealed class ApiImageCropperValue
 
     public string Url { get; }
 
-    public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; }
+    public ImageFocalPoint? FocalPoint { get; }
 
-    public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; }
+    public IEnumerable<ImageCrop>? Crops { get; }
 }

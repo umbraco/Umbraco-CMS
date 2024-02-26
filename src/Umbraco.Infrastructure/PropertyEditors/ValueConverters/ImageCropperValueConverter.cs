@@ -73,7 +73,10 @@ public class ImageCropperValueConverter : PropertyValueConverterBase, IDeliveryA
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(ApiImageCropperValue);
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
-        => inter is ImageCropperValue {Src: { }} imageCropperValue
-            ? new ApiImageCropperValue(imageCropperValue.Src, imageCropperValue.FocalPoint, imageCropperValue.Crops)
+        => inter is ImageCropperValue { Src: { } } imageCropperValue
+            ? new ApiImageCropperValue(
+                imageCropperValue.Src,
+                imageCropperValue.GetImageFocalPoint(),
+                imageCropperValue.GetImageCrops())
             : null;
 }
