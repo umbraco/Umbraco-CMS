@@ -1,3 +1,3 @@
-import { manifests as webhooksRootManifests } from './webhooks/manifests.js';
+import { manifests as webhookRootManifests } from './overview/manifests.js';
 
-export const manifests = [...webhooksRootManifests];
+export const manifests = [...webhookRootManifests];

@@ -36,12 +36,13 @@ export class UmbWebhookCollectionServerDataSource implements UmbCollectionDataSo
 		if (data) {
 			const items = data.items.map((item) => {
 				const model: UmbWebhookDetailModel = {
-					unique: item.isoCode.toLowerCase(),
-					name: item.name,
+					unique: '', //item.id.toLowerCase(),
+					//name: item.name,
 					entityType: UMB_WEBHOOK_ENTITY_TYPE,
-					isDefault: item.isDefault,
-					isMandatory: item.isMandatory,
-					fallbackIsoCode: item.fallbackIsoCode?.toLowerCase() || null,
+					url: item.url,
+					enabled: item.enabled,
+					events: item.events.split(','),
+					types: item.types.split(','),
 				};
 
 				return model;

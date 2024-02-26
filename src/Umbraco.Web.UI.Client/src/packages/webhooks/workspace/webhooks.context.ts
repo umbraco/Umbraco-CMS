@@ -31,10 +31,6 @@ export class UmbWebhooksWorkspaceContext extends UmbBaseController implements Um
 		this.provideContext(UMB_APP_WEBHOOKS_CONTEXT, this);
 		this.#repository = new UmbWebhookRepository(host);
 	}
-
-	onChangeState = () => {
-		
-	};
 }
 
 export const UMB_APP_WEBHOOKS_CONTEXT = new UmbContextToken<UmbWebhooksWorkspaceContext>(

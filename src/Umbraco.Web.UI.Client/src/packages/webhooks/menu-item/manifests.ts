@@ -7,8 +7,8 @@ const menuItem: ManifestMenuItem = {
 	weight: 100,
 	meta: {
 		label: 'Webhooks',
-		icon: 'umb:anchor',
-		entityType: 'webhooks',
+		icon: 'webhook',
+		entityType: 'webhook-root',
 		menus: ['Umb.Menu.Settings'],
 	},
 };

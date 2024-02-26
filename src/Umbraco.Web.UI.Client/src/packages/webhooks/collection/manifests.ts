@@ -18,7 +18,7 @@ const collectionManifest: ManifestCollection = {
 
 export const manifests = [
 	collectionManifest,
-	...collectionRepositoryManifests,
+	//...collectionRepositoryManifests,
 	...collectionViewManifests,
 	...collectionActionManifests,
 ];
