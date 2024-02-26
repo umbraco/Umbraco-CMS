@@ -131,9 +131,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		const segment = variantId.segment;
 
 		this.observe(
-			this.#languages.asObservable(),
-			(languages) => {
-				const languageName = languages.find((language) => language.unique === variantId.culture)?.name ?? '';
+			this.#languages.asObservablePart(
+				(languages) => languages.find((language) => language.unique === variantId.culture)?.name ?? '',
+			),
+			(languageName) => {
 				this._variantDisplayName = (languageName ? languageName : '') + (segment ? ' — ' + segment : '');
 				this._variantTitleName =
 					(languageName ? `${languageName} (${culture})` : '') + (segment ? ' — ' + segment : '');
