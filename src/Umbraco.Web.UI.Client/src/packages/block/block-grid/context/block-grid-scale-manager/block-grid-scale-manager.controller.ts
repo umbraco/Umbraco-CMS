@@ -1,69 +1,7 @@
+import { getAccumulatedValueOfIndex, getInterpolatedIndexOfPositionInWeightMap } from '@umbraco-cms/backoffice/utils';
+import { closestColumnSpanOption } from '../../utils/index.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-
-// Utils:
-// TODO: Move these methods into their own files:
-
-function getInterpolatedIndexOfPositionInWeightMap(target: number, weights: Array<number>) {
-	const map = [0];
-	weights.reduce((a, b, i) => {
-		return (map[i + 1] = a + b);
-	}, 0);
-	const foundValue = map.reduce((a, b) => {
-		const aDiff = Math.abs(a - target);
-		const bDiff = Math.abs(b - target);
-
-		if (aDiff === bDiff) {
-			return a < b ? a : b;
-		} else {
-			return bDiff < aDiff ? b : a;
-		}
-	});
-	const foundIndex = map.indexOf(foundValue);
-	const targetDiff = target - foundValue;
-	let interpolatedIndex = foundIndex;
-	if (targetDiff < 0 && foundIndex === 0) {
-		// Don't adjust.
-	} else if (targetDiff > 0 && foundIndex === map.length - 1) {
-		// Don't adjust.
-	} else {
-		const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex - 1];
-		interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : targetDiff / foundInterpolationWeight;
-	}
-	return interpolatedIndex;
-}
-
-function getAccumulatedValueOfIndex(index: number, weights: Array<number>) {
-	const len = Math.min(index, weights.length);
-	let i = 0,
-		calc = 0;
-	while (i < len) {
-		calc += weights[i++];
-	}
-	return calc;
-}
-
-function closestColumnSpanOption(target: number, map: Array<number>, max: number) {
-	if (map.length > 0) {
-		const result = map.reduce((a, b) => {
-			if (a > max) {
-				return b;
-			}
-			const aDiff = Math.abs(a - target);
-			const bDiff = Math.abs(b - target);
-
-			if (aDiff === bDiff) {
-				return a < b ? a : b;
-			} else {
-				return bDiff < aDiff ? b : a;
-			}
-		});
-		if (result) {
-			return result;
-		}
-	}
-	return;
-}
 
 // This might be more generic than Block Grid, but this is where it belongs currently:
 export interface UmbBlockGridScalableContext extends UmbControllerHost {

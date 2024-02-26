@@ -1,10 +1,10 @@
-import icons from '../../../../../shared/icon-registry/icons/icons.json' assert { type: 'json' };
+import icons from '../../../icon-registry/icons/icons.json' assert { type: 'json' };
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-import type { UmbIconPickerModalData, UmbIconPickerModalValue} from '@umbraco-cms/backoffice/modal';
+import type { UmbIconPickerModalData, UmbIconPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 // TODO: Make use of UmbPickerLayoutBase

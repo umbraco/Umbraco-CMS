@@ -8,3 +8,5 @@ export class UmbMediaTypeStructureRepository extends UmbContentTypeStructureRepo
 		super(host, UmbMediaTypeStructureServerDataSource);
 	}
 }
+
+export default UmbMediaTypeStructureRepository;

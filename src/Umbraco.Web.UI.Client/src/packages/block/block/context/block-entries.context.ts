@@ -1,8 +1,8 @@
-import type { UmbBlockTypeBaseModel } from '../../block-type/types.js';
 import type { UmbBlockDataType, UmbBlockLayoutBaseModel } from '../types.js';
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../workspace/block-workspace.modal-token.js';
 import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-manager.context.js';
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

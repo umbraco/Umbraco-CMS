@@ -17,14 +17,14 @@ const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_MEMBER_TYPE_TREE_REPOSITORY_ALIAS,
 	name: 'Member Type Tree Repository',
-	api: UmbMemberTypeTreeRepository,
+	api: () => import('./member-type-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_MEMBER_TYPE_TREE_STORE_ALIAS,
 	name: 'Member Type Tree Store',
-	api: UmbMemberTypeTreeStore,
+	api: () => import('./member-type-tree.store.js'),
 };
 
 const tree: ManifestTree = {

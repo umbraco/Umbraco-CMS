@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { TemporaryFileConfigurationResponseModel } from '../models/TemporaryFileConfigurationResponseModel';
 import type { TemporaryFileResponseModel } from '../models/TemporaryFileResponseModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -85,7 +86,7 @@ export class TemporaryFileResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getTemporaryFileConfiguration(): CancelablePromise<any> {
+    public static getTemporaryFileConfiguration(): CancelablePromise<TemporaryFileConfigurationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/temporary-file/configuration',

@@ -1,7 +1,6 @@
 import { UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
 import type { UmbMediaTypeCreateOptionsModalData } from './index.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	type UmbModalManagerContext,
 	type UmbModalContext,
@@ -68,8 +67,6 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbDataTypeCreateOptionsModalElement;

@@ -9,3 +9,5 @@ export class UmbRenameStylesheetRepository extends UmbRenameRepositoryBase<UmbSt
 		super(host, UmbRenameStylesheetServerDataSource, UMB_STYLESHEET_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbRenameStylesheetRepository;

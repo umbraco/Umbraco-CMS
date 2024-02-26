@@ -9,3 +9,5 @@ export class UmbStaticFileItemRepository extends UmbItemRepositoryBase<UmbStatic
 		super(host, UmbStaticFileItemServerDataSource, UMB_STATIC_FILE_ITEM_STORE_CONTEXT);
 	}
 }
+
+export default UmbStaticFileItemRepository;

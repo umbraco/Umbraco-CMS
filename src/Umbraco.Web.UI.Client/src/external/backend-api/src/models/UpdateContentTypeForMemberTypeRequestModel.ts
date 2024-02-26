@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 import type { UpdateMemberTypePropertyTypeContainerRequestModel } from './UpdateMemberTypePropertyTypeContainerRequestModel';
 import type { UpdateMemberTypePropertyTypeRequestModel } from './UpdateMemberTypePropertyTypeRequestModel';
 
@@ -14,6 +15,7 @@ export type UpdateContentTypeForMemberTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<UpdateMemberTypePropertyTypeRequestModel>;
     containers: Array<UpdateMemberTypePropertyTypeContainerRequestModel>;

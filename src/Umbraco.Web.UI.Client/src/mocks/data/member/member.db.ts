@@ -42,7 +42,6 @@ const createDetailMockMapper = (request: CreateMemberRequestModel): UmbMockMembe
 		memberType: {
 			id: memberType.id,
 			icon: memberType.icon,
-			hasListView: memberType.hasListView,
 		},
 		username: request.username,
 		values: request.values,

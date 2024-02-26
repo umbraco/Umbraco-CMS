@@ -73,3 +73,5 @@ export class UmbTagStore extends UmbStoreBase {
 		this._data.remove(uniques);
 	}
 }
+
+export default UmbTagStore;

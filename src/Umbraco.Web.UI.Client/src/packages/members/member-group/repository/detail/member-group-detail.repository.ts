@@ -15,3 +15,5 @@ export class UmbMemberGroupDetailRepository extends UmbDetailRepositoryBase<UmbM
 		super(host, UmbMemberGroupServerDataSource, UMB_MEMBER_GROUP_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbMemberGroupDetailRepository;

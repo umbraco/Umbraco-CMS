@@ -2,7 +2,6 @@ import type { UmbDocumentWorkspaceContext } from './document-workspace.context.j
 import { UmbDocumentWorkspaceEditorElement } from './document-workspace-editor.element.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
@@ -63,8 +62,6 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 	render() {
 		return html`<umb-router-slot .routes="${this._routes}"></umb-router-slot>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbDocumentWorkspaceElement;

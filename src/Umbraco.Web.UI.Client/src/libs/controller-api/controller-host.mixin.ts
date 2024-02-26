@@ -99,32 +99,34 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 			}
 		}
 
-		hostConnected() {
+		hostConnected(): void {
 			this.#attached = true;
 			// Note: this might not be optimal, as if hostDisconnected remove one of the controllers, then the next controller will be skipped.
 			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostConnected());
 		}
 
-		hostDisconnected() {
+		hostDisconnected(): void {
 			this.#attached = false;
 			// Note: this might not be optimal, as if hostDisconnected remove one of the controllers, then the next controller will be skipped.
 			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostDisconnected());
 		}
 
-		destroy() {
+		destroy(): void {
 			let ctrl: UmbController | undefined;
-			//let prev = null;
+			let prev = null;
 			// Note: A very important way of doing this loop, as foreach will skip over the next item if the current item is removed.
 			while ((ctrl = this.#controllers[0])) {
 				ctrl.destroy();
-				/*
-				//This code can help debug if there is some controller that does not destroy properly: (When a controller is destroyed it should remove it self)
+
+				// Help developer realize that they made a mistake in code:
 				if (ctrl === prev) {
-					console.log('WUPS, we have a controller that does not destroy it self');
-					debugger;
+					throw new Error(
+						`Controller with controller alias: '${ctrl.controllerAlias?.toString()}' and class name: '${
+							(ctrl as any).constructor.name
+						}', does not remove it self when destroyed. This can cause memory leaks. Please fix this issue.`,
+					);
 				}
 				prev = ctrl;
-				*/
 			}
 			this.#controllers.length = 0;
 		}

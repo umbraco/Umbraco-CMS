@@ -118,6 +118,7 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 		compositions: item.compositions,
 		allowedTemplates: item.allowedTemplates,
 		cleanup: item.cleanup,
+		collection: item.collection,
 	};
 };
 

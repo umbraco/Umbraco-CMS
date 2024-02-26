@@ -1,6 +1,5 @@
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
 import { html, customElement, property, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../../components/input-image-cropper/input-image-cropper.element.js';
@@ -56,8 +55,6 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 
 		return html`<umb-input-image-cropper @change=${this.#onChange} .value=${this.value}></umb-input-image-cropper>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIImageCropperElement;
