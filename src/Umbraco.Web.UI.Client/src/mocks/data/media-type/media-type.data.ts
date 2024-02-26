@@ -57,6 +57,26 @@ export const data: Array<UmbMockMediaTypeModel> = [
 					labelOnTop: false,
 				},
 			},
+			{
+				id: '7',
+				container: { id: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75' },
+				alias: 'listView',
+				name: 'List View',
+				description: '',
+				dataType: { id: 'dt-collectionView' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 2,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{
@@ -71,9 +91,12 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		allowedMediaTypes: [],
+		allowedMediaTypes: [
+			{ mediaType: { id: 'media-type-1-id' }, sortOrder: 0 },
+		],
 		compositions: [],
 		isFolder: false,
 		hasChildren: false,
+		collection: { id: 'dt-collectionView' },
 	},
 ];

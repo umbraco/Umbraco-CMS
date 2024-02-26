@@ -361,6 +361,7 @@ export type { TemplateQueryResultItemPresentationModel } from './models/Template
 export type { TemplateQueryResultResponseModel } from './models/TemplateQueryResultResponseModel';
 export type { TemplateQuerySettingsResponseModel } from './models/TemplateQuerySettingsResponseModel';
 export type { TemplateResponseModel } from './models/TemplateResponseModel';
+export type { TemporaryFileConfigurationResponseModel } from './models/TemporaryFileConfigurationResponseModel';
 export type { TemporaryFileResponseModel } from './models/TemporaryFileResponseModel';
 export type { TourStatusModel } from './models/TourStatusModel';
 export type { TreeItemPresentationModel } from './models/TreeItemPresentationModel';

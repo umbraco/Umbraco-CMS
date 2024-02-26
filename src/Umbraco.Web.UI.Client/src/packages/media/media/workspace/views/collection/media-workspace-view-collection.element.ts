@@ -1,22 +1,22 @@
-import type {
-	UmbCollectionBulkActionPermissions,
-	UmbCollectionConfiguration,
-} from '../../../../../core/collection/types.js';
 import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import { UMB_MEDIA_COLLECTION_ALIAS, UMB_MEDIA_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/media';
+import type {
+	UmbCollectionBulkActionPermissions,
+	UmbCollectionConfiguration,
+} from '@umbraco-cms/backoffice/collection';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-document-workspace-view-collection')
-export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@customElement('umb-media-workspace-view-collection')
+export class UmbMediaWorkspaceViewCollectionElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
 	private _config?: UmbCollectionConfiguration;
 
 	@state()
-	private _documentUnique?: string;
+	private _mediaUnique?: string;
 
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
@@ -26,16 +26,16 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 	}
 
 	async #observeConfig() {
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.observe(workspaceContext.unique, (unique) => {
-				this._documentUnique = unique;
+				this._mediaUnique = unique;
 			});
 			this.observe(
 				workspaceContext.structure.ownerContentType(),
-				async (documentType) => {
-					if (!documentType || !documentType.collection) return;
+				async (mediaType) => {
+					if (!mediaType || !mediaType.collection) return;
 
-					const dataTypeUnique = documentType.collection.unique;
+					const dataTypeUnique = mediaType.collection.unique;
 
 					if (dataTypeUnique) {
 						await this.#dataTypeDetailRepository.requestByUnique(dataTypeUnique);
@@ -49,7 +49,7 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 						);
 					}
 				},
-				'_observeConfigDocumentType',
+				'_observeConfigMediaType',
 			);
 		});
 	}
@@ -57,7 +57,7 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 	#mapDataTypeConfigToCollectionConfig(dataType: UmbDataTypeDetailModel): UmbCollectionConfiguration {
 		const config = new UmbPropertyEditorConfigCollection(dataType.values);
 		return {
-			unique: this._documentUnique,
+			unique: this._mediaUnique,
 			dataTypeId: dataType.unique,
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
@@ -70,14 +70,14 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 
 	render() {
 		if (!this._config?.unique || !this._config?.dataTypeId) return html`<uui-loader></uui-loader>`;
-		return html`<umb-collection alias="Umb.Collection.Document" .config=${this._config}></umb-collection>`;
+		return html`<umb-collection .alias=${UMB_MEDIA_COLLECTION_ALIAS} .config=${this._config}></umb-collection>`;
 	}
 }
 
-export default UmbDocumentWorkspaceViewCollectionElement;
+export default UmbMediaWorkspaceViewCollectionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-workspace-view-collection': UmbDocumentWorkspaceViewCollectionElement;
+		'umb-media-workspace-view-collection': UmbMediaWorkspaceViewCollectionElement;
 	}
 }

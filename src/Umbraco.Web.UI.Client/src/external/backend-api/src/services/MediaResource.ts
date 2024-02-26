@@ -11,6 +11,7 @@ import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
 import type { PagedMediaCollectionResponseModel } from '../models/PagedMediaCollectionResponseModel';
 import type { PagedMediaRecycleBinItemResponseModel } from '../models/PagedMediaRecycleBinItemResponseModel';
 import type { PagedMediaTreeItemResponseModel } from '../models/PagedMediaTreeItemResponseModel';
+import type { ReferenceByIdModel } from '../models/ReferenceByIdModel';
 import type { SortingRequestModel } from '../models/SortingRequestModel';
 import type { UpdateMediaRequestModel } from '../models/UpdateMediaRequestModel';
 
@@ -351,6 +352,58 @@ export class MediaResource {
             path: {
                 'id': id,
             },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getRecycleBinMediaByIdOriginalParent({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<ReferenceByIdModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/recycle-bin/media/{id}/original-parent',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putRecycleBinMediaByIdRestore({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveMediaRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/recycle-bin/media/{id}/restore',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
