@@ -12,10 +12,9 @@ import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 
-@customElement('umb-document-granular-user-permission')
-export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
+@customElement('umb-input-document-granular-user-permission')
+export class UmbInputDocumentGranularUserPermissionElement extends UmbLitElement {
 	_value: Array<UmbDocumentUserPermissionModel> = [];
 	public get value(): Array<UmbDocumentUserPermissionModel> {
 		return this._value;
@@ -238,10 +237,10 @@ export class UmbDocumentGranularUserPermissionElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentGranularUserPermissionElement;
+export default UmbInputDocumentGranularUserPermissionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-granular-user-permission': UmbDocumentGranularUserPermissionElement;
+		'umb-document-granular-user-permission': UmbInputDocumentGranularUserPermissionElement;
 	}
 }
