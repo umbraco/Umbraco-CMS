@@ -1,48 +1,80 @@
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbMediaCollectionRepository } from '../collection/repository/index.js';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
+import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
+import type {
+	UmbCollectionBulkActionPermissions,
+	UmbCollectionConfiguration,
+} from '@umbraco-cms/backoffice/collection';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-media-section-view')
 export class UmbMediaSectionViewElement extends UmbLitElement {
-	#routes: UmbRoute[] = [
-		{
-			path: 'collection',
-			component: () => {
+	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+	#mediaCollectionRepository = new UmbMediaCollectionRepository(this);
 
-				// TODO: [LK] Work-in-progress. Need to get the data-type configuration for the Media Collection.
-				const config = {
-					unique: '',
-					dataTypeId: '', //'3a0156c4-3b8c-4803-bdc1-6871faa83fff', //'dt-collectionView',
-					allowedEntityBulkActions: {
-						allowBulkCopy: true,
-						allowBulkDelete: true,
-						allowBulkMove: true,
-						allowBulkPublish: false,
-						allowBulkUnpublish: false,
+	@state()
+	private _routes?: UmbRoute[];
+
+	constructor() {
+		super();
+
+		this.#defineRoutes();
+	}
+
+	async #defineRoutes() {
+		const config = await this.#mediaCollectionRepository.getDefaultConfiguration();
+
+		await this.#dataTypeDetailRepository.requestByUnique(config.defaultDataTypeId);
+
+		this.observe(
+			await this.#dataTypeDetailRepository.byUnique(config.defaultDataTypeId),
+			(dataType) => {
+				if (!dataType) return;
+
+				const dataTypeConfig = this.#mapDataTypeConfigToCollectionConfig(dataType);
+
+				this._routes = [
+					{
+						path: 'collection',
+						component: () => {
+							const element = new UmbCollectionElement();
+							element.alias = UMB_MEDIA_COLLECTION_ALIAS;
+							element.config = dataTypeConfig;
+							return element;
+						},
 					},
-					orderBy: 'updateDate',
-					orderDirection: 'asc',
-					pageSize: 50,
-					useInfiniteEditor: false,
-					userDefinedProperties: undefined,
-				};
-
-				const element = new UmbCollectionElement();
-				element.alias = UMB_MEDIA_COLLECTION_ALIAS;
-				element.config = config;
-				return element;
+					{
+						path: '',
+						redirectTo: 'collection',
+					},
+				];
 			},
-		},
-		{
-			path: '',
-			redirectTo: 'collection',
-		},
-	];
+			'_observeConfigDataType',
+		);
+	}
+
+	#mapDataTypeConfigToCollectionConfig(dataType: UmbDataTypeDetailModel): UmbCollectionConfiguration {
+		const config = new UmbPropertyEditorConfigCollection(dataType.values);
+		return {
+			unique: '',
+			dataTypeId: dataType.unique,
+			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
+			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
+			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',
+			pageSize: Number(config?.getValueByAlias('pageSize')) ?? 50,
+			useInfiniteEditor: config?.getValueByAlias('useInfiniteEditor') ?? false,
+			userDefinedProperties: config?.getValueByAlias('includeProperties'),
+		};
+	}
 
 	render() {
-		return html`<umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot>`;
+		if (!this._routes) return;
+		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
 	}
 
 	static styles = [

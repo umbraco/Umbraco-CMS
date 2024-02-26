@@ -13,9 +13,9 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 	}
 
 	async getCollection(query: UmbMediaCollectionFilterModel) {
-		// if (!query.dataTypeId) {
-		// 	throw new Error('Data type ID is required to fetch a collection.');
-		// }
+		if (!query.dataTypeId) {
+			throw new Error('Data type ID is required to fetch a collection.');
+		}
 
 		const params = {
 			id: query.unique ?? '',

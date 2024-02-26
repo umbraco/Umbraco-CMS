@@ -1,4 +1,4 @@
-import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_MEDIA_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/media-workspace-has-collection.condition.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -18,24 +18,23 @@ const workspace: ManifestWorkspace = {
 };
 
 const workspaceViews: Array<ManifestWorkspaceView> = [
-	// {
-	// 	type: 'workspaceView',
-	// 	alias: 'Umb.WorkspaceView.Media.Collection',
-	// 	name: 'Media Workspace Collection View',
-	// 	element: () => import('./views/collection/media-collection-workspace-view.element.js'),
-	// 	weight: 300,
-	// 	meta: {
-	// 		label: 'Media',
-	// 		pathname: 'collection',
-	// 		icon: 'icon-grid',
-	// 	},
-	// 	conditions: [
-	// 		{
-	// 			alias: 'Umb.Condition.WorkspaceAlias',
-	// 			match: workspace.alias,
-	// 		},
-	// 	],
-	// },
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Media.Collection',
+		name: 'Media Workspace Collection View',
+		element: () => import('./views/collection/media-workspace-view-collection.element.js'),
+		weight: 300,
+		meta: {
+			label: 'Collection',
+			pathname: 'collection',
+			icon: 'icon-grid',
+		},
+		conditions: [
+			{
+				alias: UMB_MEDIA_WORKSPACE_HAS_COLLECTION_CONDITION,
+			},
+		],
+	},
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Media.Edit',
