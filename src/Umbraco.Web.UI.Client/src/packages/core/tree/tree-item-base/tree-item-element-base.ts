@@ -81,14 +81,11 @@ export abstract class UmbTreeItemElementBase extends UmbLitElement {
 		});
 	}
 
-	private _openActions() {
-		this.#treeItemContext?.toggleContextMenu();
-	}
-
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	render() {
 		return html`
+			HELLO HELLO
 			<uui-menu-item
 				@show-children=${this._onShowChildren}
 				@selected=${this._handleSelectedItem}

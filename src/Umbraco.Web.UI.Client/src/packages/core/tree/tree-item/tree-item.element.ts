@@ -1,5 +1,5 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbTreeItemModelBase } from '../types.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

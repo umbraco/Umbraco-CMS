@@ -8,7 +8,7 @@ export * from './types.js';
 
 // Unique
 export * from './data/unique-tree-store.js';
-export * from './unique-tree-item/index.js';
+export * from './tree-item-default/index.js';
 
 export * from './data/index.js';
 

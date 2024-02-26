@@ -8,7 +8,7 @@ import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/b
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -18,7 +18,7 @@ export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase>
 ) => string | null | undefined;
 
 export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
-	extends UmbBaseController
+	extends UmbContextBase<UmbTreeItemContext<TreeItemType>>
 	implements UmbTreeItemContext<TreeItemType>
 {
 	public unique?: string | null;
@@ -59,10 +59,9 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
 
 	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
-		super(host);
+		super(host, UMB_TREE_ITEM_CONTEXT);
 		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();
-		this.provideContext(UMB_TREE_ITEM_CONTEXT, this);
 	}
 
 	public setTreeItem(treeItem: TreeItemType | undefined) {

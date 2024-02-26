@@ -38,7 +38,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'unique',
+	kind: 'default',
 	alias: 'Umb.TreeItem.DocumentRecycleBin',
 	name: 'DocumentRecycleBin Tree Item',
 	meta: {
