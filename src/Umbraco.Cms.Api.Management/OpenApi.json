@@ -26618,6 +26618,7 @@
       },
       "CurrentUserResponseModel": {
         "required": [
+          "allowedSections",
           "avatarUrls",
           "documentStartNodeIds",
           "email",
@@ -26699,6 +26700,13 @@
                   "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
                 }
               ]
+            }
+          },
+          "allowedSections": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
             }
           }
         },

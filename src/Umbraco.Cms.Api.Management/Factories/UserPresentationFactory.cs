@@ -162,6 +162,7 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         var hasAccessToAllLanguages = presentationGroups.Any(x => x.HasAccessToAllLanguages);
 
+        var allowedSections = presentationGroups.SelectMany(x => x.Sections).ToHashSet();
         return await Task.FromResult(new CurrentUserResponseModel()
         {
             Id = presentationUser.Id,
@@ -175,7 +176,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             DocumentStartNodeIds = documentStartNodeKeys,
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
-            HasAccessToAllLanguages = hasAccessToAllLanguages
+            HasAccessToAllLanguages = hasAccessToAllLanguages,
+            AllowedSections = allowedSections
         });
     }
 

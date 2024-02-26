@@ -28,4 +28,5 @@ public class CurrentUserResponseModel
 
     public required ISet<string> FallbackPermissions { get; init; }
     public required ISet<IPermissionPresentationModel> Permissions { get; init; }
+    public required ISet<string> AllowedSections { get; init; }
 }
