@@ -2270,7 +2270,7 @@ internal class UserService : RepositoryService, IUserService
             results.Add(new NodePermissions { NodeKey = idKeyMap[nodeId], Permissions = permissions });
         }
 
-        return Attempt.SucceedWithStatus<IEnumerable<NodePermissions>, UserOperationStatus>(UserOperationStatus.UserNotFound, results);
+        return Attempt.SucceedWithStatus<IEnumerable<NodePermissions>, UserOperationStatus>(UserOperationStatus.Success, results);
     }
 
     /// <summary>
