@@ -40,7 +40,8 @@ export class UmbDocumentPublishingServerDataSource {
 			(variant) => {
 				return {
 					culture: variant.isCultureInvariant() ? null : variant.toCultureString(),
-					schedule: variant.schedule,
+					// TODO: NO, this does not belong as part of the UmbVariantID, we need another way to parse that around:
+					//schedule: variant.schedule,
 				};
 			},
 		);
