@@ -19,13 +19,12 @@ public static class BackOfficeAuthBuilderExtensions
         builder
             .AddAuthentication()
             .AddUmbracoOpenIddict()
-            .AddBackOfficeLogin()
-            .AddTokenRevocation();
+            .AddBackOfficeLogin();
 
         return builder;
     }
 
-    private static IUmbracoBuilder AddTokenRevocation(this IUmbracoBuilder builder)
+    public static IUmbracoBuilder AddTokenRevocation(this IUmbracoBuilder builder)
     {
         builder.AddNotificationAsyncHandler<UserSavingNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserSavedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
@@ -52,28 +51,29 @@ public static class BackOfficeAuthBuilderExtensions
     {
         builder.Services
             .AddAuthentication()
-            .AddCookie(Constants.Security.NewBackOfficeAuthenticationType, options =>
+            // Add our custom schemes which are cookie handlers
+            .AddCookie(Constants.Security.BackOfficeAuthenticationType, options =>
             {
                 options.LoginPath = "/umbraco/login";
-                options.Cookie.Name = Constants.Security.NewBackOfficeAuthenticationType;
+                options.Cookie.Name = Constants.Security.BackOfficeAuthenticationType;
             })
-            .AddCookie(Constants.Security.NewBackOfficeExternalAuthenticationType, options =>
+            .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
             {
-                options.Cookie.Name = Constants.Security.NewBackOfficeExternalAuthenticationType;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             })
 
             // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
             // they don't have to worry about manually adding this scheme or modifying the sign in manager
-            .AddCookie(Constants.Security.NewBackOfficeTwoFactorAuthenticationType, options =>
+            .AddCookie(Constants.Security.BackOfficeTwoFactorAuthenticationType, options =>
             {
-                options.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorAuthenticationType;
+                options.Cookie.Name = Constants.Security.BackOfficeTwoFactorAuthenticationType;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             })
-            .AddCookie(Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType, options =>
+            .AddCookie(Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType, o =>
             {
-                options.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                o.Cookie.Name = Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
 
         return builder;
