@@ -706,6 +706,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 						allowInAreas: true,
 						rowMinSpan: 1,
 						rowMaxSpan: 2,
+						inlineEditing: true,
 						columnSpanOptions: [
 							{
 								columnSpan: 1,
@@ -810,7 +811,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: false,
 		canIgnoreStartNodes: false,
 		values: [
-			{ alias: 'pageSize', value: 2 },
+			{ alias: 'pageSize', value: 25 },
 			{ alias: 'orderDirection', value: 'desc' },
 			{
 				alias: 'includeProperties',
@@ -841,6 +842,51 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'icon', value: 'icon-layers' },
 			{ alias: 'tabName', value: 'Children' },
 			{ alias: 'showContentFirst', value: true },
+			{ alias: 'useInfiniteEditor', value: true },
+		],
+	},
+	{
+		name: 'Collection View - Media',
+		id: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
+		parent: null,
+		editorAlias: 'Umbraco.ListView',
+		editorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: false,
+		canIgnoreStartNodes: false,
+		values: [
+			{ alias: 'pageSize', value: 2 },
+			{ alias: 'orderDirection', value: 'desc' },
+			{
+				alias: 'includeProperties',
+				value: [
+					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: '' },
+					{ alias: 'updateDate', header: 'Last edited', isSystem: true },
+					{ alias: 'owner', header: 'Created by', isSystem: true },
+				],
+			},
+			{ alias: 'orderBy', value: 'updateDate' },
+			{
+				alias: 'bulkActionPermissions',
+				value: {
+					allowBulkPublish: false,
+					allowBulkUnpublish: false,
+					allowBulkCopy: true,
+					allowBulkMove: true,
+					allowBulkDelete: true,
+				},
+			},
+			{
+				alias: 'layouts',
+				value: [
+					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
+					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+				],
+			},
+			{ alias: 'icon', value: 'icon-layers' },
+			{ alias: 'tabName', value: 'Items' },
+			{ alias: 'showContentFirst', value: false },
 			{ alias: 'useInfiniteEditor', value: true },
 		],
 	},

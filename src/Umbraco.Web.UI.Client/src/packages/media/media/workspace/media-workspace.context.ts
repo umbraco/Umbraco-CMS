@@ -44,6 +44,7 @@ export class UmbMediaWorkspaceContext
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.mediaType.unique);
+	readonly contentTypeCollection = this.#currentData.asObservablePart((data) => data?.mediaType.collection);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly variantOptions = combineObservables([this.variants, this.languages], ([variants, languages]) => {

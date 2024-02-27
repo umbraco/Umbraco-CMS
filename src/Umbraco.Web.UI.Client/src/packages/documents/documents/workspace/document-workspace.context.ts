@@ -102,6 +102,7 @@ export class UmbDocumentWorkspaceContext
 		this.#getDataPromise = this.repository.createScaffold(parentUnique, {
 			documentType: {
 				unique: documentTypeUnique,
+				collection: null,
 			},
 		});
 		const { data } = await this.#getDataPromise;

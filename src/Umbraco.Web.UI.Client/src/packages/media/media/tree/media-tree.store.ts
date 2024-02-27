@@ -42,7 +42,7 @@ export class UmbMediaTreeStore extends UmbUniqueTreeStore {
 			hasChildren: false,
 			variants: item.variants,
 			isTrashed: item.isTrashed,
-			mediaType: { unique: item.mediaType.unique, icon: '' },
+			mediaType: { unique: item.mediaType.unique, icon: '', collection: null },
 			noAccess: false,
 		};
 
