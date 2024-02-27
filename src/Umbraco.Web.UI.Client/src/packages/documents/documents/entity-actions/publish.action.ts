@@ -11,12 +11,12 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<UmbDocum
 
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestCollection({});
-
-		// TODO: Not sure we need to use the Detail Repository for this, we might do just fine with the tree item model it self.
 		const { data: documentData } = await this.repository.requestByUnique(this.unique);
 
+		if (!documentData) throw new Error('The document was not found');
+
 		// If the document has only one variant, we can skip the modal and publish directly:
-		if (documentData?.variants.length === 1) {
+		if (documentData.variants.length === 1) {
 			const variantId = UmbVariantId.Create(documentData.variants[0]);
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 			await publishingRepository.publish(this.unique, [variantId]);
@@ -25,7 +25,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<UmbDocum
 
 		const allOptions = (languageData?.items ?? []).map((language) => ({
 			language: language,
-			variant: documentData?.variants.find((variant) => variant.culture === language.unique),
+			variant: documentData.variants.find((variant) => variant.culture === language.unique),
 			unique: new UmbVariantId(language.unique, null).toString(),
 		}));
 

@@ -11,13 +11,13 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<UmbDoc
 
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestCollection({});
-
-		// TODO: Not sure we need to use the Detail Repository for this, we might do just fine with the tree item model it self.
 		const { data: documentData } = await this.repository.requestByUnique(this.unique);
+
+		if (!documentData) throw new Error('The document was not found');
 
 		const allOptions = (languageData?.items ?? []).map((language) => ({
 			language: language,
-			variant: documentData?.variants.find((variant) => variant.culture === language.unique),
+			variant: documentData.variants.find((variant) => variant.culture === language.unique),
 			unique: new UmbVariantId(language.unique, null).toString(),
 		}));
 
