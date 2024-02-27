@@ -1127,7 +1127,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (string.IsNullOrEmpty(model.ResetPasswordToken) is false)
         {
-            Attempt<UserOperationStatus> verifyPasswordResetAsync = await VerifyPasswordResetAsync(userKey, model.ResetPasswordToken);
+            Attempt<UserOperationStatus> verifyPasswordResetAsync = await VerifyPasswordResetAsync(model.UserKey, model.ResetPasswordToken);
             if (verifyPasswordResetAsync.Result != UserOperationStatus.Success)
             {
                 return Attempt.FailWithStatus(verifyPasswordResetAsync.Result, new PasswordChangedModel());
