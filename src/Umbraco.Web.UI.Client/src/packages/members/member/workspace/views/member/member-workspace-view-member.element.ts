@@ -141,21 +141,22 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		return html`
 			<div id="right-column">
 				<uui-box>
-					<umb-property-layout label="Failed login attempts">
-						<div slot="editor">${this._workspaceContext.failedPasswordAttempts}</div>
-					</umb-property-layout>
-
-					<umb-property-layout label="Last lockout date">
-						<div slot="editor">${this._workspaceContext.lastLockOutDate}</div>
-					</umb-property-layout>
-
-					<umb-property-layout label="Last login">
-						<div slot="editor">${this._workspaceContext.lastLoginDate}</div>
-					</umb-property-layout>
-
-					<umb-property-layout label="Password changed">
-						<div slot="editor">${this._workspaceContext.lastPasswordChangeDate}</div>
-					</umb-property-layout>
+					<div class="general-item">
+						<umb-localize class="headline" key="user_failedPasswordAttempts"></umb-localize>
+						<span>${this._workspaceContext.failedPasswordAttempts}</span>
+					</div>
+					<div class="general-item">
+						<umb-localize class="headline" key="user_lastLockoutDate"></umb-localize>
+						<span>${this._workspaceContext.lastLockOutDate}</span>
+					</div>
+					<div class="general-item">
+						<umb-localize class="headline" key="user_lastLogin"></umb-localize>
+						<span>${this._workspaceContext.lastLoginDate}</span>
+					</div>
+					<div class="general-item">
+						<umb-localize class="headline" key="user_passwordChangedGeneric"></umb-localize>
+						<span>${this._workspaceContext.lastPasswordChangeDate}</span>
+					</div>
 				</uui-box>
 
 				<uui-box>
@@ -211,6 +212,18 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			.validation-error {
 				margin-top: 0;
 				color: var(--uui-color-danger);
+			}
+
+			.general-item {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-1);
+			}
+			.general-item:not(:last-child) {
+				margin-bottom: var(--uui-size-space-6);
+			}
+			.general-item .headline {
+				font-weight: bold;
 			}
 		`,
 	];

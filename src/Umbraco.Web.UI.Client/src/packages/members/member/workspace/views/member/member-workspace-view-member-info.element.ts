@@ -92,10 +92,6 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 	static styles = [
 		UmbTextStyles,
 		css`
-			.headline {
-				font-weight: bold;
-			}
-
 			.member-type-edit {
 				display: flex;
 				align-items: center;
@@ -107,21 +103,16 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 				margin-left: auto;
 			}
 
-			//General section
-
-			#general-section {
-				display: flex;
-				flex-direction: column;
-			}
-
 			.general-item {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-1);
 			}
-
 			.general-item:not(:last-child) {
 				margin-bottom: var(--uui-size-space-6);
+			}
+			.general-item .headline {
+				font-weight: bold;
 			}
 		`,
 	];
