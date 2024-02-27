@@ -1,11 +1,27 @@
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { css, html, customElement, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, repeat, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbMediaTypeDetailRepository } from '@umbraco-cms/backoffice/media-type';
+import {
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT,
+	type UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
+import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+
+enum FieldType {
+	MEDIA_TYPE = 'media-type',
+	DOCUMENT_TYPE = 'document-type',
+	SYSTEM = 'system',
+}
+
+interface FieldPicker {
+	unique: string;
+	type: FieldType;
+}
 
 @customElement('umb-field-dropdown-list')
 export class UmbFieldDropdownListElement extends UmbLitElement {
@@ -13,15 +29,17 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 	public value = '';
 
 	#documentTypeDetailRepository = new UmbDocumentTypeDetailRepository(this);
+	#mediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
+	#modalManager?: UmbModalManagerContext;
 
-	#unique = new UmbStringState<string>('');
+	#unique = new UmbObjectState<{ unique: string; type: FieldType }>({ unique: '', type: FieldType.SYSTEM });
 	readonly unique = this.#unique.asObservable();
 
-	@property({ type: String })
-	set documentTypeUnique(value: string) {
+	@property({ type: Object })
+	set documentTypeUnique(value: FieldPicker) {
 		this.#unique.setValue(value);
 	}
-	get documentTypeUnique(): string | null | undefined {
+	get documentTypeUnique(): FieldPicker | null | undefined {
 		return this.#unique.getValue();
 	}
 
@@ -33,6 +51,12 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	@state()
 	private _customFields: Array<UmbPropertyTypeModel> = [];
+
+	@state()
+	private _type?: FieldType = FieldType.SYSTEM;
+
+	@state()
+	private _previewString?: string;
 
 	private _systemFields = [
 		{ value: 'sortOrder', name: this.localize.term('general_sort'), group: 'System Fields' },
@@ -62,61 +86,74 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 			this.value = '';
 			this.dispatchEvent(new UmbChangeEvent());
 		});
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
+			this.#modalManager = modalManager;
+		});
 	}
 
-	#changeFieldType() {
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
-			if (modalManager) {
-				const modalContext = modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
-					data: {
-						hideTreeRoot: true,
-						multiple: false,
-					},
-					value: {
-						selection: this.documentTypeUnique ? [this.documentTypeUnique] : [],
-					},
-				});
+	async #changeFieldType() {
+		if (!this.#modalManager) return;
 
-				const modalValue = await modalContext?.onSubmit();
-				this.documentTypeUnique = modalValue.selection[0] ?? '';
-			}
+		const modalContext = this.#modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+			data: {
+				hideTreeRoot: true,
+				multiple: false,
+			},
+			value: {
+				selection: this.documentTypeUnique ? [this.documentTypeUnique] : [],
+			},
 		});
+
+		const modalValue = await modalContext.onSubmit();
+		this.documentTypeUnique = modalValue.selection[0] ?? '';
+
+		this._previewString = 'System Fields';
 	}
 
 	#onChange(e: UUIComboboxEvent) {
 		e.stopPropagation();
-		const alias = (e.composedPath()[0] as UUIComboboxElement).value as string;
-		this.value = alias;
-		this.dispatchEvent(new UmbChangeEvent());
+		const type = (e.composedPath()[0] as UUIComboboxElement).value as FieldType;
+		switch (type) {
+			case FieldType.DOCUMENT_TYPE:
+				this.#changeFieldType();
+				break;
+			case FieldType.MEDIA_TYPE:
+				console.log(type);
+				this.documentTypeUnique = '';
+				break;
+			default:
+				this._previewString = 'System Fields';
+				break;
+		}
+		//const alias = (e.composedPath()[0] as UUIComboboxElement).value as string;
+		//this.documentTypeUnique = alias;
+		//this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
 		return html`
-			<uui-button look="outline" @click=${this.#changeFieldType} compact>
-				<uui-icon
-					.name=${this.documentTypeUnique
-						? this._documentTypeIcon
-							? this._documentTypeIcon
-							: 'icon-circle-dotted'
-						: 'icon-database'}></uui-icon>
-				${this.documentTypeUnique ? this._documentTypeName : this.localize.term('formSettings_systemFields')}
-			</uui-button>
-
-			<uui-combobox slot="tag" .value=${this.value} @change=${this.#onChange}>
-				<uui-combobox-list>
-					${this.documentTypeUnique
-						? repeat(
-								this._customFields,
-								(item) => item.id,
-								(item) => html`<uui-combobox-list-option .value=${item.alias}>${item.alias}</uui-combobox-list-option>`,
-						  )
-						: repeat(
-								this._systemFields,
-								(item) => item.value,
-								(item) => html`<uui-combobox-list-option .value=${item.value}>${item.name}</uui-combobox-list-option>`,
-						  )}
-				</uui-combobox-list>
-			</uui-combobox>
+			<div>
+				<uui-combobox value="preview">
+					<uui-combobox-list @change=${this.#onChange}>
+						<uui-combobox-list-option value="preview" style="display:none">
+							${this._previewString}
+						</uui-combobox-list-option>
+						<uui-combobox-list-option value="system"><strong>System Field</strong></uui-combobox-list-option>
+						<uui-combobox-list-option value="document-type">
+							<strong>Document Type</strong>Pick a document type...
+						</uui-combobox-list-option>
+						<uui-combobox-list-option value="media-type">
+							<strong>Media Type</strong>Pick a media type...
+						</uui-combobox-list-option>
+					</uui-combobox-list>
+				</uui-combobox>
+				<uui-combobox>
+					<uui-combobox-list>
+						<uui-combobox-list-option>Cookies</uui-combobox-list-option>
+					</uui-combobox-list>
+				</uui-combobox>
+			</div>
 		`;
 	}
 
@@ -125,8 +162,8 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 			:host {
 				display: flex;
 			}
-			:host > * {
-				flex: 1;
+			strong {
+				display: block;
 			}
 			uui-combobox-list-option {
 				padding: calc(var(--uui-size-2, 6px) + 1px);
