@@ -18,6 +18,10 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (context) => {
 			this._workspaceContext = context;
+
+			this.observe(this._workspaceContext.isNew, (isNew) => {
+				this._isNew = !!isNew;
+			});
 		});
 	}
 
@@ -26,6 +30,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 	@state()
 	private _newPasswordError = '';
+
+	@state()
+	private _isNew = true;
 
 	#onChange(propertyName: keyof UmbMemberDetailModel, value: UmbMemberDetailModel[keyof UmbMemberDetailModel]) {
 		if (!this._workspaceContext) return;
@@ -43,6 +50,8 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			return;
 		}
 
+		this._newPasswordError = '';
+
 		this._workspaceContext?.set('newPassword', newPassword);
 	};
 
@@ -51,6 +60,67 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		this._showChangePasswordForm = false;
 		this._newPasswordError = '';
 	};
+
+	#renderPasswordInput() {
+		if (this._isNew) {
+			return html`
+				<umb-property-layout label="Password">
+					<uui-input
+						slot="editor"
+						name="newPassword"
+						label="New password"
+						type="password"
+						@input=${() => this.#onPasswordUpdate()}></uui-input>
+				</umb-property-layout>
+
+				<umb-property-layout label="Confirm password">
+					<uui-input
+						slot="editor"
+						name="confirmPassword"
+						label="Confirm password"
+						type="password"
+						@input=${() => this.#onPasswordUpdate()}></uui-input>
+				</umb-property-layout>
+				${when(this._newPasswordError, () => html`<p class="validation-error">${this._newPasswordError}</p>`)}
+			`;
+		}
+
+		return html`
+			<umb-property-layout label="Change password">
+				${when(
+					this._showChangePasswordForm,
+					() => html`
+						<div slot="editor">
+							<umb-property-layout label="New password">
+								<uui-input
+									slot="editor"
+									name="newPassword"
+									label="New password"
+									type="password"
+									@input=${() => this.#onPasswordUpdate()}></uui-input>
+							</umb-property-layout>
+							<umb-property-layout label="Confirm password">
+								<uui-input
+									slot="editor"
+									name="confirmPassword"
+									label="Confirm password"
+									type="password"
+									@input=${() => this.#onPasswordUpdate()}></uui-input>
+							</umb-property-layout>
+							${when(this._newPasswordError, () => html`<p class="validation-error">${this._newPasswordError}</p>`)}
+							<uui-button label="Cancel" look="secondary" @click=${this.#onNewPasswordCancel}></uui-button>
+						</div>
+					`,
+					() =>
+						html`<uui-button
+							slot="editor"
+							label="Change password"
+							look="secondary"
+							@click=${() => (this._showChangePasswordForm = true)}></uui-button>`,
+				)}
+			</umb-property-layout>
+		`;
+	}
 
 	#renderLeftColumn() {
 		if (!this._workspaceContext) return;
@@ -74,39 +144,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						value=${this._workspaceContext.email}></uui-input>
 				</umb-property-layout>
 
-				<umb-property-layout label="Change password">
-					${when(
-						this._showChangePasswordForm,
-						() => html`
-							<div slot="editor">
-								<umb-property-layout label="New password">
-									<uui-input
-										slot="editor"
-										name="newPassword"
-										label="New password"
-										type="password"
-										@input=${() => this.#onPasswordUpdate()}></uui-input>
-								</umb-property-layout>
-								<umb-property-layout label="Confirm password">
-									<uui-input
-										slot="editor"
-										name="confirmPassword"
-										label="Confirm password"
-										type="password"
-										@input=${() => this.#onPasswordUpdate()}></uui-input>
-								</umb-property-layout>
-								${when(this._newPasswordError, () => html`<p class="validation-error">${this._newPasswordError}</p>`)}
-								<uui-button label="Cancel" look="secondary" @click=${this.#onNewPasswordCancel}></uui-button>
-							</div>
-						`,
-						() =>
-							html`<uui-button
-								slot="editor"
-								label="Change password"
-								look="secondary"
-								@click=${() => (this._showChangePasswordForm = true)}></uui-button>`,
-					)}
-				</umb-property-layout>
+				${this.#renderPasswordInput()}
 
 				<umb-property-layout label="Member Group">
 					<div slot="editor">MEMBER GROUP PICKER</div>

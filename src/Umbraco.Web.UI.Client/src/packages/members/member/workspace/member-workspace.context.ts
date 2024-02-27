@@ -45,7 +45,6 @@ export class UmbMemberWorkspaceContext
 
 	async load(unique: string) {
 		const { data } = await this.repository.requestByUnique(unique);
-
 		if (data) {
 			this.setIsNew(false);
 			this.#data.setValue(data);

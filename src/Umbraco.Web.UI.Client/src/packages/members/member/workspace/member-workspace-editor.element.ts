@@ -53,6 +53,9 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 				width: 100%;
 				height: 100%;
 			}
+			uui-input {
+				width: 100%;
+			}
 		`,
 	];
 }
