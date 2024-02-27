@@ -8,7 +8,7 @@ export class UmbPaginationManager extends EventTarget {
 	#totalItems = new UmbNumberState(0);
 	public readonly totalItems = this.#totalItems.asObservable();
 
-	#totalPages = new UmbNumberState(0);
+	#totalPages = new UmbNumberState(1);
 	public readonly totalPages = this.#totalPages.asObservable();
 
 	#currentPage = new UmbNumberState(1);
