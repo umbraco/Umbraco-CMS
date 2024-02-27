@@ -28,12 +28,12 @@ public class UpdateUserController : UserControllerBase
         IUserService userService,
         IUserPresentationFactory userPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IAuthorizationService _authorizationService)
+        IAuthorizationService authorizationService)
     {
         _userService = userService;
         _userPresentationFactory = userPresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        this._authorizationService = _authorizationService;
+        _authorizationService = authorizationService;
     }
 
     [HttpPut("{id:guid}")]
