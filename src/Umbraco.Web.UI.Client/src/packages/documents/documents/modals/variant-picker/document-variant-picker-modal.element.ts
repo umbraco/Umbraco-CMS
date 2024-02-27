@@ -7,6 +7,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-document-variant-picker-modal')
 export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
@@ -39,8 +41,8 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 			const context = await ctrl.asPromise();
 			const appCulture = context.getAppCulture();
 			// If the app language is one of the options, select it by default:
-			if (appCulture && modalData.options.some((o) => o.language.unique === appCulture)) {
-				selected.push(new UmbVariantId(appCulture, null));
+			if (appCulture && this.data?.options.some((o) => o.language.unique === appCulture)) {
+				selected.push(new UmbVariantId(appCulture, null).toString());
 			}
 			ctrl.destroy();
 		}
