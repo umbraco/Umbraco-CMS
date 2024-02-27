@@ -276,10 +276,11 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async unpublish() {
+		const variantIds = await this.#pickVariantsForAction('unpublish');
 		const unique = this.getEntityId();
-
-		if (!unique) throw new Error('Unique is missing');
-		new UmbUnpublishDocumentEntityAction(this, '', unique, '');
+		if (variantIds.length && unique) {
+			await this.publishingRepository.unpublish(unique, variantIds);
+		}
 	}
 
 	async delete() {
