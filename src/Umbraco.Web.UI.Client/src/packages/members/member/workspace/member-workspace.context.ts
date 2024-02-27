@@ -20,6 +20,7 @@ export class UmbMemberWorkspaceContext
 
 	#data = new UmbObjectState<UmbMemberDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly name = this.#data.asObservablePart((data) => data?.variants[0].name);
 	readonly contentTypeUnique = this.#data.asObservablePart((data) => data?.memberType.unique);
 	readonly structure = new UmbContentTypePropertyStructureManager<UmbMemberTypeDetailModel>(
 		this,
@@ -94,16 +95,6 @@ export class UmbMemberWorkspaceContext
 		return 'member';
 	}
 
-	getName(variantId?: UmbVariantId) {
-		const variants = this.#data.getValue()?.variants;
-		if (!variants) return;
-		if (variantId) {
-			return variants.find((x) => variantId.compare(x))?.name;
-		} else {
-			return variants[0]?.name;
-		}
-	}
-
 	setName(name: string, variantId?: UmbVariantId) {
 		const oldVariants = this.#data.getValue()?.variants || [];
 		const variants = partialUpdateFrozenArray(
@@ -149,7 +140,9 @@ export class UmbMemberWorkspaceContext
 	}
 
 	get lastPasswordChangeDate() {
-		return this.#get('lastPasswordChangeDate') || 'never';
+		const date = this.#get('lastPasswordChangeDate');
+		if (!date) return 'never';
+		return new Date(date).toLocaleString();
 	}
 
 	#get<PropertyName extends keyof UmbMemberDetailModel>(propertyName: PropertyName) {

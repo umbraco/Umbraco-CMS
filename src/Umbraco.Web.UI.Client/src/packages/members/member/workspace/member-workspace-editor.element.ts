@@ -21,9 +21,9 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			if (this.#workspaceContext) {
-				this._name = this.#workspaceContext.getName() || '';
-			}
+			this.observe(this.#workspaceContext.name, (name) => {
+				this._name = name || '';
+			});
 		});
 	}
 

@@ -1,10 +1,10 @@
 // import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context.js';
 import type { UmbMemberDetailModel } from '../../../types.js';
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-member-workspace-view-member')
@@ -172,7 +172,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 				flex: 9999 1 500px;
 			}
 			#right-column {
-				flex: 1 1 300px;
+				flex: 1 1 350px;
 			}
 			uui-box {
 				height: fit-content;
