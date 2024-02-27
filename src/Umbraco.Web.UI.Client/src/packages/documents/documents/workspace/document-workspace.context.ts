@@ -310,7 +310,7 @@ export class UmbDocumentWorkspaceContext
 		const unique = this.getEntityId();
 
 		if (!unique) throw new Error('Unique is missing');
-		new UmbUnpublishDocumentEntityAction(this, '', unique, '');
+		new UmbUnpublishDocumentEntityAction(this, '', unique, '').execute();
 	}
 
 	async delete() {
