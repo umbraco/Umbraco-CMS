@@ -5,12 +5,9 @@ import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel, UmbDocumentVariantOptionModel } from '../types.js';
 import { umbPickDocumentVariantModal, type UmbDocumentVariantPickerModalType } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
+import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
-import {
-	type UmbObjectWithVariantProperties,
-	UmbVariantId,
-	variantPropertiesObjectToString,
-} from '@umbraco-cms/backoffice/variant';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
@@ -21,6 +18,7 @@ import {
 import {
 	appendToFrozenArray,
 	combineObservables,
+	naiveObjectComparison,
 	partialUpdateFrozenArray,
 	UmbArrayState,
 	UmbObjectState,
@@ -28,7 +26,6 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -212,11 +209,45 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
+	#calculateChangedVariants() {
+		const persisted = this.#persistedData.getValue();
+		if (!persisted) throw new Error('Persisted data is missing');
+		const current = this.#currentData.getValue();
+		if (!persisted) throw new Error('Current data is missing');
+
+		const changedVariants = current?.variants.map((variant) => {
+			const persistedVariant = persisted.variants.find((x) => UmbVariantId.Create(variant).compare(x));
+			return {
+				culture: variant.culture,
+				segment: variant.segment,
+				equal: persistedVariant ? naiveObjectComparison(variant, persistedVariant) : false,
+			};
+		});
+
+		const changedProperties = current?.values.map((value) => {
+			const persistedValues = persisted.values.find((x) => UmbVariantId.Create(value).compare(x));
+			return {
+				culture: value.culture,
+				segment: value.segment,
+				equal: persistedValues ? naiveObjectComparison(value, persistedValues) : false,
+			};
+		});
+
+		// calculate the variantIds of those who either have a change in properties or in variants:
+		return (
+			changedVariants
+				?.concat(changedProperties ?? [])
+				.filter((x) => x.equal === false)
+				.map((x) => new UmbVariantId(x.culture, x.segment)) ?? []
+		);
+	}
+
 	async #pickVariantsForAction(type: UmbDocumentVariantPickerModalType): Promise<UmbVariantId[]> {
 		const activeVariants = this.splitView.getActiveVariants();
 
 		// TODO: Picked variants should include the ones that has been changed (but not jet saved) this requires some more awareness about the state of runtime data. [NL]
-		const selected = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
+		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
+		const selected = activeVariantIds.concat(this.#calculateChangedVariants());
 		const options = await firstValueFrom(this.variantOptions);
 
 		// If there is only one variant, we don't need to open the modal.

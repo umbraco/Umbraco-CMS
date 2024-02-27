@@ -30,19 +30,6 @@ export class UmbPickDocumentVariantModalController extends UmbBaseController {
 			// TODO: What do to when there is no options?
 		}
 
-		// TODO: Maybe move this to modal [NL]
-		if (selected.length === 0) {
-			// TODO: Make it possible to use consume context without callback. [NL]
-			const ctrl = this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {});
-			const context = await ctrl.asPromise();
-			const appCulture = context.getAppCulture();
-			// If the app language is one of the options, select it by default:
-			if (appCulture && modalData.options.some((o) => o.language.unique === appCulture)) {
-				selected.push(new UmbVariantId(appCulture, null));
-			}
-			ctrl.destroy();
-		}
-
 		const modalContext = modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
 			data: modalData,
 			// We need to turn the selected variant ids into strings for them to be serializable to the value state, in other words the value of a modal cannot hold class instances:

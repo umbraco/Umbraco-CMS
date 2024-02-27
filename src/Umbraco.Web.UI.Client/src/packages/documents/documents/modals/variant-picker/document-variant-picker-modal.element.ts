@@ -27,11 +27,26 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 
 	connectedCallback(): void {
 		super.connectedCallback();
-		this.#selectionManager.setSelectable(true);
-		this.#selectionManager.setMultiple(true);
+		this.#setInitialSelection();
+	}
 
-		// Make sure all mandatory variants are selected when not in unpublish mode
-		// TODO: Currently only supports culture variants, not segment variants, but as well our Selection Manager also only supports a single string value pr. selection... [NL]
+	async #setInitialSelection() {
+		const selected = this.value?.selection ?? [];
+
+		if (selected.length === 0) {
+			// TODO: Make it possible to use consume context without callback. [NL]
+			const ctrl = this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {});
+			const context = await ctrl.asPromise();
+			const appCulture = context.getAppCulture();
+			// If the app language is one of the options, select it by default:
+			if (appCulture && modalData.options.some((o) => o.language.unique === appCulture)) {
+				selected.push(new UmbVariantId(appCulture, null));
+			}
+			ctrl.destroy();
+		}
+
+		this.#selectionManager.setMultiple(true);
+		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setSelection(this.value?.selection ?? []);
 
 		if (this.data?.type !== 'unpublish') {
