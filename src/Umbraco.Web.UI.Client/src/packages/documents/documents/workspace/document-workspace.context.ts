@@ -28,6 +28,7 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -41,6 +42,7 @@ export class UmbDocumentWorkspaceContext
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
+	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 	#getDataPromise?: Promise<any>;
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
@@ -68,7 +70,6 @@ export class UmbDocumentWorkspaceContext
 		});
 	});
 
-	readonly changedVariants = new UmbArrayState<UmbObjectWithVariantProperties>([], variantPropertiesObjectToString);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
@@ -95,7 +96,7 @@ export class UmbDocumentWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(false);
-		//this.#persisted.next(data);
+		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 		return data || undefined;
 	}
@@ -206,7 +207,8 @@ export class UmbDocumentWorkspaceContext
 				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
 			);
 			this.#currentData.update({ values });
-			this.changedVariants.appendOne(variantId);
+
+			// TODO: Ensure variant object..
 		}
 	}
 
@@ -254,6 +256,10 @@ export class UmbDocumentWorkspaceContext
 		await this.#pickVariantsForAction('save');
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
+
+		this.#persistedData.setValue(data);
+		this.#currentData.setValue(data);
+
 		this.saveComplete(data);
 	}
 
@@ -273,11 +279,7 @@ export class UmbDocumentWorkspaceContext
 		const unique = this.getEntityId();
 
 		if (!unique) throw new Error('Unique is missing');
-		//if (!this.#variantManagerContext) throw new Error('Variant manager context is missing');
-
-		//this.#variantManagerContext.unpublish(unique);
-		alert('not implemented');
-		throw new Error('Not implemented');
+		new UmbUnpublishDocumentEntityAction(this, '', unique, '');
 	}
 
 	async delete() {
