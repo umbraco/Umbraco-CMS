@@ -6,15 +6,17 @@ import {
 	UmbBlockGridScaleManager,
 } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbBlockGridTypeModel, UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
 	UmbBooleanState,
 	UmbNumberState,
+	UmbObjectState,
 	appendToFrozenArray,
+	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -38,6 +40,7 @@ export class UmbBlockGridEntryContext
 		const x = this._blockType.getValue();
 		return [x?.rowMinSpan ?? 1, x?.rowMaxSpan ?? 1];
 	}
+	readonly inlineEditingMode = this._blockType.asObservablePart((x) => x?.inlineEditing === true);
 
 	#relevantColumnSpanOptions = new UmbArrayState<number>([], (x) => x);
 	readonly relevantColumnSpanOptions = this.#relevantColumnSpanOptions.asObservable();
@@ -52,6 +55,9 @@ export class UmbBlockGridEntryContext
 	readonly areaGridColumns = this.#areaGridColumns.asObservable();
 
 	readonly showContentEdit = this._blockType.asObservablePart((x) => !x?.forceHideContentEditorInOverlay);
+
+	#firstPropertyType = new UmbObjectState<UmbPropertyTypeModel | undefined>(undefined);
+	readonly firstPropertyType = this.#firstPropertyType.asObservable();
 
 	readonly scaleManager = new UmbBlockGridScaleManager(this);
 
@@ -95,21 +101,8 @@ export class UmbBlockGridEntryContext
 		if (!this._entries) return;
 		const layoutColumns = this._entries.getLayoutColumns();
 		if (!layoutColumns) return;
-		/*
-		const oldColumnSpan = this._layout.getValue()?.columnSpan;
-		if (!oldColumnSpan) {
-			// Some fallback solution, to reset it so something that makes sense.
-			return;
-		}
-		*/
 
 		columnSpan = Math.max(1, Math.min(columnSpan, layoutColumns));
-
-		/*
-		const columnSpanOptions = this.#relevantColumnSpanOptions.getValue();
-		if (columnSpanOptions.length > 0) {
-			columnSpan = closestColumnSpanOption(columnSpan, columnSpanOptions, layoutColumns) ?? layoutColumns;
-		}*/
 		this._layout.update({ columnSpan });
 	}
 	getColumnSpan() {
@@ -127,19 +120,7 @@ export class UmbBlockGridEntryContext
 		return this._layout.getValue()?.rowSpan;
 	}
 
-	_gotManager() {
-		if (this._manager) {
-			/*this.observe(
-				this._manager.inlineEditingMode,
-				(inlineEditingMode) => {
-					this.#inlineEditingMode.setValue(inlineEditingMode);
-				},
-				'observeInlineEditingMode',
-			);*/
-		} else {
-			//this.removeControllerByAlias('observeInlineEditingMode');
-		}
-	}
+	_gotManager() {}
 
 	_gotEntries() {
 		this.scaleManager.setEntriesContext(this._entries);
@@ -147,7 +128,7 @@ export class UmbBlockGridEntryContext
 		if (!this._entries) return;
 
 		this.observe(
-			combineLatest([this.minMaxRowSpan, this.columnSpanOptions, this._entries.layoutColumns]),
+			observeMultiple([this.minMaxRowSpan, this.columnSpanOptions, this._entries.layoutColumns]),
 			([minMaxRowSpan, columnSpanOptions, layoutColumns]) => {
 				if (!layoutColumns) return;
 				const relevantColumnSpanOptions = columnSpanOptions
@@ -167,7 +148,7 @@ export class UmbBlockGridEntryContext
 		);
 
 		this.observe(
-			combineLatest([this.areaTypeGridColumns, this._entries.layoutColumns]),
+			observeMultiple([this.areaTypeGridColumns, this._entries.layoutColumns]),
 			([areaTypeGridColumns, layoutColumns]) => {
 				this.#areaGridColumns.setValue(areaTypeGridColumns ?? layoutColumns);
 			},
@@ -175,7 +156,7 @@ export class UmbBlockGridEntryContext
 		);
 
 		this.observe(
-			combineLatest([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
+			observeMultiple([this.columnSpan, this.relevantColumnSpanOptions, this._entries.layoutColumns]),
 			([columnSpan, relevantColumnSpanOptions, layoutColumns]) => {
 				if (!columnSpan || !layoutColumns) return;
 				if (relevantColumnSpanOptions.length > 0) {
@@ -196,5 +177,9 @@ export class UmbBlockGridEntryContext
 			},
 			'observeColumnSpanValidation',
 		);
+	}
+
+	_gotContentType(contentType: UmbContentTypeModel | undefined) {
+		this.#firstPropertyType.setValue(contentType?.properties[0]);
 	}
 }

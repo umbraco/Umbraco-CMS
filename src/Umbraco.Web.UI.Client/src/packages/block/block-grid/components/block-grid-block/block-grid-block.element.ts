@@ -8,7 +8,7 @@ import type { UmbBlockViewUrlsPropType } from '@umbraco-cms/backoffice/block';
  * @element umb-block-grid-block
  */
 @customElement('umb-block-grid-block')
-export class UmbRefGridBlockElement extends UmbLitElement {
+export class UmbBlockGridBlockElement extends UmbLitElement {
 	//
 	@property({ attribute: false })
 	label?: string;
@@ -24,9 +24,6 @@ export class UmbRefGridBlockElement extends UmbLitElement {
 
 	static styles = [
 		css`
-			uui-ref-node {
-				min-height: var(--uui-size-16);
-			}
 			umb-block-grid-areas-container {
 				margin-top: calc(var(--uui-size-2) + 1px);
 			}
@@ -37,10 +34,10 @@ export class UmbRefGridBlockElement extends UmbLitElement {
 	];
 }
 
-export default UmbRefGridBlockElement;
+export default UmbBlockGridBlockElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-grid-block': UmbRefGridBlockElement;
+		'umb-block-grid-block': UmbBlockGridBlockElement;
 	}
 }
