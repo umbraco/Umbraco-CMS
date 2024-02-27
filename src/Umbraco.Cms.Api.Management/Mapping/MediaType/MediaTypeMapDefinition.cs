@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
+﻿using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.Mapping.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Mapping;
@@ -30,6 +31,8 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.VariesByCulture = source.VariesByCulture();
         target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
+
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
         target.AllowedMediaTypes = source.AllowedContentTypes?.Select(ct =>
@@ -47,7 +50,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
     // Umbraco.Code.MapAll
@@ -55,7 +58,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
     // Umbraco.Code.MapAll

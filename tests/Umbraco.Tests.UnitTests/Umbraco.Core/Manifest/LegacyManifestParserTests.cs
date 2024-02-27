@@ -43,7 +43,7 @@ public class LegacyManifestParserTests
             loggerFactory.CreateLogger<LegacyManifestParser>(),
             _ioHelper,
             TestHelper.GetHostingEnvironment(),
-            new JsonNetSerializer(),
+            new SystemTextJsonSerializer(),
             Mock.Of<ILocalizedTextService>(),
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IDataValueEditorFactory>(),

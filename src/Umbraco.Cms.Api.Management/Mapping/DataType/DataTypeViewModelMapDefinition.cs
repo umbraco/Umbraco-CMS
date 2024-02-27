@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.DataType;
 
@@ -26,6 +27,8 @@ public class DataTypeViewModelMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.EditorAlias = source.EditorAlias;
         target.EditorUiAlias = source.EditorUiAlias;
+        target.IsDeletable = source.IsDeletableDataType();
+        target.CanIgnoreStartNodes = source.IsBuildInDataType() is false;
 
         IConfigurationEditor? configurationEditor = source.Editor?.GetConfigurationEditor();
         IDictionary<string, object> configuration = configurationEditor?.ToConfigurationEditor(source.ConfigurationData)

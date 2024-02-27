@@ -111,6 +111,9 @@ stages:
           - script: npm ci --no-fund --no-audit --prefer-offline
             displayName: Run npm ci (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client
+          - script: npm run generate:api-local
+            displayName: Generate API models (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
           - script: npm run build:for:cms
             displayName: Run build (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client
@@ -357,7 +360,8 @@ stages:
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 180
-        condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}})
+        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}}) # Outcommented due to timeouts
+        condition: eq(${{parameters.sqlServerIntegrationTests}}, True)
         displayName: Integration Tests (SQL Server)
         strategy:
           matrix:
@@ -575,7 +579,8 @@ stages:
 
       - job:
         displayName: E2E Tests (SQL Server)
-        condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}})
+        # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}}) # Outcommented due to timeouts
+        condition: eq(${{parameters.sqlServerAcceptanceTests}}, True)
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True

@@ -106,6 +106,9 @@ internal sealed class ContentEditingService
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
 
+    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
+        => await HandleMoveAsync(key, parentKey, userKey, true);
+
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => await HandleCopyAsync(key, parentKey, relateToOriginal, includeDescendants, userKey);
 

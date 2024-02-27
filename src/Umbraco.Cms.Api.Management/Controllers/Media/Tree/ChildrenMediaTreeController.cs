@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
-using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
