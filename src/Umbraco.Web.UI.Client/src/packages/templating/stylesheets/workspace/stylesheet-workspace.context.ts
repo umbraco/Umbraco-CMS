@@ -44,7 +44,7 @@ export class UmbStylesheetWorkspaceContext
 		return UMB_STYLESHEET_ENTITY_TYPE;
 	}
 
-	getEntityId() {
+	getUnique() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		return data.unique;

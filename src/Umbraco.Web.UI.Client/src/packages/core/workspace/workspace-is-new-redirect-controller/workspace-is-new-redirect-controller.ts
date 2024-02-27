@@ -26,7 +26,7 @@ export class UmbWorkspaceIsNewRedirectController extends UmbBaseController {
 			workspaceContext.isNew,
 			(isNew) => {
 				if (isNew === false) {
-					const unique = workspaceContext.getEntityId();
+					const unique = workspaceContext.getUnique();
 					if (router && unique) {
 						const routerPath = router.absoluteRouterPath;
 						if (routerPath) {

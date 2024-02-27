@@ -74,7 +74,7 @@ export class UmbDocumentTypeWorkspaceContext
 		return this.structure.getOwnerContentType();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 

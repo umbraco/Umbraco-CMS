@@ -75,7 +75,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()!.key;
 	}
 

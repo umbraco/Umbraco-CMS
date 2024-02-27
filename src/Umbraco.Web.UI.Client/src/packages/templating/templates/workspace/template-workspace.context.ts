@@ -47,7 +47,7 @@ export class UmbTemplateWorkspaceContext
 		return 'template';
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 

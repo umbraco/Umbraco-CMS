@@ -231,7 +231,7 @@ export class UmbBlockWorkspaceContext<
 		return this.#layout.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()!.contentUdi;
 	}
 

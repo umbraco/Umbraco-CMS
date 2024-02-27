@@ -125,7 +125,7 @@ export class UmbDocumentWorkspaceContext
 		return this.#currentData.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 
@@ -330,7 +330,7 @@ export class UmbDocumentWorkspaceContext
 
 	public async publish() {
 		const variantIds = await this.#pickVariantsForAction('publish');
-		const unique = this.getEntityId();
+		const unique = this.getUnique();
 		if (variantIds.length && unique) {
 			await this.publishingRepository.publish(unique, variantIds);
 		}
@@ -341,14 +341,14 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async unpublish() {
-		const unique = this.getEntityId();
+		const unique = this.getUnique();
 
 		if (!unique) throw new Error('Unique is missing');
 		new UmbUnpublishDocumentEntityAction(this, '', unique, '').execute();
 	}
 
 	async delete() {
-		const id = this.getEntityId();
+		const id = this.getUnique();
 		if (id) {
 			await this.repository.delete(id);
 		}

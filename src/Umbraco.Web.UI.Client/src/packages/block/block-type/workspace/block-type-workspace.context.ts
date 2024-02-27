@@ -73,7 +73,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()!.contentElementTypeKey;
 	}
 

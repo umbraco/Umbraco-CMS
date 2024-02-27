@@ -99,7 +99,7 @@ export class UmbMediaWorkspaceContext
 		return this.#currentData.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 
@@ -208,7 +208,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async delete() {
-		const id = this.getEntityId();
+		const id = this.getUnique();
 		if (id) {
 			await this.repository.delete(id);
 		}

@@ -49,7 +49,7 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 		}
 	}
 
-	abstract getEntityId(): string | undefined; // TODO: Consider if this should go away/be renamed? now that we have getUnique()
+	abstract getUnique(): string | undefined; // TODO: Consider if this should go away/be renamed? now that we have getUnique()
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
 	abstract save(): Promise<void>;

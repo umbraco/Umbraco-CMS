@@ -29,7 +29,7 @@ export class UmbDictionaryWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 

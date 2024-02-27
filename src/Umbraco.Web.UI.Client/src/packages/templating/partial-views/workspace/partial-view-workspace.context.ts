@@ -39,7 +39,7 @@ export class UmbPartialViewWorkspaceContext
 		}
 	}
 
-	getEntityId() {
+	getUnique() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		return data.unique;

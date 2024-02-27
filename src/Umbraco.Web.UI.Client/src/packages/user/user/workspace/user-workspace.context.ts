@@ -51,7 +51,7 @@ export class UmbUserWorkspaceContext
 		this.#data.update({ state: user.state });
 	}
 
-	getEntityId(): string | undefined {
+	getUnique(): string | undefined {
 		return this.getData()?.unique;
 	}
 
@@ -96,13 +96,13 @@ export class UmbUserWorkspaceContext
 
 	// TODO: implement upload progress
 	async uploadAvatar(file: File) {
-		const unique = this.getEntityId();
+		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 		return this.avatarRepository.uploadAvatar(unique, file);
 	}
 
 	async deleteAvatar() {
-		const unique = this.getEntityId();
+		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 		return this.avatarRepository.deleteAvatar(unique);
 	}

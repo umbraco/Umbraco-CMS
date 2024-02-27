@@ -61,7 +61,7 @@ export class UmbMemberGroupWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique || '';
 	}
 

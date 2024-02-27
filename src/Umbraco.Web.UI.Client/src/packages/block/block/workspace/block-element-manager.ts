@@ -1,6 +1,6 @@
 import type { UmbBlockDataType } from '../types.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
-import type { UmbContentTypeModel} from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -40,7 +40,7 @@ export class UmbBlockElementManager extends UmbBaseController {
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.udi;
 	}
 

@@ -36,7 +36,7 @@ export class UmbDocumentPropertyDataContext
 		return this.#workspace.getEntityType();
 	}
 	getUnique(): string | undefined {
-		return this.#workspace.getEntityId();
+		return this.#workspace.getUnique();
 	}
 	getName(): string | undefined {
 		return this.#workspace.getName(this.#variantId);

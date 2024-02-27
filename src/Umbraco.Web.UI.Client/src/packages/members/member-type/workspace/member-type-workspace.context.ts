@@ -60,7 +60,7 @@ export class UmbMemberTypeWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique || '';
 	}
 

@@ -51,7 +51,7 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	// TODO: Convert to uniques:
-	getEntityId() {
+	getUnique() {
 		return this.#data.getValue()?.unique;
 	}
 

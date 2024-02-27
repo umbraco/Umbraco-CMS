@@ -35,7 +35,7 @@ export class UmbUserGroupWorkspaceContext
 		}
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 

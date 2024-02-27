@@ -42,14 +42,14 @@ export class UmbRelationTypeWorkspaceContext
 
 	async getRelations() {
 		//TODO: How do we test this?
-		return await this.repository.requestRelationsById(this.getEntityId());
+		return await this.repository.requestRelationsById(this.getUnique());
 	}
 
 	getData() {
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.id || '';
 	}
 

@@ -213,7 +213,7 @@ export class UmbDataTypeWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique || '';
 	}
 

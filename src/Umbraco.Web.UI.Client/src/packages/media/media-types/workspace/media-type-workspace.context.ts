@@ -59,7 +59,7 @@ export class UmbMediaTypeWorkspaceContext
 		return this.structure.getOwnerContentType();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 
