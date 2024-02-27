@@ -12,11 +12,13 @@ public class ConfigurationDocumentController : DocumentControllerBase
 {
     private readonly GlobalSettings _globalSettings;
     private readonly ContentSettings _contentSettings;
+    private readonly PropertySettings _propertySettings;
 
-    public ConfigurationDocumentController(IOptionsSnapshot<GlobalSettings> globalSettings, IOptionsSnapshot<ContentSettings> contentSettings)
+    public ConfigurationDocumentController(IOptionsSnapshot<GlobalSettings> globalSettings, IOptionsSnapshot<ContentSettings> contentSettings, IOptionsSnapshot<PropertySettings> propertySettings)
     {
         _contentSettings = contentSettings.Value;
         _globalSettings = globalSettings.Value;
+        _propertySettings = propertySettings.Value;
     }
 
     [HttpGet("configuration")]
@@ -30,6 +32,7 @@ public class ConfigurationDocumentController : DocumentControllerBase
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
             SanitizeTinyMce = _globalSettings.SanitizeTinyMce,
             AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
+            StandardFieldNames = _propertySettings.StandardFieldNames,
         };
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }

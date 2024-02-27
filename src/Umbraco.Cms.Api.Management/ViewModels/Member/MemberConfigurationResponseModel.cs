@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Media;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Member;
 
-public class MediaConfigurationResponseModel
+public class MemberConfigurationResponseModel
 {
     public required bool DisableDeleteWhenReferenced { get; set; }
 

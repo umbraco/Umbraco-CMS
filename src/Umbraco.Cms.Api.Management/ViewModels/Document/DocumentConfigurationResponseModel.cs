@@ -9,4 +9,5 @@ public class DocumentConfigurationResponseModel
     public required bool DisableUnpublishWhenReferenced { get; set; }
 
     public required bool AllowEditInvariantFromNonDefault { get; set; }
+    public required ISet<string> StandardFieldNames { get; set; }
 }
