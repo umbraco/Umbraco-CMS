@@ -1,18 +1,19 @@
 import { umbPickDocumentVariantModal } from '../modals/pick-document-variant-modal.controller.js';
-import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
+import { type UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentVariantState } from '../types.js';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<UmbDocumentPublishingRepository> {
+export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<UmbDocumentDetailRepository> {
 	async execute() {
+		if (!this.repository) throw new Error('Document repository not set');
+
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestCollection({});
 
 		// TODO: Not sure we need to use the Detail Repository for this, we might do just fine with the tree item model it self.
-		const documentRepository = new UmbDocumentDetailRepository(this._host);
-		const { data: documentData } = await documentRepository.requestByUnique(this.unique);
+		const { data: documentData } = await this.repository.requestByUnique(this.unique);
 
 		const allOptions = (languageData?.items ?? []).map((language) => ({
 			language: language,
