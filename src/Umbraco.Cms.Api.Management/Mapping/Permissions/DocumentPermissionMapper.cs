@@ -5,7 +5,12 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
-
+/// <summary>
+/// Mapping required for mapping all the way from viewmodel to database and back.
+/// </summary>
+/// <remarks>
+/// This mapping maps all the way from management api to database in one file intentionally, so it is very clear what it takes, if we wanna add permissions to media or other types in the future.
+/// </remarks>
 public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissionMapper
 {
     public string Context => DocumentGranularPermission.ContextType;
