@@ -155,6 +155,7 @@ export class UmbDocumentWorkspaceContext
 			variantId ? (x) => variantId.compare(x) : () => true,
 		);
 		this.#currentData.update({ variants });
+		// TODO: We should move this type of logic to the act of saving [NL]
 		this.#ensureVariantDataFor(variantId ?? UmbVariantId.CreateInvariant());
 	}
 
@@ -207,7 +208,7 @@ export class UmbDocumentWorkspaceContext
 			);
 			this.#currentData.update({ values });
 
-			// If it turns out to become a performance problem to ensure this all the time, then we should move this type of logic to the data-source
+			// TODO: We should move this type of logic to the act of saving [NL]
 			this.#ensureVariantDataFor(variantId);
 		}
 	}
