@@ -7,6 +7,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
+import './member-workspace-view-member-info.element.js';
+
 @customElement('umb-member-workspace-view-member')
 export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	private _workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
@@ -50,92 +52,95 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		this._newPasswordError = '';
 	};
 
-	render() {
-		if (!this._workspaceContext) {
-			return html`<div>Not found</div>`;
-		}
+	#renderLeftColumn() {
+		if (!this._workspaceContext) return;
+		return html` <div id="left-column">
+			<uui-box>
+				<umb-property-layout label="${this.localize.term('general_login')}">
+					<uui-input
+						slot="editor"
+						name="login"
+						label="${this.localize.term('general_login')}"
+						value=""
+						@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
+				</umb-property-layout>
 
-		return html` <umb-body-layout header-fit-height>
-			<div id="main">
-				<uui-box id="left-column">
-					<umb-property-layout label="${this.localize.term('general_login')}">
-						<uui-input
-							slot="editor"
-							name="login"
-							label="${this.localize.term('general_login')}"
-							value=""
-							@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
-					</umb-property-layout>
+				<umb-property-layout label="${this.localize.term('general_email')}">
+					<uui-input
+						slot="editor"
+						name="email"
+						label="${this.localize.term('general_email')}"
+						@input=${(e: Event) => this.#onChange('email', (e.target as HTMLInputElement).value)}
+						value=${this._workspaceContext.email}></uui-input>
+				</umb-property-layout>
 
-					<umb-property-layout label="${this.localize.term('general_email')}">
-						<uui-input
-							slot="editor"
-							name="email"
-							label="${this.localize.term('general_email')}"
-							@input=${(e: Event) => this.#onChange('email', (e.target as HTMLInputElement).value)}
-							value=${this._workspaceContext.email}></uui-input>
-					</umb-property-layout>
+				<umb-property-layout label="Change password">
+					${when(
+						this._showChangePasswordForm,
+						() => html`
+							<div slot="editor">
+								<umb-property-layout label="New password">
+									<uui-input
+										slot="editor"
+										name="newPassword"
+										label="New password"
+										type="password"
+										@input=${() => this.#onPasswordUpdate()}></uui-input>
+								</umb-property-layout>
+								<umb-property-layout label="Confirm password">
+									<uui-input
+										slot="editor"
+										name="confirmPassword"
+										label="Confirm password"
+										type="password"
+										@input=${() => this.#onPasswordUpdate()}></uui-input>
+								</umb-property-layout>
+								${when(this._newPasswordError, () => html`<p class="validation-error">${this._newPasswordError}</p>`)}
+								<uui-button label="Cancel" look="secondary" @click=${this.#onNewPasswordCancel}></uui-button>
+							</div>
+						`,
+						() =>
+							html`<uui-button
+								slot="editor"
+								label="Change password"
+								look="secondary"
+								@click=${() => (this._showChangePasswordForm = true)}></uui-button>`,
+					)}
+				</umb-property-layout>
 
-					<umb-property-layout label="Change password">
-						${when(
-							this._showChangePasswordForm,
-							() => html`
-								<div slot="editor">
-									<umb-property-layout label="New password">
-										<uui-input
-											slot="editor"
-											name="newPassword"
-											label="New password"
-											type="password"
-											@input=${() => this.#onPasswordUpdate()}></uui-input>
-									</umb-property-layout>
-									<umb-property-layout label="Confirm password">
-										<uui-input
-											slot="editor"
-											name="confirmPassword"
-											label="Confirm password"
-											type="password"
-											@input=${() => this.#onPasswordUpdate()}></uui-input>
-									</umb-property-layout>
-									${when(this._newPasswordError, () => html`<p class="validation-error">${this._newPasswordError}</p>`)}
-									<uui-button label="Cancel" look="secondary" @click=${this.#onNewPasswordCancel}></uui-button>
-								</div>
-							`,
-							() =>
-								html`<uui-button
-									slot="editor"
-									label="Change password"
-									look="secondary"
-									@click=${() => (this._showChangePasswordForm = true)}></uui-button>`,
-						)}
-					</umb-property-layout>
+				<umb-property-layout label="Member Group">
+					<div slot="editor">MEMBER GROUP PICKER</div>
+				</umb-property-layout>
 
-					<umb-property-layout label="Member Group">
-						<div slot="editor">MEMBER GROUP PICKER</div>
-					</umb-property-layout>
+				<umb-property-layout label="Approved">
+					<uui-toggle
+						slot="editor"
+						.checked=${this._workspaceContext.isApproved}
+						@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
+					</uui-toggle>
+				</umb-property-layout>
 
-					<umb-property-layout label="Approved">
-						<uui-toggle
-							slot="editor"
-							.checked=${this._workspaceContext.isApproved}
-							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
-						</uui-toggle>
-					</umb-property-layout>
+				<umb-property-layout label="Locked out">
+					<uui-toggle
+						slot="editor"
+						.checked=${this._workspaceContext.isLockedOut}
+						@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
+					</uui-toggle>
+				</umb-property-layout>
 
-					<umb-property-layout label="Locked out">
-						<uui-toggle
-							slot="editor"
-							.checked=${this._workspaceContext.isLockedOut}
-							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
-						</uui-toggle>
-					</umb-property-layout>
+				<umb-property-layout label="Two-Factor authentication">
+					<uui-toggle slot="editor"></uui-toggle>
+				</umb-property-layout>
+			</uui-box>
+		</div>`;
+	}
 
-					<umb-property-layout label="Two-Factor authentication">
-						<uui-toggle slot="editor"></uui-toggle>
-					</umb-property-layout>
-				</uui-box>
+	#renderRightColumn() {
+		if (!this._workspaceContext) return;
 
-				<uui-box id="right-column">
+		return html`
+			<div id="right-column">
+				<uui-box>
 					<umb-property-layout label="Failed login attempts">
 						<div slot="editor">${this._workspaceContext.failedPasswordAttempts}</div>
 					</umb-property-layout>
@@ -152,7 +157,21 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						<div slot="editor">${this._workspaceContext.lastPasswordChangeDate}</div>
 					</umb-property-layout>
 				</uui-box>
+
+				<uui-box>
+					<umb-member-workspace-view-member-info></umb-member-workspace-view-member-info>
+				</uui-box>
 			</div>
+		`;
+	}
+
+	render() {
+		if (!this._workspaceContext) {
+			return html`<div>Not found</div>`;
+		}
+
+		return html` <umb-body-layout header-fit-height>
+			<div id="main">${this.#renderLeftColumn()} ${this.#renderRightColumn()}</div>
 		</umb-body-layout>`;
 	}
 
@@ -173,6 +192,9 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 			}
 			#right-column {
 				flex: 1 1 350px;
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
 			}
 			uui-box {
 				height: fit-content;

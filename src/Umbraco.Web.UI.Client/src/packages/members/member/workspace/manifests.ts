@@ -75,24 +75,6 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 			},
 		],
 	},
-	{
-		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Member.Info',
-		name: 'Member Workspace Info View',
-		js: () => import('./views/info/member-workspace-view-info.element.js'),
-		weight: 100,
-		meta: {
-			label: 'Info',
-			pathname: 'info',
-			icon: 'icon-info',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: UMB_MEMBER_WORKSPACE_ALIAS,
-			},
-		],
-	},
 ];
 
 export const manifests = [workspace, ...workspaceActions, ...workspaceViews];

@@ -21,6 +21,8 @@ export class UmbMemberWorkspaceContext
 	#data = new UmbObjectState<UmbMemberDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.variants[0].name);
+	readonly createDate = this.#data.asObservablePart((data) => data?.variants[0].createDate);
+	readonly updateDate = this.#data.asObservablePart((data) => data?.variants[0].updateDate);
 	readonly contentTypeUnique = this.#data.asObservablePart((data) => data?.memberType.unique);
 	readonly structure = new UmbContentTypePropertyStructureManager<UmbMemberTypeDetailModel>(
 		this,
