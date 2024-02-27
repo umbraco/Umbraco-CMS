@@ -1,7 +1,7 @@
-import type { UmbTreeItemContext } from '../tree-item/tree-item-context.interface.js';
-import type { UmbTreeContextBase } from '../tree.context.js';
-import type { UmbTreeItemModelBase } from '../types.js';
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '../reload-tree-item-children/index.js';
+import type { UmbTreeItemContext } from '../tree-item-context.interface.js';
+import type { UmbTreeContextBase } from '../../tree.context.js';
+import type { UmbTreeItemModelBase } from '../../types.js';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '../../reload-tree-item-children/index.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';

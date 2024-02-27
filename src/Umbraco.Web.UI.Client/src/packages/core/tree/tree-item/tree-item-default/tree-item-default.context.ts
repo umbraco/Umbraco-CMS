@@ -1,5 +1,5 @@
 import { UmbTreeItemContextBase } from '../tree-item-base/index.js';
-import type { UmbUniqueTreeItemModel } from '../types.js';
+import type { UmbUniqueTreeItemModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDefaultTreeItemContext<

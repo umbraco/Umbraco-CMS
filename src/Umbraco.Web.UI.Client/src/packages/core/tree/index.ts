@@ -1,16 +1,13 @@
 export * from './components/index.js';
 export * from './tree-item/index.js';
-export * from './tree-item-base/index.js';
 export * from './tree-menu-item-default/index.js';
 export * from './tree.context.js';
 export * from './tree.element.js';
 export * from './types.js';
+export * from './data/index.js';
 
 // Unique
 export * from './data/unique-tree-store.js';
-export * from './tree-item-default/index.js';
-
-export * from './data/index.js';
 
 // Folder
 export * from './folder/index.js';

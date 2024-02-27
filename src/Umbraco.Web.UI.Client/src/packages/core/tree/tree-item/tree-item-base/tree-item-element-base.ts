@@ -1,5 +1,5 @@
-import type { UmbTreeItemContext } from '../tree-item/index.js';
-import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemContext } from '../index.js';
+import type { UmbTreeItemModelBase } from '../../types.js';
 import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
 import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
