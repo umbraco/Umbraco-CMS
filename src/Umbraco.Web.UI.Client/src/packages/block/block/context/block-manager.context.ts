@@ -101,26 +101,29 @@ export abstract class UmbBlockManagerContext<
 				'observePropertyVariantId',
 			);
 		});
+
+		this.observe(this.blockTypes, (blockTypes) => {
+			blockTypes.forEach((x) => {
+				this.#ensureContentType(x.contentElementTypeKey);
+				if (x.settingsElementTypeKey) {
+					this.#ensureContentType(x.settingsElementTypeKey);
+				}
+			});
+		});
 	}
 
-	async ensureContentType(unique?: string) {
-		if (!unique) return;
+	async #ensureContentType(unique: string) {
 		if (this.#contentTypes.getValue().find((x) => x.unique === unique)) return;
-		const contentType = await this.#loadContentType(unique);
-		return contentType;
-	}
-
-	async #loadContentType(unique?: string) {
-		if (!unique) return {};
 
 		const { data } = await this.#contentTypeRepository.requestByUnique(unique);
-		if (!data) return {};
+		if (!data) {
+			this.#contentTypes.removeOne(unique);
+			return;
+		}
 
 		// We could have used the global store of Document Types, but to ensure we first react ones the latest is loaded then we have our own local store:
-		// TODO: Revisit if this is right to do. Notice this can potentially be proxied to the global store.
+		// TODO: Revisit if this is right to do. Notice this can potentially be proxied to the global store. In that way we do not need to observe and we can just use the global store for data.
 		this.#contentTypes.appendOne(data);
-
-		return data;
 	}
 
 	contentTypeOf(contentTypeKey: string) {
