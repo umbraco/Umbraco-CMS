@@ -11,7 +11,7 @@ import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -89,8 +89,6 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 
 	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbMediaTypeDetailModel>(this);
 
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-
 	constructor() {
 		super();
 		this.sorter = new UmbSorterController(this, this.config);
@@ -115,10 +113,6 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 				'_observeIsSorting',
 			);
 			this._observeRootGroups();
-		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
-			this._modalManagerContext = context;
 		});
 	}
 
@@ -188,7 +182,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 		this._routes = routes;
 	}
 
-	#requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
+	async #requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
 		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
@@ -204,12 +198,9 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 		};
 
 		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
+		await umbConfirmModal(this, modalData);
 
-		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, { data: modalData });
-
-		modalHandler?.onSubmit().then(() => {
-			this.#remove(tab?.id);
-		});
+		this.#remove(tab?.id);
 	}
 	#remove(tabId?: string) {
 		if (!tabId) return;

@@ -1,4 +1,4 @@
-import type { UmbModalToken } from './token/modal-token.js';
+import type { UmbModalToken } from '../token/modal-token.js';
 import { UmbModalContext, type UmbModalContextClassArgs } from './modal.context.js';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
