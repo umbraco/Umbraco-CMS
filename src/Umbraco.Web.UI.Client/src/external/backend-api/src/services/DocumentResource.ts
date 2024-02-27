@@ -11,12 +11,14 @@ import type { DocumentNotificationResponseModel } from '../models/DocumentNotifi
 import type { DocumentResponseModel } from '../models/DocumentResponseModel';
 import type { DomainsResponseModel } from '../models/DomainsResponseModel';
 import type { MoveDocumentRequestModel } from '../models/MoveDocumentRequestModel';
+import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
 import type { PagedDocumentCollectionResponseModel } from '../models/PagedDocumentCollectionResponseModel';
 import type { PagedDocumentRecycleBinItemResponseModel } from '../models/PagedDocumentRecycleBinItemResponseModel';
 import type { PagedDocumentTreeItemResponseModel } from '../models/PagedDocumentTreeItemResponseModel';
 import type { PublicAccessRequestModel } from '../models/PublicAccessRequestModel';
 import type { PublishDocumentRequestModel } from '../models/PublishDocumentRequestModel';
 import type { PublishDocumentWithDescendantsRequestModel } from '../models/PublishDocumentWithDescendantsRequestModel';
+import type { ReferenceByIdModel } from '../models/ReferenceByIdModel';
 import type { SortingRequestModel } from '../models/SortingRequestModel';
 import type { UnpublishDocumentRequestModel } from '../models/UnpublishDocumentRequestModel';
 import type { UpdateDocumentNotificationsRequestModel } from '../models/UpdateDocumentNotificationsRequestModel';
@@ -225,7 +227,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns void
      * @throws ApiError
      */
     public static putDocumentByIdDomains({
@@ -234,7 +236,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: UpdateDomainsRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/domains',
@@ -244,7 +246,10 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+                409: `Conflict`,
             },
         });
     }
@@ -674,6 +679,58 @@ export class DocumentResource {
             path: {
                 'id': id,
             },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getRecycleBinDocumentByIdOriginalParent({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<ReferenceByIdModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/recycle-bin/document/{id}/original-parent',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putRecycleBinDocumentByIdRestore({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveMediaRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/recycle-bin/document/{id}/restore',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
