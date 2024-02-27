@@ -4,9 +4,6 @@ import { html, nothing, customElement, property, state, repeat } from '@umbraco-
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-import './tree-item/tree-item.element.js';
-import './tree-item/tree-item-base/tree-item-element-base.js';
-
 export type UmbTreeSelectionConfiguration = {
 	multiple?: boolean;
 	selectable?: boolean;
