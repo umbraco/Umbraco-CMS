@@ -5,6 +5,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 export interface UmbEntityBulkAction<RepositoryType = unknown> extends UmbAction<RepositoryType> {
 	selection: Array<string>;
 	setSelection(selection: Array<string>): void;
+	execute(): Promise<void>;
 }
 
 export abstract class UmbEntityBulkActionBase<RepositoryType = unknown>

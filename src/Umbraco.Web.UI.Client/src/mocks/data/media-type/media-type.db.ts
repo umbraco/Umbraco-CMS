@@ -65,6 +65,7 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 		compositions: [],
 		isFolder: true,
 		hasChildren: false,
+		collection: null,
 	};
 };
 
@@ -86,6 +87,7 @@ const createMockMediaTypeMapper = (request: CreateMediaTypeRequestModel): UmbMoc
 		parent: request.folder ? { id: request.folder.id } : null,
 		isFolder: false,
 		hasChildren: false,
+		collection: null,
 	};
 };
 
@@ -104,6 +106,7 @@ const mediaTypeDetailMapper = (item: UmbMockMediaTypeModel): MediaTypeResponseMo
 		isElement: item.isElement,
 		allowedMediaTypes: item.allowedMediaTypes,
 		compositions: item.compositions,
+		collection: item.collection,
 	};
 };
 

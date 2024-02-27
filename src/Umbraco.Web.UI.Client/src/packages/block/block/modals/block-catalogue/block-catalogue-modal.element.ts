@@ -8,6 +8,8 @@ import {
 	UmbModalBaseElement,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
+// TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the umb-block-type-card element
+import '@umbraco-cms/backoffice/block-type';
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<

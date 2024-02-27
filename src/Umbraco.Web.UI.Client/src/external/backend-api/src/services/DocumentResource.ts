@@ -227,7 +227,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns void
      * @throws ApiError
      */
     public static putDocumentByIdDomains({
@@ -236,7 +236,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: UpdateDomainsRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/domains',
@@ -246,7 +246,10 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+                409: `Conflict`,
             },
         });
     }
