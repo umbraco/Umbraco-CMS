@@ -8,3 +8,4 @@ export * from './token/index.js';
 export * from './types.js';
 export * from './component/modal-element.element.js';
 export * from './component/modal.element.js';
+export * from './common/confirm/confirm-modal.controller.js';

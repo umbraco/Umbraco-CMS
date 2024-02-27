@@ -81,6 +81,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	 */
 	public submit() {
 		this.#submitResolver?.(this.getValue());
+		// TODO: Could we clean up this class here? (Example destroy the value state, and other things?)
 	}
 
 	/**
@@ -90,6 +91,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	 */
 	public reject(reason?: UmbModalRejectReason) {
 		this.#submitRejecter?.(reason);
+		// TODO: Could we clean up this class here? (Example destroy the value state, and other things?)
 	}
 
 	/**
