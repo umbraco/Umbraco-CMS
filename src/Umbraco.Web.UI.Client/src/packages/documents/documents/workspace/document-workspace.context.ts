@@ -80,6 +80,12 @@ export class UmbDocumentWorkspaceContext
 		this.loadLanguages();
 	}
 
+	resetState() {
+		super.resetState();
+		this.#persistedData.setValue(undefined);
+		this.#currentData.setValue(undefined);
+	}
+
 	async loadLanguages() {
 		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
 		const { data } = await this.#languageRepository.requestCollection({});
@@ -87,6 +93,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
@@ -98,6 +105,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async create(parentUnique: string | null, documentTypeUnique: string) {
+		this.resetState();
 		this.#getDataPromise = this.repository.createScaffold(parentUnique, {
 			documentType: {
 				unique: documentTypeUnique,

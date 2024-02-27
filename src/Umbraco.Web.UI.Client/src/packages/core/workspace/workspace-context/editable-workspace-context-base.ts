@@ -27,11 +27,15 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 		});
 	}
 
+	protected resetState() {
+		this.#isNew.setValue(undefined);
+	}
+
 	getIsNew() {
 		return this.#isNew.getValue();
 	}
 
-	setIsNew(isNew: boolean) {
+	protected setIsNew(isNew: boolean) {
 		this.#isNew.setValue(isNew);
 	}
 
