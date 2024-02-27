@@ -38,7 +38,7 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 	/** TODO: Implement "Choose field" */
 
 	#onChangeFieldValue(e: Event) {
-		this._field = (e.target as UmbFieldDropdownListElement).value;
+		this._field = (e.target as UmbFieldDropdownListElement).value?.alias;
 	}
 
 	render() {
@@ -49,7 +49,7 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 						<uui-label for="page-field-value">
 							<umb-localize key="templateEditor_chooseField">Choose field</umb-localize>
 						</uui-label>
-						<umb-field-dropdown-list @change=${this.#onChangeFieldValue}></umb-field-dropdown-list>
+						<umb-field-dropdown-list @change=${this.#onChangeFieldValue} exclude-media-type></umb-field-dropdown-list>
 
 						<uui-label for="page-field-default-value">
 							<umb-localize key="templateEditor_defaultValue">Default value</umb-localize>

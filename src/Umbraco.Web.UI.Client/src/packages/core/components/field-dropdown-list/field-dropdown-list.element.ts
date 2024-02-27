@@ -1,16 +1,30 @@
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { css, html, customElement, property, repeat, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
+import {
+	css,
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	ifDefined,
+	nothing,
+} from '@umbraco-cms/backoffice/external/lit';
+import type { UUIComboboxEvent, UUIComboboxElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbMediaTypeDetailRepository } from '@umbraco-cms/backoffice/media-type';
 import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	UMB_MEDIA_TYPE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
 	type UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+
+interface FieldPickerValue {
+	alias: string;
+	label: string;
+}
 
 enum FieldType {
 	MEDIA_TYPE = 'media-type',
@@ -18,149 +32,161 @@ enum FieldType {
 	SYSTEM = 'system',
 }
 
-interface FieldPicker {
-	unique: string;
-	type: FieldType;
-}
-
 @customElement('umb-field-dropdown-list')
 export class UmbFieldDropdownListElement extends UmbLitElement {
-	@property({ type: String })
-	public value = '';
+	@property({ type: Boolean, attribute: 'exclude-media-type', reflect: true })
+	public excludeMediaType = false;
+
+	@property({ type: Object })
+	public value?: FieldPickerValue;
+
+	@state()
+	private _type?: FieldType;
+
+	@state()
+	private _uniqueName?: string;
+
+	@state()
+	private _unique?: string;
 
 	#documentTypeDetailRepository = new UmbDocumentTypeDetailRepository(this);
 	#mediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	#modalManager?: UmbModalManagerContext;
 
-	#unique = new UmbObjectState<{ unique: string; type: FieldType }>({ unique: '', type: FieldType.SYSTEM });
-	readonly unique = this.#unique.asObservable();
-
-	@property({ type: Object })
-	set documentTypeUnique(value: FieldPicker) {
-		this.#unique.setValue(value);
-	}
-	get documentTypeUnique(): FieldPicker | null | undefined {
-		return this.#unique.getValue();
-	}
-
 	@state()
-	private _documentTypeName?: string;
+	private _customFields: Array<Partial<UmbPropertyTypeModel>> = [];
 
-	@state()
-	private _documentTypeIcon?: string;
-
-	@state()
-	private _customFields: Array<UmbPropertyTypeModel> = [];
-
-	@state()
-	private _type?: FieldType = FieldType.SYSTEM;
-
-	@state()
-	private _previewString?: string;
-
-	private _systemFields = [
-		{ value: 'sortOrder', name: this.localize.term('general_sort'), group: 'System Fields' },
-		{ value: 'updateDate', name: this.localize.term('content_updateDate'), group: 'System Fields' },
-		{ value: 'updater', name: this.localize.term('content_updatedBy'), group: 'System Fields' },
-		{ value: 'createDate', name: this.localize.term('content_createDate'), group: 'System Fields' },
-		{ value: 'owner', name: this.localize.term('content_createBy'), group: 'System Fields' },
-		{ value: 'published', name: this.localize.term('content_isPublished'), group: 'System Fields' },
-		{ value: 'contentTypeAlias', name: this.localize.term('content_documentType'), group: 'System Fields' },
-		{ value: 'email', name: this.localize.term('general_email'), group: 'System Fields' },
-		{ value: 'username', name: this.localize.term('general_username'), group: 'System Fields' },
+	private _systemFields: Array<Partial<UmbPropertyTypeModel>> = [
+		{ alias: 'sortOrder', name: this.localize.term('general_sort') },
+		{ alias: 'updateDate', name: this.localize.term('content_updateDate') },
+		{ alias: 'updater', name: this.localize.term('content_updatedBy') },
+		{ alias: 'createDate', name: this.localize.term('content_createDate') },
+		{ alias: 'owner', name: this.localize.term('content_createBy') },
+		{ alias: 'published', name: this.localize.term('content_isPublished') },
+		{ alias: 'contentTypeAlias', name: this.localize.term('content_documentType') },
+		{ alias: 'email', name: this.localize.term('general_email') },
+		{ alias: 'username', name: this.localize.term('general_username') },
 	];
 
 	constructor() {
 		super();
-		this.observe(this.unique, async (unique) => {
-			if (unique) {
-				const { data } = await this.#documentTypeDetailRepository.requestByUnique(unique);
-				this._customFields = data?.properties ?? [];
-				this._documentTypeName = data?.name;
-				this._documentTypeIcon = data?.icon;
-			} else {
-				this._customFields = [];
-				this._documentTypeIcon = undefined;
-				this._documentTypeName = undefined;
-			}
-			this.value = '';
-			this.dispatchEvent(new UmbChangeEvent());
-		});
-
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 			this.#modalManager = modalManager;
 		});
 	}
 
-	async #changeFieldType() {
+	async #getDocumentTypeFields() {
 		if (!this.#modalManager) return;
-
 		const modalContext = this.#modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: false,
 			},
-			value: {
-				selection: this.documentTypeUnique ? [this.documentTypeUnique] : [],
+		});
+
+		const modalValue = await modalContext.onSubmit();
+		const unique = modalValue.selection[0] ?? '';
+
+		const { data } = await this.#documentTypeDetailRepository.requestByUnique(unique);
+		if (!data) return;
+
+		this._unique = data.unique;
+		this._uniqueName = data.name;
+		this._customFields = data.properties;
+	}
+
+	async #getMediaTypeFields() {
+		if (!this.#modalManager) return;
+		const modalContext = this.#modalManager.open(UMB_MEDIA_TYPE_PICKER_MODAL, {
+			data: {
+				hideTreeRoot: true,
+				multiple: false,
 			},
 		});
 
 		const modalValue = await modalContext.onSubmit();
-		this.documentTypeUnique = modalValue.selection[0] ?? '';
+		const unique = modalValue.selection[0] ?? '';
 
-		this._previewString = 'System Fields';
+		const { data } = await this.#mediaTypeDetailRepository.requestByUnique(unique);
+		if (!data) return;
+
+		this._unique = data.unique;
+		this._uniqueName = data.name;
+		this._customFields = data.properties;
 	}
 
 	#onChange(e: UUIComboboxEvent) {
 		e.stopPropagation();
-		const type = (e.composedPath()[0] as UUIComboboxElement).value as FieldType;
-		switch (type) {
+		this._type = (e.composedPath()[0] as UUIComboboxElement).value as FieldType;
+		this.value = undefined;
+
+		switch (this._type) {
 			case FieldType.DOCUMENT_TYPE:
-				this.#changeFieldType();
+				this.#getDocumentTypeFields();
 				break;
 			case FieldType.MEDIA_TYPE:
-				console.log(type);
-				this.documentTypeUnique = '';
+				this.#getMediaTypeFields();
 				break;
 			default:
-				this._previewString = 'System Fields';
+				this._customFields = this._systemFields;
+				this.value = undefined;
 				break;
 		}
-		//const alias = (e.composedPath()[0] as UUIComboboxElement).value as string;
-		//this.documentTypeUnique = alias;
-		//this.dispatchEvent(new UmbChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	#onChangeValue(e: UUIComboboxEvent) {
+		e.stopPropagation();
+		const alias = (e.composedPath()[0] as UUIComboboxElement).value as FieldType;
+		this.value = this._customFields.find((field) => field.alias === alias) as FieldPickerValue;
+
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
 		return html`
-			<div>
-				<uui-combobox value="preview">
-					<uui-combobox-list @change=${this.#onChange}>
-						<uui-combobox-list-option value="preview" style="display:none">
-							${this._previewString}
-						</uui-combobox-list-option>
-						<uui-combobox-list-option value="system"><strong>System Field</strong></uui-combobox-list-option>
-						<uui-combobox-list-option value="document-type">
-							<strong>Document Type</strong>Pick a document type...
-						</uui-combobox-list-option>
-						<uui-combobox-list-option value="media-type">
-							<strong>Media Type</strong>Pick a media type...
-						</uui-combobox-list-option>
-					</uui-combobox-list>
-				</uui-combobox>
-				<uui-combobox>
-					<uui-combobox-list>
-						<uui-combobox-list-option>Cookies</uui-combobox-list-option>
-					</uui-combobox-list>
-				</uui-combobox>
-			</div>
+			<uui-combobox id="preview">
+				<uui-combobox-list @change=${this.#onChange}>
+					<uui-combobox-list-option value="system">
+						<strong>${this.localize.term('formSettings_systemFields')}</strong>
+					</uui-combobox-list-option>
+					<uui-combobox-list-option value="document-type" display-value=${this.localize.term('content_documentType')}>
+						<strong> ${this.localize.term('content_documentType')} </strong>
+						${this.localize.term('defaultdialogs_treepicker')}
+					</uui-combobox-list-option>
+					${!this.excludeMediaType
+						? html`<uui-combobox-list-option
+								value="media-type"
+								display-value=${this.localize.term('content_mediatype')}>
+								<strong> ${this.localize.term('content_mediatype')} </strong>
+								${this.localize.term('defaultdialogs_treepicker')}
+						  </uui-combobox-list-option>`
+						: nothing}
+				</uui-combobox-list>
+			</uui-combobox>
+			${this.#renderAliasDropdown()}
 		`;
+	}
+
+	#renderAliasDropdown() {
+		if (this._type !== FieldType.SYSTEM && !this._unique) return;
+		return html`<strong>${this._uniqueName}</strong>
+			<uui-combobox id="value" value=${ifDefined(this.value?.alias)}>
+				<uui-combobox-list @change=${this.#onChangeValue}>
+					${repeat(
+						this._customFields,
+						(field) => field.alias,
+						(field) =>
+							html`<uui-combobox-list-option value=${ifDefined(field.alias)}>${field.alias}</uui-combobox-list-option>`,
+					)}
+				</uui-combobox-list>
+			</uui-combobox>`;
 	}
 
 	static styles = [
 		css`
-			:host {
-				display: flex;
+			uui-combobox {
+				width: 100%;
 			}
 			strong {
 				display: block;
