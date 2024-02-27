@@ -37,7 +37,7 @@ public class ResetPasswordUserController : UserControllerBase
 
     [HttpPost("{id:guid}/reset-password")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ChangePasswordUserResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResetPasswordUserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResetPassword(Guid id)
@@ -55,7 +55,7 @@ public class ResetPasswordUserController : UserControllerBase
         Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.ResetPasswordAsync(CurrentUserKey(_backOfficeSecurityAccessor), id);
 
         return response.Success
-            ? Ok(_mapper.Map<ChangePasswordUserResponseModel>(response.Result))
+            ? Ok(_mapper.Map<ResetPasswordUserResponseModel>(response.Result))
             : UserOperationStatusResult(response.Status, response.Result);
     }
 }
