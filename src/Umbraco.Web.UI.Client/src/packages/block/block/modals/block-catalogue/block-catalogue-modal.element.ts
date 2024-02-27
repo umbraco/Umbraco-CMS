@@ -71,8 +71,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#updateFiltered() {
-		// A minimum of 3 characters is required to start filtering:
-		if (this._search.length <= 3) {
+		if (this._search.length === 0) {
 			this._filtered = this._groupedBlocks;
 		} else {
 			const search = this._search.toLowerCase();
@@ -109,7 +108,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderCreateEmpty() {
 		return html`
-			${this.data?.blocks && this.data.blocks.length >= 10
+			${this.data?.blocks && this.data.blocks.length > 8
 				? html`<uui-input
 						id="search"
 						@input=${this.#onSearch}
