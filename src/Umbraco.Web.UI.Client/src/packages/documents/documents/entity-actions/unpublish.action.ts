@@ -28,6 +28,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<UmbDoc
 					option.variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES),
 		);
 
+		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
 		const selectedVariants = await umbPickDocumentVariantModal(this, { type: 'unpublish', options });
 
 		if (selectedVariants.length) {
