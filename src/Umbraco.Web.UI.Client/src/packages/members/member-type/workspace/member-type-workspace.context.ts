@@ -23,7 +23,13 @@ export class UmbMemberTypeWorkspaceContext
 		super(host, 'Umb.Workspace.MemberType');
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.detailRepository.requestByUnique(unique);
 
 		if (data) {
@@ -33,6 +39,7 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.resetState();
 		const { data } = await this.detailRepository.createScaffold(parentUnique);
 
 		if (data) {

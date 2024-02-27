@@ -24,7 +24,13 @@ export class UmbRelationTypeWorkspaceContext
 		super(host, 'Umb.Workspace.RelationType');
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async load(id: string) {
+		this.resetState();
 		const { data } = await this.repository.requestById(id);
 
 		if (data) {
@@ -33,7 +39,8 @@ export class UmbRelationTypeWorkspaceContext
 		}
 	}
 
-	async createScaffold(parentId: string | null) {
+	async create(parentId: string | null) {
+		this.resetState();
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);

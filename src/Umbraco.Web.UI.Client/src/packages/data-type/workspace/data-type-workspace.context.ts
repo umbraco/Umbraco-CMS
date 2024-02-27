@@ -21,22 +21,28 @@ import type {
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
+type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailModel>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbInvariantableWorkspaceContextInterface
 {
 	//
 	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
-	#data = new UmbObjectState<UmbDataTypeDetailModel | undefined>(undefined);
-	readonly data = this.#data.asObservable();
+	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
+	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
+
 	#getDataPromise?: Promise<any>;
 
-	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly unique = this.#data.asObservablePart((data) => data?.unique);
+	public isLoaded() {
+		return this.#getDataPromise;
+	}
 
-	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.editorUiAlias);
-	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.editorAlias);
+	readonly name = this.#currentData.asObservablePart((data) => data?.name);
+	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
+
+	readonly propertyEditorUiAlias = this.#currentData.asObservablePart((data) => data?.editorUiAlias);
+	readonly propertyEditorSchemaAlias = this.#currentData.asObservablePart((data) => data?.editorAlias);
 
 	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
@@ -67,35 +73,49 @@ export class UmbDataTypeWorkspaceContext
 		this.#observePropertyEditorUIAlias();
 	}
 
+	resetState() {
+		super.resetState();
+		this.#persistedData.setValue(undefined);
+		this.#currentData.setValue(undefined);
+	}
+
 	#observePropertyEditorUIAlias() {
-		this.observe(this.propertyEditorUiAlias, async (propertyEditorUiAlias) => {
-			// we only want to react on the change if the alias is set or null. When it is undefined something is still loading
-			if (propertyEditorUiAlias === undefined) return;
+		this.observe(
+			this.propertyEditorUiAlias,
+			async (propertyEditorUiAlias) => {
+				// we only want to react on the change if the alias is set or null. When it is undefined something is still loading
+				if (propertyEditorUiAlias === undefined) return;
 
-			// if the property editor ui alias is not set, we use the default alias from the schema
-			if (propertyEditorUiAlias === null) {
-				await this.#observePropertyEditorSchemaAlias();
-				this.setPropertyEditorUiAlias(this._propertyEditorSchemaConfigDefaultUIAlias!);
-			} else {
-				await this.#setPropertyEditorUIConfig(propertyEditorUiAlias);
-				this.setPropertyEditorSchemaAlias(this._propertyEditorUISettingsSchemaAlias!);
-				await this.#observePropertyEditorSchemaAlias();
-			}
+				// if the property editor ui alias is not set, we use the default alias from the schema
+				if (propertyEditorUiAlias === null) {
+					await this.#observePropertyEditorSchemaAlias();
+					this.setPropertyEditorUiAlias(this._propertyEditorSchemaConfigDefaultUIAlias!);
+				} else {
+					await this.#setPropertyEditorUIConfig(propertyEditorUiAlias);
+					this.setPropertyEditorSchemaAlias(this._propertyEditorUISettingsSchemaAlias!);
+					await this.#observePropertyEditorSchemaAlias();
+				}
 
-			this._mergeConfigProperties();
-			this._mergeConfigDefaultData();
-		});
+				this._mergeConfigProperties();
+				this._mergeConfigDefaultData();
+			},
+			'editorUiAlias',
+		);
 	}
 
 	#observePropertyEditorSchemaAlias() {
-		return this.observe(this.propertyEditorSchemaAlias, async (propertyEditorSchemaAlias) => {
-			if (!propertyEditorSchemaAlias) {
-				this.setPropertyEditorSchemaAlias(UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT);
-				return;
-			}
+		return this.observe(
+			this.propertyEditorSchemaAlias,
+			async (propertyEditorSchemaAlias) => {
+				if (!propertyEditorSchemaAlias) {
+					this.setPropertyEditorSchemaAlias(UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT);
+					return;
+				}
 
-			await this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias);
-		}).asPromise();
+				await this.#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias);
+			},
+			'schemaAlias',
+		).asPromise();
 	}
 
 	#setPropertyEditorSchemaConfig(propertyEditorSchemaAlias: string) {
@@ -106,27 +126,31 @@ export class UmbDataTypeWorkspaceContext
 				this._propertyEditorSchemaConfigDefaultData = manifest?.meta.settings?.defaultData || [];
 				this._propertyEditorSchemaConfigDefaultUIAlias = manifest?.meta.defaultPropertyEditorUiAlias || null;
 			},
+			'schema',
 		).asPromise();
 	}
 
 	#setPropertyEditorUIConfig(propertyEditorUIAlias: string) {
-		return this.observe(umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', propertyEditorUIAlias), (manifest) => {
-			this.#propertyEditorUiIcon.setValue(manifest?.meta.icon || null);
-			this.#propertyEditorUiName.setValue(manifest?.name || null);
+		return this.observe(
+			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', propertyEditorUIAlias),
+			(manifest) => {
+				this.#propertyEditorUiIcon.setValue(manifest?.meta.icon || null);
+				this.#propertyEditorUiName.setValue(manifest?.name || null);
 
-			this._propertyEditorUISettingsSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
-			this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
-			this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
-		}).asPromise();
+				this._propertyEditorUISettingsSchemaAlias = manifest?.meta.propertyEditorSchemaAlias;
+				this._propertyEditorUISettingsProperties = manifest?.meta.settings?.properties || [];
+				this._propertyEditorUISettingsDefaultData = manifest?.meta.settings?.defaultData || [];
+			},
+			'editorUi',
+		).asPromise();
 	}
 
 	private _mergeConfigProperties() {
 		if (this._propertyEditorSchemaConfigProperties && this._propertyEditorUISettingsProperties) {
-			// TODO: Consider the ability to to omit a schema config if a UI config has same alias. Otherwise we should make an error when this case happens.
-			this.#properties.setValue([
-				...this._propertyEditorSchemaConfigProperties,
-				...this._propertyEditorUISettingsProperties,
-			]);
+			// Reset the value to this array, and then afterwards append:
+			this.#properties.setValue(this._propertyEditorSchemaConfigProperties);
+			// Append the UI settings properties to the schema properties, so they can override the schema properties:
+			this.#properties.append(this._propertyEditorUISettingsProperties);
 		}
 	}
 
@@ -146,71 +170,34 @@ export class UmbDataTypeWorkspaceContext
 
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
 		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
-		/*
-		// Example of how this could have been done with the PropertyDatasetBaseContext:
-		const context = new UmbPropertyDatasetBaseContext(host);
-
-		// Observe workspace name:
-		this.observe(this.name, (name) => {
-			context.setName(name ?? '');
-		});
-		// Observe the variant name:
-		this.observe(context.name, (name) => {
-			this.setName(name);
-		});
-
-		this.observe(
-			this.properties,
-			(properties) => {
-				if (properties) {
-					properties.forEach(async (property) => {
-						// Observe value of workspace:
-						this.observe(
-							await this.propertyValueByAlias(property.alias),
-							(value) => {
-								context.setPropertyValue(property.alias, value);
-							},
-							'observeWorkspacePropertyOf_' + property.alias,
-						);
-						// Observe value of variant:
-						this.observe(
-							await context.propertyValueByAlias(property.alias),
-							(value) => {
-								this.setPropertyValue(property.alias, value);
-							},
-							'observeVariantPropertyOf_' + property.alias,
-						);
-					});
-				}
-			},
-			'observePropertyValues',
-		);
-		return context;
-		*/
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
 		const { data } = await this.#getDataPromise;
-		if (data) {
-			this.setIsNew(false);
-			this.#data.update(data);
-		}
+		if (!data) return undefined;
+
+		this.setIsNew(false);
+		this.#persistedData.setValue(data);
+		this.#currentData.setValue(data);
 	}
 
 	async create(parentUnique: string | null) {
+		this.resetState();
 		this.#getDataPromise = this.repository.createScaffold(parentUnique);
 		let { data } = await this.#getDataPromise;
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
 		}
 		this.setIsNew(true);
-		this.#data.setValue(data);
-		return { data };
+		this.#persistedData.setValue(data);
+		this.#currentData.setValue(data);
+		return data;
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.#currentData.getValue();
 	}
 
 	getUnique() {
@@ -222,24 +209,26 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	getName() {
-		return this.#data.getValue()?.name;
+		return this.#currentData.getValue()?.name;
 	}
 	setName(name: string | undefined) {
-		this.#data.update({ name });
+		this.#currentData.update({ name });
 	}
 
 	setPropertyEditorSchemaAlias(alias?: string) {
-		this.#data.update({ editorAlias: alias });
+		this.#currentData.update({ editorAlias: alias });
 	}
 	setPropertyEditorUiAlias(alias?: string) {
-		this.#data.update({ editorUiAlias: alias });
+		this.#currentData.update({ editorUiAlias: alias });
 	}
 
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
 
 		return combineLatest([
-			this.#data.asObservablePart((data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType),
+			this.#currentData.asObservablePart(
+				(data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
+			),
 			this.#defaults.asObservablePart(
 				(defaults) => defaults?.find((x) => x.alias === propertyAlias)?.value as ReturnType,
 			),
@@ -252,7 +241,7 @@ export class UmbDataTypeWorkspaceContext
 
 	getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
 		return (
-			(this.#data.getValue()?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType) ??
+			(this.#currentData.getValue()?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType) ??
 			(this.getPropertyDefaultValue(propertyAlias) as ReturnType)
 		);
 	}
@@ -262,25 +251,25 @@ export class UmbDataTypeWorkspaceContext
 		await this.#getDataPromise;
 		const entry = { alias: alias, value: value };
 
-		const currentData = this.#data.value;
+		const currentData = this.#currentData.value;
 		if (currentData) {
 			// TODO: make a partial update method for array of data, (idea/concept, use if this case is getting common)
 			const newDataSet = appendToFrozenArray(currentData.values || [], entry, (x) => x.alias);
-			this.#data.update({ values: newDataSet });
+			this.#currentData.update({ values: newDataSet });
 		}
 	}
 
 	async save() {
-		if (!this.#data.value) return;
-		if (!this.#data.value.unique) return;
+		if (!this.#currentData.value) return;
+		if (!this.#currentData.value.unique) return;
 
 		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
+			await this.repository.create(this.#currentData.value);
 		} else {
-			await this.repository.save(this.#data.value);
+			await this.repository.save(this.#currentData.value);
 		}
 
-		this.saveComplete(this.#data.value);
+		this.saveComplete(this.#currentData.value);
 	}
 
 	async delete(unique: string) {
@@ -288,7 +277,13 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.destroy();
+		this.#persistedData.destroy();
+		this.#currentData.destroy();
+		this.#properties.destroy();
+		this.#defaults.destroy();
+		this.#propertyEditorUiIcon.destroy();
+		this.#propertyEditorUiName.destroy();
+		this.repository.destroy();
 		super.destroy();
 	}
 }

@@ -31,6 +31,11 @@ export class UmbStylesheetWorkspaceContext
 		this.#loadCodeEditor();
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
@@ -63,6 +68,7 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
 
 		if (data) {
@@ -72,6 +78,7 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.resetState();
 		const { data } = await this.repository.createScaffold(parentUnique);
 
 		if (data) {

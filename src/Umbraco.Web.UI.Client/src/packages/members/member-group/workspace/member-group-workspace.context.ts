@@ -24,7 +24,13 @@ export class UmbMemberGroupWorkspaceContext
 		super(host, UMB_MEMBER_GROUP_WORKSPACE_ALIAS);
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.detailRepository.requestByUnique(unique);
 
 		if (data) {
@@ -34,6 +40,7 @@ export class UmbMemberGroupWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.resetState();
 		const { data } = await this.detailRepository.createScaffold(parentUnique);
 
 		if (data) {

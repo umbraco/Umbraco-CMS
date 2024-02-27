@@ -118,7 +118,7 @@ export class UmbDocumentWorkspaceContext
 		this.setIsNew(true);
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(data);
-		return data || undefined;
+		return data;
 	}
 
 	getData() {
@@ -367,8 +367,10 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public destroy(): void {
+		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.structure.destroy();
+		this.#languageRepository.destroy();
 		super.destroy();
 	}
 }

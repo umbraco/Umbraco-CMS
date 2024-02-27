@@ -37,11 +37,17 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
 		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.value, (value) => {
 				if (value) {

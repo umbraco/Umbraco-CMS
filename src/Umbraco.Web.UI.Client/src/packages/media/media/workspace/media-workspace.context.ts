@@ -31,6 +31,7 @@ export class UmbMediaWorkspaceContext
 	/**
 	 * The media is the current state/draft version of the media.
 	 */
+	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 	#getDataPromise?: Promise<any>;
 	// TODo: Optimize this so it uses either a App Language Context? [NL]
@@ -63,10 +64,15 @@ export class UmbMediaWorkspaceContext
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	constructor(host: UmbControllerHost) {
-		// TODO: Get Workspace Alias via Manifest.
 		super(host, 'Umb.Workspace.Media');
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
+	}
+
+	resetState() {
+		super.resetState();
+		this.#persistedData.setValue(undefined);
+		this.#currentData.setValue(undefined);
 	}
 
 	async loadLanguages() {
@@ -75,24 +81,27 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
 		this.setIsNew(false);
-		//this.#persisted.next(data);
+		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 		return data || undefined;
 	}
 
 	async create(parentUnique: string | null, mediaTypeUnique: string) {
+		this.resetState();
 		this.#getDataPromise = this.repository.createScaffold(parentUnique, { unique: mediaTypeUnique });
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
 		this.setIsNew(true);
+		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
-		return data || undefined;
+		return data;
 	}
 
 	getData() {
@@ -227,6 +236,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	public destroy(): void {
+		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.structure.destroy();
 		super.destroy();

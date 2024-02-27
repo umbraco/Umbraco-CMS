@@ -25,6 +25,11 @@ export class UmbDictionaryWorkspaceContext
 		super(host, 'Umb.Workspace.Dictionary');
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	getData() {
 		return this.#data.getValue();
 	}
@@ -63,6 +68,7 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
@@ -71,6 +77,7 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.resetState();
 		const { data } = await this.detailRepository.createScaffold(parentUnique);
 		if (!data) return;
 		this.setIsNew(true);

@@ -7,12 +7,14 @@ import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffi
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
+type EntityType = UmbUserDetailModel;
+
 export class UmbUserWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbUserDetailModel>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
@@ -23,19 +25,20 @@ export class UmbUserWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_WORKSPACE_ALIAS);
 
-		new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT, (instance) => {
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
 			this.#currentUserContext = instance;
 		});
 	}
 
-	#data = new UmbObjectState<UmbUserDetailModel | undefined>(undefined);
-	data = this.#data.asObservable();
+	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
+	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
+	data = this.#currentData.asObservable();
 
 	async load(unique: string) {
 		const { data, asObservable } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.update(data);
+			this.#currentData.update(data);
 		}
 
 		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
@@ -46,9 +49,9 @@ export class UmbUserWorkspaceContext
 		Therefore we have to subscribe to the user store to update the state in the workspace data.
 		There might be a less manual way to do this.
 	*/
-	onUserStoreChanges(user: UmbUserDetailModel | undefined) {
+	onUserStoreChanges(user: EntityType | undefined) {
 		if (!user) return;
-		this.#data.update({ state: user.state });
+		this.#currentData.update({ state: user.state });
 	}
 
 	getUnique(): string | undefined {
@@ -60,30 +63,27 @@ export class UmbUserWorkspaceContext
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.#currentData.getValue();
 	}
 
-	updateProperty<PropertyName extends keyof UmbUserDetailModel>(
-		propertyName: PropertyName,
-		value: UmbUserDetailModel[PropertyName],
-	) {
-		this.#data.update({ [propertyName]: value });
+	updateProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
+		this.#currentData.update({ [propertyName]: value });
 	}
 
 	async save() {
-		if (!this.#data.value) throw new Error('Data is missing');
-		if (!this.#data.value.unique) throw new Error('Unique is missing');
+		if (!this.#currentData.value) throw new Error('Data is missing');
+		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
-			await this.detailRepository.create(this.#data.value);
+			await this.detailRepository.create(this.#currentData.value);
 		} else {
-			await this.detailRepository.save(this.#data.value);
+			await this.detailRepository.save(this.#currentData.value);
 		}
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
 
 		// If we are saving the current user, we need to refetch it
-		await this.#reloadCurrentUser(this.#data.value.unique);
+		await this.#reloadCurrentUser(this.#currentData.value.unique);
 	}
 
 	async #reloadCurrentUser(savedUserUnique: string): Promise<void> {
@@ -108,7 +108,8 @@ export class UmbUserWorkspaceContext
 	}
 
 	destroy(): void {
-		this.#data.destroy();
+		this.#persistedData.destroy();
+		this.#currentData.destroy();
 		super.destroy();
 	}
 }
