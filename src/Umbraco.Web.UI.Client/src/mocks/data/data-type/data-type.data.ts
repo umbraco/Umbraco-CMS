@@ -706,6 +706,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 						allowInAreas: true,
 						rowMinSpan: 1,
 						rowMaxSpan: 2,
+						inlineEditing: true,
 						columnSpanOptions: [
 							{
 								columnSpan: 1,
