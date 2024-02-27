@@ -28,7 +28,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<UmbDoc
 					option.variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES),
 		);
 
-		const selectedVariants = await umbPickDocumentVariantModal(this, { type: 'publish', options });
+		const selectedVariants = await umbPickDocumentVariantModal(this, { type: 'unpublish', options });
 
 		if (selectedVariants.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
