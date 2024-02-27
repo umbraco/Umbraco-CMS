@@ -22633,34 +22633,22 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/CreateUserResponseModel"
-                    }
-                  ]
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
                 }
               },
-              "text/json": {
+              "Location": {
+                "description": "Location of the newly created resource",
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/CreateUserResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/CreateUserResponseModel"
-                    }
-                  ]
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
                 }
               }
             }
@@ -23352,36 +23340,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ChangePasswordUserResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ChangePasswordUserResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ChangePasswordUserResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
+            "description": "Success"
           },
           "404": {
             "description": "Not Found",
@@ -23462,7 +23421,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ChangePasswordUserResponseModel"
+                      "$ref": "#/components/schemas/ResetPasswordUserResponseModel"
                     }
                   ]
                 }
@@ -23471,7 +23430,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ChangePasswordUserResponseModel"
+                      "$ref": "#/components/schemas/ResetPasswordUserResponseModel"
                     }
                   ]
                 }
@@ -23480,7 +23439,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ChangePasswordUserResponseModel"
+                      "$ref": "#/components/schemas/ResetPasswordUserResponseModel"
                     }
                   ]
                 }
@@ -24301,36 +24260,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ChangePasswordUserResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ChangePasswordUserResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ChangePasswordUserResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
+            "description": "Success"
           },
           "400": {
             "description": "Bad Request",
@@ -26091,16 +26021,6 @@
         },
         "additionalProperties": false
       },
-      "ChangePasswordUserResponseModel": {
-        "type": "object",
-        "properties": {
-          "resetPassword": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "CompositionTypeModel": {
         "enum": [
           "Composition",
@@ -27658,26 +27578,6 @@
           "id": {
             "type": "string",
             "format": "uuid",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "CreateUserResponseModel": {
-        "required": [
-          "user"
-        ],
-        "type": "object",
-        "properties": {
-          "user": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ]
-          },
-          "initialPassword": {
-            "type": "string",
             "nullable": true
           }
         },
@@ -32769,6 +32669,16 @@
           "password": {
             "minLength": 1,
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResetPasswordUserResponseModel": {
+        "type": "object",
+        "properties": {
+          "resetPassword": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
