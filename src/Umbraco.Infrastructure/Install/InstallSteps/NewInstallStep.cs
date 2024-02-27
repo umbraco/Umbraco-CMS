@@ -1,10 +1,10 @@
 using System.Collections.Specialized;
 using System.Data.Common;
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install.Models;
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             if (user.SubscribeToNewsLetter)
             {
                 var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
-                var content = new StringContent(JsonConvert.SerializeObject(values), Encoding.UTF8, "application/json");
+                var content = new StringContent(JsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
 
                 HttpClient httpClient = _httpClientFactory.CreateClient();
 

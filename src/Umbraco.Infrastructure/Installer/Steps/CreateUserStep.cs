@@ -1,9 +1,9 @@
 ﻿using System.Collections.Specialized;
 using System.Data.Common;
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Installer;
@@ -94,7 +94,7 @@ public class CreateUserStep : StepBase, IInstallStep
             if (model.User.SubscribeToNewsletter)
             {
                 var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
-                var content = new StringContent(JsonConvert.SerializeObject(values), Encoding.UTF8, "application/json");
+                var content = new StringContent(JsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
 
                 HttpClient httpClient = _httpClientFactory.CreateClient();
 
