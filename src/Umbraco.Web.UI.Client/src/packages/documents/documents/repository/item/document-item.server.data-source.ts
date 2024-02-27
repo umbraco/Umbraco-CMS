@@ -38,7 +38,7 @@ const mapper = (item: DocumentItemResponseModel): UmbDocumentItemModel => {
 		documentType: {
 			unique: item.documentType.id,
 			icon: item.documentType.icon,
-			collection: item.documentType.collection ?? undefined,
+			collection: item.documentType.collection ? { unique: item.documentType.collection.id } : null,
 		},
 		variants: item.variants.map((variant) => {
 			return {
