@@ -114,6 +114,7 @@ stages:
           - script: npm run generate:api-local
             displayName: Generate API models (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client
+            enabled: false
           - script: npm run build:for:cms
             displayName: Run build (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client
