@@ -10,3 +10,4 @@ export type WebhookItemResponseModel = {
     url: string;
     types: string;
 };
+

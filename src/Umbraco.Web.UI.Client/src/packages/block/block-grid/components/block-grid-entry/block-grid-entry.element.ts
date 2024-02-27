@@ -2,10 +2,11 @@ import { UmbBlockGridEntryContext } from '../../context/block-grid-entry.context
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import '../block-grid-block-view/index.js';
-import '../block-scale-handler/index.js';
 import type { UmbBlockViewPropsType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
+import '../block-grid-block-inline/index.js';
+import '../block-grid-block/index.js';
+import '../block-scale-handler/index.js';
 
 /**
  * @element umb-block-grid-entry
@@ -78,11 +79,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		super();
 
 		// Misc:
-		this.observe(this.#context.showContentEdit, (showContentEdit) => {
-			this._showContentEdit = showContentEdit;
+		this.observe(this.#context.showContentEdit, (show) => {
+			this._showContentEdit = show;
 		});
-		this.observe(this.#context.settingsElementTypeKey, (settingsElementTypeKey) => {
-			this._hasSettings = !!settingsElementTypeKey;
+		this.observe(this.#context.settingsElementTypeKey, (key) => {
+			this._hasSettings = !!key;
 		});
 		this.observe(this.#context.canScale, (canScale) => {
 			this._canScale = canScale;
@@ -90,6 +91,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.label, (label) => {
 			this.#updateBlockViewProps({ label });
 			this._label = label;
+		});
+		this.observe(this.#context.inlineEditingMode, (mode) => {
+			this._inlineEditingMode = mode;
 		});
 
 		// Data:
@@ -158,6 +162,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		});
 	}
 
+	#renderInlineEditBlock() {
+		return html`<umb-block-grid-block-inline
+			.contentUdi=${this.contentUdi}
+			.label=${this._label}></umb-block-grid-block-inline>`;
+	}
+
 	#renderRefBlock() {
 		return html`<umb-block-grid-block .contentUdi=${this.contentUdi} .label=${this._label}></umb-block-grid-block>`;
 	}
@@ -171,7 +181,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 							type="blockEditorCustomView"
 							default-element="umb-block-grid-block"
 							.props=${this._blockViewProps}
-							>${this.#renderRefBlock()}</umb-extension-slot
+							>${this._inlineEditingMode ? this.#renderInlineEditBlock() : this.#renderRefBlock()}</umb-extension-slot
 						>
 						<uui-action-bar>
 							${this._showContentEdit && this._workspaceEditContentPath

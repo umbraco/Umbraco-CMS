@@ -6,5 +6,6 @@
 import type { WebhookModelBaseModel } from './WebhookModelBaseModel';
 
 export type UpdateWebhookRequestModel = (WebhookModelBaseModel & {
-events: Array<string>;
+    events: Array<string>;
 });
+

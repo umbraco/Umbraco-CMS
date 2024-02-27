@@ -9,3 +9,4 @@ export type WebhookModelBaseModel = {
     contentTypeKeys: Array<string>;
     headers: Record<string, string>;
 };
+

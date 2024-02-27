@@ -92,7 +92,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			urls: data.urls,
 			mediaType: {
 				unique: data.mediaType.id,
-				collection: data.mediaType.collection || null,
+				collection: data.mediaType.collection ? { unique: data.mediaType.collection.id } : null,
 			},
 			isTrashed: data.isTrashed,
 		};

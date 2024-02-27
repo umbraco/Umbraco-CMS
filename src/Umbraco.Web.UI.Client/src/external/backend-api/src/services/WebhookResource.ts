@@ -18,10 +18,10 @@ export class WebhookResource {
      * @throws ApiError
      */
     public static postWebhook({
-requestBody,
-}: {
-requestBody?: CreateWebhookRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateWebhookRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/webhook',
@@ -41,10 +41,10 @@ requestBody?: CreateWebhookRequestModel,
      * @throws ApiError
      */
     public static getWebhookById({
-id,
-}: {
-id: string,
-}): CancelablePromise<WebhookResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<WebhookResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/webhook/{id}',
@@ -63,12 +63,12 @@ id: string,
      * @throws ApiError
      */
     public static putWebhookById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateWebhookRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateWebhookRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/webhook/{id}',
@@ -90,10 +90,10 @@ requestBody?: UpdateWebhookRequestModel,
      * @throws ApiError
      */
     public static deleteWebhookById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/webhook/{id}',
@@ -113,10 +113,10 @@ id: string,
      * @throws ApiError
      */
     public static getWebhookItem({
-ids,
-}: {
-ids?: Array<string>,
-}): CancelablePromise<Array<WebhookItemResponseModel>> {
+        ids,
+    }: {
+        ids?: Array<string>,
+    }): CancelablePromise<Array<WebhookItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/webhook/item',

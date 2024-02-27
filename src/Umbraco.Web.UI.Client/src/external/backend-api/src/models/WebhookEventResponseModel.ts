@@ -8,3 +8,4 @@ export type WebhookEventResponseModel = {
     eventType: string;
     alias: string;
 };
+
