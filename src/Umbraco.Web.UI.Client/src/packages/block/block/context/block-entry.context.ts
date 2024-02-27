@@ -8,6 +8,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNumberState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export abstract class UmbBlockEntryContext<
@@ -28,6 +29,23 @@ export abstract class UmbBlockEntryContext<
 	_entries?: BlockEntriesContextType;
 
 	#contentUdi?: string;
+
+	// Workspace alike methods, to enables editing of data without the need of a workspace (Custom views and block grid inline editing mode for example).
+	getEntityType() {
+		return 'block';
+	}
+	getEntityId() {
+		return this.getContentUdi();
+	}
+	propertyValueByAlias<ReturnType>(propertyAlias: string) {
+		return this.#content.asObservablePart((x) => x?.[propertyAlias] as ReturnType | undefined);
+	}
+	setPropertyValue(propertyAlias: string, value: unknown) {
+		this.#content.setValue({
+			...this.#content.getValue()!,
+			[propertyAlias]: value,
+		});
+	}
 
 	#index = new UmbNumberState(undefined);
 	readonly index = this.#index.asObservable();
@@ -279,10 +297,14 @@ export abstract class UmbBlockEntryContext<
 			(contentType) => {
 				this.#contentElementTypeAlias.setValue(contentType?.alias);
 				this.#contentElementTypeName.setValue(contentType?.name);
+				this._gotContentType(contentType);
 			},
 			'observeContentElementType',
 		);
 	}
+
+	abstract _gotContentType(contentType: UmbContentTypeModel | undefined): void;
+
 	#observeBlockType() {
 		if (!this._manager) return;
 		const contentTypeKey = this.#content.value?.contentTypeKey;
