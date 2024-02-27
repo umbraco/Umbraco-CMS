@@ -50,7 +50,6 @@ public class BackOfficeController : UmbracoController
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<BackOfficeController> _logger;
-    private readonly ILegacyManifestParser _legacyManifestParser;
     private readonly IRuntimeMinifier _runtimeMinifier;
     private readonly IRuntimeState _runtimeState;
     private readonly IOptions<SecuritySettings> _securitySettings;
@@ -85,7 +84,6 @@ public class BackOfficeController : UmbracoController
         IBackOfficeExternalLoginProviders externalLogins,
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
-        ILegacyManifestParser legacyManifestParser,
         ServerVariablesParser serverVariables,
         IOptions<SecuritySettings> securitySettings)
     {
@@ -104,7 +102,6 @@ public class BackOfficeController : UmbracoController
         _externalLogins = externalLogins;
         _httpContextAccessor = httpContextAccessor;
         _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
-        _legacyManifestParser = legacyManifestParser;
         _serverVariables = serverVariables;
         _securitySettings = securitySettings;
     }
@@ -263,12 +260,8 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public async Task<IActionResult> Application()
     {
-        var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(
-            _globalSettings,
-            _hostingEnvironment,
-            _legacyManifestParser);
-
-        return new JavaScriptResult(result);
+        // Removed in separate PR
+        return Ok();
     }
 
     /// <summary>

@@ -74,6 +74,8 @@ internal class DatabaseDataCreator
         }
     ];
 
+    private const string ImageMediaTypeKey = "cc07b313-0843-4aa8-bbda-871c8da728c8";
+
     private readonly IDatabase _database;
 
     private readonly IDictionary<string, IList<string>> _entitiesToAlwaysCreate = new Dictionary<string, IList<string>>
@@ -928,7 +930,7 @@ internal class DatabaseDataCreator
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var imageUniqueId = new Guid("cc07b313-0843-4aa8-bbda-871c8da728c8");
+        var imageUniqueId = new Guid(ImageMediaTypeKey);
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
             imageUniqueId.ToString(),
@@ -1941,9 +1943,9 @@ internal class DatabaseDataCreator
 
         // layouts for the list view
         const string cardLayout =
-            "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": 1, \"selected\": true}";
+            "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": true, \"selected\": true}";
         const string listLayout =
-            "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": 1,\"selected\": true}";
+            "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": true,\"selected\": true}";
         const string layouts = "[" + cardLayout + "," + listLayout + "]";
 
         // Insert data types only if the corresponding Node record exists (which may or may not have been created depending on configuration
@@ -1982,7 +1984,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.RichText,
                     DbType = "Ntext",
                     Configuration =
-                        "{\"value\":\",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|\"}",
+                        "{\"toolbar\":[\"ace\",\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"stylesheets\":[],\"maxImageSize\":500,\"mode\":\"classic\"}",
                 });
         }
 
@@ -2040,6 +2042,7 @@ internal class DatabaseDataCreator
                     NodeId = Constants.DataTypes.DateTime,
                     EditorAlias = Constants.PropertyEditors.Aliases.DateTime,
                     DbType = "Date",
+                    Configuration = "{\"format\":\"YYYY-MM-DD HH:mm:ss\"}",
                 });
         }
 
@@ -2134,7 +2137,7 @@ internal class DatabaseDataCreator
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
                         layouts +
-                        ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1},{\"alias\":\"owner\",\"header\":\"Updated by\",\"isSystem\":1}]}",
+                        ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }
 
@@ -2152,7 +2155,7 @@ internal class DatabaseDataCreator
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
                         layouts +
-                        ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1},{\"alias\":\"owner\",\"header\":\"Updated by\",\"isSystem\":1}]}",
+                        ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }
 
@@ -2168,7 +2171,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.ListView,
                     DbType = "Nvarchar",
                     Configuration =
-                        "{\"pageSize\":10, \"orderBy\":\"username\", \"orderDirection\":\"asc\", \"includeProperties\":[{\"alias\":\"username\",\"isSystem\":1},{\"alias\":\"email\",\"isSystem\":1},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1}]}",
+                        "{\"pageSize\":10, \"orderBy\":\"username\", \"orderDirection\":\"asc\", \"includeProperties\":[{\"alias\":\"username\",\"isSystem\":true},{\"alias\":\"email\",\"isSystem\":true},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true}]}",
                 });
         }
 
@@ -2215,7 +2218,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
                     DbType = "Nvarchar",
                     Configuration =
-                        "{\"fileExtensions\":[{\"id\":0, \"value\":\"mp4\"}, {\"id\":1, \"value\":\"webm\"}, {\"id\":2, \"value\":\"ogv\"}]}",
+                        "{\"fileExtensions\":[\"mp4\",\"webm\",\"ogv\"]}",
                 });
         }
 
@@ -2228,7 +2231,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
                     DbType = "Nvarchar",
                     Configuration =
-                        "{\"fileExtensions\":[{\"id\":0, \"value\":\"mp3\"}, {\"id\":1, \"value\":\"weba\"}, {\"id\":2, \"value\":\"oga\"}, {\"id\":3, \"value\":\"opus\"}]}",
+                        "{\"fileExtensions\":[\"mp3\",\"weba\",\"oga\",\"opus\"]}",
                 });
         }
 
@@ -2241,7 +2244,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
                     DbType = "Nvarchar",
                     Configuration =
-                        "{\"fileExtensions\":[{\"id\":0, \"value\":\"pdf\"}, {\"id\":1, \"value\":\"docx\"}, {\"id\":2, \"value\":\"doc\"}]}",
+                        "{\"fileExtensions\":[\"pdf\",\"docx\",\"doc\"]}",
                 });
         }
 
@@ -2253,7 +2256,7 @@ internal class DatabaseDataCreator
                     NodeId = Constants.DataTypes.UploadVectorGraphics,
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
                     DbType = "Nvarchar",
-                    Configuration = "{\"fileExtensions\":[{\"id\":0, \"value\":\"svg\"}]}",
+                    Configuration = "{\"fileExtensions\":[\"svg\"]}",
                 });
         }
 
@@ -2289,7 +2292,7 @@ internal class DatabaseDataCreator
                     NodeId = 1053,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + Constants.Conventions.MediaTypes.Image +
+                    Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
                                     "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
                 });
         }
@@ -2302,7 +2305,7 @@ internal class DatabaseDataCreator
                     NodeId = 1054,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + Constants.Conventions.MediaTypes.Image +
+                    Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
                                     "\", \"multiple\": true}",
                 });
         }

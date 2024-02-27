@@ -11,8 +11,6 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Models.Membership.Permissions;
-using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -28,7 +26,6 @@ public class UserMapDefinition : IMapDefinition
     private readonly GlobalSettings _globalSettings;
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly MediaFileManager _mediaFileManager;
-    private readonly ISectionService _sectionService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ILocalizedTextService _textService;
     private readonly IUserService _userService;
@@ -39,7 +36,6 @@ public class UserMapDefinition : IMapDefinition
         ILocalizedTextService textService,
         IUserService userService,
         IEntityService entityService,
-        ISectionService sectionService,
         AppCaches appCaches,
         ActionCollection actions,
         IOptions<GlobalSettings> globalSettings,
@@ -49,7 +45,6 @@ public class UserMapDefinition : IMapDefinition
         ILocalizationService localizationService,
         IUserGroupService userGroupService)
     {
-        _sectionService = sectionService;
         _entityService = entityService;
         _userService = userService;
         _textService = textService;
@@ -68,7 +63,6 @@ public class UserMapDefinition : IMapDefinition
         ILocalizedTextService textService,
         IUserService userService,
         IEntityService entityService,
-        ISectionService sectionService,
         AppCaches appCaches,
         ActionCollection actions,
         IOptions<GlobalSettings> globalSettings,
@@ -80,7 +74,6 @@ public class UserMapDefinition : IMapDefinition
             textService,
             userService,
             entityService,
-            sectionService,
             appCaches,
             actions,
             globalSettings,
@@ -475,9 +468,6 @@ public class UserMapDefinition : IMapDefinition
         }
 
         target.Languages = context.MapEnumerable<ILanguage, ContentEditing.Language>(applicableLanguages).WhereNotNull();
-
-        var allSections = _sectionService.GetSections();
-        target.Sections = context.MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias))).WhereNotNull();
 
         if (sourceStartMediaId > 0)
         {

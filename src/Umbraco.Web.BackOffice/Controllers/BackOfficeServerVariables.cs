@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Media;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.TemplateQuery;
 using Umbraco.Cms.Core.Services;
@@ -379,20 +378,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.GetPublicAccess(0))
                         },
                         {
-                            "mediaApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaController>(
-                                controller => controller.GetRootMedia())
-                        },
-                        {
                             "iconApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<IconController>(
                                 controller => controller.GetIcon(string.Empty))
                         },
                         {
                             "imagesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImagesController>(
                                 controller => controller.GetBigThumbnail(string.Empty))
-                        },
-                        {
-                            "sectionApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<SectionController>(
-                                controller => controller.GetSections())
                         },
                         {
                             "treeApplicationApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
@@ -431,16 +422,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.GetById(0))
                         },
                         {
-                            "dashboardApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<DashboardController>(
-                                controller => controller.GetDashboard(string.Empty))
-                        },
-                        {
                             "logApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<LogController>(
                                 controller => controller.GetPagedEntityLog(0, 0, 0, Direction.Ascending, null))
-                        },
-                        {
-                            "memberApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberController>(
-                                controller => controller.GetByKey(Guid.Empty))
                         },
                         {
                             "packageApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PackageController>(
@@ -576,10 +559,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             "mediaPickerThreeBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaPickerThreeController>(
                                 controller => controller.UploadMedia(null!))
-                        },
-                        {
-                            "webhooksApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<WebhookController>(
-                                controller => controller.GetAll(0, 0))
                         },
                     }
                 },
