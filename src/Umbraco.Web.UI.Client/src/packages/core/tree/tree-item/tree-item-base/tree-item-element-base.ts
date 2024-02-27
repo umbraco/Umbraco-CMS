@@ -40,7 +40,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	private _totalPages = 0;
 
 	@state()
-	private _currentPage = 0;
+	private _currentPage = 1;
 
 	#treeItemContext?: UmbTreeItemContext<TreeItemModelType>;
 
