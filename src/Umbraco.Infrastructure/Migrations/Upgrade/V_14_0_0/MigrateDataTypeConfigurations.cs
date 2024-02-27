@@ -8,36 +8,33 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 using PropertyEditorAliases = Umbraco.Cms.Core.Constants.PropertyEditors.Aliases;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 
-// TODO: this migration is a work in progress; it will be amended for a while, thus it MUST be able to re-run several times without failing miserably
 public class MigrateDataTypeConfigurations : MigrationBase
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IMemberTypeService _memberTypeService;
-    private readonly ILogger<MigrateDataTypeConfigurations> _logger;
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
+    private readonly ILogger<MigrateDataTypeConfigurations> _logger;
 
     public MigrateDataTypeConfigurations(
         IMigrationContext context,
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
         IMemberTypeService memberTypeService,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
         ILogger<MigrateDataTypeConfigurations> logger)
         : base(context)
     {
         _contentTypeService = contentTypeService;
         _mediaTypeService = mediaTypeService;
-        _logger = logger;
         _memberTypeService = memberTypeService;
-
-        // TODO: inject this once we're rid of the Newtonsoft.Json based config serializer
-        _configurationEditorJsonSerializer = new SystemTextConfigurationEditorJsonSerializer();
+        _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+        _logger = logger;
     }
 
     protected override void Migrate()
@@ -95,7 +92,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
                     PropertyEditorAliases.DropDownListFlexible => HandleDropDown(ref configurationData),
                     PropertyEditorAliases.EmailAddress => HandleEmailAddress(ref configurationData),
                     PropertyEditorAliases.Label => HandleLabel(ref configurationData),
-                    PropertyEditorAliases.ListView => HandleListView(ref configurationData),
+                    PropertyEditorAliases.ListView => HandleListView(ref configurationData, dataTypeDto.NodeDto?.UniqueId, allMediaTypes, allMemberTypes),
                     PropertyEditorAliases.MediaPicker3 => HandleMediaPicker(ref configurationData, allMediaTypes),
                     PropertyEditorAliases.MultiNodeTreePicker => HandleMultiNodeTreePicker(ref configurationData, allContentTypes, allMediaTypes, allMemberTypes),
                     PropertyEditorAliases.MultiUrlPicker => HandleMultiUrlPicker(ref configurationData),
@@ -306,8 +303,25 @@ public class MigrateDataTypeConfigurations : MigrationBase
 
     // ensure that list view configs have all configurations, as some have never been added by means of migration.
     // also performs a re-formatting of "layouts" and "includeProperties" to a V14 format
-    private bool HandleListView(ref Dictionary<string, object> configurationData)
+    private bool HandleListView(ref Dictionary<string, object> configurationData, Guid? dataTypeKey, IMediaType[] allMediaTypes, IMemberType[] allMemberTypes)
     {
+        var collectionViewType = dataTypeKey == Constants.DataTypes.Guids.ListViewMediaGuid || allMediaTypes.Any(mt => mt.ListView == dataTypeKey)
+            ? "Media"
+            : dataTypeKey == Constants.DataTypes.Guids.ListViewMembersGuid || allMemberTypes.Any(mt => mt.ListView == dataTypeKey)
+                ? "Member"
+                : "Document";
+
+        string? LayoutPathToCollectionView(string? path)
+            => "views/propertyeditors/listview/layouts/list/list.html".InvariantEquals(path)
+                ? TableCollectionView()
+                : "views/propertyeditors/listview/layouts/grid/grid.html".InvariantEquals(path)
+                    ? GridCollectionView()
+                    : null;
+
+        string TableCollectionView() => $"Umb.CollectionView.{collectionViewType}.Table";
+
+        string GridCollectionView() => $"Umb.CollectionView.{collectionViewType}.Grid";
+
         var layoutsValue = ConfigurationValue(configurationData, "layouts", true);
         if (layoutsValue is not null)
         {
@@ -324,8 +338,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
                 IsSystem = layout.IsSystem == 1,
                 Selected = layout.Selected,
                 Icon = layout.Icon,
-                // TODO: this will be changed - likely into "Component", with some default translation of core layout paths (pending LKE)
-                Path = layout.Path
+                CollectionView = LayoutPathToCollectionView(layout.Path)
             }).ToArray();
         }
         else
@@ -335,8 +348,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
                 new NewListViewLayout
                 {
                     Name = "List",
-                    // TODO: this will be changed - figure out the defaults (pending LKE)
-                    Path = "views/propertyeditors/listview/layouts/list/list.html",
+                    CollectionView = TableCollectionView(),
                     Icon = "icon-list",
                     IsSystem = true,
                     Selected = true
@@ -344,8 +356,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
                 new NewListViewLayout
                 {
                     Name = "Grid",
-                    // TODO: this will be changed - figure out the defaults (pending LKE)
-                    Path = "views/propertyeditors/listview/layouts/grid/grid.html",
+                    CollectionView = GridCollectionView(),
                     Icon = "icon-thumbnails-small",
                     IsSystem = true,
                     Selected = true
@@ -731,7 +742,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
     {
         public string? Name { get; set; }
 
-        public string? Path { get; set; }
+        public string? CollectionView { get; set; }
 
         public string? Icon { get; set; }
 
