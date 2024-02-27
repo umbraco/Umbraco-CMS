@@ -12,7 +12,6 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 		return this._item;
 	}
 	set item(newVal: TreeItemModelType) {
-		console.log('set item', newVal);
 		this._item = newVal;
 		this.#initTreeItem();
 	}
@@ -74,7 +73,6 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	#initTreeItem() {
 		if (!this.#treeItemContext) return;
 		if (!this._item) return;
-		console.log('initTreeItem', this._item);
 		this.#treeItemContext.setTreeItem(this._item);
 	}
 
