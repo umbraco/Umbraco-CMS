@@ -1,5 +1,5 @@
-import type { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
 import { UmbModalToken } from '../token/modal-token.js';
+import type { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -132,5 +132,3 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 		this.#value.update(partialValue);
 	}
 }
-
-export const UMB_MODAL_CONTEXT = new UmbContextToken<UmbModalContext>('UmbModalContext');
