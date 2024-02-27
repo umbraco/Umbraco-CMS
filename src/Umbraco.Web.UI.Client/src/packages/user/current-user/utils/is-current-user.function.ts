@@ -5,9 +5,13 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export const isCurrentUser = async (host: UmbControllerHost, userId: string) => {
 	let currentUserContext: typeof UMB_CURRENT_USER_CONTEXT.TYPE | undefined;
 
-	await new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT, (context) => {
+	const controller = new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT, (context) => {
 		currentUserContext = context;
-	}).asPromise();
+	});
+
+	await controller.asPromise();
+
+	controller.destroy();
 
 	return await currentUserContext!.isUserCurrentUser(userId);
 };
