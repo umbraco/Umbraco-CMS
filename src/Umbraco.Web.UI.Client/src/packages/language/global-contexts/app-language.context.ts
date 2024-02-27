@@ -13,6 +13,10 @@ export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
 	appLanguage = this.#appLanguage.asObservable();
 	appLanguageCulture = this.#appLanguage.asObservablePart((x) => x?.unique);
 
+	getAppCulture() {
+		return this.#appLanguage.getValue()?.unique;
+	}
+
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.provideContext(UMB_APP_LANGUAGE_CONTEXT, this);

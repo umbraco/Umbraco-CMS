@@ -3,7 +3,7 @@ import { UmbDocumentPropertyDataContext } from '../property-dataset-context/docu
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type { UmbDocumentDetailModel, UmbDocumentVariantModel, UmbDocumentVariantOptionModel } from '../types.js';
-import { UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, type UmbDocumentVariantPickerModalData } from '../modals/index.js';
+import { umbPickDocumentVariantModal, type UmbDocumentVariantPickerModalType } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import {
@@ -28,7 +28,6 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -211,20 +210,34 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async #createOrSave(type: UmbDocumentVariantPickerModalData['type']): Promise<UmbVariantId[]> {
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-		if (!data.unique) throw new Error('Unique is missing');
-
+	async #pickVariantsForAction(type: UmbDocumentVariantPickerModalType): Promise<UmbVariantId[]> {
 		const activeVariants = this.splitView.getActiveVariants();
 
-		const pickedVariants = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant).toString());
-		const allowedVariants = await firstValueFrom(this.variantOptions);
+		// TODO: Picked variants should include the ones that has been changed (but not jet saved) this requires some more awareness about the state of runtime data. [NL]
+		const selected = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
+		const options = await firstValueFrom(this.variantOptions);
 
-		const selectedVariants = await this.pickVariants(type, allowedVariants, pickedVariants);
+		// If there is only one variant, we don't need to open the modal.
+		if (options.length === 0) {
+			throw new Error('No variants are available');
+		} else if (options.length === 1) {
+			// If only one option we will skip ahead and save the document with the only variant available:
+			const firstVariant = new UmbVariantId(options[0].language.unique, null);
+			return await this.#performSaveOrCreate([firstVariant]);
+		}
+
+		const selectedVariants = await umbPickDocumentVariantModal(this, { type, options, selected });
 
 		// If no variants are selected, we don't save anything.
 		if (!selectedVariants.length) return [];
+
+		return await this.#performSaveOrCreate(selectedVariants);
+	}
+
+	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>) {
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+		if (!data.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
 			if ((await this.repository.create(data)).data !== undefined) {
@@ -237,44 +250,15 @@ export class UmbDocumentWorkspaceContext
 		return selectedVariants;
 	}
 
-	// TODO: refactor this part so it can be utilized by others? [NL]
-	async pickVariants(
-		type: UmbDocumentVariantPickerModalData['type'],
-		availableVariants: Array<UmbDocumentVariantOptionModel>,
-		selectedVariants?: Array<string>,
-	): Promise<UmbVariantId[]> {
-		// If there is only one variant, we don't need to select anything.
-		if (availableVariants.length === 1) {
-			// TODO: we are missing a good way to make a variantId from a variantOptionModel. [NL]
-			return [new UmbVariantId(availableVariants[0].language.unique, null)];
-		}
-
-		const modalManagerContext = await this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, () => {}).asPromise();
-
-		const modalData: UmbDocumentVariantPickerModalData = {
-			type,
-			options: availableVariants,
-		};
-
-		const modalContext = modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
-			data: modalData,
-			value: { selection: selectedVariants?.map((x) => x.toString()) ?? [] },
-		});
-
-		const result = await modalContext.onSubmit().catch(() => undefined);
-
-		return result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
-	}
-
 	async save() {
-		await this.#createOrSave('save');
+		await this.#pickVariantsForAction('save');
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		this.saveComplete(data);
 	}
 
 	public async publish() {
-		const variantIds = await this.#createOrSave('publish');
+		const variantIds = await this.#pickVariantsForAction('publish');
 		const unique = this.getEntityId();
 		if (variantIds.length && unique) {
 			await this.publishingRepository.publish(unique, variantIds);
