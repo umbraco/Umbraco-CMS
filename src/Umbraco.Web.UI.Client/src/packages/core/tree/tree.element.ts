@@ -129,7 +129,7 @@ export class UmbTreeElement extends UmbLitElement {
 			${repeat(
 				this._items,
 				(item, index) => item.name + '___' + index,
-				(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${item}></umb-tree-item>`,
+				(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
 			)}
 		`;
 	}

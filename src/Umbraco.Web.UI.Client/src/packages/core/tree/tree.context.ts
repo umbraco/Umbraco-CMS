@@ -92,7 +92,7 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 
 	public async requestRootItems() {
 		await this.#init;
-		return this.#repository!.requestRootTreeItems();
+		return this.#repository!.requestRootTreeItems({ skip: 0, take: 100 });
 	}
 
 	public async rootItems() {

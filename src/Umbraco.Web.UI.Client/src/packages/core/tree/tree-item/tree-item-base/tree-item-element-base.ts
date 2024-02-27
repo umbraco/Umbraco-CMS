@@ -6,11 +6,16 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
 export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModelBase> extends UmbLitElement {
+	_item?: TreeItemModelType;
 	@property({ type: Object, attribute: false })
-	item?: TreeItemModelType;
-
-	@state()
-	private _item?: TreeItemModelType;
+	get item(): TreeItemModelType | undefined {
+		return this._item;
+	}
+	set item(newVal: TreeItemModelType) {
+		console.log('set item', newVal);
+		this._item = newVal;
+		this.#initTreeItem();
+	}
 
 	@state()
 	private _childItems?: TreeItemModelType[];
@@ -51,8 +56,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;
 
-			// TODO: this get set too early. We should also set it when the item is set.
-			this.#treeItemContext.setTreeItem(this.item);
+			this.#initTreeItem();
 
 			// TODO: investigate if we can make an observe decorator
 			this.observe(this.#treeItemContext.treeItem, (value) => (this._item = value));
@@ -65,6 +69,13 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 			this.observe(this.#treeItemContext.pagination.currentPage, (value) => (this._currentPage = value));
 			this.observe(this.#treeItemContext.pagination.totalPages, (value) => (this._totalPages = value));
 		});
+	}
+
+	#initTreeItem() {
+		if (!this.#treeItemContext) return;
+		if (!this._item) return;
+		console.log('initTreeItem', this._item);
+		this.#treeItemContext.setTreeItem(this._item);
 	}
 
 	private _handleSelectedItem(event: Event) {
@@ -117,7 +128,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				.hasChildren=${this._hasChildren}
 				label="${ifDefined(this._item?.name)}"
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.#renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
+				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
 				<uui-button @click=${this.#onLoadMoreClick}>Load more</uui-button>
 			</uui-menu-item>
@@ -128,7 +139,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	};
 
-	#renderIconContainer() {
+	renderIconContainer() {
 		return html`
 			<slot
 				name="icon"

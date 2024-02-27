@@ -6,7 +6,7 @@ import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 @customElement('umb-document-tree-item')
 export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocumentTreeItemModel> {
 	// TODO: implement correct status symbol
-	#renderIconWithStatusSymbol() {
+	renderIconContainer() {
 		return html`
 			<span id="icon-container" slot="icon">
 				${this.item?.documentType.icon
