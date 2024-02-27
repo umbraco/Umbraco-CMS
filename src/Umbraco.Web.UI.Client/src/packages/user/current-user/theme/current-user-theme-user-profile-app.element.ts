@@ -6,8 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-user-profile-app-themes')
-export class UmbUserProfileAppThemesElement extends UmbLitElement {
+@customElement('umb-current-user-theme-user-profile-app')
+export class UmbCurrentUserThemeUserProfileAppElement extends UmbLitElement {
 	#themeContext?: UmbThemeContext;
 
 	@state()
@@ -77,10 +77,10 @@ export class UmbUserProfileAppThemesElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserProfileAppThemesElement;
+export default UmbCurrentUserThemeUserProfileAppElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-profile-app-themes': UmbUserProfileAppThemesElement;
+		'umb-current-user-theme-user-profile-app': UmbCurrentUserThemeUserProfileAppElement;
 	}
 }
