@@ -26,6 +26,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<UmbDocum
 			(option) =>
 				option.variant &&
 				(option.variant.state === UmbDocumentVariantState.DRAFT ||
+					option.variant.state === UmbDocumentVariantState.PUBLISHED ||
 					option.variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES),
 		);
 

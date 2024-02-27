@@ -7,7 +7,6 @@ import {
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbPickDocumentVariantModalArgs {
