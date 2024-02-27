@@ -153,7 +153,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                     {
                         AddPropertyValue(property, null, null, values, availableCultures, contentTypeDictionary);
                     }
-                    catch (JsonSerializationException ex)
+                    catch (Exception ex)
                     {
                         _logger.LogError(ex, "Failed to add property '{PropertyAlias}' to index for content {ContentId}", property.Alias, c.Id);
                         throw;
@@ -167,7 +167,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                         {
                             AddPropertyValue(property, culture.ToLowerInvariant(), null, values, availableCultures, contentTypeDictionary);
                         }
-                        catch (JsonSerializationException ex)
+                        catch (Exception ex)
                         {
                             _logger.LogError(
                                 ex,
