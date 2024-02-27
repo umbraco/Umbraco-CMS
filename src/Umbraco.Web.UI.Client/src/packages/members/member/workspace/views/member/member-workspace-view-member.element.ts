@@ -126,11 +126,11 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 		if (!this._workspaceContext) return;
 		return html` <div id="left-column">
 			<uui-box>
-				<umb-property-layout label="${this.localize.term('general_login')}">
+				<umb-property-layout label="${this.localize.term('general_username')}">
 					<uui-input
 						slot="editor"
 						name="login"
-						label="${this.localize.term('general_login')}"
+						label="${this.localize.term('general_username')}"
 						value=${this._workspaceContext.username}
 						@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
 				</umb-property-layout>
