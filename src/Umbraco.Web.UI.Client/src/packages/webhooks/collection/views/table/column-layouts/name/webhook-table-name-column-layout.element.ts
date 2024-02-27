@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, LitElement, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
-@customElement('umb-language-table-name-column-layout')
+@customElement('umb-w-table-name-column-layout')
 export class UmbLanguageTableNameColumnLayoutElement extends LitElement {
 	@property({ attribute: false })
 	value!: { unique: string; name: string };
