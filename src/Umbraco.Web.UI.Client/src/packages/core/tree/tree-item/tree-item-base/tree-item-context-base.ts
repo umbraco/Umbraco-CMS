@@ -112,10 +112,12 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	public async requestChildren() {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
-
 		// TODO: wait for tree context to be ready
+		const repository = this.treeContext?.getRepository();
+		if (!repository) throw new Error('Could not request children, repository is missing');
+
 		this.#isLoading.setValue(true);
-		const response = await this.treeContext!.requestChildrenOf(this.unique);
+		const response = await repository.requestTreeItemsOf(this.unique);
 		this.#isLoading.setValue(false);
 		return response;
 	}
@@ -230,10 +232,15 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	async #observeHasChildren() {
 		if (!this.treeContext || !this.unique) return;
 
-		const observable = await this.treeContext.childrenOf(this.unique);
+		const repository = this.treeContext.getRepository();
+		if (!repository) return;
+
+		const hasChildrenObservable = (await repository.treeItemsOf(this.unique)).pipe(
+			map((children) => children.length > 0),
+		);
 
 		// observe if any children will be added runtime to a tree item. Nested items/folders etc.
-		this.observe(observable.pipe(map((children) => children.length > 0)), (hasChildren) => {
+		this.observe(hasChildrenObservable, (hasChildren) => {
 			// we need to skip the first value, because it will also return false until a child is in the store
 			// we therefor rely on the value from the tree item itself
 			if (this.#hasChildrenInitValueFlag === true) {

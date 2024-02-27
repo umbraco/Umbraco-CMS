@@ -1,9 +1,8 @@
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from './reload-tree-item-children/index.js';
 import type { UmbTreeItemModelBase } from './types.js';
 import type { UmbTreeRepository } from './data/tree-repository.interface.js';
+import type { UmbTreeContext } from './tree-context.interface.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import {
 	type ManifestRepository,
 	type ManifestTree,
@@ -12,33 +11,22 @@ import {
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
-// TODO: update interface
-export interface UmbTreeContext<TreeItemType extends UmbTreeItemModelBase> extends UmbBaseController {
-	selection: UmbSelectionManager;
-	requestChildrenOf: (parentUnique: string | null) => Promise<{
-		data?: UmbPagedModel<TreeItemType>;
-		error?: ProblemDetails;
-		asObservable?: () => Observable<TreeItemType[]>;
-	}>;
-}
-
 export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 	extends UmbBaseController
-	implements UmbTreeContext<TreeItemType>
+	implements UmbTreeContext
 {
 	#treeRoot = new UmbObjectState<TreeItemType | undefined>(undefined);
 	treeRoot = this.#treeRoot.asObservable();
 
-	public repository?: UmbTreeRepository<TreeItemType>;
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this._host);
 
+	#repository?: UmbTreeRepository<TreeItemType>;
 	#treeAlias?: string;
 	#actionEventContext?: UmbActionEventContext;
 
@@ -70,7 +58,7 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 
 	// TODO: find a generic way to do this
 	#checkIfInitialized() {
-		if (this.repository) {
+		if (this.#repository) {
 			this.#initialized = true;
 			this.#initResolver?.();
 		}
@@ -87,36 +75,29 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 		return this.#treeAlias;
 	}
 
+	public getRepository() {
+		return this.#repository;
+	}
+
 	public async requestTreeRoot() {
 		await this.#init;
-		const { data } = await this.repository!.requestTreeRoot();
+		const { data } = await this.#repository!.requestTreeRoot();
 
 		if (data) {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
+			//@ts-ignore
 			this.#treeRoot.setValue(data);
 		}
 	}
 
 	public async requestRootItems() {
 		await this.#init;
-		return this.repository!.requestRootTreeItems();
-	}
-
-	public async requestChildrenOf(parentUnique: string | null) {
-		await this.#init;
-		if (parentUnique === undefined) throw new Error('Parent unique cannot be undefined.');
-		return this.repository!.requestTreeItemsOf(parentUnique);
+		return this.#repository!.requestRootTreeItems();
 	}
 
 	public async rootItems() {
 		await this.#init;
-		return this.repository!.rootTreeItems();
-	}
-
-	public async childrenOf(parentUnique: string | null) {
-		await this.#init;
-		return this.repository!.treeItemsOf(parentUnique);
+		return this.#repository!.rootTreeItems();
 	}
 
 	#observeTreeManifest() {
@@ -142,7 +123,7 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 			repositoryAlias,
 			[this._host],
 			(permitted, ctrl) => {
-				this.repository = permitted ? ctrl.api : undefined;
+				this.#repository = permitted ? ctrl.api : undefined;
 				this.#checkIfInitialized();
 			},
 		);
