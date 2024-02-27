@@ -1,6 +1,6 @@
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbTreeItemModelBase } from '../types.js';
 import type { UmbTreeDataSource } from './tree-data-source.interface.js';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
@@ -9,8 +9,12 @@ export interface UmbTreeServerDataSourceBaseArgs<
 	ServerTreeItemType extends TreeItemPresentationModel,
 	ClientTreeItemType extends UmbTreeItemModelBase,
 > {
-	getRootItems: () => Promise<UmbPagedModel<ServerTreeItemType>>;
-	getChildrenOf: (parentUnique: string | null) => Promise<UmbPagedModel<ServerTreeItemType>>;
+	getRootItems: (args: { skip: number; take: number }) => Promise<UmbPagedModel<ServerTreeItemType>>;
+	getChildrenOf: (args: {
+		parentUnique: string | null;
+		skip: number;
+		take: number;
+	}) => Promise<UmbPagedModel<ServerTreeItemType>>;
 	mapper: (item: ServerTreeItemType) => ClientTreeItemType;
 }
 
@@ -47,8 +51,8 @@ export abstract class UmbTreeServerDataSourceBase<
 	 * @return {*}
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
-	async getRootItems() {
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getRootItems());
+	async getRootItems(args: { skip: number; take: number }) {
+		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getRootItems(args));
 
 		if (data) {
 			const items = data?.items.map((item) => this.#mapper(item));
@@ -64,10 +68,10 @@ export abstract class UmbTreeServerDataSourceBase<
 	 * @return {*}
 	 * @memberof UmbTreeServerDataSourceBase
 	 */
-	async getChildrenOf(parentUnique: string | null) {
-		if (parentUnique === undefined) throw new Error('Parent unique is missing');
+	async getChildrenOf(args: { parentUnique: string | null; skip: number; take: number }) {
+		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getChildrenOf(parentUnique));
+		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getChildrenOf(args));
 
 		if (data) {
 			const items = data?.items.map((item: ServerTreeItemType) => this.#mapper(item));

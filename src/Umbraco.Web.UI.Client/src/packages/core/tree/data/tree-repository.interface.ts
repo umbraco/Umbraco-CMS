@@ -29,7 +29,7 @@ export interface UmbTreeRepository<
 	 * Requests the root items of the tree.
 	 * @memberof UmbTreeRepository
 	 */
-	requestRootTreeItems: () => Promise<{
+	requestRootTreeItems: (args: { skip: number; take: number }) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
@@ -40,7 +40,7 @@ export interface UmbTreeRepository<
 	 * @param {(string | null)} parentUnique
 	 * @memberof UmbTreeRepository
 	 */
-	requestTreeItemsOf: (parentUnique: string | null) => Promise<{
+	requestTreeItemsOf: (args: { parentUnique: string | null; skip: number; take: number }) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;

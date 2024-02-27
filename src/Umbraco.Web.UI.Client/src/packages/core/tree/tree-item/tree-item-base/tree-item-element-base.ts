@@ -36,6 +36,12 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	@state()
 	private _iconSlotHasChildren = false;
 
+	@state()
+	private _totalPages = 0;
+
+	@state()
+	private _currentPage = 0;
+
 	#treeItemContext?: UmbTreeItemContext<TreeItemModelType>;
 
 	constructor() {
@@ -56,6 +62,8 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 			this.observe(this.#treeItemContext.isSelectable, (value) => (this._isSelectable = value));
 			this.observe(this.#treeItemContext.isSelected, (value) => (this._isSelected = value));
 			this.observe(this.#treeItemContext.path, (value) => (this._href = value));
+			this.observe(this.#treeItemContext.pagination.currentPage, (value) => (this._currentPage = value));
+			this.observe(this.#treeItemContext.pagination.totalPages, (value) => (this._totalPages = value));
 		});
 	}
 
@@ -88,6 +96,12 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 		});
 	}
 
+	#onLoadMoreClick = (event: any) => {
+		event.stopPropagation();
+		const next = (this._currentPage = this._currentPage + 1);
+		this.#treeItemContext?.pagination.setCurrentPageNumber(next);
+	};
+
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	render() {
@@ -105,6 +119,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
 				${this.#renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
+				<uui-button @click=${this.#onLoadMoreClick}>Load more</uui-button>
 			</uui-menu-item>
 		`;
 	}

@@ -117,7 +117,7 @@ export class UmbPaginationManager extends EventTarget {
 	}
 
 	#calculateSkip() {
-		const skip = (this.#currentPage.getValue() - 1) * this.#pageSize.getValue();
+		const skip = Math.max(0, (this.#currentPage.getValue() - 1) * this.#pageSize.getValue());
 		this.#skip.setValue(skip);
 	}
 }

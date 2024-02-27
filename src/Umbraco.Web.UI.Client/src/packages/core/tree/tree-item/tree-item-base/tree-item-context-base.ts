@@ -13,6 +13,8 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
 	x: TreeItemType,
@@ -61,10 +63,21 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#actionEventContext?: UmbActionEventContext;
 	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
 
+	public readonly pagination = new UmbPaginationManager();
+
+	#filter = {
+		skip: 0,
+		take: 3,
+	};
+
 	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
+		this.pagination.setPageSize(this.#filter.take);
 		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();
+
+		// listen for page changes on the pagination manager
+		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 	}
 
 	/**
@@ -111,15 +124,30 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	}
 
 	public async requestChildren() {
+		debugger;
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		// TODO: wait for tree context to be ready
 		const repository = this.treeContext?.getRepository();
 		if (!repository) throw new Error('Could not request children, repository is missing');
 
 		this.#isLoading.setValue(true);
-		const response = await repository.requestTreeItemsOf(this.unique);
+		const { data, error, asObservable } = await repository.requestTreeItemsOf({
+			parentUnique: this.unique,
+			skip: this.#filter.skip,
+			take: this.#filter.take,
+		});
+
+		if (data) {
+			this.pagination.setTotalItems(data.total);
+
+			const currentPageNumber = this.pagination.getCurrentPageNumber();
+			const totalPages = this.pagination.getTotalPages();
+			console.log('currentPageNumber', currentPageNumber);
+			console.log('totalPages', totalPages);
+		}
+
 		this.#isLoading.setValue(false);
-		return response;
+		return { data, error, asObservable };
 	}
 
 	public toggleContextMenu() {
@@ -255,6 +283,13 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		if (!this.unique) return;
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
+		this.requestChildren();
+	};
+
+	#onPageChange = (event: UmbChangeEvent) => {
+		const target = event.target as UmbPaginationManager;
+		this.#filter.skip = target.getSkip();
+		debugger;
 		this.requestChildren();
 	};
 

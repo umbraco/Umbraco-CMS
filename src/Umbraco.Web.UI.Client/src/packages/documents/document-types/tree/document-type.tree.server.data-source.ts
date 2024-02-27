@@ -29,16 +29,19 @@ export class UmbDocumentTypeTreeServerDataSource extends UmbTreeServerDataSource
 	}
 }
 
-// eslint-disable-next-line local-rules/no-direct-api-import
-const getRootItems = () => DocumentTypeResource.getTreeDocumentTypeRoot({});
+const getRootItems = (args: { skip: number; take: number }) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	DocumentTypeResource.getTreeDocumentTypeRoot({ skip: args.skip, take: args.take });
 
-const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
-		return getRootItems();
+const getChildrenOf = (args: { parentUnique: string | null; skip: number; take: number }) => {
+	if (args.parentUnique === null) {
+		return getRootItems({ skip: args.skip, take: args.take });
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentTypeResource.getTreeDocumentTypeChildren({
-			parentId: parentUnique,
+			parentId: args.parentUnique,
+			skip: args.skip,
+			take: args.take,
 		});
 	}
 };

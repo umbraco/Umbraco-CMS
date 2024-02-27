@@ -1,5 +1,5 @@
-import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '../types.js';
+import type { UmbTreeStore } from './tree-store.interface.js';
 import type { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
@@ -61,10 +61,10 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestRootTreeItems() {
+	async requestRootTreeItems(args: any) {
 		await this._init;
 
-		const { data, error } = await this.#treeSource.getRootItems();
+		const { data, error } = await this.#treeSource.getRootItems(args);
 
 		if (data) {
 			this._treeStore!.appendItems(data.items);
@@ -79,17 +79,17 @@ export abstract class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemsOf(parentUnique: string | null) {
-		if (parentUnique === undefined) throw new Error('Parent unique is missing');
+	async requestTreeItemsOf(args: any) {
+		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		await this._init;
 
-		const { data, error } = await this.#treeSource.getChildrenOf(parentUnique);
+		const { data, error } = await this.#treeSource.getChildrenOf(args);
 
 		if (data) {
 			this._treeStore!.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.childrenOf(parentUnique) };
+		return { data, error, asObservable: () => this._treeStore!.childrenOf(args.parentUnique) };
 	}
 
 	/**

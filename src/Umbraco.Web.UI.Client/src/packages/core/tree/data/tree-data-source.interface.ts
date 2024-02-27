@@ -24,13 +24,16 @@ export interface UmbTreeDataSource<TreeItemType extends UmbTreeItemModelBase> {
 	 * @return {*}  {Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
-	getRootItems(): Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>>;
+	getRootItems(args: { skip: number; take: number }): Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the children of the given parent item.
-	 * @param {(string | null)} parentUnique
 	 * @return {*}  {Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>}
 	 * @memberof UmbTreeDataSource
 	 */
-	getChildrenOf(parentUnique: string | null): Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>>;
+	getChildrenOf(args: {
+		parentUnique: string | null;
+		skip: number;
+		take: number;
+	}): Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>>;
 }

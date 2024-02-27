@@ -11,7 +11,7 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 	_totalPages = 0;
 
 	@state()
-	_currentPage = 1;
+	_currentPage = 0;
 
 	private _collectionContext?: UmbDefaultCollectionContext<any, any>;
 
