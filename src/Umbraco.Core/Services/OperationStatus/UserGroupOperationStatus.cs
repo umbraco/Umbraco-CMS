@@ -13,6 +13,7 @@ public enum UserGroupOperationStatus
     CancelledByNotification,
     MediaStartNodeKeyNotFound,
     DocumentStartNodeKeyNotFound,
+    DocumentPermissionKeyNotFound,
     LanguageNotFound,
     NameTooLong,
     AliasTooLong,

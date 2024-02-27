@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -34,6 +35,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     private string? _passwordConfigJson;
     private bool _passwordConfigInitialized;
     private readonly object _sqliteValidateSessionLock = new();
+    private readonly IDictionary<string, IPermissionMapper> _permissionMappers;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -49,6 +51,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     /// <param name="passwordConfiguration">The password configuration.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
+    /// <param name="permissionMappers">The permission mappers.</param>
     /// <exception cref="System.ArgumentNullException">
     ///     mapperCollection
     ///     or
@@ -64,7 +67,8 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
         IOptions<GlobalSettings> globalSettings,
         IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IJsonSerializer jsonSerializer,
-        IRuntimeState runtimeState)
+        IRuntimeState runtimeState,
+        IEnumerable<IPermissionMapper> permissionMappers)
         : base(scopeAccessor, appCaches, logger)
     {
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
@@ -73,6 +77,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
             passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
+        _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
     }
 
     /// <summary>
@@ -99,7 +104,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     }
 
     private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos) =>
-        dtos.Select(x => UserFactory.BuildEntity(_globalSettings, x));
+        dtos.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
 
     #region Overrides of RepositoryBase<int,IUser>
 
@@ -137,7 +142,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
         }
 
         PerformGetReferencedDtos(dtos);
-        return UserFactory.BuildEntity(_globalSettings, dtos[0]);
+        return UserFactory.BuildEntity(_globalSettings, dtos[0], _permissionMappers);
     }
 
     /// <summary>
@@ -194,7 +199,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
 
         PerformGetReferencedDtos(new List<UserDto> { userDto });
 
-        return UserFactory.BuildEntity(_globalSettings, userDto);
+        return UserFactory.BuildEntity(_globalSettings, userDto, _permissionMappers);
     }
 
     /// <summary>
@@ -349,7 +354,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var i = 0;
         foreach (UserDto dto in dtos)
         {
-            users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
+            users[i++] = UserFactory.BuildEntity(_globalSettings, dto, _permissionMappers);
         }
 
         return users;
@@ -365,7 +370,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         var i = 0;
         foreach (UserDto dto in dtos)
         {
-            users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
+            users[i++] = UserFactory.BuildEntity(_globalSettings, dto, _permissionMappers);
         }
 
         return users;
@@ -374,7 +379,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
     private IUser? GetWith(Action<Sql<ISqlContext>> with, bool includeReferences)
     {
         UserDto? dto = GetDtoWith(with, includeReferences);
-        return dto == null ? null : UserFactory.BuildEntity(_globalSettings, dto);
+        return dto == null ? null : UserFactory.BuildEntity(_globalSettings, dto, _permissionMappers);
     }
 
     private UserDto? GetDtoWith(Action<Sql<ISqlContext>> with, bool includeReferences)
@@ -415,15 +420,48 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         List<int> userIds = dtos.Count == 1 ? new List<int> {dtos[0].Id} : dtos.Select(x => x.Id).ToList();
         Dictionary<int, UserDto>? xUsers = dtos.Count == 1 ? null : dtos.ToDictionary(x => x.Id, x => x);
 
-        // get users2groups
+        List<int> groupIds = new List<int>();
+        List<Guid> groupKeys = new List<Guid>();
+        Sql<ISqlContext> sql;
+        try
+        {
+            sql = SqlContext.Sql()
+                .Select<UserGroupDto>(x=>x.Id, x=>x.Key)
+                .From<UserGroupDto>()
+                .InnerJoin<User2UserGroupDto>().On<UserGroupDto, User2UserGroupDto>((left, right) => left.Id == right.UserGroupId)
+                .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
 
-        Sql<ISqlContext> sql = SqlContext.Sql()
+            List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>(sql);
+
+
+            groupKeys= userGroups.Select(x => x.Key).ToList();
+
+        }
+        catch (DbException e)
+        {
+            // ignore doing upgrade, as we know the Key potentially do not exists
+            if (_runtimeState.Level != RuntimeLevel.Upgrade)
+            {
+                throw;
+            }
+
+        }
+
+
+        // get users2groups
+        sql = SqlContext.Sql()
             .Select<User2UserGroupDto>()
             .From<User2UserGroupDto>()
             .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
 
         List<User2UserGroupDto>? user2Groups = Database.Fetch<User2UserGroupDto>(sql);
-        var groupIds = user2Groups.Select(x => x.UserGroupId).ToList();
+
+        if (groupIds.Any() is false)
+        {
+            //this can happen if we are upgrading, so we try do read from this table, as we counn't because of the key earlier
+            groupIds = user2Groups.Select(x=>x.UserGroupId).Distinct().ToList();
+        }
+
 
         // get groups
         // We wrap this in a try-catch, as this might throw errors when you try to login before having migrated your database
@@ -495,20 +533,42 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         sql = SqlContext.Sql()
             .Select<UserGroup2PermissionDto>()
             .From<UserGroup2PermissionDto>()
-            .WhereIn<UserGroup2PermissionDto>(x => x.UserGroupId, groupIds);
+            .WhereIn<UserGroup2PermissionDto>(x => x.UserGroupKey, groupKeys);
 
-        Dictionary<int, IGrouping<int, UserGroup2PermissionDto>> groups2permissions;
+        Dictionary<Guid, IGrouping<Guid, UserGroup2PermissionDto>> groups2permissions;
         try
         {
             groups2permissions = Database.Fetch<UserGroup2PermissionDto>(sql)
-                .GroupBy(x => x.UserGroupId)
+                .GroupBy(x => x.UserGroupKey)
                 .ToDictionary(x => x.Key, x => x);
         }
         catch
         {
             // If we get an error, the table has not been made in the database yet, set the list to an empty one
-            groups2permissions = new Dictionary<int, IGrouping<int, UserGroup2PermissionDto>>();
+            groups2permissions = new Dictionary<Guid, IGrouping<Guid, UserGroup2PermissionDto>>();
         }
+
+        // get groups2granularPermissions
+
+        sql = SqlContext.Sql()
+            .Select<UserGroup2GranularPermissionDto>()
+            .From<UserGroup2GranularPermissionDto>()
+            .WhereIn<UserGroup2GranularPermissionDto>(x => x.UserGroupKey, groupKeys);
+
+
+        Dictionary<Guid, IGrouping<Guid, UserGroup2GranularPermissionDto>> groups2GranularPermissions;
+        try
+        {
+             groups2GranularPermissions = Database.Fetch<UserGroup2GranularPermissionDto>(sql)
+                .GroupBy(x => x.UserGroupKey)
+                .ToDictionary(x => x.Key, x => x);
+        }
+        catch
+        {
+            // If we get an error, the table has not been made in the database yet, set the list to an empty one
+            groups2GranularPermissions = new Dictionary<Guid, IGrouping<Guid, UserGroup2GranularPermissionDto>>();
+        }
+
 
         // map groups
 
@@ -540,6 +600,8 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         }
 
+
+
         // map languages
 
         foreach (var group in groups.Values)
@@ -553,12 +615,22 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         // map group permissions
         foreach (UserGroupDto? group in groups.Values)
         {
-            if (groups2permissions.TryGetValue(group.Id, out IGrouping<int, UserGroup2PermissionDto>? list))
+            if (groups2permissions.TryGetValue(group.Key, out IGrouping<Guid, UserGroup2PermissionDto>? list))
             {
                 group.UserGroup2PermissionDtos = list.ToList(); // groups2apps is distinct
             }
-
         }
+
+        // map granular permissions
+
+        foreach (UserGroupDto? group in groups.Values)
+        {
+            if (groups2GranularPermissions.TryGetValue(group.Key, out IGrouping<Guid, UserGroup2GranularPermissionDto>? list))
+            {
+                group.UserGroup2GranularPermissionDtos = list.ToList(); // groups2apps is distinct
+            }
+        }
+
     }
 
     #endregion
@@ -1059,7 +1131,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         // map references
         PerformGetReferencedDtos(pagedResult.Items);
-        return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x));
+        return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x, _permissionMappers));
     }
 
     private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext>? filterSql, bool hasWhereClause)
