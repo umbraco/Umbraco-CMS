@@ -13,7 +13,7 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
         new DocumentGranularPermission()
         {
             Key = dto.UniqueId!.Value,
-            Permission = dto.Permission
+            Permission = dto.Permission,
         };
 
     public Type PresentationModelToHandle => typeof(DocumentPermissionPresentationModel);
@@ -26,10 +26,10 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
             var verbs = keyGroup.Select(x => x.Permission).ToHashSet();
             if (keyGroup.Key.HasValue)
             {
-                yield return new DocumentPermissionPresentationModel()
+                yield return new DocumentPermissionPresentationModel
                 {
                     Document = new ReferenceByIdModel(keyGroup.Key.Value),
-                    Verbs = verbs
+                    Verbs = verbs,
                 };
             }
         }
@@ -39,13 +39,12 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     {
         if (permissionViewModel is DocumentPermissionPresentationModel documentPermissionPresentationModel)
         {
-            Guid key = documentPermissionPresentationModel.Document.Id;
             foreach (var verb in documentPermissionPresentationModel.Verbs)
             {
-                yield return new DocumentGranularPermission()
+                yield return new DocumentGranularPermission
                 {
                     Key = documentPermissionPresentationModel.Document.Id,
-                    Permission = verb
+                    Permission = verb,
                 };
             }
         }

@@ -24,8 +24,8 @@ public class PermissionPresentationFactory : IPermissionPresentationFactory
     public PermissionPresentationFactory(IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers, ILogger<PermissionPresentationFactory> logger)
     {
         _logger = logger;
-        _permissionPresentationMappersByContext = permissionPresentationMappers.ToDictionary(x=>x.Context);
-        _permissionPresentationMappersByType = permissionPresentationMappers.ToDictionary(x=>x.PresentationModelToHandle);
+        _permissionPresentationMappersByContext = permissionPresentationMappers.ToDictionary(x => x.Context);
+        _permissionPresentationMappersByType = permissionPresentationMappers.ToDictionary(x => x.PresentationModelToHandle);
     }
 
     public Task<ISet<IPermissionPresentationModel>> CreateAsync(ISet<IGranularPermission> granularPermissions)
@@ -78,7 +78,7 @@ public class PermissionPresentationFactory : IPermissionPresentationFactory
             {
                 foreach (var verb in unknownTypePermissionViewModel.Verbs)
                 {
-                    granularPermissions.Add(new UnknownTypeGranularPermission()
+                    granularPermissions.Add(new UnknownTypeGranularPermission
                     {
                         Context = unknownTypePermissionViewModel.Context,
                         Permission = verb
@@ -89,8 +89,8 @@ public class PermissionPresentationFactory : IPermissionPresentationFactory
             {
                 _logger.LogWarning("Unknown mapper for type {Type} to IGranularPermission", permissionViewModel.GetType());
             }
-
         }
+
         return Task.FromResult(granularPermissions);
     }
 }

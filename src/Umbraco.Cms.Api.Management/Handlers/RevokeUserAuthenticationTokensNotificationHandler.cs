@@ -58,7 +58,6 @@ internal sealed class RevokeUserAuthenticationTokensNotificationHandler :
         {
             _logger.LogWarning(e, "This is expected when we upgrade from < Umbraco 14. Otherwise it should not happen");
         }
-
     }
 
     public async Task HandleAsync(UserSavedNotification notification, CancellationToken cancellationToken)

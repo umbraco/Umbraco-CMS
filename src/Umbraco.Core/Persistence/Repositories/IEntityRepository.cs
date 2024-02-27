@@ -47,6 +47,7 @@ public interface IEntityRepository : IRepository
     bool Exists(int id);
 
     bool Exists(Guid key);
+
     bool Exists(IEnumerable<Guid> keys);
 
     /// <summary>

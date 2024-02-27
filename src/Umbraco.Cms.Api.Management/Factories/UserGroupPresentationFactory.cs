@@ -67,8 +67,6 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         };
     }
 
-
-
     /// <inheritdoc />
     public async Task<UserGroupResponseModel> CreateAsync(IReadOnlyUserGroup userGroup)
     {

@@ -59,7 +59,12 @@ public interface IEntityService
     /// </summary>
     /// <param name="key">The unique key of the entity.</param>
     bool Exists(Guid key);
-    bool Exists(IEnumerable<Guid> key);
+
+    /// <summary>
+    ///     Determines whether an entity exists.
+    /// </summary>
+    /// <param name="keys">The unique keys of the entities.</param>
+    bool Exists(IEnumerable<Guid> keys);
 
     /// <summary>
     /// Determines whether and entity of a certain object type exists.

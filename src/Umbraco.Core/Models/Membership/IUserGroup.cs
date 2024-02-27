@@ -39,6 +39,7 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     /// By default the server has no concept of what all of these strings mean, we simple store them and return them to the UI.
     /// </remarks>
     ISet<string> Permissions { get; set; }
+
     ISet<IGranularPermission> GranularPermissions { get; set; }
 
     IEnumerable<string> AllowedSections { get; }

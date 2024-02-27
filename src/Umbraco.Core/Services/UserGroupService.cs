@@ -494,18 +494,18 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         return UserGroupOperationStatus.Success;
     }
+
     private UserGroupOperationStatus ValidateGranularPermissionsExists(IUserGroup userGroup)
     {
-        IEnumerable<Guid> documentKeys = userGroup.GranularPermissions.Select(x =>
+        IEnumerable<Guid> documentKeys = userGroup.GranularPermissions.Select(granularPermission =>
         {
-            if (x is DocumentGranularPermission nodeGranularPermission)
+            if (granularPermission is DocumentGranularPermission nodeGranularPermission)
             {
                 return (Guid?)nodeGranularPermission.Key;
             }
 
             return null;
-
-        }).Where(x=>x.HasValue).Cast<Guid>().ToArray();
+        }).Where(x => x.HasValue).Cast<Guid>().ToArray();
         if (documentKeys.Any() && _entityService.Exists(documentKeys) is false)
         {
             return UserGroupOperationStatus.DocumentPermissionKeyNotFound;

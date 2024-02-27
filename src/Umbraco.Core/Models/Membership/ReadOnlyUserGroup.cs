@@ -66,8 +66,11 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public bool HasAccessToAllLanguages { get; set; }
 
     public IEnumerable<int> AllowedLanguages { get; private set; }
+
     public ISet<string> Permissions { get; private set; }
+
     public ISet<IGranularPermission> GranularPermissions { get; private set; }
+
     public IEnumerable<string> AllowedSections { get; private set; }
 
     public static bool operator ==(ReadOnlyUserGroup left, ReadOnlyUserGroup right) => Equals(left, right);
