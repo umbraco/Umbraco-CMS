@@ -9,6 +9,7 @@ import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-document-variant-picker-modal')
 export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
@@ -33,23 +34,23 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 	}
 
 	async #setInitialSelection() {
-		const selected = this.value?.selection ?? [];
+		let selected = this.value?.selection ?? [];
 
 		if (selected.length === 0) {
 			// TODO: Make it possible to use consume context without callback. [NL]
-			const ctrl = this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {});
+			const ctrl = this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, () => {});
 			const context = await ctrl.asPromise();
 			const appCulture = context.getAppCulture();
 			// If the app language is one of the options, select it by default:
 			if (appCulture && this.data?.options.some((o) => o.language.unique === appCulture)) {
-				selected.push(new UmbVariantId(appCulture, null).toString());
+				selected = appendToFrozenArray(selected, new UmbVariantId(appCulture, null).toString());
 			}
 			ctrl.destroy();
 		}
 
 		this.#selectionManager.setMultiple(true);
 		this.#selectionManager.setSelectable(true);
-		this.#selectionManager.setSelection(this.value?.selection ?? []);
+		this.#selectionManager.setSelection(selected);
 
 		if (this.data?.type !== 'unpublish') {
 			this.#selectMandatoryVariants();
