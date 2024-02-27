@@ -1,7 +1,7 @@
-import { html, customElement, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import UmbMemberTypeTreeRepository from 'src/packages/members/member-type/tree/member-type-tree.repository';
+import { html, customElement, state, repeat, css, until } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbMemberTypeTreeRepository } from '@umbraco-cms/backoffice/member-type';
 
 @customElement('umb-create-member-collection-action')
 export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
@@ -9,14 +9,9 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	private _options: Array<{ label: string; unique: string; icon: string }> = [];
 
 	#memberTypeCollectionRepository = new UmbMemberTypeTreeRepository(this);
+	#optionRequestPromise?: Promise<void>;
 
-	constructor() {
-		super();
-
-		this.#test();
-	}
-
-	async #test() {
+	async #getOptions() {
 		//TODO: Should we use the tree repository or make a collection repository?
 		//TODO: And how would we get all the member types?
 		//TODO: This only works because member types can't have folders.
@@ -30,15 +25,18 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 				icon: item.icon || '',
 			};
 		});
-		console.log(this._options);
 		this.requestUpdate();
 	}
 
 	#onButtonClick = () => {
-		console.log('Create');
+		if (this._options.length > 0) return;
+
+		this.#getOptions();
 	};
 
-	#renderOptions() {
+	async #renderOptions() {
+		await this.#optionRequestPromise;
+
 		return html`
 			${repeat(
 				this._options,
@@ -48,8 +46,8 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 						compact
 						label=${option.label}
 						href="section/member-management/workspace/member/create/${option.unique}">
-						<uui-icon name=${option.icon}></uui-icon
-						><span style="margin-left: var(--uui-size-space-2)">${option.label}</span>
+						<uui-icon name=${option.icon}></uui-icon>
+						<span style="margin-left: var(--uui-size-space-2)">${option.label}</span>
 					</uui-button>`,
 			)}
 		`;
@@ -63,7 +61,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 				look="outline"
 				popovertarget="create-popover"></uui-button>
 			<uui-popover-container id="create-popover">
-				<div id="popover-content">${this.#renderOptions()}</div>
+				<div id="popover-content">${until(this.#renderOptions(), html`<uui-loader></uui-loader>`)}</div>
 			</uui-popover-container>
 		`;
 	}
