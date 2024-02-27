@@ -156,7 +156,6 @@ public static partial class UmbracoBuilderExtensions
 
         // WebRootFileProviderFactory is just a wrapper around the IWebHostEnvironment.WebRootFileProvider,
         // therefore no need to register it as singleton
-        builder.Services.AddSingleton<ILegacyPackageManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
         builder.Services.AddSingleton<IGridEditorsConfigFileProviderFactory, WebRootFileProviderFactory>();
         builder.Services.AddSingleton<IPackageManifestFileProviderFactory, ContentAndWebRootFileProviderFactory>();
 

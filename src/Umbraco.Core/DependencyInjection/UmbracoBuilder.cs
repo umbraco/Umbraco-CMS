@@ -194,7 +194,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<UriUtility>();
 
-            Services.AddUnique<IDashboardService, DashboardService>();
             Services.AddSingleton<IMetricsConsentService, MetricsConsentService>();
 
             // will be injected in controllers when needed to invoke rest endpoints on Our
@@ -219,8 +218,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             Services.AddUnique<ITreeService, TreeService>();
-            Services.AddUnique<ISectionService, SectionService>();
-
             Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
             Services.AddUnique<IEmailSender, NotImplementedEmailSender>();
 
