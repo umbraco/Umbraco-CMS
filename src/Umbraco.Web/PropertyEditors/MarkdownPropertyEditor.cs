@@ -1,4 +1,6 @@
-﻿using Umbraco.Core;
+﻿using System;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Security;
@@ -18,6 +20,13 @@ namespace Umbraco.Web.PropertyEditors
     public class MarkdownPropertyEditor : DataEditor
     {
         private readonly IMarkdownSanitizer _markdownSanitizer;
+
+        [Obsolete("Use non obsolete constructor")]
+        public MarkdownPropertyEditor(ILogger logger)
+            : this(logger, Current.Factory.GetInstance<IMarkdownSanitizer>())
+        {
+
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkdownPropertyEditor"/> class.
