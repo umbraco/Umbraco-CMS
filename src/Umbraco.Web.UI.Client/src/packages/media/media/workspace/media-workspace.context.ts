@@ -12,7 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
-	combineObservables,
+	mergeObservables,
 	partialUpdateFrozenArray,
 	UmbArrayState,
 	UmbObjectState,
@@ -47,7 +47,7 @@ export class UmbMediaWorkspaceContext
 	readonly contentTypeCollection = this.#currentData.asObservablePart((data) => data?.mediaType.collection);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
-	readonly variantOptions = combineObservables([this.variants, this.languages], ([variants, languages]) => {
+	readonly variantOptions = mergeObservables([this.variants, this.languages], ([variants, languages]) => {
 		return languages.map((language) => {
 			return {
 				variant: variants.find((x) => x.culture === language.unique),
