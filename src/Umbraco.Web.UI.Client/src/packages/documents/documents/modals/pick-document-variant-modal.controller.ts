@@ -30,6 +30,7 @@ export class UmbPickDocumentVariantModalController extends UmbBaseController {
 			// TODO: What do to when there is no options?
 		}
 
+		// TODO: Maybe move this to modal [NL]
 		if (selected.length === 0) {
 			// TODO: Make it possible to use consume context without callback. [NL]
 			const ctrl = this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (appLanguageContext) => {});

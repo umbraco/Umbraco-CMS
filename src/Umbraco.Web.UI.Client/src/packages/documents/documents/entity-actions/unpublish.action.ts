@@ -20,6 +20,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<UmbDoc
 			unique: new UmbVariantId(language.unique, null).toString(),
 		}));
 
+		// TODO: Maybe move this to modal [NL]
 		// Only display variants that are relevant to pick from, i.e. variants that are published or published with pending changes:
 		const options = allOptions.filter(
 			(option) =>

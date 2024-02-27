@@ -20,6 +20,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<UmbDocum
 			unique: new UmbVariantId(language.unique, null).toString(),
 		}));
 
+		// TODO: Maybe move this to modal [NL]
 		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
 		const options = allOptions.filter(
 			(option) =>
