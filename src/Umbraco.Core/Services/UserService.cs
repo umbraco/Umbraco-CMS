@@ -869,7 +869,7 @@ internal class UserService : RepositoryService, IUserService
             return UserOperationStatus.InvalidEmail;
         }
 
-        if (model.Id is not null && await GetAsync(model.Id.Value) is null)
+        if (model.Id is not null && await GetAsync(model.Id.Value) is not null)
         {
             return UserOperationStatus.DuplicateId;
         }
