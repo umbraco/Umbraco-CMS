@@ -3544,7 +3544,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         // verify saved state
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(1, content.PublishedCultures.Count());
-        Assert.AreEqual(langEn.IsoCode.ToLowerInvariant(), content.PublishedCultures.First());
+        Assert.AreEqual(langEn.IsoCode, content.PublishedCultures.First());
     }
 
     private void AssertPerCulture<T>(IContent item, Func<IContent, string, T> getter,
