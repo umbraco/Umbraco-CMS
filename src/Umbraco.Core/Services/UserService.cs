@@ -2126,7 +2126,7 @@ internal class UserService : RepositoryService, IUserService
         Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt =
             await ChangePasswordAsync(performingUserKey, new ChangeUserPasswordModel
             {
-                NewPassword = backOfficeUserManager.GeneratePassword(),
+                NewPassword = generatedPassword,
                 UserKey = userKey,
             });
 
