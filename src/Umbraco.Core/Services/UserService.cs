@@ -622,7 +622,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new UserCreationResult());
         }
 
-        UserOperationStatus result = ValidateUserCreateModel(model);
+        UserOperationStatus result = await ValidateUserCreateModel(model);
         if (result != UserOperationStatus.Success)
         {
             return Attempt.FailWithStatus(result, new UserCreationResult());
@@ -743,7 +743,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new UserInvitationResult());
         }
 
-        UserOperationStatus validationResult = ValidateUserCreateModel(model);
+        UserOperationStatus validationResult = await ValidateUserCreateModel(model);
 
         if (validationResult is not UserOperationStatus.Success)
         {
@@ -858,7 +858,7 @@ internal class UserService : RepositoryService, IUserService
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserInvitationResult { InvitedUser = invitedUser });
     }
 
-    private UserOperationStatus ValidateUserCreateModel(UserCreateModel model)
+    private async Task<UserOperationStatus> ValidateUserCreateModel(UserCreateModel model)
     {
         if (_securitySettings.UsernameIsEmail && model.UserName != model.Email)
         {
@@ -867,6 +867,11 @@ internal class UserService : RepositoryService, IUserService
         if (!IsEmailValid(model.Email))
         {
             return UserOperationStatus.InvalidEmail;
+        }
+
+        if (model.Id is not null && await GetAsync(model.Id.Value) is null)
+        {
+            return UserOperationStatus.DuplicateId;
         }
 
         if (GetByEmail(model.Email) is not null)

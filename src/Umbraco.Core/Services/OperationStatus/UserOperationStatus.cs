@@ -37,4 +37,5 @@ public enum UserOperationStatus
     CannotPasswordReset,
     NotInInviteState,
     SelfPasswordResetNotAllowed,
+    DuplicateId,
 }
