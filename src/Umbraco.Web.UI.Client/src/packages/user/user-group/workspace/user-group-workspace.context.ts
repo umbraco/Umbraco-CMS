@@ -1,10 +1,9 @@
 import { UmbUserGroupDetailRepository } from '../repository/detail/index.js';
-import { UmbUserRepository } from '../../user/repository/user.repository.js';
 import type { UmbUserGroupDetailModel } from '../types.js';
 import type { UmbUserPermissionModel } from '@umbraco-cms/backoffice/user-permission';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
@@ -30,15 +29,8 @@ export class UmbUserGroupWorkspaceContext
 	readonly fallbackPermissions = this.#data.asObservablePart((data) => data?.fallbackPermissions || []);
 	readonly permissions = this.#data.asObservablePart((data) => data?.permissions || []);
 
-	#userUniques = new UmbArrayState<string>([], (x) => x);
-	userUniques = this.#userUniques.asObservable();
-
-	#userRepository: UmbUserRepository;
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.UserGroup');
-
-		this.#userRepository = new UmbUserRepository(host);
 	}
 
 	async create() {
@@ -78,18 +70,6 @@ export class UmbUserGroupWorkspaceContext
 			await this.repository.save(this.#data.value);
 		} else return;
 
-		//TODO: This next user-group section kinda works. But it will overwrite the entire user-group list on the user.
-		//TODO: instead we need to get all the users by their id's to get their user groups.
-		//TODO: these user-groups need to be updated together with the new user-group id.
-		//TODO: or the new user-group id needs to be removed from the existing list.
-
-		const userUniques = this.#userUniques.getValue();
-		const userGroupUniques = [this.#data.getValue()?.unique ?? ''];
-
-		if (userUniques.length > 0 && userGroupUniques.length > 0) {
-			await this.#userRepository.setUserGroups(userUniques, userGroupUniques);
-		}
-
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
 	}
@@ -105,10 +85,6 @@ export class UmbUserGroupWorkspaceContext
 
 	updateProperty<Alias extends keyof UmbUserGroupDetailModel>(alias: Alias, value: UmbUserGroupDetailModel[Alias]) {
 		this.#data.update({ [alias]: value });
-	}
-
-	updateUserKeys(keys: Array<string>) {
-		this.#userUniques.setValue(keys);
 	}
 
 	/**
