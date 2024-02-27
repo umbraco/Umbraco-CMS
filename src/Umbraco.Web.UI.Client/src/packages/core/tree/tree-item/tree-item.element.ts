@@ -16,11 +16,15 @@ export class UmbTreeItemElement extends UmbExtensionInitializerElementBase<Manif
 
 	#observeManifest() {
 		if (!this._entityType) return;
+
+		const filterByEntityType = (manifest: ManifestTreeItem) => {
+			if (!this._entityType) return false;
+			return manifest.meta.entityTypes.includes(this._entityType);
+		};
+
 		this.observe(
-			umbExtensionsRegistry.byTypeAndFilter(this.getExtensionType(), (manifest: ManifestTreeItem) =>
-				manifest.meta.entityTypes.includes(this._entityType),
-			),
-			async (manifests) => {
+			umbExtensionsRegistry.byTypeAndFilter(this.getExtensionType(), filterByEntityType),
+			(manifests) => {
 				if (!manifests) return;
 				// TODO: what should we do if there are multiple tree items for an entity type?
 				const manifest = manifests[0];
