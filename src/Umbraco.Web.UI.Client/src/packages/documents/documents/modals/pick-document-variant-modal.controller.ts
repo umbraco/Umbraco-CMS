@@ -46,6 +46,7 @@ export class UmbPickDocumentVariantModalController extends UmbBaseController {
 
 		const result = await modalContext.onSubmit().catch(() => undefined);
 
+		// This is a one time off, so we can destroy our selfs.
 		this.destroy();
 
 		// Map back into UmbVariantId instances:
