@@ -1,31 +1,10 @@
 import type { UmbDocumentTreeItemModel } from '../types.js';
-import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
-import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbTreeItemElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-tree-item')
-export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
-	private _item?: UmbDocumentTreeItemModel;
-	@property({ type: Object, attribute: false })
-	public get item() {
-		return this._item;
-	}
-	public set item(value: UmbDocumentTreeItemModel | undefined) {
-		this._item = value;
-		this.#context.setTreeItem(value);
-	}
-
-	#context = new UmbDocumentTreeItemContext(this);
-
-	render() {
-		if (!this.item) return nothing;
-		return html`
-			<umb-tree-item-base> ${this.#renderIconWithStatusSymbol()} ${this.#renderLabel()} </umb-tree-item-base>
-		`;
-	}
-
+export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocumentTreeItemModel> {
 	// TODO: implement correct status symbol
 	#renderIconWithStatusSymbol() {
 		return html`
@@ -42,8 +21,8 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 
 	// TODO: lower opacity if item is not published
 	// TODO: get correct variant name
-	#renderLabel() {
-		return html` <span id="label" slot="label">${this.item?.variants[0].name}</span> `;
+	renderLabel() {
+		return html`<span id="label" slot="label">${this.item?.variants[0].name}</span> `;
 	}
 
 	static styles = [

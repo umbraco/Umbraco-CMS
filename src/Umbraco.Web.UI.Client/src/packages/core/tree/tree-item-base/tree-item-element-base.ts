@@ -45,6 +45,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;
 
+			// TODO: this get set too early. We should also set it when the item is set.
 			this.#treeItemContext.setTreeItem(this.item);
 
 			// TODO: investigate if we can make an observe decorator

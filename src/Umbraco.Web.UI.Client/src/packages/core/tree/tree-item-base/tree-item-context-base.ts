@@ -1,4 +1,4 @@
-import type { UmbTreeItemContext } from '../tree-item/tree-item.context.interface.js';
+import type { UmbTreeItemContext } from '../tree-item/tree-item-context.interface.js';
 import type { UmbTreeContextBase } from '../tree.context.js';
 import type { UmbTreeItemModelBase } from '../types.js';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '../reload-tree-item-children/index.js';
