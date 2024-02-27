@@ -1,5 +1,5 @@
-import type { UmbModalContext } from './modal.context.js';
-import { UMB_MODAL_CONTEXT } from './modal.context.js';
+import type { UmbModalContext } from '../context/modal.context.js';
+import { UMB_MODAL_CONTEXT } from '../context/modal.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
