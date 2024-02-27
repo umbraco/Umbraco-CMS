@@ -12,7 +12,6 @@ import { manifests as modalManifests } from './modals/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as userPermissionManifests } from './user-permissions/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
-import { manifests as globalContextManifests } from './global-contexts/manifests.js';
 
 export const manifests = [
 	...breadcrumbManifests,
@@ -29,5 +28,4 @@ export const manifests = [
 	...treeManifests,
 	...userPermissionManifests,
 	...workspaceManifests,
-	...globalContextManifests,
 ];

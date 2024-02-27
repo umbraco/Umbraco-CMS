@@ -1,4 +1,4 @@
-import type { UmbModalConfig } from '../modal-manager.context.js';
+import type { UmbModalConfig } from '../context/modal-manager.context.js';
 
 export interface UmbModalTokenDefaults<ModalDataType extends object = object, ModalValueType = unknown> {
 	modal?: UmbModalConfig;

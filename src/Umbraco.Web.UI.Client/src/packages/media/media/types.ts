@@ -1,12 +1,12 @@
 import type { UmbMediaEntityType } from './entity.js';
-import type { UmbReferenceById } from '@umbraco-cms/backoffice/models';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantModel, UmbVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { MediaUrlInfoModel, MediaValueModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbMediaDetailModel {
 	mediaType: {
 		unique: string;
-		collection: UmbReferenceById | null;
+		collection: UmbReferenceByUnique | null;
 	};
 	entityType: UmbMediaEntityType;
 	isTrashed: boolean;
@@ -16,3 +16,5 @@ export interface UmbMediaDetailModel {
 	values: Array<MediaValueModel>;
 	variants: Array<UmbVariantModel>;
 }
+
+export interface UmbMediaVariantOptionModel extends UmbVariantOptionModel<UmbVariantModel> {}

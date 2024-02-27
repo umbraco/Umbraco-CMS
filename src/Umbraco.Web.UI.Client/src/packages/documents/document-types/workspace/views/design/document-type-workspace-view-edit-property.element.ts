@@ -2,13 +2,11 @@ import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import {
-	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_PROPERTY_SETTINGS_MODAL,
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
+	umbConfirmModal,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
@@ -57,7 +55,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
 	#modalRegistration;
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	@state()
 	protected _modalRoute?: string;
@@ -113,10 +110,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this._editDocumentTypePath = routeBuilder({});
 			});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
-			this._modalManagerContext = context;
-		});
 	}
 
 	_partialUpdate(partialObject: UmbPropertyTypeModel) {
@@ -137,12 +130,12 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		this._aliasLocked = !this._aliasLocked;
 	}
 
-	#requestRemove(e: Event) {
+	async #requestRemove(e: Event) {
 		e.preventDefault();
 		e.stopImmediatePropagation();
 		if (!this.property || !this.property.id) return;
 
-		const modalData: UmbConfirmModalData = {
+		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
 				this.property.name || this.property.id,
@@ -152,19 +145,9 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				</div>`,
 			confirmLabel: this.localize.term('actions_delete'),
 			color: 'danger',
-		};
+		});
 
-		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, { data: modalData });
-
-		modalHandler
-			?.onSubmit()
-			.then(() => {
-				this.dispatchEvent(new CustomEvent('property-delete'));
-			})
-			.catch(() => {
-				// We do not need to react to cancel, so we will leave an empty method to prevent Uncaught Promise Rejection error.
-				return;
-			});
+		this.dispatchEvent(new CustomEvent('property-delete'));
 	}
 
 	#onNameChange(event: UUIInputEvent) {

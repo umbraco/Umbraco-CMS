@@ -1,4 +1,4 @@
-import type { UmbPickerModalValue, UmbTreePickerModalData } from '../modal.interfaces.js';
+import type { UmbPickerModalValue, UmbTreePickerModalData } from '../types.js';
 import { UmbModalToken } from './modal-token.js';
 import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
