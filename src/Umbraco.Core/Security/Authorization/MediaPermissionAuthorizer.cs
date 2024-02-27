@@ -1,24 +1,19 @@
-using System.Security.Principal;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Media;
+namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <inheritdoc />
 internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 {
-    private readonly IAuthorizationHelper _authorizationHelper;
     private readonly IMediaPermissionService _mediaPermissionService;
 
-    public MediaPermissionAuthorizer(IAuthorizationHelper authorizationHelper, IMediaPermissionService mediaPermissionService)
-    {
-        _authorizationHelper = authorizationHelper;
+    public MediaPermissionAuthorizer(IMediaPermissionService mediaPermissionService) =>
         _mediaPermissionService = mediaPermissionService;
-    }
 
     /// <inheritdoc />
-    public async Task<bool> IsDeniedAsync(IPrincipal currentUser, IEnumerable<Guid> mediaKeys)
+    public async Task<bool> IsDeniedAsync(IUser currentUser, IEnumerable<Guid> mediaKeys)
     {
         if (!mediaKeys.Any())
         {
@@ -26,31 +21,25 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
             return true;
         }
 
-        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
-
-        var result = await _mediaPermissionService.AuthorizeAccessAsync(user, mediaKeys);
+        MediaAuthorizationStatus result = await _mediaPermissionService.AuthorizeAccessAsync(currentUser, mediaKeys);
 
         // If we can't find the media item(s) then we can't determine whether you are denied access.
         return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsDeniedAtRootLevelAsync(IPrincipal currentUser)
+    public async Task<bool> IsDeniedAtRootLevelAsync(IUser currentUser)
     {
-        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
-
-        var result = await _mediaPermissionService.AuthorizeRootAccessAsync(user);
+        MediaAuthorizationStatus result = await _mediaPermissionService.AuthorizeRootAccessAsync(currentUser);
 
         // If we can't find the media item(s) then we can't determine whether you are denied access.
         return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsDeniedAtRecycleBinLevelAsync(IPrincipal currentUser)
+    public async Task<bool> IsDeniedAtRecycleBinLevelAsync(IUser currentUser)
     {
-        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
-
-        var result = await _mediaPermissionService.AuthorizeBinAccessAsync(user);
+        MediaAuthorizationStatus result = await _mediaPermissionService.AuthorizeBinAccessAsync(currentUser);
 
         // If we can't find the media item(s) then we can't determine whether you are denied access.
         return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);

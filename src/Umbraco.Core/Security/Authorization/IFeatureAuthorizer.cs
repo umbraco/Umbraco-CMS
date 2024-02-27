@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
-
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Feature;
+namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
 ///     Authorizes Umbraco features.
@@ -10,7 +8,7 @@ public interface IFeatureAuthorizer
     /// <summary>
     ///     Authorizes the current action.
     /// </summary>
-    /// <param name="context">The authorization context.</param>
+    /// <param name="type">The type to check if is disabled.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsDeniedAsync(AuthorizationHandlerContext context);
+    Task<bool> IsDeniedAsync(Type type);
 }
