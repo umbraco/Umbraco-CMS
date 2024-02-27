@@ -42,7 +42,6 @@ public class UmbracoApiBehaviorApplicationModelProvider : IApplicationModelProvi
 
             // This ensures that all parameters of type BindingSource.Body and those of complex type are bound
             // using our own UmbracoJsonModelBinder
-            new UmbracoJsonModelBinderConvention(modelMetadataProvider),
         };
 
         Type defaultErrorType = typeof(ProblemDetails);
