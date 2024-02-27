@@ -21,7 +21,7 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<UmbUnlockUser
 		if (data) {
 			const item = data[0];
 
-			await umbConfirmModal(this, {
+			await umbConfirmModal(this._host, {
 				headline: `Unlock ${item.name}`,
 				content: 'Are you sure you want to unlock this user?',
 				confirmLabel: 'Unlock',

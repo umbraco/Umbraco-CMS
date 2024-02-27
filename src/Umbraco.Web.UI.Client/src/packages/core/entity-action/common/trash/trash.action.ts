@@ -13,7 +13,7 @@ export class UmbTrashEntityAction<
 		if (data) {
 			const item = data[0];
 
-			await umbConfirmModal(this, {
+			await umbConfirmModal(this._host, {
 				headline: `Trash ${item.name}`,
 				content: 'Are you sure you want to move this item to the recycle bin?',
 				color: 'danger',

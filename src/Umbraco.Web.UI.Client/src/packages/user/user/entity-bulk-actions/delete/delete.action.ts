@@ -7,7 +7,7 @@ export class UmbUserDeleteEntityBulkAction extends UmbEntityBulkActionBase<UmbUs
 	async execute() {
 		if (this.selection.length === 0) return;
 
-		await umbConfirmModal(this, {
+		await umbConfirmModal(this._host, {
 			color: 'danger',
 			headline: `Delete users?`,
 			content: html`Are you sure you want to delete selected users?`,

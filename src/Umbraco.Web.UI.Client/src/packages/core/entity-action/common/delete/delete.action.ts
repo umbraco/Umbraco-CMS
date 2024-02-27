@@ -11,7 +11,7 @@ export class UmbDeleteEntityAction<
 		// TOOD: add back when entity actions can support multiple repositories
 		//const { data } = await this.repository.requestItems([this.unique]);
 
-		await umbConfirmModal(this, {
+		await umbConfirmModal(this._host, {
 			headline: `Delete`,
 			content: 'Are you sure you want to delete this item?',
 			color: 'danger',

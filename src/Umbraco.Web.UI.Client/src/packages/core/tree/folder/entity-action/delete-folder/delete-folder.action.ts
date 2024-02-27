@@ -11,7 +11,7 @@ export class UmbDeleteFolderEntityAction<T extends UmbFolderRepository> extends 
 		if (folder) {
 			// TODO: maybe we can show something about how many items are part of the folder?
 
-			await umbConfirmModal(this, {
+			await umbConfirmModal(this._host, {
 				headline: `Delete folder ${folder.name}`,
 				content: 'Are you sure you want to delete this folder?',
 				color: 'danger',

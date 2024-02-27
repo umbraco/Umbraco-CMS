@@ -21,7 +21,7 @@ export class UmbEnableUserEntityAction extends UmbEntityActionBase<UmbEnableUser
 		if (data) {
 			const item = data[0];
 
-			await umbConfirmModal(this, {
+			await umbConfirmModal(this._host, {
 				headline: `Enable ${item.name}`,
 				content: 'Are you sure you want to enable this user?',
 				confirmLabel: 'Enable',

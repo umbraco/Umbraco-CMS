@@ -21,7 +21,7 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<UmbDisableUs
 		if (data) {
 			const item = data[0];
 
-			await umbConfirmModal(this, {
+			await umbConfirmModal(this._host, {
 				headline: `Disable ${item.name}`,
 				content: 'Are you sure you want to disable this user?',
 				color: 'danger',
