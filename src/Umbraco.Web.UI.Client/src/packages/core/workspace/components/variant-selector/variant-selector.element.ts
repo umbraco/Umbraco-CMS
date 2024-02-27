@@ -201,7 +201,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-input id="name-input" .value=${this._name} @input="${this.#handleInput}">
+			<uui-input id="name-input" .value=${this._name ?? ''} @input="${this.#handleInput}">
 				${
 					this._variants?.length
 						? html`

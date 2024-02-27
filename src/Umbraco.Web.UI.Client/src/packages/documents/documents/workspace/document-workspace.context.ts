@@ -148,6 +148,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
+		/*
 		const oldVariants = this.#currentData.getValue()?.variants || [];
 		const variants = partialUpdateFrozenArray(
 			oldVariants,
@@ -155,8 +156,9 @@ export class UmbDocumentWorkspaceContext
 			variantId ? (x) => variantId.compare(x) : () => true,
 		);
 		this.#currentData.update({ variants });
+		*/
 		// TODO: We should move this type of logic to the act of saving [NL]
-		this.#ensureVariantDataFor(variantId ?? UmbVariantId.CreateInvariant());
+		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
 	setTemplate(templateUnique: string) {
@@ -209,7 +211,7 @@ export class UmbDocumentWorkspaceContext
 			this.#currentData.update({ values });
 
 			// TODO: We should move this type of logic to the act of saving [NL]
-			this.#ensureVariantDataFor(variantId);
+			this.#updateVariantData(variantId);
 		}
 	}
 
@@ -245,7 +247,7 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 
-	#ensureVariantDataFor(variantId: UmbVariantId) {
+	#updateVariantData(variantId: UmbVariantId, update?: Partial<UmbDocumentVariantModel>) {
 		const currentData = this.getData();
 		if (!currentData) throw new Error('Data is missing');
 		const variant = currentData.variants.find((x) => variantId.compare(x));
@@ -259,6 +261,7 @@ export class UmbDocumentWorkspaceContext
 				updateDate: null,
 				...variantId.toObject(),
 				...variant,
+				...update,
 			},
 			(x) => variantId.compare(x),
 		);
