@@ -123,13 +123,13 @@ public static class UmbracoBuilderExtensions
 
                 var currFolder = new DirectoryInfo(srcFolder);
 
-                var uiProject = currFolder.GetDirectories("Umbraco.Web.UI", SearchOption.TopDirectoryOnly).First();
+                var uiProject = currFolder.GetDirectories("Umbraco.Web.UI.New", SearchOption.TopDirectoryOnly).First();
                 var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
 
                 return new LocalizedTextServiceFileSources(
                     loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
                     appCaches,
-                    mainLangFolder,
+                    currFolder,
                     Array.Empty<LocalizedTextServiceSupplementaryFileSource>(),
                     new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang").GetDirectoryContents(string.Empty));
             }),
