@@ -32,6 +32,9 @@ export declare class UmbElement extends UmbControllerHostElement {
 		alias: string | UmbContextToken<BaseType, ResultType>,
 		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
+	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
+	): Promise<ResultType>;
 	/**
 	 * Use the UmbLocalizeController to localize your element.
 	 * @see UmbLocalizationController
@@ -84,6 +87,24 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 			callback: UmbContextCallback<ResultType>,
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, alias, callback);
+		}
+
+		/**
+		 * @description Setup a subscription for a context. The callback is called when the context is resolved.
+		 * @param {string} contextAlias
+		 * @param {method} callback Callback method called when context is resolved.
+		 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
+		 * @memberof UmbElementMixin
+		 */
+		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+			contextAlias: string | UmbContextToken<BaseType, ResultType>,
+		): Promise<ResultType> {
+			const controller = new UmbContextConsumerController(this, contextAlias);
+			const promise = controller.asPromise().then((result) => {
+				controller.destroy();
+				return result;
+			});
+			return promise;
 		}
 
 		destroy(): void {

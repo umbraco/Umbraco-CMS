@@ -65,6 +65,16 @@ declare class UmbClassMixinDeclaration extends EventTarget implements UmbClassMi
 		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
 
+	/**
+	 * @description Retrieve a context. Notice this is a one time retrieving of a context, meaning if you expect this to be up to date with reality you should instead use the consumeContext method.
+	 * @param {string} contextAlias
+	 * @return {Promise<ContextType>} A Promise with the reference to the Context Api Instance
+	 * @memberof UmbClassMixin
+	 */
+	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
+	): Promise<ResultType>;
+
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
@@ -127,6 +137,17 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			callback: UmbContextCallback<ResultType>,
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, contextAlias, callback);
+		}
+
+		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+			contextAlias: string | UmbContextToken<BaseType, ResultType>,
+		): Promise<ResultType> {
+			const controller = new UmbContextConsumerController(this, contextAlias);
+			const promise = controller.asPromise().then((result) => {
+				controller.destroy();
+				return result;
+			});
+			return promise;
 		}
 
 		public destroy(): void {
