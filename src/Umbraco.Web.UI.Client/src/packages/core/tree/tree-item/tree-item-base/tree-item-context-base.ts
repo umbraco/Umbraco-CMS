@@ -124,7 +124,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	}
 
 	public async requestChildren() {
-		debugger;
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		// TODO: wait for tree context to be ready
 		const repository = this.treeContext?.getRepository();
@@ -289,7 +288,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#filter.skip = target.getSkip();
-		debugger;
 		this.requestChildren();
 	};
 
