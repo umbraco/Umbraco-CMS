@@ -54,5 +54,18 @@ describe('UmbObserverController', () => {
 			expect(hostElement.hasController(firstCtrl)).to.be.false;
 			expect(hostElement.hasController(secondCtrl)).to.be.true;
 		});
+
+		it('controller is NOT replacing another controller when using a null for controller-alias', () => {
+			const state = new UmbObjectState(undefined);
+			const observable = state.asObservable();
+
+			const callbackMethod = (state: unknown) => {};
+
+			const firstCtrl = new UmbObserverController(hostElement, observable, callbackMethod, null);
+			const secondCtrl = new UmbObserverController(hostElement, observable, callbackMethod, null);
+
+			expect(hostElement.hasController(firstCtrl)).to.be.true;
+			expect(hostElement.hasController(secondCtrl)).to.be.true;
+		});
 	});
 });

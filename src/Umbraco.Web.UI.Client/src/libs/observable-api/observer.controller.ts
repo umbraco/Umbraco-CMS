@@ -15,12 +15,12 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 		host: UmbControllerHost,
 		source: Observable<T>,
 		callback: ObserverCallback<T>,
-		alias?: UmbControllerAlias,
+		alias?: UmbControllerAlias | null,
 	) {
 		super(source, callback);
 		this.#host = host;
-		// Fallback to use a hash of the provided method:
-		this.#alias = alias ?? simpleHashCode(callback.toString());
+		// Fallback to use a hash of the provided method, but only if the alias is undefined.
+		this.#alias = alias ?? (alias === undefined ? simpleHashCode(callback.toString()) : undefined);
 
 		// Lets check if controller is already here:
 		// No we don't want this, as multiple different controllers might be looking at the same source.
