@@ -20,6 +20,6 @@ export interface NumberRangeValueType {
 	max?: number;
 }
 
-export interface UmbReferenceById {
-	id: string;
+export interface UmbReferenceByUnique {
+	unique: string;
 }

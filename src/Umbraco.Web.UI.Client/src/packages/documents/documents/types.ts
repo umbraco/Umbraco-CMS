@@ -1,13 +1,13 @@
 import type { UmbDocumentEntityType } from './entity.js';
 import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
-import type { UmbReferenceById } from '@umbraco-cms/backoffice/models';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { DocumentVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 export { UmbDocumentVariantState };
 
 export interface UmbDocumentDetailModel {
 	documentType: {
 		unique: string;
-		collection?: UmbReferenceById;
+		collection: UmbReferenceByUnique | null;
 	};
 	entityType: UmbDocumentEntityType;
 	isTrashed: boolean;
