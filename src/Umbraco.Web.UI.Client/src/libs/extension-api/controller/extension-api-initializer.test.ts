@@ -9,9 +9,9 @@ import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { type ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
-export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-export class UmbTestApiController extends UmbBaseController {
+class UmbTestApiController extends UmbBaseController {
 	public i_am_test_api_controller = true;
 
 	constructor(host: UmbControllerHost) {

@@ -1,1 +1,1 @@
-export type UmbControllerAlias = string | symbol | undefined;
+export type UmbControllerAlias = string | number | symbol | undefined;

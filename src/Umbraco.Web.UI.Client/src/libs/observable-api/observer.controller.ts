@@ -1,4 +1,5 @@
 import { type ObserverCallback, UmbObserver } from './observer.js';
+import { simpleHashCode } from './utils/simple-hash-code.function.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbController, UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -18,7 +19,8 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 	) {
 		super(source, callback);
 		this.#host = host;
-		this.#alias = alias;
+		// Fallback to use a hash of the provided method:
+		this.#alias = alias ?? simpleHashCode(callback.toString());
 
 		// Lets check if controller is already here:
 		// No we don't want this, as multiple different controllers might be looking at the same source.

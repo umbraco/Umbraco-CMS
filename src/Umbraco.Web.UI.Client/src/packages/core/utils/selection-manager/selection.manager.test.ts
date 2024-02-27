@@ -5,7 +5,7 @@ import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
 @customElement('test-my-controller-host')
-export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 describe('UmbSelectionManager', () => {
 	let manager: UmbSelectionManager;
