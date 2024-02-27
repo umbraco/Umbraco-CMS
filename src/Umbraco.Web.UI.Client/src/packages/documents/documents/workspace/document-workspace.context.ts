@@ -17,9 +17,8 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
-	combineObservables,
+	mergeObservables,
 	naiveObjectComparison,
-	partialUpdateFrozenArray,
 	UmbArrayState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
@@ -56,7 +55,7 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
-	readonly variantOptions = combineObservables([this.variants, this.languages], ([variants, languages]) => {
+	readonly variantOptions = mergeObservables([this.variants, this.languages], ([variants, languages]) => {
 		return languages.map((language) => {
 			return {
 				variant: variants.find((x) => x.culture === language.unique),
