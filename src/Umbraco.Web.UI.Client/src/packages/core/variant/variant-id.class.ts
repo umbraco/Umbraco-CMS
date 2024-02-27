@@ -32,7 +32,6 @@ export class UmbVariantId {
 
 	public readonly culture: string | null = null;
 	public readonly segment: string | null = null;
-	public readonly schedule: { publishTime?: string | null; unpublishTime?: string | null } | null = null;
 
 	constructor(culture?: string | null, segment?: string | null) {
 		this.culture = (culture === UMB_INVARIANT_CULTURE ? null : culture?.toLowerCase()) ?? null;

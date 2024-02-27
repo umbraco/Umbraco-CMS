@@ -17,8 +17,6 @@ export class UmbDocumentVariantManagerContext
 	extends UmbContextBase<UmbDocumentVariantManagerContext>
 	implements UmbApi
 {
-	#publishingRepository = new UmbDocumentPublishingRepository(this);
-	#documentRepository = new UmbDocumentDetailRepository(this);
 	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#appLanguageCulture?: string;
 
@@ -88,6 +86,7 @@ export class UmbDocumentVariantManagerContext
 	 * @param documentUnique The unique identifier of the document.
 	 */
 	async publish(documentUnique: string) {
+		#documentRepository = new UmbDocumentDetailRepository(this);
 		const { data } = await this.#documentRepository.requestByUnique(documentUnique);
 		if (!data) throw new Error('Document not found');
 		const variantIds = await this.pickVariants(
@@ -96,6 +95,7 @@ export class UmbDocumentVariantManagerContext
 			this.#appLanguageCulture ? [this.#appLanguageCulture] : undefined,
 		);
 		if (variantIds.length) {
+			#publishingRepository = new UmbDocumentPublishingRepository(this);
 			await this.#publishingRepository.publish(documentUnique, variantIds);
 		}
 	}
@@ -105,6 +105,7 @@ export class UmbDocumentVariantManagerContext
 	 * @param documentUnique The unique identifier of the document.
 	 */
 	async unpublish(documentUnique: string) {
+		#documentRepository = new UmbDocumentDetailRepository(this);
 		const { data } = await this.#documentRepository.requestByUnique(documentUnique);
 		if (!data) throw new Error('Document not found');
 
