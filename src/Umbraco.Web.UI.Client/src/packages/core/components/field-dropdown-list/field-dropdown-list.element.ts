@@ -10,6 +10,7 @@ import {
 	repeat,
 	ifDefined,
 	nothing,
+	query,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIComboboxEvent, UUIComboboxElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -48,6 +49,9 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	@state()
 	private _unique?: string;
+
+	@query('#value')
+	private _valueElement?: UUIComboboxElement;
 
 	#documentTypeDetailRepository = new UmbDocumentTypeDetailRepository(this);
 	#mediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
@@ -116,9 +120,9 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 	}
 
 	#onChange(e: UUIComboboxEvent) {
-		e.stopPropagation();
 		this._type = (e.composedPath()[0] as UUIComboboxElement).value as FieldType;
 		this.value = undefined;
+		if (this._valueElement) this._valueElement.value = '';
 
 		switch (this._type) {
 			case FieldType.DOCUMENT_TYPE:
@@ -128,6 +132,8 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 				this.#getMediaTypeFields();
 				break;
 			default:
+				this._uniqueName = '';
+				this._unique = '';
 				this._customFields = this._systemFields;
 				this.value = undefined;
 				break;
