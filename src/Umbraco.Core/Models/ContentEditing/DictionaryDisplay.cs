@@ -15,7 +15,6 @@ public class DictionaryDisplay : EntityBasic, INotificationModel
     {
         Notifications = new List<BackOfficeNotification>();
         Translations = new List<DictionaryTranslationDisplay>();
-        ContentApps = new List<ContentApp>();
     }
 
     /// <summary>
@@ -29,12 +28,6 @@ public class DictionaryDisplay : EntityBasic, INotificationModel
     /// </summary>
     [DataMember(Name = "translations")]
     public List<DictionaryTranslationDisplay> Translations { get; private set; }
-
-    /// <summary>
-    ///     Apps for the dictionary item
-    /// </summary>
-    [DataMember(Name = "apps")]
-    public List<ContentApp> ContentApps { get; private set; }
 
     /// <inheritdoc />
     /// <summary>

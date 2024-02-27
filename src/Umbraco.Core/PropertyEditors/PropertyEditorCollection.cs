@@ -6,12 +6,6 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class PropertyEditorCollection : BuilderCollectionBase<IDataEditor>
 {
-    public PropertyEditorCollection(DataEditorCollection dataEditors, ILegacyManifestParser legacyManifestParser)
-        : base(() => dataEditors
-            .Union(legacyManifestParser.CombinedManifest.PropertyEditors))
-    {
-    }
-
     public PropertyEditorCollection(DataEditorCollection dataEditors)
         : base(() => dataEditors)
     {
