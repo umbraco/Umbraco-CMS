@@ -19,5 +19,6 @@ export type CurrentUserResponseModel = {
     hasAccessToAllLanguages: boolean;
     fallbackPermissions: Array<string>;
     permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    allowedSections: Array<string>;
 };
 
