@@ -131,7 +131,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						slot="editor"
 						name="login"
 						label="${this.localize.term('general_login')}"
-						value=""
+						value=${this._workspaceContext.username}
 						@input=${(e: Event) => this.#onChange('username', (e.target as HTMLInputElement).value)}></uui-input>
 				</umb-property-layout>
 
