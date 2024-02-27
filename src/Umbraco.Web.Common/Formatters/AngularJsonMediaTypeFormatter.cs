@@ -25,7 +25,6 @@ public class AngularJsonMediaTypeFormatter : NewtonsoftJsonOutputFormatter
     protected static JsonSerializerSettings RegisterJsonConverters(JsonSerializerSettings serializerSettings)
     {
         serializerSettings.Converters.Add(new StringEnumConverter());
-        serializerSettings.Converters.Add(new UdiJsonConverter());
 
         return serializerSettings;
     }
