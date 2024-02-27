@@ -16,7 +16,9 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue
 > {
-	@state()
+	//
+	private _search = '';
+
 	private _groupedBlocks: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
 
 	@state()
@@ -27,9 +29,6 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _filtered: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
-
-	@state()
-	private _search = '';
 
 	constructor() {
 		super();
@@ -68,10 +67,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		}));
 
 		this._groupedBlocks = [{ blocks: noGroupBlocks }, ...grouped];
-		this.#onFilter();
+		this.#updateFiltered();
 	}
 
-	#onFilter() {
+	#updateFiltered() {
+		// A minimum of 3 characters is required to start filtering:
 		if (this._search.length <= 3) {
 			this._filtered = this._groupedBlocks;
 		} else {
@@ -84,7 +84,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#onSearch(e: UUIInputEvent) {
 		this._search = e.target.value as string;
-		this.#onFilter();
+		this.#updateFiltered();
 	}
 
 	render() {
