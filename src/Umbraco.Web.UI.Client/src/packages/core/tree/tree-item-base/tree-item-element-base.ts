@@ -1,16 +1,19 @@
 import type { UmbTreeItemContext } from '../tree-item/index.js';
 import type { UmbTreeItemModelBase } from '../types.js';
 import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
-import { html, nothing, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
-export abstract class UmbTreeItemElementBase extends UmbLitElement {
-	@state()
-	private _item?: UmbTreeItemModelBase;
+export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModelBase> extends UmbLitElement {
+	@property({ type: Object, attribute: false })
+	item?: TreeItemModelType;
 
 	@state()
-	private _childItems?: UmbTreeItemModelBase[];
+	private _item?: TreeItemModelType;
+
+	@state()
+	private _childItems?: TreeItemModelType[];
 
 	@state()
 	private _href?: string;
@@ -33,7 +36,7 @@ export abstract class UmbTreeItemElementBase extends UmbLitElement {
 	@state()
 	private _iconSlotHasChildren = false;
 
-	#treeItemContext?: UmbTreeItemContext<UmbTreeItemModelBase>;
+	#treeItemContext?: UmbTreeItemContext<TreeItemModelType>;
 
 	constructor() {
 		super();
@@ -41,6 +44,9 @@ export abstract class UmbTreeItemElementBase extends UmbLitElement {
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;
+
+			this.#treeItemContext.setTreeItem(this.item);
+
 			// TODO: investigate if we can make an observe decorator
 			this.observe(this.#treeItemContext.treeItem, (value) => (this._item = value));
 			this.observe(this.#treeItemContext.hasChildren, (value) => (this._hasChildren = value));
@@ -85,7 +91,6 @@ export abstract class UmbTreeItemElementBase extends UmbLitElement {
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
 	render() {
 		return html`
-			HELLO HELLO
 			<uui-menu-item
 				@show-children=${this._onShowChildren}
 				@selected=${this._handleSelectedItem}
@@ -97,7 +102,7 @@ export abstract class UmbTreeItemElementBase extends UmbLitElement {
 				.hasChildren=${this._hasChildren}
 				label="${ifDefined(this._item?.name)}"
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.#renderIconContainer()} ${this.#renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
+				${this.#renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
 			</uui-menu-item>
 		`;
@@ -134,7 +139,7 @@ export abstract class UmbTreeItemElementBase extends UmbLitElement {
 		return html`<uui-icon slot="icon" name="icon-circle-dotted"></uui-icon>`;
 	}
 
-	#renderLabel() {
+	renderLabel() {
 		return html`<slot name="label" slot="label"></slot>`;
 	}
 
@@ -154,9 +159,8 @@ export abstract class UmbTreeItemElementBase extends UmbLitElement {
 			${this._childItems
 				? repeat(
 						this._childItems,
-						// TODO: get unique here instead of name. we might be able to get it from the context
-						(item) => item.name,
-						(item) => html`<umb-tree-item-default .item=${item}></umb-tree-item-default>`,
+						(item, index) => item.name + '___' + index,
+						(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
 				  )
 				: ''}
 		`;

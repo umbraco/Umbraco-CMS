@@ -9,3 +9,5 @@ export class UmbDefaultTreeItemContext<
 		super(host, (x: UmbUniqueTreeItemModel) => x.unique);
 	}
 }
+
+export default UmbDefaultTreeItemContext;

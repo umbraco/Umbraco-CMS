@@ -1,32 +1,43 @@
-import type { UmbTreeItemModelBase } from '../types.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbExtensionInitializerElementBase, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-tree-item')
-export class UmbTreeItemElement extends UmbLitElement {
-	@property({ type: Object, attribute: false })
-	item?: UmbTreeItemModelBase;
-
-	render() {
-		if (!this.item) return nothing;
-		return html`<umb-extension-slot
-			type="treeItem"
-			.filter=${(manifests: ManifestTreeItem) => manifests.meta.entityTypes.includes(this.item!.entityType)}
-			.props=${{
-				item: this.item,
-			}}></umb-extension-slot>`;
+export class UmbTreeItemElement extends UmbExtensionInitializerElementBase<ManifestTreeItem> {
+	_entityType?: string;
+	@property({ type: String, reflect: true })
+	get entityType() {
+		return this._entityType;
+	}
+	set entityType(newVal) {
+		this._entityType = newVal;
+		this.#observeManifest();
 	}
 
-	static styles = [
-		UmbTextStyles,
-		css`
-			:host {
-				display: block;
-			}
-		`,
-	];
+	#observeManifest() {
+		if (!this._entityType) return;
+		this.observe(
+			umbExtensionsRegistry.byTypeAndFilter(this.getExtensionType(), (manifest: ManifestTreeItem) =>
+				manifest.meta.entityTypes.includes(this._entityType),
+			),
+			async (manifests) => {
+				if (!manifests) return;
+				// TODO: what should we do if there are multiple tree items for an entity type?
+				const manifest = manifests[0];
+				this.createApi(manifest);
+				this.createElement(manifest);
+			},
+			'umbObserveTreeManifest',
+		);
+	}
+
+	getExtensionType() {
+		return 'treeItem';
+	}
+
+	getDefaultElementName() {
+		return 'umb-default-tree-item';
+	}
 }
 
 declare global {

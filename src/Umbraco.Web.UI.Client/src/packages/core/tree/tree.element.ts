@@ -121,7 +121,9 @@ export class UmbTreeElement extends UmbLitElement {
 
 	#renderTreeRoot() {
 		if (this.hideTreeRoot || this._treeRoot === undefined) return nothing;
-		return html` <umb-tree-item .item=${this._treeRoot}></umb-tree-item> `;
+		return html`
+			<umb-tree-item .entityType=${this._treeRoot.entityType} .props=${{ item: this._treeRoot }}></umb-tree-item>
+		`;
 	}
 
 	#renderRootItems() {
@@ -129,9 +131,8 @@ export class UmbTreeElement extends UmbLitElement {
 		return html`
 			${repeat(
 				this._items,
-				// TODO: use unique here:
 				(item, index) => item.name + '___' + index,
-				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`,
+				(item) => html`<umb-tree-item .entityType=${this._treeRoot.entityType} .props=${item}></umb-tree-item>`,
 			)}
 		`;
 	}

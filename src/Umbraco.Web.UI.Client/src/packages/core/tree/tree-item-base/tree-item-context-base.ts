@@ -5,6 +5,7 @@ import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '../reload-tre
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
+import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -23,6 +24,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 {
 	public unique?: string | null;
 	public entityType?: string;
+
+	#manifest?: ManifestTreeItem;
 
 	#treeItem = new UmbDeepState<TreeItemType | undefined>(undefined);
 	treeItem = this.#treeItem.asObservable();
@@ -62,6 +65,25 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		super(host, UMB_TREE_ITEM_CONTEXT);
 		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();
+	}
+
+	/**
+	 * Sets the manifest
+	 * @param {ManifestCollection} manifest
+	 * @memberof UmbCollectionContext
+	 */
+	public setManifest(manifest: ManifestTreeItem | undefined) {
+		if (this.#manifest === manifest) return;
+		this.#manifest = manifest;
+	}
+
+	/**
+	 * Returns the manifest.
+	 * @return {ManifestCollection}
+	 * @memberof UmbCollectionContext
+	 */
+	public getManifest() {
+		return this.#manifest;
 	}
 
 	public setTreeItem(treeItem: TreeItemType | undefined) {
