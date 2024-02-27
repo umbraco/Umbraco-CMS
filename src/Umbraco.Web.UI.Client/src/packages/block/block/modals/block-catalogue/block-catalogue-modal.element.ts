@@ -72,12 +72,12 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#onFilter() {
-		if (this._search.length < 3) {
+		if (this._search.length <= 3) {
 			this._filtered = this._groupedBlocks;
 		} else {
 			const search = this._search.toLowerCase();
-			this._filtered = this._groupedBlocks.filter((group) => {
-				return group.blocks.find((block) => block.label?.toLocaleLowerCase().includes(search)) ? true : false;
+			this._filtered = this._groupedBlocks.map((group) => {
+				return { ...group, blocks: group.blocks.filter((block) => block.label?.toLocaleLowerCase().includes(search)) };
 			});
 		}
 	}
@@ -109,37 +109,35 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderCreateEmpty() {
 		return html`
-			${this._groupedBlocks.length > 7
+			${this.data?.blocks && this.data.blocks.length >= 10
 				? html`<uui-input
 						id="search"
-						@change=${this.#onSearch}
+						@input=${this.#onSearch}
 						label=${this.localize.term('general_search')}
 						placeholder=${this.localize.term('placeholders_search')}>
 						<uui-icon name="icon-search" slot="prepend"></uui-icon>
 				  </uui-input>`
 				: nothing}
-			${this._groupedBlocks
-				? this._groupedBlocks.map(
-						(group) => html`
-							${group.name && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
-							<div class="blockGroup">
-								${repeat(
-									group.blocks,
-									(block) => block.contentElementTypeKey,
-									(block) => html`
-										<umb-block-type-card
-											.name=${block.label}
-											.iconColor=${block.iconColor}
-											.backgroundColor=${block.backgroundColor}
-											.contentElementTypeKey=${block.contentElementTypeKey}
-											.href="${this._workspacePath}create/${block.contentElementTypeKey}">
-										</umb-block-type-card>
-									`,
-								)}
-							</div>
-						`,
-				  )
-				: ''}
+			${this._filtered.map(
+				(group) => html`
+					${group.name && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
+					<div class="blockGroup">
+						${repeat(
+							group.blocks,
+							(block) => block.contentElementTypeKey,
+							(block) => html`
+								<umb-block-type-card
+									.name=${block.label}
+									.iconColor=${block.iconColor}
+									.backgroundColor=${block.backgroundColor}
+									.contentElementTypeKey=${block.contentElementTypeKey}
+									.href="${this._workspacePath}create/${block.contentElementTypeKey}">
+								</umb-block-type-card>
+							`,
+						)}
+					</div>
+				`,
+			)}
 		`;
 	}
 
@@ -169,6 +167,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			#search {
 				width: 100%;
 				align-items: center;
+				margin-bottom: var(--uui-size-layout-1);
 			}
 			#search uui-icon {
 				padding-left: var(--uui-size-space-3);
