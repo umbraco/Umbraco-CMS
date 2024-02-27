@@ -108,6 +108,7 @@ export class UmbDocumentWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
+		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(data);
 		return data || undefined;
 	}
@@ -154,6 +155,7 @@ export class UmbDocumentWorkspaceContext
 			variantId ? (x) => variantId.compare(x) : () => true,
 		);
 		this.#currentData.update({ variants });
+		this.#ensureVariantDataFor(variantId ?? UmbVariantId.CreateInvariant());
 	}
 
 	setTemplate(templateUnique: string) {
@@ -193,7 +195,7 @@ export class UmbDocumentWorkspaceContext
 		value: UmbDocumentValueModel,
 		variantId?: UmbVariantId,
 	) {
-		if (!variantId) throw new Error('VariantId is missing');
+		variantId ??= UmbVariantId.CreateInvariant();
 
 		const entry = { ...variantId.toObject(), alias, value };
 		const currentData = this.getData();
@@ -205,18 +207,18 @@ export class UmbDocumentWorkspaceContext
 			);
 			this.#currentData.update({ values });
 
-			// TODO: Ensure variant object..
+			// If it turns out to become a performance problem to ensure this all the time, then we should move this type of logic to the data-source
+			this.#ensureVariantDataFor(variantId);
 		}
 	}
 
 	#calculateChangedVariants() {
 		const persisted = this.#persistedData.getValue();
-		if (!persisted) throw new Error('Persisted data is missing');
 		const current = this.#currentData.getValue();
-		if (!persisted) throw new Error('Current data is missing');
+		if (!current) throw new Error('Current data is missing');
 
 		const changedVariants = current?.variants.map((variant) => {
-			const persistedVariant = persisted.variants.find((x) => UmbVariantId.Create(variant).compare(x));
+			const persistedVariant = persisted?.variants.find((x) => UmbVariantId.Create(variant).compare(x));
 			return {
 				culture: variant.culture,
 				segment: variant.segment,
@@ -225,7 +227,7 @@ export class UmbDocumentWorkspaceContext
 		});
 
 		const changedProperties = current?.values.map((value) => {
-			const persistedValues = persisted.values.find((x) => UmbVariantId.Create(value).compare(x));
+			const persistedValues = persisted?.values.find((x) => UmbVariantId.Create(value).compare(x));
 			return {
 				culture: value.culture,
 				segment: value.segment,
@@ -240,6 +242,26 @@ export class UmbDocumentWorkspaceContext
 				.filter((x) => x.equal === false)
 				.map((x) => new UmbVariantId(x.culture, x.segment)) ?? []
 		);
+	}
+
+	#ensureVariantDataFor(variantId: UmbVariantId) {
+		const currentData = this.getData();
+		if (!currentData) throw new Error('Data is missing');
+		const variant = currentData.variants.find((x) => variantId.compare(x));
+		const newVariants = appendToFrozenArray(
+			currentData.variants,
+			{
+				state: null,
+				name: '',
+				publishDate: null,
+				createDate: null,
+				updateDate: null,
+				...variantId.toObject(),
+				...variant,
+			},
+			(x) => variantId.compare(x),
+		);
+		this.#currentData.update({ variants: newVariants });
 	}
 
 	async #pickVariantsForAction(type: UmbDocumentVariantPickerModalType): Promise<UmbVariantId[]> {
