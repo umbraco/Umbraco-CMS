@@ -1,4 +1,5 @@
 import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbPaginationManager } from '../../utils/pagination-manager/pagination.manager.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
@@ -16,7 +17,7 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModelBase> e
 	isActive: Observable<boolean>;
 	hasActions: Observable<boolean>;
 	path: Observable<string>;
-
+	pagination: UmbPaginationManager;
 	setTreeItem(treeItem: TreeItemType | undefined): void;
 	requestChildren(): Promise<{
 		data?: UmbPagedModel<TreeItemType> | undefined;
