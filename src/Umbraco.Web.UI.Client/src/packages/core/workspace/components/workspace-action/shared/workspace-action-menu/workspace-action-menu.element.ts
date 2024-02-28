@@ -90,7 +90,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						popovertarget="workspace-action-popover"
 						look="${this.look}"
 						color="${this.color}"
-						label="Expand"
+						label=${this.localize.term('visuallyHiddenTexts_tabExpand')}
 						compact>
 						<uui-symbol-expand id="expand-symbol" .open=${this._popoverOpen}></uui-symbol-expand>
 					</uui-button>
