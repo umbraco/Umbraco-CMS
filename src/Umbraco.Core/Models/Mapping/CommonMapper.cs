@@ -1,7 +1,5 @@
-using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -11,7 +9,6 @@ namespace Umbraco.Cms.Core.Models.Mapping;
 
 public class CommonMapper
 {
-    private readonly ContentAppFactoryCollection _contentAppDefinitions;
     private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
     private readonly ILocalizedTextService _localizedTextService;
     private readonly IUserService _userService;
@@ -19,12 +16,10 @@ public class CommonMapper
     public CommonMapper(
         IUserService userService,
         IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-        ContentAppFactoryCollection contentAppDefinitions,
         ILocalizedTextService localizedTextService)
     {
         _userService = userService;
         _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-        _contentAppDefinitions = contentAppDefinitions;
         _localizedTextService = localizedTextService;
     }
 
@@ -45,24 +40,5 @@ public class CommonMapper
         IContentTypeComposition? contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
         ContentTypeBasic? contentTypeBasic = context.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
         return contentTypeBasic;
-    }
-
-    public IEnumerable<ContentApp> GetContentApps(IUmbracoEntity source) => GetContentAppsForEntity(source);
-
-    public IEnumerable<ContentApp> GetContentAppsForEntity(IEntity source)
-    {
-        ContentApp[] apps = _contentAppDefinitions.GetContentAppsFor(source).ToArray();
-
-        // localize content app names
-        foreach (ContentApp app in apps)
-        {
-            var localizedAppName = _localizedTextService.Localize("apps", app.Alias);
-            if (localizedAppName.Equals($"[{app.Alias}]", StringComparison.OrdinalIgnoreCase) == false)
-            {
-                app.Name = localizedAppName;
-            }
-        }
-
-        return apps;
     }
 }
