@@ -4,9 +4,6 @@ import type { UmbMemberCollectionContext } from './member-collection.context.js'
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import type { UUIBooleanInputEvent, UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
-
-// import './action/create-member-collection-action.element.js';
 
 @customElement('umb-member-collection-header')
 export class UmbMemberCollectionHeaderElement extends UmbLitElement {
@@ -47,7 +44,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 	}
 
 	get #getContentTypeFilterLabel() {
-		if (!this._selectedContentTypeUnique) return this.localize.term('general_all');
+		if (!this._selectedContentTypeUnique) return this.localize.term('general_all') + ' Member types';
 
 		return (
 			this._contentTypes.find((type) => type.unique === this._selectedContentTypeUnique)?.name ||
@@ -71,8 +68,8 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 		return html`<umb-collection-action-bundle></umb-collection-action-bundle>
 			<uui-input
 				@input=${this.#onSearch}
-				label=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
-				placeholder=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
+				label=${this.localize.term('general_search')}
+				placeholder=${this.localize.term('general_search')}
 				id="input-search"></uui-input>
 			${this.#renderContentTypeFilter()} `;
 	}
@@ -84,6 +81,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 				<div id="dropdown-layout">
 					<uui-button
 						label=${this.localize.term('general_all')}
+						look=${!this._selectedContentTypeUnique ? 'secondary' : 'default'}
 						compact
 						@click=${() => this.#onContentTypeFilterChange('')}></uui-button>
 					${repeat(
@@ -92,6 +90,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 						(memberType) => html`
 							<uui-button
 								label=${ifDefined(memberType.name)}
+								look=${memberType.unique === this._selectedContentTypeUnique ? 'secondary' : 'default'}
 								compact
 								@click=${() => this.#onContentTypeFilterChange(memberType.unique)}></uui-button>
 						`,
@@ -102,10 +101,24 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 	}
 	static styles = [
 		css`
+			:host {
+				height: 100%;
+				width: 100%;
+				display: flex;
+				justify-content: space-between;
+				white-space: nowrap;
+				gap: var(--uui-size-space-5);
+				align-items: center;
+			}
+
 			#dropdown-layout {
 				display: flex;
 				flex-direction: column;
 				--uui-button-content-align: left;
+			}
+
+			uui-input {
+				width: 100%;
 			}
 		`,
 	];

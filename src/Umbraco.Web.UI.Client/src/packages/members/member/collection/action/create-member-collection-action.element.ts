@@ -8,14 +8,14 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	@state()
 	private _options: Array<{ label: string; unique: string; icon: string }> = [];
 
-	#memberTypeCollectionRepository = new UmbMemberTypeTreeRepository(this);
+	#memberTypeTreeRepository = new UmbMemberTypeTreeRepository(this);
 	#optionRequestPromise?: Promise<void>;
 
 	async #getOptions() {
 		//TODO: Should we use the tree repository or make a collection repository?
 		//TODO: And how would we get all the member types?
 		//TODO: This only works because member types can't have folders.
-		const { data } = await this.#memberTypeCollectionRepository.requestRootTreeItems();
+		const { data } = await this.#memberTypeTreeRepository.requestRootTreeItems();
 		if (!data) return;
 
 		this._options = data.items.map((item) => {
