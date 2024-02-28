@@ -93,9 +93,13 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						color="${this.color}"
 						label="Expand"
 						compact>
-						<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
+						<uui-symbol-expand id="expand-symbol" .open=${this._popoverOpen}></uui-symbol-expand>
 					</uui-button>
-					<uui-popover-container id="workspace-action-popover" placement="bottom-end" @toggle=${this.#onPopoverToggle}>
+					<uui-popover-container
+						id="workspace-action-popover"
+						margin="5"
+						placement="top-end"
+						@toggle=${this.#onPopoverToggle}>
 						<umb-popover-layout>
 							<uui-scroll-container>
 								${repeat(
@@ -116,15 +120,23 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			:host {
 				--uui-menu-item-flat-structure: 1;
 			}
-			#more-symbol {
-				font-size: 0.6em;
+
+			#expand-symbol {
+				transform: rotate(-90deg);
+			}
+
+			#expand-symbol[open] {
+				transform: rotate(0deg);
+			}
+
+			#workspace-action-popover {
+				min-width: 200px;
 			}
 
 			#popover-trigger {
 				--uui-button-padding-top-factor: 0.5;
 				--uui-button-padding-bottom-factor: 0.1;
-				--uui-button-height: 18px;
-				--uui-button-border-radius: 6px;
+				--uui-button-border-radius: 0;
 			}
 		`,
 	];
