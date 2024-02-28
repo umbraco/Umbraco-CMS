@@ -28,7 +28,6 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box class="uui-text">
-				<umb-field-dropdown-list></umb-field-dropdown-list>
 				<h1 class="uui-h2" style="margin-top: var(--uui-size-layout-1);">Welcome, ${this.name}</h1>
 				<p class="uui-lead">
 					This is a preview version of Umbraco, where you can have a first-hand look at the new Backoffice.
