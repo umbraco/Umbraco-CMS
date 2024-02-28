@@ -41,7 +41,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 				// First in list
 				if (newIndex === 0 && model.length > 1) {
-					this._groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
+					this.#groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
 					return;
 				}
 
@@ -50,14 +50,14 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 					const prevItemSortOrder = model[newIndex - 1].sortOrder;
 
 					let weight = 1;
-					this._groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
+					this.#groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
 
 					// Check for overlaps
 					model.some((entry, index) => {
 						if (index <= newIndex) return;
 						if (entry.sortOrder === prevItemSortOrder + weight) {
 							weight++;
-							this._groupStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
+							this.#groupStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
 						}
 						// Break the loop
 						return true;
@@ -78,7 +78,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		if (value === this._ownerTabId) return;
 		const oldValue = this._ownerTabId;
 		this._ownerTabId = value;
-		this._groupStructureHelper.setOwnerId(value);
+		this.#groupStructureHelper.setOwnerId(value);
 		this.requestUpdate('ownerTabId', oldValue);
 	}
 
@@ -86,13 +86,13 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	@property({ type: String })
 	public get tabName(): string | undefined {
-		return this._groupStructureHelper.getName();
+		return this.#groupStructureHelper.getName();
 	}
 	public set tabName(value: string | undefined) {
 		if (value === this._tabName) return;
 		const oldValue = this._tabName;
 		this._tabName = value;
-		this._groupStructureHelper.setName(value);
+		this.#groupStructureHelper.setName(value);
 		this.requestUpdate('tabName', oldValue);
 	}
 
@@ -101,14 +101,12 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	@property({ type: Boolean })
 	public get noTabName(): boolean {
-		return this._groupStructureHelper.getIsRoot();
+		return this.#groupStructureHelper.getIsRoot();
 	}
 	public set noTabName(value: boolean) {
 		this._noTabName = value;
-		this._groupStructureHelper.setIsRoot(value);
+		this.#groupStructureHelper.setIsRoot(value);
 	}
-
-	_groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbDocumentTypeDetailModel>(this);
 
 	@state()
 	_groups: Array<UmbPropertyTypeContainerModel> = [];
@@ -119,11 +117,13 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	@state()
 	_sortModeActive?: boolean;
 
+	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbDocumentTypeDetailModel>(this);
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
-			this._groupStructureHelper.setStructureManager((context as UmbDocumentTypeWorkspaceContext).structure);
+			this.#groupStructureHelper.setStructureManager((context as UmbDocumentTypeWorkspaceContext).structure);
 			this.observe(
 				(context as UmbDocumentTypeWorkspaceContext).isSorting,
 				(isSorting) => {
@@ -137,12 +137,12 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				'_observeIsSorting',
 			);
 		});
-		this.observe(this._groupStructureHelper.containers, (groups) => {
+		this.observe(this.#groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
 			this.#sorter.setModel(this._groups);
 			this.requestUpdate('_groups');
 		});
-		this.observe(this._groupStructureHelper.hasProperties, (hasProperties) => {
+		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {
 			this._hasProperties = hasProperties;
 			this.requestUpdate('_hasProperties');
 		});
@@ -150,7 +150,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	#onAddGroup = () => {
 		// Idea, maybe we can gather the sortOrder from the last group rendered and add 1 to it?
-		this._groupStructureHelper.addContainer(this._ownerTabId);
+		this.#groupStructureHelper.addContainer(this._ownerTabId);
 	};
 
 	render() {
@@ -196,7 +196,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	#renderHeader(group: UmbPropertyTypeContainerModel) {
-		const inherited = !this._groupStructureHelper.isOwnerChildContainer(group.id!);
+		const inherited = !this.#groupStructureHelper.isOwnerChildContainer(group.id!);
 
 		if (this._sortModeActive) {
 			return html`<div slot="header">
@@ -208,7 +208,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 					type="number"
 					label=${this.localize.term('sort_sortOrder')}
 					@change=${(e: UUIInputEvent) =>
-						this._groupStructureHelper.partialUpdateContainer(group.id!, {
+						this.#groupStructureHelper.partialUpdateContainer(group.id!, {
 							sortOrder: parseInt(e.target.value as string) || 0,
 						})}
 					.value=${group.sortOrder || 0}
@@ -228,7 +228,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			.value=${group.name}
 			@change=${(e: InputEvent) => {
 				const newName = (e.target as HTMLInputElement).value;
-				this._groupStructureHelper.updateContainerName(group.id!, group.parent?.id ?? null, newName);
+				this.#groupStructureHelper.updateContainerName(group.id!, group.parent?.id ?? null, newName);
 			}}></uui-input>`;
 	}
 
