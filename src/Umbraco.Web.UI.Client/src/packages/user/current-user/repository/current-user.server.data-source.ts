@@ -42,7 +42,7 @@ export class UmbCurrentUserServerDataSource {
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,
 				fallbackPermissions: data.fallbackPermissions,
 				permissions: data.permissions,
-				sections: data.sections,
+				allowedSections: data.allowedSections,
 			};
 			return { data: user };
 		}
