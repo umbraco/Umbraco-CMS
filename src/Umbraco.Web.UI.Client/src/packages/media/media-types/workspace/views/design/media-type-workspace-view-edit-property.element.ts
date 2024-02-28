@@ -94,9 +94,6 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 				return { data: { documentTypeId: mediaTypeId }, value: propertyData }; //TODO: Should we have a separate modal for mediaTypes?
 			})
 			.onSubmit((result) => {
-				if (!result.dataType) {
-					throw new Error('No dataType found on property');
-				}
 				this._partialUpdate(result as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {

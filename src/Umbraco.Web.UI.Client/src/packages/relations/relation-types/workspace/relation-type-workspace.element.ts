@@ -26,7 +26,7 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 			component: this.#createElement,
 			setup: (_component, info) => {
 				const parentId = info.match.params.parentId;
-				this.#workspaceContext.createScaffold(parentId);
+				this.#workspaceContext.create(parentId);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,

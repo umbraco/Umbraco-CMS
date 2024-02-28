@@ -19,7 +19,7 @@ export class UmbBlockGridInlinePropertyDatasetContext extends UmbBaseController 
 		return this.#entryContext.getEntityType();
 	}
 	getUnique() {
-		return this.#entryContext.getEntityId();
+		return this.#entryContext.getUnique();
 	}
 
 	getName(): string | undefined {

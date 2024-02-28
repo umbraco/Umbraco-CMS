@@ -1,17 +1,17 @@
 import { umbPickDocumentVariantModal } from '../modals/pick-document-variant-modal.controller.js';
-import { type UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
+import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentVariantState } from '../types.js';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<UmbDocumentDetailRepository> {
+export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<unknown> {
 	async execute() {
-		if (!this.repository) throw new Error('Document repository not set');
-
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestCollection({});
-		const { data: documentData } = await this.repository.requestByUnique(this.unique);
+
+		const documentRepository = new UmbDocumentDetailRepository(this._host);
+		const { data: documentData } = await documentRepository.requestByUnique(this.unique);
 
 		if (!documentData) throw new Error('The document was not found');
 

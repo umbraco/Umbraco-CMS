@@ -34,7 +34,7 @@ export abstract class UmbBlockEntryContext<
 	getEntityType() {
 		return 'block';
 	}
-	getEntityId() {
+	getUnique() {
 		return this.getContentUdi();
 	}
 	propertyValueByAlias<ReturnType>(propertyAlias: string) {

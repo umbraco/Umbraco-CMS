@@ -1,9 +1,5 @@
-import type {
-	UmbPropertyDatasetContext,
-	UmbNameablePropertyDatasetContext} from '@umbraco-cms/backoffice/property';
-import {
-	UMB_PROPERTY_DATASET_CONTEXT
-} from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -31,7 +27,7 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 		return this.#workspace.getEntityType();
 	}
 	getUnique() {
-		return this.#workspace.getEntityId();
+		return this.#workspace.getUnique();
 	}
 	getName() {
 		return this.#workspace.getName();

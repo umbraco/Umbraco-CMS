@@ -7,6 +7,7 @@ export * from './code-block/index.js';
 export * from './dropdown/index.js';
 export * from './entity-actions-bundle/index.js';
 export * from './extension-slot/index.js';
+export * from './field-dropdown-list/index.js';
 export * from './footer-layout/index.js';
 export * from './header-app/index.js';
 export * from './history/index.js';
