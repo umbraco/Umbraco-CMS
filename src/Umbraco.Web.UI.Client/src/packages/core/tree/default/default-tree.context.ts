@@ -72,7 +72,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	public setManifest(manifest: ManifestTree | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
-		this.#observeRepository(this.#manifest.meta.repositoryAlias;);
+		this.#observeRepository(this.#manifest?.meta.repositoryAlias);
 	}
 
 	/**
@@ -100,7 +100,6 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	}
 
 	public async requestRootItems() {
-		debugger;
 		await this.#init;
 		const response = await this.#repository!.requestRootTreeItems({ skip: 0, take: 100 });
 		debugger;
@@ -112,7 +111,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		return this.#repository!.rootTreeItems();
 	}
 
-	#observeRepository(repositoryAlias: string) {
+	#observeRepository(repositoryAlias?: string) {
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
 
 		new UmbExtensionApiInitializer<ManifestRepository<UmbTreeRepository<TreeItemType>>>(
