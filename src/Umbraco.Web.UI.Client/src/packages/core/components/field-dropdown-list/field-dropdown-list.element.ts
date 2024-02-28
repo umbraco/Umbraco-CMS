@@ -38,8 +38,17 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'exclude-media-type', reflect: true })
 	public excludeMediaType = false;
 
+	private _value: FieldPickerValue = { alias: '', label: '' };
 	@property({ type: Object })
-	public value?: FieldPickerValue;
+	public get value(): FieldPickerValue {
+		return this._value;
+	}
+	public set value(val: FieldPickerValue) {
+		const oldVal = this._value;
+		this._value = val;
+		this.requestUpdate('value', oldVal);
+		this.dispatchEvent(new UmbChangeEvent());
+	}
 
 	@state()
 	private _type?: FieldType;
@@ -133,18 +142,14 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 				this._uniqueName = '';
 				this._unique = '';
 				this._customFields = this._systemFields;
-				this.value = undefined;
 				break;
 		}
-		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onChangeValue(e: UUIComboboxEvent) {
 		e.stopPropagation();
 		const alias = (e.composedPath()[0] as UUIComboboxElement).value as FieldType;
 		this.value = this._customFields.find((field) => field.alias === alias) as FieldPickerValue;
-
-		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	render() {
