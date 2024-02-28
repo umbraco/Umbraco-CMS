@@ -227,32 +227,6 @@ public class UdiTests
 
     }
 
-    [Test]
-    public void SerializationTest()
-    {
-        var settings = new JsonSerializerSettings
-        {
-            Converters = new JsonConverter[] { new UdiJsonConverter(), new UdiRangeJsonConverter() },
-        };
-
-        var guid = Guid.NewGuid();
-        var udi = new GuidUdi(Constants.UdiEntityType.AnyGuid, guid);
-        var json = JsonConvert.SerializeObject(udi, settings);
-        Assert.AreEqual(string.Format("\"umb://any-guid/{0:N}\"", guid), json);
-
-        var dudi = JsonConvert.DeserializeObject<Udi>(json, settings);
-        Assert.AreEqual(Constants.UdiEntityType.AnyGuid, dudi.EntityType);
-        Assert.AreEqual(guid, ((GuidUdi)dudi).Guid);
-
-        var range = new UdiRange(udi, Constants.DeploySelector.ChildrenOfThis);
-        json = JsonConvert.SerializeObject(range, settings);
-        Assert.AreEqual(string.Format("\"umb://any-guid/{0:N}?children\"", guid), json);
-
-        var drange = JsonConvert.DeserializeObject<UdiRange>(json, settings);
-        Assert.AreEqual(udi, drange.Udi);
-        Assert.AreEqual(string.Format("umb://any-guid/{0:N}", guid), drange.Udi.UriValue.ToString());
-        Assert.AreEqual(Constants.DeploySelector.ChildrenOfThis, drange.Selector);
-    }
 
     [Test]
     public void ValidateUdiEntityType()

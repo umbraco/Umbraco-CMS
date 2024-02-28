@@ -15,8 +15,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Tour;
-using Umbraco.Cms.Core.Trees;
-using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Extensions;
 
@@ -97,7 +95,6 @@ public static partial class UmbracoBuilderExtensions
             .Append<Hulu>()
             .Append<Giphy>()
             .Append<LottieFiles>();
-        builder.BackOfficeAssets();
         builder.SelectorHandlers().Add(() => builder.TypeLoader.GetTypes<ISelectorHandler>());
         builder.FilterHandlers().Add(() => builder.TypeLoader.GetTypes<IFilterHandler>());
         builder.SortHandlers().Add(() => builder.TypeLoader.GetTypes<ISortHandler>());
@@ -243,12 +240,6 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static EmbedProvidersCollectionBuilder EmbedProviders(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<EmbedProvidersCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the back office custom assets collection builder
-    /// </summary>
-    public static CustomBackOfficeAssetsCollectionBuilder BackOfficeAssets(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<CustomBackOfficeAssetsCollectionBuilder>();
 
     /// <summary>
     /// Gets the Delivery API selector handler collection builder
