@@ -22,23 +22,19 @@ export class UmbWorkspaceIsNewRedirectController extends UmbBaseController {
 		super(host, 'isNewRedirectController');
 
 		// Navigate to edit route when language is created:
-		this.observe(
-			workspaceContext.isNew,
-			(isNew) => {
-				if (isNew === false) {
-					const unique = workspaceContext.getUnique();
-					if (router && unique) {
-						const routerPath = router.absoluteRouterPath;
-						if (routerPath) {
-							const newPath = createRoutePathBuilder(ensurePathEndsWithSlash(routerPath) + 'edit/:id')({ id: unique });
-							window.history.pushState({}, '', newPath);
+		this.observe(workspaceContext.isNew, (isNew) => {
+			if (isNew === false) {
+				const unique = workspaceContext.getUnique();
+				if (router && unique) {
+					const routerPath = router.absoluteRouterPath;
+					if (routerPath) {
+						const newPath = createRoutePathBuilder(ensurePathEndsWithSlash(routerPath) + 'edit/:id')({ id: unique });
+						window.history.pushState({}, '', newPath);
 
-							this.destroy();
-						}
+						this.destroy();
 					}
 				}
-			},
-			'_observeIsNew',
-		);
+			}
+		});
 	}
 }
