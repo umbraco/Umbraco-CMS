@@ -3,8 +3,8 @@ import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffic
 import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-@customElement('umb-workspace-action-menu')
-export class UmbWorkspaceActionMenuElement extends UmbLitElement {
+@customElement('umb-workspace-entity-action-menu')
+export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
@@ -49,12 +49,12 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	#renderActionsMenu() {
 		return this._entityId && this._entityType
 			? html`
-					<uui-button popovertarget="workspace-action-menu-popover" label="Actions">
+					<uui-button popovertarget="workspace-entity-action-menu-popover" label="Actions">
 						Actions
 						<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 					</uui-button>
 					<uui-popover-container
-						id="workspace-action-menu-popover"
+						id="workspace-entity-action-menu-popover"
 						placement="bottom-end"
 						@toggle=${this.#onPopoverToggle}>
 						<umb-popover-layout>
@@ -87,6 +87,6 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-action-menu': UmbWorkspaceActionMenuElement;
+		'umb-workspace-entity-action-menu': UmbWorkspaceEntityActionMenuElement;
 	}
 }
