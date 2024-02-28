@@ -1,27 +1,18 @@
 import type { ConditionTypes } from '../conditions/types.js';
-import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
-import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { MetaEntityAction } from './entity-action.model.js';
+import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export interface ManifestWorkspaceActionMenuItem
-	extends ManifestElement<HTMLElement>,
+	extends ManifestElementAndApi<HTMLElement, UmbWorkspaceAction>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'workspaceActionMenuItem';
 	meta: MetaWorkspaceActionMenuItem;
 }
 
-export interface MetaWorkspaceActionMenuItem {
+export interface MetaWorkspaceActionMenuItem extends MetaEntityAction {
 	/**
 	 * Define which workspace actions this menu item should be shown for.
 	 */
 	workspaceActionAliases: string[];
-
-	/**
-	 * The color of the button. Defaults to the workspace action button color.
-	 */
-	buttonColor?: UUIInterfaceColor;
-
-	/**
-	 * The look of the button. Defaults to the workspace action button look.
-	 */
-	buttonLook?: UUIInterfaceLook;
 }
