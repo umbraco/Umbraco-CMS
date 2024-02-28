@@ -40,10 +40,10 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	private _value?: FieldPickerValue;
 	@property({ type: Object })
-	public get value(): FieldPickerValue {
+	public get value(): FieldPickerValue | undefined {
 		return this._value;
 	}
-	public set value(val: FieldPickerValue) {
+	public set value(val: FieldPickerValue | undefined) {
 		const oldVal = this._value;
 		this._value = val;
 		this.requestUpdate('value', oldVal);
