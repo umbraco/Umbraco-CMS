@@ -229,6 +229,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 null,
                 userKey);
 
+            scope.Complete();
             return attempt;
         }
 
