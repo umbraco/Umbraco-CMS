@@ -5,7 +5,7 @@ import {
 	type UmbDocumentVariantPickerModalType,
 } from './variant-picker/document-variant-picker-modal.token.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -15,7 +15,7 @@ export interface UmbPickDocumentVariantModalArgs {
 	selected?: Array<UmbVariantId>;
 }
 
-export class UmbPickDocumentVariantModalController extends UmbBaseController {
+export class UmbPickDocumentVariantModalController extends UmbControllerBase {
 	async open(args: UmbPickDocumentVariantModalArgs): Promise<UmbVariantId[]> {
 		const modalManagerContext = await this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, () => {}).asPromise();
 		const selected = args.selected ?? [];

@@ -1,5 +1,5 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -7,7 +7,7 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbMediaWorkspaceHasCollectionCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbMediaWorkspaceHasCollectionCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: MediaWorkspaceHasCollectionConditionConfig;
 	permitted = false;
 	#onChange: () => void;

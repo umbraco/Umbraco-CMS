@@ -1,5 +1,5 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user/current-user.context.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -7,7 +7,7 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbUserPermissionCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbUserPermissionCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: UserPermissionConditionConfig;
 	permitted = false;
 	#onChange: () => void;

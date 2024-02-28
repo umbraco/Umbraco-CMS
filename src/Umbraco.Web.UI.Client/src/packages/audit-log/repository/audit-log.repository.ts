@@ -4,9 +4,9 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { AuditTypeModel, DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbAuditLogRepository extends UmbBaseController {
+export class UmbAuditLogRepository extends UmbControllerBase {
 	#dataSource: UmbAuditLogServerDataSource;
 	#notificationService?: UmbNotificationContext;
 	#init;

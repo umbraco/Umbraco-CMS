@@ -9,7 +9,7 @@ import {
 	type ManifestTree,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
@@ -18,7 +18,7 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: update interface
-export interface UmbTreeContext<TreeItemType extends UmbTreeItemModelBase> extends UmbBaseController {
+export interface UmbTreeContext<TreeItemType extends UmbTreeItemModelBase> extends UmbControllerBase {
 	selection: UmbSelectionManager;
 	requestChildrenOf: (parentUnique: string | null) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
@@ -28,7 +28,7 @@ export interface UmbTreeContext<TreeItemType extends UmbTreeItemModelBase> exten
 }
 
 export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
-	extends UmbBaseController
+	extends UmbControllerBase
 	implements UmbTreeContext<TreeItemType>
 {
 	#treeRoot = new UmbObjectState<TreeItemType | undefined>(undefined);
