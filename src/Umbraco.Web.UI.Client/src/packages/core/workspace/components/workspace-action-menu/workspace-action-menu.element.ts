@@ -27,7 +27,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 
 	private _observeInfo() {
 		if (!this._workspaceContext) return;
-		this._entityId = this._workspaceContext.getEntityId();
+		this._entityId = this._workspaceContext.getUnique();
 		this._entityType = this._workspaceContext.getEntityType();
 	}
 

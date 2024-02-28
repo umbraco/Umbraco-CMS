@@ -26,11 +26,11 @@ export class UmbWorkspaceIsNewRedirectController extends UmbBaseController {
 			workspaceContext.isNew,
 			(isNew) => {
 				if (isNew === false) {
-					const id = workspaceContext.getEntityId();
-					if (router && id) {
+					const unique = workspaceContext.getUnique();
+					if (router && unique) {
 						const routerPath = router.absoluteRouterPath;
 						if (routerPath) {
-							const newPath = createRoutePathBuilder(ensurePathEndsWithSlash(routerPath) + 'edit/:id')({ id });
+							const newPath = createRoutePathBuilder(ensurePathEndsWithSlash(routerPath) + 'edit/:id')({ id: unique });
 							window.history.pushState({}, '', newPath);
 
 							this.destroy();

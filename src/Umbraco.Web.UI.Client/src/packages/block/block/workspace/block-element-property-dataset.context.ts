@@ -19,7 +19,7 @@ export class UmbBlockElementPropertyDatasetContext extends UmbBaseController imp
 		return this.#elementManager.getEntityType();
 	}
 	getUnique() {
-		return this.#elementManager.getEntityId();
+		return this.#elementManager.getUnique();
 	}
 
 	getName(): string | undefined {

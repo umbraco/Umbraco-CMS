@@ -84,8 +84,8 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.observe(await context.propertyValueByAlias('umbracoExtension'), (value) => {
-				const test = value;
-				console.log('test', test);
+				//const test = value;
+				//console.log('test', test);
 			});
 		});
 

@@ -138,7 +138,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				'_observeIsSorting',
 			);
 
-			const unique = this._workspaceContext.getEntityId();
+			const unique = this._workspaceContext.getUnique();
 
 			//TODO Figure out the correct data that needs to be sent to the compositions modal. Do we really have to send isElement, currentPropertyAliases - isn't unique enough?
 			this.observe(this._workspaceContext.structure.contentTypes, (contentTypes) => {
