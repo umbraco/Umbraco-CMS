@@ -7,6 +7,7 @@ import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/ext
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
@@ -15,6 +16,12 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 
 	@property({ type: Array })
 	workspaceActionAlias: Array<string> = [];
+
+	@property()
+	look: UUIInterfaceLook = 'secondary';
+
+	@property()
+	color: UUIInterfaceColor = 'default';
 
 	@state()
 	private _actions: Array<UmbExtensionElementInitializer<ManifestWorkspaceActionMenuItem, never>> = [];
@@ -47,7 +54,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem', // TODO: Stop using string for 'workspaceActionMenuItem', we need to start using Const.
 			(action) =>
-				action.meta.workspaceActionAliases.some((alias) => this.workspaceActionAlias.includes(alias)) &&
+				(action.meta.workspaceActionAliases.some((alias) => this.workspaceActionAlias.includes(alias)) &&
+					!action.meta.entityTypes.length) ||
 				action.meta.entityTypes.includes(entityType),
 			(ctrls) => {
 				ctrls.forEach((ctrl) => {
@@ -73,7 +81,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 					<uui-button
 						id="popover-trigger"
 						popovertarget="workspace-action-popover"
-						look="secondary"
+						look="${this.look}"
+						color="${this.color}"
 						label="Expand"
 						compact>
 						<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
