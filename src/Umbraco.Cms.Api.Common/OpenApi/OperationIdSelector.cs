@@ -30,7 +30,7 @@ public class OperationIdSelector : IOperationIdSelector
         }
 
         var controllerTypeInfoNamespace = controllerActionDescriptor.ControllerTypeInfo.Namespace;
-        if (controllerTypeInfoNamespace is not null && _umbracoOperationIdSettings.NameSpacePrefixes.All(prefix=> controllerTypeInfoNamespace.StartsWith(prefix) is false))
+        if (controllerTypeInfoNamespace is not null && _umbracoOperationIdSettings.NameSpacePrefixes.Any(prefix => controllerTypeInfoNamespace.StartsWith(prefix)) is false)
         {
             return null;
         }
