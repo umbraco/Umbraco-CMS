@@ -66,8 +66,4 @@
       <_Parameter1>Umbraco.Cms.Infrastructure</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="WebAssets\*.js" />
-  </ItemGroup>
 </Project>
