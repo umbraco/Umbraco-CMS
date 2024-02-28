@@ -41,7 +41,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	private _iconSlotHasChildren = false;
 
 	@state()
-	private _totalPages = 0;
+	private _totalPages = 1;
 
 	@state()
 	private _currentPage = 1;
@@ -128,7 +128,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
 				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
-				<uui-button @click=${this.#onLoadMoreClick}>Load more</uui-button>
+				${this.#renderPaging()}
 			</uui-menu-item>
 		`;
 	}
@@ -189,5 +189,13 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 				  )
 				: ''}
 		`;
+	}
+
+	#renderPaging() {
+		if (this._totalPages <= 1 || this._currentPage === this._totalPages) {
+			return nothing;
+		}
+
+		return html` <uui-button @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
 	}
 }
