@@ -1,4 +1,4 @@
-import type { UmbWorkspaceAction } from './index.js';
+import type { UmbWorkspaceAction } from '../../../../index.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
@@ -6,12 +6,15 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
+import '../workspace-action-menu/index.js';
+
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement extends UmbLitElement {
 	@state()
 	private _buttonState?: UUIButtonState;
 
 	private _manifest?: ManifestWorkspaceAction;
+
 	@property({ type: Object, attribute: false })
 	public get manifest() {
 		return this._manifest;
@@ -24,6 +27,20 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 			this.#createApi();
 			this.requestUpdate('manifest', oldValue);
 		}
+	}
+
+	@state()
+	get manifestAliases(): Array<string> {
+		const aliases = new Set<string>();
+		if (this.manifest) {
+			aliases.add(this.manifest.alias);
+			if (this.manifest.overwrites) {
+				for (const alias of this.manifest.overwrites) {
+					aliases.add(alias);
+				}
+			}
+		}
+		return Array.from(aliases);
 	}
 
 	async #createApi() {
@@ -49,13 +66,16 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-button
-				id="action-button"
-				@click=${this._onClick}
-				look=${this.manifest?.meta.look || 'default'}
-				color=${this.manifest?.meta.color || 'default'}
-				label=${this.manifest?.meta.label || ''}
-				.state=${this._buttonState}></uui-button>
+			<uui-button-group>
+				<uui-button
+					id="action-button"
+					@click=${this._onClick}
+					look=${this.manifest?.meta.look || 'default'}
+					color=${this.manifest?.meta.color || 'default'}
+					label=${this.manifest?.meta.label || ''}
+					.state=${this._buttonState}></uui-button>
+				<umb-workspace-action-menu .workspaceActionAlias=${this.manifestAliases}></umb-workspace-action-menu>
+			</uui-button-group>
 		`;
 	}
 }
