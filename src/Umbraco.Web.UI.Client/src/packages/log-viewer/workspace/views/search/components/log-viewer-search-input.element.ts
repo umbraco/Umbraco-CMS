@@ -7,7 +7,7 @@ import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/extern
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { query as getQuery, path, toQueryString } from '@umbraco-cms/backoffice/router';
 import type { UmbModalManagerContext, UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT, UmbModalToken, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UmbModalToken, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 import './log-viewer-search-input-modal.element.js';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
@@ -126,20 +126,16 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		this.#logViewerContext?.saveSearch(savedSearch);
 	}
 
-	#removeSearch(name: string) {
-		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			data: {
-				headline: this.localize.term('logViewer_deleteSavedSearch'),
-				content: `${this.localize.term('defaultdialogs_confirmdelete')} ${name}?`,
-				color: 'danger',
-				confirmLabel: 'Delete',
-			},
+	async #removeSearch(name: string) {
+		await umbConfirmModal(this, {
+			headline: this.localize.term('logViewer_deleteSavedSearch'),
+			content: `${this.localize.term('defaultdialogs_confirmdelete')} ${name}?`,
+			color: 'danger',
+			confirmLabel: 'Delete',
 		});
 
-		modalContext?.onSubmit().then(() => {
-			this.#logViewerContext?.removeSearch({ name });
-			//this.dispatchEvent(new UmbDeleteEvent());
-		});
+		this.#logViewerContext?.removeSearch({ name });
+		//this.dispatchEvent(new UmbDeleteEvent());
 	}
 
 	#openSaveSearchDialog() {

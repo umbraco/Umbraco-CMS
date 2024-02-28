@@ -15,7 +15,7 @@ import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
@@ -99,8 +99,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbDocumentTypeDetailModel>(this);
 
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
-
 	@state()
 	private _compositionConfiguration?: UmbCompositionPickerModalData;
 
@@ -153,10 +151,6 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 			});
 
 			this._observeRootGroups();
-		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
-			this._modalManagerContext = context;
 		});
 	}
 
@@ -220,7 +214,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		this._routes = routes;
 	}
 
-	#requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
+	async #requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
 		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
@@ -237,11 +231,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
 
-		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, { data: modalData });
+		await umbConfirmModal(this, modalData);
 
-		modalHandler?.onSubmit().then(() => {
-			this.#remove(tab?.id);
-		});
+		this.#remove(tab?.id);
 	}
 	#remove(tabId?: string) {
 		if (!tabId) return;
@@ -303,7 +295,8 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	async #openCompositionModal() {
-		const modalContext = this._modalManagerContext?.open(UMB_COMPOSITION_PICKER_MODAL, {
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManagerContext.open(UMB_COMPOSITION_PICKER_MODAL, {
 			data: this._compositionConfiguration,
 		});
 		await modalContext?.onSubmit();

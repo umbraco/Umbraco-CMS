@@ -8,10 +8,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-// Import of local components that should only be used here
+// import local components. Theses are not meant to be used outside of this component.
 import './components/user-workspace-profile-settings/user-workspace-profile-settings.element.js';
 import './components/user-workspace-access-settings/user-workspace-access-settings.element.js';
 import './components/user-workspace-info/user-workspace-info.element.js';
+import './components/user-workspace-avatar/user-workspace-avatar.element.js';
 
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
@@ -83,6 +84,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 		if (!this._user || !this.#workspaceContext) return nothing;
 
 		return html`
+			<umb-user-workspace-avatar></umb-user-workspace-avatar>
 			<umb-user-workspace-info></umb-user-workspace-info>
 
 			<uui-box>

@@ -2,12 +2,12 @@ import { expect } from '@open-wc/testing';
 import { UmbCollectionViewManager } from './collection-view.manager.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { ManifestCollectionView} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('test-my-controller-host')
-export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 const VIEW_1_ALIAS = 'UmbTest.CollectionView.1';
 const VIEW_2_ALIAS = 'UmbTest.CollectionView.2';

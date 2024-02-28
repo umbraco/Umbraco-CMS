@@ -130,6 +130,8 @@ export abstract class UmbBaseExtensionsInitializer<
 
 	#notifyChange = () => {
 		this.#changeDebounce = undefined;
+		// This means that we have been destroyed:
+		if (this.#permittedExts === undefined) return;
 
 		// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly.
 		this.#exposedPermittedExts = [...this.#permittedExts];
