@@ -78,7 +78,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 					.state=${this._buttonState}></uui-button>
 				<umb-workspace-action-menu
 					.workspaceActions=${this.aliases}
-					color="${this.manifest?.meta.color ?? 'default'}"
+					color="${this.manifest?.meta.color || 'default'}"
 					look="${this.manifest?.meta.look || 'default'}"></umb-workspace-action-menu>
 			</uui-button-group>
 		`;
