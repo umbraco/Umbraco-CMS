@@ -12,39 +12,6 @@ type Story = StoryObj<UmbFieldDropdownListElement>;
 
 export const Overview: Story = {
 	args: {
-		options: [
-			{
-				name: 'One',
-				value: 'One',
-			},
-			{
-				name: 'Two',
-				value: 'Two',
-			},
-			{
-				name: 'Three',
-				value: 'Three',
-			},
-		],
-	},
-};
-
-export const WithSelectedValue: Story = {
-	args: {
-		options: [
-			{
-				name: 'One',
-				value: 'One',
-			},
-			{
-				name: 'Two',
-				value: 'Two',
-				selected: true,
-			},
-			{
-				name: 'Three',
-				value: 'Three',
-			},
-		],
+		excludeMediaType: false,
 	},
 };
