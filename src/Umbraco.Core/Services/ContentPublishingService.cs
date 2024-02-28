@@ -217,6 +217,25 @@ internal sealed class ContentPublishingService : IContentPublishingService
             : Attempt.Fail(ToContentPublishingOperationStatus(result));
     }
 
+    /// <inheritdoc/>
+    public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCulturesAsync(Guid key, IEnumerable<string> cultures, Guid userKey)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        foreach (var culture in cultures)
+        {
+            Attempt<ContentPublishingOperationStatus> attempt = await UnpublishAsync(key, culture, userKey);
+
+            if (attempt.Success is false)
+            {
+                return attempt;
+            }
+        }
+
+        scope.Complete();
+        return Attempt.Succeed(ContentPublishingOperationStatus.Success);
+    }
+
     private static ContentPublishingOperationStatus ToContentPublishingOperationStatus(PublishResult publishResult)
         => publishResult.Result switch
         {

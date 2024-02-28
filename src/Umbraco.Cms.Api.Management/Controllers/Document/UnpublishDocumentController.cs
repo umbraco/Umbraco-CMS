@@ -38,13 +38,12 @@ public class UnpublishDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Unpublish(Guid id, UnpublishDocumentRequestModel requestModel)
     {
-
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             ContentPermissionResource.WithKeys(
                 ActionUnpublish.ActionLetter,
                 id,
-                requestModel.Culture is not null ? requestModel.Culture.Yield() : Enumerable.Empty<string>()),
+                requestModel.Cultures ?? Enumerable.Empty<string>()),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -52,10 +51,22 @@ public class UnpublishDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        Attempt<ContentPublishingOperationStatus> attempt = await _contentPublishingService.UnpublishAsync(
-            id,
-            requestModel.Culture,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<ContentPublishingOperationStatus> attempt;
+        if (requestModel.Cultures is null)
+        {
+            attempt = await _contentPublishingService.UnpublishAsync(
+                id,
+                null,
+                CurrentUserKey(_backOfficeSecurityAccessor));
+        }
+        else
+        {
+            attempt = await _contentPublishingService.UnpublishMultipleCulturesAsync(
+                id,
+                requestModel.Cultures,
+                CurrentUserKey(_backOfficeSecurityAccessor));
+        }
+
         return attempt.Success
             ? Ok()
             : DocumentPublishingOperationStatusResult(attempt.Result);
