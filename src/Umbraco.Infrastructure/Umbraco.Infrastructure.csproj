@@ -69,14 +69,5 @@
 
   <ItemGroup>
     <EmbeddedResource Include="WebAssets\*.js" />
-    <EmbeddedResource Update="WebAssets\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <Compile Update="WebAssets\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
   </ItemGroup>
 </Project>

@@ -14,7 +14,6 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -244,19 +243,18 @@ public static class UrlHelperExtensions
         string controllerName,
         RouteValueDictionary routeVals,
         IHostingEnvironment hostingEnvironment,
-        IUmbracoVersion umbracoVersion,
-        IRuntimeMinifier runtimeMinifier)
+        IUmbracoVersion umbracoVersion)
     {
         var applicationJs = url.Action(actionName, controllerName, routeVals);
         applicationJs = applicationJs + "?umb__rnd=" +
-                        GetCacheBustHash(hostingEnvironment, umbracoVersion, runtimeMinifier);
+                        GetCacheBustHash(hostingEnvironment, umbracoVersion);
         return applicationJs;
     }
 
     /// <summary>
     /// </summary>
     /// <returns></returns>
-    public static string GetCacheBustHash(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion, IRuntimeMinifier runtimeMinifier)
+    public static string GetCacheBustHash(IHostingEnvironment hostingEnvironment, IUmbracoVersion umbracoVersion)
     {
         // make a hash of umbraco and client dependency version
         // in case the user bypasses the installer and just bumps the web.config or client dependency config
@@ -268,7 +266,7 @@ public static class UrlHelperExtensions
         }
 
         var version = umbracoVersion.SemanticVersion.ToSemanticString();
-        return $"{version}.{runtimeMinifier.CacheBuster}".GenerateHash();
+        return $"{version}".GenerateHash();
     }
 
     public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent? mediaItem, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
