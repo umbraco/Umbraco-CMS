@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -456,6 +457,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return startNodesValidationStatus;
         }
 
+        UserGroupOperationStatus granularPermissionsValidationStatus = ValidateGranularPermissionsExists(userGroup);
+        if (granularPermissionsValidationStatus is not UserGroupOperationStatus.Success)
+        {
+            return granularPermissionsValidationStatus;
+        }
+
         return UserGroupOperationStatus.Success;
     }
 
@@ -483,6 +490,25 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             && _entityService.Exists(userGroup.StartMediaId.Value, UmbracoObjectTypes.Media) is false)
         {
             return UserGroupOperationStatus.MediaStartNodeKeyNotFound;
+        }
+
+        return UserGroupOperationStatus.Success;
+    }
+
+    private UserGroupOperationStatus ValidateGranularPermissionsExists(IUserGroup userGroup)
+    {
+        IEnumerable<Guid> documentKeys = userGroup.GranularPermissions.Select(granularPermission =>
+        {
+            if (granularPermission is DocumentGranularPermission nodeGranularPermission)
+            {
+                return (Guid?)nodeGranularPermission.Key;
+            }
+
+            return null;
+        }).Where(x => x.HasValue).Cast<Guid>().ToArray();
+        if (documentKeys.Any() && _entityService.Exists(documentKeys) is false)
+        {
+            return UserGroupOperationStatus.DocumentPermissionKeyNotFound;
         }
 
         return UserGroupOperationStatus.Success;
