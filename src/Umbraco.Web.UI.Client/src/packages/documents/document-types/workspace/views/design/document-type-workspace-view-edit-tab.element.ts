@@ -26,7 +26,6 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			itemSelector: '.container-handle',
 			containerSelector: '.container-list',
 			onChange: ({ model }) => {
-				console.log('change groups model');
 				this._groups = model;
 			},
 			onEnd: ({ item }) => {
