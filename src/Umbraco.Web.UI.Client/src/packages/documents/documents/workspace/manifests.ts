@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/document-workspace-has-collection.condition.js';
+import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
 //import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
 //import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
@@ -7,6 +8,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
+	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -152,4 +154,19 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	*/
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
+	{
+		type: 'workspaceActionMenuItem',
+		alias: 'Umb.WorkspaceActionMenuItem.Unpublish',
+		name: 'Unpublish',
+		api: UmbUnpublishDocumentEntityAction,
+		meta: {
+			workspaceActionAliases: ['Umb.WorkspaceAction.Document.SaveAndPublish'],
+			label: 'Unpublish',
+			repositoryAlias: 'Umb.Repository.Document.Detail',
+			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		},
+	},
+];
+
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...workspaceActionMenuItems];
