@@ -68,8 +68,6 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 		{ alias: 'owner', name: this.localize.term('content_createBy') },
 		{ alias: 'published', name: this.localize.term('content_isPublished') },
 		{ alias: 'contentTypeAlias', name: this.localize.term('content_documentType') },
-		{ alias: 'email', name: this.localize.term('general_email') },
-		{ alias: 'username', name: this.localize.term('general_username') },
 	];
 
 	constructor() {
