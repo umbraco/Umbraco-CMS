@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -140,6 +141,39 @@ public partial class ContentPublishingServiceTests
 
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(0, content.PublishedCultures.Count());
+    }
+
+    [Test]
+    public async Task Can_Unpublish_Multiple_Cultures()
+    {
+        var (langEn, langDa, contentType) = await SetupVariantTest();
+
+        var langSe = new LanguageBuilder()
+            .WithCultureInfo("sv-SE")
+            .Build();
+        await LanguageService.CreateAsync(langSe, Constants.Security.SuperUserKey);
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "EN root")
+            .WithCultureName(langDa.IsoCode, "DA root")
+            .WithCultureName(langSe.IsoCode, "SE root")
+            .Build();
+        content.SetValue("title", "EN title", culture: langEn.IsoCode);
+        content.SetValue("title", "DA title", culture: langDa.IsoCode);
+        content.SetValue("title", "SE title", culture: langSe.IsoCode);
+        ContentService.Save(content);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode, langSe.IsoCode }), Constants.Security.SuperUserKey);
+        VerifyIsPublished(content.Key);
+        content = ContentService.GetById(content.Key)!;
+        Assert.AreEqual(3, content.PublishedCultures.Count());
+
+        var result = await ContentPublishingService.UnpublishMultipleCulturesAsync(content.Key, new[] { langDa.IsoCode, langSe.IsoCode }, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        VerifyIsPublished(content.Key);
+        content = ContentService.GetById(content.Key)!;
+        Assert.AreEqual(1, content.PublishedCultures.Count());
     }
 
     [Test]
