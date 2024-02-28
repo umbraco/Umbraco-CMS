@@ -62,7 +62,13 @@ public sealed class AppendEventMessagesAttribute : TypeFilterAttribute
         {
         }
 
-        private class Notification
+        /// <summary>
+        /// This is the format when communicating notification messages to the API consumers.
+        /// </summary>
+        /// <remarks>
+        /// The class is made public on purpose, to make it clear that changing it might constitute a breaking change towards API consumers.
+        /// </remarks>
+        public sealed class Notification
         {
             public required string Message { get; init; }
 
