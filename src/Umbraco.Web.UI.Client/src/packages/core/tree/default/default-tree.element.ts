@@ -47,7 +47,6 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (instance) => {
 				this.#treeContext = instance;
 				this.#observeTreeRoot();
-				debugger;
 			}).asPromise(),
 		]);
 	}
@@ -58,7 +57,6 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	}
 
 	protected async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
-		debugger;
 		super.updated(_changedProperties);
 		await this.#init;
 
@@ -71,7 +69,6 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		}
 
 		if (_changedProperties.has('hideTreeRoot')) {
-			debugger;
 			if (this.hideTreeRoot === true) {
 				this.#observeRootItems();
 			}
