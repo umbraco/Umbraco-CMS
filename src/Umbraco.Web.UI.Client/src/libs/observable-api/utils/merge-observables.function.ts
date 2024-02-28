@@ -26,7 +26,6 @@ type ArrayToObservableTypes<T extends Array<Observable<any>>> = {
  * if observable1 has the value of 10 and observable2 has the value of 4, the mergedObservable will return the value of 14.
  * if one of them changes the mergedObservable will return the new value.
  */
-
 export function mergeObservables<
 	R,
 	SourceTypes extends Array<Observable<unknown>>,
