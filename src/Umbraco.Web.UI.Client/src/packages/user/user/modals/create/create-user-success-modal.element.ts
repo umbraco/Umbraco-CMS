@@ -41,8 +41,6 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 			this.#userNewPasswordRepository.requestNewPassword(unique),
 		]);
 
-		console.log(userItemResponse, userItemResponse);
-
 		if (userItemResponse.data) {
 			this._userItem = userItemResponse.data[0];
 		}
