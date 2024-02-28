@@ -9,8 +9,8 @@ export interface UmbCurrentUserModel {
 	userName: string;
 	name: string;
 	languageIsoCode: string;
-	documentStartNodeIds: Array<string>;
-	mediaStartNodeIds: Array<string>;
+	documentStartNodeUniques: Array<string>;
+	mediaStartNodeUniques: Array<string>;
 	avatarUrls: Array<string>;
 	languages: Array<string>;
 	hasAccessToAllLanguages: boolean;

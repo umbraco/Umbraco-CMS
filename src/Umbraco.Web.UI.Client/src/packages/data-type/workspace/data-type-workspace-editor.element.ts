@@ -41,7 +41,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 						(this.shadowRoot!.querySelector('#nameInput') as HTMLElement).focus();
 					});
 				}
-				this.removeControllerByAlias('_observeIsNew');
+				this.removeControllerByAlias('isNewRedirectController');
 			},
 			'_observeIsNew',
 		);

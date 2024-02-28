@@ -29,9 +29,9 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#workspaceContext?.createPropertyDatasetContext(this);
-			this.observe(this.#workspaceContext.data, (data) => {
-				if (data) {
-					this.#itemManager.setUniques([data.contentElementTypeKey]);
+			this.observe(this.#workspaceContext.unique, (unique) => {
+				if (unique) {
+					this.#itemManager.setUniques([unique]);
 				}
 			});
 		});

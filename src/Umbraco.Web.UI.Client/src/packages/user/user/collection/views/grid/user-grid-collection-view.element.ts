@@ -1,4 +1,4 @@
-import { getDisplayStateFromUserStatus } from '../../../../utils.js';
+import { getDisplayStateFromUserStatus } from '../../../utils.js';
 import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -76,6 +76,27 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderUserCard(user: UmbUserDetailModel) {
+		const avatarUrls = [
+			{
+				scale: '1x',
+				url: user.avatarUrls?.[0],
+			},
+			{
+				scale: '2x',
+				url: user.avatarUrls?.[1],
+			},
+			{
+				scale: '3x',
+				url: user.avatarUrls?.[2],
+			},
+		];
+
+		let avatarSrcset = '';
+
+		avatarUrls.forEach((url) => {
+			avatarSrcset += `${url.url} ${url.scale},`;
+		});
+
 		return html`
 			<uui-card-user
 				.name=${user.name ?? 'Unnamed user'}
@@ -86,6 +107,12 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>
 				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
+
+				<uui-avatar
+					slot="avatar"
+					.name=${user.name || 'Unknown'}
+					img-src=${ifDefined(user.avatarUrls.length > 0 ? avatarUrls[0].url : undefined)}
+					img-srcset=${ifDefined(user.avatarUrls.length > 0 ? avatarSrcset : undefined)}></uui-avatar>
 			</uui-card-user>
 		`;
 	}

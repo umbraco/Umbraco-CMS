@@ -33,7 +33,13 @@ export class UmbUserGroupWorkspaceContext
 		super(host, 'Umb.Workspace.UserGroup');
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async create() {
+		this.resetState();
 		const { data } = await this.repository.createScaffold(null);
 		this.setIsNew(true);
 		this.#data.setValue(data);
@@ -41,6 +47,7 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
@@ -48,7 +55,7 @@ export class UmbUserGroupWorkspaceContext
 		}
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 

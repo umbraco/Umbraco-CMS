@@ -35,8 +35,8 @@ export class UmbCurrentUserServerDataSource {
 				userName: data.userName,
 				name: data.name,
 				languageIsoCode: data.languageIsoCode || 'en-us', // TODO: make global variable
-				documentStartNodeIds: data.documentStartNodeIds,
-				mediaStartNodeIds: data.mediaStartNodeIds,
+				documentStartNodeUniques: data.documentStartNodeIds,
+				mediaStartNodeUniques: data.mediaStartNodeIds,
 				avatarUrls: data.avatarUrls,
 				languages: data.languages,
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,

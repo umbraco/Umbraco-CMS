@@ -1,14 +1,14 @@
 import type { UmbCurrentUserModel } from './types.js';
 import { UmbCurrentUserRepository } from './repository/index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
-export class UmbCurrentUserContext extends UmbBaseController {
+export class UmbCurrentUserContext extends UmbContextBase<UmbCurrentUserContext> {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
 
@@ -18,7 +18,7 @@ export class UmbCurrentUserContext extends UmbBaseController {
 	#currentUserRepository = new UmbCurrentUserRepository(this);
 
 	constructor(host: UmbControllerHost) {
-		super(host);
+		super(host, UMB_CURRENT_USER_CONTEXT);
 
 		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this.#authContext = instance;
@@ -29,16 +29,18 @@ export class UmbCurrentUserContext extends UmbBaseController {
 			if (!currentLanguageIsoCode) return;
 			umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
 		});
-
-		this.provideContext(UMB_CURRENT_USER_CONTEXT, this);
 	}
 
-	async requestCurrentUser() {
-		const { data } = await this.#currentUserRepository.requestCurrentUser();
+	/**
+	 * Loads the current user
+	 */
+	async load() {
+		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
-		if (data) {
-			// TODO: observe current user
-			this.#currentUser.setValue(data);
+		if (asObservable) {
+			this.observe(asObservable(), (currentUser) => {
+				this.#currentUser?.setValue(currentUser);
+			});
 		}
 	}
 
@@ -57,7 +59,7 @@ export class UmbCurrentUserContext extends UmbBaseController {
 		if (!this.#authContext) return;
 		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
 			if (isAuthorized) {
-				this.requestCurrentUser();
+				this.load();
 			}
 		});
 	}

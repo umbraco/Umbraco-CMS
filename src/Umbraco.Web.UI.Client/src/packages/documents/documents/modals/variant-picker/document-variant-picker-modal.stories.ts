@@ -12,17 +12,29 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentVariantPickerModalData = {
 	type: 'save',
-	variants: [
+	options: [
 		{
-			name: 'English',
-			culture: 'en-us',
-			state: UmbDocumentVariantState.PUBLISHED,
-			createDate: '2021-08-25T14:00:00Z',
-			publishDate: null,
-			updateDate: null,
-			segment: null,
-			isMandatory: true,
+			unique: 'en-us',
+			variant: {
+				name: 'English variant name',
+				culture: 'en-us',
+				state: UmbDocumentVariantState.PUBLISHED,
+				createDate: '2021-08-25T14:00:00Z',
+				publishDate: null,
+				updateDate: null,
+				segment: null,
+			},
+			language: {
+				entityType: 'language',
+				name: 'English',
+				unique: 'en-us',
+				isDefault: true,
+				isMandatory: true,
+				fallbackIsoCode: null,
+			},
 		},
+		/*
+		// TODO: We do not support segments currently
 		{
 			name: 'English',
 			culture: 'en-us',
@@ -31,17 +43,27 @@ const modalData: UmbDocumentVariantPickerModalData = {
 			publishDate: null,
 			updateDate: null,
 			segment: 'GTM',
-			isMandatory: true,
 		},
+		*/
 		{
-			name: 'Danish',
-			culture: 'da-dk',
-			state: UmbDocumentVariantState.NOT_CREATED,
-			createDate: null,
-			publishDate: null,
-			updateDate: null,
-			segment: null,
-			isMandatory: false,
+			unique: 'da-dk',
+			variant: {
+				name: 'Danish variant name',
+				culture: 'da-dk',
+				state: UmbDocumentVariantState.NOT_CREATED,
+				createDate: null,
+				publishDate: null,
+				updateDate: null,
+				segment: null,
+			},
+			language: {
+				entityType: 'language',
+				name: 'Danish',
+				unique: 'da-dk',
+				isDefault: false,
+				isMandatory: false,
+				fallbackIsoCode: null,
+			},
 		},
 	],
 };
@@ -80,7 +102,6 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 					publishDate: '2021-08-25T14:00:00Z',
 					updateDate: null,
 					segment: null,
-					isMandatory: true,
 				},
 				{
 					name: 'English',
@@ -90,7 +111,6 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 					publishDate: '2021-08-25T14:00:00Z',
 					updateDate: null,
 					segment: 'GTM',
-					isMandatory: false,
 				},
 				{
 					name: 'Danish',
@@ -100,7 +120,6 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 					publishDate: null,
 					updateDate: null,
 					segment: null,
-					isMandatory: false,
 				},
 			],
 		}

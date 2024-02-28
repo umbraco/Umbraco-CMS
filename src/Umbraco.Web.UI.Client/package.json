@@ -124,6 +124,8 @@
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
 		"compile": "tsc",
 		"dev": "vite",
+		"dev:server": "VITE_UMBRACO_USE_MSW=off vite",
+		"dev:mock": "VITE_UMBRACO_USE_MSW=on vite",
 		"example": "node ./devops/example-runner/index.js",
 		"format:fix": "npm run format -- --write",
 		"format": "prettier 'src/**/*.ts' -- check",

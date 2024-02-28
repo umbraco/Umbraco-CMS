@@ -87,8 +87,8 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 
 	async #observeUserGroups() {
 		if (this._users.length === 0) return;
-		const userGroupsIds = [...new Set(this._users.flatMap((user) => user.userGroupUniques))];
-		const { asObservable } = await this.#userGroupItemRepository.requestItems(userGroupsIds);
+		const userGroupsUniques = [...new Set(this._users.flatMap((user) => user.userGroupUniques))];
+		const { asObservable } = await this.#userGroupItemRepository.requestItems(userGroupsUniques);
 		this.observe(
 			asObservable(),
 			(userGroups) => {
@@ -116,7 +116,9 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 					{
 						columnAlias: 'userName',
 						value: {
+							unique: user.unique,
 							name: user.name,
+							avatarUrls: user.avatarUrls,
 						},
 					},
 					{

@@ -20,7 +20,7 @@ export class UmbPropertyTypeWorkspaceContext
 		return UMB_PROPERTY_TYPE_WORKSPACE_ALIAS;
 	}
 
-	getEntityId() {
+	getUnique() {
 		return undefined;
 	}
 
