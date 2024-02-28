@@ -37,7 +37,7 @@ export function mergeObservables<
 ): Observable<R> {
 	return combineLatest(sources).pipe(
 		map(mergeFunction as MappingFunction<unknown[], R>),
-		distinctUntilChanged(memoizationFunction || defaultMemoization),
+		distinctUntilChanged(memoizationFunction ?? defaultMemoization),
 		shareReplay(1),
 	);
 }
