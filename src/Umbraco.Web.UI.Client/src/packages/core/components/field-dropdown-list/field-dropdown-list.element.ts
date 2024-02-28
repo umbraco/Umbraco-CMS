@@ -38,7 +38,7 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 	@property({ type: Boolean, attribute: 'exclude-media-type', reflect: true })
 	public excludeMediaType = false;
 
-	private _value: FieldPickerValue = { alias: '', label: '' };
+	private _value?: FieldPickerValue;
 	@property({ type: Object })
 	public get value(): FieldPickerValue {
 		return this._value;
