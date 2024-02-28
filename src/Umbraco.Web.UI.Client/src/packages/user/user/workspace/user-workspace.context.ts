@@ -8,8 +8,6 @@ import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspa
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 type EntityType = UmbUserDetailModel;
 
@@ -20,19 +18,13 @@ export class UmbUserWorkspaceContext
 	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
 
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_WORKSPACE_ALIAS);
-
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
-			this.#currentUserContext = instance;
-		});
 	}
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
-	data = this.#currentData.asObservable();
+	//data = this.#currentData.asObservable();
 
 	async load(unique: string) {
 		const { data, asObservable } = await this.detailRepository.requestByUnique(unique);
@@ -51,7 +43,7 @@ export class UmbUserWorkspaceContext
 	*/
 	onUserStoreChanges(user: EntityType | undefined) {
 		if (!user) return;
-		this.#currentData.update({ state: user.state });
+		this.#currentData.update({ state: user.state, avatarUrls: user.avatarUrls });
 	}
 
 	getUnique(): string | undefined {
@@ -74,36 +66,32 @@ export class UmbUserWorkspaceContext
 		if (!this.#currentData.value) throw new Error('Data is missing');
 		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
 
+		let newData = undefined;
+
 		if (this.getIsNew()) {
-			await this.detailRepository.create(this.#currentData.value);
+			const { data } = await this.detailRepository.create(this.#data.value);
+			newData = data;
 		} else {
-			await this.detailRepository.save(this.#currentData.value);
+			const { data } = await this.detailRepository.save(this.#data.value);
+			newData = data;
 		}
-		// If it went well, then its not new anymore?.
-		this.setIsNew(false);
 
-		// If we are saving the current user, we need to refetch it
-		await this.#reloadCurrentUser(this.#currentData.value.unique);
-	}
-
-	async #reloadCurrentUser(savedUserUnique: string): Promise<void> {
-		if (!this.#currentUserContext) return;
-		const currentUser = await firstValueFrom(this.#currentUserContext.currentUser);
-		if (currentUser?.unique === savedUserUnique) {
-			await this.#currentUserContext.requestCurrentUser();
+		if (newData) {
+			this.#currentData.setValue(newData);
+			this.saveComplete(newData);
 		}
 	}
 
 	// TODO: implement upload progress
-	async uploadAvatar(file: File) {
+	uploadAvatar(file: File) {
 		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
+		if (!unique) throw new Error('Id is missing');
 		return this.avatarRepository.uploadAvatar(unique, file);
 	}
 
-	async deleteAvatar() {
+	deleteAvatar() {
 		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
+		if (!unique) throw new Error('Id is missing');
 		return this.avatarRepository.deleteAvatar(unique);
 	}
 
