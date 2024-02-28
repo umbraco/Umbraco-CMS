@@ -2,7 +2,7 @@ import { createObservablePart } from '../utils/create-observable-part.function.j
 import { deepFreeze } from '../utils/deep-freeze.function.js';
 import type { MappingFunction } from '../types/mapping-function.type.js';
 import type { MemoizationFunction } from '../types/memoization-function.type.js';
-import { naiveObjectComparison } from '../utils/naive-object-comparison.function.js';
+import { jsonStringComparison } from '../utils/naive-object-comparison.function.js';
 import { UmbBasicState } from './basic-state.js';
 
 /**
@@ -28,7 +28,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 		mappingFunction: MappingFunction<T, ReturnType>,
 		memoizationFunction?: MemoizationFunction<ReturnType>,
 	) {
-		return createObservablePart(this._subject, mappingFunction, memoizationFunction ?? naiveObjectComparison);
+		return createObservablePart(this._subject, mappingFunction, memoizationFunction ?? jsonStringComparison);
 	}
 
 	/**
@@ -40,7 +40,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 		if (!this._subject) return;
 		const frozenData = deepFreeze(data);
 		// Only update data if its different than current data.
-		if (!naiveObjectComparison(frozenData, this._subject.getValue())) {
+		if (!jsonStringComparison(frozenData, this._subject.getValue())) {
 			this._subject.next(frozenData);
 		}
 	}
