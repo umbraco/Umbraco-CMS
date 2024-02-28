@@ -326,6 +326,9 @@ export class UmbBlockWorkspaceContext<
 	public destroy(): void {
 		super.destroy();
 		this.#layout.destroy();
+		this.#label.destroy();
+		this.#blockManager = undefined;
+		this.#modalContext = undefined;
 	}
 }
 
