@@ -24,8 +24,11 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	private _value?: unknown;
 
+	#propertyEditorUiAlias = '';
+
 	@property()
 	set propertyEditorUiAlias(alias: string) {
+		this.#propertyEditorUiAlias = alias;
 		// TODO: Stop using string for 'propertyAction', we need to start using Const.
 		// TODO: Align property actions with entity actions.
 		this.#actionsInitializer = new UmbExtensionsElementInitializer(
@@ -39,6 +42,10 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			'extensionsInitializer',
 		);
 	}
+	get propertyEditorUiAlias() {
+		return this.#propertyEditorUiAlias;
+	}
+
 	@state()
 	private _actions: Array<UmbExtensionElementInitializer<ManifestPropertyAction, any>> = [];
 
