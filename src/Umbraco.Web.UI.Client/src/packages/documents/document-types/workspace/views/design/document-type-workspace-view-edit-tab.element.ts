@@ -179,7 +179,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
 					${repeat(
 						this._groups,
-						(group) => group.id + '' + group.name + group.sortOrder,
+						(group) => group.id,
 						(group) =>
 							html`<uui-box class="container-handle">
 								${this.#renderHeader(group)}

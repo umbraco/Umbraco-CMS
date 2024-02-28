@@ -167,9 +167,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				return { data: { documentTypeId }, value: propertyData };
 			})
 			.onSubmit((value) => {
-				if (!value.dataType) {
-					throw new Error('No data type selected');
-				}
 				this.#addProperty(value as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
