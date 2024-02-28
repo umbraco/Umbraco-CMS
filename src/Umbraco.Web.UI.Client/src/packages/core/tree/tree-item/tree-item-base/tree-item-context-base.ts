@@ -138,11 +138,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		if (data) {
 			this.pagination.setTotalItems(data.total);
-
-			const currentPageNumber = this.pagination.getCurrentPageNumber();
-			const totalPages = this.pagination.getTotalPages();
-			console.log('currentPageNumber', currentPageNumber);
-			console.log('totalPages', totalPages);
 		}
 
 		this.#isLoading.setValue(false);
