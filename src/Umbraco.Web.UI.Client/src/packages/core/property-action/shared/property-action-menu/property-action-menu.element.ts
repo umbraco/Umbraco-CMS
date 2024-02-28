@@ -12,15 +12,16 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'propertyAction'>;
 
 	@property({ attribute: false })
-	public get value(): unknown {
-		return this._value;
-	}
 	public set value(value: unknown) {
 		this._value = value;
 		if (this.#actionsInitializer) {
 			this.#actionsInitializer.properties = { value };
 		}
 	}
+	public get value(): unknown {
+		return this._value;
+	}
+
 	private _value?: unknown;
 
 	@property()
@@ -79,4 +80,10 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 			}
 		`,
 	];
+}
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-property-action-menu': UmbPropertyActionMenuElement;
+	}
 }
