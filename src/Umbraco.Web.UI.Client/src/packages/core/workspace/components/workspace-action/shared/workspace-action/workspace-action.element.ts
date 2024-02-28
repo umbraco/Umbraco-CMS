@@ -46,8 +46,8 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 	}
 
 	async #createApi() {
-		if (!this.#manifest) return;
-		this.#api = await createExtensionApi(this.#manifest, [this]);
+		if (!this.manifest) return;
+		this.#api = await createExtensionApi(this.manifest, [this]);
 	}
 
 	#api?: UmbWorkspaceAction;
