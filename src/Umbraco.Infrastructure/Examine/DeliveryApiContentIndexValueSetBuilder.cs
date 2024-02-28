@@ -76,7 +76,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
 
             foreach (var culture in availableCultures)
             {
-                var indexCulture = culture ?? "none";
+                var indexCulture = culture?.ToLowerInvariant() ?? "none";
                 var isPublished = publishedCultures.Contains(culture);
 
                 // required index values go here

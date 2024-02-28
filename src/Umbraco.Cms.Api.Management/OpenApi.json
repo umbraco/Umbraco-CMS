@@ -28008,9 +28008,11 @@
       },
       "CurrentUserResponseModel": {
         "required": [
+          "allowedSections",
           "avatarUrls",
           "documentStartNodeIds",
           "email",
+          "fallbackPermissions",
           "hasAccessToAllLanguages",
           "id",
           "languages",
@@ -28069,7 +28071,28 @@
           "hasAccessToAllLanguages": {
             "type": "boolean"
           },
+          "fallbackPermissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "permissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
+                },
+                {
+                  "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
+                }
+              ]
+            }
+          },
+          "allowedSections": {
             "uniqueItems": true,
             "type": "array",
             "items": {
@@ -28665,6 +28688,40 @@
           }
         },
         "additionalProperties": false
+      },
+      "DocumentPermissionPresentationModel": {
+        "required": [
+          "$type",
+          "document",
+          "verbs"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "document": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "verbs": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "DocumentPermissionPresentationModel": "#/components/schemas/DocumentPermissionPresentationModel"
+          }
+        }
       },
       "DocumentRecycleBinItemResponseModel": {
         "required": [
@@ -33789,6 +33846,36 @@
         },
         "additionalProperties": false
       },
+      "UnknownTypePermissionPresentationModel": {
+        "required": [
+          "$type",
+          "context",
+          "verbs"
+        ],
+        "type": "object",
+        "properties": {
+          "$type": {
+            "type": "string"
+          },
+          "verbs": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "context": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "UnknownTypePermissionPresentationModel": "#/components/schemas/UnknownTypePermissionPresentationModel"
+          }
+        }
+      },
       "UnlockUsersRequestModel": {
         "required": [
           "userIds"
@@ -34644,6 +34731,7 @@
       "UserGroupBaseModel": {
         "required": [
           "documentRootAccess",
+          "fallbackPermissions",
           "hasAccessToAllLanguages",
           "languages",
           "mediaRootAccess",
@@ -34697,11 +34785,25 @@
           "mediaRootAccess": {
             "type": "boolean"
           },
-          "permissions": {
+          "fallbackPermissions": {
             "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"
+            }
+          },
+          "permissions": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentPermissionPresentationModel"
+                },
+                {
+                  "$ref": "#/components/schemas/UnknownTypePermissionPresentationModel"
+                }
+              ]
             }
           }
         },
@@ -34810,6 +34912,7 @@
             "format": "uuid"
           },
           "permissions": {
+            "uniqueItems": true,
             "type": "array",
             "items": {
               "type": "string"

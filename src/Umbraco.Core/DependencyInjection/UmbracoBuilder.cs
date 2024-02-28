@@ -217,7 +217,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            Services.AddUnique<ITreeService, TreeService>();
+
             Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
             Services.AddUnique<IEmailSender, NotImplementedEmailSender>();
 
@@ -369,7 +369,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
-            
+
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
             Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();
