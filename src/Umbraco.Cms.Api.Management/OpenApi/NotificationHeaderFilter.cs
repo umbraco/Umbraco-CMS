@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Management.OpenApi;
@@ -14,6 +15,13 @@ internal class NotificationHeaderFilter : IOperationFilter
             return;
         }
 
+        Type notificationModelType = typeof(NotificationHeaderModel);
+
+        if (!context.SchemaRepository.Schemas.TryGetValue(notificationModelType.Name, out _))
+        {
+            context.SchemaGenerator.GenerateSchema(notificationModelType, context.SchemaRepository);
+        }
+
         // filter out irrelevant responses (401 will never produce notifications)
         IEnumerable<OpenApiResponse> relevantResponses = operation
             .Responses
@@ -24,7 +32,14 @@ internal class NotificationHeaderFilter : IOperationFilter
             response.Headers.TryAdd(Constants.Headers.Notifications, new OpenApiHeader
             {
                 Description = "The list of notifications produced during the request.",
-                Schema = new OpenApiSchema { Type = "array" }
+                Schema = new OpenApiSchema { Type = "array" , Nullable = true, Items = new OpenApiSchema(){
+                        Reference = new OpenApiReference()
+                        {
+                            Type = ReferenceType.Schema,
+                            Id = notificationModelType.Name
+                        },
+                    }
+                }
             });
         }
     }
