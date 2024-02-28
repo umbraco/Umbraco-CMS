@@ -29,6 +29,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_DICTIONARY_TREE_ALIAS,
 	name: 'Dictionary Tree',
 	meta: {

@@ -28,6 +28,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: 'Umb.Tree.DataTypes',
 	name: 'Data Types Tree',
 	meta: {

@@ -28,6 +28,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_DOCUMENT_TREE_ALIAS,
 	name: 'Document Tree',
 	meta: {

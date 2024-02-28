@@ -32,6 +32,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_MEDIA_TYPE_TREE_ALIAS,
 	name: 'Media Type Tree',
 	meta: {

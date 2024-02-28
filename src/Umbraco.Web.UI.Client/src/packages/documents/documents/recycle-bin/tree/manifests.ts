@@ -29,6 +29,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_DOCUMENT_RECYCLE_BIN_TREE_ALIAS,
 	name: 'Document Recycle Bin Tree',
 	meta: {

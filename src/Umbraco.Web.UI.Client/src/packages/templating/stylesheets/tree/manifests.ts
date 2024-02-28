@@ -32,6 +32,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_STYLESHEET_TREE_ALIAS,
 	name: 'Stylesheet Tree',
 	weight: 10,
