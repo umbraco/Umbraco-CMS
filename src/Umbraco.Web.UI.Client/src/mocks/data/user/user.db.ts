@@ -64,7 +64,9 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			languages: [],
 			documentStartNodeIds: firstUser.documentStartNodeIds,
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
+			fallbackPermissions: [],
 			permissions,
+			allowedSections: [],
 		};
 	}
 

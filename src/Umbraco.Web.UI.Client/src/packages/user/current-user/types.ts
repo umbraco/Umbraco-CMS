@@ -1,3 +1,8 @@
+import type {
+	DocumentPermissionPresentationModel,
+	UnknownTypePermissionPresentationModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+
 export interface UmbCurrentUserModel {
 	unique: string;
 	email: string;
@@ -9,6 +14,7 @@ export interface UmbCurrentUserModel {
 	avatarUrls: Array<string>;
 	languages: Array<string>;
 	hasAccessToAllLanguages: boolean;
-	permissions: Array<string>;
-	sections: Array<string>;
+	allowedSections: Array<string>;
+	fallbackPermissions: Array<string>;
+	permissions: Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel>;
 }

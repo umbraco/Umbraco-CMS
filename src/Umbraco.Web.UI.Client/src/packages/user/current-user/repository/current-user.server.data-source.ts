@@ -40,6 +40,7 @@ export class UmbCurrentUserServerDataSource {
 				avatarUrls: data.avatarUrls,
 				languages: data.languages,
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,
+				fallbackPermissions: data.fallbackPermissions,
 				permissions: data.permissions,
 				sections: data.sections,
 			};
