@@ -134,7 +134,18 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	onRequestMove?: (argument: { item: T }) => boolean;
 	/**
 	 * This callback is executed when an item is hovered within this container.
-	 * The callback should return true if the item should be placed after based on a vertical logic. Other wise false for horizontal. True is default.
+	 * The callback should return true if the item should be placed after the hovered item, or false if it should be placed before the hovered item.
+	 * In this way the callback can control the placement of the item.
+	 * @example
+	 * This is equivalent to the default behavior:
+	 * ```ts
+	 * resolveVerticalDirection: (argument) => {
+	 * 	if(argument.pointerY > argument.relatedRect.top + argument.relatedRect.height * 0.5) {
+	 * 		return true; // Place after
+	 * 	} else {
+	 * 		return false; // Place before
+	 * 	}
+	 * }
 	 */
 	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => boolean | null;
 	/**
@@ -726,8 +737,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			throw new Error('Element was not defined');
 		}
 		const elementUnique = this.#config.getUniqueOfElement(element);
-		if (!elementUnique) {
-			throw new Error('Could not find unique of element');
+		if (elementUnique === undefined) {
+			console.error('Could not find unique of element', element);
+			return undefined;
 		}
 		return this.#model.find((entry: T) => elementUnique === this.#config.getUniqueOfModel(entry));
 	}
