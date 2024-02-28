@@ -28,7 +28,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		itemSelector: 'uui-tab',
 		containerSelector: 'uui-tab-group',
 		disabledItemSelector: '#root-tab',
-		resolveVerticalDirection: (args) => args.relatedRect.left + args.relatedRect.width * 0.5 > args.pointerX,
+		resolvePlacement: (args) => args.relatedRect.left + args.relatedRect.width * 0.5 > args.pointerX,
 		onChange: ({ model }) => {
 			this._tabs = model;
 		},

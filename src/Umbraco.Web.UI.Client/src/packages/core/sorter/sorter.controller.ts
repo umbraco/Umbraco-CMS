@@ -57,7 +57,7 @@ function destroyPreventEvent(element: Element) {
 	//element.removeAttribute('draggable');
 }
 
-export type resolveVerticalDirectionArgs<T, ElementType extends HTMLElement> = {
+export type resolvePlacementArgs<T, ElementType extends HTMLElement> = {
 	containerElement: Element;
 	containerRect: DOMRect;
 	item: T;
@@ -136,10 +136,11 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 * This callback is executed when an item is hovered within this container.
 	 * The callback should return true if the item should be placed after the hovered item, or false if it should be placed before the hovered item.
 	 * In this way the callback can control the placement of the item.
+	 * If it returns null the placement will be prevented.
 	 * @example
 	 * This is equivalent to the default behavior:
 	 * ```ts
-	 * resolveVerticalDirection: (argument) => {
+	 * resolvePlacement: (argument) => {
 	 * 	if(argument.pointerY > argument.relatedRect.top + argument.relatedRect.height * 0.5) {
 	 * 		return true; // Place after
 	 * 	} else {
@@ -147,7 +148,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 * 	}
 	 * }
 	 */
-	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => boolean | null;
+	resolvePlacement?: (argument: resolvePlacementArgs<T, ElementType>) => boolean | null;
 	/**
 	 * This callback is executed when an item is moved within this container.
 	 */
@@ -640,8 +641,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				return;
 			}
 
-			const verticalDirection: boolean | null = this.#config.resolveVerticalDirection
-				? this.#config.resolveVerticalDirection({
+			const verticalDirection: boolean | null = this.#config.resolvePlacement
+				? this.#config.resolvePlacement({
 						containerElement: this.#containerElement,
 						containerRect: currentContainerRect,
 						item: UmbSorterController.activeItem,
@@ -658,7 +659,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				: true;
 
 			if (verticalDirection === null) {
-				// The resolveVerticalDirection has chosen to back out of this move.
+				// The resolvePlacement has chosen to back out of this move.
 				return;
 			}
 
