@@ -1,7 +1,7 @@
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { ManifestWorkspaceAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes, ManifestWorkspaceActionMenuItem } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -9,34 +9,34 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
-	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'workspaceAction'>;
-	#workspacActionAlias: Array<string> = [];
+	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'workspaceActionMenuItem'>;
+	#workspaceActionAlias: Array<string> = [];
 
 	@property({ type: Array })
 	set workspaceActionAlias(alias: Array<string>) {
 		// If there is an existing initializer, we need to dispose it.
 		this.#actionsInitializer?.destroy();
 
-		this.#workspacActionAlias = alias;
+		this.#workspaceActionAlias = alias;
 
 		this.#actionsInitializer = new UmbExtensionsElementInitializer(
 			this,
 			umbExtensionsRegistry,
-			'workspaceAction', // TODO: Stop using string for 'workspaceAction', we need to start using Const.
-			undefined, //(action) => !!action, //action.meta.propertyEditors.includes(alias),
+			'workspaceActionMenuItem', // TODO: Stop using string for 'workspaceActionMenuItem', we need to start using Const.
+			(action) => action.meta.workspaceActionAliases.some((alias) => this.#workspaceActionAlias.includes(alias)),
 			(ctrls) => {
-				debugger;
 				this._actions = ctrls;
 			},
 			'extensionsInitializer',
+			'uui-menu-item',
 		);
 	}
 	get workspaceActionAlias() {
-		return this.#workspacActionAlias;
+		return this.#workspaceActionAlias;
 	}
 
 	@state()
-	private _actions: Array<UmbExtensionElementInitializer<ManifestWorkspaceAction, never>> = [];
+	private _actions: Array<UmbExtensionElementInitializer<ManifestWorkspaceActionMenuItem, never>> = [];
 
 	render() {
 		return this._actions.length > 0
@@ -45,9 +45,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						id="popover-trigger"
 						popovertarget="workspace-action-popover"
 						look="secondary"
-						label="More"
+						label="Expand"
 						compact>
-						<uui-symbol-more id="more-symbol"></uui-symbol-more>
+						<uui-symbol-expand id="expand-symbol"></uui-symbol-expand>
 					</uui-button>
 					<uui-popover-container id="workspace-action-popover" placement="bottom-start">
 						<umb-popover-layout>
