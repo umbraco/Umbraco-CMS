@@ -37,6 +37,12 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _treeRoot?: UmbTreeItemModelBase;
 
+	@state()
+	private _currentPage = 1;
+
+	@state()
+	private _totalPages = 1;
+
 	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModelBase>;
 	#init: Promise<unknown>;
 
@@ -46,6 +52,10 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		this.#init = Promise.all([
 			this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (instance) => {
 				this.#treeContext = instance;
+
+				this.observe(this.#treeContext.pagination.currentPage, (value) => (this._currentPage = value));
+				this.observe(this.#treeContext.pagination.totalPages, (value) => (this._totalPages = value));
+
 				this.#observeTreeRoot();
 			}).asPromise(),
 		]);
@@ -136,7 +146,22 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 				(item, index) => item.name + '___' + index,
 				(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
 			)}
+			${this.#renderPaging()}
 		`;
+	}
+
+	#onLoadMoreClick = (event: any) => {
+		event.stopPropagation();
+		const next = (this._currentPage = this._currentPage + 1);
+		this.#treeContext?.pagination.setCurrentPageNumber(next);
+	};
+
+	#renderPaging() {
+		if (this._totalPages <= 1 || this._currentPage === this._totalPages) {
+			return nothing;
+		}
+
+		return html` <uui-button @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
 	}
 }
 

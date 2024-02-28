@@ -11,10 +11,11 @@ import {
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType>>
@@ -26,10 +27,16 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this._host);
+	public readonly pagination = new UmbPaginationManager();
 
 	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType>;
 	#actionEventContext?: UmbActionEventContext;
+
+	#paging = {
+		skip: 0,
+		take: 3,
+	};
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -40,19 +47,11 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DEFAULT_TREE_CONTEXT);
+		this.pagination.setPageSize(this.#paging.take);
+		this.#consumeContexts();
 
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#actionEventContext = instance;
-			this.#actionEventContext.removeEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-			this.#actionEventContext.addEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-		});
-
+		// listen for page changes on the pagination manager
+		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 		this.requestTreeRoot();
 	}
 
@@ -101,13 +100,43 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 	public async requestRootItems() {
 		await this.#init;
-		return this.#repository!.requestRootTreeItems({ skip: 0, take: 100 });
+
+		const { data, error, asObservable } = await this.#repository!.requestRootTreeItems({
+			skip: this.#paging.skip,
+			take: this.#paging.take,
+		});
+
+		if (data) {
+			this.pagination.setTotalItems(data.total);
+		}
+
+		return { data, error, asObservable };
 	}
 
 	public async rootItems() {
 		await this.#init;
 		return this.#repository!.rootTreeItems();
 	}
+
+	#consumeContexts() {
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#actionEventContext = instance;
+			this.#actionEventContext.removeEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+			this.#actionEventContext.addEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+		});
+	}
+
+	#onPageChange = (event: UmbChangeEvent) => {
+		const target = event.target as UmbPaginationManager;
+		this.#paging.skip = target.getSkip();
+		this.requestRootItems();
+	};
 
 	#observeRepository(repositoryAlias?: string) {
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');

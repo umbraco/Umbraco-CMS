@@ -26,6 +26,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 {
 	public unique?: string | null;
 	public entityType?: string;
+	public readonly pagination = new UmbPaginationManager();
 
 	#manifest?: ManifestTreeItem;
 
@@ -63,16 +64,15 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#actionEventContext?: UmbActionEventContext;
 	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
 
-	public readonly pagination = new UmbPaginationManager();
-
-	#filter = {
+	// TODO: get this from the tree context
+	#paging = {
 		skip: 0,
 		take: 3,
 	};
 
 	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
-		this.pagination.setPageSize(this.#filter.take);
+		this.pagination.setPageSize(this.#paging.take);
 		this.#getUniqueFunction = getUniqueFunction;
 		this.#consumeContexts();
 
@@ -132,8 +132,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#isLoading.setValue(true);
 		const { data, error, asObservable } = await repository.requestTreeItemsOf({
 			parentUnique: this.unique,
-			skip: this.#filter.skip,
-			take: this.#filter.take,
+			skip: this.#paging.skip,
+			take: this.#paging.take,
 		});
 
 		if (data) {
@@ -282,7 +282,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
-		this.#filter.skip = target.getSkip();
+		this.#paging.skip = target.getSkip();
 		this.requestChildren();
 	};
 
