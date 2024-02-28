@@ -53,10 +53,13 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			this,
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem', // TODO: Stop using string for 'workspaceActionMenuItem', we need to start using Const.
-			(action) =>
-				(action.meta.workspaceActionAliases.some((alias) => this.workspaceActionAlias.includes(alias)) &&
-					!action.meta.entityTypes.length) ||
-				action.meta.entityTypes.includes(entityType),
+			(action) => {
+				const containsAlias = action.meta.workspaceActionAliases.some((alias) =>
+					this.workspaceActionAlias.includes(alias),
+				);
+				const isValidEntityType = !action.meta.entityTypes.length || action.meta.entityTypes.includes(entityType);
+				return containsAlias && isValidEntityType;
+			},
 			(ctrls) => {
 				ctrls.forEach((ctrl) => {
 					ctrl.properties = { unique, entityType };
