@@ -165,6 +165,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		meta: {
 			workspaceActions: ['Umb.WorkspaceAction.Document.SaveAndPublish'],
 			label: 'Unpublish',
+			icon: 'icon-globe',
 			repositoryAlias: 'Umb.Repository.Document.Detail',
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
@@ -178,6 +179,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		meta: {
 			workspaceActions: ['Umb.WorkspaceAction.Document.SaveAndPublish'],
 			label: 'Publish with descendants (TBD)',
+			icon: 'icon-globe',
 			repositoryAlias: 'Umb.Repository.Document.Detail',
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
@@ -191,6 +193,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		meta: {
 			workspaceActions: ['Umb.WorkspaceAction.Document.SaveAndPublish'],
 			label: 'Schedule publishing (TBD)',
+			icon: 'icon-globe',
 			repositoryAlias: 'Umb.Repository.Document.Detail',
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
