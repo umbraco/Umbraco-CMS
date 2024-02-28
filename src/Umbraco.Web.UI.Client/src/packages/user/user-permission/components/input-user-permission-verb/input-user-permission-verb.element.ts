@@ -1,11 +1,11 @@
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-@customElement('umb-user-permission-setting')
-export class UmbUserPermissionSettingElement extends UmbLitElement {
+@customElement('umb-input-user-permission-verb')
+export class UmbUserPermissionVerbElement extends UmbLitElement {
 	@property({ type: String, attribute: true })
 	label: string = '';
 
@@ -54,10 +54,10 @@ export class UmbUserPermissionSettingElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserPermissionSettingElement;
+export default UmbUserPermissionVerbElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-permission-setting': UmbUserPermissionSettingElement;
+		'umb-input-user-permission-verb': UmbUserPermissionVerbElement;
 	}
 }

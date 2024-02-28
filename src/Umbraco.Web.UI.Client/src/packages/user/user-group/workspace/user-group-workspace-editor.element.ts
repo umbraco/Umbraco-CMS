@@ -11,7 +11,7 @@ import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/components'
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 
-import './components/user-group-default-permission-list.element.js';
+import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
 
 @customElement('umb-user-group-workspace-editor')
@@ -123,15 +123,16 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
-				<umb-user-group-default-permission-list></umb-user-group-default-permission-list>
+
+				<umb-property-layout label="Entity permissions" description="Assign permissions for an entity type">
+					<umb-user-group-entity-user-permission-list slot="editor"></umb-user-group-entity-user-permission-list>
+				</umb-property-layout>
 			</uui-box>
 
-			<!-- Temp disabled because it is work in progress
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
 				<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
 			</uui-box>
-	-->
 		`;
 	}
 

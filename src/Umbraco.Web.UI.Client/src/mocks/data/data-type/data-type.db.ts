@@ -47,10 +47,10 @@ const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDat
 		editorAlias: request.editorAlias,
 		editorUiAlias: request.editorUiAlias,
 		values: request.values,
+		canIgnoreStartNodes: false,
 		isFolder: false,
 		hasChildren: false,
 		isDeletable: true,
-		canIgnoreStartNodes: false,
 	};
 };
 

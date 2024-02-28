@@ -7,7 +7,6 @@ import { manifests as propertyEditorsManifests } from './property-editors/manife
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
-import { manifests as userPermissionManifests } from './user-permissions/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 
 export const manifests = [
@@ -20,6 +19,5 @@ export const manifests = [
 	...repositoryManifests,
 	...sectionViewManifests,
 	...treeManifests,
-	...userPermissionManifests,
 	...workspaceManifests,
 ];
