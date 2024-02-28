@@ -76,7 +76,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		);
 	}
 
-	// @TJS-ignore
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
 		this._popoverOpen = event.newState === 'open';
 	}
