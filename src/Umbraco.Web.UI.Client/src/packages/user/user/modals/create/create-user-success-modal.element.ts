@@ -1,4 +1,5 @@
-import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
+import { UmbUserItemRepository } from '../../repository/item/index.js';
+import { UmbNewUserPasswordRepository } from '../../repository/new-password/index.js';
 import type { UmbUserItemModel } from '../../repository/item/types.js';
 import type {
 	UmbCreateUserSuccessModalData,
@@ -20,24 +21,34 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 	_userItem?: UmbUserItemModel;
 
 	@state()
-	_initialPassword: string = 'INITIAL PASSWORD GOES HERE';
+	_initialPassword: string = '';
 
 	#userItemRepository = new UmbUserItemRepository(this);
+	#userNewPasswordRepository = new UmbNewUserPasswordRepository(this);
 	#notificationContext?: UmbNotificationContext;
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => (this.#notificationContext = instance));
 	}
 
 	protected async firstUpdated(): Promise<void> {
-		if (!this.data?.user.unique) throw new Error('No user unique is provided');
+		const unique = this.data?.user.unique;
+		if (!unique) throw new Error('No user unique is provided');
 
-		// TODO: generate a new random password for the user, when the end point is ready
-		const { data } = await this.#userItemRepository.requestItems([this.data?.user.unique]);
-		if (data) {
-			this._userItem = data[0];
+		const [userItemResponse, newPasswordResponse] = await Promise.all([
+			this.#userItemRepository.requestItems([unique]),
+			this.#userNewPasswordRepository.requestNewPassword(unique),
+		]);
+
+		console.log(userItemResponse, userItemResponse);
+
+		if (userItemResponse.data) {
+			this._userItem = userItemResponse.data[0];
+		}
+
+		if (newPasswordResponse.data?.resetPassword) {
+			this._initialPassword = newPasswordResponse.data.resetPassword;
 		}
 	}
 
@@ -50,21 +61,21 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 		this.#notificationContext?.peek('positive', { data });
 	}
 
-	#onCloseModal(event: Event) {
+	#onCloseModal = (event: Event) => {
 		event.stopPropagation();
-		this.modalContext?.reject();
-	}
+		this._rejectModal();
+	};
 
-	#onCreateAnotherUser(event: Event) {
+	#onCreateAnotherUser = (event: Event) => {
 		event.stopPropagation();
-		this.modalContext?.reject({ type: 'createAnotherUser' });
-	}
+		this._rejectModal({ type: 'createAnotherUser' });
+	};
 
-	#onGoToProfile(event: Event) {
+	#onGoToProfile = (event: Event) => {
 		event.stopPropagation();
-		history.pushState(null, '', 'section/user-management/view/users/user/' + this.data?.user.unique); //TODO: URL Should be dynamic
 		this._submitModal();
-	}
+		history.pushState(null, '', 'section/user-management/view/users/user/' + this.data?.user.unique); //TODO: URL Should be dynamic
+	};
 
 	render() {
 		return html`<uui-dialog-layout headline="${this._userItem?.name} has been created">
@@ -79,10 +90,17 @@ export class UmbCreateUserSuccessModalElement extends UmbModalBaseElement<
 			</uui-form-layout-item>
 
 			<uui-button @click=${this.#onCloseModal} slot="actions" label="Close" look="secondary"></uui-button>
-			<uui-button @click=${this.#onCreateAnotherUser} slot="actions" label="Create another user" look="secondary">
-			</uui-button>
-			<uui-button @click=${this.#onGoToProfile} slot="actions" label="Go to profile" look="primary" color="positive">
-			</uui-button>
+			<uui-button
+				@click=${this.#onCreateAnotherUser}
+				slot="actions"
+				label="Create another user"
+				look="secondary"></uui-button>
+			<uui-button
+				@click=${this.#onGoToProfile}
+				slot="actions"
+				label="Go to profile"
+				look="primary"
+				color="positive"></uui-button>
 		</uui-dialog-layout>`;
 	}
 
