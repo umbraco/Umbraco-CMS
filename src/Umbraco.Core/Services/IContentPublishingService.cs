@@ -37,8 +37,8 @@ public interface IContentPublishingService
     ///     Unpublishes multiple cultures of a single content item.
     /// </summary>
     /// <param name="key">The key of the root content.</param>
-    /// <param name="cultures">The culture to unpublish.</param>
+    /// <param name="cultures">The cultures to unpublish. Use null to unpublish all cultures.</param>
     /// <param name="userKey">The identifier of the user performing the operation.</param>
     /// <returns>Status of the publish operation.</returns>
-    Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCulturesAsync(Guid key, IEnumerable<string> cultures, Guid userKey);
+    Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCulturesAsync(Guid key, ISet<string>? cultures, Guid userKey);
 }

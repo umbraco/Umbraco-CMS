@@ -218,9 +218,24 @@ internal sealed class ContentPublishingService : IContentPublishingService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCulturesAsync(Guid key, IEnumerable<string> cultures, Guid userKey)
+    public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCulturesAsync(Guid key, ISet<string>? cultures, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        if (cultures is null)
+        {
+            Attempt<ContentPublishingOperationStatus> attempt = await UnpublishAsync(
+                key,
+                null,
+                userKey);
+
+            return attempt;
+        }
+
+        if (cultures.Any() is false)
+        {
+            return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CultureMissing);
+        }
 
         foreach (var culture in cultures)
         {

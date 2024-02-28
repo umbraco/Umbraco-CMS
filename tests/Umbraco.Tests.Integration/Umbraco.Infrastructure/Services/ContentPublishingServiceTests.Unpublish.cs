@@ -168,7 +168,7 @@ public partial class ContentPublishingServiceTests
         content = ContentService.GetById(content.Key)!;
         Assert.AreEqual(3, content.PublishedCultures.Count());
 
-        var result = await ContentPublishingService.UnpublishMultipleCulturesAsync(content.Key, new[] { langDa.IsoCode, langSe.IsoCode }, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.UnpublishMultipleCulturesAsync(content.Key, new HashSet<string> { langDa.IsoCode, langSe.IsoCode }, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsPublished(content.Key);
