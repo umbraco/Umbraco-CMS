@@ -52,7 +52,6 @@ public class ChangePasswordUserController : UserControllerBase
         var passwordModel = new ChangeUserPasswordModel
         {
             NewPassword = model.NewPassword,
-            OldPassword = model.OldPassword,
             UserKey = id,
         };
 

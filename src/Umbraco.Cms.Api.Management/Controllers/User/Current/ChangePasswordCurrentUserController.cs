@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.User;
+using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -29,7 +29,7 @@ public class ChangePasswordCurrentUserController : CurrentUserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ChangePassword(ChangePasswordUserRequestModel model)
+    public async Task<IActionResult> ChangePassword(ChangePasswordCurrentUserRequestModel model)
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 

@@ -23314,6 +23314,9 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ChangePasswordCurrentUserRequestModel"
                   }
                 ]
               }
@@ -23323,6 +23326,9 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ChangePasswordCurrentUserRequestModel"
                   }
                 ]
               }
@@ -23332,6 +23338,9 @@
                 "oneOf": [
                   {
                     "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ChangePasswordCurrentUserRequestModel"
                   }
                 ]
               }
@@ -24233,7 +24242,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+                    "$ref": "#/components/schemas/ChangePasswordCurrentUserRequestModel"
                   }
                 ]
               }
@@ -24242,7 +24251,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+                    "$ref": "#/components/schemas/ChangePasswordCurrentUserRequestModel"
                   }
                 ]
               }
@@ -24251,7 +24260,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+                    "$ref": "#/components/schemas/ChangePasswordCurrentUserRequestModel"
                   }
                 ]
               }
@@ -26005,6 +26014,21 @@
         ],
         "additionalProperties": false
       },
+      "ChangePasswordCurrentUserRequestModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ChangePasswordUserRequestModel"
+          }
+        ],
+        "properties": {
+          "oldPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ChangePasswordUserRequestModel": {
         "required": [
           "newPassword"
@@ -26013,10 +26037,6 @@
         "properties": {
           "newPassword": {
             "type": "string"
-          },
-          "oldPassword": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
