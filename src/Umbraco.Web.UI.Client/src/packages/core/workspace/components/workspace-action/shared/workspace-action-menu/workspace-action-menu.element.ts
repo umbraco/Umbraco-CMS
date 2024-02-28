@@ -6,37 +6,66 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
+	#workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'workspaceActionMenuItem'>;
-	#workspaceActionAlias: Array<string> = [];
 
 	@property({ type: Array })
-	set workspaceActionAlias(alias: Array<string>) {
-		// If there is an existing initializer, we need to dispose it.
-		this.#actionsInitializer?.destroy();
+	workspaceActionAlias: Array<string> = [];
 
-		this.#workspaceActionAlias = alias;
+	@state()
+	private _actions: Array<UmbExtensionElementInitializer<ManifestWorkspaceActionMenuItem, never>> = [];
+
+	@state()
+	_popoverOpen = false;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
+			this.#initialise();
+		});
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#actionsInitializer?.destroy();
+	}
+
+	#initialise() {
+		if (!this.#workspaceContext) throw new Error('No workspace context');
+
+		const unique = this.#workspaceContext.getUnique();
+		const entityType = this.#workspaceContext.getEntityType();
 
 		this.#actionsInitializer = new UmbExtensionsElementInitializer(
 			this,
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem', // TODO: Stop using string for 'workspaceActionMenuItem', we need to start using Const.
-			(action) => action.meta.workspaceActionAliases.some((alias) => this.#workspaceActionAlias.includes(alias)),
+			(action) =>
+				action.meta.workspaceActionAliases.some((alias) => this.workspaceActionAlias.includes(alias)) &&
+				action.meta.entityTypes.includes(entityType),
 			(ctrls) => {
+				ctrls.forEach((ctrl) => {
+					ctrl.properties = { unique, entityType };
+				});
 				this._actions = ctrls;
 			},
-			'extensionsInitializer',
-			'uui-menu-item',
+			undefined,
+			'umb-entity-action',
 		);
 	}
-	get workspaceActionAlias() {
-		return this.#workspaceActionAlias;
-	}
 
-	@state()
-	private _actions: Array<UmbExtensionElementInitializer<ManifestWorkspaceActionMenuItem, never>> = [];
+	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	#onPopoverToggle(event: ToggleEvent) {
+		this._popoverOpen = event.newState === 'open';
+	}
 
 	render() {
 		return this._actions.length > 0
@@ -47,11 +76,17 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						look="secondary"
 						label="Expand"
 						compact>
-						<uui-symbol-expand id="expand-symbol"></uui-symbol-expand>
+						<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 					</uui-button>
-					<uui-popover-container id="workspace-action-popover" placement="bottom-start">
+					<uui-popover-container id="workspace-action-popover" placement="bottom-end" @toggle=${this.#onPopoverToggle}>
 						<umb-popover-layout>
-							<div id="dropdown">${repeat(this._actions, (action) => action.component)}</div>
+							<uui-scroll-container>
+								${repeat(
+									this._actions,
+									(action) => action.alias,
+									(action) => action.component,
+								)}
+							</uui-scroll-container>
 						</umb-popover-layout>
 					</uui-popover-container>
 			  `
