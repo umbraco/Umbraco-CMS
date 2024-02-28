@@ -92,6 +92,8 @@ export class UmbMemberWorkspaceContext
 
 	public destroy(): void {
 		super.destroy();
+		this.#persistedData.destroy();
+		this.#currentData.destroy();
 	}
 }
 
