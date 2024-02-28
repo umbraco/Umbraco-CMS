@@ -2,11 +2,12 @@ import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-worksp
 import type { UmbInputDocumentTypeElement } from '../../../components/input-document-type/input-document-type.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbInputCollectionConfigurationElement } from '@umbraco-cms/backoffice/components';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-document-type-workspace-view-structure')
 export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -17,6 +18,9 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 
 	@state()
 	private _allowedContentTypeUniques?: Array<string>;
+
+	@state()
+	private _collection?: string | null;
 
 	constructor() {
 		super();
@@ -30,14 +34,32 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 
 	private _observeDocumentType() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.allowedAsRoot, (allowedAsRoot) => (this._allowedAtRoot = allowedAsRoot));
-		this.observe(this.#workspaceContext.allowedContentTypes, (allowedContentTypes) => {
-			const oldValue = this._allowedContentTypeUniques;
-			this._allowedContentTypeUniques = allowedContentTypes
-				?.map((x) => x.contentType.unique)
-				.filter((x) => x !== undefined) as Array<string>;
-			this.requestUpdate('_allowedContentTypeUniques', oldValue);
-		});
+
+		this.observe(
+			this.#workspaceContext.allowedAsRoot,
+			(allowedAsRoot) => (this._allowedAtRoot = allowedAsRoot),
+			'_allowedAsRootObserver',
+		);
+
+		this.observe(
+			this.#workspaceContext.allowedContentTypes,
+			(allowedContentTypes) => {
+				const oldValue = this._allowedContentTypeUniques;
+				this._allowedContentTypeUniques = allowedContentTypes
+					?.map((x) => x.contentType.unique)
+					.filter((x) => x !== undefined) as Array<string>;
+				this.requestUpdate('_allowedContentTypeUniques', oldValue);
+			},
+			'_allowedContentTypesObserver',
+		);
+
+		this.observe(
+			this.#workspaceContext.collection,
+			(collection) => {
+				this._collection = collection?.unique;
+			},
+			'_collectionObserver',
+		);
 	}
 
 	render() {
@@ -77,9 +99,20 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 				</umb-property-layout>
 			</uui-box>
 			<uui-box headline="Presentation">
-				<umb-property-layout alias="Root" label="Collection view">
-					<div slot="description">Provides an overview of child content and hides it in the tree.</div>
-					<div slot="editor"><uui-toggle label="Display children in a Collection view"></uui-toggle></div>
+				<umb-property-layout alias="collection" label="Collection">
+					<div slot="description">
+						Configures the content item to show list of its children, the children will not be shown in the tree.
+					</div>
+					<div slot="editor">
+						<umb-input-collection-configuration
+							default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
+							.value=${this._collection ?? ''}
+							@change=${(e: CustomEvent) => {
+								const unique = (e.target as UmbInputCollectionConfigurationElement).value as string;
+								this.#workspaceContext?.setCollection({ unique });
+							}}>
+						</umb-input-collection-configuration>
+					</div>
 				</umb-property-layout>
 			</uui-box>
 		`;
