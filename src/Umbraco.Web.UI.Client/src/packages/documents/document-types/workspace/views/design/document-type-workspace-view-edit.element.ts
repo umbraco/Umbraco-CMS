@@ -21,17 +21,15 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	#model: Array<PropertyTypeContainerModelBaseModel> = [];
 	#sorter = new UmbSorterController<PropertyTypeContainerModelBaseModel, UUITabElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
-		getUniqueOfModel: (modelEntry) => modelEntry.id,
+		getUniqueOfModel: (tab) => tab.id,
 		identifier: 'document-type-tabs-sorter',
 		itemSelector: 'uui-tab',
 		containerSelector: 'uui-tab-group',
 		disabledItemSelector: '#root-tab',
-		resolveVerticalDirection: () => false,
+		resolveVerticalDirection: (args) => args.relatedRect.left + args.relatedRect.width * 0.5 > args.pointerX,
 		onChange: ({ model }) => {
-			this.#model = model;
 			this._tabs = model;
 		},
 		onEnd: ({ item }) => {
@@ -39,7 +37,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 			 */
-			const model = this.#model;
+			const model = this._tabs ?? [];
 			const newIndex = model.findIndex((entry) => entry.id === item.id);
 
 			// Doesn't exist in model
@@ -105,18 +103,15 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	constructor() {
 		super();
 
+		this.#sorter.disable();
+
 		//TODO: We need to differentiate between local and composition tabs (and hybrids)
 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this._tabsStructureHelper.containers, (tabs) => {
 			this._tabs = tabs;
-			if (this._sortModeActive) {
-				this.#sorter.setModel(tabs);
-			} else {
-				this.#sorter.setModel([]);
-			}
-
+			this.#sorter.setModel(tabs);
 			this._createRoutes();
 		});
 
@@ -130,9 +125,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {
-						this.#sorter.setModel(this._tabs!);
+						this.#sorter.enable();
 					} else {
-						this.#sorter.setModel([]);
+						this.#sorter.disable();
 					}
 				},
 				'_observeIsSorting',
@@ -369,7 +364,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				${this.renderRootTab()}
 				${repeat(
 					this._tabs,
-					(tab) => tab.id! + tab.name,
+					(tab) => tab.id,
 					(tab) => this.renderTab(tab),
 				)}
 			</uui-tab-group>
