@@ -1,7 +1,7 @@
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from './reload-tree-item-children/index.js';
-import type { UmbTreeItemModelBase } from './types.js';
-import type { UmbTreeRepository } from './data/tree-repository.interface.js';
-import type { UmbTreeContext } from './tree-context.interface.js';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '../reload-tree-item-children/index.js';
+import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
+import type { UmbTreeContext } from '../tree-context.interface.js';
 import { type UmbActionEventContext, UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import {
 	type ManifestRepository,
@@ -15,7 +15,7 @@ import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
+export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	extends UmbBaseController
 	implements UmbTreeContext
 {
@@ -26,8 +26,8 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this._host);
 
+	#manifest?: ManifestTree;
 	#repository?: UmbTreeRepository<TreeItemType>;
-	#treeAlias?: string;
 	#actionEventContext?: UmbActionEventContext;
 
 	#initResolver?: () => void;
@@ -64,15 +64,24 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 		}
 	}
 
-	public async setTreeAlias(treeAlias?: string) {
-		if (this.#treeAlias === treeAlias) return;
-		this.#treeAlias = treeAlias;
-
-		this.#observeTreeManifest();
+	/**
+	 * Sets the manifest
+	 * @param {ManifestCollection} manifest
+	 * @memberof UmbCollectionContext
+	 */
+	public setManifest(manifest: ManifestTree | undefined) {
+		if (this.#manifest === manifest) return;
+		this.#manifest = manifest;
+		this.#observeRepository(this.#manifest.meta.repositoryAlias;);
 	}
 
-	public getTreeAlias() {
-		return this.#treeAlias;
+	/**
+	 * Returns the manifest.
+	 * @return {ManifestCollection}
+	 * @memberof UmbCollectionContext
+	 */
+	public getManifest() {
+		return this.#manifest;
 	}
 
 	public getRepository() {
@@ -91,8 +100,11 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 	}
 
 	public async requestRootItems() {
+		debugger;
 		await this.#init;
-		return this.#repository!.requestRootTreeItems({ skip: 0, take: 100 });
+		const response = await this.#repository!.requestRootTreeItems({ skip: 0, take: 100 });
+		debugger;
+		return response;
 	}
 
 	public async rootItems() {
@@ -100,21 +112,7 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 		return this.#repository!.rootTreeItems();
 	}
 
-	#observeTreeManifest() {
-		if (this.#treeAlias) {
-			this.observe(
-				umbExtensionsRegistry.byTypeAndAlias('tree', this.#treeAlias),
-				async (treeManifest) => {
-					if (!treeManifest) return;
-					this.#observeRepository(treeManifest);
-				},
-				'_observeTreeManifest',
-			);
-		}
-	}
-
-	#observeRepository(treeManifest: ManifestTree) {
-		const repositoryAlias = treeManifest.meta.repositoryAlias;
+	#observeRepository(repositoryAlias: string) {
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
 
 		new UmbExtensionApiInitializer<ManifestRepository<UmbTreeRepository<TreeItemType>>>(
@@ -148,3 +146,5 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 		super.destroy();
 	}
 }
+
+export default UmbDefaultTreeContext;

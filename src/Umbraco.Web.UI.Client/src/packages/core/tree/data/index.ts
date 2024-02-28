@@ -6,3 +6,5 @@ export type { UmbTreeRepository } from './tree-repository.interface.js';
 export type { UmbTreeStore } from './tree-store.interface.js';
 
 export type { UmbTreeRootItemsRequestArgs, UmbTreeChildrenOfRequestArgs } from './types.js';
+
+export { UmbUniqueTreeStore } from './unique-tree-store.js';

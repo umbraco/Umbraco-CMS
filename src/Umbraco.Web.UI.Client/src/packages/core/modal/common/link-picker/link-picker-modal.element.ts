@@ -187,10 +187,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					placeholder=${this.localize.term('placeholders_search')}
 					label=${this.localize.term('placeholders_search')}></uui-input>
 				<umb-tree
-					?hide-tree-root=${true}
 					alias=${UMB_DOCUMENT_TREE_ALIAS}
-					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'document')}
-					.selectionConfiguration=${this._selectionConfiguration}></umb-tree>
+					.props=${{
+						hideTreeRoot: true,
+						selectionConfiguration: this._selectionConfiguration,
+					}}
+					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'document')}></umb-tree>
 			</div>
 			<hr />
 			<uui-symbol-expand
@@ -200,10 +202,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<uui-label for="media-expand">${this.localize.term('defaultdialogs_linkToMedia')}</uui-label>
 			<div style="${styleMap({ display: !this.mediaExpanded ? 'block' : 'none' })}">
 				<umb-tree
-					?hide-tree-root=${true}
 					alias="Umb.Tree.Media"
-					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'media')}
-					.selectionConfiguration=${this._selectionConfiguration}></umb-tree>
+					.props=${{
+						hideTreeRoot: true,
+						selectionConfiguration: this._selectionConfiguration,
+					}}
+					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'media')}></umb-tree>
 			</div>
 		`;
 	}

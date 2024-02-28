@@ -41,12 +41,14 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			<umb-body-layout headline="Select">
 				<uui-box>
 					<umb-tree
-						?hide-tree-root=${this.data?.hideTreeRoot}
 						alias=${ifDefined(this.data?.treeAlias)}
-						@selection-change=${this.#onSelectionChange}
-						.selectionConfiguration=${this._selectionConfiguration}
-						.filter=${this.data?.filter}
-						.selectableFilter=${this.data?.pickableFilter}></umb-tree>
+						.props=${{
+							hideTreeRoot: this.data?.hideTreeRoot,
+							selectionConfiguration: this._selectionConfiguration,
+							filter: this.data?.filter,
+							selectableFilter: this.data?.pickableFilter,
+						}}
+						@selection-change=${this.#onSelectionChange}></umb-tree>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
