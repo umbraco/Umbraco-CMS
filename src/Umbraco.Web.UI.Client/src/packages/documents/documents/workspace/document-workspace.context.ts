@@ -80,6 +80,12 @@ export class UmbDocumentWorkspaceContext
 		this.loadLanguages();
 	}
 
+	resetState() {
+		super.resetState();
+		this.#persistedData.setValue(undefined);
+		this.#currentData.setValue(undefined);
+	}
+
 	async loadLanguages() {
 		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
 		const { data } = await this.#languageRepository.requestCollection({});
@@ -87,6 +93,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
@@ -98,6 +105,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async create(parentUnique: string | null, documentTypeUnique: string) {
+		this.resetState();
 		this.#getDataPromise = this.repository.createScaffold(parentUnique, {
 			documentType: {
 				unique: documentTypeUnique,
@@ -110,14 +118,14 @@ export class UmbDocumentWorkspaceContext
 		this.setIsNew(true);
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(data);
-		return data || undefined;
+		return data;
 	}
 
 	getData() {
 		return this.#currentData.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 
@@ -322,7 +330,7 @@ export class UmbDocumentWorkspaceContext
 
 	public async publish() {
 		const variantIds = await this.#pickVariantsForAction('publish');
-		const unique = this.getEntityId();
+		const unique = this.getUnique();
 		if (variantIds.length && unique) {
 			await this.publishingRepository.publish(unique, variantIds);
 		}
@@ -333,14 +341,14 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async unpublish() {
-		const unique = this.getEntityId();
+		const unique = this.getUnique();
 
 		if (!unique) throw new Error('Unique is missing');
 		new UmbUnpublishDocumentEntityAction(this, '', unique, '').execute();
 	}
 
 	async delete() {
-		const id = this.getEntityId();
+		const id = this.getUnique();
 		if (id) {
 			await this.repository.delete(id);
 		}
@@ -359,8 +367,10 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public destroy(): void {
+		this.#persistedData.destroy();
 		this.#currentData.destroy();
 		this.structure.destroy();
+		this.#languageRepository.destroy();
 		super.destroy();
 	}
 }

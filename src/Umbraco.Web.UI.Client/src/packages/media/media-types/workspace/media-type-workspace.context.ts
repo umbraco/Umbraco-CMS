@@ -6,7 +6,7 @@ import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspa
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
@@ -16,6 +16,8 @@ export class UmbMediaTypeWorkspaceContext
 	//
 	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
+
+	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
 	readonly data;
@@ -47,6 +49,11 @@ export class UmbMediaTypeWorkspaceContext
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 	}
 
+	protected resetState() {
+		this.#persistedData.setValue(undefined);
+		super.resetState();
+	}
+
 	getIsSorting() {
 		return this.#isSorting.getValue();
 	}
@@ -59,7 +66,7 @@ export class UmbMediaTypeWorkspaceContext
 		return this.structure.getOwnerContentType();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 
@@ -72,25 +79,25 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	async create(parentId: string | null) {
+		this.resetState();
 		const { data } = await this.structure.createScaffold(parentId);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
 		this.setIsSorting(false);
-		//this.#draft.next(data);
-		return { data } || undefined;
-		// TODO: Is this wrong? should we return { data }??
+		this.#persistedData.setValue(data);
+		return data;
 	}
 
 	async load(entityId: string) {
+		this.resetState();
 		const { data } = await this.structure.loadType(entityId);
 		if (!data) return undefined;
 
 		this.setIsNew(false);
 		this.setIsSorting(false);
-		//this.#draft.next(data);
-		return { data } || undefined;
-		// TODO: Is this wrong? should we return { data }??
+		this.#persistedData.setValue(data);
+		return data;
 	}
 
 	/**
@@ -115,7 +122,10 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	public destroy(): void {
+		this.#persistedData.destroy();
 		this.structure.destroy();
+		this.#isSorting.destroy();
+		this.repository.destroy();
 		super.destroy();
 	}
 }

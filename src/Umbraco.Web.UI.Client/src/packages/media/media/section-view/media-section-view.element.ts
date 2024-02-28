@@ -62,7 +62,7 @@ export class UmbMediaSectionViewElement extends UmbLitElement {
 		const config = new UmbPropertyEditorConfigCollection(dataType.values);
 		return {
 			unique: '',
-			dataTypeId: dataType.unique,
+			dataTypeId: '',
 			allowedEntityBulkActions: config?.getValueByAlias<UmbCollectionBulkActionPermissions>('bulkActionPermissions'),
 			orderBy: config?.getValueByAlias('orderBy') ?? 'updateDate',
 			orderDirection: config?.getValueByAlias('orderDirection') ?? 'asc',

@@ -197,6 +197,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#scrollElement?: Element | null;
 
+	#enabled = true;
+
 	#dragX = 0;
 	#dragY = 0;
 
@@ -234,7 +236,18 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		});
 	}
 
-	setModel(model: Array<T>) {
+	enable(): void {
+		if (this.#enabled) return;
+		this.#enabled = true;
+		this.#initialize();
+	}
+	disable(): void {
+		if (!this.#enabled) return;
+		this.#enabled = false;
+		this.#uninitialize();
+	}
+
+	setModel(model: Array<T>): void {
 		if (this.#model) {
 			// TODO: Some updates might need to be done, as the modal is about to changed? Do make the changes after setting the model?..
 		}
@@ -250,9 +263,16 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	hostConnected() {
-		requestAnimationFrame(this._onFirstRender);
+		if (this.#enabled) {
+			requestAnimationFrame(this.#initialize);
+		}
 	}
-	private _onFirstRender = () => {
+	hostDisconnected() {
+		if (this.#enabled) {
+			this.#uninitialize();
+		}
+	}
+	#initialize = () => {
 		const containerEl =
 			(this.#config.containerSelector
 				? this.#host.shadowRoot!.querySelector(this.#config.containerSelector)
@@ -281,7 +301,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			subtree: false,
 		});
 	};
-	hostDisconnected() {
+	#uninitialize() {
 		// TODO: Is there more clean up to do??
 		this.#observer.disconnect();
 		if (this.#containerElement) {
@@ -427,7 +447,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		UmbSorterController.originalIndex = this.#model.indexOf(UmbSorterController.activeItem);
 
 		if (!UmbSorterController.activeItem) {
-			console.error('Could not find item related to this element.');
+			console.error('Could not find item related to this element.', UmbSorterController.activeElement);
 			return;
 		}
 

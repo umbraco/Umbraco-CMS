@@ -13,14 +13,6 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'edit/:unique',
-			component: this.#createElement,
-			setup: (_component, info) => {
-				const unique = info.match.params.unique;
-				this.#workspaceContext.load(unique);
-			},
-		},
-		{
 			path: 'create/:parentUnique',
 			component: this.#createElement,
 			setup: async (_component, info) => {
@@ -32,6 +24,14 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 					this.#workspaceContext,
 					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
+			},
+		},
+		{
+			path: 'edit/:unique',
+			component: this.#createElement,
+			setup: (_component, info) => {
+				const unique = info.match.params.unique;
+				this.#workspaceContext.load(unique);
 			},
 		},
 	];

@@ -1,7 +1,6 @@
 import './component/modal.element.js';
 
-export * from './context/modal-manager.context.js';
-export * from './context/modal.context.js';
+export * from './context/index.js';
 export * from './route-registration/modal-route-registration.js';
 export * from './route-registration/modal-route-registration.controller.js';
 export * from './token/index.js';

@@ -1,18 +1,10 @@
 import { UmbUserActionConditionBase } from './user-allow-action-base.condition.js';
-import type {
-	ManifestCondition,
-	UmbConditionConfigBase,
-	UmbConditionControllerArguments,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbUserAllowDeleteActionCondition extends UmbUserActionConditionBase {
-	constructor(args: UmbConditionControllerArguments<UmbConditionConfigBase>) {
-		super(args);
-	}
-
 	async onUserDataChange() {
 		// don't allow the current user to delete themselves
-		if (!this.userData || !this.userData.unique || (await this.isCurrentUser())) {
+		if (!this.userUnique || (await this.isCurrentUser())) {
 			this.permitted = false;
 		} else {
 			this.permitted = true;
