@@ -13,14 +13,6 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'edit/:unique',
-			component: this.#createElement,
-			setup: (_component, info) => {
-				this.removeControllerByAlias('_observeIsNew');
-				this.#languageWorkspaceContext.load(info.match.params.unique);
-			},
-		},
-		{
 			path: 'create',
 			component: this.#createElement,
 			setup: async () => {
@@ -31,6 +23,14 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 					this.#languageWorkspaceContext,
 					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
+			},
+		},
+		{
+			path: 'edit/:unique',
+			component: this.#createElement,
+			setup: (_component, info) => {
+				this.removeControllerByAlias('_observeIsNew');
+				this.#languageWorkspaceContext.load(info.match.params.unique);
 			},
 		},
 	];
