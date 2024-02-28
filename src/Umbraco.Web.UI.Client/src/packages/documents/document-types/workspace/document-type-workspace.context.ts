@@ -1,11 +1,12 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
 import type { UmbDocumentTypeDetailModel } from '../types.js';
-import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -31,6 +32,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly isElement;
 	readonly allowedContentTypes;
 	readonly compositions;
+	readonly collection;
 
 	// Document type specific:
 	readonly allowedTemplateIds;
@@ -57,6 +59,7 @@ export class UmbDocumentTypeWorkspaceContext
 		this.isElement = this.structure.ownerContentTypeObservablePart((data) => data?.isElement);
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
+		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 
 		// Document type specific:
 		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplates);
@@ -122,6 +125,9 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
 		this.structure.updateOwnerContentType({ compositions });
+	}
+	setCollection(collection: UmbReferenceByUnique) {
+		this.structure.updateOwnerContentType({ collection });
 	}
 
 	// Document type specific:
