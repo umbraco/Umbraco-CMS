@@ -1,4 +1,4 @@
-import type { UmbUserDetailModel } from '../types.js';
+import type { UmbUserDetailModel, UmbUserStateEnum } from '../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserDetailRepository } from '../repository/index.js';
 import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
@@ -24,12 +24,15 @@ export class UmbUserWorkspaceContext
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
-	//data = this.#currentData.asObservable();
+	readonly data = this.#currentData.asObservable();
+	readonly state = this.#currentData.asObservablePart((x) => x?.state);
+	readonly unique = this.#currentData.asObservablePart((x) => x?.unique);
 
 	async load(unique: string) {
 		const { data, asObservable } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
+			this.#persistedData.update(data);
 			this.#currentData.update(data);
 		}
 
@@ -48,6 +51,9 @@ export class UmbUserWorkspaceContext
 
 	getUnique(): string | undefined {
 		return this.getData()?.unique;
+	}
+	getState(): UmbUserStateEnum | null | undefined {
+		return this.getData()?.state;
 	}
 
 	getEntityType(): string {
@@ -69,14 +75,15 @@ export class UmbUserWorkspaceContext
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.detailRepository.create(this.#data.value);
+			const { data } = await this.detailRepository.create(this.#currentData.value);
 			newData = data;
 		} else {
-			const { data } = await this.detailRepository.save(this.#data.value);
+			const { data } = await this.detailRepository.save(this.#currentData.value);
 			newData = data;
 		}
 
 		if (newData) {
+			this.#persistedData.setValue(newData);
 			this.#currentData.setValue(newData);
 			this.saveComplete(newData);
 		}
@@ -98,6 +105,8 @@ export class UmbUserWorkspaceContext
 	destroy(): void {
 		this.#persistedData.destroy();
 		this.#currentData.destroy();
+		this.detailRepository.destroy();
+		this.avatarRepository.destroy();
 		super.destroy();
 	}
 }
