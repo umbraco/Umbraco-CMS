@@ -14,8 +14,12 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	#workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'workspaceActionMenuItem'>;
 
+	/**
+	 * The workspace actions to filter the available actions by.
+	 * @example ['Umb.WorkspaceAction.Document.Save', 'Umb.WorkspaceAction.Document.SaveAndPublishNew']
+	 */
 	@property({ type: Array })
-	workspaceActionAlias: Array<string> = [];
+	workspaceActions: Array<string> = [];
 
 	@property()
 	look: UUIInterfaceLook = 'secondary';
@@ -46,6 +50,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	#initialise() {
 		if (!this.#workspaceContext) throw new Error('No workspace context');
 
+		// If there are no workspace action aliases, then there is no need to initialize the actions.
+		if (!this.workspaceActions.length) return;
+
 		const unique = this.#workspaceContext.getUnique();
 		const entityType = this.#workspaceContext.getEntityType();
 
@@ -54,9 +61,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem', // TODO: Stop using string for 'workspaceActionMenuItem', we need to start using Const.
 			(action) => {
-				const containsAlias = action.meta.workspaceActionAliases.some((alias) =>
-					this.workspaceActionAlias.includes(alias),
-				);
+				const containsAlias = action.meta.workspaceActions.some((alias) => this.workspaceActions.includes(alias));
 				const isValidEntityType = !action.meta.entityTypes.length || action.meta.entityTypes.includes(entityType);
 				return containsAlias && isValidEntityType;
 			},

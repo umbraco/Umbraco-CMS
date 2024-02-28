@@ -30,10 +30,12 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 	}
 
 	@state()
-	get manifestAliases(): Array<string> {
+	get aliases(): Array<string> {
 		const aliases = new Set<string>();
 		if (this.manifest) {
 			aliases.add(this.manifest.alias);
+
+			// Add overwrites so that we can show any previously registered actions on the original workspace action
 			if (this.manifest.overwrites) {
 				for (const alias of this.manifest.overwrites) {
 					aliases.add(alias);
@@ -75,7 +77,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 					label=${this.manifest?.meta.label || ''}
 					.state=${this._buttonState}></uui-button>
 				<umb-workspace-action-menu
-					.workspaceActionAlias=${this.manifestAliases}
+					.workspaceActions=${this.aliases}
 					color="${this.manifest?.meta.color ?? 'default'}"
 					look="${this.manifest?.meta.look || 'default'}"></umb-workspace-action-menu>
 			</uui-button-group>

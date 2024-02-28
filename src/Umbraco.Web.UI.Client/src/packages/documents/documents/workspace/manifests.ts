@@ -161,7 +161,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		name: 'Unpublish',
 		api: UmbUnpublishDocumentEntityAction,
 		meta: {
-			workspaceActionAliases: ['Umb.WorkspaceAction.Document.SaveAndPublish'],
+			workspaceActions: ['Umb.WorkspaceAction.Document.SaveAndPublish'],
 			label: 'Unpublish',
 			repositoryAlias: 'Umb.Repository.Document.Detail',
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
