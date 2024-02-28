@@ -8,15 +8,16 @@ import {
 	type ManifestTree,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
-	extends UmbBaseController
+	extends UmbContextBase<UmbDefaultTreeContext<TreeItemType>>
 	implements UmbTreeContext
 {
 	#treeRoot = new UmbObjectState<TreeItemType | undefined>(undefined);
@@ -38,8 +39,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	});
 
 	constructor(host: UmbControllerHostElement) {
-		super(host);
-		this.provideContext('umbTreeContext', this);
+		super(host, UMB_DEFAULT_TREE_CONTEXT);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
 			this.#actionEventContext = instance;
@@ -101,9 +101,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 	public async requestRootItems() {
 		await this.#init;
-		const response = await this.#repository!.requestRootTreeItems({ skip: 0, take: 100 });
-		debugger;
-		return response;
+		return this.#repository!.requestRootTreeItems({ skip: 0, take: 100 });
 	}
 
 	public async rootItems() {
@@ -147,3 +145,5 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 }
 
 export default UmbDefaultTreeContext;
+
+export const UMB_DEFAULT_TREE_CONTEXT = new UmbContextToken<UmbDefaultTreeContext<any>>('UmbTreeContext');

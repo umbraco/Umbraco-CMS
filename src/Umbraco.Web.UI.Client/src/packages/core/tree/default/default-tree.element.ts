@@ -1,8 +1,9 @@
 import type { UmbTreeItemModelBase } from '../types.js';
-import { UmbDefaultTreeContext } from './default-tree.context.js';
+import type { UmbDefaultTreeContext } from './default-tree.context.js';
+import { UMB_DEFAULT_TREE_CONTEXT } from './default-tree.context.js';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export type UmbTreeSelectionConfiguration = {
 	multiple?: boolean;
@@ -18,48 +19,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		selection: [],
 	};
 
-	@property({ type: Object })
-	set selectionConfiguration(config: UmbTreeSelectionConfiguration) {
-		this._selectionConfiguration = config;
-		this.#treeContext.selection.setMultiple(config.multiple ?? false);
-		this.#treeContext.selection.setSelectable(config.selectable ?? true);
-		this.#treeContext.selection.setSelection(config.selection ?? []);
-	}
-	get selectionConfiguration(): UmbTreeSelectionConfiguration {
-		return this._selectionConfiguration;
-	}
+	@property({ type: Object, attribute: false })
+	selectionConfiguration: UmbTreeSelectionConfiguration = this._selectionConfiguration;
 
-	// TODO: what is the best name for this functionality?
-	private _hideTreeRoot = false;
-	@property({ type: Boolean, attribute: 'hide-tree-root' })
-	set hideTreeRoot(newVal: boolean) {
-		const oldVal = this._hideTreeRoot;
-		this._hideTreeRoot = newVal;
-		if (newVal === true) {
-			this.#observeRootItems();
-		}
+	@property({ type: Boolean, attribute: false })
+	hideTreeRoot: boolean = false;
 
-		this.requestUpdate('hideTreeRoot', oldVal);
-	}
-	get hideTreeRoot() {
-		return this._hideTreeRoot;
-	}
+	@property({ attribute: false })
+	selectableFilter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
-	@property()
-	set selectableFilter(newVal) {
-		this.#treeContext.selectableFilter = newVal;
-	}
-	get selectableFilter() {
-		return this.#treeContext.selectableFilter;
-	}
-
-	@property()
-	set filter(newVal) {
-		this.#treeContext.filter = newVal;
-	}
-	get filter() {
-		return this.#treeContext.filter;
-	}
+	@property({ attribute: false })
+	filter: (item: UmbTreeItemModelBase) => boolean = () => true;
 
 	@state()
 	private _items: UmbTreeItemModelBase[] = [];
@@ -67,14 +37,57 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@state()
 	private _treeRoot?: UmbTreeItemModelBase;
 
-	#treeContext = new UmbDefaultTreeContext<UmbTreeItemModelBase>(this);
+	#treeContext?: UmbDefaultTreeContext<UmbTreeItemModelBase>;
+	#init: Promise<unknown>;
 
 	constructor() {
 		super();
-		this.#observeTreeRoot();
+
+		this.#init = Promise.all([
+			this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (instance) => {
+				this.#treeContext = instance;
+				this.#observeTreeRoot();
+				debugger;
+			}).asPromise(),
+		]);
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.#init;
+	}
+
+	protected async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
+		debugger;
+		super.updated(_changedProperties);
+		await this.#init;
+
+		if (_changedProperties.has('selectionConfiguration')) {
+			this._selectionConfiguration = this.selectionConfiguration;
+
+			this.#treeContext!.selection.setMultiple(this._selectionConfiguration.multiple ?? false);
+			this.#treeContext!.selection.setSelectable(this._selectionConfiguration.selectable ?? true);
+			this.#treeContext!.selection.setSelection(this._selectionConfiguration.selection ?? []);
+		}
+
+		if (_changedProperties.has('hideTreeRoot')) {
+			debugger;
+			if (this.hideTreeRoot === true) {
+				this.#observeRootItems();
+			}
+		}
+
+		if (_changedProperties.has('selectableFilter')) {
+			this.#treeContext!.selectableFilter = this.selectableFilter;
+		}
+
+		if (_changedProperties.has('filter')) {
+			this.#treeContext!.filter = this.filter;
+		}
 	}
 
 	#observeTreeRoot() {
+		if (!this.#treeContext) return;
 		this.observe(
 			this.#treeContext.treeRoot,
 			(treeRoot) => {
@@ -85,8 +98,8 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	}
 
 	async #observeRootItems() {
+		await this.#init;
 		if (!this.#treeContext?.requestRootItems) throw new Error('Tree does not support root items');
-		console.log('asObservable');
 
 		const { asObservable } = await this.#treeContext.requestRootItems();
 
@@ -95,7 +108,6 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 				asObservable(),
 				(rootItems) => {
 					const oldValue = this._items;
-					console.log('rootItems', rootItems);
 					this._items = rootItems;
 					this.requestUpdate('_items', oldValue);
 				},
@@ -105,7 +117,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	}
 
 	getSelection() {
-		return this.#treeContext.selection.getSelection();
+		return this.#treeContext?.selection.getSelection();
 	}
 
 	render() {
