@@ -10,20 +10,20 @@ import '../workspace-action-menu/index.js';
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement extends UmbLitElement {
+	#manifest?: ManifestWorkspaceAction;
+
 	@state()
 	private _buttonState?: UUIButtonState;
 
-	private _manifest?: ManifestWorkspaceAction;
-
 	@property({ type: Object, attribute: false })
 	public get manifest() {
-		return this._manifest;
+		return this.#manifest;
 	}
 	public set manifest(value: ManifestWorkspaceAction | undefined) {
 		if (!value) return;
-		const oldValue = this._manifest;
-		this._manifest = value;
-		if (oldValue !== this._manifest) {
+		const oldValue = this.#manifest;
+		this.#manifest = value;
+		if (oldValue !== this.#manifest) {
 			this.#createApi();
 			this.requestUpdate('manifest', oldValue);
 		}
@@ -44,8 +44,8 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 	}
 
 	async #createApi() {
-		if (!this._manifest) return;
-		this.#api = await createExtensionApi(this._manifest, [this]);
+		if (!this.#manifest) return;
+		this.#api = await createExtensionApi(this.#manifest, [this]);
 	}
 
 	#api?: UmbWorkspaceAction;
