@@ -39,7 +39,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		return 'Log Viewer';
 	}
 
-	getEntityId() {
+	getUnique() {
 		return undefined;
 	}
 

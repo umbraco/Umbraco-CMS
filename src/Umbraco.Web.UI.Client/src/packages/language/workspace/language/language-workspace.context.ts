@@ -26,7 +26,13 @@ export class UmbLanguageWorkspaceContext
 		super(host, 'Umb.Workspace.Language');
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
@@ -35,6 +41,7 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	async create() {
+		this.resetState();
 		const { data } = await this.repository.createScaffold(null);
 		if (!data) return;
 		this.setIsNew(true);
@@ -51,7 +58,7 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	// TODO: Convert to uniques:
-	getEntityId() {
+	getUnique() {
 		return this.#data.getValue()?.unique;
 	}
 

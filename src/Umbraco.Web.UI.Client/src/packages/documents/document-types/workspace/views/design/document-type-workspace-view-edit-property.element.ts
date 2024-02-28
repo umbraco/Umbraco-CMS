@@ -93,9 +93,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				return { data: { documentTypeId }, value: propertyData };
 			})
 			.onSubmit((result) => {
-				if (!result.dataType) {
-					throw new Error('No dataType found on property');
-				}
 				this._partialUpdate(result as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {

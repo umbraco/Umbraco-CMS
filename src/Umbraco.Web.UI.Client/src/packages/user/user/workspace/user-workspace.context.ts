@@ -1,4 +1,4 @@
-import type { UmbUserDetailModel } from '../types.js';
+import type { UmbUserDetailModel, UmbUserStateEnum } from '../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserDetailRepository } from '../repository/index.js';
 import { UmbUserAvatarRepository } from '../repository/avatar/index.js';
@@ -9,8 +9,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
+type EntityType = UmbUserDetailModel;
+
 export class UmbUserWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbUserDetailModel>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
@@ -20,14 +22,18 @@ export class UmbUserWorkspaceContext
 		super(host, UMB_USER_WORKSPACE_ALIAS);
 	}
 
-	#data = new UmbObjectState<UmbUserDetailModel | undefined>(undefined);
-	data = this.#data.asObservable();
+	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
+	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
+	readonly data = this.#currentData.asObservable();
+	readonly state = this.#currentData.asObservablePart((x) => x?.state);
+	readonly unique = this.#currentData.asObservablePart((x) => x?.unique);
 
 	async load(unique: string) {
 		const { data, asObservable } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.update(data);
+			this.#persistedData.update(data);
+			this.#currentData.update(data);
 		}
 
 		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
@@ -38,13 +44,16 @@ export class UmbUserWorkspaceContext
 		Therefore we have to subscribe to the user store to update the state in the workspace data.
 		There might be a less manual way to do this.
 	*/
-	onUserStoreChanges(user: UmbUserDetailModel | undefined) {
+	onUserStoreChanges(user: EntityType | undefined) {
 		if (!user) return;
-		this.#data.update({ state: user.state, avatarUrls: user.avatarUrls });
+		this.#currentData.update({ state: user.state, avatarUrls: user.avatarUrls });
 	}
 
-	getEntityId(): string | undefined {
+	getUnique(): string | undefined {
 		return this.getData()?.unique;
+	}
+	getState(): UmbUserStateEnum | null | undefined {
+		return this.getData()?.state;
 	}
 
 	getEntityType(): string {
@@ -52,51 +61,52 @@ export class UmbUserWorkspaceContext
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.#currentData.getValue();
 	}
 
-	updateProperty<PropertyName extends keyof UmbUserDetailModel>(
-		propertyName: PropertyName,
-		value: UmbUserDetailModel[PropertyName],
-	) {
-		this.#data.update({ [propertyName]: value });
+	updateProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
+		this.#currentData.update({ [propertyName]: value });
 	}
 
 	async save() {
-		if (!this.#data.value) throw new Error('Data is missing');
-		if (!this.#data.value.unique) throw new Error('Unique is missing');
+		if (!this.#currentData.value) throw new Error('Data is missing');
+		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
 
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.detailRepository.create(this.#data.value);
+			const { data } = await this.detailRepository.create(this.#currentData.value);
 			newData = data;
 		} else {
-			const { data } = await this.detailRepository.save(this.#data.value);
+			const { data } = await this.detailRepository.save(this.#currentData.value);
 			newData = data;
 		}
 
 		if (newData) {
-			this.#data.setValue(newData);
+			this.#persistedData.setValue(newData);
+			this.#currentData.setValue(newData);
 			this.saveComplete(newData);
 		}
 	}
 
 	// TODO: implement upload progress
 	uploadAvatar(file: File) {
-		const unique = this.getEntityId();
+		const unique = this.getUnique();
 		if (!unique) throw new Error('Id is missing');
 		return this.avatarRepository.uploadAvatar(unique, file);
 	}
 
 	deleteAvatar() {
-		const unique = this.getEntityId();
+		const unique = this.getUnique();
 		if (!unique) throw new Error('Id is missing');
 		return this.avatarRepository.deleteAvatar(unique);
 	}
 
 	destroy(): void {
-		this.#data.destroy();
+		this.#persistedData.destroy();
+		this.#currentData.destroy();
+		this.detailRepository.destroy();
+		this.avatarRepository.destroy();
 		super.destroy();
 	}
 }
