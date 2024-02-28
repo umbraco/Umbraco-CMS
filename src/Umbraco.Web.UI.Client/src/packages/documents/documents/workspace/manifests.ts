@@ -11,6 +11,7 @@ import type {
 	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbPublishDocumentEntityAction } from '../entity-actions/publish.action.js';
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 
@@ -157,12 +158,39 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 	{
 		type: 'workspaceActionMenuItem',
-		alias: 'Umb.WorkspaceActionMenuItem.Unpublish',
+		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
 		name: 'Unpublish',
+		weight: 10,
 		api: UmbUnpublishDocumentEntityAction,
 		meta: {
 			workspaceActions: ['Umb.WorkspaceAction.Document.SaveAndPublish'],
 			label: 'Unpublish',
+			repositoryAlias: 'Umb.Repository.Document.Detail',
+			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		},
+	},
+	{
+		type: 'workspaceActionMenuItem',
+		alias: 'Umb.Document.WorkspaceActionMenuItem.PublishWithDescendants',
+		name: 'Publish with descendants',
+		weight: 20,
+		api: UmbPublishDocumentEntityAction,
+		meta: {
+			workspaceActions: ['Umb.WorkspaceAction.Document.SaveAndPublish'],
+			label: 'Publish with descendants (TBD)',
+			repositoryAlias: 'Umb.Repository.Document.Detail',
+			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		},
+	},
+	{
+		type: 'workspaceActionMenuItem',
+		alias: 'Umb.Document.WorkspaceActionMenuItem.SchedulePublishing',
+		name: 'Schedule publishing',
+		weight: 20,
+		api: UmbPublishDocumentEntityAction,
+		meta: {
+			workspaceActions: ['Umb.WorkspaceAction.Document.SaveAndPublish'],
+			label: 'Schedule publishing (TBD)',
 			repositoryAlias: 'Umb.Repository.Document.Detail',
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
