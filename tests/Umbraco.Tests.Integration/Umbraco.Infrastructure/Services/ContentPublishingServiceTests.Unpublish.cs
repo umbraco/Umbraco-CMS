@@ -144,6 +144,31 @@ public partial class ContentPublishingServiceTests
     }
 
     [Test]
+    public async Task Can_Unpublish_All_Cultures_With_Multiple_Cultures_Method()
+    {
+        var (langEn, langDa, contentType) = await SetupVariantTest();
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "EN root")
+            .WithCultureName(langDa.IsoCode, "DA root")
+            .Build();
+        content.SetValue("title", "EN title", culture: langEn.IsoCode);
+        content.SetValue("title", "DA title", culture: langDa.IsoCode);
+        ContentService.Save(content);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        VerifyIsPublished(content.Key);
+
+        var result = await ContentPublishingService.UnpublishMultipleCulturesAsync(content.Key, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+        VerifyIsNotPublished(content.Key);
+
+        content = ContentService.GetById(content.Key)!;
+        Assert.AreEqual(0, content.PublishedCultures.Count());
+    }
+
+    [Test]
     public async Task Can_Unpublish_Multiple_Cultures()
     {
         var (langEn, langDa, contentType) = await SetupVariantTest();
