@@ -2,9 +2,7 @@
 // See LICENSE for more details.
 
 using System.Runtime.Serialization;
-using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -149,13 +147,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        // FIXME: get rid of Json.NET here
-        // FIXME: consider creating an object deserialization method on IJsonSerializer instead of relying on deserializing serialized JSON here (and likely other places as well)
-        var value = editorValue.Value is JArray jArray
-            ? jArray.ToString()
-            : editorValue.Value is JsonArray jsonArray
-                ? jsonArray.ToJsonString()
-                : string.Empty;
+        // the editor value is a JsonArray, which produces deserialize-able JSON with ToString() (deserialization happens later on)
+        var value = editorValue.Value?.ToString();
 
         if (string.IsNullOrEmpty(value))
         {

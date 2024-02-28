@@ -1,5 +1,6 @@
 using System.Collections;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership.Permissions;
 
 namespace Umbraco.Cms.Core.Models.Membership;
 
@@ -32,23 +33,14 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     }
 
     /// <summary>
-    ///     The set of default permissions
-    /// </summary>
-    /// <remarks>
-    ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
-    ///     flexible permissions structure in the future.
-    /// </remarks>
-    IEnumerable<string>? Permissions { get; set; }
-
-    /// <summary>
     /// The set of permissions provided by the frontend.
     /// </summary>
     /// <remarks>
-    /// By default the server has no concept of what these strings mean, we simple store them and return them to the UI.
-    /// FIXME: For now this is named PermissionNames since Permissions already exists, but is subject to change in the future
-    /// when we know more about how we want to handle permissions, potentially those will be migrated in the these "soft" permissions.
+    /// By default the server has no concept of what all of these strings mean, we simple store them and return them to the UI.
     /// </remarks>
-    ISet<string> PermissionNames { get; set; }
+    ISet<string> Permissions { get; set; }
+
+    ISet<IGranularPermission> GranularPermissions { get; set; }
 
     IEnumerable<string> AllowedSections { get; }
 

@@ -136,6 +136,16 @@ public class WebhookService : IWebhookService
     }
 
     /// <inheritdoc />
+    public async Task<IEnumerable<IWebhook?>> GetMultipleAsync(IEnumerable<Guid> keys)
+    {
+        using ICoreScope scope = _provider.CreateCoreScope();
+        PagedModel<IWebhook> webhooks = await _webhookRepository.GetByIdsAsync(keys);
+        scope.Complete();
+
+        return webhooks.Items;
+    }
+
+    /// <inheritdoc />
     public async Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
