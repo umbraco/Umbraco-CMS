@@ -81,11 +81,11 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			(options) => {
 				this._variants = options.map<UmbDocumentVariantOption>((option) => {
 					const name = option.variant?.name ?? option.language.name;
-					const segment = option.variant?.segment ?? null;
+					const segment = option.segment;
 					return {
 						// Notice the option object has a unique property, but it's not used here. (Its equivalent to a UmbVariantId string) [NL]
-						culture: option.language.unique,
-						segment: segment,
+						culture: option.culture,
+						segment: segment ?? null,
 						title: name + (segment ? ` — ${segment}` : ''),
 						displayName: name + (segment ? ` — ${segment}` : ''),
 						state: option.variant?.state ?? DocumentVariantStateModel.NOT_CREATED,
@@ -143,7 +143,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				const languageName = option?.language.name;
 				this._variantDisplayName = (languageName ? languageName : '') + (segment ? ` — ${segment}` : '');
 				this._variantTitleName =
-					(languageName ? `${languageName} (${culture})` : '') + (segment ? ` — ${segment}` : '');
+					(languageName ? `${languageName} ${culture ? `(${culture})` : ''}` : '') + (segment ? ` — ${segment}` : '');
 			},
 			'_currentLanguage',
 		);
@@ -247,7 +247,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																: nothing}
 															<div>
 																${variant.title}
-																<i>(${variant.culture})</i> ${variant.segment}
+																${variant.culture ? html` <i>(${variant.culture})</i>` : ''}
+																${variant.segment}
 																<div class="variant-selector-state">${variant.state}</div>
 															</div>
 														</button>

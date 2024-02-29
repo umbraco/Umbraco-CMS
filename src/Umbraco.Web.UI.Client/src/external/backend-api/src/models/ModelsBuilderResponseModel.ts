@@ -2,7 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { ModelsModeModel } from './ModelsModeModel';
+
 export type ModelsBuilderResponseModel = {
     mode: ModelsModeModel;
     canGenerate: boolean;

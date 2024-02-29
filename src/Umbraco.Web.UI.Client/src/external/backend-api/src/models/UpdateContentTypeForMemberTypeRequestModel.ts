@@ -2,9 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 import type { UpdateMemberTypePropertyTypeContainerRequestModel } from './UpdateMemberTypePropertyTypeContainerRequestModel';
 import type { UpdateMemberTypePropertyTypeRequestModel } from './UpdateMemberTypePropertyTypeRequestModel';
+
 export type UpdateContentTypeForMemberTypeRequestModel = {
     alias: string;
     name: string;

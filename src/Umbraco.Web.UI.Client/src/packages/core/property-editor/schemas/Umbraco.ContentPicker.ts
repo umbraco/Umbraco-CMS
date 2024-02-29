@@ -9,10 +9,10 @@ export const manifest: ManifestPropertyEditorSchema = {
 		settings: {
 			properties: [
 				{
-					alias: 'startNodeId',
-					label: 'Start node',
-					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+					alias: 'ignoreUserStartNodes',
+					label: 'Ignore user start nodes',
+					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
 			],
 		},

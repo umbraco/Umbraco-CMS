@@ -26,6 +26,8 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<unknown>
 		}
 
 		const allOptions = (languageData?.items ?? []).map((language) => ({
+			culture: language.unique,
+			segment: null,
 			language: language,
 			variant: documentData.variants.find((variant) => variant.culture === language.unique),
 			unique: new UmbVariantId(language.unique, null).toString(),

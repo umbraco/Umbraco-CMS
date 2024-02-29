@@ -3,10 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { PagedHelpPageResponseModel } from '../models/PagedHelpPageResponseModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class HelpResource {
+
     /**
      * @returns PagedHelpPageResponseModel Success
      * @throws ApiError
@@ -40,4 +43,5 @@ export class HelpResource {
             },
         });
     }
+
 }

@@ -36,12 +36,12 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 		if (data) {
 			const items = data.items.map((item) => {
 				const model: UmbLanguageDetailModel = {
-					unique: item.isoCode.toLowerCase(),
+					unique: item.isoCode,
 					name: item.name,
 					entityType: UMB_LANGUAGE_ENTITY_TYPE,
 					isDefault: item.isDefault,
 					isMandatory: item.isMandatory,
-					fallbackIsoCode: item.fallbackIsoCode?.toLowerCase() || null,
+					fallbackIsoCode: item.fallbackIsoCode || null,
 				};
 
 				return model;

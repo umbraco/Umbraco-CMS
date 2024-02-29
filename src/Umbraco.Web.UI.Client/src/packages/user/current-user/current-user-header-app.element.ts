@@ -13,7 +13,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	private _currentUser?: UmbCurrentUserModel;
 
 	@state()
-	private _userAvatarUrls: Array<{ url: string; scale: string }> = [];
+	private _userAvatarUrls: Array<{ url: string; descriptor: string }> = [];
 
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#modalManagerContext?: UmbModalManagerContext;
@@ -57,15 +57,15 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 
 		this._userAvatarUrls = [
 			{
-				scale: '1x',
+				descriptor: '1x',
 				url: user.avatarUrls?.[0],
 			},
 			{
-				scale: '2x',
+				descriptor: '2x',
 				url: user.avatarUrls?.[1],
 			},
 			{
-				scale: '3x',
+				descriptor: '3x',
 				url: user.avatarUrls?.[2],
 			},
 		];
@@ -75,7 +75,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 		let string = '';
 
 		this._userAvatarUrls?.forEach((url) => {
-			string += `${url.url} ${url.scale},`;
+			string += `${url.url} ${url.descriptor},`;
 		});
 		return string;
 	}

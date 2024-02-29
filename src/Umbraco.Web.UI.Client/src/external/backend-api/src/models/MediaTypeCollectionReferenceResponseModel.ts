@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { ContentTypeCollectionReferenceResponseModelBaseModel } from './ContentTypeCollectionReferenceResponseModelBaseModel';
+
 export type MediaTypeCollectionReferenceResponseModel = ContentTypeCollectionReferenceResponseModelBaseModel;
 

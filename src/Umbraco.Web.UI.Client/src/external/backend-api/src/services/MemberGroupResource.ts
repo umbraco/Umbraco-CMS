@@ -8,10 +8,13 @@ import type { MemberGroupResponseModel } from '../models/MemberGroupResponseMode
 import type { PagedMemberGroupResponseModel } from '../models/PagedMemberGroupResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { UpdateMemberGroupRequestModel } from '../models/UpdateMemberGroupRequestModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class MemberGroupResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -32,6 +35,7 @@ export class MemberGroupResource {
             },
         });
     }
+
     /**
      * @returns PagedMemberGroupResponseModel Success
      * @throws ApiError
@@ -55,6 +59,7 @@ export class MemberGroupResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -75,6 +80,7 @@ export class MemberGroupResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -101,6 +107,7 @@ export class MemberGroupResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -124,6 +131,7 @@ export class MemberGroupResource {
             },
         });
     }
+
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -147,4 +155,5 @@ export class MemberGroupResource {
             },
         });
     }
+
 }

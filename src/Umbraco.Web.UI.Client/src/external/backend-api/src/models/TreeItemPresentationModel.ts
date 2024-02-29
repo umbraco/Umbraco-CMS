@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 export type TreeItemPresentationModel = {
     type: string;
     hasChildren: boolean;

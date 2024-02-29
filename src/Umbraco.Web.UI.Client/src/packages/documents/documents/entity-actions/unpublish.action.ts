@@ -18,6 +18,8 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<unknow
 		if (!documentData) throw new Error('The document was not found');
 
 		const allOptions = (languageData?.items ?? []).map((language) => ({
+			culture: language.unique,
+			segment: null,
 			language: language,
 			variant: documentData.variants.find((variant) => variant.culture === language.unique),
 			unique: new UmbVariantId(language.unique, null).toString(),

@@ -4,10 +4,13 @@
 /* eslint-disable */
 import type { DynamicRootRequestModel } from '../models/DynamicRootRequestModel';
 import type { DynamicRootResponseModel } from '../models/DynamicRootResponseModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class DynamicRootResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -27,6 +30,7 @@ export class DynamicRootResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -40,4 +44,5 @@ export class DynamicRootResource {
             },
         });
     }
+
 }

@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { ContentTypeCompositionResponseModelBaseModel } from './ContentTypeCompositionResponseModelBaseModel';
+
 export type MediaTypeCompositionResponseModel = ContentTypeCompositionResponseModelBaseModel;
 

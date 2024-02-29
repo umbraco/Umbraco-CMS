@@ -15,4 +15,6 @@ export interface UmbVariantOptionModel<VariantType extends UmbVariantModel = Umb
 	 * The unique identifier is a VariantId string.
 	 */
 	unique: string;
+	culture: string | null;
+	segment: string | null;
 }

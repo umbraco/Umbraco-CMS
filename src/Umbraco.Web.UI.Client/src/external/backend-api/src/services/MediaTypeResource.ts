@@ -16,10 +16,13 @@ import type { PagedAllowedMediaTypeModel } from '../models/PagedAllowedMediaType
 import type { PagedMediaTypeTreeItemResponseModel } from '../models/PagedMediaTypeTreeItemResponseModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
 import type { UpdateMediaTypeRequestModel } from '../models/UpdateMediaTypeRequestModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class MediaTypeResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -40,6 +43,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -62,6 +66,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -83,6 +88,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -105,6 +111,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -132,6 +139,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns PagedAllowedMediaTypeModel Success
      * @throws ApiError
@@ -161,6 +169,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -183,6 +192,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -210,6 +220,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -237,6 +248,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns PagedAllowedMediaTypeModel Success
      * @throws ApiError
@@ -260,6 +272,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -279,6 +292,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -301,6 +315,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -322,6 +337,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -345,6 +361,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -372,6 +389,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns PagedMediaTypeTreeItemResponseModel Success
      * @throws ApiError
@@ -401,6 +419,7 @@ export class MediaTypeResource {
             },
         });
     }
+
     /**
      * @returns PagedMediaTypeTreeItemResponseModel Success
      * @throws ApiError
@@ -427,4 +446,5 @@ export class MediaTypeResource {
             },
         });
     }
+
 }
