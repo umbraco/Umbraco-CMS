@@ -303,7 +303,7 @@ export class UmbDocumentWorkspaceContext
 					publishDate: null,
 					createDate: null,
 					updateDate: null,
-					...variantId.toObject(),
+					...invariantVariantId.toObject(),
 					...variant,
 					...update,
 				},
