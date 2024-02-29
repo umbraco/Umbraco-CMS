@@ -205,6 +205,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {
+            scope.Complete();
             return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
@@ -223,6 +224,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
         if (cultures.Any() is false)
         {
+            scope.Complete();
             return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CultureMissing);
         }
 
@@ -239,11 +241,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
                 cultures,
                 userId);
         }
-
-        if (attempt.Success)
-        {
-            scope.Complete();
-        }
+        scope.Complete();
 
         return attempt;
     }
@@ -271,6 +269,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
         if (content.ContentType.VariesByCulture() is false)
         {
+            scope.Complete();
             return Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant);
         }
 
@@ -280,6 +279,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         {
             if (validCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
             {
+                scope.Complete();
                 return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
             }
 
