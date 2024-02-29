@@ -134,7 +134,7 @@ public partial class ContentPublishingServiceTests
         await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
-        var result = await ContentPublishingService.UnpublishAsync(content.Key, null, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>(){"*"}, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsNotPublished(content.Key);
@@ -159,7 +159,7 @@ public partial class ContentPublishingServiceTests
         await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
         VerifyIsPublished(content.Key);
 
-        var result = await ContentPublishingService.UnpublishAsync(content.Key, (ISet<string>?)null, Constants.Security.SuperUserKey);
+        var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsNotPublished(content.Key);
