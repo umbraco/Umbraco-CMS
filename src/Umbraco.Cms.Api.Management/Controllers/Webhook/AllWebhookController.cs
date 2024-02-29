@@ -26,10 +26,11 @@ public class AllWebhookController : WebhookControllerBase
     [ProducesResponseType(typeof(PagedViewModel<WebhookResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<WebhookResponseModel>>> All(int skip = 0, int take = 100)
     {
-        IWebhook[] webhooks = (await _webhookService.GetAllAsync(skip, take)).Items.ToArray();
+        PagedModel<IWebhook> result = await _webhookService.GetAllAsync(skip, take);
+        IWebhook[] webhooks = result.Items.ToArray();
         var viewModel = new PagedViewModel<WebhookResponseModel>
         {
-            Total = webhooks.Length,
+            Total = result.Total,
             Items = _umbracoMapper.MapEnumerable<IWebhook, WebhookResponseModel>(webhooks)
         };
 
