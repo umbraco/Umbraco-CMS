@@ -28,9 +28,6 @@ public class DocumentTypeDisplay : ContentTypeCompositionDisplay<PropertyTypeDis
     [DataMember(Name = "allowSegmentVariant")]
     public bool AllowSegmentVariant { get; set; }
 
-    [DataMember(Name = "apps")]
-    public IEnumerable<ContentApp>? ContentApps { get; set; }
-
     [DataMember(Name = "historyCleanup")]
     public HistoryCleanupViewModel? HistoryCleanup { get; set; }
 }

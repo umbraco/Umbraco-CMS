@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
@@ -28,7 +29,6 @@ public class ContentItemDisplay<TVariant> :
         Notifications = new List<BackOfficeNotification>();
         Errors = new Dictionary<string, object>();
         Variants = new List<TVariant>();
-        ContentApps = new List<ContentApp>();
     }
 
     [DataMember(Name = "id", IsRequired = true)]
@@ -135,6 +135,7 @@ public class ContentItemDisplay<TVariant> :
     public DateTime UpdateDate { get; set; }
 
     [DataMember(Name = "template")]
+    [JsonPropertyName("template")]
     public string? TemplateAlias { get; set; }
 
     [DataMember(Name = "templateId")]
@@ -171,9 +172,6 @@ public class ContentItemDisplay<TVariant> :
     [DataMember(Name = "isBlueprint")]
     public bool IsBlueprint { get; set; }
 
-    [DataMember(Name = "apps")]
-    public IEnumerable<ContentApp> ContentApps { get; set; }
-
     /// <summary>
     ///     The real persisted content object - used during inbound model binding
     /// </summary>
@@ -200,6 +198,7 @@ public class ContentItemDisplay<TVariant> :
     ///     A collection of extra data that is available for this specific entity/entity type
     /// </summary>
     [DataMember(Name = "metaData")]
+    [JsonPropertyName("metaData")]
     [ReadOnly(true)]
     public IDictionary<string, object> AdditionalData { get; private set; } = new Dictionary<string, object>();
 
@@ -213,6 +212,7 @@ public class ContentItemDisplay<TVariant> :
     ///     NOTE: The ProperCase is important because when we return ModeState normally it will always be proper case.
     /// </remarks>
     [DataMember(Name = "ModelState")]
+    [JsonPropertyName("ModelState")]
     [ReadOnly(true)]
     public IDictionary<string, object> Errors { get; set; }
 

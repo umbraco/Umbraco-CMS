@@ -92,6 +92,9 @@ internal sealed class MediaEditingService
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveAsync(Guid key, Guid? parentKey, Guid userKey)
         => await HandleMoveAsync(key, parentKey, userKey);
 
+    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> RestoreAsync(Guid key, Guid? parentKey, Guid userKey)
+        => await HandleMoveAsync(key, parentKey, userKey, true);
+
     public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 

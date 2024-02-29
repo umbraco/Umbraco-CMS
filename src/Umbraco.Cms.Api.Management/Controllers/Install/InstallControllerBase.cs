@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Api.Management.Routing;
@@ -18,31 +17,32 @@ namespace Umbraco.Cms.Api.Management.Controllers.Install;
 public abstract class InstallControllerBase : ManagementApiControllerBase
 {
     protected IActionResult InstallOperationResult(InstallOperationStatus status, InstallationResult? result = null) =>
-        status switch
-        {
-            InstallOperationStatus.Success => Ok(),
-            InstallOperationStatus.UnknownDatabaseProvider => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid database configuration")
-                .WithDetail("The database provider is unknown.")
-                .Build()),
-            InstallOperationStatus.MissingConnectionString => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid database configuration")
-                .WithDetail("The connection string is missing.")
-                .Build()),
-            InstallOperationStatus.MissingProviderName => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid database configuration")
-                .WithDetail("The provider name is missing.")
-                .Build()),
-            InstallOperationStatus.DatabaseConnectionFailed => BadRequest(new ProblemDetailsBuilder()
-                .WithTitle("Invalid database configuration")
-                .WithDetail("Could not connect to the database.")
-                .Build()),
-            InstallOperationStatus.InstallFailed => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
-                .WithTitle("Install failed")
-                .WithDetail(result?.ErrorMessage ?? "An unknown error occurred.")
-                .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
-                .WithTitle("Unknown install operation status.")
-                .Build()),
-        };
+        status is InstallOperationStatus.Success
+            ? Ok()
+            : OperationStatusResult(status, problemDetailsBuilder => status switch
+            {
+                InstallOperationStatus.UnknownDatabaseProvider => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid database configuration")
+                    .WithDetail("The database provider is unknown.")
+                    .Build()),
+                InstallOperationStatus.MissingConnectionString => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid database configuration")
+                    .WithDetail("The connection string is missing.")
+                    .Build()),
+                InstallOperationStatus.MissingProviderName => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid database configuration")
+                    .WithDetail("The provider name is missing.")
+                    .Build()),
+                InstallOperationStatus.DatabaseConnectionFailed => BadRequest(problemDetailsBuilder
+                    .WithTitle("Invalid database configuration")
+                    .WithDetail("Could not connect to the database.")
+                    .Build()),
+                InstallOperationStatus.InstallFailed => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                    .WithTitle("Install failed")
+                    .WithDetail(result?.ErrorMessage ?? "An unknown error occurred.")
+                    .Build()),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
+                    .WithTitle("Unknown install operation status.")
+                    .Build()),
+            });
 }

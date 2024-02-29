@@ -124,6 +124,14 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    public bool Exists(IEnumerable<Guid> keys)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _entityRepository.Exists(keys);
+        }
+    }
+
     /// <inheritdoc />
     public bool Exists(Guid key, UmbracoObjectTypes objectType)
     {

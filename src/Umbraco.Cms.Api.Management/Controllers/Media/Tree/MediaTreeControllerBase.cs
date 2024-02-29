@@ -10,7 +10,7 @@ using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
