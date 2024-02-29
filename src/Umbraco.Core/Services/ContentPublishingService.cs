@@ -213,7 +213,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             if (culture is null || validCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
             {
                 scope.Complete();
-                return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
+                return Attempt.Fail(ContentPublishingOperationStatus.CultureMissing);
             }
         }
         else
