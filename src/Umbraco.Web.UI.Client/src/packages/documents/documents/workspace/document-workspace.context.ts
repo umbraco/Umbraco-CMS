@@ -12,7 +12,7 @@ import { umbPickDocumentVariantModal, type UmbDocumentVariantPickerModalType } f
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
@@ -60,16 +60,6 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
-	readonly variantOptions = mergeObservables([this.variants, this.languages], ([variants, languages]) => {
-		return languages.map((language) => {
-			return {
-				variant: variants.find((x) => x.culture === language.unique),
-				language,
-				// TODO: When including segments, this should be updated to include the segment as well. [NL]
-				unique: language.unique, // This must be a variantId string!
-			} as UmbDocumentVariantOptionModel;
-		});
-	});
 
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
@@ -79,10 +69,43 @@ export class UmbDocumentWorkspaceContext
 	//#variesByCulture?: boolean;
 	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
 	//#variesBySegment?: boolean;
-	readonly varies = this.structure.ownerContentTypePart((x) => x?.variesByCulture || x?.variesBySegment);
+	readonly varies = this.structure.ownerContentTypePart((x) =>
+		x ? x.variesByCulture || x.variesBySegment : undefined,
+	);
 	#varies?: boolean;
 
 	readonly splitView = new UmbWorkspaceSplitViewManager();
+
+	readonly variantOptions = mergeObservables(
+		[this.varies, this.variants, this.languages],
+		([varies, variants, languages]) => {
+			// TODO: When including segments, when be aware about the case of segment varying when not culture varying. [NL]
+			if (varies === true) {
+				return languages.map((language) => {
+					return {
+						variant: variants.find((x) => x.culture === language.unique),
+						language,
+						// TODO: When including segments, this object should be updated to include a object for the segment. [NL]
+						// TODO: When including segments, the unique should be updated to include the segment as well. [NL]
+						unique: language.unique, // This must be a variantId string!
+						culture: language.unique,
+						segment: null,
+					} as UmbDocumentVariantOptionModel;
+				});
+			} else if (varies === false) {
+				return [
+					{
+						variant: variants.find((x) => x.culture === null),
+						language: languages.find((x) => x.isDefault),
+						culture: null,
+						segment: null,
+						unique: UMB_INVARIANT_CULTURE, // This must be a variantId string!
+					} as UmbDocumentVariantOptionModel,
+				];
+			}
+			return [] as Array<UmbDocumentVariantOptionModel>;
+		},
+	);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);

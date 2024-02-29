@@ -15,6 +15,8 @@ const modalData: UmbDocumentVariantPickerModalData = {
 	options: [
 		{
 			unique: 'en-us',
+			culture: 'en-us',
+			segment: null,
 			variant: {
 				name: 'English variant name',
 				culture: 'en-us',
@@ -47,6 +49,8 @@ const modalData: UmbDocumentVariantPickerModalData = {
 		*/
 		{
 			unique: 'da-dk',
+			culture: 'da-dk',
+			segment: null,
 			variant: {
 				name: 'Danish variant name',
 				culture: 'da-dk',
