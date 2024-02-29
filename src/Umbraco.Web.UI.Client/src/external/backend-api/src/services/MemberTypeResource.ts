@@ -10,13 +10,10 @@ import type { MemberTypeItemResponseModel } from '../models/MemberTypeItemRespon
 import type { MemberTypeResponseModel } from '../models/MemberTypeResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { UpdateMemberTypeRequestModel } from '../models/UpdateMemberTypeRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class MemberTypeResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -37,7 +34,6 @@ export class MemberTypeResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -60,7 +56,6 @@ export class MemberTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -82,7 +77,6 @@ export class MemberTypeResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -105,7 +99,6 @@ export class MemberTypeResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -133,7 +126,6 @@ export class MemberTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -156,7 +148,6 @@ export class MemberTypeResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -180,7 +171,6 @@ export class MemberTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -200,7 +190,6 @@ export class MemberTypeResource {
             },
         });
     }
-
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -224,5 +213,4 @@ export class MemberTypeResource {
             },
         });
     }
-
 }

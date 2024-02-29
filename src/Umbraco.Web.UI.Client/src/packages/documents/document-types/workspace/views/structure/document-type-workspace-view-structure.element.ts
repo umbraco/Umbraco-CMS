@@ -36,9 +36,9 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 		if (!this.#workspaceContext) return;
 
 		this.observe(
-			this.#workspaceContext.allowedAsRoot,
-			(allowedAsRoot) => (this._allowedAtRoot = allowedAsRoot),
-			'_allowedAsRootObserver',
+			this.#workspaceContext.allowedAtRoot,
+			(allowedAtRoot) => (this._allowedAtRoot = allowedAtRoot),
+			'_allowedAtRootObserver',
 		);
 
 		this.observe(
@@ -72,7 +72,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 							label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}
 							?checked=${this._allowedAtRoot}
 							@change=${(e: CustomEvent) => {
-								this.#workspaceContext?.setAllowedAsRoot((e.target as UUIToggleElement).checked);
+								this.#workspaceContext?.setAllowedAtRoot((e.target as UUIToggleElement).checked);
 							}}></uui-toggle>
 					</div>
 				</umb-property-layout>

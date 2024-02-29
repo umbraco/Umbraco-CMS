@@ -9,13 +9,10 @@ import type { PackageManifestResponseModel } from '../models/PackageManifestResp
 import type { PagedPackageDefinitionResponseModel } from '../models/PagedPackageDefinitionResponseModel';
 import type { PagedPackageMigrationStatusResponseModel } from '../models/PagedPackageMigrationStatusResponseModel';
 import type { UpdatePackageRequestModel } from '../models/UpdatePackageRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class PackageResource {
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -39,7 +36,6 @@ export class PackageResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -53,7 +49,6 @@ export class PackageResource {
             },
         });
     }
-
     /**
      * @returns PagedPackageDefinitionResponseModel Success
      * @throws ApiError
@@ -77,7 +72,6 @@ export class PackageResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -100,7 +94,6 @@ export class PackageResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -122,7 +115,6 @@ export class PackageResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -145,7 +137,6 @@ export class PackageResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -172,7 +163,6 @@ export class PackageResource {
             },
         });
     }
-
     /**
      * @returns binary Success
      * @throws ApiError
@@ -194,7 +184,6 @@ export class PackageResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -208,7 +197,6 @@ export class PackageResource {
             },
         });
     }
-
     /**
      * @returns PagedPackageMigrationStatusResponseModel Success
      * @throws ApiError
@@ -232,5 +220,4 @@ export class PackageResource {
             },
         });
     }
-
 }

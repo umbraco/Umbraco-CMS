@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { RuntimeModeModel } from './RuntimeModeModel';
-
 export type ServerInformationResponseModel = {
     version: string;
     assemblyVersion: string;

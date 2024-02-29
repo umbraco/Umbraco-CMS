@@ -137,10 +137,12 @@ export const resolve = async <T>(options: ApiRequestOptions, resolver?: T | Reso
 };
 
 export const getHeaders = async (config: OpenAPIConfig, options: ApiRequestOptions): Promise<Headers> => {
-    const token = await resolve(options, config.TOKEN);
-    const username = await resolve(options, config.USERNAME);
-    const password = await resolve(options, config.PASSWORD);
-    const additionalHeaders = await resolve(options, config.HEADERS);
+    const [token, username, password, additionalHeaders] = await Promise.all([
+        resolve(options, config.TOKEN),
+        resolve(options, config.USERNAME),
+        resolve(options, config.PASSWORD),
+        resolve(options, config.HEADERS),
+    ]);
 
     const headers = Object.entries({
         Accept: 'application/json',

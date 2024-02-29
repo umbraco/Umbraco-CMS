@@ -2,11 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { CreateDocumentTypePropertyTypeContainerRequestModel } from './CreateDocumentTypePropertyTypeContainerRequestModel';
 import type { CreateDocumentTypePropertyTypeRequestModel } from './CreateDocumentTypePropertyTypeRequestModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-
 export type CreateContentTypeForDocumentTypeRequestModel = {
     alias: string;
     name: string;

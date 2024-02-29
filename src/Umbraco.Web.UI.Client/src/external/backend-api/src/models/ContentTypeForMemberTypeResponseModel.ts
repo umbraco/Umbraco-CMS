@@ -2,11 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { MemberTypePropertyTypeContainerResponseModel } from './MemberTypePropertyTypeContainerResponseModel';
 import type { MemberTypePropertyTypeResponseModel } from './MemberTypePropertyTypeResponseModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-
 export type ContentTypeForMemberTypeResponseModel = {
     alias: string;
     name: string;

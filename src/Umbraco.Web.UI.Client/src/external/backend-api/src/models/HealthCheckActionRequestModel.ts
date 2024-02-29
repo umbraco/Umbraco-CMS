@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-
 export type HealthCheckActionRequestModel = {
     healthCheck: ReferenceByIdModel;
     alias?: string | null;

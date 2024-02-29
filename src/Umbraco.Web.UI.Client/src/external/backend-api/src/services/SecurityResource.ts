@@ -6,13 +6,10 @@ import type { ResetPasswordRequestModel } from '../models/ResetPasswordRequestMo
 import type { ResetPasswordTokenRequestModel } from '../models/ResetPasswordTokenRequestModel';
 import type { SecurityConfigurationResponseModel } from '../models/SecurityConfigurationResponseModel';
 import type { VerifyResetPasswordTokenRequestModel } from '../models/VerifyResetPasswordTokenRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class SecurityResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -26,7 +23,6 @@ export class SecurityResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -47,7 +43,6 @@ export class SecurityResource {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -69,7 +64,6 @@ export class SecurityResource {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -91,5 +85,4 @@ export class SecurityResource {
             },
         });
     }
-
 }
