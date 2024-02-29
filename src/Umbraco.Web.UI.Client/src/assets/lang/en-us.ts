@@ -1566,8 +1566,7 @@ export default {
 		allowAtRootHeading: 'Allow at root',
 		allowAtRootDescription: 'Allow editors to create content of this type in the root of the content tree.\n    ',
 		childNodesHeading: 'Allowed child node types',
-		childNodesDescription:
-			'Allow content of the specified types to be created underneath content of this\n      type.\n    ',
+		childNodesDescription: 'Allow content of the specified types to be created underneath content of this type.',
 		chooseChildNode: 'Choose child node',
 		compositionsDescription:
 			'Inherit tabs and properties from an existing Document Type. New tabs will be\n      added to the current Document Type or merged if a tab with an identical name exists.\n    ',

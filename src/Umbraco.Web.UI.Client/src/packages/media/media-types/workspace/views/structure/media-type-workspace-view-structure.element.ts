@@ -54,10 +54,8 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 							}}></uui-toggle>
 					</div>
 				</umb-property-layout>
-				<umb-property-layout alias="ChildNodeType" label="Allowed child node types">
-					<div slot="description">
-						Allow content of the specified types to be created underneath content of this type.
-					</div>
+				<umb-property-layout alias="ChildNodeType" label=${this.localize.term('contentTypeEditor_childNodesHeading')}>
+					<div slot="description">${this.localize.term('contentTypeEditor_childNodesDescription')}</div>
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-media-type
