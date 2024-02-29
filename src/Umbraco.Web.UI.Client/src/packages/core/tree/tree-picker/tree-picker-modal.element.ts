@@ -1,8 +1,9 @@
+import type { UmbTreeSelectionConfiguration } from '../default/default-tree.element.js';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeElement, UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeElement, UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -30,7 +31,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#onSelectionChange(event: UmbSelectionChangeEvent) {
-		debugger;
 		event.stopPropagation();
 		const element = event.target as UmbTreeElement;
 		this.value = { selection: element.getSelection() };
@@ -38,13 +38,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	}
 
 	#onSelected(event: UmbSelectedEvent) {
-		debugger;
 		event.stopPropagation();
 		this.modalContext?.dispatchEvent(new UmbSelectedEvent(event.unique));
 	}
 
 	#onDeselected(event: UmbDeselectedEvent) {
-		debugger;
 		event.stopPropagation();
 		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
