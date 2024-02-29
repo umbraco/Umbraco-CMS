@@ -7,8 +7,8 @@ import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: Revisit usage of workspace for this case...
 export class UmbWebhooksWorkspaceContext extends UmbBaseController implements UmbWorkspaceContextInterface {
-	public readonly workspaceAlias: string = 'Umb.Workspace.Webhooks';
-	#repository: UmbWebhookRepository;
+	public readonly workspaceAlias = 'Umb.Workspace.Webhooks';
+	#repository;
 
 	getEntityType() {
 		return 'webhooks';
@@ -18,7 +18,7 @@ export class UmbWebhooksWorkspaceContext extends UmbBaseController implements Um
 		return 'Webhooks';
 	}
 
-	getEntityId() {
+	getUnique() {
 		return undefined;
 	}
 
