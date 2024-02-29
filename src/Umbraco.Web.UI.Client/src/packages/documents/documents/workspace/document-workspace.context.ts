@@ -355,11 +355,18 @@ export class UmbDocumentWorkspaceContext
 		if (!data) throw new Error('Data is missing');
 		if (!data.unique) throw new Error('Unique is missing');
 		const invariantVariantId = UmbVariantId.CreateInvariant();
+		if (this.#varies === false) {
+			// If we do not vary, we wil just do this for the invariant variant id.
+			selectedVariants = [invariantVariantId];
+		}
 
 		const persistedData = this.#persistedData.getValue();
 
-		// We need to include the invariant variant for values to be saved, we always want to save the invariant values.
-		const variantIdToParseForValues = [...selectedVariants, invariantVariantId];
+		const variantIdsToParseForValues = [...selectedVariants];
+		if (this.#varies === true) {
+			// If we vary then We need to include the invariant variant id for invariant values to be saved, as we always want to save the invariant values.
+			variantIdsToParseForValues.push(invariantVariantId);
+		}
 
 		// Combine data and persisted data depending on the selectedVariants. Always use the invariant values from the data.
 		// loops over each entry in values, determine wether the value should be from the data or the persisted data, depending on wether its a selectedVariant or an invariant value.
@@ -369,7 +376,7 @@ export class UmbDocumentWorkspaceContext
 			values: data.values
 				.map((value) => {
 					// Should this value be saved?
-					if (variantIdToParseForValues.some((x) => x.compare(value))) {
+					if (variantIdsToParseForValues.some((x) => x.compare(value))) {
 						return value;
 					} else {
 						// If not we will find the value in the persisted data and use that instead.
