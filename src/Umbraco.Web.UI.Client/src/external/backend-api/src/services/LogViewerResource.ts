@@ -11,13 +11,10 @@ import type { PagedLogTemplateResponseModel } from '../models/PagedLogTemplateRe
 import type { PagedSavedLogSearchResponseModel } from '../models/PagedSavedLogSearchResponseModel';
 import type { SavedLogSearchRequestModel } from '../models/SavedLogSearchRequestModel';
 import type { SavedLogSearchResponseModel } from '../models/SavedLogSearchResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class LogViewerResource {
-
     /**
      * @returns PagedLoggerResponseModel Success
      * @throws ApiError
@@ -41,7 +38,6 @@ export class LogViewerResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -66,7 +62,6 @@ export class LogViewerResource {
             },
         });
     }
-
     /**
      * @returns PagedLogMessageResponseModel Success
      * @throws ApiError
@@ -105,7 +100,6 @@ export class LogViewerResource {
             },
         });
     }
-
     /**
      * @returns PagedLogTemplateResponseModel Success
      * @throws ApiError
@@ -136,7 +130,6 @@ export class LogViewerResource {
             },
         });
     }
-
     /**
      * @returns PagedSavedLogSearchResponseModel Success
      * @throws ApiError
@@ -160,7 +153,6 @@ export class LogViewerResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -182,7 +174,6 @@ export class LogViewerResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -204,7 +195,6 @@ export class LogViewerResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -227,7 +217,6 @@ export class LogViewerResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -252,5 +241,4 @@ export class LogViewerResource {
             },
         });
     }
-
 }

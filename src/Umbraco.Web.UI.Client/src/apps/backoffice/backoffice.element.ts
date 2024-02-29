@@ -36,6 +36,7 @@ const CORE_PACKAGES = [
 	import('../../packages/tiny-mce/umbraco-package.js'),
 	import('../../packages/umbraco-news/umbraco-package.js'),
 	import('../../packages/user/umbraco-package.js'),
+	import('../../packages/webhook/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')

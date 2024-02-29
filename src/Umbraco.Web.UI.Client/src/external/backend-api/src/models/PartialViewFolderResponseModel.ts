@@ -2,8 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { FileSystemResponseModelBaseModel } from './FileSystemResponseModelBaseModel';
-
 export type PartialViewFolderResponseModel = FileSystemResponseModelBaseModel;
 

@@ -2,10 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { MediaValueModel } from './MediaValueModel';
 import type { MediaVariantResponseModel } from './MediaVariantResponseModel';
-
 export type ContentForMediaResponseModel = {
     values: Array<MediaValueModel>;
     variants: Array<MediaVariantResponseModel>;

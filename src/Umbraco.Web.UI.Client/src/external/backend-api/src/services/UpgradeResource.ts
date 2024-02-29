@@ -3,13 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { UpgradeSettingsResponseModel } from '../models/UpgradeSettingsResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class UpgradeResource {
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -26,7 +23,6 @@ export class UpgradeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -41,5 +37,4 @@ export class UpgradeResource {
             },
         });
     }
-
 }

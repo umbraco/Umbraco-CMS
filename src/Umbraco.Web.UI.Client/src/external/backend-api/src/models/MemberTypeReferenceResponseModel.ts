@@ -2,8 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { ContentTypeReferenceResponseModelBaseModel } from './ContentTypeReferenceResponseModelBaseModel';
-
 export type MemberTypeReferenceResponseModel = ContentTypeReferenceResponseModelBaseModel;
 

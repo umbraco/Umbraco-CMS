@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 export type DeleteUsersRequestModel = {
     userIds: Array<string>;
 };
