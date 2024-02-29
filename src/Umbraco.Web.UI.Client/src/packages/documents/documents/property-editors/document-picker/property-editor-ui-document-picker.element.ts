@@ -13,7 +13,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		return this._value;
 	}
 	public set value(value: Array<string>) {
-		this._value = value || [];
+		this._value = Array.isArray(value) ? value : value ? [value] : [];
 	}
 
 	@property({ attribute: false })
