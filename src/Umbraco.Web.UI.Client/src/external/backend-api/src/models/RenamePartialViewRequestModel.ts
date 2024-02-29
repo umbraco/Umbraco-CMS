@@ -2,8 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { FileSystemRenameRequestModelBaseModel } from './FileSystemRenameRequestModelBaseModel';
-
 export type RenamePartialViewRequestModel = FileSystemRenameRequestModelBaseModel;
 

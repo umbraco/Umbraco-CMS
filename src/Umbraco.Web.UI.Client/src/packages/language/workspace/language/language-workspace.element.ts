@@ -29,7 +29,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 			path: 'edit/:unique',
 			component: this.#createElement,
 			setup: (_component, info) => {
-				this.removeControllerByAlias('_observeIsNew');
+				this.removeControllerByAlias('isNewRedirectController');
 				this.#languageWorkspaceContext.load(info.match.params.unique);
 			},
 		},

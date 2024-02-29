@@ -3,14 +3,14 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { loadManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
 
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
-export class UmbThemeContext extends UmbBaseController {
+export class UmbThemeContext extends UmbControllerBase {
 	#theme = new UmbStringState('umb-light-theme');
 	#themeObserver?: UmbObserverController<ManifestTheme[]>;
 

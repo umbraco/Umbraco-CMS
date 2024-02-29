@@ -4,13 +4,10 @@
 /* eslint-disable */
 import type { TemporaryFileConfigurationResponseModel } from '../models/TemporaryFileConfigurationResponseModel';
 import type { TemporaryFileResponseModel } from '../models/TemporaryFileResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class TemporaryFileResource {
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -35,7 +32,6 @@ export class TemporaryFileResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -58,22 +54,22 @@ export class TemporaryFileResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteTemporaryFileById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/temporary-file/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -81,7 +77,6 @@ export class TemporaryFileResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -95,5 +90,4 @@ export class TemporaryFileResource {
             },
         });
     }
-
 }

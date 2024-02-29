@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { EntityTreeItemResponseModel } from './EntityTreeItemResponseModel';
-
 export type NamedEntityTreeItemResponseModel = (EntityTreeItemResponseModel & {
     name: string;
 });

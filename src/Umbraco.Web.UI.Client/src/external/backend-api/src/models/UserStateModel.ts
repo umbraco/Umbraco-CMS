@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 export enum UserStateModel {
     ACTIVE = 'Active',
     DISABLED = 'Disabled',

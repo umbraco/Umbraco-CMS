@@ -31,7 +31,7 @@ export class UmbChangeUserPasswordServerDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			UserResource.postUserChangePasswordById({
+			UserResource.postUserByIdChangePassword({
 				id,
 				requestBody: {
 					newPassword,

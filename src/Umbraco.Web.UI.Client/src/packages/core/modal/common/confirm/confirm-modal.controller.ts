@@ -1,11 +1,11 @@
 import { UMB_CONFIRM_MODAL, type UmbConfirmModalData } from '../../token/confirm-modal.token.js';
 import { UMB_MODAL_MANAGER_CONTEXT } from '../../context/modal-manager.context.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbConfirmModalArgs extends UmbConfirmModalData {}
 
-export class UmbConfirmModalController extends UmbBaseController {
+export class UmbConfirmModalController extends UmbControllerBase {
 	async open(args: UmbConfirmModalArgs): Promise<void> {
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 

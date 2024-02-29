@@ -19,6 +19,7 @@ export type { AvailableContentTypeCompositionResponseModelBaseModel } from './mo
 export type { AvailableDocumentTypeCompositionResponseModel } from './models/AvailableDocumentTypeCompositionResponseModel';
 export type { AvailableMediaTypeCompositionResponseModel } from './models/AvailableMediaTypeCompositionResponseModel';
 export type { AvailableMemberTypeCompositionResponseModel } from './models/AvailableMemberTypeCompositionResponseModel';
+export type { ChangePasswordCurrentUserRequestModel } from './models/ChangePasswordCurrentUserRequestModel';
 export type { ChangePasswordUserRequestModel } from './models/ChangePasswordUserRequestModel';
 export { CompositionTypeModel } from './models/CompositionTypeModel';
 export type { ConsentLevelPresentationModel } from './models/ConsentLevelPresentationModel';
@@ -60,6 +61,7 @@ export type { CreateMediaRequestModel } from './models/CreateMediaRequestModel';
 export type { CreateMediaTypePropertyTypeContainerRequestModel } from './models/CreateMediaTypePropertyTypeContainerRequestModel';
 export type { CreateMediaTypePropertyTypeRequestModel } from './models/CreateMediaTypePropertyTypeRequestModel';
 export type { CreateMediaTypeRequestModel } from './models/CreateMediaTypeRequestModel';
+export type { CreateMemberGroupRequestModel } from './models/CreateMemberGroupRequestModel';
 export type { CreateMemberRequestModel } from './models/CreateMemberRequestModel';
 export type { CreateMemberTypePropertyTypeContainerRequestModel } from './models/CreateMemberTypePropertyTypeContainerRequestModel';
 export type { CreateMemberTypePropertyTypeRequestModel } from './models/CreateMemberTypePropertyTypeRequestModel';
@@ -75,7 +77,6 @@ export type { CreateStylesheetRequestModel } from './models/CreateStylesheetRequ
 export type { CreateTemplateRequestModel } from './models/CreateTemplateRequestModel';
 export type { CreateUserGroupRequestModel } from './models/CreateUserGroupRequestModel';
 export type { CreateUserRequestModel } from './models/CreateUserRequestModel';
-export type { CreateUserResponseModel } from './models/CreateUserResponseModel';
 export type { CreateWebhookRequestModel } from './models/CreateWebhookRequestModel';
 export type { CultureAndScheduleRequestModel } from './models/CultureAndScheduleRequestModel';
 export type { CultureReponseModel } from './models/CultureReponseModel';
@@ -108,6 +109,7 @@ export type { DocumentCollectionResponseModel } from './models/DocumentCollectio
 export type { DocumentConfigurationResponseModel } from './models/DocumentConfigurationResponseModel';
 export type { DocumentItemResponseModel } from './models/DocumentItemResponseModel';
 export type { DocumentNotificationResponseModel } from './models/DocumentNotificationResponseModel';
+export type { DocumentPermissionPresentationModel } from './models/DocumentPermissionPresentationModel';
 export type { DocumentRecycleBinItemResponseModel } from './models/DocumentRecycleBinItemResponseModel';
 export type { DocumentResponseModel } from './models/DocumentResponseModel';
 export type { DocumentTreeItemResponseModel } from './models/DocumentTreeItemResponseModel';
@@ -142,6 +144,7 @@ export type { DynamicRootResponseModel } from './models/DynamicRootResponseModel
 export type { EnableTwoFactorRequestModel } from './models/EnableTwoFactorRequestModel';
 export type { EnableUserRequestModel } from './models/EnableUserRequestModel';
 export type { EntityTreeItemResponseModel } from './models/EntityTreeItemResponseModel';
+export { EventMessageTypeModel } from './models/EventMessageTypeModel';
 export type { FieldPresentationModel } from './models/FieldPresentationModel';
 export type { FileSystemCreateRequestModelBaseModel } from './models/FileSystemCreateRequestModelBaseModel';
 export type { FileSystemFileCreateRequestModelBaseModel } from './models/FileSystemFileCreateRequestModelBaseModel';
@@ -208,6 +211,8 @@ export type { MediaValueModel } from './models/MediaValueModel';
 export type { MediaVariantRequestModel } from './models/MediaVariantRequestModel';
 export type { MediaVariantResponseModel } from './models/MediaVariantResponseModel';
 export type { MemberGroupItemResponseModel } from './models/MemberGroupItemResponseModel';
+export type { MemberGroupPresentationBaseModel } from './models/MemberGroupPresentationBaseModel';
+export type { MemberGroupResponseModel } from './models/MemberGroupResponseModel';
 export type { MemberItemResponseModel } from './models/MemberItemResponseModel';
 export type { MemberResponseModel } from './models/MemberResponseModel';
 export type { MemberTypeCompositionModel } from './models/MemberTypeCompositionModel';
@@ -232,6 +237,7 @@ export type { MoveMediaTypeRequestModel } from './models/MoveMediaTypeRequestMod
 export type { NamedEntityTreeItemResponseModel } from './models/NamedEntityTreeItemResponseModel';
 export type { NamedItemResponseModelBaseModel } from './models/NamedItemResponseModelBaseModel';
 export type { NoopSetupTwoFactorModel } from './models/NoopSetupTwoFactorModel';
+export type { NotificationHeaderModel } from './models/NotificationHeaderModel';
 export type { ObjectTypeResponseModel } from './models/ObjectTypeResponseModel';
 export type { OkResult } from './models/OkResult';
 export { OperatorModel } from './models/OperatorModel';
@@ -266,6 +272,7 @@ export type { PagedMediaCollectionResponseModel } from './models/PagedMediaColle
 export type { PagedMediaRecycleBinItemResponseModel } from './models/PagedMediaRecycleBinItemResponseModel';
 export type { PagedMediaTreeItemResponseModel } from './models/PagedMediaTreeItemResponseModel';
 export type { PagedMediaTypeTreeItemResponseModel } from './models/PagedMediaTypeTreeItemResponseModel';
+export type { PagedMemberGroupResponseModel } from './models/PagedMemberGroupResponseModel';
 export type { PagedMemberResponseModel } from './models/PagedMemberResponseModel';
 export type { PagedNamedEntityTreeItemResponseModel } from './models/PagedNamedEntityTreeItemResponseModel';
 export type { PagedObjectTypeResponseModel } from './models/PagedObjectTypeResponseModel';
@@ -318,6 +325,7 @@ export type { RenameStylesheetRequestModel } from './models/RenameStylesheetRequ
 export type { ResendInviteUserRequestModel } from './models/ResendInviteUserRequestModel';
 export type { ResetPasswordRequestModel } from './models/ResetPasswordRequestModel';
 export type { ResetPasswordTokenRequestModel } from './models/ResetPasswordTokenRequestModel';
+export type { ResetPasswordUserResponseModel } from './models/ResetPasswordUserResponseModel';
 export { RuntimeLevelModel } from './models/RuntimeLevelModel';
 export { RuntimeModeModel } from './models/RuntimeModeModel';
 export type { SavedLogSearchPresenationBaseModel } from './models/SavedLogSearchPresenationBaseModel';
@@ -366,6 +374,7 @@ export type { TemporaryFileConfigurationResponseModel } from './models/Temporary
 export type { TemporaryFileResponseModel } from './models/TemporaryFileResponseModel';
 export type { TourStatusModel } from './models/TourStatusModel';
 export type { TreeItemPresentationModel } from './models/TreeItemPresentationModel';
+export type { UnknownTypePermissionPresentationModel } from './models/UnknownTypePermissionPresentationModel';
 export type { UnlockUsersRequestModel } from './models/UnlockUsersRequestModel';
 export type { UnpublishDocumentRequestModel } from './models/UnpublishDocumentRequestModel';
 export type { UpdateContentForDocumentRequestModel } from './models/UpdateContentForDocumentRequestModel';
@@ -388,6 +397,7 @@ export type { UpdateMediaRequestModel } from './models/UpdateMediaRequestModel';
 export type { UpdateMediaTypePropertyTypeContainerRequestModel } from './models/UpdateMediaTypePropertyTypeContainerRequestModel';
 export type { UpdateMediaTypePropertyTypeRequestModel } from './models/UpdateMediaTypePropertyTypeRequestModel';
 export type { UpdateMediaTypeRequestModel } from './models/UpdateMediaTypeRequestModel';
+export type { UpdateMemberGroupRequestModel } from './models/UpdateMemberGroupRequestModel';
 export type { UpdateMemberRequestModel } from './models/UpdateMemberRequestModel';
 export type { UpdateMemberTypePropertyTypeContainerRequestModel } from './models/UpdateMemberTypePropertyTypeContainerRequestModel';
 export type { UpdateMemberTypePropertyTypeRequestModel } from './models/UpdateMemberTypePropertyTypeRequestModel';

@@ -14,13 +14,10 @@ import type { PagedMediaTreeItemResponseModel } from '../models/PagedMediaTreeIt
 import type { ReferenceByIdModel } from '../models/ReferenceByIdModel';
 import type { SortingRequestModel } from '../models/SortingRequestModel';
 import type { UpdateMediaRequestModel } from '../models/UpdateMediaRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class MediaResource {
-
     /**
      * @returns PagedMediaCollectionResponseModel Success
      * @throws ApiError
@@ -61,7 +58,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -82,7 +78,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -106,7 +101,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -129,22 +123,22 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteMediaById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/media/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -153,9 +147,8 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putMediaById({
@@ -164,7 +157,7 @@ export class MediaResource {
     }: {
         id: string,
         requestBody?: UpdateMediaRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/{id}',
@@ -173,6 +166,7 @@ export class MediaResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -181,9 +175,8 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putMediaByIdMove({
@@ -192,7 +185,7 @@ export class MediaResource {
     }: {
         id: string,
         requestBody?: MoveMediaRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/{id}/move',
@@ -201,6 +194,7 @@ export class MediaResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -208,22 +202,22 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putMediaByIdMoveToRecycleBin({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/{id}/move-to-recycle-bin',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -232,9 +226,8 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putMediaByIdValidate({
@@ -243,7 +236,7 @@ export class MediaResource {
     }: {
         id: string,
         requestBody?: UpdateMediaRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/{id}/validate',
@@ -252,6 +245,7 @@ export class MediaResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -260,7 +254,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -274,21 +267,21 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putMediaSort({
         requestBody,
     }: {
         requestBody?: SortingRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media/sort',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -297,21 +290,21 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postMediaValidate({
         requestBody,
     }: {
         requestBody?: CreateMediaRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/media/validate',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -320,15 +313,15 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
-    public static deleteRecycleBinMedia(): CancelablePromise<any> {
+    public static deleteRecycleBinMedia(): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/recycle-bin/media',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -336,22 +329,22 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteRecycleBinMediaById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/recycle-bin/media/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -360,7 +353,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -384,9 +376,8 @@ export class MediaResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putRecycleBinMediaByIdRestore({
@@ -395,7 +386,7 @@ export class MediaResource {
     }: {
         id: string,
         requestBody?: MoveMediaRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/recycle-bin/media/{id}/restore',
@@ -404,6 +395,7 @@ export class MediaResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -412,7 +404,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns PagedMediaRecycleBinItemResponseModel Success
      * @throws ApiError
@@ -439,7 +430,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns PagedMediaRecycleBinItemResponseModel Success
      * @throws ApiError
@@ -463,7 +453,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns PagedMediaTreeItemResponseModel Success
      * @throws ApiError
@@ -493,7 +482,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns PagedMediaTreeItemResponseModel Success
      * @throws ApiError
@@ -520,5 +508,4 @@ export class MediaResource {
             },
         });
     }
-
 }

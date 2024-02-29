@@ -6,13 +6,10 @@ import type { ResetPasswordRequestModel } from '../models/ResetPasswordRequestMo
 import type { ResetPasswordTokenRequestModel } from '../models/ResetPasswordTokenRequestModel';
 import type { SecurityConfigurationResponseModel } from '../models/SecurityConfigurationResponseModel';
 import type { VerifyResetPasswordTokenRequestModel } from '../models/VerifyResetPasswordTokenRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class SecurityResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -26,27 +23,26 @@ export class SecurityResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postSecurityForgotPassword({
         requestBody,
     }: {
         requestBody?: ResetPasswordRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/forgot-password',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -68,7 +64,6 @@ export class SecurityResource {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -90,5 +85,4 @@ export class SecurityResource {
             },
         });
     }
-
 }

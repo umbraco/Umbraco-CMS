@@ -1,6 +1,6 @@
 import type { UmbUserStateEnum } from '../types.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../workspace/user-workspace.context.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { isCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import type {
 	UmbConditionConfigBase,
@@ -8,7 +8,7 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbUserActionConditionBase extends UmbBaseController implements UmbExtensionCondition {
+export class UmbUserActionConditionBase extends UmbControllerBase implements UmbExtensionCondition {
 	config: UmbConditionConfigBase;
 	permitted = false;
 	#onChange: () => void;

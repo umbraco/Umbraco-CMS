@@ -7,13 +7,10 @@ import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamed
 import type { RelationTypeItemResponseModel } from '../models/RelationTypeItemResponseModel';
 import type { RelationTypeResponseModel } from '../models/RelationTypeResponseModel';
 import type { UpdateRelationTypeRequestModel } from '../models/UpdateRelationTypeRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class RelationTypeResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -34,7 +31,6 @@ export class RelationTypeResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -56,7 +52,6 @@ export class RelationTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -78,29 +73,28 @@ export class RelationTypeResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteRelationTypeById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/relation-type/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -127,7 +121,6 @@ export class RelationTypeResource {
             },
         });
     }
-
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -151,5 +144,4 @@ export class RelationTypeResource {
             },
         });
     }
-
 }
