@@ -1,11 +1,10 @@
-import { UmbWebhookRepository } from '../../repository/webhooks.repository.js';
+import { UmbWebhookRepository } from '../repository/webhooks.repository.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
-// TODO: Revisit usage of workspace for this case...
 export class UmbWebhooksWorkspaceContext extends UmbBaseController implements UmbWorkspaceContextInterface {
 	public readonly workspaceAlias = 'Umb.Workspace.Webhooks';
 	#repository;

@@ -2,5 +2,6 @@ import './components/index.js';
 
 export * from './repository/index.js';
 export * from './collection/index.js';
+export * from './workspace/index.js';
 
-export type { UmbWebhookDetailModel } from './types.js';
+export type * from './types.js';
