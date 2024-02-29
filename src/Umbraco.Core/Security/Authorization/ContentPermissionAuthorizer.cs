@@ -14,7 +14,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
 
     /// <inheritdoc/>
     public async Task<bool> IsDeniedAsync(IUser currentUser, IEnumerable<Guid> contentKeys,
-        ISet<char> permissionsToCheck)
+        ISet<string> permissionsToCheck)
     {
         if (!contentKeys.Any())
         {
@@ -31,7 +31,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
 
     /// <inheritdoc/>
     public async Task<bool> IsDeniedWithDescendantsAsync(IUser currentUser, Guid parentKey,
-        ISet<char> permissionsToCheck)
+        ISet<string> permissionsToCheck)
     {
         ContentAuthorizationStatus result =
             await _contentPermissionService.AuthorizeDescendantsAccessAsync(currentUser, parentKey, permissionsToCheck);
@@ -41,7 +41,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsDeniedAtRootLevelAsync(IUser currentUser, ISet<char> permissionsToCheck)
+    public async Task<bool> IsDeniedAtRootLevelAsync(IUser currentUser, ISet<string> permissionsToCheck)
     {
         ContentAuthorizationStatus result =
             await _contentPermissionService.AuthorizeRootAccessAsync(currentUser, permissionsToCheck);
@@ -51,7 +51,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsDeniedAtRecycleBinLevelAsync(IUser currentUser, ISet<char> permissionsToCheck)
+    public async Task<bool> IsDeniedAtRecycleBinLevelAsync(IUser currentUser, ISet<string> permissionsToCheck)
     {
         ContentAuthorizationStatus result =
             await _contentPermissionService.AuthorizeBinAccessAsync(currentUser, permissionsToCheck);

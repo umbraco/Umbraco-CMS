@@ -150,7 +150,6 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         builder.AddConfiguration()
             .AddUmbracoCore()
             .AddWebComponents()
-            .AddRuntimeMinifier()
             .AddBackOfficeAuthentication()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()

@@ -50,6 +50,10 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Media start node key not found")
                 .WithDetail("The assigned media start node does not exists.")
                 .Build()),
+            UserGroupOperationStatus.DocumentPermissionKeyNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("A document permission key not found")
+                .WithDetail("A assigned document permission not exists.")
+                .Build()),
             UserGroupOperationStatus.LanguageNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Language not found")
                 .WithDetail("The specified language cannot be found.")
