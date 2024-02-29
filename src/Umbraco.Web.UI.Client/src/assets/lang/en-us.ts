@@ -1654,6 +1654,7 @@ export default {
 		collections: 'Collections',
 		collectionsDescription:
 			'Configures the content item to show list of its children, the children will not be shown in the tree.',
+		structure: 'Structure',
 	},
 	languages: {
 		addLanguage: 'Add language',

@@ -1658,6 +1658,7 @@ export default {
 		collections: 'Samlinger',
 		collectionsDescription:
 			'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer, underordnede elementer vil ikke blive vist i træet.',
+		structure: 'Struktur',
 	},
 	languages: {
 		addLanguage: 'Tilføj sprog',
