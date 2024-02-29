@@ -351,7 +351,6 @@ export class UmbDocumentWorkspaceContext
 	async #pickVariantsForAction(type: UmbDocumentVariantPickerModalType): Promise<UmbVariantId[]> {
 		const activeVariants = this.splitView.getActiveVariants();
 
-		// TODO: Picked variants should include the ones that has been changed (but not jet saved) this requires some more awareness about the state of runtime data. [NL]
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
 		const selected = activeVariantIds.concat(this.#calculateChangedVariants());
 		const options = await firstValueFrom(this.variantOptions);
