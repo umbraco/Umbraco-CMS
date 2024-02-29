@@ -66,14 +66,13 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				return containsAlias && isValidEntityType;
 			},
 			(ctrls) => {
-				ctrls.forEach((ctrl) => {
-					ctrl.properties = { unique, entityType };
-				});
 				this._actions = ctrls;
 			},
-			undefined,
+			'workspaceActionExtensionsInitializer',
 			'umb-entity-action',
 		);
+
+		this.#actionsInitializer.properties = { unique, entityType };
 	}
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
