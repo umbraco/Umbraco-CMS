@@ -355,12 +355,15 @@ export class UmbDocumentWorkspaceContext
 		const selected = activeVariantIds.concat(this.#calculateChangedVariants());
 		const options = await firstValueFrom(this.variantOptions);
 
+		console.log('activeVariantIds', activeVariantIds);
+		console.log('selected', selected);
+
 		// If there is only one variant, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
 		} else if (options.length === 1) {
 			// If only one option we will skip ahead and save the document with the only variant available:
-			const firstVariant = new UmbVariantId(options[0].language.unique, null);
+			const firstVariant = UmbVariantId.Create(options[0]);
 			return await this.#performSaveOrCreate([firstVariant]);
 		}
 
