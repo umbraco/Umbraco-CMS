@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -13,20 +14,20 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement;
 internal sealed class ContentListViewService : ContentListViewServiceBase<IContent, IContentType, IContentTypeService>, IContentListViewService
 {
     private readonly IContentService _contentService;
-    private readonly IContentPermissionService _contentPermissionService;
+    private readonly IContentPermissionAuthorizer _contentPermissionAuthorizer;
 
     protected override Guid DefaultListViewKey => Constants.DataTypes.Guids.ListViewContentGuid;
 
     public ContentListViewService(
         IContentService contentService,
         IContentTypeService contentTypeService,
-        IContentPermissionService contentPermissionService,
         IDataTypeService dataTypeService,
-        ISqlContext sqlContext)
+        ISqlContext sqlContext,
+        IContentPermissionAuthorizer contentPermissionAuthorizer)
         : base(contentTypeService, dataTypeService, sqlContext)
     {
         _contentService = contentService;
-        _contentPermissionService = contentPermissionService;
+        _contentPermissionAuthorizer = contentPermissionAuthorizer;
     }
 
     public async Task<Attempt<ListViewPagedModel<IContent>?, ContentCollectionOperationStatus>> GetListViewItemsByKeyAsync(
@@ -80,19 +81,11 @@ internal sealed class ContentListViewService : ContentListViewServiceBase<IConte
     // a general response whether the user has access to all nodes.
     protected override async Task<bool> HasAccessToListViewItemAsync(IUser user, Guid key)
     {
-        // TODO: Consider if it is better to use IContentPermissionAuthorizer here as people will be able to apply their external authorization
-        ContentAuthorizationStatus accessStatus = await _contentPermissionService.AuthorizeAccessAsync(
+        var isDenied = await _contentPermissionAuthorizer.IsDeniedAsync(
             user,
             key,
             ActionBrowse.ActionLetter);
 
-        // var isAuthorized = await _contentPermissionAuthorizer.IsAuthorizedAsync(
-        //     user, //IPrincipal
-        //     item.Key,
-        //     ActionBrowse.ActionLetter);
-        //
-        // return isAuthorized;
-
-        return accessStatus == ContentAuthorizationStatus.Success;
+        return isDenied is false;
     }
 }

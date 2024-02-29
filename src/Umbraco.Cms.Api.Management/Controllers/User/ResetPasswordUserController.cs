@@ -1,12 +1,12 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -16,28 +16,31 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiVersion("1.0")]
-public class ChangePasswordUserController : UserControllerBase
+public class ResetPasswordUserController : UserControllerBase
 {
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IUmbracoMapper _mapper;
     private readonly IAuthorizationService _authorizationService;
 
-    public ChangePasswordUserController(
+    public ResetPasswordUserController(
         IUserService userService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUmbracoMapper mapper,
         IAuthorizationService authorizationService)
     {
         _userService = userService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _mapper = mapper;
         _authorizationService = authorizationService;
     }
 
-    [HttpPost("{id:guid}/change-password")]
+    [HttpPost("{id:guid}/reset-password")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResetPasswordUserResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ChangePassword(Guid id, ChangePasswordUserRequestModel model)
+    public async Task<IActionResult> ResetPassword(Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
@@ -49,16 +52,10 @@ public class ChangePasswordUserController : UserControllerBase
             return Forbidden();
         }
 
-        var passwordModel = new ChangeUserPasswordModel
-        {
-            NewPassword = model.NewPassword,
-            UserKey = id,
-        };
-
-        Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.ChangePasswordAsync(CurrentUserKey(_backOfficeSecurityAccessor), passwordModel);
+        Attempt<PasswordChangedModel, UserOperationStatus> response = await _userService.ResetPasswordAsync(CurrentUserKey(_backOfficeSecurityAccessor), id);
 
         return response.Success
-            ? Ok()
+            ? Ok(_mapper.Map<ResetPasswordUserResponseModel>(response.Result))
             : UserOperationStatusResult(response.Status, response.Result);
     }
 }

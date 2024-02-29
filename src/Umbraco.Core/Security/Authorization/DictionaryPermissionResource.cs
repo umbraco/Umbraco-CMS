@@ -1,11 +1,9 @@
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Dictionary;
+namespace Umbraco.Cms.Core.Security.Authorization;
 
 public class DictionaryPermissionResource : IPermissionResource
 {
-    public DictionaryPermissionResource(IEnumerable<string> cultures)
-    {
+    public DictionaryPermissionResource(IEnumerable<string> cultures) =>
         CulturesToCheck = new HashSet<string>(cultures);
-    }
 
     /// <summary>
     /// All the cultures need to be accessible when evaluating

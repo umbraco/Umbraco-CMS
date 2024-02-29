@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization;
+namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <inheritdoc />
 internal sealed class AuthorizationHelper : IAuthorizationHelper
@@ -40,7 +40,8 @@ internal sealed class AuthorizationHelper : IAuthorizationHelper
 
         if (user is null)
         {
-            throw new InvalidOperationException($"Could not obtain an {nameof(IUser)} instance from {nameof(IPrincipal)}");
+            throw new InvalidOperationException(
+                $"Could not obtain an {nameof(IUser)} instance from {nameof(IPrincipal)}");
         }
 
         return user;
