@@ -26,7 +26,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly description;
 	readonly icon;
 
-	readonly allowedAsRoot;
+	readonly allowedAtRoot;
 	readonly variesByCulture;
 	readonly variesBySegment;
 	readonly isElement;
@@ -53,7 +53,7 @@ export class UmbDocumentTypeWorkspaceContext
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
 		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
-		this.allowedAsRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAsRoot);
+		this.allowedAtRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAtRoot);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((data) => data?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((data) => data?.variesBySegment);
 		this.isElement = this.structure.ownerContentTypeObservablePart((data) => data?.isElement);
@@ -108,8 +108,8 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ icon });
 	}
 
-	setAllowedAsRoot(allowedAsRoot: boolean) {
-		this.structure.updateOwnerContentType({ allowedAsRoot });
+	setAllowedAtRoot(allowedAtRoot: boolean) {
+		this.structure.updateOwnerContentType({ allowedAtRoot });
 	}
 	setVariesByCulture(variesByCulture: boolean) {
 		this.structure.updateOwnerContentType({ variesByCulture });
