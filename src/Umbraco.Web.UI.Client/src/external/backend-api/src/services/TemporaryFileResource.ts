@@ -4,13 +4,10 @@
 /* eslint-disable */
 import type { TemporaryFileConfigurationResponseModel } from '../models/TemporaryFileConfigurationResponseModel';
 import type { TemporaryFileResponseModel } from '../models/TemporaryFileResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class TemporaryFileResource {
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -35,7 +32,6 @@ export class TemporaryFileResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -58,7 +54,6 @@ export class TemporaryFileResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -82,7 +77,6 @@ export class TemporaryFileResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -96,5 +90,4 @@ export class TemporaryFileResource {
             },
         });
     }
-
 }

@@ -4,13 +4,10 @@
 /* eslint-disable */
 import type { ModelsBuilderResponseModel } from '../models/ModelsBuilderResponseModel';
 import type { OutOfDateStatusResponseModel } from '../models/OutOfDateStatusResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class ModelsBuilderResource {
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -26,7 +23,6 @@ export class ModelsBuilderResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -40,7 +36,6 @@ export class ModelsBuilderResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -54,5 +49,4 @@ export class ModelsBuilderResource {
             },
         });
     }
-
 }

@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { MemberResponseModel } from './MemberResponseModel';
-
 export type PagedMemberResponseModel = {
     total: number;
     items: Array<MemberResponseModel>;

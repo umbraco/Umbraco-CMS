@@ -8,13 +8,10 @@ import type { MemberItemResponseModel } from '../models/MemberItemResponseModel'
 import type { MemberResponseModel } from '../models/MemberResponseModel';
 import type { PagedMemberResponseModel } from '../models/PagedMemberResponseModel';
 import type { UpdateMemberRequestModel } from '../models/UpdateMemberRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class MemberResource {
-
     /**
      * @returns PagedMemberResponseModel Success
      * @throws ApiError
@@ -51,7 +48,6 @@ export class MemberResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -72,7 +68,6 @@ export class MemberResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -95,7 +90,6 @@ export class MemberResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -117,7 +111,6 @@ export class MemberResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -141,7 +134,6 @@ export class MemberResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -169,7 +161,6 @@ export class MemberResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -197,7 +188,6 @@ export class MemberResource {
             },
         });
     }
-
     /**
      * @returns PagedMemberResponseModel Success
      * @throws ApiError
@@ -258,5 +248,4 @@ export class MemberResource {
             },
         });
     }
-
 }

@@ -8,13 +8,10 @@ import type { PagedUserGroupResponseModel } from '../models/PagedUserGroupRespon
 import type { UpdateUserGroupRequestModel } from '../models/UpdateUserGroupRequestModel';
 import type { UserGroupItemResponseModel } from '../models/UserGroupItemResponseModel';
 import type { UserGroupResponseModel } from '../models/UserGroupResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class UserGroupResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -35,7 +32,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -58,7 +54,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -80,7 +75,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns PagedUserGroupResponseModel Success
      * @throws ApiError
@@ -104,7 +98,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -127,7 +120,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -151,7 +143,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -178,7 +169,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -206,7 +196,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -234,5 +223,4 @@ export class UserGroupResource {
             },
         });
     }
-
 }
