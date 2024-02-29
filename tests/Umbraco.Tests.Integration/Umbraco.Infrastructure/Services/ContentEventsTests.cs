@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -2088,7 +2089,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public class LocalServerMessenger : ServerMessengerBase
         {
             public LocalServerMessenger()
-                : base(false)
+                : base(false, new SystemTextJsonSerializer())
             {
             }
 
