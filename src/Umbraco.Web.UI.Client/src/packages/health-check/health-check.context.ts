@@ -46,7 +46,6 @@ export class UmbHealthCheckContext implements UmbApi {
 	}
 
 	public destroy(): void {
-		this.destroy();
 	}
 }
 
