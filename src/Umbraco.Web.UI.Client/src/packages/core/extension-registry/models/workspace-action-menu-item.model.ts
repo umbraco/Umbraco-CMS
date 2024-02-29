@@ -14,9 +14,10 @@ export interface MetaWorkspaceActionMenuItem extends MetaEntityAction {
 	/**
 	 * Define which workspace actions this menu item should be shown for.
 	 * @examples [
-	 * 	['Umb.WorkspaceAction.Document.Save', 'Umb.WorkspaceAction.Document.SaveAndPublish']
+	 * 	['Umb.WorkspaceAction.Document.Save', 'Umb.WorkspaceAction.Document.SaveAndPublish'],
+	 * 	"Umb.WorkspaceAction.Document.Save"
 	 * ]
 	 * @required
 	 */
-	workspaceActions: string[];
+	workspaceActions: string | string[];
 }

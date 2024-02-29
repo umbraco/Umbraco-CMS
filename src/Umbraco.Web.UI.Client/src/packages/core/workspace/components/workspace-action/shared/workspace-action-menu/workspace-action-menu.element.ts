@@ -56,7 +56,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			umbExtensionsRegistry,
 			'workspaceActionMenuItem', // TODO: Stop using string for 'workspaceActionMenuItem', we need to start using Const.
 			(action) => {
-				const containsAlias = action.meta.workspaceActions.some((alias) => this.workspaceActions.includes(alias));
+				const containsAlias = Array.isArray(action.meta.workspaceActions)
+					? action.meta.workspaceActions
+					: [action.meta.workspaceActions].some((alias) => this.workspaceActions.includes(alias));
 				const isValidEntityType = !action.meta.entityTypes.length || action.meta.entityTypes.includes(entityType);
 				return containsAlias && isValidEntityType;
 			},
