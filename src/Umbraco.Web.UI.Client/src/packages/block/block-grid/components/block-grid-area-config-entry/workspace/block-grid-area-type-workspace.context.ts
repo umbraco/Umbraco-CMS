@@ -12,7 +12,7 @@ import {
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockGridAreaTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbBlockGridTypeAreaType>
@@ -29,7 +29,7 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.alias);
 	readonly unique = this.#data.asObservablePart((data) => data?.key);
 
-	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
+	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
 
 	constructor(host: UmbControllerHostElement, workspaceArgs: { manifest: ManifestWorkspace }) {

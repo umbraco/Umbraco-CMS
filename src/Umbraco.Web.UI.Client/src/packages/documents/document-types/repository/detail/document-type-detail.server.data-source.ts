@@ -186,6 +186,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			allowedTemplates: model.allowedTemplates,
 			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -252,6 +253,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			allowedTemplates: model.allowedTemplates,
 			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { error } = await tryExecuteAndNotify(

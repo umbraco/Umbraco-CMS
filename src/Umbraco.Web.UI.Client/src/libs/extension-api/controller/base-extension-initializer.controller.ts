@@ -1,7 +1,7 @@
 import { createExtensionApi } from '../functions/index.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	UmbConditionConfigBase,
 	ManifestCondition,
@@ -21,7 +21,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 export abstract class UmbBaseExtensionInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	SubClassType = never,
-> extends UmbBaseController {
+> extends UmbControllerBase {
 	//
 	#promiseResolvers: Array<() => void> = [];
 	#manifestObserver!: UmbObserverController<ManifestType | undefined>;

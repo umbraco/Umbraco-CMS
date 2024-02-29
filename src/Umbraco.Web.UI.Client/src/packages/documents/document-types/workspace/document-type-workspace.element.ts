@@ -30,7 +30,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 			path: 'edit/:id',
 			component: this.#createElement,
 			setup: (_component, info) => {
-				this.removeControllerByAlias('_observeIsNew');
+				this.removeControllerByAlias('isNewRedirectController');
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
 			},

@@ -1,7 +1,7 @@
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import type { ManifestUserPermission } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -25,7 +25,7 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 	async #observeUserPermissions(value: Array<string>) {
 		if (value) {
 			this.observe(
-				umbExtensionsRegistry.byType('userPermission').pipe(
+				umbExtensionsRegistry.byType('entityUserPermission').pipe(
 					map((manifests) => {
 						return manifests.filter((manifest) => manifest.alias && value.includes(manifest.alias));
 					}),
@@ -38,7 +38,7 @@ export class UmbUserGroupRefElement extends UmbElementMixin(UUIRefNodeElement) {
 		}
 	}
 
-	#setUserPermissionLabels(manifests: Array<ManifestUserPermission>) {
+	#setUserPermissionLabels(manifests: Array<ManifestEntityUserPermission>) {
 		this.#userPermissionLabels = manifests.map((manifest) =>
 			manifest.meta.labelKey ? this.localize.term(manifest.meta.labelKey) : manifest.meta.label ?? '',
 		);

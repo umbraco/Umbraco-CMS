@@ -3,9 +3,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbRepositoryItemsManager<ItemType extends { unique: string }> extends UmbBaseController {
+export class UmbRepositoryItemsManager<ItemType extends { unique: string }> extends UmbControllerBase {
 	//
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;

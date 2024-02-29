@@ -9,10 +9,10 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A base property dataset context implementation.
- * @class UmbPropertyDatasetBaseContext
+ * @class UmbPropertyDatasetContextBase
  * @extends {UmbContextBase}
  */
-export class UmbPropertyDatasetBaseContext
+export class UmbPropertyDatasetContextBase
 	extends UmbContextBase<typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE>
 	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {

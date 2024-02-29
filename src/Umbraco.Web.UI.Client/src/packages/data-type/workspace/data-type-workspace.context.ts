@@ -15,8 +15,8 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
-	PropertyEditorConfigDefaultData,
-	PropertyEditorConfigProperty,
+	PropertyEditorSettingsDefaultData,
+	PropertyEditorSettingsProperty,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
@@ -44,22 +44,22 @@ export class UmbDataTypeWorkspaceContext
 	readonly propertyEditorUiAlias = this.#currentData.asObservablePart((data) => data?.editorUiAlias);
 	readonly propertyEditorSchemaAlias = this.#currentData.asObservablePart((data) => data?.editorAlias);
 
-	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
+	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
 
-	private _propertyEditorSchemaConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
-	private _propertyEditorUISettingsDefaultData: Array<PropertyEditorConfigDefaultData> = [];
+	private _propertyEditorSchemaConfigDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
+	private _propertyEditorUISettingsDefaultData: Array<PropertyEditorSettingsDefaultData> = [];
 
-	private _propertyEditorSchemaConfigProperties: Array<PropertyEditorConfigProperty> = [];
-	private _propertyEditorUISettingsProperties: Array<PropertyEditorConfigProperty> = [];
+	private _propertyEditorSchemaConfigProperties: Array<PropertyEditorSettingsProperty> = [];
+	private _propertyEditorUISettingsProperties: Array<PropertyEditorSettingsProperty> = [];
 
 	private _propertyEditorSchemaConfigDefaultUIAlias: string | null = null;
 
-	private _configDefaultData?: Array<PropertyEditorConfigDefaultData>;
+	private _configDefaultData?: Array<PropertyEditorSettingsDefaultData>;
 
 	private _propertyEditorUISettingsSchemaAlias?: string;
 
-	#defaults = new UmbArrayState<PropertyEditorConfigDefaultData>([], (entry) => entry.alias);
+	#defaults = new UmbArrayState<PropertyEditorSettingsDefaultData>([], (entry) => entry.alias);
 	readonly defaults = this.#defaults.asObservable();
 
 	#propertyEditorUiIcon = new UmbStringState<string | null>(null);

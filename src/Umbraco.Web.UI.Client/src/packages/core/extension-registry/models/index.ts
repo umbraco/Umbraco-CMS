@@ -29,11 +29,12 @@ import type { ManifestTreeItem } from './tree-item.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
 import type { ManifestWorkspace } from './workspace.model.js';
 import type { ManifestWorkspaceAction } from './workspace-action.model.js';
+import type { ManifestWorkspaceActionMenuItem } from './workspace-action-menu-item.model.js';
 import type { ManifestWorkspaceContext } from './workspace-context.model.js';
 import type { ManifestWorkspaceFooterApp } from './workspace-footer-app.model.js';
 import type { ManifestWorkspaceView } from './workspace-view.model.js';
-import type { ManifestUserPermission } from './user-permission.model.js';
-import type { ManifestUserGranularPermission } from './user-granular-permission.model.js';
+import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
+import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
 import type {
 	ManifestBase,
@@ -72,9 +73,10 @@ export type * from './tinymce-plugin.model.js';
 export type * from './tree-item.model.js';
 export type * from './tree.model.js';
 export type * from './user-granular-permission.model.js';
-export type * from './user-permission.model.js';
+export type * from './entity-user-permission.model.js';
 export type * from './user-profile-app.model.js';
 export type * from './workspace-action.model.js';
+export type * from './workspace-action-menu-item.model.js';
 export type * from './workspace-context.model.js';
 export type * from './workspace-footer-app.model.js';
 export type * from './workspace-view.model.js';
@@ -123,9 +125,10 @@ export type ManifestTypes =
 	| ManifestUserProfileApp
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
+	| ManifestWorkspaceActionMenuItem
 	| ManifestWorkspaceContext
 	| ManifestWorkspaceFooterApp
 	| ManifestWorkspaceView
-	| ManifestUserPermission
-	| ManifestUserGranularPermission
+	| ManifestEntityUserPermission
+	| ManifestGranularUserPermission
 	| ManifestBase;

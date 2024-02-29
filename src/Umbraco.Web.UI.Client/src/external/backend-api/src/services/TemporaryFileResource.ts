@@ -60,20 +60,21 @@ export class TemporaryFileResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteTemporaryFileById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/temporary-file/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

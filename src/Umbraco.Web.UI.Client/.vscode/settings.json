@@ -20,6 +20,7 @@
 		"tinymce",
 		"umbraco",
 		"Uncategorized",
+		"uninitialize",
 		"variantable"
 	],
 	"exportall.config.folderListener": [],

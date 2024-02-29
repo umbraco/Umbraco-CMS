@@ -34,40 +34,36 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	async getCollection(filter: UmbUserCollectionFilterModel) {
 		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getFilterUser(filter));
 
-		if (error) {
-			return { error };
+		if (data) {
+			const { items, total } = data;
+
+			const mappedItems: Array<UmbUserDetailModel> = items.map((item: UserResponseModel) => {
+				const userDetail: UmbUserDetailModel = {
+					entityType: UMB_USER_ENTITY_TYPE,
+					email: item.email,
+					userName: item.userName,
+					name: item.name,
+					userGroupUniques: item.userGroupIds,
+					unique: item.id,
+					languageIsoCode: item.languageIsoCode || null,
+					documentStartNodeUniques: item.documentStartNodeIds,
+					mediaStartNodeUniques: item.mediaStartNodeIds,
+					avatarUrls: item.avatarUrls,
+					state: item.state,
+					failedLoginAttempts: item.failedLoginAttempts,
+					createDate: item.createDate,
+					updateDate: item.updateDate,
+					lastLoginDate: item.lastLoginDate || null,
+					lastLockoutDate: item.lastLockoutDate || null,
+					lastPasswordChangeDate: item.lastPasswordChangeDate || null,
+				};
+
+				return userDetail;
+			});
+
+			return { data: { items: mappedItems, total } };
 		}
 
-		if (!data) {
-			return { data: { items: [], total: 0 } };
-		}
-
-		const { items, total } = data;
-
-		const mappedItems: Array<UmbUserDetailModel> = items.map((item: UserResponseModel) => {
-			const userDetail: UmbUserDetailModel = {
-				entityType: UMB_USER_ENTITY_TYPE,
-				email: item.email,
-				userName: item.userName,
-				name: item.name,
-				userGroupUniques: item.userGroupIds,
-				unique: item.id,
-				languageIsoCode: item.languageIsoCode || null,
-				documentStartNodeUniques: item.documentStartNodeIds,
-				mediaStartNodeUniques: item.mediaStartNodeIds,
-				avatarUrls: item.avatarUrls,
-				state: item.state,
-				failedLoginAttempts: item.failedLoginAttempts,
-				createDate: item.createDate,
-				updateDate: item.updateDate,
-				lastLoginDate: item.lastLoginDate || null,
-				lastLockoutDate: item.lastLockoutDate || null,
-				lastPasswordChangeDate: item.lastPasswordChangeDate || null,
-			};
-
-			return userDetail;
-		});
-
-		return { data: { items: mappedItems, total } };
+		return { error };
 	}
 }

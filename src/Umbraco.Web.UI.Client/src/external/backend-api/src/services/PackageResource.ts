@@ -17,20 +17,21 @@ import { request as __request } from '../core/request';
 export class PackageResource {
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postPackageByNameRunMigration({
         name,
     }: {
         name: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/package/{name}/run-migration',
             path: {
                 'name': name,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
@@ -123,20 +124,21 @@ export class PackageResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deletePackageCreatedById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/package/created/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
@@ -145,7 +147,7 @@ export class PackageResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putPackageCreatedById({
@@ -154,7 +156,7 @@ export class PackageResource {
     }: {
         id: string,
         requestBody?: UpdatePackageRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/package/created/{id}',
@@ -163,6 +165,7 @@ export class PackageResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
