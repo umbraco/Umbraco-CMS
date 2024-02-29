@@ -16,8 +16,6 @@ export class UmbMemberWorkspaceContext
 {
 	public readonly repository = new UmbMemberDetailRepository(this);
 
-	#parentUnique: string | null = null;
-
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 
@@ -45,9 +43,8 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null, memberTypeUnique: string) {
+	async create(memberTypeUnique: string) {
 		this.resetState();
-		this.#parentUnique = parentUnique;
 		const { data } = await this.repository.createScaffold({
 			memberType: { unique: memberTypeUnique },
 		});
