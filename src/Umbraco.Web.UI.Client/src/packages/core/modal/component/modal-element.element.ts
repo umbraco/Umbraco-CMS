@@ -1,6 +1,6 @@
+import type { UmbModalRejectReason, UmbModalContext } from '../context/index.js';
 import { property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import type { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 export abstract class UmbModalBaseElement<
@@ -72,7 +72,7 @@ export abstract class UmbModalBaseElement<
 	 * @protected
 	 * @memberof UmbModalBaseElement
 	 */
-	protected _rejectModal() {
-		this.#modalContext?.reject();
+	protected _rejectModal(reason?: UmbModalRejectReason) {
+		this.#modalContext?.reject(reason);
 	}
 }
