@@ -30,4 +30,8 @@
   <ItemGroup>
     <EmbeddedResource Include="OpenApi.json" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Security\Authorization\Dictionary\IDictionaryPermissionAuthorizer.cs" />
+  </ItemGroup>
 </Project>

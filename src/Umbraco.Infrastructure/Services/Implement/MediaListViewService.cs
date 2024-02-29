@@ -2,6 +2,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -12,20 +13,20 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement;
 internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, IMediaType, IMediaTypeService>, IMediaListViewService
 {
     private readonly IMediaService _mediaService;
-    private readonly IMediaPermissionService _mediaPermissionService;
+    private readonly IMediaPermissionAuthorizer _mediaPermissionAuthorizer;
 
     protected override Guid DefaultListViewKey => Constants.DataTypes.Guids.ListViewMediaGuid;
 
     public MediaListViewService(
         IMediaService mediaService,
         IMediaTypeService mediaTypeService,
-        IMediaPermissionService mediaPermissionService,
         IDataTypeService dataTypeService,
-        ISqlContext sqlContext)
+        ISqlContext sqlContext,
+        IMediaPermissionAuthorizer mediaPermissionAuthorizer)
         : base(mediaTypeService, dataTypeService, sqlContext)
     {
         _mediaService = mediaService;
-        _mediaPermissionService = mediaPermissionService;
+        _mediaPermissionAuthorizer = mediaPermissionAuthorizer;
     }
 
     public async Task<Attempt<ListViewPagedModel<IMedia>?, ContentCollectionOperationStatus>> GetListViewItemsByKeyAsync(
@@ -76,17 +77,10 @@ internal sealed class MediaListViewService : ContentListViewServiceBase<IMedia, 
     // a general response whether the user has access to all nodes.
     protected override async Task<bool> HasAccessToListViewItemAsync(IUser user, Guid key)
     {
-        // TODO: Consider if it is better to use IMediaPermissionAuthorizer here as people will be able to apply their external authorization
-        MediaAuthorizationStatus accessStatus = await _mediaPermissionService.AuthorizeAccessAsync(
+        var isDenied = await _mediaPermissionAuthorizer.IsDeniedAsync(
             user,
             key);
 
-        // var isAuthorized = await _mediaPermissionAuthorizer.IsAuthorizedAsync(
-        //     user, //IPrincipal
-        //     item.Key);
-        //
-        // return isAuthorized;
-
-        return accessStatus == MediaAuthorizationStatus.Success;
+        return isDenied is false;
     }
 }

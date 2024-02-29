@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Umbraco.Cms.Api.Management.Security.Authorization;
+using Umbraco.Cms.Core.Security.Authorization;
 
 namespace Umbraco.Extensions;
 
