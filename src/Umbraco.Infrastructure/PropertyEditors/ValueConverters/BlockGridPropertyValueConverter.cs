@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
@@ -132,7 +133,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
                 if (inter is not string intermediateBlockModelValue)
                 {
-                    return null;
+                    var value = inter.ToString();
+                    if (!value?.DetectIsJson() == true && !value?.Contains("layout") == true && !value?.Contains("contentData") == true && !value?.Contains("settingsData") == true)
+                    {
+                        // This is not a block grid model
+                        return null;
+                    }
+
+                    if (value == null)
+                    {
+                        return null;
+                    }
+
+                    intermediateBlockModelValue = value;
                 }
 
                 // Get configuration
