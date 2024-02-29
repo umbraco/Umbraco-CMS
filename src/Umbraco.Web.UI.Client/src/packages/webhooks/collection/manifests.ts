@@ -1,5 +1,7 @@
-import { UMB_WEBHOOK_COLLECTION_REPOSITORY_ALIAS } from './repository/index.js';
-import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
+import {
+	manifests as collectionRepositoryManifests,
+	UMB_WEBHOOK_COLLECTION_REPOSITORY_ALIAS,
+} from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { manifests as collectionActionManifests } from './action/manifests.js';
 import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
@@ -18,7 +20,7 @@ const collectionManifest: ManifestCollection = {
 
 export const manifests = [
 	collectionManifest,
-	//...collectionRepositoryManifests,
+	...collectionRepositoryManifests,
 	...collectionViewManifests,
 	...collectionActionManifests,
 ];
