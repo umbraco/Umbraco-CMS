@@ -1,31 +1,26 @@
 import type { UmbInputMultipleTextStringItemElement } from './input-multiple-text-string-item.element.js';
 import { css, html, nothing, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-
-const SORTER_CONFIG: UmbSorterConfig<MultipleTextStringValueItem> = {
-	getUniqueOfElement: (element) => {
-		return element.getAttribute('data-sort-entry-id');
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.value;
-	},
-	identifier: 'Umb.SorterIdentifier.ColorEditor',
-	itemSelector: 'umb-input-multiple-text-string-item',
-	containerSelector: '#sorter-wrapper',
-};
+import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-input-multiple-text-string
  */
 @customElement('umb-input-multiple-text-string')
 export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitElement) {
-	#prevalueSorter = new UmbSorterController(this, {
-		...SORTER_CONFIG,
+	#sorter = new UmbSorterController(this, {
+		getUniqueOfElement: (element) => {
+			return element.getAttribute('data-sort-entry-id');
+		},
+		getUniqueOfModel: (modelEntry: string) => {
+			return modelEntry;
+		},
+		identifier: 'Umb.SorterIdentifier.ColorEditor',
+		itemSelector: 'umb-input-multiple-text-string-item',
+		containerSelector: '#sorter-wrapper',
 		onChange: ({ model }) => {
 			const oldValue = this._items;
 			this._items = model;
@@ -124,7 +119,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		// TODO: when we have a way to overwrite the missing value validator we can remove this
 		this.value = items?.length > 0 ? 'some value' : '';
 		this._items = items ?? [];
-		this.#prevalueSorter.setModel(this.items);
+		this.#sorter.setModel(this.items);
 	}
 
 	// TODO: Some inputs might not have a value that is either FormDataEntryValue or FormData.
