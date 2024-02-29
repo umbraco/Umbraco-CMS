@@ -76,7 +76,11 @@ export class UmbDocumentWorkspaceContext
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
-	#variesByCulture?: boolean;
+	//#variesByCulture?: boolean;
+	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
+	//#variesBySegment?: boolean;
+	readonly varies = this.structure.ownerContentTypePart((x) => x?.variesByCulture || x?.variesBySegment);
+	#varies?: boolean;
 
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
@@ -84,7 +88,7 @@ export class UmbDocumentWorkspaceContext
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
-		this.observe(this.variesByCulture, (variesByCulture) => (this.#variesByCulture = variesByCulture));
+		this.observe(this.varies, (varies) => (this.#varies = varies));
 
 		this.loadLanguages();
 	}
@@ -147,9 +151,16 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	// TODO: Check if this is used:
+	getVaries() {
+		return this.#varies;
+	}
+	/*
 	getVariesByCulture() {
 		return this.#variesByCulture;
 	}
+	getVariesBySegment() {
+		return this.#variesBySegment;
+	}*/
 
 	variantById(variantId: UmbVariantId) {
 		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
@@ -272,7 +283,7 @@ export class UmbDocumentWorkspaceContext
 	#updateVariantData(variantId: UmbVariantId, update?: Partial<UmbDocumentVariantModel>) {
 		const currentData = this.getData();
 		if (!currentData) throw new Error('Data is missing');
-		if (this.#variesByCulture === true) {
+		if (this.#varies === true) {
 			// If variant Id is invariant, we don't to have the variant appended to our data.
 			if (variantId.isInvariant()) return;
 			const variant = currentData.variants.find((x) => variantId.compare(x));
@@ -291,7 +302,7 @@ export class UmbDocumentWorkspaceContext
 				(x) => variantId.compare(x),
 			);
 			this.#currentData.update({ variants: newVariants });
-		} else if (this.#variesByCulture === false) {
+		} else if (this.#varies === false) {
 			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
 			const invariantVariantId = UmbVariantId.CreateInvariant();
 			const variant = currentData.variants.find((x) => invariantVariantId.compare(x));
