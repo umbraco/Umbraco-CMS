@@ -22,6 +22,12 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 				const snippetId = info.match.params.snippetId;
 				await this.#onCreate(parentUnique, snippetId);
+
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#workspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!,
+				);
 			},
 		},
 		{
@@ -30,6 +36,12 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 				await this.#onCreate(parentUnique);
+
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#workspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!,
+				);
 			},
 		},
 		{

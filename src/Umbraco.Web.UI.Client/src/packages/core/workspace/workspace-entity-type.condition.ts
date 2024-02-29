@@ -1,5 +1,5 @@
 import { UMB_WORKSPACE_CONTEXT } from './workspace-context/index.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -7,7 +7,7 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbWorkspaceEntityTypeCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbWorkspaceEntityTypeCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: WorkspaceEntityTypeConditionConfig;
 	permitted = false;
 	#onChange: () => void;

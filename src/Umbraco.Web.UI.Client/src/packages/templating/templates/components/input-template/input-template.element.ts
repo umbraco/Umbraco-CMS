@@ -5,7 +5,12 @@ import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_TEMPLATE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_TEMPLATE_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT,
+	UMB_WORKSPACE_MODAL,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -73,12 +78,23 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	@state()
 	_pickedTemplates: UmbTemplateItemModel[] = [];
 
+	#templatePath = '';
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('template')
+			.onSetup(() => {
+				return { data: { entityType: 'template', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this.#templatePath = routeBuilder({});
+			});
 	}
 
 	async #observePickedTemplates() {
@@ -160,19 +176,15 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#openTemplate(e: CustomEvent) {
-		alert('open template modal');
-	}
-
 	render() {
 		return html`
 			${this._pickedTemplates.map(
 				(template) => html`
 					<umb-template-card
-						.name="${template.name ?? ''}"
-						.id="${template.unique ?? ''}"
+						.name=${template.name}
+						.id=${template.unique}
+						@open=${() => window.history.pushState({}, '', this.#templatePath + 'edit/' + template.unique)}
 						@change=${this.#onCardChange}
-						@open="${this.#openTemplate}"
 						?default="${template.unique === this.defaultUnique}">
 						<uui-button
 							slot="actions"

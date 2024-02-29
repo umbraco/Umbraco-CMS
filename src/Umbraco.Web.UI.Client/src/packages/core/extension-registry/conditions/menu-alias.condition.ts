@@ -1,5 +1,5 @@
 import { UMB_MENU_CONTEXT } from '../../menu/menu.context.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -11,7 +11,7 @@ export type MenuAliasConditionConfig = UmbConditionConfigBase & {
 	match: string;
 };
 
-export class UmbMenuAliasCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbMenuAliasCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: MenuAliasConditionConfig;
 	permitted = false;
 	#onChange: () => void;

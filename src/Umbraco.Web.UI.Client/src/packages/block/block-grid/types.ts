@@ -13,6 +13,7 @@ export interface UmbBlockGridTypeModel extends UmbBlockTypeWithGroupKey {
 	thumbnail?: string;
 	areaGridColumns?: number;
 	areas: Array<UmbBlockGridTypeAreaType>;
+	inlineEditing?: boolean;
 }
 
 export type UmbBlockGridTypeColumnSpanOption = {

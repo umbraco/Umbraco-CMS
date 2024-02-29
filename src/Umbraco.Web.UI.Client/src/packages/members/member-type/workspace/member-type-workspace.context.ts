@@ -62,9 +62,15 @@ export class UmbMemberTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ [propertyName]: value });
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async load(unique: string) {
 		const { data } = await this.structure.loadType(unique);
 		if (!data) return undefined;
+		this.resetState();
 
 		this.setIsNew(false);
 		this.setIsSorting(false);
@@ -74,6 +80,7 @@ export class UmbMemberTypeWorkspaceContext
 	async create(parentUnique: string | null) {
 		const { data } = await this.structure.createScaffold(parentUnique);
 		if (!data) return undefined;
+		this.resetState();
 
 		this.setIsNew(true);
 		this.setIsSorting(false);
@@ -105,8 +112,8 @@ export class UmbMemberTypeWorkspaceContext
 		return this.structure.getOwnerContentType();
 	}
 
-	getEntityId() {
-		return this.getData()?.unique;
+	getUnique() {
+		return this.getData()?.unique || '';
 	}
 
 	getEntityType() {

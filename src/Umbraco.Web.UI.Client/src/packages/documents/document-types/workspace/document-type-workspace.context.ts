@@ -1,11 +1,12 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
 import type { UmbDocumentTypeDetailModel } from '../types.js';
-import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -15,6 +16,8 @@ export class UmbDocumentTypeWorkspaceContext
 	//
 	readonly repository = new UmbDocumentTypeDetailRepository(this);
 	// Data/Draft is located in structure manager
+
+	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
 	readonly data;
@@ -29,6 +32,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly isElement;
 	readonly allowedContentTypes;
 	readonly compositions;
+	readonly collection;
 
 	// Document type specific:
 	readonly allowedTemplateIds;
@@ -55,11 +59,18 @@ export class UmbDocumentTypeWorkspaceContext
 		this.isElement = this.structure.ownerContentTypeObservablePart((data) => data?.isElement);
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
+		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 
 		// Document type specific:
 		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplates);
 		this.defaultTemplate = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
 		this.cleanup = this.structure.ownerContentTypeObservablePart((data) => data?.defaultTemplate);
+	}
+
+	protected resetState(): void {
+		super.resetState();
+		this.#persistedData.setValue(undefined);
+		this.#isSorting.setValue(undefined);
 	}
 
 	getIsSorting() {
@@ -74,7 +85,7 @@ export class UmbDocumentTypeWorkspaceContext
 		return this.structure.getOwnerContentType();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 
@@ -115,6 +126,9 @@ export class UmbDocumentTypeWorkspaceContext
 	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
 		this.structure.updateOwnerContentType({ compositions });
 	}
+	setCollection(collection: UmbReferenceByUnique) {
+		this.structure.updateOwnerContentType({ collection });
+	}
 
 	// Document type specific:
 	setAllowedTemplateIds(allowedTemplates: Array<{ id: string }>) {
@@ -125,23 +139,25 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.resetState();
 		const { data } = await this.structure.createScaffold(parentUnique);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
 		this.setIsSorting(false);
-		//this.#draft.next(data);
-		return { data } || undefined;
+		this.#persistedData.setValue(data);
+		return data;
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.structure.loadType(unique);
 		if (!data) return undefined;
 
 		this.setIsNew(false);
 		this.setIsSorting(false);
-		//this.#draft.next(data);
-		return { data } || undefined;
+		this.#persistedData.setValue(data);
+		return data;
 	}
 
 	/**
@@ -163,7 +179,10 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	public destroy(): void {
+		this.#persistedData.destroy();
 		this.structure.destroy();
+		this.#isSorting.destroy();
+		this.repository.destroy();
 		super.destroy();
 	}
 }

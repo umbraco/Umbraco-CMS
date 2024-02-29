@@ -40,12 +40,12 @@ export interface MetaPropertyEditorSchema {
 
 // Config
 export interface PropertyEditorSettings {
-	properties: PropertyEditorConfigProperty[];
+	properties: PropertyEditorSettingsProperty[];
 	// default data is kept separate from the properties, to give the ability for Property Editor UI to overwrite default values for the property editor settings.
-	defaultData?: PropertyEditorConfigDefaultData[];
+	defaultData?: PropertyEditorSettingsDefaultData[];
 }
 
-export interface PropertyEditorConfigProperty {
+export interface PropertyEditorSettingsProperty {
 	label: string;
 	description?: string;
 	alias: string;
@@ -53,7 +53,7 @@ export interface PropertyEditorConfigProperty {
 	config?: UmbPropertyEditorConfig;
 }
 
-export interface PropertyEditorConfigDefaultData {
+export interface PropertyEditorSettingsDefaultData {
 	alias: string;
 	value: unknown;
 }

@@ -1,26 +1,34 @@
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
-import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
+import type { UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue } from '@umbraco-cms/backoffice/block';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_MODAL_CONTEXT,
 	UmbModalBaseElement,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
+// TODO: This is across packages, how should we go about getting just a single element from another package? like here we just need the umb-block-type-card element
+import '@umbraco-cms/backoffice/block-type';
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue
 > {
-	@state()
+	//
+	private _search = '';
+
 	private _groupedBlocks: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
 
 	@state()
-	_openClipboard?: boolean;
+	private _openClipboard?: boolean;
 
 	@state()
-	_workspacePath?: string;
+	private _workspacePath?: string;
+
+	@state()
+	private _filtered: Array<{ name?: string; blocks: Array<UmbBlockTypeWithGroupKey> }> = [];
 
 	constructor() {
 		super();
@@ -59,6 +67,23 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		}));
 
 		this._groupedBlocks = [{ blocks: noGroupBlocks }, ...grouped];
+		this.#updateFiltered();
+	}
+
+	#updateFiltered() {
+		if (this._search.length === 0) {
+			this._filtered = this._groupedBlocks;
+		} else {
+			const search = this._search.toLowerCase();
+			this._filtered = this._groupedBlocks.map((group) => {
+				return { ...group, blocks: group.blocks.filter((block) => block.label?.toLocaleLowerCase().includes(search)) };
+			});
+		}
+	}
+
+	#onSearch(e: UUIInputEvent) {
+		this._search = e.target.value as string;
+		this.#updateFiltered();
 	}
 
 	render() {
@@ -83,28 +108,35 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderCreateEmpty() {
 		return html`
-			${this._groupedBlocks
-				? this._groupedBlocks.map(
-						(group) => html`
-							${group.name && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
-							<div class="blockGroup">
-								${repeat(
-									group.blocks,
-									(block) => block.contentElementTypeKey,
-									(block) => html`
-										<umb-block-type-card
-											.name=${block.label}
-											.iconColor=${block.iconColor}
-											.backgroundColor=${block.backgroundColor}
-											.contentElementTypeKey=${block.contentElementTypeKey}
-											.href="${this._workspacePath}create/${block.contentElementTypeKey}">
-										</umb-block-type-card>
-									`,
-								)}
-							</div>
-						`,
-				  )
-				: ''}
+			${this.data?.blocks && this.data.blocks.length > 8
+				? html`<uui-input
+						id="search"
+						@input=${this.#onSearch}
+						label=${this.localize.term('general_search')}
+						placeholder=${this.localize.term('placeholders_search')}>
+						<uui-icon name="icon-search" slot="prepend"></uui-icon>
+				  </uui-input>`
+				: nothing}
+			${this._filtered.map(
+				(group) => html`
+					${group.name && group.name !== '' ? html`<h4>${group.name}</h4>` : nothing}
+					<div class="blockGroup">
+						${repeat(
+							group.blocks,
+							(block) => block.contentElementTypeKey,
+							(block) => html`
+								<umb-block-type-card
+									.name=${block.label}
+									.iconColor=${block.iconColor}
+									.backgroundColor=${block.backgroundColor}
+									.contentElementTypeKey=${block.contentElementTypeKey}
+									.href="${this._workspacePath}create/${block.contentElementTypeKey}">
+								</umb-block-type-card>
+							`,
+						)}
+					</div>
+				`,
+			)}
 		`;
 	}
 
@@ -131,6 +163,14 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	static styles = [
 		css`
+			#search {
+				width: 100%;
+				align-items: center;
+				margin-bottom: var(--uui-size-layout-1);
+			}
+			#search uui-icon {
+				padding-left: var(--uui-size-space-3);
+			}
 			.blockGroup {
 				display: grid;
 				gap: 1rem;

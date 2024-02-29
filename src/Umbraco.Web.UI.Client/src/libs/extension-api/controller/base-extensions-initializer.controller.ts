@@ -5,7 +5,7 @@ import type {
 	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
@@ -26,7 +26,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
-> extends UmbBaseController {
+> extends UmbControllerBase {
 	#promiseResolvers: Array<() => void> = [];
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
@@ -130,6 +130,8 @@ export abstract class UmbBaseExtensionsInitializer<
 
 	#notifyChange = () => {
 		this.#changeDebounce = undefined;
+		// This means that we have been destroyed:
+		if (this.#permittedExts === undefined) return;
 
 		// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly.
 		this.#exposedPermittedExts = [...this.#permittedExts];

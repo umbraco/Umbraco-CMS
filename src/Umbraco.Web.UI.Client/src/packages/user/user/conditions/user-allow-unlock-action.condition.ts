@@ -1,25 +1,17 @@
+import { UmbUserStateEnum } from '../types.js';
 import { UmbUserActionConditionBase } from './user-allow-action-base.condition.js';
-import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type {
-	ManifestCondition,
-	UmbConditionConfigBase,
-	UmbConditionControllerArguments,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbUserAllowUnlockActionCondition extends UmbUserActionConditionBase {
-	constructor(args: UmbConditionControllerArguments<UmbConditionConfigBase>) {
-		super(args);
-	}
-
 	async onUserDataChange() {
 		// don't allow the current user to unlock themselves
-		if (!this.userData || !this.userData.unique || (await this.isCurrentUser())) {
+		if (!this.userUnique || (await this.isCurrentUser())) {
 			this.permitted = false;
 			super.onUserDataChange();
 			return;
 		}
 
-		this.permitted = this.userData?.state === UserStateModel.LOCKED_OUT;
+		this.permitted = this.userState === UmbUserStateEnum.LOCKED_OUT;
 		super.onUserDataChange();
 	}
 }

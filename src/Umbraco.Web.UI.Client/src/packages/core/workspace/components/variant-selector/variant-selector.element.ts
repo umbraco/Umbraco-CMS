@@ -5,20 +5,22 @@ import {
 	UUIInputEvent,
 	type UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
-import {
-	css,
-	html,
-	nothing,
-	customElement,
-	property,
-	state,
-	ifDefined,
-	query,
-} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbDocumentVariantModel } from '@umbraco-cms/backoffice/document';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+
+type UmbDocumentVariantOption = {
+	culture: string | null;
+	segment: string | null;
+	title: string;
+	displayName: string;
+	state: DocumentVariantStateModel;
+};
+
+type UmbDocumentVariantOptions = Array<UmbDocumentVariantOption>;
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -26,73 +28,75 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	private _popoverElement?: UUIPopoverContainerElement;
 
 	@state()
-	_variants: Array<UmbDocumentVariantModel> = [];
+	private _variants: UmbDocumentVariantOptions = [];
 
 	// TODO: Stop using document context specific ActiveVariant type.
 	@state()
 	_activeVariants: Array<ActiveVariant> = [];
 
-	@property({ attribute: false })
-	public get _activeVariantsCultures(): string[] {
-		return this._activeVariants.map((el) => el.culture ?? '') ?? [];
-	}
+	@state()
+	_activeVariantsCultures: string[] = [];
 
 	#splitViewContext?: typeof UMB_WORKSPACE_SPLIT_VIEW_CONTEXT.TYPE;
-	#variantContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
+	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	@state()
 	private _name?: string;
 
-	private _culture?: string | null;
-	private _segment?: string | null;
+	@state()
+	private _variantDisplayName = '';
 
 	@state()
-	private _variantDisplayName?: string;
-
-	@state()
-	private _variantTitleName?: string;
+	private _variantTitleName = '';
 
 	@state()
 	private _variantSelectorOpen = false;
-
-	// TODO: make adapt to backoffice locale.
-	private _cultureNames = new Intl.DisplayNames('en', { type: 'language' });
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, (instance) => {
 			this.#splitViewContext = instance;
-			this._observeVariants();
-			this._observeActiveVariants();
+			this.#observeVariants();
+			this.#observeActiveVariants();
+			this.#observeCurrentVariant();
 		});
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (instance) => {
-			this.#variantContext = instance;
-			this._observeVariantContext();
+			this.#datasetContext = instance;
+			this.#observeDatasetContext();
+			this.#observeCurrentVariant();
 		});
 	}
 
-	private async _observeVariants() {
+	async #observeVariants() {
 		if (!this.#splitViewContext) return;
 
-		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
-		if (workspaceContext) {
-			this.observe(
-				workspaceContext.variants,
-				(variants) => {
-					if (variants) {
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						// TODO: figure out what we do with the different variant models. Document has a state, but the variant model does not.
-						this._variants = variants;
-					}
-				},
-				'_observeVariants',
-			);
-		}
+		// NOTICE: This is dirty (the TypeScript casting), we can only accept doing this so far because we currently only use the Variant Selector on Document Workspace. [NL]
+		// This would need a refactor to enable the code below to work with different ContentTypes. Main problem here is the state, which is not generic for them all. [NL]
+		const workspaceContext = this.#splitViewContext.getWorkspaceContext() as UmbDocumentWorkspaceContext;
+		if (!workspaceContext) throw new Error('Split View Workspace context not found');
+
+		this.observe(
+			workspaceContext.variantOptions,
+			(options) => {
+				this._variants = options.map<UmbDocumentVariantOption>((option) => {
+					const name = option.variant?.name ?? option.language.name;
+					const segment = option.variant?.segment ?? null;
+					return {
+						// Notice the option object has a unique property, but it's not used here. (Its equivalent to a UmbVariantId string) [NL]
+						culture: option.language.unique,
+						segment: segment,
+						title: name + (segment ? ` — ${segment}` : ''),
+						displayName: name + (segment ? ` — ${segment}` : ''),
+						state: option.variant?.state ?? DocumentVariantStateModel.NOT_CREATED,
+					};
+				});
+			},
+			'_observeVariants',
+		);
 	}
 
-	private async _observeActiveVariants() {
+	async #observeActiveVariants() {
 		if (!this.#splitViewContext) return;
 
 		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
@@ -102,6 +106,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				(activeVariants) => {
 					if (activeVariants) {
 						this._activeVariants = activeVariants;
+						this._activeVariantsCultures = this._activeVariants.map((el) => el.culture ?? '') ?? [];
 					}
 				},
 				'_observeActiveVariants',
@@ -109,16 +114,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private async _observeVariantContext() {
-		if (!this.#variantContext) return;
-
-		const variantId = this.#variantContext.getVariantId();
-		this._culture = variantId.culture;
-		this._segment = variantId.segment;
-		this.updateVariantDisplayName();
-
+	async #observeDatasetContext() {
+		if (!this.#datasetContext) return;
 		this.observe(
-			this.#variantContext.name,
+			this.#datasetContext.name,
 			(name) => {
 				this._name = name;
 			},
@@ -126,48 +125,62 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		);
 	}
 
-	private updateVariantDisplayName() {
-		if (!this._culture && !this._segment) return;
-		this._variantTitleName =
-			(this._culture ? this._cultureNames.of(this._culture) + ` (${this._culture})` : '') +
-			(this._segment ? ' — ' + this._segment : '');
-		this._variantDisplayName =
-			(this._culture ? this._cultureNames.of(this._culture) : '') + (this._segment ? ' — ' + this._segment : '');
+	async #observeCurrentVariant() {
+		if (!this.#datasetContext || !this.#splitViewContext) return;
+		const workspaceContext = this.#splitViewContext.getWorkspaceContext();
+		if (!workspaceContext) return;
+
+		const variantId = this.#datasetContext.getVariantId();
+		// Find the variant option matching this, to get the language name...
+
+		const culture = variantId.culture;
+		const segment = variantId.segment;
+
+		this.observe(
+			workspaceContext.variantOptions,
+			(options) => {
+				const option = options.find((option) => option.language.unique === culture);
+				const languageName = option?.language.name;
+				this._variantDisplayName = (languageName ? languageName : '') + (segment ? ` — ${segment}` : '');
+				this._variantTitleName =
+					(languageName ? `${languageName} (${culture})` : '') + (segment ? ` — ${segment}` : '');
+			},
+			'_currentLanguage',
+		);
 	}
 
-	// TODO: find a way where we don't have to do this for all workspaces.
-	private _handleInput(event: UUIInputEvent) {
+	#handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (
 				typeof target?.value === 'string' &&
-				this.#variantContext &&
-				isNameablePropertyDatasetContext(this.#variantContext)
+				this.#datasetContext &&
+				isNameablePropertyDatasetContext(this.#datasetContext)
 			) {
-				this.#variantContext.setName(target.value);
+				this.#datasetContext.setName(target.value);
 			}
 		}
 	}
 
-	private _switchVariant(variant: UmbDocumentVariantModel) {
+	#switchVariant(variant: UmbDocumentVariantOption) {
 		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
 	}
 
-	private _openSplitView(variant: UmbDocumentVariantModel) {
+	#openSplitView(variant: UmbDocumentVariantOption) {
 		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
 	}
 
-	private _closeSplitView() {
+	#closeSplitView() {
 		this.#splitViewContext?.closeSplitView();
 	}
 
-	private _isVariantActive(culture: string) {
-		return this._activeVariantsCultures.includes(culture);
+	#isVariantActive(culture: string | null) {
+		return culture !== null ? this._activeVariantsCultures.includes(culture) : true;
 	}
 
-	private _isNotPublishedMode(culture: string, state: DocumentVariantStateModel) {
-		return state !== DocumentVariantStateModel.PUBLISHED && !this._isVariantActive(culture!);
+	#isNotPublishedMode(culture: string | null, state: DocumentVariantStateModel) {
+		return state !== DocumentVariantStateModel.PUBLISHED && !this.#isVariantActive(culture);
 	}
 
 	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -182,26 +195,27 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (!isOpen) return;
 
 		const host = this.getBoundingClientRect();
+		// TODO: Ideally this is kept updated while open, but for now we just set it once:
 		this._popoverElement.style.width = `${host.width}px`;
 	}
 
 	render() {
 		return html`
-			<uui-input id="name-input" .value=${this._name} @input="${this._handleInput}">
+			<uui-input id="name-input" .value=${this._name ?? ''} @input="${this.#handleInput}">
 				${
-					this._variants && this._variants.length > 0
+					this._variants?.length
 						? html`
 								<uui-button
 									id="variant-selector-toggle"
 									slot="append"
 									popovertarget="variant-selector-popover"
-									title=${ifDefined(this._variantTitleName)}>
+									title=${this._variantTitleName}>
 									${this._variantDisplayName}
 									<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 								</uui-button>
 								${this._activeVariants.length > 1
 									? html`
-											<uui-button slot="append" compact id="variant-close" @click=${this._closeSplitView}>
+											<uui-button slot="append" compact id="variant-close" @click=${this.#closeSplitView}>
 												<uui-icon name="remove"></uui-icon>
 											</uui-button>
 									  `
@@ -212,7 +226,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			</uui-input>
 
 			${
-				this._variants && this._variants.length > 0
+				this._variants?.length
 					? html`
 							<uui-popover-container
 								id="variant-selector-popover"
@@ -223,25 +237,26 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 										<ul>
 											${this._variants.map(
 												(variant) => html`
-													<li class="${this._isVariantActive(variant.culture!) ? 'selected' : ''}">
+													<li class="${this.#isVariantActive(variant.culture) ? 'selected' : ''}">
 														<button
 															class="variant-selector-switch-button
-																	${this._isNotPublishedMode(variant.culture!, variant.state!) ? 'add-mode' : ''}"
-															@click=${() => this._switchVariant(variant)}>
-															${this._isNotPublishedMode(variant.culture!, variant.state!)
+																	${this.#isNotPublishedMode(variant.culture, variant.state) ? 'add-mode' : ''}"
+															@click=${() => this.#switchVariant(variant)}>
+															${this.#isNotPublishedMode(variant.culture, variant.state)
 																? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
 																: nothing}
 															<div>
-																${variant.name} <i>(${variant.culture})</i> ${variant.segment}
+																${variant.title}
+																<i>(${variant.culture})</i> ${variant.segment}
 																<div class="variant-selector-state">${variant.state}</div>
 															</div>
 														</button>
-														${this._isVariantActive(variant.culture!)
+														${this.#isVariantActive(variant.culture)
 															? nothing
 															: html`
 																	<uui-button
 																		class="variant-selector-split-view"
-																		@click=${() => this._openSplitView(variant)}>
+																		@click=${() => this.#openSplitView(variant)}>
 																		Split view
 																	</uui-button>
 															  `}
@@ -260,6 +275,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	}
 
 	static styles = [
+		UmbTextStyles,
 		css`
 			#name-input {
 				width: 100%;
@@ -331,12 +347,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				font-size: 14px;
 				cursor: pointer;
 				border-bottom: 1px solid var(--uui-color-divider-standalone);
-				font-family:
-					Lato,
-					Helvetica Neue,
-					Helvetica,
-					Arial,
-					sans-serif;
 			}
 
 			.variant-selector-switch-button:hover {

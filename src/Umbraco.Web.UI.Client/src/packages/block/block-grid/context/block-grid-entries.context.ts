@@ -244,33 +244,32 @@ export class UmbBlockGridEntriesContext
 			// Area entries:
 			if (!this.#areaType) return [];
 
-			if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance.length > 0) {
-				return this.#areaType.specifiedAllowance
-					.flatMap((permission) => {
-						if (permission.groupKey) {
-							return (
-								this._manager
-									?.getBlockTypes()
-									.filter(
-										(blockType) => blockType.groupKey === permission.groupKey && blockType.allowInAreas === true,
-									) ?? []
-							);
-						} else if (permission.elementTypeKey) {
-							return (
-								this._manager?.getBlockTypes().filter((x) => x.contentElementTypeKey === permission.elementTypeKey) ??
-								[]
-							);
-						}
-						return [];
-					})
-					.filter((v, i, a) => a.find((x) => x.contentElementTypeKey === v.contentElementTypeKey) === undefined);
+			if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance?.length > 0) {
+				return (
+					this.#areaType.specifiedAllowance
+						.flatMap((permission) => {
+							if (permission.groupKey) {
+								return (
+									this._manager?.getBlockTypes().filter((blockType) => blockType.groupKey === permission.groupKey) ?? []
+								);
+							} else if (permission.elementTypeKey) {
+								return (
+									this._manager?.getBlockTypes().filter((x) => x.contentElementTypeKey === permission.elementTypeKey) ??
+									[]
+								);
+							}
+							return [];
+						})
+						// Remove duplicates:
+						.filter((v, i, a) => a.findIndex((x) => x.contentElementTypeKey === v.contentElementTypeKey) === i)
+				);
 			}
 
+			// No specific permissions setup, so we will fallback to items allowed in areas:
 			return this._manager.getBlockTypes().filter((x) => x.allowInAreas);
 		}
-		// If no AreaKey, then we are representing the items of the root:
 
-		// Root entries:
+		// If no AreaKey, then we are in the root, looking for items allowed as root:
 		return this._manager.getBlockTypes().filter((x) => x.allowAtRoot);
 	}
 

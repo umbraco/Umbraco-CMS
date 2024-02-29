@@ -7,6 +7,7 @@ import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-fi
 export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 	#temporaryFileRepository: UmbTemporaryFileRepository;
 	#avatarSource: UmbUserAvatarServerDataSource;
+	#avatarFile: File | null = null;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -17,13 +18,13 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Uploads an avatar for the user with the given id
-	 * @param {string} userId
+	 * @param {string} userUnique
 	 * @param {File} file
 	 * @return {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserRepository
 	 */
-	async uploadAvatar(userId: string, file: File) {
-		if (!userId) throw new Error('Id is missing');
+	async uploadAvatar(userUnique: string, file: File) {
+		if (!userUnique) throw new Error('Id is missing');
 		await this.init;
 
 		// upload temp file
@@ -31,10 +32,15 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 		await this.#temporaryFileRepository.upload(fileId, file);
 
 		// assign temp file to avatar
-		const { error } = await this.#avatarSource.createAvatar(userId, fileId);
+		const { error } = await this.#avatarSource.createAvatar(userUnique, fileId);
 
 		if (!error) {
 			// TODO: update store + current user
+			const localUrl = URL.createObjectURL(file);
+
+			// The server returns 5 different sizes of the avatar, so we need to mimick that here
+			this.detailStore?.updateItem(userUnique, { avatarUrls: [localUrl, localUrl, localUrl, localUrl, localUrl] });
+
 			const notification = { data: { message: `Avatar uploaded` } };
 			this.notificationContext?.peek('positive', notification);
 		}
@@ -44,23 +50,28 @@ export class UmbUserAvatarRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Removes the avatar for the user with the given id
-	 * @param {string} id
+	 * @param {string} userUnique
 	 * @return {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserRepository
 	 */
-	async deleteAvatar(id: string) {
-		if (!id) throw new Error('Id is missing');
+	async deleteAvatar(userUnique: string) {
+		if (!userUnique) throw new Error('Id is missing');
 		await this.init;
 
-		const { error } = await this.#avatarSource.deleteAvatar(id);
+		const { error } = await this.#avatarSource.deleteAvatar(userUnique);
 
 		if (!error) {
-			// TODO: update store + current user
+			this.detailStore?.updateItem(userUnique, { avatarUrls: [] });
+
 			const notification = { data: { message: `Avatar deleted` } };
 			this.notificationContext?.peek('positive', notification);
 		}
 
 		return { error };
+	}
+
+	destroy() {
+		super.destroy();
 	}
 }
 
