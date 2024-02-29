@@ -78,7 +78,10 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 								@click=${this.#onNavigate}>
 								>
 								${documentType.icon
-									? html`<uui-icon slot="icon" name=${icon} style="--uui-icon-color:var(${color})"></uui-icon>`
+									? html`<uui-icon
+											slot="icon"
+											name=${icon}
+											style=${ifDefined(color ? '--uui-icon-color:var(${color})' : undefined)}></uui-icon>`
 									: nothing}
 							</uui-menu-item>
 						`;

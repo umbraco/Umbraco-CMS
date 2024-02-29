@@ -7,6 +7,7 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
+import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 @customElement('umb-media-type-workspace-editor')
 export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
@@ -23,7 +24,6 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _iconColorAlias?: string;
-	// TODO: Color should be using an alias, and look up in some dictionary/key/value) of project-colors.
 
 	#workspaceContext?: UmbMediaTypeWorkspaceContext;
 
@@ -46,7 +46,15 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
-		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
+		this.observe(
+			this.#workspaceContext.icon,
+			(icon) => {
+				const [name, color] = icon ? icon.split(' ') : [];
+				this._icon = name;
+				this._iconColorAlias = color?.replace('color-', '');
+			},
+			'_observeIcon',
+		);
 
 		this.observe(
 			this.#workspaceContext.isNew,
@@ -106,9 +114,10 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 			},
 		});
 
-		modalContext?.onSubmit().then((value) => {
-			if (value.icon) this.#workspaceContext?.updateProperty('icon', value.icon);
-			// TODO: save color ALIAS as well
+		modalContext?.onSubmit().then((saved) => {
+			if (saved.icon && saved.color)
+				this.#workspaceContext?.updateProperty('icon', `${saved.icon} color-${saved.color}`);
+			else if (saved.icon) this.#workspaceContext?.updateProperty('icon', saved.icon);
 		});
 	}
 
@@ -116,7 +125,11 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		return html`<umb-workspace-editor alias="Umb.Workspace.MediaType">
 			<div id="header" slot="header">
 				<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
-					<uui-icon name="${ifDefined(this._icon)}" style="color: ${this._iconColorAlias}"></uui-icon>
+					${this._iconColorAlias
+						? html`<uui-icon
+								name="${ifDefined(this._icon)}"
+								style="--uui-icon-color: var(${extractUmbColorVariable(this._iconColorAlias)})"></uui-icon>`
+						: html`<uui-icon name="${ifDefined(this._icon)}"></uui-icon>`}
 				</uui-button>
 
 				<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name">

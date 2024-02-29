@@ -6,6 +6,7 @@ import type {
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbMediaTypeStructureRepository, type UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
+import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-media-create-options-modal')
 export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
@@ -62,8 +63,10 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 					${this._allowedMediaTypes.length === 0
 						? html`<umb-localize key="create_noMediaTypes"></umb-localize>`
 						: nothing}
-					${this._allowedMediaTypes.map(
-						(mediaType) => html`
+					${this._allowedMediaTypes.map((mediaType) => {
+						const [icon, alias] = mediaType.icon ? mediaType.icon.split(' ') : [];
+						const color = alias ? extractUmbColorVariable(alias.replace('color-', '')) : undefined;
+						return html`
 							<uui-menu-item
 								data-id=${ifDefined(mediaType.unique)}
 								href="${`section/media/workspace/media/create/${this.data?.media?.unique ?? 'null'}/${
@@ -71,10 +74,16 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 								}`}"
 								label="${mediaType.name}"
 								@click=${this.#onNavigate}>
-								> ${mediaType.icon ? html`<uui-icon slot="icon" name=${mediaType.icon}></uui-icon>` : nothing}
+								>
+								${mediaType.icon
+									? html`<uui-icon
+											slot="icon"
+											name=${icon}
+											style=${ifDefined(color ? '--uui-icon-color:var(${color})' : undefined)}></uui-icon>`
+									: nothing}
 							</uui-menu-item>
-						`,
-					)}
+						`;
+					})}
 				</uui-box>
 				<uui-button
 					slot="actions"
