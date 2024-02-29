@@ -2,7 +2,12 @@ import { UmbDocumentTypeDetailRepository } from '../../document-types/repository
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
-import type { UmbDocumentDetailModel, UmbDocumentVariantModel, UmbDocumentVariantOptionModel } from '../types.js';
+import type {
+	UmbDocumentDetailModel,
+	UmbDocumentValueModel,
+	UmbDocumentVariantModel,
+	UmbDocumentVariantOptionModel,
+} from '../types.js';
 import { umbPickDocumentVariantModal, type UmbDocumentVariantPickerModalType } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
@@ -334,17 +339,58 @@ export class UmbDocumentWorkspaceContext
 		return await this.#performSaveOrCreate(selectedVariants);
 	}
 
-	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>) {
+	#buildSaveData(selectedVariants: Array<UmbVariantId>): UmbDocumentDetailModel {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		if (!data.unique) throw new Error('Unique is missing');
+		const invariantVariantId = UmbVariantId.CreateInvariant();
+
+		const persistedData = this.#persistedData.getValue();
+
+		// We need to include the invariant variant for values to be saved, we always want to save the invariant values.
+		const variantIdToParseForValues = [...selectedVariants, invariantVariantId];
+
+		// Combine data and persisted data depending on the selectedVariants. Always use the invariant values from the data.
+		// loops over each entry in values, determine wether the value should be from the data or the persisted data, depending on wether its a selectedVariant or an invariant value.
+		// loops over each entry in variants, determine wether the variant should be from the data or the persisted data, depending on the selectedVariants.
+		return {
+			...data,
+			values: data.values
+				.map((value) => {
+					// Should this value be saved?
+					if (variantIdToParseForValues.some((x) => x.compare(value))) {
+						return value;
+					} else {
+						// If not we will find the value in the persisted data and use that instead.
+						return persistedData?.values.find(
+							(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
+						);
+					}
+				})
+				.filter((x) => x !== undefined) as Array<UmbDocumentValueModel<unknown>>,
+			variants: data.variants
+				.map((variant) => {
+					// Should this value be saved?
+					if (selectedVariants.some((x) => x.compare(variant))) {
+						return variant;
+					} else {
+						// If not we will find the value in the persisted data and use that instead.
+						return persistedData?.variants.find((x) => x.culture === variant.culture && x.segment === variant.segment);
+					}
+				})
+				.filter((x) => x !== undefined) as Array<UmbDocumentVariantModel>,
+		};
+	}
+
+	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>) {
+		const saveData = this.#buildSaveData(selectedVariants);
 
 		if (this.getIsNew()) {
-			if ((await this.repository.create(data)).data !== undefined) {
+			if ((await this.repository.create(saveData)).data !== undefined) {
 				this.setIsNew(false);
 			}
 		} else {
-			await this.repository.save(data);
+			await this.repository.save(saveData);
 		}
 
 		return selectedVariants;
