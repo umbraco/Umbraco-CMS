@@ -11,6 +11,13 @@ export class UmbTreeElement extends UmbExtensionInitializerElementBase<ManifestT
 	getDefaultElementName() {
 		return 'umb-default-tree';
 	}
+
+	getSelection() {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: make base interface for a tree element
+		return this._element?.getSelection?.() ?? [];
+	}
 }
 
 declare global {
