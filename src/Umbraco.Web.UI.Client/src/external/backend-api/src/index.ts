@@ -19,6 +19,7 @@ export type { AvailableContentTypeCompositionResponseModelBaseModel } from './mo
 export type { AvailableDocumentTypeCompositionResponseModel } from './models/AvailableDocumentTypeCompositionResponseModel';
 export type { AvailableMediaTypeCompositionResponseModel } from './models/AvailableMediaTypeCompositionResponseModel';
 export type { AvailableMemberTypeCompositionResponseModel } from './models/AvailableMemberTypeCompositionResponseModel';
+export type { ChangePasswordCurrentUserRequestModel } from './models/ChangePasswordCurrentUserRequestModel';
 export type { ChangePasswordUserRequestModel } from './models/ChangePasswordUserRequestModel';
 export { CompositionTypeModel } from './models/CompositionTypeModel';
 export type { ConsentLevelPresentationModel } from './models/ConsentLevelPresentationModel';
