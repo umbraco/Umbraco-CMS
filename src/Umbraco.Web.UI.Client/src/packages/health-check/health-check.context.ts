@@ -45,8 +45,11 @@ export class UmbHealthCheckContext implements UmbApi {
 		}
 	}
 
-	public destroy(): void {
+	static isInstanceLike(instance: unknown): instance is UmbHealthCheckContext {
+		return typeof instance === 'object' && (instance as UmbHealthCheckContext).results !== undefined;
 	}
+
+	public destroy(): void {}
 }
 
 export default UmbHealthCheckContext;

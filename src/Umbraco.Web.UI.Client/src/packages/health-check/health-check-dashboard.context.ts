@@ -1,4 +1,4 @@
-import type { UmbHealthCheckContext } from './health-check.context.js';
+import { UmbHealthCheckContext } from './health-check.context.js';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
@@ -29,8 +29,11 @@ export class UmbHealthCheckDashboardContext {
 	#registerApis() {
 		this.apis.clear();
 		this.#manifests.forEach(async (manifest) => {
-			const api = await loadManifestApi<UmbHealthCheckContext>(manifest.api);
-			if (api) this.apis.set(manifest.meta.label, new api(this.host));
+			if (!manifest.api) return;
+			const api = await loadManifestApi(manifest.api);
+			if (!api) return;
+			const apiInstance = new api(this.host);
+			if (api && UmbHealthCheckContext.isInstanceLike(apiInstance)) this.apis.set(manifest.meta.label, apiInstance);
 		});
 	}
 }
