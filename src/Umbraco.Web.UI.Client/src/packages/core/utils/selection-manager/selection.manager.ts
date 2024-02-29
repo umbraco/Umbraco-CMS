@@ -8,11 +8,7 @@ import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observab
  * @export
  * @class UmbSelectionManager
  */
-<<<<<<< HEAD
-export class UmbSelectionManager<ValueType = string | null> extends UmbControllerBase {
-=======
-export class UmbSelectionManager<ValueType extends string | null = string | null> extends UmbBaseController {
->>>>>>> origin/main
+export class UmbSelectionManager<ValueType extends string | null = string | null> extends UmbControllerBase {
 	#selectable = new UmbBooleanState(false);
 	public readonly selectable = this.#selectable.asObservable();
 
