@@ -1790,6 +1790,7 @@ export default {
 		settingsGroup: 'Indstillinger',
 		templatingGroup: 'Design og layout',
 		thirdPartyGroup: 'Tredjepart',
+		webhooks: 'Webhooks',
 	},
 	update: {
 		updateAvailable: 'Ny opdatering er klar',

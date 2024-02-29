@@ -83,6 +83,7 @@
 		"./user": "./dist-cms/packages/user/user/index.js",
 		"./utils": "./dist-cms/packages/core/utils/index.js",
 		"./variant": "./dist-cms/packages/core/variant/index.js",
+		"./webhook": "./dist-cms/packages/webhook/index.js",
 		"./workspace": "./dist-cms/packages/core/workspace/index.js",
 		"./external/backend-api": "./dist-cms/external/backend-api/index.js",
 		"./external/dompurify": "./dist-cms/external/dompurify/index.js",
