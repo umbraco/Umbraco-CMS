@@ -27,6 +27,7 @@ public class SetAvatarUserController : UserControllerBase
     [HttpPost("avatar/{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SetAvatar(Guid id, SetAvatarRequestModel model)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
