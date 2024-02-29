@@ -1,6 +1,6 @@
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 // Move to documentation / JSdoc
@@ -22,6 +22,5 @@ export class UmbWebhookRepository {
 
 	async requestWebhooks({ skip, take } = { skip: 0, take: 1000 }) {
 		await this.#init;
-		
 	}
 }
