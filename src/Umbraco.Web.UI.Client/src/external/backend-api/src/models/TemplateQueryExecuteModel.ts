@@ -2,9 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
 import type { TemplateQueryExecuteFilterPresentationModel } from './TemplateQueryExecuteFilterPresentationModel';
 import type { TemplateQueryExecuteSortModel } from './TemplateQueryExecuteSortModel';
+
 export type TemplateQueryExecuteModel = {
     rootDocument?: ReferenceByIdModel | null;
     documentTypeAlias?: string | null;

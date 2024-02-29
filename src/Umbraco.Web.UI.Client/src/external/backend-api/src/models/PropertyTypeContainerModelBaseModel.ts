@@ -2,7 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type PropertyTypeContainerModelBaseModel = {
     id: string;
     parent?: ReferenceByIdModel | null;

@@ -6,10 +6,13 @@ import type { ServerConfigurationResponseModel } from '../models/ServerConfigura
 import type { ServerInformationResponseModel } from '../models/ServerInformationResponseModel';
 import type { ServerStatusResponseModel } from '../models/ServerStatusResponseModel';
 import type { ServerTroubleshootingResponseModel } from '../models/ServerTroubleshootingResponseModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class ServerResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -23,6 +26,7 @@ export class ServerResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -36,6 +40,7 @@ export class ServerResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -49,6 +54,7 @@ export class ServerResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -62,4 +68,5 @@ export class ServerResource {
             },
         });
     }
+
 }

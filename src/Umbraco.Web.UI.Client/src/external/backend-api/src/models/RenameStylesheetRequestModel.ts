@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { FileSystemRenameRequestModelBaseModel } from './FileSystemRenameRequestModelBaseModel';
+
 export type RenameStylesheetRequestModel = FileSystemRenameRequestModelBaseModel;
 

@@ -10,10 +10,13 @@ import type { StylesheetFolderResponseModel } from '../models/StylesheetFolderRe
 import type { StylesheetItemResponseModel } from '../models/StylesheetItemResponseModel';
 import type { StylesheetResponseModel } from '../models/StylesheetResponseModel';
 import type { UpdateStylesheetRequestModel } from '../models/UpdateStylesheetRequestModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class StylesheetResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -34,6 +37,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -56,6 +60,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -77,6 +82,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -100,6 +106,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -127,6 +134,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -154,6 +162,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -176,6 +185,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -197,6 +207,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -220,6 +231,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -246,6 +258,7 @@ export class StylesheetResource {
             },
         });
     }
+
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -269,4 +282,5 @@ export class StylesheetResource {
             },
         });
     }
+
 }

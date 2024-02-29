@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 export type TemporaryFileConfigurationResponseModel = {
     imageFileTypes: Array<string>;
     disallowedUploadedFilesExtensions: Array<string>;

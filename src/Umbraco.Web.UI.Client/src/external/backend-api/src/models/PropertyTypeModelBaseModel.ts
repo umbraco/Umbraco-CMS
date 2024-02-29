@@ -2,9 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { PropertyTypeAppearanceModel } from './PropertyTypeAppearanceModel';
 import type { PropertyTypeValidationModel } from './PropertyTypeValidationModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type PropertyTypeModelBaseModel = {
     id: string;
     container?: ReferenceByIdModel | null;

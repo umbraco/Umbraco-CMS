@@ -7,10 +7,13 @@ import type { LanguageItemResponseModel } from '../models/LanguageItemResponseMo
 import type { LanguageResponseModel } from '../models/LanguageResponseModel';
 import type { PagedLanguageResponseModel } from '../models/PagedLanguageResponseModel';
 import type { UpdateLanguageRequestModel } from '../models/UpdateLanguageRequestModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class LanguageResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -31,6 +34,7 @@ export class LanguageResource {
             },
         });
     }
+
     /**
      * @returns PagedLanguageResponseModel Success
      * @throws ApiError
@@ -54,6 +58,7 @@ export class LanguageResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -76,6 +81,7 @@ export class LanguageResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -97,6 +103,7 @@ export class LanguageResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -120,6 +127,7 @@ export class LanguageResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -147,4 +155,5 @@ export class LanguageResource {
             },
         });
     }
+
 }

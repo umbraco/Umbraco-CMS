@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 export enum UserOrderModel {
     USER_NAME = 'UserName',
     LANGUAGE = 'Language',
