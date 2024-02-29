@@ -74,10 +74,10 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 					const expectedOldAlias = generateAlias(oldName ?? '');
 					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
 					if (expectedOldAlias === oldAlias) {
-						this.#workspaceContext?.updateProperty('alias', generateAlias(newName));
+						this.#workspaceContext?.setAlias(generateAlias(newName));
 					}
 				}
-				this.#workspaceContext?.updateProperty('name', target.value);
+				this.#workspaceContext?.setName(target.value);
 			}
 		}
 	}
@@ -88,7 +88,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.updateProperty('alias', target.value);
+				this.#workspaceContext?.setAlias(target.value);
 			}
 		}
 		event.stopPropagation();
@@ -107,7 +107,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		modalContext?.onSubmit().then((value) => {
-			if (value.icon) this.#workspaceContext?.updateProperty('icon', value.icon);
+			if (value.icon) this.#workspaceContext?.setIcon(value.icon);
 			// TODO: save color ALIAS as well
 		});
 	}

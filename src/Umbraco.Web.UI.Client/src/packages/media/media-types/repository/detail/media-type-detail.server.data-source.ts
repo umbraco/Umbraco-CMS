@@ -170,6 +170,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			}),
 			id: model.unique,
 			folder: model.parentUnique ? { id: model.parentUnique } : null,
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -233,6 +234,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 					compositionType: composition.compositionType,
 				};
 			}),
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { error } = await tryExecuteAndNotify(
