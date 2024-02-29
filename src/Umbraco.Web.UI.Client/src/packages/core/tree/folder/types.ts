@@ -1,6 +1,5 @@
 export interface UmbFolderModel {
 	unique: string;
-	parentUnique: string | null;
 	name: string;
 }
 
