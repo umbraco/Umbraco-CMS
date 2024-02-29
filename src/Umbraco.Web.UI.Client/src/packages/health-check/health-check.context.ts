@@ -7,8 +7,9 @@ import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-ap
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbHealthCheckContext {
+export class UmbHealthCheckContext implements UmbApi {
 	private _checks = new BehaviorSubject<HealthCheckGroupPresentationModel | undefined>(undefined);
 	public readonly checks = this._checks.asObservable();
 
@@ -42,6 +43,10 @@ export class UmbHealthCheckContext {
 		} else {
 			this._results.next(undefined);
 		}
+	}
+
+	public destroy(): void {
+		this.destroy();
 	}
 }
 

@@ -1,3 +1,4 @@
+import { UmbHealthCheckContext } from './health-check.context.js';
 import type { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element.js';
 import { UmbHealthCheckDashboardContext, UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from './health-check-dashboard.context.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -58,7 +59,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 				weight: 500,
 				meta: {
 					label: group.name || '',
-					api: () => import('./health-check.context.js'),
+					api: UmbHealthCheckContext,
 				},
 			};
 		});
