@@ -45,7 +45,7 @@ public class EntityBasic
     public int ParentId { get; set; }
 
     /// <summary>
-    ///     This will only be populated for some entities like macros
+    ///     This will only be populated for some entities
     /// </summary>
     /// <remarks>
     ///     It is possible to override this to specify different validation attributes if required

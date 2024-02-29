@@ -26,7 +26,6 @@ using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -51,7 +50,6 @@ using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
 using Umbraco.Cms.Web.Common.Localization;
-using Umbraco.Cms.Web.Common.Macros;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
@@ -287,25 +285,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
-        builder.Services.AddUnique<IMacroRenderer>(serviceProvider =>
-        {
-            return new MacroRenderer(
-                serviceProvider.GetRequiredService<IProfilingLogger>(),
-                serviceProvider.GetRequiredService<ILogger<MacroRenderer>>(),
-                serviceProvider.GetRequiredService<IUmbracoContextAccessor>(),
-                serviceProvider.GetRequiredService<IOptionsMonitor<ContentSettings>>(),
-                serviceProvider.GetRequiredService<ILocalizedTextService>(),
-                serviceProvider.GetRequiredService<AppCaches>(),
-                serviceProvider.GetRequiredService<IMacroService>(),
-                serviceProvider.GetRequiredService<ICookieManager>(),
-                serviceProvider.GetRequiredService<ISessionManager>(),
-                serviceProvider.GetRequiredService<IRequestAccessor>(),
-                serviceProvider.GetRequiredService<PartialViewMacroEngine>(),
-                serviceProvider.GetRequiredService<IHttpContextAccessor>(),
-                serviceProvider.GetRequiredService<IWebHostEnvironment>());
-        });
-
-        builder.Services.AddSingleton<PartialViewMacroEngine>();
         builder.Services.AddSingleton<IPartialViewBlockEngine, PartialViewBlockEngine>();
 
         // register the umbraco context factory

@@ -212,24 +212,6 @@ public static class DistributedCacheExtensions
 
     #endregion
 
-    #region MacroCacheRefresher
-
-    [Obsolete("Use the overload accepting IEnumerable instead. This overload will be removed in Umbraco 13.")]
-    public static void RefreshMacroCache(this DistributedCache dc, IMacro macro)
-        => dc.RefreshMacroCache(macro.Yield());
-
-    public static void RefreshMacroCache(this DistributedCache dc, IEnumerable<IMacro> macros)
-        => dc.RefreshByPayload(MacroCacheRefresher.UniqueId, macros.DistinctBy(x => (x.Id, x.Alias)).Select(x => new MacroCacheRefresher.JsonPayload(x.Id, x.Alias)));
-
-    [Obsolete("Use the overload accepting IEnumerable instead. This overload will be removed in Umbraco 13.")]
-    public static void RemoveMacroCache(this DistributedCache dc, IMacro macro)
-        => dc.RemoveMacroCache(macro.Yield());
-
-    public static void RemoveMacroCache(this DistributedCache dc, IEnumerable<IMacro> macros)
-        => dc.RefreshByPayload(MacroCacheRefresher.UniqueId, macros.DistinctBy(x => (x.Id, x.Alias)).Select(x => new MacroCacheRefresher.JsonPayload(x.Id, x.Alias)));
-
-    #endregion
-
     #region ContentTypeCacheRefresher
 
     [Obsolete("Use the overload accepting IEnumerable instead to avoid allocating arrays. This overload will be removed in Umbraco 13.")]

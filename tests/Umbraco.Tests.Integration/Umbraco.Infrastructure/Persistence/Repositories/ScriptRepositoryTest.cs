@@ -36,7 +36,6 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
             HostingEnvironment,
             null,
             null,
-            null,
             _fileSystem,
             null);
         using (var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))

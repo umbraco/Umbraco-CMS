@@ -31,7 +31,6 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
             Constants.Telemetry.DomainCount,
             Constants.Telemetry.ExamineIndexCount,
             Constants.Telemetry.LanguageCount,
-            Constants.Telemetry.MacroCount,
             Constants.Telemetry.MediaCount,
             Constants.Telemetry.MediaCount,
             Constants.Telemetry.TemplateCount,
