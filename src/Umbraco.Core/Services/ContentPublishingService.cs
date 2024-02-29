@@ -207,6 +207,13 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
+        IEnumerable<string> validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
+        if (culture is not null && validCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
+        }
+
         var userId = await _userIdKeyResolver.GetAsync(userKey);
         PublishResult result = _contentService.Unpublish(content, culture ?? "*", userId);
         scope.Complete();
