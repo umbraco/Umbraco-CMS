@@ -64,22 +64,20 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 
 	render() {
 		return html`
-			<uui-box headline="Structure">
-				<umb-property-layout alias="Root" label="Allow as Root">
-					<div slot="description">${this.localize.term('contentTypeEditor_allowAsRootDescription')}</div>
+			<uui-box headline=${this.localize.term('contentTypeEditor_structure')}>
+				<umb-property-layout alias="Root" label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}>
+					<div slot="description">${this.localize.term('contentTypeEditor_allowAtRootDescription')}</div>
 					<div slot="editor">
 						<uui-toggle
-							label=${this.localize.term('contentTypeEditor_allowAsRootHeading')}
+							label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}
 							?checked=${this._allowedAtRoot}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.setAllowedAsRoot((e.target as UUIToggleElement).checked);
 							}}></uui-toggle>
 					</div>
 				</umb-property-layout>
-				<umb-property-layout alias="ChildNodeType" label="Allowed child node types">
-					<div slot="description">
-						Allow content of the specified types to be created underneath content of this type.
-					</div>
+				<umb-property-layout alias="ChildNodeType" label=${this.localize.term('contentTypeEditor_childNodesHeading')}>
+					<div slot="description">${this.localize.term('contentTypeEditor_childNodesDescription')}</div>
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-input-document-type
@@ -98,7 +96,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					</div>
 				</umb-property-layout>
 			</uui-box>
-			<uui-box headline="Presentation">
+			<uui-box headline=${this.localize.term('contentTypeEditor_presentation')}>
 				<umb-property-layout alias="collection" label="${this.localize.term('contentTypeEditor_collections')}">
 					<div slot="description">${this.localize.term('contentTypeEditor_collectionsDescription')}</div>
 					<div slot="editor">
