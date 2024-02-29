@@ -4,6 +4,8 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { CreateMemberGroupRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A data source for the Member Group that fetches data from the server
@@ -43,38 +45,31 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	 * Fetches a Member Group with the given id from the server
 	 * @param {string} unique
 	 * @return {*}
-	 * @memberof UmbMemberGroupServerDataSource
+	 * @memberof UmbMemberServerDataSource
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		/*
+		//TODO: Use the getById Endpoint when available
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			MemberGroupResource.getMemberGroupById({ id: unique }),
+			MemberGroupResource.getItemMemberGroup({ id: [unique] }),
 		);
-		*/
-
-		// TODO => use backend cli when available.
-		const { data, error } = (await tryExecuteAndNotify(
-			this.#host,
-			fetch(`/umbraco/management/api/v1/member-group/${unique}`),
-		)) as any;
-
-		const json = await data.json(); // remove this line when backend cli is available
 
 		if (error || !data) {
 			return { error };
 		}
 
-		// TODO: make data mapper to prevent errors
-		const memberGroup: UmbMemberGroupDetailModel = {
+		//TODO: Use the getById Endpoint when available
+		const temp = data[0];
+
+		const MemberGroup: UmbMemberGroupDetailModel = {
 			entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
-			unique: json.id,
-			name: json.name,
+			unique: temp.id,
+			name: temp.name,
 		};
 
-		return { data: memberGroup };
+		return { data: MemberGroup };
 	}
 
 	/**
@@ -86,32 +81,20 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	async create(model: UmbMemberGroupDetailModel) {
 		if (!model) throw new Error('Member Group is missing');
 
-		// TODO: make data mapper to prevent errors
-		// TODO: add type CreateMemberGroupRequestModel
-		const requestBody: any = {
-			id: model.unique,
+		const requestBody: CreateMemberGroupRequestModel = {
 			name: model.name,
+			id: model.unique,
 		};
 
-		/*
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			MemberGroupResource.postMemberGroup({
 				requestBody,
 			}),
 		);
-		*/
-
-		// TODO => use backend cli when available.
-		const { data, error } = (await tryExecuteAndNotify(
-			this.#host,
-			fetch(`/umbraco/management/api/v1/member-group`, { method: 'POST', body: JSON.stringify(requestBody) }),
-		)) as any;
-
-		const newUnqiue = data.headers.get('Umb-Generated-Resource'); // TODO: remove when backend cli is available
 
 		if (data) {
-			return this.read(newUnqiue);
+			return this.read(data.id);
 		}
 
 		return { error };

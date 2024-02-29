@@ -31,7 +31,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	// TODO. find a way where we don't have to do this for all Workspaces.
-	#handleInput(event: UUIInputEvent) {
+	#onInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
@@ -44,7 +44,7 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.MemberGroup">
-				<uui-input slot="header" id="nameInput" .value=${this._name} @input="${this.#handleInput}"></uui-input>
+				<uui-input slot="header" id="nameInput" .value=${this._name} @input="${this.#onInput}"></uui-input>
 			</umb-workspace-editor>
 		`;
 	}
@@ -56,6 +56,9 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
+			}
+			uui-input {
+				width: 100%;
 			}
 		`,
 	];
