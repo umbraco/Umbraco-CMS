@@ -67,7 +67,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	// TODO: get this from the tree context
 	#paging = {
 		skip: 0,
-		take: 3,
+		take: 50,
 	};
 
 	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {

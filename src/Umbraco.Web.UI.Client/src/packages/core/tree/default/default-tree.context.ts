@@ -35,7 +35,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 	#paging = {
 		skip: 0,
-		take: 3,
+		take: 50,
 	};
 
 	#initResolver?: () => void;
