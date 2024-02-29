@@ -1,13 +1,14 @@
-import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbHealthCheckContext } from '../../../health-check/health-check.context.js';
+import type { ApiLoaderProperty, ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestHealthCheck extends ManifestElement {
+export interface ManifestHealthCheck extends ManifestElementAndApi {
 	type: 'healthCheck';
 	meta: MetaHealthCheck;
+	api: ApiLoaderProperty<UmbHealthCheckContext>;
 }
 
 export interface MetaHealthCheck {
 	label: string;
-	api: any;
 }
 
 export interface HealthCheck {

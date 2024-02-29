@@ -56,10 +56,10 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 				type: 'healthCheck',
 				alias: `Umb.HealthCheck.${group.name?.replace(/\s+/g, '') || ''}`,
 				name: `${group.name} Health Check`,
+				api: () => import('./health-check.context.js'),
 				weight: 500,
 				meta: {
 					label: group.name || '',
-					api: UmbHealthCheckContext,
 				},
 			};
 		});

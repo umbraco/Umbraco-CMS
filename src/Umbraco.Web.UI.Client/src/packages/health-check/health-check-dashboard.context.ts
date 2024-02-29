@@ -29,7 +29,7 @@ export class UmbHealthCheckDashboardContext {
 	#registerApis() {
 		this.apis.clear();
 		this.#manifests.forEach(async (manifest) => {
-			const api = await loadManifestApi<UmbHealthCheckContext>(manifest.meta.api);
+			const api = await loadManifestApi<UmbHealthCheckContext>(manifest.api);
 			if (api) this.apis.set(manifest.meta.label, new api(this.host));
 		});
 	}
