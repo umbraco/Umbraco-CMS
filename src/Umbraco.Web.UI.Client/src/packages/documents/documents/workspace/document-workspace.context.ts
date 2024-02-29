@@ -362,7 +362,7 @@ export class UmbDocumentWorkspaceContext
 		} else if (options.length === 1) {
 			// If only one option we will skip ahead and save the document with the only variant available:
 			const firstVariant = UmbVariantId.Create(options[0]);
-			return await this.#performSaveOrCreate([firstVariant]);
+			return this.#performSaveOrCreate([firstVariant]);
 		}
 
 		const selectedVariants = await umbPickDocumentVariantModal(this, { type, options, selected });
@@ -370,7 +370,7 @@ export class UmbDocumentWorkspaceContext
 		// If no variants are selected, we don't save anything.
 		if (!selectedVariants.length) return [];
 
-		return await this.#performSaveOrCreate(selectedVariants);
+		return this.#performSaveOrCreate(selectedVariants);
 	}
 
 	#buildSaveData(selectedVariants: Array<UmbVariantId>): UmbDocumentDetailModel {
@@ -427,11 +427,18 @@ export class UmbDocumentWorkspaceContext
 		const saveData = this.#buildSaveData(selectedVariants);
 
 		if (this.getIsNew()) {
-			if ((await this.repository.create(saveData)).data !== undefined) {
-				this.setIsNew(false);
+			const { data: create, error } = await this.repository.create(saveData);
+			if (!create || error) {
+				console.error('Error creating document', error);
+				throw new Error('Error creating document');
 			}
+			this.setIsNew(false);
 		} else {
-			await this.repository.save(saveData);
+			const { data: save, error } = await this.repository.save(saveData);
+			if (!save || error) {
+				console.error('Error saving document', error);
+				throw new Error('Error saving document');
+			}
 		}
 
 		return selectedVariants;
