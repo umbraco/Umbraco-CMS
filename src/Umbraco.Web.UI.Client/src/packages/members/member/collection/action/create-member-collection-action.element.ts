@@ -1,5 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { html, customElement, state, repeat, css, until } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, repeat, css, until, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbMemberTypeTreeRepository } from '@umbraco-cms/backoffice/member-type';
 
@@ -28,14 +28,21 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		this.requestUpdate();
 	}
 
-	#onButtonClick = () => {
+	#onButtonClick = async () => {
 		if (this._options.length > 0) return;
 
-		this.#getOptions();
+		await this.#getOptions();
+
+		if (this._options.length === 1) {
+			history.pushState({}, '', `section/member-management/workspace/member/create/${this._options[0].unique}`);
+		}
 	};
 
 	async #renderOptions() {
 		await this.#optionRequestPromise;
+
+		// If we only have one option, we don't need to render the popover. We will go directly to it on click.
+		if (this._options.length === 1) return nothing;
 
 		return html`
 			${repeat(
