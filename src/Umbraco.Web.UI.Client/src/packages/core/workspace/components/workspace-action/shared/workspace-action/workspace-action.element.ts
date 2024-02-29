@@ -15,6 +15,9 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 	@state()
 	private _buttonState?: UUIButtonState;
 
+	@state()
+	private _aliases: Array<string> = [];
+
 	@property({ type: Object, attribute: false })
 	public get manifest() {
 		return this.#manifest;
@@ -25,16 +28,26 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 		this.#manifest = value;
 		if (oldValue !== this.#manifest) {
 			this.#createApi();
+			this.#createAliases();
 			this.requestUpdate('manifest', oldValue);
 		}
 	}
 
-	@state()
-	get aliases(): Array<string> {
+	async #createApi() {
+		if (!this.manifest) return;
+		this.#api = await createExtensionApi(this.manifest, [this]);
+	}
+
+	/**
+	 * Create a list of original and overwritten aliases of workspace actions for the action.
+	 */
+	async #createAliases() {
+		if (!this.manifest) return;
 		const aliases = new Set<string>();
 		if (this.manifest) {
 			aliases.add(this.manifest.alias);
 
+			// TODO: This works on one level for now, which will be enough for the current use case. However, you can overwrite the overwrites, so we need to make this recursive. Perhaps we could move this to the extensions initializer.
 			// Add overwrites so that we can show any previously registered actions on the original workspace action
 			if (this.manifest.overwrites) {
 				for (const alias of this.manifest.overwrites) {
@@ -42,12 +55,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 				}
 			}
 		}
-		return Array.from(aliases);
-	}
-
-	async #createApi() {
-		if (!this.manifest) return;
-		this.#api = await createExtensionApi(this.manifest, [this]);
+		this._aliases = Array.from(aliases);
 	}
 
 	#api?: UmbWorkspaceAction;
@@ -77,7 +85,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 					label=${this.manifest?.meta.label || ''}
 					.state=${this._buttonState}></uui-button>
 				<umb-workspace-action-menu
-					.workspaceActions=${this.aliases}
+					.workspaceActions=${this._aliases}
 					color="${this.manifest?.meta.color || 'default'}"
 					look="${this.manifest?.meta.look || 'default'}"></umb-workspace-action-menu>
 			</uui-button-group>
