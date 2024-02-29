@@ -5,13 +5,10 @@
 import type { PagedRedirectUrlResponseModel } from '../models/PagedRedirectUrlResponseModel';
 import type { RedirectStatusModel } from '../models/RedirectStatusModel';
 import type { RedirectUrlStatusResponseModel } from '../models/RedirectUrlStatusResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class RedirectManagementResource {
-
     /**
      * @returns PagedRedirectUrlResponseModel Success
      * @throws ApiError
@@ -39,7 +36,6 @@ export class RedirectManagementResource {
             },
         });
     }
-
     /**
      * @returns PagedRedirectUrlResponseModel Success
      * @throws ApiError
@@ -68,7 +64,6 @@ export class RedirectManagementResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -90,7 +85,6 @@ export class RedirectManagementResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -104,7 +98,6 @@ export class RedirectManagementResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -126,5 +119,4 @@ export class RedirectManagementResource {
             },
         });
     }
-
 }

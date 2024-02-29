@@ -17,7 +17,7 @@ export interface UmbContentTypeModel {
 	alias: string;
 	description: string | null;
 	icon: string;
-	allowedAsRoot: boolean;
+	allowedAtRoot: boolean;
 	variesByCulture: boolean;
 	variesBySegment: boolean;
 	isElement: boolean;

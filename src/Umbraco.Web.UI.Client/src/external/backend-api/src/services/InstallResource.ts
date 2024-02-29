@@ -5,13 +5,10 @@
 import type { DatabaseInstallRequestModel } from '../models/DatabaseInstallRequestModel';
 import type { InstallRequestModel } from '../models/InstallRequestModel';
 import type { InstallSettingsResponseModel } from '../models/InstallSettingsResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class InstallResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -25,7 +22,6 @@ export class InstallResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -46,7 +42,6 @@ export class InstallResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -67,5 +62,4 @@ export class InstallResource {
             },
         });
     }
-
 }

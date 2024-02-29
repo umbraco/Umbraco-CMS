@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { VerifyResetPasswordTokenRequestModel } from './VerifyResetPasswordTokenRequestModel';
-
 export type ResetPasswordTokenRequestModel = (VerifyResetPasswordTokenRequestModel & {
     password: string;
 });

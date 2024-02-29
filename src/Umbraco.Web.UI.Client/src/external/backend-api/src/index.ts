@@ -19,6 +19,7 @@ export type { AvailableContentTypeCompositionResponseModelBaseModel } from './mo
 export type { AvailableDocumentTypeCompositionResponseModel } from './models/AvailableDocumentTypeCompositionResponseModel';
 export type { AvailableMediaTypeCompositionResponseModel } from './models/AvailableMediaTypeCompositionResponseModel';
 export type { AvailableMemberTypeCompositionResponseModel } from './models/AvailableMemberTypeCompositionResponseModel';
+export type { ChangePasswordCurrentUserRequestModel } from './models/ChangePasswordCurrentUserRequestModel';
 export type { ChangePasswordUserRequestModel } from './models/ChangePasswordUserRequestModel';
 export { CompositionTypeModel } from './models/CompositionTypeModel';
 export type { ConsentLevelPresentationModel } from './models/ConsentLevelPresentationModel';
@@ -76,7 +77,6 @@ export type { CreateStylesheetRequestModel } from './models/CreateStylesheetRequ
 export type { CreateTemplateRequestModel } from './models/CreateTemplateRequestModel';
 export type { CreateUserGroupRequestModel } from './models/CreateUserGroupRequestModel';
 export type { CreateUserRequestModel } from './models/CreateUserRequestModel';
-export type { CreateUserResponseModel } from './models/CreateUserResponseModel';
 export type { CreateWebhookRequestModel } from './models/CreateWebhookRequestModel';
 export type { CultureAndScheduleRequestModel } from './models/CultureAndScheduleRequestModel';
 export type { CultureReponseModel } from './models/CultureReponseModel';
@@ -325,6 +325,7 @@ export type { RenameStylesheetRequestModel } from './models/RenameStylesheetRequ
 export type { ResendInviteUserRequestModel } from './models/ResendInviteUserRequestModel';
 export type { ResetPasswordRequestModel } from './models/ResetPasswordRequestModel';
 export type { ResetPasswordTokenRequestModel } from './models/ResetPasswordTokenRequestModel';
+export type { ResetPasswordUserResponseModel } from './models/ResetPasswordUserResponseModel';
 export { RuntimeLevelModel } from './models/RuntimeLevelModel';
 export { RuntimeModeModel } from './models/RuntimeModeModel';
 export type { SavedLogSearchPresenationBaseModel } from './models/SavedLogSearchPresenationBaseModel';

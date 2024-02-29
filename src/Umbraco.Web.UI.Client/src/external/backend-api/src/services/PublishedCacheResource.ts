@@ -5,9 +5,7 @@
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class PublishedCacheResource {
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -22,7 +20,6 @@ export class PublishedCacheResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -37,7 +34,6 @@ export class PublishedCacheResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -52,7 +48,6 @@ export class PublishedCacheResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -66,5 +61,4 @@ export class PublishedCacheResource {
             },
         });
     }
-
 }
