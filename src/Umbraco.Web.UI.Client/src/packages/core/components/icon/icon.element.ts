@@ -6,26 +6,37 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-icon')
 export class UmbIconElement extends UmbLitElement {
 	@state()
-	private icon?: string;
+	private _icon?: string;
+
+	@state()
+	private _color?: string;
 
 	@property({ type: String })
-	color?: string;
+	public set color(value: string) {
+		this.#setColorStyle(value);
+	}
+	public get color(): string {
+		return this._color ?? '';
+	}
+
+	#setColorStyle(value: string) {
+		const alias = value.replace('color-', '');
+		const variable = extractUmbColorVariable(alias);
+		this._color = alias ? (variable ? `--uui-icon-color: var(${variable})` : `--uui-icon-color: ${alias}`) : undefined;
+	}
 
 	@property({ type: String })
 	public set name(value: string | undefined) {
-		const [icon, alias] = value ? value.replace('color-', '').split(' ') : [];
-
-		const variable = extractUmbColorVariable(alias);
-		this.color = alias ? (variable ? `--uui-icon-color: var(${variable})` : `--uui-icon-color: ${alias}`) : undefined;
-
-		this.icon = icon;
+		const [icon, alias] = value ? value.split(' ') : [];
+		this.#setColorStyle(alias);
+		this._icon = icon;
 	}
 	public get name(): string | undefined {
-		return this.icon;
+		return this._icon;
 	}
 
 	render() {
-		return html`<uui-icon name=${ifDefined(this.icon)} style=${ifDefined(this.color)}></uui-icon>`;
+		return html`<uui-icon name=${ifDefined(this._icon)} style=${ifDefined(this._color)}></uui-icon>`;
 	}
 
 	static styles = [UmbTextStyles];
