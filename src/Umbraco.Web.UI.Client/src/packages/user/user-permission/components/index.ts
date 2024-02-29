@@ -1,3 +1,5 @@
-import './entity-user-permission-settings-list/entity-user-permission-settings-list.element.js';
+import './input-entity-user-permission/input-entity-user-permission.element.js';
+import './input-user-permission-verb/input-user-permission-verb.element.js';
 
-export * from './entity-user-permission-settings-list/entity-user-permission-settings-list.element.js';
+export * from './input-entity-user-permission/input-entity-user-permission.element.js';
+export * from './input-user-permission-verb/input-user-permission-verb.element.js';

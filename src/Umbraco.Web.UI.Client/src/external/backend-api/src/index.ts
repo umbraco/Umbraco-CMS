@@ -107,6 +107,7 @@ export type { DocumentCollectionResponseModel } from './models/DocumentCollectio
 export type { DocumentConfigurationResponseModel } from './models/DocumentConfigurationResponseModel';
 export type { DocumentItemResponseModel } from './models/DocumentItemResponseModel';
 export type { DocumentNotificationResponseModel } from './models/DocumentNotificationResponseModel';
+export type { DocumentPermissionPresentationModel } from './models/DocumentPermissionPresentationModel';
 export type { DocumentRecycleBinItemResponseModel } from './models/DocumentRecycleBinItemResponseModel';
 export type { DocumentResponseModel } from './models/DocumentResponseModel';
 export type { DocumentTreeItemResponseModel } from './models/DocumentTreeItemResponseModel';
@@ -362,10 +363,10 @@ export type { TemplateQueryResultItemPresentationModel } from './models/Template
 export type { TemplateQueryResultResponseModel } from './models/TemplateQueryResultResponseModel';
 export type { TemplateQuerySettingsResponseModel } from './models/TemplateQuerySettingsResponseModel';
 export type { TemplateResponseModel } from './models/TemplateResponseModel';
-export type { TemporaryFileConfigurationResponseModel } from './models/TemporaryFileConfigurationResponseModel';
 export type { TemporaryFileResponseModel } from './models/TemporaryFileResponseModel';
 export type { TourStatusModel } from './models/TourStatusModel';
 export type { TreeItemPresentationModel } from './models/TreeItemPresentationModel';
+export type { UnknownTypePermissionPresentationModel } from './models/UnknownTypePermissionPresentationModel';
 export type { UnlockUsersRequestModel } from './models/UnlockUsersRequestModel';
 export type { UnpublishDocumentRequestModel } from './models/UnpublishDocumentRequestModel';
 export type { UpdateContentForDocumentRequestModel } from './models/UpdateContentForDocumentRequestModel';
