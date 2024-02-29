@@ -243,6 +243,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
             if (attempt.Success is false)
             {
+                scope.Complete();
                 return attempt;
             }
         }
