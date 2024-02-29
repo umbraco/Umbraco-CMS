@@ -33,6 +33,6 @@ public class AllWebhookController : WebhookControllerBase
             Items = _umbracoMapper.MapEnumerable<IWebhook, WebhookResponseModel>(webhooks)
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Ok(viewModel);
     }
 }
