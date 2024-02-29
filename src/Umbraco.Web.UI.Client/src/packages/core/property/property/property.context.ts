@@ -1,7 +1,7 @@
 import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/index.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbArrayState,
@@ -15,7 +15,7 @@ import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/pr
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
+export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 	private _providerController: UmbContextProviderController;
 
 	#alias = new UmbStringState(undefined);
@@ -76,7 +76,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 
 	private _observePropertyVariant?: UmbObserverController<UmbVariantId | undefined>;
 	private _observePropertyValue?: UmbObserverController<ValueType | undefined>;
-	private async _observeProperty() {
+	private async _observeProperty(): Promise<void> {
 		const alias = this.#alias.getValue();
 		if (!this.#datasetContext || !alias) return;
 
@@ -107,20 +107,20 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 		);
 	}
 
-	public setAlias(alias: string | undefined) {
+	public setAlias(alias: string | undefined): void {
 		this.#alias.setValue(alias);
 	}
-	public setLabel(label: string | undefined) {
+	public setLabel(label: string | undefined): void {
 		this.#label.setValue(label);
 	}
-	public setDescription(description: string | undefined) {
+	public setDescription(description: string | undefined): void {
 		this.#description.setValue(description);
 	}
 	/**
 	 * Set the value of this property.
 	 * @param value {ValueType} the whole value to be set
 	 */
-	public setValue(value: ValueType | undefined) {
+	public setValue(value: ValueType | undefined): void {
 		const alias = this.#alias.getValue();
 		if (!this.#datasetContext || !alias) return;
 		this.#datasetContext?.setPropertyValue(alias, value);
@@ -130,24 +130,25 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	 * Notice this is not reactive, you should us the `value` observable for that.
 	 * @returns {ValueType}
 	 */
-	public getValue() {
+	public getValue(): ValueType | undefined {
 		return this.#value.getValue();
 	}
-	public setConfig(config: Array<UmbPropertyEditorConfigProperty> | undefined) {
+	public setConfig(config: Array<UmbPropertyEditorConfigProperty> | undefined): void {
 		this.#configValues.setValue(config ?? []);
 	}
-	public setVariantId(variantId: UmbVariantId | undefined) {
+	public setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId.setValue(variantId);
 	}
-	public getVariantId() {
+	public getVariantId(): UmbVariantId | undefined {
 		return this.#variantId.getValue();
 	}
 
-	public resetValue() {
+	public resetValue(): void {
 		this.setValue(undefined); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property.
 	}
 
 	public destroy(): void {
+		super.destroy();
 		this.#alias.destroy();
 		this.#label.destroy();
 		this.#description.destroy();
@@ -155,6 +156,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 		this.#value.destroy();
 		this.#configCollection.destroy();
 		this._providerController.destroy(); // This would also be handled by the controller host, but if someone wanted to replace/remove this context without the host being destroyed. Then we have clean up out selfs here.
+		this.#datasetContext = undefined;
 	}
 }
 

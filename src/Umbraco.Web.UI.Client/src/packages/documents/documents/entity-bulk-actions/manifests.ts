@@ -1,5 +1,5 @@
 import type { UmbCollectionBulkActionPermissions } from '../../../core/collection/types.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_PUBLISHING_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action.js';
 import { UmbDocumentDeleteEntityBulkAction } from './delete/delete.action.js';
@@ -12,7 +12,6 @@ import {
 	UMB_COLLECTION_BULK_ACTION_PERMISSION_CONDITION,
 } from '@umbraco-cms/backoffice/collection';
 
-// TODO: [LK] Wondering how these actions could be wired up to the `bulkActionPermissions` config?
 export const manifests: Array<ManifestEntityBulkAction> = [
 	{
 		type: 'entityBulkAction',
@@ -22,7 +21,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		api: UmbDocumentPublishEntityBulkAction,
 		meta: {
 			label: 'Publish',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_PUBLISHING_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -43,7 +42,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		api: UmbDocumentUnpublishEntityBulkAction,
 		meta: {
 			label: 'Unpublish',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DOCUMENT_PUBLISHING_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

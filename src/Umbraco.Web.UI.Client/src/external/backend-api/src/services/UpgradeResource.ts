@@ -3,21 +3,19 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { UpgradeSettingsResponseModel } from '../models/UpgradeSettingsResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class UpgradeResource {
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
-    public static postUpgradeAuthorize(): CancelablePromise<any> {
+    public static postUpgradeAuthorize(): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/upgrade/authorize',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 428: `Client Error`,
@@ -25,7 +23,6 @@ export class UpgradeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -40,5 +37,4 @@ export class UpgradeResource {
             },
         });
     }
-
 }

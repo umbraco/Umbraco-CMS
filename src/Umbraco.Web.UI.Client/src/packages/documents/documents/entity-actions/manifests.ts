@@ -5,7 +5,6 @@ import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.actio
 import { UmbUnpublishDocumentEntityAction } from './unpublish.action.js';
 import { UmbRollbackDocumentEntityAction } from './rollback.action.js';
 import { manifests as createManifests } from './create/manifests.js';
-import { manifests as permissionManifests } from './permissions/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import {
@@ -17,7 +16,6 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	...createManifests,
-	...permissionManifests,
 	...publicAccessManifests,
 	...cultureAndHostnamesManifests,
 	{
@@ -79,7 +77,7 @@ const entityActions: Array<ManifestTypes> = [
 		api: UmbPublishDocumentEntityAction,
 		meta: {
 			icon: 'icon-globe',
-			label: 'Publish (TBD)',
+			label: 'Publish',
 			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
@@ -91,7 +89,7 @@ const entityActions: Array<ManifestTypes> = [
 		api: UmbUnpublishDocumentEntityAction,
 		meta: {
 			icon: 'icon-globe',
-			label: 'Unpublish (TBD)',
+			label: 'Unpublish',
 			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},

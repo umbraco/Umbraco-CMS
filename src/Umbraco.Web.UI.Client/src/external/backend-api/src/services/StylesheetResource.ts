@@ -10,13 +10,10 @@ import type { StylesheetFolderResponseModel } from '../models/StylesheetFolderRe
 import type { StylesheetItemResponseModel } from '../models/StylesheetItemResponseModel';
 import type { StylesheetResponseModel } from '../models/StylesheetResponseModel';
 import type { UpdateStylesheetRequestModel } from '../models/UpdateStylesheetRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class StylesheetResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -37,7 +34,6 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -60,7 +56,6 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -82,22 +77,22 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteStylesheetByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/stylesheet/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -105,9 +100,8 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putStylesheetByPath({
@@ -116,7 +110,7 @@ export class StylesheetResource {
     }: {
         path: string,
         requestBody?: UpdateStylesheetRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/stylesheet/{path}',
@@ -125,6 +119,7 @@ export class StylesheetResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -132,7 +127,6 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -160,7 +154,6 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -183,7 +176,6 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -205,22 +197,22 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteStylesheetFolderByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/stylesheet/folder/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -228,7 +220,6 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -255,7 +246,6 @@ export class StylesheetResource {
             },
         });
     }
-
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -279,5 +269,4 @@ export class StylesheetResource {
             },
         });
     }
-
 }

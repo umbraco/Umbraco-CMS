@@ -2,8 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
+import type { CultureAndScheduleRequestModel } from './CultureAndScheduleRequestModel';
 export type PublishDocumentRequestModel = {
-    cultures: Array<string>;
+    publishSchedules: Array<CultureAndScheduleRequestModel>;
 };
 

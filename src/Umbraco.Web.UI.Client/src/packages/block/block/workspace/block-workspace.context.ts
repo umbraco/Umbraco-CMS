@@ -231,7 +231,7 @@ export class UmbBlockWorkspaceContext<
 		return this.#layout.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()!.contentUdi;
 	}
 
@@ -311,7 +311,6 @@ export class UmbBlockWorkspaceContext<
 			} else {
 				// TODO: Revert the layout, content & settings data to the original state.
 				if (this.#initialLayout) {
-					console.log('reverted layout');
 					this.#blockEntries?.setOneLayout(this.#initialLayout);
 				}
 				if (this.#initialContent) {
@@ -325,7 +324,11 @@ export class UmbBlockWorkspaceContext<
 	};
 
 	public destroy(): void {
+		super.destroy();
 		this.#layout.destroy();
+		this.#label.destroy();
+		this.#blockManager = undefined;
+		this.#modalContext = undefined;
 	}
 }
 

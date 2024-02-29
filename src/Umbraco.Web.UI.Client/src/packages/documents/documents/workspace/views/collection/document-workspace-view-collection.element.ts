@@ -33,10 +33,9 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 			this.observe(
 				workspaceContext.structure.ownerContentType(),
 				async (documentType) => {
-					if (!documentType) return;
+					if (!documentType || !documentType.collection) return;
 
-					// TODO: [LK] Temp hard-coded. Once the API is ready, wire up the data-type ID from the content-type.
-					const dataTypeUnique = 'c0808dd3-8133-4e4b-8ce8-e2bea84a96a4'; // documentType.collection.dataTypeId;
+					const dataTypeUnique = documentType.collection.unique;
 
 					if (dataTypeUnique) {
 						await this.#dataTypeDetailRepository.requestByUnique(dataTypeUnique);

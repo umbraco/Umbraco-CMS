@@ -9,8 +9,7 @@ import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffi
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { ManifestCollection, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
-import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionFilterModel, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDefaultCollectionContext<

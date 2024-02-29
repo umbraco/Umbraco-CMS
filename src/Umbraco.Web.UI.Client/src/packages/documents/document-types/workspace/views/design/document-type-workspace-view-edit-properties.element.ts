@@ -13,7 +13,6 @@ import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from
 
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	#model: Array<UmbPropertyTypeModel> = [];
 	#sorter = new UmbSorterController<UmbPropertyTypeModel, UmbDocumentTypeWorkspacePropertyElement>(this, {
 		getUniqueOfElement: (element) => {
 			return element.getAttribute('data-umb-property-id');
@@ -29,8 +28,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
 		// TODO: Fix bug where a local property turn into an inherited when moved to a new group container.
 		containerSelector: '#property-list',
-		onChange: ({ item, model }) => {
-			this.#model = model;
+		onChange: ({ model }) => {
 			this._propertyStructure = model;
 		},
 		onEnd: ({ item }) => {
@@ -38,7 +36,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
 			 */
-			const model = this.#model;
+			const model = this._propertyStructure;
 			const newIndex = model.findIndex((entry) => entry.id === item.id);
 
 			// Doesn't exist in model
@@ -123,6 +121,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	constructor() {
 		super();
 
+		this.#sorter.disable();
+
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this._propertyStructureHelper.setStructureManager(
 				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure,
@@ -132,9 +132,9 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {
-						this.#sorter.setModel(this._propertyStructure);
+						this.#sorter.enable();
 					} else {
-						this.#sorter.setModel([]);
+						this.#sorter.disable();
 					}
 				},
 				'_observeIsSorting',
@@ -151,11 +151,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
-			if (this._sortModeActive) {
-				this.#sorter.setModel(this._propertyStructure);
-			} else {
-				this.#sorter.setModel([]);
-			}
+			this.#sorter.setModel(this._propertyStructure);
 		});
 
 		// Note: Route for adding a new property
@@ -171,9 +167,6 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				return { data: { documentTypeId }, value: propertyData };
 			})
 			.onSubmit((value) => {
-				if (!value.dataType) {
-					throw new Error('No data type selected');
-				}
 				this.#addProperty(value as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {

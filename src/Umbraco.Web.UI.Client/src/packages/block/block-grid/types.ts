@@ -1,27 +1,45 @@
-import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../block-type/index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '../index.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 
 export const UMB_BLOCK_GRID_TYPE = 'block-grid-type';
 
 // Configuration models:
-export interface UmbBlockGridTypeModel extends UmbBlockTypeBaseModel {
-	columnSpanOptions: Array<number>;
+export interface UmbBlockGridTypeModel extends UmbBlockTypeWithGroupKey {
+	columnSpanOptions: Array<UmbBlockGridTypeColumnSpanOption>;
 	allowAtRoot: boolean;
 	allowInAreas: boolean;
 	rowMinSpan: number;
 	rowMaxSpan: number;
 	thumbnail?: string;
 	areaGridColumns?: number;
-	areas: Array<any>;
+	areas: Array<UmbBlockGridTypeAreaType>;
+	inlineEditing?: boolean;
+}
+
+export type UmbBlockGridTypeColumnSpanOption = {
+	columnSpan: number;
+};
+
+export interface UmbBlockGridTypeAreaType {
+	key: string;
+	alias: string;
+	columnSpan?: number;
+	rowSpan?: number;
+	minAllowed?: number;
+	maxAllowed?: number;
+	specifiedAllowance?: Array<UmbBlockGridTypeAreaTypePermission>;
+}
+
+export interface UmbBlockGridTypeAreaTypePermission {
+	elementTypeKey?: string;
+	groupKey?: string;
+	minAllowed?: number;
+	maxAllowed?: number;
 }
 
 export interface UmbBlockGridTypeGroupType {
 	name: string;
 	key: string;
-}
-
-export interface UmbBlockGridGroupTypeConfiguration extends Partial<UmbBlockGridTypeGroupType> {
-	blocks: Array<UmbBlockTypeWithGroupKey>;
 }
 
 // Content models:

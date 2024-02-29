@@ -1,8 +1,7 @@
 import { html, css, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestPackageView } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -43,16 +42,12 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	private _packageView?: ManifestPackageView;
 
 	#notificationContext?: UmbNotificationContext;
-	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 			this.#notificationContext = instance;
-		});
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalContext = instance;
 		});
 	}
 
@@ -76,16 +71,13 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 
 	async _onMigration() {
 		if (!this.name) return;
-		const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-			data: {
-				color: 'positive',
-				headline: `Run migrations for ${this.name}?`,
-				content: `Do you want to start run migrations for ${this.name}`,
-				confirmLabel: 'Run migrations',
-			},
-		});
 
-		await modalContext?.onSubmit();
+		await umbConfirmModal(this, {
+			color: 'positive',
+			headline: `Run migrations for ${this.name}?`,
+			content: `Do you want to start run migrations for ${this.name}`,
+			confirmLabel: 'Run migrations',
+		});
 
 		this._migrationButtonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(

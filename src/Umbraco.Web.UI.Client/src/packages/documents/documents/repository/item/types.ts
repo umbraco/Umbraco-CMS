@@ -1,6 +1,9 @@
+import type { UmbDocumentEntityType } from '../../entity.js';
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbDocumentItemModel {
+	entityType: UmbDocumentEntityType;
 	name: string; // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 	unique: string;
 	isTrashed: boolean;
@@ -8,7 +11,7 @@ export interface UmbDocumentItemModel {
 	documentType: {
 		unique: string;
 		icon: string;
-		hasCollection: boolean;
+		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbDocumentItemVariantModel>;
 }

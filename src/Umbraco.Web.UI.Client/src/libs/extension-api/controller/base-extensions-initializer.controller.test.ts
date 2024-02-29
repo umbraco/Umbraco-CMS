@@ -4,7 +4,7 @@ import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConf
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import type { PermittedControllerType } from './index.js';
 import { UmbBaseExtensionInitializer, UmbBaseExtensionsInitializer } from './index.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
@@ -65,7 +65,7 @@ class UmbTestExtensionsController<
 	}
 }
 
-class UmbTestConditionAlwaysValid extends UmbBaseController implements UmbExtensionCondition {
+class UmbTestConditionAlwaysValid extends UmbControllerBase implements UmbExtensionCondition {
 	config: UmbConditionConfigBase;
 	constructor(args: { host: UmbControllerHost; config: UmbConditionConfigBase }) {
 		super(args.host);
@@ -73,7 +73,7 @@ class UmbTestConditionAlwaysValid extends UmbBaseController implements UmbExtens
 	}
 	permitted = true;
 }
-class UmbTestConditionAlwaysInvalid extends UmbBaseController implements UmbExtensionCondition {
+class UmbTestConditionAlwaysInvalid extends UmbControllerBase implements UmbExtensionCondition {
 	config: UmbConditionConfigBase;
 	constructor(args: { host: UmbControllerHost; config: UmbConditionConfigBase }) {
 		super(args.host);

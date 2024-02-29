@@ -43,7 +43,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			alias: '',
 			description: '',
 			icon: '',
-			allowedAsRoot: false,
+			allowedAtRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
@@ -51,6 +51,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			containers: [],
 			allowedContentTypes: [],
 			compositions: [],
+			collection: null,
 			...preset,
 		};
 
@@ -80,7 +81,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			alias: data.alias,
 			description: data.description || null,
 			icon: data.icon,
-			allowedAsRoot: data.allowedAsRoot,
+			allowedAtRoot: data.allowedAsRoot,
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
@@ -115,6 +116,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 					compositionType: composition.compositionType,
 				};
 			}),
+			collection: data.collection ? { unique: data.collection.id } : null,
 		};
 
 		return { data: memberType };
@@ -135,7 +137,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -193,7 +195,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,

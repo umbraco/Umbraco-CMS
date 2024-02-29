@@ -66,11 +66,11 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		// TODO: make data mapper to prevent errors
 		const dataType: UmbLanguageDetailModel = {
 			entityType: UMB_LANGUAGE_ENTITY_TYPE,
-			fallbackIsoCode: data.fallbackIsoCode || null,
+			fallbackIsoCode: data.fallbackIsoCode?.toLowerCase() || null,
 			isDefault: data.isDefault,
 			isMandatory: data.isMandatory,
 			name: data.name,
-			unique: data.isoCode,
+			unique: data.isoCode.toLowerCase(),
 		};
 
 		return { data: dataType };
@@ -87,10 +87,10 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateLanguageRequestModel = {
-			fallbackIsoCode: model.fallbackIsoCode,
+			fallbackIsoCode: model.fallbackIsoCode?.toLowerCase(),
 			isDefault: model.isDefault,
 			isMandatory: model.isMandatory,
-			isoCode: model.unique,
+			isoCode: model.unique.toLowerCase(),
 			name: model.name,
 		};
 
@@ -119,7 +119,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: LanguageModelBaseModel = {
-			fallbackIsoCode: model.fallbackIsoCode,
+			fallbackIsoCode: model.fallbackIsoCode?.toLowerCase(),
 			isDefault: model.isDefault,
 			isMandatory: model.isMandatory,
 			name: model.name,
@@ -128,7 +128,7 @@ export class UmbLanguageServerDataSource implements UmbDetailDataSource<UmbLangu
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			LanguageResource.putLanguageByIsoCode({
-				isoCode: model.unique,
+				isoCode: model.unique.toLowerCase(),
 				requestBody,
 			}),
 		);

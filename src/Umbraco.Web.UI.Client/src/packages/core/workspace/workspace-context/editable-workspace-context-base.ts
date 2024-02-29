@@ -1,13 +1,13 @@
 import { UMB_WORKSPACE_CONTEXT } from './workspace-context.token.js';
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
-	extends UmbBaseController
+	extends UmbContextBase<UmbEditableWorkspaceContextBase<WorkspaceDataModelType>>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	public readonly workspaceAlias: string;
@@ -18,20 +18,31 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
+	/*
+		Concept notes: [NL]
+		Considerations are, if we bring a dirty state (observable) we need to maintain it all the time.
+		This might be too heavy process, so we might want to consider just having a get dirty state method.
+	*/
+	//#isDirty = new UmbBooleanState(undefined);
+	//isDirty = this.#isNew.asObservable();
+
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
-		super(host);
+		super(host, UMB_WORKSPACE_CONTEXT.toString());
 		this.workspaceAlias = workspaceAlias;
-		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext) = context;
 		});
+	}
+
+	protected resetState() {
+		this.#isNew.setValue(undefined);
 	}
 
 	getIsNew() {
 		return this.#isNew.getValue();
 	}
 
-	setIsNew(isNew: boolean) {
+	protected setIsNew(isNew: boolean) {
 		this.#isNew.setValue(isNew);
 	}
 
@@ -45,7 +56,8 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 		}
 	}
 
-	abstract getEntityId(): string | undefined; // TODO: Consider if this should go away/be renamed? now that we have getUnique()
+	//abstract getIsDirty(): Promise<boolean>;
+	abstract getUnique(): string | undefined; // TODO: Consider if this should go away/be renamed? now that we have getUnique()
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
 	abstract save(): Promise<void>;

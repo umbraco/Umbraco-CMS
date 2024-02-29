@@ -26,3 +26,5 @@ export class UmbStaticFileTreeRepository
 		return { data };
 	}
 }
+
+export default UmbStaticFileTreeRepository;

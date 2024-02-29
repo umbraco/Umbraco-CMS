@@ -90,11 +90,11 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 							.exception=${log.exception ?? ''}
 							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`,
 			  )}`
-			: html`<umb-empty-state size="small">
+			: html`
 					<span id="empty">
 						<uui-icon name="icon-search"></uui-icon>Sorry, we cannot find what you are looking for.
 					</span>
-			  </umb-empty-state>`}`;
+			  `}`;
 	}
 
 	render() {
@@ -115,9 +115,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				</div>
 				<div id="main">
 					${this._isLoading
-						? html`<umb-empty-state size="small">
-								<span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span>
-						  </umb-empty-state>`
+						? html` <span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span> `
 						: html`${this.#renderLogs()}`}
 				</div>
 			</uui-box>
@@ -172,11 +170,12 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				justify-content: center;
 				align-items: center;
 				gap: var(--uui-size-space-3);
+				margin: var(--uui-size-space-5) 0;
 			}
 
 			#pagination {
 				display: block;
-				margin: var(--uui-size-space-5, 18px) 0;
+				margin: var(--uui-size-space-5) 0;
 			}
 		`,
 	];

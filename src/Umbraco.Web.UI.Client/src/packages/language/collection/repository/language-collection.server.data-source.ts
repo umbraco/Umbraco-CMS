@@ -1,7 +1,7 @@
 import type { UmbLanguageCollectionFilterModel } from '../types.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UMB_LANGUAGE_ENTITY_TYPE } from '../../entity.js';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import { LanguageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -36,12 +36,12 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 		if (data) {
 			const items = data.items.map((item) => {
 				const model: UmbLanguageDetailModel = {
-					unique: item.isoCode,
+					unique: item.isoCode.toLowerCase(),
 					name: item.name,
 					entityType: UMB_LANGUAGE_ENTITY_TYPE,
 					isDefault: item.isDefault,
 					isMandatory: item.isMandatory,
-					fallbackIsoCode: item.fallbackIsoCode || null,
+					fallbackIsoCode: item.fallbackIsoCode?.toLowerCase() || null,
 				};
 
 				return model;

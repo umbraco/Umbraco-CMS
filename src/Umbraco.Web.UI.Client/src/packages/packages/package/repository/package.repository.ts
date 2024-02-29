@@ -2,7 +2,7 @@ import type { UmbPackageStore } from './package.store.js';
 import { UMB_PACKAGE_STORE_TOKEN } from './package.store.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
@@ -11,7 +11,7 @@ import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
  * A repository for Packages which mimics a tree store.
  * @export
  */
-export class UmbPackageRepository extends UmbBaseController implements UmbApi {
+export class UmbPackageRepository extends UmbControllerBase implements UmbApi {
 	#init!: Promise<void>;
 	#packageStore?: UmbPackageStore;
 	#packageSource: UmbPackageServerDataSource;
@@ -118,3 +118,5 @@ export class UmbPackageRepository extends UmbBaseController implements UmbApi {
 		return this.#packageStore!.migrations;
 	}
 }
+
+export default UmbPackageRepository;

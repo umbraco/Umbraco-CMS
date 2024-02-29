@@ -37,7 +37,8 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			unique: UmbId.new(),
 			urls: [],
 			mediaType: {
-				unique: 'mediaTypeId',
+				unique: '',
+				collection: null,
 			},
 			isTrashed: false,
 			values: [],
@@ -87,7 +88,10 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 				};
 			}),
 			urls: data.urls,
-			mediaType: { unique: data.mediaType.id },
+			mediaType: {
+				unique: data.mediaType.id,
+				collection: data.mediaType.collection ? { unique: data.mediaType.collection.id } : null,
+			},
 			isTrashed: data.isTrashed,
 		};
 

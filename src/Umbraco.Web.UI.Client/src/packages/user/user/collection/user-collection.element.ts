@@ -1,5 +1,4 @@
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 
 import './user-collection-header.element.js';
@@ -9,8 +8,6 @@ export class UmbUserCollectionElement extends UmbCollectionDefaultElement {
 	protected renderToolbar() {
 		return html`<umb-user-collection-header slot="header"></umb-user-collection-header> `;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbUserCollectionElement;

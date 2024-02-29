@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
+import type { DocumentPermissionPresentationModel } from './DocumentPermissionPresentationModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-
+import type { UnknownTypePermissionPresentationModel } from './UnknownTypePermissionPresentationModel';
 export type UserGroupBaseModel = {
     name: string;
     icon?: string | null;
@@ -15,6 +15,7 @@ export type UserGroupBaseModel = {
     documentRootAccess: boolean;
     mediaStartNode?: ReferenceByIdModel | null;
     mediaRootAccess: boolean;
-    permissions: Array<string>;
+    fallbackPermissions: Array<string>;
+    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
 };
 

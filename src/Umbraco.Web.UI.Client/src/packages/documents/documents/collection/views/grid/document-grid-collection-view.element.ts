@@ -13,21 +13,24 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	private _items: Array<UmbDocumentCollectionItemModel> = [];
 
 	@state()
+	private _loading = false;
+
+	@state()
 	private _selection: Array<string | null> = [];
 
 	@state()
-	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
+	private _skip: number = 0;
 
 	@state()
-	private _loading = false;
+	private _userDefinedProperties?: Array<UmbCollectionColumnConfiguration>;
 
 	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance;
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
 	}
@@ -35,9 +38,15 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 	#observeCollectionContext() {
 		if (!this.#collectionContext) return;
 
-		this.observe(this.#collectionContext.userDefinedProperties, (userDefinedProperties) => {
-			this._userDefinedProperties = userDefinedProperties;
-		},'umbCollectionUserDefinedPropertiesObserver');
+		this.observe(
+			this.#collectionContext.userDefinedProperties,
+			(userDefinedProperties) => {
+				this._userDefinedProperties = userDefinedProperties;
+			},
+			'umbCollectionUserDefinedPropertiesObserver',
+		);
+
+		this.observe(this.#collectionContext.items, (items) => (this._items = items), 'umbCollectionItemsObserver');
 
 		this.observe(
 			this.#collectionContext.selection.selection,
@@ -45,21 +54,31 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 			'umbCollectionSelectionObserver',
 		);
 
-		this.observe(this.#collectionContext.items, (items) => (this._items = items), 'umbCollectionItemsObserver');
+		this.observe(
+			this.#collectionContext.pagination.skip,
+			(skip) => {
+				this._skip = skip;
+			},
+			'umbCollectionSkipObserver',
+		);
 	}
 
 	// TODO: How should we handle url stuff? [?]
-	private _handleOpenCard(id: string) {
+	#onOpen(id: string) {
 		// TODO: this will not be needed when cards works as links with href [?]
 		history.pushState(null, '', 'section/content/workspace/document/edit/' + id);
 	}
 
 	#onSelect(item: UmbDocumentCollectionItemModel) {
-		this.#collectionContext?.selection.select(item.unique ?? '');
+		this.#collectionContext?.selection.select(item.unique);
 	}
 
 	#onDeselect(item: UmbDocumentCollectionItemModel) {
-		this.#collectionContext?.selection.deselect(item.unique ?? '');
+		this.#collectionContext?.selection.deselect(item.unique);
+	}
+
+	#isSelected(item: UmbDocumentCollectionItemModel) {
+		return this.#collectionContext?.selection.isSelected(item.unique);
 	}
 
 	render() {
@@ -76,24 +95,25 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) => this.#renderCard(item),
+					(item, index) => this.#renderCard(index, item),
 				)}
 			</div>
 		`;
 	}
 
-	#renderCard(item: UmbDocumentCollectionItemModel) {
+	#renderCard(index: number, item: UmbDocumentCollectionItemModel) {
+		const sortOrder = this._skip + index;
 		return html`
 			<uui-card-content-node
 				.name=${item.name ?? 'Unnamed Document'}
 				selectable
 				?select-only=${this._selection.length > 0}
-				?selected=${this.#collectionContext?.selection.isSelected(item.unique ?? '')}
-				@open=${() => this._handleOpenCard(item.unique ?? '')}
+				?selected=${this.#isSelected(item)}
+				@open=${() => this.#onOpen(item.unique ?? '')}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
 				<uui-icon slot="icon" name=${item.icon}></uui-icon>
-				${this.#renderState(item)} ${this.#renderProperties(item)}
+				${this.#renderState(item)} ${this.#renderProperties(sortOrder, item)}
 			</uui-card-content-node>
 		`;
 	}
@@ -124,14 +144,14 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 		}
 	}
 
-	#renderProperties(item: UmbDocumentCollectionItemModel) {
+	#renderProperties(sortOrder: number, item: UmbDocumentCollectionItemModel) {
 		if (!this._userDefinedProperties) return;
 		return html`
 			<ul>
 				${repeat(
 					this._userDefinedProperties,
 					(column) => column.alias,
-					(column) => html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(item, column.alias)}</li>`,
+					(column) => html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(sortOrder, item, column.alias)}</li>`,
 				)}
 			</ul>
 		`;

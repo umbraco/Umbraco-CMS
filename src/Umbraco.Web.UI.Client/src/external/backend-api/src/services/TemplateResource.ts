@@ -11,13 +11,10 @@ import type { TemplateQueryResultResponseModel } from '../models/TemplateQueryRe
 import type { TemplateQuerySettingsResponseModel } from '../models/TemplateQuerySettingsResponseModel';
 import type { TemplateResponseModel } from '../models/TemplateResponseModel';
 import type { UpdateTemplateRequestModel } from '../models/UpdateTemplateRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class TemplateResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -38,7 +35,6 @@ export class TemplateResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -61,7 +57,6 @@ export class TemplateResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -83,22 +78,22 @@ export class TemplateResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteTemplateById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/template/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -106,9 +101,8 @@ export class TemplateResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putTemplateById({
@@ -117,7 +111,7 @@ export class TemplateResource {
     }: {
         id: string,
         requestBody?: UpdateTemplateRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/template/{id}',
@@ -126,6 +120,7 @@ export class TemplateResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -133,7 +128,6 @@ export class TemplateResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -147,7 +141,6 @@ export class TemplateResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -167,7 +160,6 @@ export class TemplateResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -181,7 +173,6 @@ export class TemplateResource {
             },
         });
     }
-
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -208,7 +199,6 @@ export class TemplateResource {
             },
         });
     }
-
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -232,5 +222,4 @@ export class TemplateResource {
             },
         });
     }
-
 }

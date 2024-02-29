@@ -1,23 +1,31 @@
 import type { UmbBlockDataType } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridWorkspaceData } from '../index.js';
-import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
+import type { UmbBlockGridLayoutModel, UmbBlockGridTypeAreaType, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
+import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
+import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
-export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
-	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
-	typeof UMB_BLOCK_GRID_MANAGER_CONTEXT.TYPE,
-	UmbBlockGridTypeModel,
-	UmbBlockGridLayoutModel
-> {
+export class UmbBlockGridEntriesContext
+	extends UmbBlockEntriesContext<
+		typeof UMB_BLOCK_GRID_MANAGER_CONTEXT,
+		typeof UMB_BLOCK_GRID_MANAGER_CONTEXT.TYPE,
+		UmbBlockGridTypeModel,
+		UmbBlockGridLayoutModel
+	>
+	implements UmbBlockGridScalableContainerContext
+{
 	//
 	#catalogueModal: UmbModalRouteRegistrationController<typeof UMB_BLOCK_CATALOGUE_MODAL.DATA, undefined>;
-	#catalogueRouteBuilder?: UmbModalRouteBuilder;
 
 	#parentEntry?: typeof UMB_BLOCK_GRID_ENTRY_CONTEXT.TYPE;
-	#retrieveParentEntry;
+
+	#layoutColumns = new UmbNumberState(undefined);
+	readonly layoutColumns = this.#layoutColumns.asObservable();
+
+	#areaType?: UmbBlockGridTypeAreaType;
 
 	//#parentUnique?: string;
 	#areaKey?: string | null;
@@ -34,14 +42,27 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 		this.#gotAreaKey();
 	}
 
+	setLayoutColumns(columns: number | undefined) {
+		this.#layoutColumns.setValue(columns);
+	}
+	getLayoutColumns() {
+		return this.#layoutColumns.getValue();
+	}
+
+	getLayoutContainerElement() {
+		return this.getHostElement().shadowRoot?.querySelector('.umb-block-grid__layout-container') as
+			| HTMLElement
+			| undefined;
+	}
+
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT);
 
 		this._workspaceModal.addUniquePaths(['parentUnique', 'areaKey']);
 
-		this.#retrieveParentEntry = this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
+		this.consumeContext(UMB_BLOCK_GRID_ENTRY_CONTEXT, (blockGridEntry) => {
 			this.#parentEntry = blockGridEntry;
-			//this.#gotBlockParentEntry();// is not used at this point.
+			this.#gotBlockParentEntry(); // is not used at this point.
 		}).asPromise();
 
 		this.#catalogueModal = new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
@@ -52,16 +73,15 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				return {
 					data: {
-						blocks: [],
-						blockGroups: [],
+						blocks: this.#retrieveAllowedElementTypes(),
+						blockGroups: this._manager?.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						blockOriginData: { index: index },
 					},
 				};
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this.#catalogueRouteBuilder = routeBuilder;
-				// TODO: Trigger render update?
+				this._catalogueRouteBuilderState.setValue(routeBuilder);
 			});
 	}
 
@@ -91,7 +111,12 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 		if (!this.#parentEntry) return;
 	}*/
 
-	async #gotAreaKey() {
+	#gotAreaKey() {
+		if (this.#areaKey === undefined) return;
+		this.#gotBlockParentEntry();
+	}
+
+	async #gotBlockParentEntry() {
 		if (this.#areaKey === undefined) return;
 
 		if (this.#areaKey === null) {
@@ -114,9 +139,19 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 				},
 				'observeThisLayouts',
 			);
+
+			this.removeControllerByAlias('observeAreaType');
+
+			const hostEl = this.getHostElement() as HTMLElement | undefined;
+			if (hostEl) {
+				hostEl.removeAttribute('data-area-alias');
+				hostEl.removeAttribute('data-area-col-span');
+				hostEl.removeAttribute('data-area-row-span');
+				hostEl.style.removeProperty('--umb-block-grid--grid-columns');
+				hostEl.style.removeProperty('--umb-block-grid--area-column-span');
+				hostEl.style.removeProperty('--umb-block-grid--area-row-span');
+			}
 		} else {
-			// entries of a area:
-			await this.#retrieveParentEntry;
 			if (!this.#parentEntry) return;
 
 			this.observe(
@@ -143,15 +178,31 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 				},
 				'observeThisLayouts',
 			);
+
+			this.observe(
+				this.#parentEntry.areaType(this.#areaKey),
+				(areaType) => {
+					this.#areaType = areaType;
+					const hostEl = this.getHostElement() as HTMLElement | undefined;
+					if (!hostEl) return;
+					hostEl.setAttribute('data-area-alias', areaType?.alias ?? '');
+					hostEl.setAttribute('data-area-col-span', areaType?.columnSpan?.toString() ?? '');
+					hostEl.setAttribute('data-area-row-span', areaType?.rowSpan?.toString() ?? '');
+					hostEl.style.setProperty('--umb-block-grid--grid-columns', areaType?.columnSpan?.toString() ?? '');
+					hostEl.style.setProperty('--umb-block-grid--area-column-span', areaType?.columnSpan?.toString() ?? '');
+					hostEl.style.setProperty('--umb-block-grid--area-row-span', areaType?.rowSpan?.toString() ?? '');
+				},
+				'observeAreaType',
+			);
 		}
 	}
 
 	getPathForCreateBlock(index: number) {
-		return this.#catalogueRouteBuilder?.({ view: 'create', index: index });
+		return this._catalogueRouteBuilderState.getValue()?.({ view: 'create', index: index });
 	}
 
 	getPathForClipboard(index: number) {
-		return this.#catalogueRouteBuilder?.({ view: 'clipboard', index: index });
+		return this._catalogueRouteBuilderState.getValue()?.({ view: 'clipboard', index: index });
 	}
 
 	async create(
@@ -180,5 +231,69 @@ export class UmbBlockGridEntriesContext extends UmbBlockEntriesContext<
 	async delete(contentUdi: string) {
 		// TODO: Loop through children and delete them as well?
 		await super.delete(contentUdi);
+	}
+
+	/**
+	 * @internal
+	 * @returns an Array of ElementTypeKeys that are allowed in the current area. Or undefined if not ready jet.
+	 */
+	#retrieveAllowedElementTypes() {
+		if (!this._manager) return [];
+
+		if (this.#areaKey) {
+			// Area entries:
+			if (!this.#areaType) return [];
+
+			if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance?.length > 0) {
+				return (
+					this.#areaType.specifiedAllowance
+						.flatMap((permission) => {
+							if (permission.groupKey) {
+								return (
+									this._manager?.getBlockTypes().filter((blockType) => blockType.groupKey === permission.groupKey) ?? []
+								);
+							} else if (permission.elementTypeKey) {
+								return (
+									this._manager?.getBlockTypes().filter((x) => x.contentElementTypeKey === permission.elementTypeKey) ??
+									[]
+								);
+							}
+							return [];
+						})
+						// Remove duplicates:
+						.filter((v, i, a) => a.findIndex((x) => x.contentElementTypeKey === v.contentElementTypeKey) === i)
+				);
+			}
+
+			// No specific permissions setup, so we will fallback to items allowed in areas:
+			return this._manager.getBlockTypes().filter((x) => x.allowInAreas);
+		}
+
+		// If no AreaKey, then we are in the root, looking for items allowed as root:
+		return this._manager.getBlockTypes().filter((x) => x.allowAtRoot);
+	}
+
+	/**
+	 * Check if given contentUdi is allowed in the current area.
+	 * @param contentUdi {string} - The contentUdi of the content to check.
+	 * @returns {boolean} - True if the content is allowed in the current area, otherwise false.
+	 */
+	allowDrop(contentUdi: string) {
+		const content = this._manager?.getContentOf(contentUdi);
+		if (!content) return false;
+
+		return (
+			this.#retrieveAllowedElementTypes()
+				.map((x) => x.contentElementTypeKey)
+				.indexOf(content.contentTypeKey) !== -1
+		);
+	}
+
+	onDragStart() {
+		this._manager?.onDragStart();
+	}
+
+	onDragEnd() {
+		this._manager?.onDragEnd();
 	}
 }

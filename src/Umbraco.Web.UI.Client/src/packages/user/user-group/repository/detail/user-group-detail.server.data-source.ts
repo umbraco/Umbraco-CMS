@@ -1,10 +1,10 @@
+import type { UmbUserGroupDetailModel } from '../../types.js';
+import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type {
 	CreateUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbUserGroupDetailModel } from '../../types.js';
-import { UMB_USER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -48,6 +48,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			documentRootAccess: false,
 			mediaStartNode: null,
 			mediaRootAccess: false,
+			fallbackPermissions: [],
 			permissions: [],
 		};
 
@@ -83,6 +84,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			documentRootAccess: data.documentRootAccess,
 			mediaStartNode: data.mediaStartNode ? { unique: data.mediaStartNode.id } : null,
 			mediaRootAccess: data.mediaRootAccess,
+			fallbackPermissions: data.fallbackPermissions,
 			permissions: data.permissions,
 		};
 
@@ -109,6 +111,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			documentRootAccess: model.documentRootAccess,
 			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
 			mediaRootAccess: model.mediaRootAccess,
+			fallbackPermissions: model.fallbackPermissions,
 			permissions: model.permissions,
 		};
 
@@ -146,6 +149,7 @@ export class UmbUserGroupServerDataSource implements UmbDetailDataSource<UmbUser
 			documentRootAccess: model.documentRootAccess,
 			mediaStartNode: model.mediaStartNode ? { id: model.mediaStartNode.unique } : null,
 			mediaRootAccess: model.mediaRootAccess,
+			fallbackPermissions: model.fallbackPermissions,
 			permissions: model.permissions,
 		};
 

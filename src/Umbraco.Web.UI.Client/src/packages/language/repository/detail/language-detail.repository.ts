@@ -13,3 +13,5 @@ export class UmbLanguageDetailRepository extends UmbDetailRepositoryBase<UmbLang
 		return super.create(model, null);
 	}
 }
+
+export default UmbLanguageDetailRepository;

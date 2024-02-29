@@ -5,6 +5,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -14,10 +15,10 @@ import type {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
 import './column-layouts/document-table-column-name.element.js';
 import './column-layouts/document-table-column-state.element.js';
+
 @customElement('umb-document-table-collection-view')
 export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
@@ -58,12 +59,15 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string> = [];
 
+	@state()
+	private _skip: number = 0;
+
 	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
-			this.#collectionContext = instance;
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (collectionContext) => {
+			this.#collectionContext = collectionContext;
 			this.#observeCollectionContext();
 		});
 	}
@@ -96,6 +100,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			},
 			'umbCollectionSelectionObserver',
 		);
+
+		this.observe(
+			this.#collectionContext.pagination.skip,
+			(skip) => {
+				this._skip = skip;
+			},
+			'umbCollectionSkipObserver',
+		);
 	}
 
 	#createTableHeadings() {
@@ -114,14 +126,16 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	}
 
 	#createTableItems(items: Array<UmbDocumentCollectionItemModel>) {
-		this._tableItems = items.map((item) => {
+		this._tableItems = items.map((item, rowIndex) => {
 			if (!item.unique) throw new Error('Item id is missing.');
+
+			const sortOrder = this._skip + rowIndex;
 
 			const data =
 				this._tableColumns?.map((column) => {
 					return {
 						columnAlias: column.alias,
-						value: column.elementName ? item : getPropertyValueByAlias(item, column.alias),
+						value: column.elementName ? item : getPropertyValueByAlias(sortOrder, item, column.alias),
 					};
 				}) ?? [];
 
@@ -133,21 +147,21 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	private _handleSelect(event: UmbTableSelectedEvent) {
+	#handleSelect(event: UmbTableSelectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
 		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	private _handleDeselect(event: UmbTableDeselectedEvent) {
+	#handleDeselect(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
 		this.#collectionContext?.selection.setSelection(selection);
 	}
 
-	private _handleOrdering(event: UmbTableOrderedEvent) {
+	#handleOrdering(event: UmbTableOrderedEvent) {
 		const table = event.target as UmbTableElement;
 		const orderingColumn = table.orderingColumn;
 		const orderingDesc = table.orderingDesc;
@@ -172,9 +186,9 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 				.columns=${this._tableColumns}
 				.items=${this._tableItems}
 				.selection=${this._selection}
-				@selected="${this._handleSelect}"
-				@deselected="${this._handleDeselect}"
-				@ordered="${this._handleOrdering}"></umb-table>
+				@selected="${this.#handleSelect}"
+				@deselected="${this.#handleDeselect}"
+				@ordered="${this.#handleOrdering}"></umb-table>
 		`;
 	}
 
@@ -207,6 +221,6 @@ export default UmbDocumentTableCollectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-view-document-table': UmbDocumentTableCollectionViewElement;
+		'umb-document-table-collection-view': UmbDocumentTableCollectionViewElement;
 	}
 }

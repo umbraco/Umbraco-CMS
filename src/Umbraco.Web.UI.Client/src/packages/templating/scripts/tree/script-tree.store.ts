@@ -35,4 +35,6 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 	};
 }
 
+export default UmbScriptTreeStore;
+
 export const UMB_SCRIPT_TREE_STORE_CONTEXT = new UmbContextToken<UmbScriptTreeStore>('UmbScriptTreeStore');

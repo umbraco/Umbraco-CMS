@@ -1,4 +1,3 @@
-import type { UmbMemberDetailModel } from '../types.js';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -11,7 +10,9 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	manifest?: ManifestWorkspace;
 
 	@state()
-	private _data?: UmbMemberDetailModel;
+	private _unique?: string;
+	@state()
+	private _email?: string;
 
 	#workspaceContext?: typeof UMB_MEMBER_WORKSPACE_CONTEXT.TYPE;
 
@@ -26,9 +27,12 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 
 	// Only for CRUD demonstration purposes
 	#observeData() {
-		this.observe(this.#workspaceContext!.data, (data) => {
-			this._data = data;
-			console.log(data);
+		if (!this.#workspaceContext) return;
+		this.observe(this.#workspaceContext.unique, (unique) => {
+			this._unique = unique;
+		});
+		this.observe(this.#workspaceContext.email, (email) => {
+			this._email = email;
 		});
 	}
 
@@ -41,9 +45,9 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.Member">
-				<div>Unique: ${this._data?.unique}</div>
+				<div>Unique: ${this._unique}</div>
 				<!-- Only for CRUD demonstration purposes -->
-				<input type="email" value=${ifDefined(this._data?.email)} @change=${this.#onChange} />
+				<input type="email" value=${ifDefined(this._email)} @change=${this.#onChange} />
 			</umb-workspace-editor>
 		`;
 	}

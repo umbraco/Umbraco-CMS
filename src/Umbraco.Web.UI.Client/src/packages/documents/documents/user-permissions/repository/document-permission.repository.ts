@@ -1,8 +1,8 @@
 import { UmbDocumentPermissionServerDataSource } from './document-permission.server.data.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbDocumentPermissionRepository extends UmbBaseController {
+export class UmbDocumentPermissionRepository extends UmbControllerBase {
 	#permissionSource: UmbDocumentPermissionServerDataSource;
 
 	constructor(host: UmbControllerHostElement) {
@@ -15,3 +15,5 @@ export class UmbDocumentPermissionRepository extends UmbBaseController {
 		return this.#permissionSource.requestPermissions(id);
 	}
 }
+
+export default UmbDocumentPermissionRepository;

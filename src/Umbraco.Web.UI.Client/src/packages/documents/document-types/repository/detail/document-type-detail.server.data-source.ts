@@ -43,7 +43,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			alias: '',
 			description: '',
 			icon: 'icon-document',
-			allowedAsRoot: false,
+			allowedAtRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
@@ -58,6 +58,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 				keepAllVersionsNewerThanDays: null,
 				keepLatestVersionPerDayForDays: null,
 			},
+			collection: null,
 			...preset,
 		};
 
@@ -90,7 +91,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			alias: data.alias,
 			description: data.description || null,
 			icon: data.icon,
-			allowedAsRoot: data.allowedAsRoot,
+			allowedAtRoot: data.allowedAsRoot,
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
@@ -125,6 +126,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			allowedTemplates: data.allowedTemplates,
 			defaultTemplate: data.defaultTemplate ? { id: data.defaultTemplate.id } : null,
 			cleanup: data.cleanup,
+			collection: data.collection ? { unique: data.collection?.id } : null,
 		};
 
 		return { data: DocumentType };
@@ -147,7 +149,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -183,6 +185,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			allowedTemplates: model.allowedTemplates,
 			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -214,7 +217,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -249,6 +252,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			allowedTemplates: model.allowedTemplates,
 			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { error } = await tryExecuteAndNotify(

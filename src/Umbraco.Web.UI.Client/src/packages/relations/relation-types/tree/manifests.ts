@@ -1,6 +1,4 @@
 import { UMB_RELATION_TYPE_ENTITY_TYPE, UMB_RELATION_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbRelationTypeTreeRepository } from './relation-type-tree.repository.js';
-import { UmbRelationTypeTreeStore } from './relation-type-tree.store.js';
 import { manifests as reloadTreeItemChildrenManifest } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
@@ -17,14 +15,14 @@ const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_RELATION_TYPE_TREE_REPOSITORY_ALIAS,
 	name: 'Relation Type Tree Repository',
-	api: UmbRelationTypeTreeRepository,
+	api: () => import('./relation-type-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_RELATION_TYPE_TREE_STORE_ALIAS,
 	name: 'Relation Type Tree Store',
-	api: UmbRelationTypeTreeStore,
+	api: () => import('./relation-type-tree.store.js'),
 };
 
 const tree: ManifestTree = {

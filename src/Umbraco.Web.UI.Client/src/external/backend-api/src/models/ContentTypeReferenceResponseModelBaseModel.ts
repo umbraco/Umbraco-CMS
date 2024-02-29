@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
+import type { ReferenceByIdModel } from './ReferenceByIdModel';
 export type ContentTypeReferenceResponseModelBaseModel = {
     id: string;
     icon: string;
-    hasListView: boolean;
+    collection?: ReferenceByIdModel | null;
 };
 

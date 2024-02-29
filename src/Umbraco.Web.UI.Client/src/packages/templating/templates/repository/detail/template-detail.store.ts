@@ -20,4 +20,6 @@ export class UmbTemplateDetailStore extends UmbDetailStoreBase<UmbTemplateDetail
 	}
 }
 
+export default UmbTemplateDetailStore;
+
 export const UMB_TEMPLATE_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbTemplateDetailStore>('UmbTemplateDetailStore');

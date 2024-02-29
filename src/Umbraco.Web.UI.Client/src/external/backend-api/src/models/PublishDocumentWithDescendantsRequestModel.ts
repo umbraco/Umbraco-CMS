@@ -2,10 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
-import type { PublishDocumentRequestModel } from './PublishDocumentRequestModel';
-
-export type PublishDocumentWithDescendantsRequestModel = (PublishDocumentRequestModel & {
+export type PublishDocumentWithDescendantsRequestModel = {
     includeUnpublishedDescendants: boolean;
-});
+    cultures: Array<string>;
+};
 

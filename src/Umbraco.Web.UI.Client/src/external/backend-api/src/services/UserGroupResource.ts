@@ -8,13 +8,10 @@ import type { PagedUserGroupResponseModel } from '../models/PagedUserGroupRespon
 import type { UpdateUserGroupRequestModel } from '../models/UpdateUserGroupRequestModel';
 import type { UserGroupItemResponseModel } from '../models/UserGroupItemResponseModel';
 import type { UserGroupResponseModel } from '../models/UserGroupResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class UserGroupResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -35,21 +32,21 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteUserGroup({
         requestBody,
     }: {
         requestBody?: DeleteUserGroupsRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user-group',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -57,7 +54,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -79,7 +75,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns PagedUserGroupResponseModel Success
      * @throws ApiError
@@ -103,7 +98,6 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -126,22 +120,22 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteUserGroupById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user-group/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -149,9 +143,8 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putUserGroupById({
@@ -160,7 +153,7 @@ export class UserGroupResource {
     }: {
         id: string,
         requestBody?: UpdateUserGroupRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -169,15 +162,15 @@ export class UserGroupResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteUserGroupByIdUsers({
@@ -186,7 +179,7 @@ export class UserGroupResource {
     }: {
         id: string,
         requestBody?: Array<string>,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user-group/{id}/users',
@@ -195,6 +188,7 @@ export class UserGroupResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -202,9 +196,8 @@ export class UserGroupResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserGroupByIdUsers({
@@ -213,7 +206,7 @@ export class UserGroupResource {
     }: {
         id: string,
         requestBody?: Array<string>,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user-group/{id}/users',
@@ -222,6 +215,7 @@ export class UserGroupResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -229,5 +223,4 @@ export class UserGroupResource {
             },
         });
     }
-
 }

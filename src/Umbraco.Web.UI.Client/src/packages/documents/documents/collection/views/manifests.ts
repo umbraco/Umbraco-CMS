@@ -1,8 +1,8 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 
-export const UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Document.Table';
 export const UMB_DOCUMENT_GRID_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Document.Grid';
+export const UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Document.Table';
 
 const gridViewManifest: ManifestCollectionView = {
 	type: 'collectionView',
@@ -28,7 +28,7 @@ const tableViewManifest: ManifestCollectionView = {
 	alias: UMB_DOCUMENT_TABLE_COLLECTION_VIEW_ALIAS,
 	name: 'Document Table Collection View',
 	element: () => import('./table/document-table-collection-view.element.js'),
-	weight: 201,
+	weight: 300,
 	meta: {
 		label: 'Table',
 		icon: 'icon-list',

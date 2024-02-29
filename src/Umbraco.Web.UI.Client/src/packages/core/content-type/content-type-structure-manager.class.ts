@@ -16,9 +16,9 @@ import {
 	filterFrozenArray,
 } from '@umbraco-cms/backoffice/observable-api';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeModel> extends UmbBaseController {
+export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init!: Promise<unknown>;
 
 	#contentTypeRepository: UmbDetailRepository<T>;
@@ -502,7 +502,6 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		this.#containers.setValue([]);
 	}
 	public destroy() {
-		this._reset();
 		this.#contentTypes.destroy();
 		this.#containers.destroy();
 		super.destroy();

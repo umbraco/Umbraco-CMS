@@ -32,6 +32,11 @@ export class UmbPartialViewWorkspaceContext
 		this.#loadCodeEditor();
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
@@ -41,7 +46,7 @@ export class UmbPartialViewWorkspaceContext
 		}
 	}
 
-	getEntityId() {
+	getUnique() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		return data.unique;
@@ -64,6 +69,7 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
@@ -72,6 +78,7 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	async create(parentUnique: string | null, snippetId?: string) {
+		this.resetState();
 		this.#parentUnique = parentUnique;
 		let snippetContent = '';
 

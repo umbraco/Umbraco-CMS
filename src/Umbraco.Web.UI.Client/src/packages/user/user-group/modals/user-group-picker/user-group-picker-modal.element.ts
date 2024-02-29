@@ -1,6 +1,5 @@
 import { UmbUserGroupCollectionRepository } from '../../collection/repository/index.js';
 import type { UmbUserGroupDetailModel } from '../../types.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UMB_USER_GROUP_PICKER_MODAL } from '@umbraco-cms/backoffice/user-group';
@@ -84,8 +83,6 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbUserGroupPickerModalElement;

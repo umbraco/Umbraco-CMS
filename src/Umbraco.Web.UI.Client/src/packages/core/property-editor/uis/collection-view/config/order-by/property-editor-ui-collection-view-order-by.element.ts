@@ -3,7 +3,6 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -42,8 +41,6 @@ export class UmbPropertyEditorUICollectionViewOrderByElement
 	render() {
 		return html`<uui-select label="select" .options=${this._options} @change=${this.#onChange}></uui-select>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUICollectionViewOrderByElement;

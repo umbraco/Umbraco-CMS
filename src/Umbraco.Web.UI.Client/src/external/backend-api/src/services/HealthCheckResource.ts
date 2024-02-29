@@ -7,13 +7,10 @@ import type { HealthCheckGroupPresentationModel } from '../models/HealthCheckGro
 import type { HealthCheckGroupWithResultResponseModel } from '../models/HealthCheckGroupWithResultResponseModel';
 import type { HealthCheckResultResponseModel } from '../models/HealthCheckResultResponseModel';
 import type { PagedHealthCheckGroupResponseModel } from '../models/PagedHealthCheckGroupResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class HealthCheckResource {
-
     /**
      * @returns PagedHealthCheckGroupResponseModel Success
      * @throws ApiError
@@ -37,7 +34,6 @@ export class HealthCheckResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -59,7 +55,6 @@ export class HealthCheckResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -81,7 +76,6 @@ export class HealthCheckResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -102,5 +96,4 @@ export class HealthCheckResource {
             },
         });
     }
-
 }

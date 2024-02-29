@@ -4,28 +4,25 @@
 /* eslint-disable */
 import type { ModelsBuilderResponseModel } from '../models/ModelsBuilderResponseModel';
 import type { OutOfDateStatusResponseModel } from '../models/OutOfDateStatusResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class ModelsBuilderResource {
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
-    public static postModelsBuilderBuild(): CancelablePromise<any> {
+    public static postModelsBuilderBuild(): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/models-builder/build',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 428: `Client Error`,
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -39,7 +36,6 @@ export class ModelsBuilderResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -53,5 +49,4 @@ export class ModelsBuilderResource {
             },
         });
     }
-
 }

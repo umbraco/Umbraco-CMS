@@ -35,4 +35,6 @@ export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 	};
 }
 
+export default UmbStylesheetTreeStore;
+
 export const UMB_STYLESHEET_TREE_STORE_CONTEXT = new UmbContextToken<UmbStylesheetTreeStore>('UmbStylesheetTreeStore');

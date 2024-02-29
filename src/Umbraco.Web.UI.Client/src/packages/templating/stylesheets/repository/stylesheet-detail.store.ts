@@ -20,6 +20,8 @@ export class UmbStylesheetDetailStore extends UmbDetailStoreBase<UmbStylesheetDe
 	}
 }
 
+export default UmbStylesheetDetailStore;
+
 export const UMB_STYLESHEET_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbStylesheetDetailStore>(
 	'UmbStylesheetDetailStore',
 );

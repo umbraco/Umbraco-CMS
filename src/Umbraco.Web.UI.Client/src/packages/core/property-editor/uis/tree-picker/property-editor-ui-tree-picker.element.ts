@@ -1,6 +1,5 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -79,11 +78,11 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	async #setStartNodeId() {
 		if (this.startNodeId) return;
 
-		const entityId = this.#workspaceContext?.getEntityId();
+		const unique = this.#workspaceContext?.getUnique();
 		// TODO: Awaiting the workspace context to have a parent entity ID value. [LK]
 		// e.g. const parentEntityId = this.#workspaceContext?.getParentEntityId();
-		if (entityId && this.#dynamicRoot) {
-			const result = await this.#dynamicRootRepository.postDynamicRootQuery(this.#dynamicRoot, entityId);
+		if (unique && this.#dynamicRoot) {
+			const result = await this.#dynamicRootRepository.postDynamicRootQuery(this.#dynamicRoot, unique);
 			if (result && result.length > 0) {
 				this.startNodeId = result[0];
 			}
@@ -107,7 +106,6 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 			@change=${this.#onChange}></umb-input-tree>`;
 	}
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITreePickerElement;

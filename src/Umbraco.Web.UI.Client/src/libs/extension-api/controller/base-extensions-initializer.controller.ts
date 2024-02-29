@@ -1,11 +1,11 @@
-import type { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	ManifestBase,
 	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
@@ -22,11 +22,11 @@ export type PermittedControllerType<ControllerType extends { manifest: any }> = 
  */
 export abstract class UmbBaseExtensionsInitializer<
 	ManifestTypes extends ManifestBase,
-	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
+	ManifestTypeName extends string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
-> extends UmbBaseController {
+> extends UmbControllerBase {
 	#promiseResolvers: Array<() => void> = [];
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
@@ -45,7 +45,7 @@ export abstract class UmbBaseExtensionsInitializer<
 
 	constructor(
 		host: UmbControllerHost,
-		extensionRegistry: UmbExtensionRegistry<ManifestType>,
+		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
@@ -130,6 +130,8 @@ export abstract class UmbBaseExtensionsInitializer<
 
 	#notifyChange = () => {
 		this.#changeDebounce = undefined;
+		// This means that we have been destroyed:
+		if (this.#permittedExts === undefined) return;
 
 		// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly.
 		this.#exposedPermittedExts = [...this.#permittedExts];

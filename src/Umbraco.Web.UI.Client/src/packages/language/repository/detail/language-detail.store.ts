@@ -20,4 +20,6 @@ export class UmbLanguageDetailStore extends UmbDetailStoreBase<UmbLanguageDetail
 	}
 }
 
+export default UmbLanguageDetailStore;
+
 export const UMB_LANGUAGE_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbLanguageDetailStore>('UmbLanguageDetailStore');

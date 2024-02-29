@@ -39,6 +39,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 			const oldValue = this._items;
 			this._items = model;
 			this.requestUpdate('_items', oldValue);
+			this.dispatchEvent(new UmbChangeEvent());
 		},
 	});
 

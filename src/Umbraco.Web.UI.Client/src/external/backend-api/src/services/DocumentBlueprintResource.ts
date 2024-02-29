@@ -4,13 +4,10 @@
 /* eslint-disable */
 import type { DocumentBlueprintResponseModel } from '../models/DocumentBlueprintResponseModel';
 import type { PagedDocumentBlueprintTreeItemResponseModel } from '../models/PagedDocumentBlueprintTreeItemResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class DocumentBlueprintResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -31,7 +28,6 @@ export class DocumentBlueprintResource {
             },
         });
     }
-
     /**
      * @returns PagedDocumentBlueprintTreeItemResponseModel Success
      * @throws ApiError
@@ -55,5 +51,4 @@ export class DocumentBlueprintResource {
             },
         });
     }
-
 }

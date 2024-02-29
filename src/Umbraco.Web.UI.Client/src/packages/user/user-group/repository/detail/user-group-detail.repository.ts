@@ -13,3 +13,4 @@ export class UmbUserGroupDetailRepository extends UmbDetailRepositoryBase<UmbUse
 		return super.create(model, null);
 	}
 }
+export default UmbUserGroupDetailRepository;

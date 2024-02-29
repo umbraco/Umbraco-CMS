@@ -21,6 +21,8 @@ export class UmbMemberGroupItemStore extends UmbItemStoreBase<UmbMemberGroupItem
 	}
 }
 
+export default UmbMemberGroupItemStore;
+
 export const UMB_MEMBER_GROUP_ITEM_STORE_CONTEXT = new UmbContextToken<UmbMemberGroupItemStore>(
 	'UmbMemberGroupItemStore',
 );

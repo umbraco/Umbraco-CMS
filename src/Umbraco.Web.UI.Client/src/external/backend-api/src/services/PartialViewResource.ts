@@ -12,13 +12,10 @@ import type { PartialViewResponseModel } from '../models/PartialViewResponseMode
 import type { PartialViewSnippetResponseModel } from '../models/PartialViewSnippetResponseModel';
 import type { RenamePartialViewRequestModel } from '../models/RenamePartialViewRequestModel';
 import type { UpdatePartialViewRequestModel } from '../models/UpdatePartialViewRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class PartialViewResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -39,7 +36,6 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -62,7 +58,6 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -84,22 +79,22 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deletePartialViewByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/partial-view/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -107,9 +102,8 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putPartialViewByPath({
@@ -118,7 +112,7 @@ export class PartialViewResource {
     }: {
         path: string,
         requestBody?: UpdatePartialViewRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/partial-view/{path}',
@@ -127,6 +121,7 @@ export class PartialViewResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -134,7 +129,6 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -162,7 +156,6 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -185,7 +178,6 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -207,22 +199,22 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deletePartialViewFolderByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/partial-view/folder/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -230,7 +222,6 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
      * @returns PagedPartialViewSnippetItemResponseModel Success
      * @throws ApiError
@@ -254,7 +245,6 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -276,7 +266,6 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -303,7 +292,6 @@ export class PartialViewResource {
             },
         });
     }
-
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -327,5 +315,4 @@ export class PartialViewResource {
             },
         });
     }
-
 }

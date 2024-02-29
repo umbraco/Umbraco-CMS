@@ -1,4 +1,4 @@
-import type { UmbDocumentDetailModel } from '../../types.js';
+import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
@@ -41,26 +41,35 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			template: null,
 			documentType: {
 				unique: '',
-				hasCollection: false,
+				collection: null,
 			},
 			isTrashed: false,
 			values: [],
-			variants: [
-				{
-					state: null,
-					culture: null,
-					segment: null,
-					name: '',
-					publishDate: null,
-					createDate: null,
-					updateDate: null,
-				},
-			],
+			variants: [],
 			...preset,
 		};
 
 		return { data };
 	}
+
+	/**
+	 * Creates a new variant scaffold.
+	 * @returns A new variant scaffold.
+	 */
+	/*
+	// TDOD: remove if not used
+	createVariantScaffold(): UmbDocumentVariantModel {
+		return {
+			state: null,
+			culture: null,
+			segment: null,
+			name: '',
+			publishDate: null,
+			createDate: null,
+			updateDate: null,
+		};
+	}
+	*/
 
 	/**
 	 * Fetches a Document with the given id from the server
@@ -109,7 +118,7 @@ export class UmbDocumentServerDataSource implements UmbDetailDataSource<UmbDocum
 			template: data.template ? { unique: data.template.id } : null,
 			documentType: {
 				unique: data.documentType.id,
-				hasCollection: data.documentType.hasListView,
+				collection: data.documentType.collection ? { unique: data.documentType.collection.id } : null,
 			},
 			isTrashed: data.isTrashed,
 		};

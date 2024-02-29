@@ -1,4 +1,3 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestMenu, ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -21,8 +20,6 @@ export class UmbMenuElement extends UmbLitElement {
 			.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(this.manifest!.alias)}
 			default-element="umb-menu-item-default"></umb-extension-slot>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbMenuElement;

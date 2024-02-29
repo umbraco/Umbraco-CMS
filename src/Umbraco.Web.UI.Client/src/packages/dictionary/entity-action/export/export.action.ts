@@ -1,14 +1,11 @@
 import type { UmbDictionaryExportRepository } from '../../repository/index.js';
 import { UMB_EXPORT_DICTIONARY_MODAL } from './export-dictionary-modal.token.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryExportRepository> {
-	static styles = [UmbTextStyles];
-
 	#modalContext?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {

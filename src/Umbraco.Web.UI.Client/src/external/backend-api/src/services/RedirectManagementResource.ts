@@ -5,13 +5,10 @@
 import type { PagedRedirectUrlResponseModel } from '../models/PagedRedirectUrlResponseModel';
 import type { RedirectStatusModel } from '../models/RedirectStatusModel';
 import type { RedirectUrlStatusResponseModel } from '../models/RedirectUrlStatusResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class RedirectManagementResource {
-
     /**
      * @returns PagedRedirectUrlResponseModel Success
      * @throws ApiError
@@ -39,7 +36,6 @@ export class RedirectManagementResource {
             },
         });
     }
-
     /**
      * @returns PagedRedirectUrlResponseModel Success
      * @throws ApiError
@@ -68,28 +64,27 @@ export class RedirectManagementResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteRedirectManagementById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/redirect-management/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -103,26 +98,25 @@ export class RedirectManagementResource {
             },
         });
     }
-
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postRedirectManagementStatus({
         status,
     }: {
         status?: RedirectStatusModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/redirect-management/status',
             query: {
                 'status': status,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },
         });
     }
-
 }

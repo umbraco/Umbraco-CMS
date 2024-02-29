@@ -33,6 +33,11 @@ export class UmbStylesheetWorkspaceContext
 		this.#loadCodeEditor();
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
@@ -46,7 +51,7 @@ export class UmbStylesheetWorkspaceContext
 		return UMB_STYLESHEET_ENTITY_TYPE;
 	}
 
-	getEntityId() {
+	getUnique() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		return data.unique;
@@ -65,6 +70,7 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
 
 		if (data) {
@@ -74,6 +80,7 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	async create(parentUnique: string | null) {
+		this.resetState();
 		this.#parentUnique = parentUnique;
 		const { data } = await this.repository.createScaffold();
 
