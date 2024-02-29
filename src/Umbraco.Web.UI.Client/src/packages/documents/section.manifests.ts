@@ -8,7 +8,7 @@ const sectionAlias = 'Umb.Section.Content';
 
 const section: ManifestSection = {
 	type: 'section',
-	alias: 'Umb.Section.Content',
+	alias: sectionAlias,
 	name: 'Content Section',
 	weight: 600,
 	meta: {
