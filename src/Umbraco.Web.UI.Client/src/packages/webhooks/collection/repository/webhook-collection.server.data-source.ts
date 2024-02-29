@@ -1,7 +1,6 @@
 import type { UmbWebhookCollectionFilterModel } from '../types.js';
 import type { UmbWebhookDetailModel } from '../../types.js';
 import { UMB_WEBHOOK_ENTITY_TYPE } from '../../entity.js';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import { WebhookResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -12,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbWebhookCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
-export class UmbWebhookCollectionServerDataSource implements UmbCollectionDataSource<UmbWebhookDetailModel> {
+export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectionServerDataSource {
 	#host: UmbControllerHost;
 
 	/**
@@ -26,19 +25,19 @@ export class UmbWebhookCollectionServerDataSource implements UmbCollectionDataSo
 
 	/**
 	 * Gets the Wwbhook collection filtered by the given filter.
-	 * @param {UmbWebhookeCollectionFilterModel} filter
+	 * @param {UmbWebhookCollectionFilterModel} filter
 	 * @return {*}
-	 * @memberof UmbWebhookeCollectionServerDataSource
+	 * @memberof UmbWebhookCollectionServerDataSource
 	 */
-	async getCollection(filter: UmbWebhookCollectionFilterModel) {
-		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookResource.getWebhookItem({ ids: [""] })); //WebhookResource.getWebhook(filter));
+	async getCollection(_filter: UmbWebhookCollectionFilterModel) {
+		const { data, error } = await tryExecuteAndNotify(this.#host, WebhookResource.getWebhookItem({ ids: [''] }));
 
-		/*if (data) {
-			const items = data.items.map((item) => {
+		if (data) {
+			const items = data.map((item) => {
 				const model: UmbWebhookDetailModel = {
-					unique: '', //item.id.toLowerCase(),
-					//name: item.name,
 					entityType: UMB_WEBHOOK_ENTITY_TYPE,
+					unique: item.url, //item.id.toLowerCase(),
+					name: item.name,
 					url: item.url,
 					enabled: item.enabled,
 					events: item.events.split(','),
@@ -48,8 +47,8 @@ export class UmbWebhookCollectionServerDataSource implements UmbCollectionDataSo
 				return model;
 			});
 
-			return { data: { items, total: data.total } };
-		}*/
+			return { data: { items, total: data.length } };
+		}
 
 		return { error };
 	}
