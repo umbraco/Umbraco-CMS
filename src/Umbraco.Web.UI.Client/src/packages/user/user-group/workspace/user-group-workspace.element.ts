@@ -16,7 +16,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 			path: 'create',
 			component: this.#createElement,
 			setup: (component, info) => {
-				this.#workspaceContext.createScaffold();
+				this.#workspaceContext.create();
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
