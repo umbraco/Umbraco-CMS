@@ -1,5 +1,5 @@
 import { isWithinRect } from '@umbraco-cms/backoffice/utils';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const autoScrollSensitivity = 50;
@@ -164,7 +164,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
  */
-export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> extends UmbBaseController {
+export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> extends UmbControllerBase {
 	//
 	// The sorter who last indicated that it was okay or not okay to drop here:
 	static lastIndicationSorter?: UmbSorterController<unknown>;

@@ -1,12 +1,12 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbSwitchCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbSwitchCondition extends UmbControllerBase implements UmbExtensionCondition {
 	#timer?: ReturnType<typeof setTimeout>;
 	config: SwitchConditionConfig;
 	permitted = false;

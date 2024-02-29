@@ -1,4 +1,4 @@
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -10,7 +10,7 @@ export interface UmbCollectionViewManagerConfig {
 	defaultViewAlias?: string;
 }
 
-export class UmbCollectionViewManager extends UmbBaseController {
+export class UmbCollectionViewManager extends UmbControllerBase {
 	#views = new UmbArrayState<ManifestCollectionView>([], (x) => x.alias);
 	public readonly views = this.#views.asObservable();
 

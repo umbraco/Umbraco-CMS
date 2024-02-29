@@ -1,10 +1,10 @@
 import type { ManifestBase, ManifestBundle } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { loadManifestPlainJs } from '../functions/load-manifest-plain-js.function.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbBundleExtensionInitializer extends UmbBaseController {
+export class UmbBundleExtensionInitializer extends UmbControllerBase {
 	#extensionRegistry;
 	#bundleMap = new Map();
 
