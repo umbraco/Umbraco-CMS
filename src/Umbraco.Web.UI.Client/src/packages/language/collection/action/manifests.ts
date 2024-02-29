@@ -4,17 +4,17 @@ import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/extension
 export const createManifest: ManifestCollectionAction = {
 	type: 'collectionAction',
 	kind: 'button',
-	name: 'Create Webhook Collection Action',
-	alias: 'Umb.CollectionAction.Webhook.Create',
+	name: 'Create Language Collection Action',
+	alias: 'Umb.CollectionAction.Language.Create',
 	weight: 200,
 	meta: {
 		label: 'Create',
-		href: 'section/settings/workspace/webhook/create',
+		href: 'section/settings/workspace/language/create',
 	},
 	conditions: [
 		{
 			alias: UMB_COLLECTION_ALIAS_CONDITION,
-			match: 'Umb.Collection.Webhook',
+			match: 'Umb.Collection.Language',
 		},
 	],
 };
