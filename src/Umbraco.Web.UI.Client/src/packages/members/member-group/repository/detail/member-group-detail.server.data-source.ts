@@ -149,22 +149,11 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		/*
 		return tryExecuteAndNotify(
 			this.#host,
-			MemberGroupResource.deleteMemberGroupById({
-				id: unique,
+			MemberGroupResource.deleteMemberGroupByKey({
+				key: unique,
 			}),
 		);
-		*/
-
-		const { error } = (await tryExecuteAndNotify(
-			this.#host,
-			fetch(`/umbraco/management/api/v1/member-group/${unique}`, {
-				method: 'DELETE',
-			}),
-		)) as any;
-
-		return { error };
 	}
 }

@@ -13,15 +13,21 @@ export class UmbMemberGroupWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberGroupDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	public readonly detailRepository = new UmbMemberGroupDetailRepository(this);
+	public readonly repository = new UmbMemberGroupDetailRepository(this);
+	#getDataPromise?: Promise<any>;
 
 	#data = new UmbObjectState<UmbMemberGroupDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_GROUP_WORKSPACE_ALIAS);
+	}
+
+	public isLoaded() {
+		return this.#getDataPromise;
 	}
 
 	protected resetState(): void {
@@ -31,7 +37,9 @@ export class UmbMemberGroupWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		const { data } = await this.detailRepository.requestByUnique(unique);
+		this.#getDataPromise = this.repository.requestByUnique(unique);
+		const { data } = await this.#getDataPromise;
+		if (!data) return undefined;
 
 		if (data) {
 			this.setIsNew(false);
@@ -41,7 +49,8 @@ export class UmbMemberGroupWorkspaceContext
 
 	async create(parentUnique: string | null) {
 		this.resetState();
-		const { data } = await this.detailRepository.createScaffold(parentUnique);
+		this.#getDataPromise = this.repository.createScaffold(parentUnique);
+		const { data } = await this.#getDataPromise;
 
 		if (data) {
 			this.setIsNew(true);
@@ -56,9 +65,9 @@ export class UmbMemberGroupWorkspaceContext
 		if (!data) throw new Error('No data to save');
 
 		if (this.getIsNew()) {
-			await this.detailRepository.create(data);
+			await this.repository.create(data);
 		} else {
-			await this.detailRepository.save(data);
+			await this.repository.save(data);
 		}
 
 		this.saveComplete(data);
@@ -69,7 +78,7 @@ export class UmbMemberGroupWorkspaceContext
 	}
 
 	getUnique() {
-		return this.getData()?.unique || '';
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
@@ -85,7 +94,8 @@ export class UmbMemberGroupWorkspaceContext
 	}
 
 	public destroy(): void {
-		console.log('destroy');
+		this.#data.destroy();
+		super.destroy();
 	}
 }
 
