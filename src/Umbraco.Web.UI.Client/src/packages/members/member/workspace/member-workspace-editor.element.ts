@@ -37,10 +37,21 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
+	#renderBackButton() {
+		return html`
+			<uui-button compact href="/section/member-management/view/members">
+				<uui-icon name="icon-arrow-left"> </uui-icon>
+			</uui-button>
+		`;
+	}
+
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.Member">
-				<uui-input slot="header" id="name-input" .value=${this._name} @input="${this.#onInput}"></uui-input>
+				<div id="header" slot="header">
+					${this.#renderBackButton()}
+					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}"></uui-input>
+				</div>
 			</umb-workspace-editor>
 		`;
 	}
@@ -52,6 +63,12 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
+			}
+			#header {
+				display: flex;
+				gap: var(--uui-size-space-4);
+				align-items: center;
+				width: 100%;
 			}
 			uui-input {
 				width: 100%;

@@ -41,10 +41,21 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 		}
 	}
 
+	#renderBackButton() {
+		return html`
+			<uui-button compact href="/section/member-management/view/member-groups">
+				<uui-icon name="icon-arrow-left"> </uui-icon>
+			</uui-button>
+		`;
+	}
+
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.MemberGroup">
-				<uui-input slot="header" id="nameInput" .value=${this._name} @input="${this.#onInput}"></uui-input>
+				<div id="header" slot="header">
+					${this.#renderBackButton()}
+					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}"></uui-input>
+				</div>
 			</umb-workspace-editor>
 		`;
 	}
@@ -56,6 +67,12 @@ export class UmbMemberGroupWorkspaceEditorElement extends UmbLitElement {
 				display: block;
 				width: 100%;
 				height: 100%;
+			}
+			#header {
+				display: flex;
+				gap: var(--uui-size-space-4);
+				align-items: center;
+				width: 100%;
 			}
 			uui-input {
 				width: 100%;
