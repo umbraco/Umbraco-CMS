@@ -207,11 +207,22 @@ internal sealed class ContentPublishingService : IContentPublishingService
             return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
-        IEnumerable<string> validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
-        if (culture is not null && validCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
+        if (content.ContentType.VariesByCulture())
         {
-            scope.Complete();
-            return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
+            IEnumerable<string> validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
+            if (culture is null || validCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
+            {
+                scope.Complete();
+                return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
+            }
+        }
+        else
+        {
+            if (culture is not null)
+            {
+                scope.Complete();
+                return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
+            }
         }
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
