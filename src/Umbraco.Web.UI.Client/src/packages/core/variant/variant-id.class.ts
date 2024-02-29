@@ -34,7 +34,7 @@ export class UmbVariantId {
 	public readonly segment: string | null = null;
 
 	constructor(culture?: string | null, segment?: string | null) {
-		this.culture = (culture === UMB_INVARIANT_CULTURE ? null : culture?.toLowerCase()) ?? null;
+		this.culture = (culture === UMB_INVARIANT_CULTURE ? null : culture) ?? null;
 		this.segment = segment ?? null;
 	}
 
