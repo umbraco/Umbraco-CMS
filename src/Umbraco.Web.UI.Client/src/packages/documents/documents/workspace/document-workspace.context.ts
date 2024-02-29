@@ -352,6 +352,7 @@ export class UmbDocumentWorkspaceContext
 		const activeVariants = this.splitView.getActiveVariants();
 
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
+		// TODO: We need to filter the selected array, so it only contains one of each variantId. [NL]
 		const selected = activeVariantIds.concat(this.#calculateChangedVariants());
 		const options = await firstValueFrom(this.variantOptions);
 
