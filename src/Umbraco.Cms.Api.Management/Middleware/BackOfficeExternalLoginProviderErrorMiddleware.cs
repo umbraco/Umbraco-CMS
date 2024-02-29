@@ -1,8 +1,8 @@
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Middleware;
@@ -18,6 +18,13 @@ namespace Umbraco.Cms.Api.Management.Middleware;
 /// </remarks>
 public class BackOfficeExternalLoginProviderErrorMiddleware : IMiddleware
 {
+    private readonly IJsonSerializer _jsonSerializer;
+
+    public BackOfficeExternalLoginProviderErrorMiddleware(IJsonSerializer jsonSerializer)
+    {
+        _jsonSerializer = jsonSerializer;
+    }
+
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var shortCircuit = false;
@@ -29,7 +36,7 @@ public class BackOfficeExternalLoginProviderErrorMiddleware : IMiddleware
             {
                 shortCircuit = true;
 
-                var serialized = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(errors)));
+                var serialized = Convert.ToBase64String(Encoding.UTF8.GetBytes(_jsonSerializer.Serialize(errors)));
 
                 context.Response.Cookies.Append(
                     ViewDataExtensions.TokenExternalSignInError,

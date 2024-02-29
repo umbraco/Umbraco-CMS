@@ -18,7 +18,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
@@ -36,6 +35,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
@@ -186,8 +186,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
 
             Services.AddSingleton<UmbracoRequestPaths>();
-
-            Services.AddSingleton<InstallStatusTracker>();
 
             Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
             Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
@@ -381,6 +379,16 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Add Query services
             Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
             Services.AddUnique<IMediaRecycleBinQueryService, MediaRecycleBinQueryService>();
+
+            // Authorizers
+            Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
+            Services.AddSingleton<IContentPermissionAuthorizer, ContentPermissionAuthorizer>();
+            Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
+            Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
+            Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();
+            Services.AddSingleton<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
+            Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
+
         }
     }
 }

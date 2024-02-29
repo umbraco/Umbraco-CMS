@@ -603,12 +603,12 @@ internal class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid userKey, UserCreateModel model, bool approveUser = false)
+    public async Task<Attempt<UserCreationResult, UserOperationStatus>> CreateAsync(Guid performingUserKey, UserCreateModel model, bool approveUser = false)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
-        IUser? performingUser = await GetAsync(userKey);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -622,7 +622,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new UserCreationResult());
         }
 
-        UserOperationStatus result = ValidateUserCreateModel(model);
+        UserOperationStatus result = await ValidateUserCreateModel(model);
         if (result != UserOperationStatus.Success)
         {
             return Attempt.FailWithStatus(result, new UserCreationResult());
@@ -724,12 +724,12 @@ internal class UserService : RepositoryService, IUserService
 
         return Attempt.Succeed(UserOperationStatus.Success);
     }
-    public async Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid userKey, UserInviteModel model)
+    public async Task<Attempt<UserInvitationResult, UserOperationStatus>> InviteAsync(Guid performingUserKey, UserInviteModel model)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
 
-        IUser? performingUser = await GetAsync(userKey);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -743,7 +743,7 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MissingUserGroup, new UserInvitationResult());
         }
 
-        UserOperationStatus validationResult = ValidateUserCreateModel(model);
+        UserOperationStatus validationResult = await ValidateUserCreateModel(model);
 
         if (validationResult is not UserOperationStatus.Success)
         {
@@ -858,7 +858,7 @@ internal class UserService : RepositoryService, IUserService
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserInvitationResult { InvitedUser = invitedUser });
     }
 
-    private UserOperationStatus ValidateUserCreateModel(UserCreateModel model)
+    private async Task<UserOperationStatus> ValidateUserCreateModel(UserCreateModel model)
     {
         if (_securitySettings.UsernameIsEmail && model.UserName != model.Email)
         {
@@ -867,6 +867,11 @@ internal class UserService : RepositoryService, IUserService
         if (!IsEmailValid(model.Email))
         {
             return UserOperationStatus.InvalidEmail;
+        }
+
+        if (model.Id is not null && await GetAsync(model.Id.Value) is not null)
+        {
+            return UserOperationStatus.DuplicateId;
         }
 
         if (GetByEmail(model.Email) is not null)
@@ -887,7 +892,7 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid userKey, UserUpdateModel model)
+    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
@@ -897,10 +902,10 @@ internal class UserService : RepositoryService, IUserService
 
         if (existingUser is null)
         {
-            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, existingUser);
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, existingUser);
         }
 
-        IUser? performingUser = await userStore.GetAsync(userKey);
+        IUser? performingUser = await userStore.GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -1091,7 +1096,7 @@ internal class UserService : RepositoryService, IUserService
         return keys;
     }
 
-    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid userKey, ChangeUserPasswordModel model)
+    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ChangePasswordAsync(Guid performingUserKey, ChangeUserPasswordModel model)
     {
         IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -1103,15 +1108,16 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new PasswordChangedModel());
         }
 
-        IUser? performingUser = await userStore.GetAsync(userKey);
+        IUser? performingUser = await userStore.GetAsync(performingUserKey);
         if (performingUser is null)
         {
             return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new PasswordChangedModel());
         }
 
+        // require old password for self change when outside of invite or resetByToken flows
         if (performingUser.UserState != UserState.Invited && performingUser.Username == user.Username && string.IsNullOrEmpty(model.OldPassword) && string.IsNullOrEmpty(model.ResetPasswordToken))
         {
-            return Attempt.FailWithStatus(UserOperationStatus.OldPasswordRequired, new PasswordChangedModel());
+            return Attempt.FailWithStatus(UserOperationStatus.SelfOldPasswordRequired, new PasswordChangedModel());
         }
 
         if (performingUser.IsAdmin() is false && user.IsAdmin())
@@ -1121,7 +1127,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (string.IsNullOrEmpty(model.ResetPasswordToken) is false)
         {
-            Attempt<UserOperationStatus> verifyPasswordResetAsync = await VerifyPasswordResetAsync(userKey, model.ResetPasswordToken);
+            Attempt<UserOperationStatus> verifyPasswordResetAsync = await VerifyPasswordResetAsync(model.UserKey, model.ResetPasswordToken);
             if (verifyPasswordResetAsync.Result != UserOperationStatus.Success)
             {
                 return Attempt.FailWithStatus(verifyPasswordResetAsync.Result, new PasswordChangedModel());
@@ -1147,11 +1153,11 @@ internal class UserService : RepositoryService, IUserService
         return Attempt.SucceedWithStatus(UserOperationStatus.Success, result.Result ?? new PasswordChangedModel());
     }
 
-    public async Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid userKey, int skip, int take)
+    public async Task<Attempt<PagedModel<IUser>?, UserOperationStatus>> GetAllAsync(Guid performingUserKey, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        IUser? requestingUser = await GetAsync(userKey);
+        IUser? requestingUser = await GetAsync(performingUserKey);
 
         if (requestingUser is null)
         {
@@ -1364,7 +1370,7 @@ internal class UserService : RepositoryService, IUserService
         };
     }
 
-    public async Task<UserOperationStatus> DeleteAsync(Guid userKey, ISet<Guid> keys)
+    public async Task<UserOperationStatus> DeleteAsync(Guid performingUserKey, ISet<Guid> keys)
     {
         if(keys.Any() is false)
         {
@@ -1372,7 +1378,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IUser? performingUser = await GetAsync(userKey);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -1412,7 +1418,7 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<UserOperationStatus> DisableAsync(Guid userKey, ISet<Guid> keys)
+    public async Task<UserOperationStatus> DisableAsync(Guid performingUserKey, ISet<Guid> keys)
     {
         if(keys.Any() is false)
         {
@@ -1420,7 +1426,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IUser? performingUser = await GetAsync(userKey);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -1458,7 +1464,7 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<UserOperationStatus> EnableAsync(Guid userKey, ISet<Guid> keys)
+    public async Task<UserOperationStatus> EnableAsync(Guid performingUserKey, ISet<Guid> keys)
     {
         if(keys.Any() is false)
         {
@@ -1466,7 +1472,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IUser? performingUser = await GetAsync(userKey);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -1528,7 +1534,7 @@ internal class UserService : RepositoryService, IUserService
         return UserOperationStatus.Success;
     }
 
-    public async Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid userKey, params Guid[] keys)
+    public async Task<Attempt<UserUnlockResult, UserOperationStatus>> UnlockAsync(Guid performingUserKey, params Guid[] keys)
     {
         if (keys.Length == 0)
         {
@@ -1536,7 +1542,7 @@ internal class UserService : RepositoryService, IUserService
         }
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IUser? performingUser = await GetAsync(userKey);
+        IUser? performingUser = await GetAsync(performingUserKey);
 
         if (performingUser is null)
         {
@@ -2102,6 +2108,40 @@ internal class UserService : RepositoryService, IUserService
         return changePasswordAttempt;
     }
 
+    public async Task<Attempt<PasswordChangedModel, UserOperationStatus>> ResetPasswordAsync(Guid performingUserKey, Guid userKey)
+    {
+        if (performingUserKey.Equals(userKey))
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.SelfPasswordResetNotAllowed, new PasswordChangedModel());
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+
+        ICoreBackOfficeUserManager backOfficeUserManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
+
+        var generatedPassword = backOfficeUserManager.GeneratePassword();
+
+        Attempt<PasswordChangedModel, UserOperationStatus> changePasswordAttempt =
+            await ChangePasswordAsync(performingUserKey, new ChangeUserPasswordModel
+            {
+                NewPassword = generatedPassword,
+                UserKey = userKey,
+            });
+
+        scope.Complete();
+
+        // todo tidy this up
+        // this should be part of the result of the ChangePasswordAsync() method
+        // but the model requires NewPassword
+        // and the passwordChanger does not have a codePath that deals with generating
+        if (changePasswordAttempt.Success)
+        {
+            changePasswordAttempt.Result.ResetPassword = generatedPassword;
+        }
+
+        return changePasswordAttempt;
+    }
 
 
     /// <summary>
@@ -2234,7 +2274,7 @@ internal class UserService : RepositoryService, IUserService
             results.Add(new NodePermissions { NodeKey = idKeyMap[nodeId], Permissions = permissions });
         }
 
-        return Attempt.SucceedWithStatus<IEnumerable<NodePermissions>, UserOperationStatus>(UserOperationStatus.UserNotFound, results);
+        return Attempt.SucceedWithStatus<IEnumerable<NodePermissions>, UserOperationStatus>(UserOperationStatus.Success, results);
     }
 
     /// <summary>

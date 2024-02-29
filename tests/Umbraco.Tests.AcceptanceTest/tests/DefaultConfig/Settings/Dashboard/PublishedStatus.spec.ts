@@ -8,17 +8,17 @@ test.describe('Published Status Dashboard tests', () => {
     await umbracoUi.publishedStatus.clickPublishedStatusTab();
   });
 
-  test('can view and refresh published cache status', async ({umbracoApi, umbracoUi}) => {
+  test('can refresh published cache status', async ({umbracoApi, umbracoUi}) => {
     // Arrange 
-    const expectedStatus = await umbracoApi.publishedCache.getStatus();
+    const expectedStatus = await umbracoApi.publishedCache.getStatus(); 
 
     // Act 
     await umbracoUi.publishedStatus.clickRefreshStatusButton();
+    // TODO: create a content item, and check if the ContentStore contains the content or not.
 
     // Assert
     await umbracoUi.publishedStatus.isSuccessButtonWithTextVisible('Refresh Status');
     await umbracoUi.publishedStatus.isPublishedCacheStatusVisible(expectedStatus);
-
   });
 
   test('can reload the memory cache', async ({umbracoUi}) => {

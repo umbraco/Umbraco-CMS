@@ -123,7 +123,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
     /// <param name="culture"></param>
     /// <param name="name"></param>
-    public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null)
+    public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null, Guid? id = null)
     {
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -139,8 +139,13 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         user.DisableChangeTracking();
         user.UserName = username;
         user.Email = email;
-
         user.Id = string.Empty;
+
+        if (id is not null)
+        {
+            user.Key = id.Value;
+        }
+
         user.HasIdentity = false;
         user._culture = culture;
         user.Name = name;

@@ -1,16 +1,36 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
 public class OperationIdSelector : IOperationIdSelector
 {
+    private readonly UmbracoOperationIdSettings _umbracoOperationIdSettings;
+
+    [Obsolete("Use non obsolete constructor")]
+    public OperationIdSelector() : this(StaticServiceProvider.Instance.GetRequiredService<IOptions<UmbracoOperationIdSettings>>())
+    {
+    }
+
+    public OperationIdSelector(IOptions<UmbracoOperationIdSettings> umbracoOperationIdSettings)
+    {
+        _umbracoOperationIdSettings = umbracoOperationIdSettings.Value;
+    }
+
     public virtual string? OperationId(ApiDescription apiDescription, ApiVersioningOptions apiVersioningOptions)
     {
-        if (apiDescription.ActionDescriptor is not ControllerActionDescriptor controllerActionDescriptor
-            || controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("Umbraco.Cms.Api") is not true)
+        if (apiDescription.ActionDescriptor is not ControllerActionDescriptor controllerActionDescriptor)
+        {
+            return null;
+        }
+
+        var controllerTypeInfoNamespace = controllerActionDescriptor.ControllerTypeInfo.Namespace;
+        if (controllerTypeInfoNamespace is not null && _umbracoOperationIdSettings.NameSpacePrefixes.Any(prefix => controllerTypeInfoNamespace.StartsWith(prefix)) is false)
         {
             return null;
         }

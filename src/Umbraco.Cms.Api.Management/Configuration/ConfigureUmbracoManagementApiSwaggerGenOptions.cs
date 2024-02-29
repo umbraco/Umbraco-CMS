@@ -60,7 +60,7 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
 
         // Sets Security requirement on backoffice apis
         swaggerGenOptions.OperationFilter<BackOfficeSecurityRequirementsOperationFilter>();
+        swaggerGenOptions.OperationFilter<NotificationHeaderFilter>();
         swaggerGenOptions.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
     }
-
 }
