@@ -1,4 +1,4 @@
-import type { UmbTreeSelectionConfiguration } from '../default/default-tree.element.js';
+import type { UmbTreeSelectionConfiguration } from '../types.js';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
