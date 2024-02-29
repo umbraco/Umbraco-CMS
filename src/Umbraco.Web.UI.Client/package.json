@@ -211,7 +211,7 @@
 		"glob": "^10.3.10",
 		"lucide-static": "^0.290.0",
 		"msw": "^1.3.2",
-		"openapi-typescript-codegen": "^0.25.0",
+		"openapi-typescript-codegen": "^0.27.0",
 		"playwright-msw": "^3.0.1",
 		"prettier": "3.0.3",
 		"react": "^18.2.0",
