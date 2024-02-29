@@ -65,8 +65,20 @@ export class UmbDocumentPublishingServerDataSource {
 		if (!unique) throw new Error('Id is missing');
 
 		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
+
+		// If variants are culture invariant, we need to pass null to the API
+		const hasInvariant = variantIds.some((variant) => variant.isCultureInvariant());
+
+		if (hasInvariant) {
+			const requestBody: UnpublishDocumentRequestModel = {
+				cultures: null,
+			};
+
+			return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdUnpublish({ id: unique, requestBody }));
+		}
+
 		const requestBody: UnpublishDocumentRequestModel = {
-			culture: variantIds.map((variant) => (variant.isCultureInvariant() ? null : variant.toCultureString()))[0],
+			cultures: variantIds.map((variant) => variant.toCultureString()),
 		};
 
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdUnpublish({ id: unique, requestBody }));
