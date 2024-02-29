@@ -1,12 +1,12 @@
 import { UMB_BLOCK_ENTRY_CONTEXT } from '../context/block-entry.context-token.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbBlockEntryShowContentEditCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbBlockEntryShowContentEditCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: BlockEntryShowContentEditConditionConfig;
 	permitted = false;
 	#onChange: () => void;
