@@ -26,7 +26,7 @@ export class UmbMediaTypeWorkspaceContext
 	readonly description;
 	readonly icon;
 
-	readonly allowedAsRoot;
+	readonly allowedAtRoot;
 	readonly allowedContentTypes;
 	readonly compositions;
 
@@ -44,7 +44,7 @@ export class UmbMediaTypeWorkspaceContext
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
 		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
-		this.allowedAsRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAsRoot);
+		this.allowedAtRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAtRoot);
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 	}

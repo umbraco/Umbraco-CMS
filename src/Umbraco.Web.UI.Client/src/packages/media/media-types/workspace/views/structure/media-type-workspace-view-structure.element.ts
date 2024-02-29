@@ -13,7 +13,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 	#workspaceContext?: UmbMediaTypeWorkspaceContext;
 
 	@state()
-	private _allowedAsRoot?: boolean;
+	private _allowedAtRoot?: boolean;
 
 	@state()
 	private _allowedContentTypeIDs?: Array<string>;
@@ -30,7 +30,8 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 
 	private _observeMediaType() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.allowedAsRoot, (allowedAsRoot) => (this._allowedAsRoot = allowedAsRoot));
+
+		this.observe(this.#workspaceContext.allowedAtRoot, (allowedAsRoot) => (this._allowedAtRoot = allowedAsRoot));
 		this.observe(this.#workspaceContext.allowedContentTypes, (allowedContentTypes) => {
 			const oldValue = this._allowedContentTypeIDs;
 			this._allowedContentTypeIDs = allowedContentTypes
@@ -48,9 +49,9 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 					<div slot="editor">
 						<uui-toggle
 							label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}
-							?checked=${this._allowedAsRoot}
+							?checked=${this._allowedAtRoot}
 							@change=${(e: CustomEvent) => {
-								this.#workspaceContext?.updateProperty('allowedAsRoot', (e.target as UUIToggleElement).checked);
+								this.#workspaceContext?.updateProperty('allowedAtRoot', (e.target as UUIToggleElement).checked);
 							}}></uui-toggle>
 					</div>
 				</umb-property-layout>
