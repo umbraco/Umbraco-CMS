@@ -14,6 +14,8 @@ export const treeHandlers = [
 	rest.get(umbracoPath(`/tree${UMB_SLUG}/children`), (req, res, ctx) => {
 		const parentPath = req.url.searchParams.get('parentPath');
 		if (!parentPath) return res(ctx.status(400));
+		const skip = Number(req.url.searchParams.get('skip'));
+		const take = Number(req.url.searchParams.get('take'));
 		const response = umbStylesheetMockDb.tree.getChildrenOf({ parentPath, skip, take });
 		return res(ctx.status(200), ctx.json(response));
 	}),
