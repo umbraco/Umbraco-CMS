@@ -7,58 +7,61 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-action')
 export class UmbEntityActionElement extends UmbLitElement {
-	private _entityType?: string | null;
+	#entityType?: string | null;
+
 	@property({ type: String })
-	public get entityType() {
-		return this._entityType;
-	}
 	public set entityType(value: string | undefined | null) {
-		const oldValue = this._entityType;
-		this._entityType = value;
-		if (oldValue !== this._entityType) {
+		const oldValue = this.#entityType;
+		this.#entityType = value;
+		if (oldValue !== this.#entityType) {
 			this.#createApi();
 			this.requestUpdate('entityType', oldValue);
 		}
 	}
-
-	private _unique?: string | null;
-	@property({ type: String })
-	public get unique() {
-		return this._unique;
+	public get entityType() {
+		return this.#entityType;
 	}
+
+	#unique?: string | null;
+
+	@property({ type: String })
 	public set unique(value: string | undefined | null) {
-		const oldValue = this._unique;
-		this._unique = value;
-		if (oldValue !== this._unique) {
+		const oldValue = this.#unique;
+		this.#unique = value;
+		if (oldValue !== this.#unique) {
 			this.#createApi();
 			this.requestUpdate('unique', oldValue);
 		}
 	}
-
-	private _manifest?: ManifestEntityAction;
-	@property({ type: Object, attribute: false })
-	public get manifest() {
-		return this._manifest;
+	public get unique() {
+		return this.#unique;
 	}
+
+	#manifest?: ManifestEntityAction;
+
+	@property({ type: Object, attribute: false })
 	public set manifest(value: ManifestEntityAction | undefined) {
 		if (!value) return;
-		const oldValue = this._manifest;
-		this._manifest = value;
-		if (oldValue !== this._manifest) {
+		const oldValue = this.#manifest;
+		this.#manifest = value;
+		if (oldValue !== this.#manifest) {
 			this.#createApi();
 			this.requestUpdate('manifest', oldValue);
 		}
 	}
+	public get manifest() {
+		return this.#manifest;
+	}
 
 	async #createApi() {
 		// only create the api if we have all the required properties
-		if (!this._manifest) return;
-		if (this._unique === undefined) return;
-		if (!this._entityType) return;
+		if (!this.#manifest) return;
+		if (this.#unique === undefined) return;
+		if (!this.#entityType) return;
 
-		this.#api = await createExtensionApi(this._manifest, [
+		this.#api = await createExtensionApi(this.#manifest, [
 			this,
-			this._manifest.meta.repositoryAlias,
+			this.#manifest.meta.repositoryAlias,
 			this.unique,
 			this.entityType,
 		]);
@@ -89,12 +92,12 @@ export class UmbEntityActionElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-menu-item
-				label=${ifDefined(this._manifest?.meta.label)}
+				label=${ifDefined(this.manifest?.meta.label)}
 				href=${ifDefined(this._href)}
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>
-				${this._manifest?.meta.icon
-					? html`<uui-icon slot="icon" name="${this._manifest?.meta.icon}"></uui-icon>`
+				${this.manifest?.meta.icon
+					? html`<uui-icon slot="icon" name="${this.manifest?.meta.icon}"></uui-icon>`
 					: nothing}
 			</uui-menu-item>
 		`;
