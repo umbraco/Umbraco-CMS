@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 export type ContentTypeCompositionRequestModelBaseModel = {
     id?: string | null;
     currentPropertyAliases: Array<string>;

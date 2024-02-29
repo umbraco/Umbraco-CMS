@@ -6,10 +6,13 @@ import type { CreateWebhookRequestModel } from '../models/CreateWebhookRequestMo
 import type { UpdateWebhookRequestModel } from '../models/UpdateWebhookRequestModel';
 import type { WebhookItemResponseModel } from '../models/WebhookItemResponseModel';
 import type { WebhookResponseModel } from '../models/WebhookResponseModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class WebhookResource {
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -32,6 +35,7 @@ export class WebhookResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -53,6 +57,7 @@ export class WebhookResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -80,6 +85,7 @@ export class WebhookResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -103,6 +109,7 @@ export class WebhookResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -123,4 +130,5 @@ export class WebhookResource {
             },
         });
     }
+
 }

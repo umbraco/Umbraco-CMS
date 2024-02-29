@@ -10,10 +10,13 @@ import type { MoveDictionaryRequestModel } from '../models/MoveDictionaryRequest
 import type { PagedDictionaryOverviewResponseModel } from '../models/PagedDictionaryOverviewResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { UpdateDictionaryItemRequestModel } from '../models/UpdateDictionaryItemRequestModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class DictionaryResource {
+
     /**
      * @returns PagedDictionaryOverviewResponseModel Success
      * @throws ApiError
@@ -40,6 +43,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -64,6 +68,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -85,6 +90,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -108,6 +114,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -136,6 +143,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns binary Success
      * @throws ApiError
@@ -162,6 +170,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -189,6 +198,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -211,6 +221,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -231,6 +242,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -257,6 +269,7 @@ export class DictionaryResource {
             },
         });
     }
+
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -280,4 +293,5 @@ export class DictionaryResource {
             },
         });
     }
+
 }

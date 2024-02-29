@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { AvailableContentTypeCompositionResponseModelBaseModel } from './AvailableContentTypeCompositionResponseModelBaseModel';
+
 export type AvailableMemberTypeCompositionResponseModel = AvailableContentTypeCompositionResponseModelBaseModel;
 

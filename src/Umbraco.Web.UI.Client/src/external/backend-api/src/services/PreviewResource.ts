@@ -5,7 +5,9 @@
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class PreviewResource {
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -20,6 +22,7 @@ export class PreviewResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -34,4 +37,5 @@ export class PreviewResource {
             },
         });
     }
+
 }

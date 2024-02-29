@@ -2,7 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type MoveDocumentRequestModel = {
     target?: ReferenceByIdModel | null;
 };

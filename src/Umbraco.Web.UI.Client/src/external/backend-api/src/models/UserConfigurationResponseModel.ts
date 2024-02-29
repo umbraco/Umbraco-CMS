@@ -2,7 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { PasswordConfigurationResponseModel } from './PasswordConfigurationResponseModel';
+
 export type UserConfigurationResponseModel = {
     canInviteUsers: boolean;
     passwordConfiguration: PasswordConfigurationResponseModel;

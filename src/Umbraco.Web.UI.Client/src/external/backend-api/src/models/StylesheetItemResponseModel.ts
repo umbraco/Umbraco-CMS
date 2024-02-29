@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { FileSystemItemResponseModelBaseModel } from './FileSystemItemResponseModelBaseModel';
+
 export type StylesheetItemResponseModel = FileSystemItemResponseModelBaseModel;
 
