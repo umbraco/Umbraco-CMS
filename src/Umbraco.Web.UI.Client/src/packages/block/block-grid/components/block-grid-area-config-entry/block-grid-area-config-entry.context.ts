@@ -9,7 +9,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 export class UmbBlockGridAreaConfigEntryContext
 	extends UmbContextBase<UmbBlockGridAreaConfigEntryContext>
 	implements UmbBlockGridScalableContext
@@ -86,19 +86,14 @@ export class UmbBlockGridAreaConfigEntryContext
 		);
 	}
 
-	requestDelete() {
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
-			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
-				data: {
-					headline: `Delete ${this.alias}`,
-					content: 'Are you sure you want to delete this Area?',
-					confirmLabel: 'Delete',
-					color: 'danger',
-				},
-			});
-			await modalContext.onSubmit();
-			this.delete();
+	async requestDelete() {
+		await umbConfirmModal(this, {
+			headline: `Delete ${this.alias}`,
+			content: 'Are you sure you want to delete this Area?',
+			confirmLabel: 'Delete',
+			color: 'danger',
 		});
+		this.delete();
 	}
 	public delete() {
 		if (!this.#areaKey || !this.#propertyContext) return;

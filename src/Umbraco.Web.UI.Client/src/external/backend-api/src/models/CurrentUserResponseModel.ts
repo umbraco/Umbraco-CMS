@@ -3,6 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { DocumentPermissionPresentationModel } from './DocumentPermissionPresentationModel';
+import type { UnknownTypePermissionPresentationModel } from './UnknownTypePermissionPresentationModel';
+
 export type CurrentUserResponseModel = {
     id: string;
     email: string;
@@ -14,6 +17,8 @@ export type CurrentUserResponseModel = {
     avatarUrls: Array<string>;
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
-    permissions: Array<string>;
+    fallbackPermissions: Array<string>;
+    permissions: Array<(DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel)>;
+    allowedSections: Array<string>;
 };
 

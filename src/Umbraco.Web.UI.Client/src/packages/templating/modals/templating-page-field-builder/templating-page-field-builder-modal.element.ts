@@ -6,6 +6,7 @@ import type {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbFieldDropdownListElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-templating-page-field-builder-modal')
 export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseElement<
@@ -36,6 +37,10 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 
 	/** TODO: Implement "Choose field" */
 
+	#onChangeFieldValue(e: Event) {
+		this._field = (e.target as UmbFieldDropdownListElement).value?.alias;
+	}
+
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('template_insert')}>
@@ -44,7 +49,7 @@ export class UmbTemplatingPageFieldBuilderModalElement extends UmbModalBaseEleme
 						<uui-label for="page-field-value">
 							<umb-localize key="templateEditor_chooseField">Choose field</umb-localize>
 						</uui-label>
-						(Not implemented yet)
+						<umb-field-dropdown-list @change=${this.#onChangeFieldValue} exclude-media-type></umb-field-dropdown-list>
 
 						<uui-label for="page-field-default-value">
 							<umb-localize key="templateEditor_defaultValue">Default value</umb-localize>

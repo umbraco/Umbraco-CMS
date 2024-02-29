@@ -84,20 +84,21 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteMemberTypeById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/member-type/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
@@ -106,7 +107,7 @@ export class MemberTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putMemberTypeById({
@@ -115,7 +116,7 @@ export class MemberTypeResource {
     }: {
         id: string,
         requestBody?: UpdateMemberTypeRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/member-type/{id}',
@@ -124,6 +125,7 @@ export class MemberTypeResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

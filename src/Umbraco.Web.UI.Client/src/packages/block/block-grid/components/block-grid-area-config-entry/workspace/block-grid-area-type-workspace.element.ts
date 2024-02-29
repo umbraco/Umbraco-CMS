@@ -13,6 +13,7 @@ export class UmbBlockGridAreaTypeWorkspaceElement extends UmbLitElement {
 	//
 	#manifest?: ManifestWorkspace;
 	#workspaceContext?: UmbBlockGridAreaTypeWorkspaceContext;
+
 	#editorElement = () => {
 		const element = new UmbBlockGridAreaTypeWorkspaceEditorElement();
 		element.workspaceAlias = this.#manifest!.alias;
@@ -37,7 +38,6 @@ export class UmbBlockGridAreaTypeWorkspaceElement extends UmbLitElement {
 		this._routes = [
 			/*
 			{
-				// Would it make more sense to have groupKey before elementTypeKey?
 				path: 'create',
 				component: this.#editorElement,
 				setup: async (_component, info) => {

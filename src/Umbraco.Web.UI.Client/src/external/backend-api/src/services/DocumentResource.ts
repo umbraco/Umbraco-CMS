@@ -125,20 +125,21 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteDocumentById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/document/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -149,7 +150,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentById({
@@ -158,7 +159,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: UpdateDocumentRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}',
@@ -167,6 +168,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -255,7 +257,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdMove({
@@ -264,7 +266,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: MoveDocumentRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/move',
@@ -273,6 +275,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -282,20 +285,21 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdMoveToRecycleBin({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/move-to-recycle-bin',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -329,7 +333,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdNotifications({
@@ -338,7 +342,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: UpdateDocumentNotificationsRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/notifications',
@@ -347,6 +351,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
@@ -383,20 +388,21 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteDocumentByIdPublicAccess({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -429,7 +435,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdPublicAccess({
@@ -438,7 +444,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: PublicAccessRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
@@ -447,6 +453,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -456,7 +463,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdPublish({
@@ -465,7 +472,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: PublishDocumentRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/publish',
@@ -474,6 +481,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -484,7 +492,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdPublishWithDescendants({
@@ -493,7 +501,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: PublishDocumentWithDescendantsRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/publish-with-descendants',
@@ -502,6 +510,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -512,7 +521,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdUnpublish({
@@ -521,7 +530,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: UnpublishDocumentRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/unpublish',
@@ -530,6 +539,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -540,7 +550,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentByIdValidate({
@@ -549,7 +559,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: UpdateDocumentRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/validate',
@@ -558,6 +568,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -582,19 +593,20 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDocumentSort({
         requestBody,
     }: {
         requestBody?: SortingRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/sort',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -605,19 +617,20 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postDocumentValidate({
         requestBody,
     }: {
         requestBody?: CreateDocumentRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document/validate',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -649,13 +662,14 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
-    public static deleteRecycleBinDocument(): CancelablePromise<any> {
+    public static deleteRecycleBinDocument(): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/recycle-bin/document',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -665,20 +679,21 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteRecycleBinDocumentById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/recycle-bin/document/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -713,7 +728,7 @@ export class DocumentResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putRecycleBinDocumentByIdRestore({
@@ -722,7 +737,7 @@ export class DocumentResource {
     }: {
         id: string,
         requestBody?: MoveMediaRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/recycle-bin/document/{id}/restore',
@@ -731,6 +746,7 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

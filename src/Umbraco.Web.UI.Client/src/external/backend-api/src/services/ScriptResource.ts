@@ -84,20 +84,21 @@ export class ScriptResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteScriptByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/script/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -107,7 +108,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putScriptByPath({
@@ -116,7 +117,7 @@ export class ScriptResource {
     }: {
         path: string,
         requestBody?: UpdateScriptRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/script/{path}',
@@ -125,6 +126,7 @@ export class ScriptResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -207,20 +209,21 @@ export class ScriptResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteScriptFolderByPath({
         path,
     }: {
         path: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/script/folder/{path}',
             path: {
                 'path': path,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

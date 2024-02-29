@@ -67,20 +67,21 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteDataTypeById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/data-type/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -90,7 +91,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDataTypeById({
@@ -99,7 +100,7 @@ export class DataTypeResource {
     }: {
         id: string,
         requestBody?: UpdateDataTypeRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/data-type/{id}',
@@ -108,6 +109,7 @@ export class DataTypeResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -166,7 +168,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDataTypeByIdMove({
@@ -175,7 +177,7 @@ export class DataTypeResource {
     }: {
         id: string,
         requestBody?: MoveDataTypeRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/data-type/{id}/move',
@@ -184,6 +186,7 @@ export class DataTypeResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
@@ -273,20 +276,21 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteDataTypeFolderById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/data-type/folder/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -296,7 +300,7 @@ export class DataTypeResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putDataTypeFolderById({
@@ -305,7 +309,7 @@ export class DataTypeResource {
     }: {
         id: string,
         requestBody?: UpdateFolderResponseModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/data-type/folder/{id}',
@@ -314,6 +318,7 @@ export class DataTypeResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

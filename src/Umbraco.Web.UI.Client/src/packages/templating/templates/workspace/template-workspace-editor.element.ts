@@ -126,7 +126,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			data: {
 				hideTreeRoot: true,
 				pickableFilter: (item) => {
-					return item.unique !== null && item.unique !== this.#templateWorkspaceContext?.getEntityId();
+					return item.unique !== null && item.unique !== this.#templateWorkspaceContext?.getUnique();
 				},
 			},
 			value: {
