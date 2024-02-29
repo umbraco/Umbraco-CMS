@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 export type RelationResponseModel = {
     parentId: string;
     parentName?: string | null;

@@ -2,8 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { FileSystemItemViewModelBaseModel } from './FileSystemItemViewModelBaseModel';
-
 export type FileSystemFolderModel = FileSystemItemViewModelBaseModel;
 

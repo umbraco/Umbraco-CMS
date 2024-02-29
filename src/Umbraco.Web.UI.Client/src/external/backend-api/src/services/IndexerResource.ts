@@ -5,13 +5,10 @@
 import type { IndexResponseModel } from '../models/IndexResponseModel';
 import type { OkResult } from '../models/OkResult';
 import type { PagedIndexResponseModel } from '../models/PagedIndexResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class IndexerResource {
-
     /**
      * @returns PagedIndexResponseModel Success
      * @throws ApiError
@@ -35,7 +32,6 @@ export class IndexerResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -57,7 +53,6 @@ export class IndexerResource {
             },
         });
     }
-
     /**
      * @returns OkResult Success
      * @throws ApiError
@@ -81,5 +76,4 @@ export class IndexerResource {
             },
         });
     }
-
 }

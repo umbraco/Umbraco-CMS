@@ -2,11 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { DocumentTypePropertyTypeContainerResponseModel } from './DocumentTypePropertyTypeContainerResponseModel';
 import type { DocumentTypePropertyTypeResponseModel } from './DocumentTypePropertyTypeResponseModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-
 export type ContentTypeForDocumentTypeResponseModel = {
     alias: string;
     name: string;

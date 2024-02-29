@@ -4,13 +4,10 @@
 /* eslint-disable */
 import type { PagedSearcherResponseModel } from '../models/PagedSearcherResponseModel';
 import type { PagedSearchResultResponseModel } from '../models/PagedSearchResultResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class SearcherResource {
-
     /**
      * @returns PagedSearcherResponseModel Success
      * @throws ApiError
@@ -34,7 +31,6 @@ export class SearcherResource {
             },
         });
     }
-
     /**
      * @returns PagedSearchResultResponseModel Success
      * @throws ApiError
@@ -67,5 +63,4 @@ export class SearcherResource {
             },
         });
     }
-
 }

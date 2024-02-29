@@ -5,13 +5,10 @@
 import type { PagedTelemetryResponseModel } from '../models/PagedTelemetryResponseModel';
 import type { TelemetryRequestModel } from '../models/TelemetryRequestModel';
 import type { TelemetryResponseModel } from '../models/TelemetryResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class TelemetryResource {
-
     /**
      * @returns PagedTelemetryResponseModel Success
      * @throws ApiError
@@ -35,7 +32,6 @@ export class TelemetryResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -49,7 +45,6 @@ export class TelemetryResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -71,5 +66,4 @@ export class TelemetryResource {
             },
         });
     }
-
 }

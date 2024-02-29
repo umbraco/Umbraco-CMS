@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { UpdateContentForMemberRequestModel } from './UpdateContentForMemberRequestModel';
-
 export type UpdateMemberRequestModel = (UpdateContentForMemberRequestModel & {
     email: string;
     username: string;

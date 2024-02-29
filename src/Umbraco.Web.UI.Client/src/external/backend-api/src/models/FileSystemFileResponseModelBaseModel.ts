@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { FileSystemFolderModel } from './FileSystemFolderModel';
-
 export type FileSystemFileResponseModelBaseModel = {
     path: string;
     name: string;
