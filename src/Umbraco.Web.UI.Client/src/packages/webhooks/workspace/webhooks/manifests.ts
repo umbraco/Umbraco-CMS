@@ -35,7 +35,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 			},
 		],
 	},
-	{
+	/*{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Webhooks.Search',
 		name: 'Webhooks Root Workspace Logs View',
@@ -52,7 +52,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 				match: workspace.alias,
 			},
 		],
-	},
+	},*/
 ];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [];
