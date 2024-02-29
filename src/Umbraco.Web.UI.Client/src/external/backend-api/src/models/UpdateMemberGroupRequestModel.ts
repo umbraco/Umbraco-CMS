@@ -2,8 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { MemberGroupPresentationBaseModel } from './MemberGroupPresentationBaseModel';
-
 export type UpdateMemberGroupRequestModel = MemberGroupPresentationBaseModel;
 

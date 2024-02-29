@@ -6,13 +6,10 @@ import type { AuditTypeModel } from '../models/AuditTypeModel';
 import type { DirectionModel } from '../models/DirectionModel';
 import type { PagedAuditLogResponseModel } from '../models/PagedAuditLogResponseModel';
 import type { PagedAuditLogWithUsernameResponseModel } from '../models/PagedAuditLogWithUsernameResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class AuditLogResource {
-
     /**
      * @returns PagedAuditLogWithUsernameResponseModel Success
      * @throws ApiError
@@ -42,7 +39,6 @@ export class AuditLogResource {
             },
         });
     }
-
     /**
      * @returns PagedAuditLogResponseModel Success
      * @throws ApiError
@@ -77,7 +73,6 @@ export class AuditLogResource {
             },
         });
     }
-
     /**
      * @returns PagedAuditLogResponseModel Success
      * @throws ApiError
@@ -109,5 +104,4 @@ export class AuditLogResource {
             },
         });
     }
-
 }

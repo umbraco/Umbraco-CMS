@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { HealthStatusModel } from './HealthStatusModel';
-
 export type IndexResponseModel = {
     name: string;
     healthStatus: HealthStatusModel;

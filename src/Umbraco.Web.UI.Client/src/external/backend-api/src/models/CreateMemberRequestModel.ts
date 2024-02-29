@@ -2,10 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { CreateContentForMemberRequestModel } from './CreateContentForMemberRequestModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-
 export type CreateMemberRequestModel = (CreateContentForMemberRequestModel & {
     email: string;
     username: string;

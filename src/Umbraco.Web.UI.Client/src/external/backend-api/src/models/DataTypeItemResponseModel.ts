@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
-
 export type DataTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
     editorUiAlias?: string | null;
     isDeletable: boolean;

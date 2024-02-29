@@ -17,13 +17,10 @@ import type { PagedAllowedDocumentTypeModel } from '../models/PagedAllowedDocume
 import type { PagedDocumentTypeTreeItemResponseModel } from '../models/PagedDocumentTypeTreeItemResponseModel';
 import type { UpdateDocumentTypeRequestModel } from '../models/UpdateDocumentTypeRequestModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class DocumentTypeResource {
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -46,7 +43,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -68,7 +64,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -91,7 +86,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -119,7 +113,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns PagedAllowedDocumentTypeModel Success
      * @throws ApiError
@@ -149,7 +142,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -172,7 +164,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -200,7 +191,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -228,7 +218,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns PagedAllowedDocumentTypeModel Success
      * @throws ApiError
@@ -252,7 +241,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -272,7 +260,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -286,7 +273,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -309,7 +295,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -331,7 +316,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -355,7 +339,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -383,7 +366,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -404,7 +386,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns PagedDocumentTypeTreeItemResponseModel Success
      * @throws ApiError
@@ -434,7 +415,6 @@ export class DocumentTypeResource {
             },
         });
     }
-
     /**
      * @returns PagedDocumentTypeTreeItemResponseModel Success
      * @throws ApiError
@@ -461,5 +441,4 @@ export class DocumentTypeResource {
             },
         });
     }
-
 }

@@ -1,4 +1,5 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTypeDetailModel } from '../types.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
@@ -26,7 +27,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly description;
 	readonly icon;
 
-	readonly allowedAsRoot;
+	readonly allowedAtRoot;
 	readonly variesByCulture;
 	readonly variesBySegment;
 	readonly isElement;
@@ -53,7 +54,7 @@ export class UmbDocumentTypeWorkspaceContext
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
 		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
-		this.allowedAsRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAsRoot);
+		this.allowedAtRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAtRoot);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((data) => data?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((data) => data?.variesBySegment);
 		this.isElement = this.structure.ownerContentTypeObservablePart((data) => data?.isElement);
@@ -90,15 +91,17 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	getEntityType() {
-		return 'document-type';
+		return UMB_DOCUMENT_TYPE_ENTITY_TYPE;
 	}
 
 	setName(name: string) {
 		this.structure.updateOwnerContentType({ name });
 	}
+
 	setAlias(alias: string) {
 		this.structure.updateOwnerContentType({ alias });
 	}
+
 	setDescription(description: string) {
 		this.structure.updateOwnerContentType({ description });
 	}
@@ -108,24 +111,30 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ icon });
 	}
 
-	setAllowedAsRoot(allowedAsRoot: boolean) {
-		this.structure.updateOwnerContentType({ allowedAsRoot });
+	setAllowedAtRoot(allowedAtRoot: boolean) {
+		this.structure.updateOwnerContentType({ allowedAtRoot });
 	}
+
 	setVariesByCulture(variesByCulture: boolean) {
 		this.structure.updateOwnerContentType({ variesByCulture });
 	}
+
 	setVariesBySegment(variesBySegment: boolean) {
 		this.structure.updateOwnerContentType({ variesBySegment });
 	}
+
 	setIsElement(isElement: boolean) {
 		this.structure.updateOwnerContentType({ isElement });
 	}
+
 	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
 		this.structure.updateOwnerContentType({ allowedContentTypes });
 	}
+
 	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
 		this.structure.updateOwnerContentType({ compositions });
 	}
+
 	setCollection(collection: UmbReferenceByUnique) {
 		this.structure.updateOwnerContentType({ collection });
 	}
@@ -134,6 +143,7 @@ export class UmbDocumentTypeWorkspaceContext
 	setAllowedTemplateIds(allowedTemplates: Array<{ id: string }>) {
 		this.structure.updateOwnerContentType({ allowedTemplates });
 	}
+
 	setDefaultTemplate(defaultTemplate: { id: string }) {
 		this.structure.updateOwnerContentType({ defaultTemplate });
 	}

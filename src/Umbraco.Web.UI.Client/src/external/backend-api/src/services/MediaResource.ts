@@ -14,13 +14,10 @@ import type { PagedMediaTreeItemResponseModel } from '../models/PagedMediaTreeIt
 import type { ReferenceByIdModel } from '../models/ReferenceByIdModel';
 import type { SortingRequestModel } from '../models/SortingRequestModel';
 import type { UpdateMediaRequestModel } from '../models/UpdateMediaRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class MediaResource {
-
     /**
      * @returns PagedMediaCollectionResponseModel Success
      * @throws ApiError
@@ -61,7 +58,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -82,7 +78,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -106,7 +101,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -129,7 +123,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -154,7 +147,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -183,7 +175,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -211,7 +202,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -236,7 +226,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -265,7 +254,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -279,7 +267,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -303,7 +290,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -327,7 +313,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -344,7 +329,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -369,7 +353,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -393,7 +376,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -422,7 +404,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns PagedMediaRecycleBinItemResponseModel Success
      * @throws ApiError
@@ -449,7 +430,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns PagedMediaRecycleBinItemResponseModel Success
      * @throws ApiError
@@ -473,7 +453,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns PagedMediaTreeItemResponseModel Success
      * @throws ApiError
@@ -503,7 +482,6 @@ export class MediaResource {
             },
         });
     }
-
     /**
      * @returns PagedMediaTreeItemResponseModel Success
      * @throws ApiError
@@ -530,5 +508,4 @@ export class MediaResource {
             },
         });
     }
-
 }
