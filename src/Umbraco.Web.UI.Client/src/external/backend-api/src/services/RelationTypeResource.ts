@@ -7,10 +7,13 @@ import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamed
 import type { RelationTypeItemResponseModel } from '../models/RelationTypeItemResponseModel';
 import type { RelationTypeResponseModel } from '../models/RelationTypeResponseModel';
 import type { UpdateRelationTypeRequestModel } from '../models/UpdateRelationTypeRequestModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class RelationTypeResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -31,6 +34,7 @@ export class RelationTypeResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -52,6 +56,7 @@ export class RelationTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -73,6 +78,7 @@ export class RelationTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -95,6 +101,7 @@ export class RelationTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -121,6 +128,7 @@ export class RelationTypeResource {
             },
         });
     }
+
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -144,4 +152,5 @@ export class RelationTypeResource {
             },
         });
     }
+
 }

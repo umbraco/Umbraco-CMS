@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { UpdateContentForMediaRequestModel } from './UpdateContentForMediaRequestModel';
+
 export type UpdateMediaRequestModel = UpdateContentForMediaRequestModel;
 

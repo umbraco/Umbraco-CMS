@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 export type VariantItemResponseModelBaseModel = {
     name: string;
     culture?: string | null;

@@ -2,9 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { MediaTypePropertyTypeContainerResponseModel } from './MediaTypePropertyTypeContainerResponseModel';
 import type { MediaTypePropertyTypeResponseModel } from './MediaTypePropertyTypeResponseModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type ContentTypeForMediaTypeResponseModel = {
     alias: string;
     name: string;

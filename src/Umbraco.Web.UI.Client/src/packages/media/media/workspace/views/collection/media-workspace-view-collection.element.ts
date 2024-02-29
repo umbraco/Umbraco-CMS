@@ -31,7 +31,7 @@ export class UmbMediaWorkspaceViewCollectionElement extends UmbLitElement implem
 				this._mediaUnique = unique;
 			});
 			this.observe(
-				workspaceContext.structure.ownerContentType(),
+				workspaceContext.structure.ownerContentType,
 				async (mediaType) => {
 					if (!mediaType || !mediaType.collection) return;
 

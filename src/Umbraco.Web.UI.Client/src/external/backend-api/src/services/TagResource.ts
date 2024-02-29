@@ -3,10 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { PagedTagResponseModel } from '../models/PagedTagResponseModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class TagResource {
+
     /**
      * @returns PagedTagResponseModel Success
      * @throws ApiError
@@ -39,4 +42,5 @@ export class TagResource {
             },
         });
     }
+
 }

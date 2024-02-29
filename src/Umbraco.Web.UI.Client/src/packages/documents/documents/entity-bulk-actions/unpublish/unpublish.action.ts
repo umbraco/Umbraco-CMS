@@ -23,6 +23,8 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 		const options: UmbDocumentVariantOptionModel[] = (languageData?.items ?? []).map((language) => ({
 			language,
 			unique: new UmbVariantId(language.unique, null).toString(),
+			culture: language.unique,
+			segment: null,
 		}));
 
 		const selectedVariants = await umbPickDocumentVariantModal(this, { type: 'unpublish', options });
