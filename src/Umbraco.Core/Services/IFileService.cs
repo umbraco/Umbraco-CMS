@@ -8,9 +8,6 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IFileService : IService
 {
-    [Obsolete("Please use SnippetCollection.GetPartialViewSnippetNames() instead. Scheduled for removal in V12.")]
-    IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
-
     [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     void CreatePartialViewFolder(string folderPath);
 

@@ -34,8 +34,4 @@
       <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Macros\MacroRenderer.cs" />
-  </ItemGroup>
 </Project>

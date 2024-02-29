@@ -583,26 +583,6 @@ public class FileService : RepositoryService, IFileService
 
     #region Partial Views
 
-    [Obsolete("Please use IPartialViewService for partial view operations - will be removed in Umbraco 15")]
-    public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
-    {
-        var snippetProvider =
-            new EmbeddedFileProvider(GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
-
-        var files = snippetProvider.GetDirectoryContents(string.Empty)
-            .Where(x => !x.IsDirectory && x.Name.EndsWith(".cshtml"))
-            .Select(x => Path.GetFileNameWithoutExtension(x.Name))
-            .Except(filterNames, StringComparer.InvariantCultureIgnoreCase)
-            .ToArray();
-
-        // Ensure the ones that are called 'Empty' are at the top
-        var empty = files.Where(x => Path.GetFileName(x)?.InvariantStartsWith("Empty") ?? false)
-            .OrderBy(x => x?.Length)
-            .ToArray();
-
-        return empty.Union(files.Except(empty)).WhereNotNull();
-    }
-
     [Obsolete("Please use IPartialViewFolderService for partial view folder operations - will be removed in Umbraco 15")]
     public void DeletePartialViewFolder(string folderPath)
     {
