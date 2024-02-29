@@ -51,7 +51,7 @@ public class UnpublishDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        Attempt<ContentPublishingOperationStatus> attempt = await _contentPublishingService.UnpublishMultipleCulturesAsync(
+        Attempt<ContentPublishingOperationStatus> attempt = await _contentPublishingService.UnpublishAsync(
             id,
             requestModel.Cultures,
             CurrentUserKey(_backOfficeSecurityAccessor));
