@@ -13,6 +13,7 @@ export class UmbIconElement extends UmbLitElement {
 
 	@property({ type: String })
 	public set color(value: string) {
+		if (!value) return;
 		this.#setColorStyle(value);
 	}
 	public get color(): string {
@@ -28,7 +29,7 @@ export class UmbIconElement extends UmbLitElement {
 	@property({ type: String })
 	public set name(value: string | undefined) {
 		const [icon, alias] = value ? value.split(' ') : [];
-		this.#setColorStyle(alias);
+		if (alias) this.#setColorStyle(alias);
 		this._icon = icon;
 	}
 	public get name(): string | undefined {
