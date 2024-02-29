@@ -91,6 +91,14 @@ public abstract class DocumentControllerBase : ContentControllerBase
                 .WithTitle("Culture missing")
                 .WithDetail("A culture needs to be specified to execute the operation.")
                 .Build()),
+            ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot publish invariant when variant")
+                .WithDetail("Cannot publish invariant culture when the document varies by culture.")
+                .Build()),
+            ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant => BadRequest(problemDetailsBuilder
+                .WithTitle("Cannot publish variant when not variant.")
+                .WithDetail("Cannot publish a given culture when the document is invariant.")
+                .Build()),
             ContentPublishingOperationStatus.ConcurrencyViolation => BadRequest(problemDetailsBuilder
                 .WithTitle("Concurrency violation detected")
                 .WithDetail("An attempt was made to publish a version older than the latest version.")

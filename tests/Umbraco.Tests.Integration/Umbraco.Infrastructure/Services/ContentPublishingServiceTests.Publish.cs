@@ -145,7 +145,7 @@ public partial class ContentPublishingServiceTests
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langEn.IsoCode));
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
 
-        var unpublishResult = await ContentPublishingService.UnpublishAsync(content.Key, "*", Constants.Security.SuperUserKey);
+        var unpublishResult = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { "*" }, Constants.Security.SuperUserKey);
 
         Assert.IsTrue(unpublishResult.Success);
         Assert.AreEqual(ContentPublishingOperationStatus.Success, unpublishResult.Result);

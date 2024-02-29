@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -39,7 +38,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<ExternalLoginRepository>();
         builder.Services.AddUnique<IExternalLoginWithKeyRepository>(factory => factory.GetRequiredService<ExternalLoginRepository>());
         builder.Services.AddUnique<ILanguageRepository, LanguageRepository>();
-        builder.Services.AddUnique<IMacroRepository, MacroRepository>();
         builder.Services.AddUnique<IMediaRepository, MediaRepository>();
         builder.Services.AddUnique<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
         builder.Services.AddUnique<IMediaTypeRepository, MediaTypeRepository>();
@@ -60,7 +58,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUserGroupRepository, UserGroupRepository>();
         builder.Services.AddUnique<IUserRepository, UserRepository>();
         builder.Services.AddUnique<IConsentRepository, ConsentRepository>();
-        builder.Services.AddUnique<IPartialViewMacroRepository, PartialViewMacroRepository>();
         builder.Services.AddUnique<IPartialViewRepository, PartialViewRepository>();
         builder.Services.AddUnique<IScriptRepository, ScriptRepository>();
         builder.Services.AddUnique<IStylesheetRepository, StylesheetRepository>();

@@ -6,10 +6,5 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public class ValueListConfiguration
 {
     [ConfigurationField("items")]
-    public List<ValueListItem> Items { get; set; } = new();
-
-    public class ValueListItem
-    {
-        public string? Value { get; set; }
-    }
+    public List<string> Items { get; set; } = new();
 }
