@@ -43,11 +43,11 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 	render() {
 		return html`
 			<uui-box headline="Structure">
-				<umb-property-layout alias="Root" label="Allow as Root">
-					<div slot="description">${this.localize.term('contentTypeEditor_allowAsRootDescription')}</div>
+				<umb-property-layout alias="Root" label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}>
+					<div slot="description">${this.localize.term('contentTypeEditor_allowAtRootDescription')}</div>
 					<div slot="editor">
 						<uui-toggle
-							label=${this.localize.term('contentTypeEditor_allowAsRootHeading')}
+							label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}
 							?checked=${this._allowedAsRoot}
 							@change=${(e: CustomEvent) => {
 								this.#workspaceContext?.updateProperty('allowedAsRoot', (e.target as UUIToggleElement).checked);

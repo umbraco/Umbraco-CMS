@@ -1565,8 +1565,8 @@ export default {
 			'Konfigurér indholdet til at blive vist i en sortérbar og søgbar liste;\n      undersider vil ikke blive vist i træet\n    ',
 		allowedTemplatesHeading: 'Tilladte skabeloner',
 		allowedTemplatesDescription: 'Vælg hvilke skabeloner, der er tilladt at bruge på dette indhold.',
-		allowAsRootHeading: 'Tillad på rodniveau',
-		allowAsRootDescription:
+		allowAtRootHeading: 'Tillad på rodniveau',
+		allowAtRootDescription:
 			'Kun dokumenttyper med denne indstilling aktiveret kan oprettes i rodniveau under\n      indhold og mediearkiv.\n    ',
 		childNodesHeading: 'Tilladte typer',
 		childNodesDescription: 'Tillad at oprette indhold af en specifik type under denne.',
