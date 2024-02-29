@@ -1,6 +1,6 @@
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.User;
+namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
 ///     A resource used for the <see cref="UserPermissionHandler" />.

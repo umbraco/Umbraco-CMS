@@ -1,7 +1,7 @@
 using System.Security.Principal;
 using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization;
+namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
 ///     Utility class for working with policy authorizers.

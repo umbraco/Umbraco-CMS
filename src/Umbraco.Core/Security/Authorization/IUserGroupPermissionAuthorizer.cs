@@ -1,7 +1,7 @@
-using System.Security.Principal;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
+namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
 ///     Authorizes user group access.
@@ -11,17 +11,17 @@ public interface IUserGroupPermissionAuthorizer
     /// <summary>
     ///     Authorizes whether the current user has access to the specified user group.
     /// </summary>
-    /// <param name="currentUser">The current user's principal.</param>
+    /// <param name="currentUser">The current user.</param>
     /// <param name="userGroupKey">The key of the user group to check against.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsDeniedAsync(IPrincipal currentUser, Guid userGroupKey)
+    Task<bool> IsDeniedAsync(IUser currentUser, Guid userGroupKey)
         => IsDeniedAsync(currentUser, userGroupKey.Yield());
 
     /// <summary>
     ///     Authorizes whether the current user has access to the specified user group(s).
     /// </summary>
-    /// <param name="currentUser">The current user's principal.</param>
+    /// <param name="currentUser">The current user.</param>
     /// <param name="userGroupKeys">The keys of the user groups to check against.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsDeniedAsync(IPrincipal currentUser, IEnumerable<Guid> userGroupKeys);
+    Task<bool> IsDeniedAsync(IUser currentUser, IEnumerable<Guid> userGroupKeys);
 }

@@ -1,6 +1,6 @@
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Media;
+namespace Umbraco.Cms.Core.Security.Authorization;
 
 /// <summary>
 ///     A resource used for the <see cref="MediaPermissionHandler" />.
@@ -31,8 +31,9 @@ public class MediaPermissionResource : IPermissionResource
     /// <returns>An instance of <see cref="MediaPermissionResource" />.</returns>
     public static MediaPermissionResource WithKeys(IEnumerable<Guid?> mediaKeys)
     {
-        var hasRoot = mediaKeys.Any(x => x is null);
-        IEnumerable<Guid> keys = mediaKeys.Where(x => x.HasValue).Select(x => x!.Value);
+        IEnumerable<Guid?> mediaKeysList = mediaKeys.ToList();
+        var hasRoot = mediaKeysList.Any(x => x is null);
+        IEnumerable<Guid> keys = mediaKeysList.Where(x => x.HasValue).Select(x => x!.Value);
         return new MediaPermissionResource(keys, hasRoot, false);
     }
 
@@ -42,21 +43,21 @@ public class MediaPermissionResource : IPermissionResource
     /// <param name="mediaKeys">The keys of the medias.</param>
     /// <returns>An instance of <see cref="MediaPermissionResource" />.</returns>
     public static MediaPermissionResource WithKeys(IEnumerable<Guid> mediaKeys) =>
-        new MediaPermissionResource(mediaKeys, false, false);
+        new(mediaKeys, false, false);
 
     /// <summary>
     ///     Creates a <see cref="MediaPermissionResource" /> with the root.
     /// </summary>
     /// <returns>An instance of <see cref="MediaPermissionResource" />.</returns>
     public static MediaPermissionResource Root() =>
-        new MediaPermissionResource(Enumerable.Empty<Guid>(), true, false);
+        new(Enumerable.Empty<Guid>(), true, false);
 
     /// <summary>
     ///     Creates a <see cref="MediaPermissionResource" /> with the recycle bin.
     /// </summary>
     /// <returns>An instance of <see cref="MediaPermissionResource" />.</returns>
     public static MediaPermissionResource RecycleBin() =>
-        new MediaPermissionResource(Enumerable.Empty<Guid>(), false, true);
+        new(Enumerable.Empty<Guid>(), false, true);
 
     private MediaPermissionResource(IEnumerable<Guid> mediaKeys, bool checkRoot, bool checkRecycleBin)
     {
