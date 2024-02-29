@@ -315,7 +315,7 @@ test.describe('Document Type tests', () => {
     // Act
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
-    await umbracoUi.documentType.clickDocumentTypeStructureTab();
+    await umbracoUi.documentType.clickStructureTab();
     await umbracoUi.documentType.clickAllowAsRootButton();
     await umbracoUi.documentType.clickSaveButton();
 
@@ -333,7 +333,7 @@ test.describe('Document Type tests', () => {
     // Act
     await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.documentType.goToDocumentType(documentTypeName);
-    await umbracoUi.documentType.clickDocumentTypeStructureTab();
+    await umbracoUi.documentType.clickStructureTab();
     await umbracoUi.documentType.clickChooseButton()
     await umbracoUi.documentType.clickButtonWithName(documentTypeName);
     await umbracoUi.documentType.clickFilterChooseButton();

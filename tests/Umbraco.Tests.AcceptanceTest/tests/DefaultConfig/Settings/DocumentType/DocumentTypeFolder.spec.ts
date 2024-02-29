@@ -54,7 +54,7 @@ test.describe('Document Type Folder tests', () => {
     await umbracoUi.documentType.clickRootFolderCaretButton();
     await umbracoUi.documentType.clickActionsMenuForName(oldFolderName);
 
-    await umbracoUi.documentType.clickRenameFolderButton();
+    await umbracoUi.documentType.clickRenameFolderThreeDotsButton();
     await umbracoUi.documentType.enterFolderName(documentFolderName);
     await umbracoUi.documentType.clickUpdateFolderButton();
 
