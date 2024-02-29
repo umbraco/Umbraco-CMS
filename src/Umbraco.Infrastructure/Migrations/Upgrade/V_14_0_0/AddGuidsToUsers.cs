@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_0_0;
 /// This is an unscoped migration to support migrating sqlite, since it doesn't support adding columns.
 /// See <see cref="AddGuidsToUserGroups"/> for more information.
 /// </summary>
-public class AddGuidsToUsers : UnscopedMigrationBase
+internal class AddGuidsToUsers : UnscopedMigrationBase
 {
     private const string NewColumnName = "key";
     private readonly IScopeProvider _scopeProvider;

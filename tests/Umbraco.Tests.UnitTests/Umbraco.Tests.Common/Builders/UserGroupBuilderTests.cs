@@ -20,7 +20,7 @@ public class UserGroupBuilderTests
         const string testName = "Test";
         const int testUserCount = 11;
         const string testIcon = "icon";
-        const string testPermissions = "abc";
+        ISet<string> testPermissions = "abc".Select(x=>x.ToString()).ToHashSet();
         const int testStartContentId = 3;
         const int testStartMediaId = 8;
 
@@ -44,7 +44,7 @@ public class UserGroupBuilderTests
         Assert.AreEqual(testName, userGroup.Name);
         Assert.AreEqual(testUserCount, userGroup.UserCount);
         Assert.AreEqual(testIcon, userGroup.Icon);
-        Assert.AreEqual(testPermissions.Length, userGroup.Permissions.Count());
+        Assert.AreEqual(testPermissions.Count, userGroup.Permissions.Count());
         Assert.AreEqual(testStartContentId, userGroup.StartContentId);
         Assert.AreEqual(testStartMediaId, userGroup.StartMediaId);
     }

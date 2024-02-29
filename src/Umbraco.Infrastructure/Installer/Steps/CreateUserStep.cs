@@ -1,7 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.Data.Common;
 using System.Text;
-using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -10,6 +9,7 @@ using Umbraco.Cms.Core.Installer;
 using Umbraco.Cms.Core.Models.Installer;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -31,6 +31,7 @@ public class CreateUserStep : StepBase, IInstallStep
     private readonly IBackOfficeUserManager _userManager;
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
     private readonly IMetricsConsentService _metricsConsentService;
+    private readonly IJsonSerializer _jsonSerializer;
 
     public CreateUserStep(
         IUserService userService,
@@ -41,7 +42,8 @@ public class CreateUserStep : StepBase, IInstallStep
         ICookieManager cookieManager,
         IBackOfficeUserManager userManager,
         IDbProviderFactoryCreator dbProviderFactoryCreator,
-        IMetricsConsentService metricsConsentService)
+        IMetricsConsentService metricsConsentService,
+        IJsonSerializer jsonSerializer)
     {
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
@@ -52,6 +54,7 @@ public class CreateUserStep : StepBase, IInstallStep
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
         _metricsConsentService = metricsConsentService;
+        _jsonSerializer = jsonSerializer;
     }
 
     public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
@@ -94,7 +97,7 @@ public class CreateUserStep : StepBase, IInstallStep
             if (model.User.SubscribeToNewsletter)
             {
                 var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
-                var content = new StringContent(JsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
+                var content = new StringContent(_jsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
 
                 HttpClient httpClient = _httpClientFactory.CreateClient();
 

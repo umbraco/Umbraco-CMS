@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
+﻿using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Permissions;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
 /// <summary>
 /// <para>
@@ -68,7 +70,8 @@ public class UserGroupBase
     public bool MediaRootAccess { get; init; }
 
     /// <summary>
-    /// Ad-hoc list of permissions provided, and maintained by the front-end. The server has no concept of what these mean.
+    /// List of permissions provided, and maintained by the front-end. The server has no concept all of them, but some can be used on the server.
     /// </summary>
-    public required ISet<string> Permissions { get; init; }
+    public required ISet<string> FallbackPermissions { get; init; }
+    public required ISet<IPermissionPresentationModel> Permissions { get; init; }
 }
