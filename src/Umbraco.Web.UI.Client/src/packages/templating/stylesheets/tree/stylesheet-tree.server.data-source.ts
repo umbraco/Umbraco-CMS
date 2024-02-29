@@ -4,11 +4,8 @@ import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/serve
 import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { StylesheetResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UmbTreeChildrenOfRequestArgs,
-	UmbTreeRootItemsRequestArgs,
-	UmbTreeServerDataSourceBase,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Stylesheet tree that fetches data from the server
