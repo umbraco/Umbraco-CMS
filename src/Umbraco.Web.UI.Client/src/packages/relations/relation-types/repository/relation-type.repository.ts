@@ -4,7 +4,7 @@ import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.
 import type { UmbRelationTypeStore } from './relation-type.store.js';
 import { UMB_RELATION_TYPE_STORE_CONTEXT } from './relation-type.store.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	CreateRelationTypeRequestModel,
 	UpdateRelationTypeRequestModel,
@@ -13,7 +13,7 @@ import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notificatio
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbRelationTypeRepository extends UmbBaseController implements UmbApi {
+export class UmbRelationTypeRepository extends UmbControllerBase implements UmbApi {
 	#init!: Promise<unknown>;
 
 	#treeStore?: UmbRelationTypeTreeStore;

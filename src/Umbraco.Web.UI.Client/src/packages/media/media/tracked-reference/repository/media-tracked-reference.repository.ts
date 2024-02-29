@@ -1,8 +1,8 @@
 import { UmbMediaTrackedReferenceServerDataSource } from './media-tracked-reference.server.data.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbMediaTrackedReferenceRepository extends UmbBaseController {
+export class UmbMediaTrackedReferenceRepository extends UmbControllerBase {
 	#trackedReferenceSource: UmbMediaTrackedReferenceServerDataSource;
 
 	constructor(host: UmbControllerHostElement) {
