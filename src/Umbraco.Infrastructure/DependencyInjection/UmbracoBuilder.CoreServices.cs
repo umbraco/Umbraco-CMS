@@ -105,8 +105,7 @@ public static partial class UmbracoBuilderExtensions
             .AddRepositories()
             .AddServices()
             .AddCoreMappingProfiles()
-            .AddFileSystems()
-            .AddWebAssets();
+            .AddFileSystems();
 
         // register persistence mappers - required by database factory so needs to be done here
         // means the only place the collection can be modified is in a runtime - afterwards it
@@ -125,8 +124,8 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
-        builder.Services.AddSingleton<IJsonSerializer, ContextualJsonSerializer>();
-        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ContextualConfigurationEditorJsonSerializer>();
+        builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
+        builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, SystemTextConfigurationEditorJsonSerializer>();
         builder.Services.AddSingleton<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
 
         // register database builder
@@ -134,13 +133,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<DatabaseBuilder>();
 
         // register manifest parser, will be injected in collection builders where needed
-        builder.Services.AddSingleton<ILegacyManifestParser, LegacyManifestParser>();
         builder.Services.AddSingleton<IPackageManifestReader, BackOfficePackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestReader, AppPluginsPackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestService, PackageManifestService>();
-
-        // register the manifest filter collection builder (collection is empty by default)
-        builder.ManifestFilters();
 
         builder.MediaUrlGenerators()
             .Add<FileUploadPropertyEditor>()
@@ -255,21 +250,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
-
-        return builder;
-    }
-
-    public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
-        builder.Services.AddSingleton<ILogLevelLoader, LogLevelLoader>();
-        builder.SetLogViewer<SerilogJsonLogViewer>();
-        builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(
-            factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
-            factory.GetRequiredService<ILogViewerConfig>(),
-            factory.GetRequiredService<ILoggingConfiguration>(),
-            factory.GetRequiredService<ILogLevelLoader>(),
-            Log.Logger));
 
         return builder;
     }

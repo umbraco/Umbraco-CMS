@@ -169,13 +169,18 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return OperationResultToAttempt(content, deleteResult);
     }
 
-    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey)
+    protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey, bool mustBeInRecycleBin = false)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
             return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
+        }
+
+        if (mustBeInRecycleBin && content.Trashed is false)
+        {
+            return await Task.FromResult(Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.NotInTrash, content));
         }
 
         TContentType contentType = ContentTypeService.Get(content.ContentType.Key)!;

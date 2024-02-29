@@ -18,7 +18,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
@@ -37,6 +36,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Services.FileSystem;
+using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -186,14 +186,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<UmbracoRequestPaths>();
 
-            Services.AddSingleton<InstallStatusTracker>();
-
             Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
             Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
 
             Services.AddSingleton<UriUtility>();
 
-            Services.AddUnique<IDashboardService, DashboardService>();
             Services.AddSingleton<IMetricsConsentService, MetricsConsentService>();
 
             // will be injected in controllers when needed to invoke rest endpoints on Our
@@ -217,8 +214,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddUnique<IEventMessagesFactory, DefaultEventMessagesFactory>();
             Services.AddUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
-            Services.AddUnique<ITreeService, TreeService>();
-            Services.AddUnique<ISectionService, SectionService>();
 
             Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
             Services.AddUnique<IEmailSender, NotImplementedEmailSender>();
@@ -371,15 +366,18 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
-            
+
             // Data type configuration cache
             Services.AddUnique<IDataTypeConfigurationCache, DataTypeConfigurationCache>();
             Services.AddNotificationHandler<DataTypeCacheRefresherNotification, DataTypeConfigurationCacheRefresher>();
 
-            //Two factor providers
+            // Two factor providers
             Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
             Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
 
+            // Add Query services
+            Services.AddUnique<IDocumentRecycleBinQueryService, DocumentRecycleBinQueryService>();
+            Services.AddUnique<IMediaRecycleBinQueryService, MediaRecycleBinQueryService>();
         }
     }
 }

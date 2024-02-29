@@ -53,8 +53,9 @@ public interface IDictionaryItemService
     ///     Gets a list of descendants for a <see cref="IDictionaryItem" />
     /// </summary>
     /// <param name="parentId">Id of the parent, null will return all dictionary items</param>
+    /// <param name="filter">An optional filter, which will limit the results to only those dictionary items whose key starts with the filter value.</param>
     /// <returns>An enumerable list of <see cref="IDictionaryItem" /> objects</returns>
-    Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId);
+    Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId, string? filter = null);
 
     /// <summary>
     ///     Gets the root/top <see cref="IDictionaryItem" /> objects

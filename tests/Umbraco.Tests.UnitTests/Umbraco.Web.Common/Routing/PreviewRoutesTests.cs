@@ -1,18 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Controllers.Preview;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 
@@ -42,7 +41,7 @@ public class PreviewRoutesTests
         var endpoints = new TestRouteBuilder();
         routes.CreateRoutes(endpoints);
 
-        Assert.AreEqual(2, endpoints.DataSources.Count);
+        Assert.AreEqual(1, endpoints.DataSources.Count);
         var route = endpoints.DataSources.First();
         Assert.AreEqual(2, route.Endpoints.Count);
 
@@ -50,18 +49,6 @@ public class PreviewRoutesTests
         Assert.AreEqual($"{routes.GetPreviewHubRoute()}/negotiate", endpoint0.RoutePattern.RawText);
         var endpoint1 = (RouteEndpoint)route.Endpoints[1];
         Assert.AreEqual($"{routes.GetPreviewHubRoute()}", endpoint1.RoutePattern.RawText);
-
-        var endpoint3 = (RouteEndpoint)endpoints.DataSources.Last().Endpoints[0];
-        var previewControllerName = ControllerExtensions.GetControllerName<PreviewController>();
-        Assert.AreEqual(
-            $"umbraco/{previewControllerName.ToLowerInvariant()}/{{action}}/{{id?}}",
-            endpoint3.RoutePattern.RawText);
-        Assert.AreEqual(Constants.Web.Mvc.BackOfficeArea, endpoint3.RoutePattern.Defaults["area"]);
-        Assert.AreEqual("Index", endpoint3.RoutePattern.Defaults[ActionToken]);
-        Assert.AreEqual(previewControllerName, endpoint3.RoutePattern.Defaults[ControllerToken]);
-        Assert.AreEqual(
-            endpoint3.RoutePattern.Defaults["area"],
-            typeof(PreviewController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
     }
 
     private PreviewRoutes GetRoutes(RuntimeLevel level)
