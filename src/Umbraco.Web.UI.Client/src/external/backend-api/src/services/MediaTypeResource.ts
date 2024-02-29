@@ -11,6 +11,7 @@ import type { MediaTypeCompositionRequestModel } from '../models/MediaTypeCompos
 import type { MediaTypeCompositionResponseModel } from '../models/MediaTypeCompositionResponseModel';
 import type { MediaTypeItemResponseModel } from '../models/MediaTypeItemResponseModel';
 import type { MediaTypeResponseModel } from '../models/MediaTypeResponseModel';
+import type { MediaTypeTreeItemResponseModel } from '../models/MediaTypeTreeItemResponseModel';
 import type { MoveMediaTypeRequestModel } from '../models/MoveMediaTypeRequestModel';
 import type { PagedAllowedMediaTypeModel } from '../models/PagedAllowedMediaTypeModel';
 import type { PagedMediaTypeTreeItemResponseModel } from '../models/PagedMediaTypeTreeItemResponseModel';
@@ -386,6 +387,27 @@ export class MediaTypeResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeMediaTypeAncestors({
+        descendantId,
+    }: {
+        descendantId?: string,
+    }): CancelablePromise<Array<MediaTypeTreeItemResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/media-type/ancestors',
+            query: {
+                'descendantId': descendantId,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
