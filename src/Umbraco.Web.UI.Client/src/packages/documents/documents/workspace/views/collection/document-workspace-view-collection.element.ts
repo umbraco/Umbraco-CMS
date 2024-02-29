@@ -31,7 +31,7 @@ export class UmbDocumentWorkspaceViewCollectionElement extends UmbLitElement imp
 				this._documentUnique = unique;
 			});
 			this.observe(
-				workspaceContext.structure.ownerContentType(),
+				workspaceContext.structure.ownerContentType,
 				async (documentType) => {
 					if (!documentType || !documentType.collection) return;
 
