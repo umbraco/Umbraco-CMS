@@ -1,3 +1,4 @@
+import { UMB_WEBHOOK_ENTITY_TYPE } from '../entity.js';
 import { UmbWebhookRepository } from '../repository/webhooks.repository.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
@@ -10,18 +11,12 @@ export class UmbWebhooksWorkspaceContext extends UmbBaseController implements Um
 	#repository;
 
 	getEntityType() {
-		return 'webhooks';
-	}
-
-	getEntityName() {
-		return 'Webhooks';
+		return UMB_WEBHOOK_ENTITY_TYPE;
 	}
 
 	getUnique() {
 		return undefined;
 	}
-
-	currentPage = 1;
 
 	constructor(host: UmbControllerHostElement) {
 		super(host);

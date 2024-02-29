@@ -6,7 +6,7 @@ import { manifests as collectionViewManifests } from './views/manifests.js';
 import { manifests as collectionActionManifests } from './action/manifests.js';
 import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
 
-export const UMB_WEBHOOK_COLLECTION_ALIAS = 'Umb.Collection.Webhook';
+export const UMB_WEBHOOK_COLLECTION_ALIAS = 'Umb.Collection.Webhooks';
 
 const collectionManifest: ManifestCollection = {
 	type: 'collection',

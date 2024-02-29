@@ -16,7 +16,7 @@ const tableCollectionView: ManifestCollectionView = {
 	conditions: [
 		{
 			alias: UMB_COLLECTION_ALIAS_CONDITION,
-			match: 'Umb.Collection.Webhook',
+			match: 'Umb.Collection.Webhooks',
 		},
 	],
 };

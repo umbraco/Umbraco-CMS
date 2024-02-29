@@ -1,8 +1,8 @@
-export const name = 'Umbraco.Core.Webhook';
+export const name = 'Umbraco.Core.Webhooks';
 export const extensions = [
 	{
-		name: 'Webhook Bundle',
-		alias: 'Umb.Bundle.Webhook',
+		name: 'Webhooks Bundle',
+		alias: 'Umb.Bundle.Webhooks',
 		type: 'bundle',
 		js: () => import('./manifests.js'),
 	},
