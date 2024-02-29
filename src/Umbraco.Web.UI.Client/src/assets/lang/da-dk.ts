@@ -1657,7 +1657,7 @@ export default {
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
 		collections: 'Samlinger',
 		collectionsDescription:
-			'Konfigurerer indholdselementet til at vise listen over dets børn, børnene vil ikke blive vist i træet.',
+			'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer, underordnede elementer vil ikke blive vist i træet.',
 	},
 	languages: {
 		addLanguage: 'Tilføj sprog',
