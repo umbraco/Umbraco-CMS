@@ -10,7 +10,6 @@ import {
 	UmbDocumentTypeStructureRepository,
 	type UmbAllowedDocumentTypeModel,
 } from '@umbraco-cms/backoffice/document-type';
-import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
@@ -65,10 +64,8 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 			<umb-body-layout headline=${this._headline ?? ''}>
 				<uui-box>
 					${this._allowedDocumentTypes.length === 0 ? html`<p>No allowed types</p>` : nothing}
-					${this._allowedDocumentTypes.map((documentType) => {
-						const [icon, alias] = documentType.icon ? documentType.icon.split(' ') : [];
-						const color = alias ? extractUmbColorVariable(alias.replace('color-', '')) : undefined;
-						return html`
+					${this._allowedDocumentTypes.map(
+						(documentType) => html`
 							<uui-menu-item
 								data-id=${ifDefined(documentType.unique)}
 								href="${`section/content/workspace/document/create/${this.data?.document?.unique ?? 'null'}/${
@@ -76,16 +73,10 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 								}`}"
 								label="${documentType.name}"
 								@click=${this.#onNavigate}>
-								>
-								${documentType.icon
-									? html`<uui-icon
-											slot="icon"
-											name=${icon}
-											style=${ifDefined(color ? '--uui-icon-color:var(${color})' : undefined)}></uui-icon>`
-									: nothing}
+								> ${documentType.icon ? html`<umb-icon slot="icon" name=${documentType.icon}></umb-icon>` : nothing}
 							</uui-menu-item>
-						`;
-					})}
+						`,
+					)}
 				</uui-box>
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
 			</umb-body-layout>

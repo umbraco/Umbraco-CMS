@@ -63,10 +63,8 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 					${this._allowedMediaTypes.length === 0
 						? html`<umb-localize key="create_noMediaTypes"></umb-localize>`
 						: nothing}
-					${this._allowedMediaTypes.map((mediaType) => {
-						const [icon, alias] = mediaType.icon ? mediaType.icon.split(' ') : [];
-						const color = alias ? extractUmbColorVariable(alias.replace('color-', '')) : undefined;
-						return html`
+					${this._allowedMediaTypes.map(
+						(mediaType) => html`
 							<uui-menu-item
 								data-id=${ifDefined(mediaType.unique)}
 								href="${`section/media/workspace/media/create/${this.data?.media?.unique ?? 'null'}/${
@@ -74,16 +72,10 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 								}`}"
 								label="${mediaType.name}"
 								@click=${this.#onNavigate}>
-								>
-								${mediaType.icon
-									? html`<uui-icon
-											slot="icon"
-											name=${icon}
-											style=${ifDefined(color ? '--uui-icon-color:var(${color})' : undefined)}></uui-icon>`
-									: nothing}
+								> ${mediaType.icon ? html`<umb-icon slot="icon" name=${mediaType.icon}></umb-icon>` : nothing}
 							</uui-menu-item>
-						`;
-					})}
+						`,
+					)}
 				</uui-box>
 				<uui-button
 					slot="actions"

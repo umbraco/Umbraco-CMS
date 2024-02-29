@@ -7,7 +7,7 @@ import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
+
 @customElement('umb-media-type-workspace-editor')
 export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
@@ -21,9 +21,6 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _icon?: string;
-
-	@state()
-	private _iconColorAlias?: string;
 
 	#workspaceContext?: UmbMediaTypeWorkspaceContext;
 
@@ -46,15 +43,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
-		this.observe(
-			this.#workspaceContext.icon,
-			(icon) => {
-				const [name, color] = icon ? icon.split(' ') : [];
-				this._icon = name;
-				this._iconColorAlias = color?.replace('color-', '');
-			},
-			'_observeIcon',
-		);
+		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
 
 		this.observe(
 			this.#workspaceContext.isNew,
@@ -107,10 +96,13 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
+		const [alias, color] = this._icon?.replace('color-', '')?.split(' ') ?? [];
+
+		console.log(alias, color);
 		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
 			value: {
-				icon: this._icon,
-				color: this._iconColorAlias,
+				icon: alias,
+				color: color,
 			},
 		});
 
@@ -125,11 +117,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		return html`<umb-workspace-editor alias="Umb.Workspace.MediaType">
 			<div id="header" slot="header">
 				<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
-					${this._iconColorAlias
-						? html`<uui-icon
-								name="${ifDefined(this._icon)}"
-								style="--uui-icon-color: var(${extractUmbColorVariable(this._iconColorAlias)})"></uui-icon>`
-						: html`<uui-icon name="${ifDefined(this._icon)}"></uui-icon>`}
+					<umb-icon name=${ifDefined(this._icon)}></umb-icon>
 				</uui-button>
 
 				<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name">

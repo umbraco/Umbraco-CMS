@@ -6,7 +6,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_ICON_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 @customElement('umb-document-type-workspace-editor')
 export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
@@ -20,9 +19,6 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	private _icon?: string;
-
-	@state()
-	private _iconColorAlias?: string;
 
 	#workspaceContext?: typeof UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT.TYPE;
 
@@ -45,15 +41,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 		if (!this.#workspaceContext) return;
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeName');
 		this.observe(this.#workspaceContext.alias, (alias) => (this._alias = alias), '_observeAlias');
-		this.observe(
-			this.#workspaceContext.icon,
-			(icon) => {
-				const [name, color] = icon ? icon.split(' ') : [];
-				this._icon = name;
-				this._iconColorAlias = color?.replace('color-', '');
-			},
-			'_observeIcon',
-		);
+		this.observe(this.#workspaceContext.icon, (icon) => (this._icon = icon), '_observeIcon');
 
 		this.observe(
 			this.#workspaceContext.isNew,
@@ -106,10 +94,11 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
+		const [alias, color] = this._icon?.replace('color-', '')?.split(' ') ?? [];
 		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
 			value: {
-				icon: this._icon,
-				color: this._iconColorAlias,
+				icon: alias,
+				color: color,
 			},
 		});
 
@@ -124,11 +113,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			<umb-workspace-editor alias="Umb.Workspace.DocumentType">
 				<div id="header" slot="header">
 					<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
-						${this._iconColorAlias
-							? html`<uui-icon
-									name="${ifDefined(this._icon)}"
-									style="--uui-icon-color: var(${extractUmbColorVariable(this._iconColorAlias)})"></uui-icon>`
-							: html`<uui-icon name="${ifDefined(this._icon)}"></uui-icon>`}
+						<umb-icon name=${ifDefined(this._icon)}></umb-icon>
 					</uui-button>
 
 					<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name">

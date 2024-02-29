@@ -3,13 +3,12 @@ import type {
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue,
 } from './composition-picker-modal.token.js';
-import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type {
 	UmbDocumentTypeCompositionCompatibleModel,
 	UmbDocumentTypeCompositionReferenceModel,
 } from '@umbraco-cms/backoffice/document-type';
-import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 
 interface CompatibleCompositions {
 	path: string;
@@ -109,19 +108,12 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				${repeat(
 					this._references,
 					(item) => item.unique,
-					(item) => {
-						const [icon, color] = item.icon ? item.icon.split(' ') : [];
-						const variable = extractUmbColorVariable(color?.replace('color-', ''));
-						console.log(icon, color);
-						return html`<uui-ref-node-document-type
+					(item) =>
+						html`<uui-ref-node-document-type
 							href=${'/section/settings/workspace/document-type/edit/' + item.unique}
 							name=${item.name}>
-							<uui-icon
-								slot="icon"
-								name=${icon}
-								style=${ifDefined(variable ? `--uui-icon-color:var(${variable})` : undefined)}></uui-icon>
-						</uui-ref-node-document-type>`;
-					},
+							<umb-icon slot="icon" name=${item.icon}></umb-icon>
+						</uui-ref-node-document-type>`,
 				)}
 			</div>`;
 	}
@@ -142,7 +134,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 						(folder) => folder.path,
 						(folder) =>
 							html`${this._compatibleCompositions!.length > 1
-								? html`<strong><uui-icon name="icon-folder"></uui-icon>${folder.path}</strong>`
+								? html`<strong><umb-icon name="icon-folder"></umb-icon>${folder.path}</strong>`
 								: nothing}
 							${this.#renderCompositionsItems(folder.compositions)}`,
 					)}
@@ -175,7 +167,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 					@selected=${() => this.#onSelectionAdd(compositions.unique)}
 					@deselected=${() => this.#onSelectionRemove(compositions.unique)}
 					?selected=${this._selection.find((unique) => unique === compositions.unique)}>
-					<uui-icon name=${compositions.icon} slot="icon"></uui-icon>
+					<umb-icon name=${compositions.icon} slot="icon"></umb-icon>
 				</uui-menu-item>`,
 		);
 	}

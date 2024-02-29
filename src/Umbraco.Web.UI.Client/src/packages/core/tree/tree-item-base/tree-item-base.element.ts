@@ -1,4 +1,3 @@
-import { extractUmbColorVariable } from '../../resources/extractUmbColorVariable.function.js';
 import type { UmbTreeItemContext } from '../tree-item-default/index.js';
 import type { UmbTreeItemModelBase } from '../types.js';
 import { UMB_TREE_ITEM_CONTEXT } from './tree-item-base.context.js';
@@ -127,21 +126,15 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		const icon = this._item?.icon;
 		const isFolder = this._item?.isFolder;
 
-		const [name, color] = icon ? icon.split(' ') : [];
-		if (name && color) {
-			const variable = extractUmbColorVariable(color.replace('color-', ''));
-			return html`<uui-icon slot="icon" name="${name}" style="--uui-icon-color: var(${variable})"></uui-icon>`;
-		}
-
 		if (icon) {
-			return html`<uui-icon slot="icon" name="${icon}"></uui-icon>`;
+			return html`<umb-icon slot="icon" name="${icon}"></umb-icon>`;
 		}
 
 		if (isFolder) {
-			return html`<uui-icon slot="icon" name="icon-folder"></uui-icon>`;
+			return html`<umb-icon slot="icon" name="icon-folder"></umb-icon>`;
 		}
 
-		return html`<uui-icon slot="icon" name="icon-circle-dotted"></uui-icon>`;
+		return html`<umb-icon slot="icon" name="icon-circle-dotted"></umb-icon>`;
 	}
 
 	#renderLabel() {
