@@ -13,24 +13,29 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
         _contentPermissionService = contentPermissionService;
 
     /// <inheritdoc/>
-    public async Task<bool> IsDeniedAsync(IUser currentUser, IEnumerable<Guid> contentKeys,
+    public async Task<bool> IsDeniedAsync(
+        IUser currentUser,
+        IEnumerable<Guid> contentKeys,
         ISet<string> permissionsToCheck)
     {
-        if (!contentKeys.Any())
+        var contentKeyList = contentKeys.ToList();
+        if (contentKeyList.Count == 0)
         {
             // Must succeed this requirement since we cannot process it.
             return true;
         }
 
         ContentAuthorizationStatus result =
-            await _contentPermissionService.AuthorizeAccessAsync(currentUser, contentKeys, permissionsToCheck);
+            await _contentPermissionService.AuthorizeAccessAsync(currentUser, contentKeyList, permissionsToCheck);
 
         // If we can't find the content item(s) then we can't determine whether you are denied access.
         return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsDeniedWithDescendantsAsync(IUser currentUser, Guid parentKey,
+    public async Task<bool> IsDeniedWithDescendantsAsync(
+        IUser currentUser,
+        Guid parentKey,
         ISet<string> permissionsToCheck)
     {
         ContentAuthorizationStatus result =
