@@ -42,11 +42,6 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		});
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this.#actionsInitializer?.destroy();
-	}
-
 	#initialise() {
 		if (!this.#workspaceContext) throw new Error('No workspace context');
 
