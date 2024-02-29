@@ -111,10 +111,6 @@ export class UmbMediaTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ collection });
 	}
 
-	updateProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
-		this.structure.updateOwnerContentType({ [propertyName]: value });
-	}
-
 	async create(parentId: string | null) {
 		this.resetState();
 		const { data } = await this.structure.createScaffold(parentId);
