@@ -32,7 +32,7 @@ export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTree
 			<span id="icon-container" slot="icon">
 				${this.item?.documentType.icon
 					? html`
-							<uui-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></uui-icon>
+							<umb-icon id="icon" slot="icon" name="${this.item.documentType.icon}"></umb-icon>
 							<span id="status-symbol"></span>
 					  `
 					: nothing}

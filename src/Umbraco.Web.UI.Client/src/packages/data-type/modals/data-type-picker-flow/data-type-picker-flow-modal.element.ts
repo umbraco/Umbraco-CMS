@@ -260,7 +260,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 									label="${propertyEditorUI.meta.label || propertyEditorUI.name}"
 									href=${this._dataTypePickerModalRouteBuilder!({ uiAlias: propertyEditorUI.alias })}>
 									<div class="item-content">
-										<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
+										<umb-icon name="${propertyEditorUI.meta.icon}" class="icon"></umb-icon>
 										${propertyEditorUI.meta.label || propertyEditorUI.name}
 									</div>
 								</uui-button>

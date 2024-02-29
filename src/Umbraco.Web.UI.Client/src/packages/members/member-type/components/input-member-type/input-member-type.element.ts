@@ -148,7 +148,7 @@ export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
 
 	#renderIcon(item: MemberTypeItemResponseModel) {
 		if (!item.icon) return;
-		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
+		return html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`;
 	}
 
 	static styles = [

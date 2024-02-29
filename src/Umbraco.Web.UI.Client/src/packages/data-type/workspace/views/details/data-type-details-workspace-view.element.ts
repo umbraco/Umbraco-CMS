@@ -84,7 +84,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 								property-editor-schema-alias=${this._propertyEditorSchemaAlias}
 								standalone>
 								${this._propertyEditorUiIcon
-									? html` <uui-icon name="${this._propertyEditorUiIcon}" slot="icon"></uui-icon> `
+									? html` <umb-icon name="${this._propertyEditorUiIcon}" slot="icon"></umb-icon> `
 									: ''}
 								<uui-action-bar slot="actions">
 									<uui-button label="Change" @click=${this.#openPropertyEditorUIPicker}></uui-button>

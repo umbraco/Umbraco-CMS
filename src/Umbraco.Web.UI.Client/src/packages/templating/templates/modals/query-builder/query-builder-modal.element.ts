@@ -252,7 +252,7 @@ export default class UmbTemplateQueryBuilderModalElement extends UmbModalBaseEle
 								${this._templateQuery?.executionTime ?? 0} ms
 							</span>
 							${this._templateQuery?.sampleResults.map(
-								(sample) => html`<span><uui-icon name=${sample.icon}></uui-icon>${sample.name}</span>`,
+								(sample) => html`<span><umb-icon name=${sample.icon}></umb-icon>${sample.name}</span>`,
 							) ?? ''}
 						</div>
 						<umb-code-block language="C#" copy>${this._templateQuery?.queryExpression ?? ''}</umb-code-block>

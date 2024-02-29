@@ -98,7 +98,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 						version="${ifDefined(this.version ?? undefined)}"
 						@open=${this._onConfigure}
 						?disabled="${!this._packageView}">
-						${this.customIcon ? html`<uui-icon slot="icon" name="${this.customIcon}"></uui-icon>` : nothing}
+						${this.customIcon ? html`<umb-icon slot="icon" name="${this.customIcon}"></umb-icon>` : nothing}
 						<div slot="tag">
 							${this.hasPendingMigrations
 								? html`<uui-button
