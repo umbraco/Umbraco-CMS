@@ -280,7 +280,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
         {
             if (validCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
             {
-                return Attempt.Fail(ContentPublishingOperationStatus.CultureMissing);
+                return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
             }
 
             PublishResult result = _contentService.Unpublish(content, culture, userId);
