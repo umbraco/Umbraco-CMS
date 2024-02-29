@@ -1,27 +1,11 @@
-import type {
-	ManifestWorkspace,
-	ManifestWorkspaceAction,
-	ManifestWorkspaceView,
-} from '@umbraco-cms/backoffice/extension-registry';
-
-const workspaceAlias = 'Umb.Workspace.Webhooks';
-
-const workspace: ManifestWorkspace = {
-	type: 'workspace',
-	alias: workspaceAlias,
-	name: 'Webhook Root Workspace',
-	js: () => import('./webhook-root-workspace.element.js'),
-	meta: {
-		entityType: 'webhooks',
-	},
-};
+import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Webhooks.Overview',
 		name: 'Webhooks Root Workspace Overview View',
-		js: () => import('../views/overview/index.js'),
+		js: () => import('./views/index.js'),
 		weight: 300,
 		meta: {
 			label: 'Overview',
@@ -31,7 +15,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: 'Umb.Workspace.Webhooks',
 			},
 		],
 	},
@@ -55,6 +39,4 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},*/
 ];
 
-const workspaceActions: Array<ManifestWorkspaceAction> = [];
-
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+export const manifests = [...workspaceViews];
