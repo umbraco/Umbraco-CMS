@@ -1,10 +1,10 @@
-import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../block-type/index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '../index.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 
 export const UMB_BLOCK_GRID_TYPE = 'block-grid-type';
 
 // Configuration models:
-export interface UmbBlockGridTypeModel extends UmbBlockTypeBaseModel {
+export interface UmbBlockGridTypeModel extends UmbBlockTypeWithGroupKey {
 	columnSpanOptions: Array<UmbBlockGridTypeColumnSpanOption>;
 	allowAtRoot: boolean;
 	allowInAreas: boolean;
@@ -13,6 +13,7 @@ export interface UmbBlockGridTypeModel extends UmbBlockTypeBaseModel {
 	thumbnail?: string;
 	areaGridColumns?: number;
 	areas: Array<UmbBlockGridTypeAreaType>;
+	inlineEditing?: boolean;
 }
 
 export type UmbBlockGridTypeColumnSpanOption = {
@@ -39,10 +40,6 @@ export interface UmbBlockGridTypeAreaTypePermission {
 export interface UmbBlockGridTypeGroupType {
 	name: string;
 	key: string;
-}
-
-export interface UmbBlockGridGroupTypeConfiguration extends Partial<UmbBlockGridTypeGroupType> {
-	blocks: Array<UmbBlockTypeWithGroupKey>;
 }
 
 // Content models:

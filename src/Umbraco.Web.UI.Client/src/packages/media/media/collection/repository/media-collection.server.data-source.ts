@@ -2,7 +2,7 @@ import type { UmbMediaCollectionFilterModel, UmbMediaCollectionItemModel } from 
 import { DirectionModel, MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { MediaCollectionResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSource<UmbMediaCollectionItemModel> {
@@ -13,10 +13,6 @@ export class UmbMediaCollectionServerDataSource implements UmbCollectionDataSour
 	}
 
 	async getCollection(query: UmbMediaCollectionFilterModel) {
-		// if (!query.dataTypeId) {
-		// 	throw new Error('Data type ID is required to fetch a collection.');
-		// }
-
 		const params = {
 			id: query.unique ?? '',
 			dataTypeId: query.dataTypeId,

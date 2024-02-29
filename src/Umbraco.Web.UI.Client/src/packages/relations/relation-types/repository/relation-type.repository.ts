@@ -163,3 +163,5 @@ export class UmbRelationTypeRepository extends UmbBaseController implements UmbA
 		return { error };
 	}
 }
+
+export default UmbRelationTypeRepository;

@@ -6,9 +6,9 @@ import type { UmbControllerHost } from './controller-host.interface.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('test-my-controller-host')
-export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
+class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-export class UmbTestControllerImplementation extends UmbControllerHostMixin(class {}) {
+class UmbTestControllerImplementation extends UmbControllerHostMixin(class {}) {
 	testIsConnected = false;
 	testIsDestroyed = false;
 
@@ -47,9 +47,7 @@ export class UmbTestControllerImplementation extends UmbControllerHostMixin(clas
 }
 
 describe('UmbController', () => {
-	type NewType = UmbControllerHostElement;
-
-	let hostElement: NewType;
+	let hostElement: UmbControllerHostElement;
 
 	beforeEach(() => {
 		hostElement = document.createElement('test-my-controller-host') as UmbControllerHostElement;

@@ -1,16 +1,20 @@
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
+import type { UmbBlockWorkspaceData } from '../workspace/index.js';
+import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
-import type { UmbBlockTypeBaseModel, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
-import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+
+function buildUdi(entityType: string, guid: string) {
+	return `umb://${entityType}/${guid.replace(/-/g, '')}`;
+}
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -97,26 +101,29 @@ export abstract class UmbBlockManagerContext<
 				'observePropertyVariantId',
 			);
 		});
+
+		this.observe(this.blockTypes, (blockTypes) => {
+			blockTypes.forEach((x) => {
+				this.#ensureContentType(x.contentElementTypeKey);
+				if (x.settingsElementTypeKey) {
+					this.#ensureContentType(x.settingsElementTypeKey);
+				}
+			});
+		});
 	}
 
-	async ensureContentType(unique?: string) {
-		if (!unique) return;
+	async #ensureContentType(unique: string) {
 		if (this.#contentTypes.getValue().find((x) => x.unique === unique)) return;
-		const contentType = await this.#loadContentType(unique);
-		return contentType;
-	}
-
-	async #loadContentType(unique?: string) {
-		if (!unique) return {};
 
 		const { data } = await this.#contentTypeRepository.requestByUnique(unique);
-		if (!data) return {};
+		if (!data) {
+			this.#contentTypes.removeOne(unique);
+			return;
+		}
 
 		// We could have used the global store of Document Types, but to ensure we first react ones the latest is loaded then we have our own local store:
-		// TODO: Revisit if this is right to do. Notice this can potentially be proxied to the global store.
+		// TODO: Revisit if this is right to do. Notice this can potentially be proxied to the global store. In that way we do not need to observe and we can just use the global store for data.
 		this.#contentTypes.appendOne(data);
-
-		return data;
 	}
 
 	contentTypeOf(contentTypeKey: string) {
@@ -139,6 +146,13 @@ export abstract class UmbBlockManagerContext<
 	}
 	settingsOf(udi: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
+	}
+
+	getBlockTypeOf(contentTypeKey: string) {
+		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);
+	}
+	getContentOf(contentUdi: string) {
+		return this.#contents.value.find((x) => x.udi === contentUdi);
 	}
 
 	/*setOneLayout(layoutData: BlockLayoutType) {

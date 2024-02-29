@@ -9,3 +9,5 @@ export class UmbRenamePartialViewRepository extends UmbRenameRepositoryBase<UmbP
 		super(host, UmbRenamePartialViewServerDataSource, UMB_PARTIAL_VIEW_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbRenamePartialViewRepository;

@@ -52,6 +52,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			containers: [],
 			allowedContentTypes: [],
 			compositions: [],
+			collection: null,
 		};
 
 		return { data };
@@ -116,6 +117,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 					compositionType: composition.compositionType,
 				};
 			}),
+			collection: data.collection ? { unique: data.collection.id } : null,
 		};
 
 		return { data: memberType };

@@ -5,7 +5,7 @@ export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseM
 export const data: Array<UmbMockLanguageModel> = [
 	{
 		name: 'English',
-		isoCode: 'en',
+		isoCode: 'en-us',
 		isDefault: true,
 		isMandatory: true,
 	},
@@ -14,6 +14,6 @@ export const data: Array<UmbMockLanguageModel> = [
 		isoCode: 'da',
 		isDefault: false,
 		isMandatory: false,
-		fallbackIsoCode: 'en',
+		fallbackIsoCode: 'en-us',
 	},
 ];

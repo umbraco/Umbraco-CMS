@@ -1,3 +1,5 @@
+import { UMB_MEDIA_MENU_ALIAS } from '../menu.manifests.js';
+import { UMB_MEDIA_TREE_ALIAS } from '../tree/index.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {
@@ -8,8 +10,8 @@ const menuItem: ManifestTypes = {
 	weight: 100,
 	meta: {
 		label: 'Media',
-		menus: ['Umb.Menu.Media'],
-		treeAlias: 'Umb.Tree.Media',
+		menus: [UMB_MEDIA_MENU_ALIAS],
+		treeAlias: UMB_MEDIA_TREE_ALIAS,
 		hideTreeRoot: true,
 	},
 };

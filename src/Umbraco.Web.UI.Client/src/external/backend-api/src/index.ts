@@ -76,6 +76,7 @@ export type { CreateTemplateRequestModel } from './models/CreateTemplateRequestM
 export type { CreateUserGroupRequestModel } from './models/CreateUserGroupRequestModel';
 export type { CreateUserRequestModel } from './models/CreateUserRequestModel';
 export type { CreateUserResponseModel } from './models/CreateUserResponseModel';
+export type { CreateWebhookRequestModel } from './models/CreateWebhookRequestModel';
 export type { CultureAndScheduleRequestModel } from './models/CultureAndScheduleRequestModel';
 export type { CultureReponseModel } from './models/CultureReponseModel';
 export type { CurrentUserResponseModel } from './models/CurrentUserResponseModel';
@@ -107,6 +108,7 @@ export type { DocumentCollectionResponseModel } from './models/DocumentCollectio
 export type { DocumentConfigurationResponseModel } from './models/DocumentConfigurationResponseModel';
 export type { DocumentItemResponseModel } from './models/DocumentItemResponseModel';
 export type { DocumentNotificationResponseModel } from './models/DocumentNotificationResponseModel';
+export type { DocumentPermissionPresentationModel } from './models/DocumentPermissionPresentationModel';
 export type { DocumentRecycleBinItemResponseModel } from './models/DocumentRecycleBinItemResponseModel';
 export type { DocumentResponseModel } from './models/DocumentResponseModel';
 export type { DocumentTreeItemResponseModel } from './models/DocumentTreeItemResponseModel';
@@ -364,6 +366,7 @@ export type { TemplateResponseModel } from './models/TemplateResponseModel';
 export type { TemporaryFileResponseModel } from './models/TemporaryFileResponseModel';
 export type { TourStatusModel } from './models/TourStatusModel';
 export type { TreeItemPresentationModel } from './models/TreeItemPresentationModel';
+export type { UnknownTypePermissionPresentationModel } from './models/UnknownTypePermissionPresentationModel';
 export type { UnlockUsersRequestModel } from './models/UnlockUsersRequestModel';
 export type { UnpublishDocumentRequestModel } from './models/UnpublishDocumentRequestModel';
 export type { UpdateContentForDocumentRequestModel } from './models/UpdateContentForDocumentRequestModel';
@@ -399,6 +402,7 @@ export type { UpdateTemplateRequestModel } from './models/UpdateTemplateRequestM
 export type { UpdateUserGroupRequestModel } from './models/UpdateUserGroupRequestModel';
 export type { UpdateUserGroupsOnUserRequestModel } from './models/UpdateUserGroupsOnUserRequestModel';
 export type { UpdateUserRequestModel } from './models/UpdateUserRequestModel';
+export type { UpdateWebhookRequestModel } from './models/UpdateWebhookRequestModel';
 export type { UpgradeSettingsResponseModel } from './models/UpgradeSettingsResponseModel';
 export type { UserConfigurationResponseModel } from './models/UserConfigurationResponseModel';
 export type { UserGroupBaseModel } from './models/UserGroupBaseModel';
@@ -422,6 +426,10 @@ export type { VariantModelBaseModel } from './models/VariantModelBaseModel';
 export type { VariantResponseModelBaseModel } from './models/VariantResponseModelBaseModel';
 export type { VerifyInviteUserRequestModel } from './models/VerifyInviteUserRequestModel';
 export type { VerifyResetPasswordTokenRequestModel } from './models/VerifyResetPasswordTokenRequestModel';
+export type { WebhookEventResponseModel } from './models/WebhookEventResponseModel';
+export type { WebhookItemResponseModel } from './models/WebhookItemResponseModel';
+export type { WebhookModelBaseModel } from './models/WebhookModelBaseModel';
+export type { WebhookResponseModel } from './models/WebhookResponseModel';
 
 export { AuditLogResource } from './services/AuditLogResource';
 export { CultureResource } from './services/CultureResource';
@@ -468,3 +476,4 @@ export { TrackedReferenceResource } from './services/TrackedReferenceResource';
 export { UpgradeResource } from './services/UpgradeResource';
 export { UserResource } from './services/UserResource';
 export { UserGroupResource } from './services/UserGroupResource';
+export { WebhookResource } from './services/WebhookResource';

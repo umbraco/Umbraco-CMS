@@ -1,7 +1,6 @@
 import type { UmbPropertyEditorConfigCollection } from '../../index.js';
 import { UmbPropertyValueChangeEvent } from '../../index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDateElement } from '@umbraco-cms/backoffice/components';
@@ -94,8 +93,6 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 			.offsetTime=${this._offsetTime || false}
 			label="Pick a date or time"></umb-input-date>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIDatePickerElement;

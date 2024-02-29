@@ -65,6 +65,7 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	destroy(): void {
 		this.#host?.removeController(this);
 		this.#hostEl = undefined as any;
+		this.#usedKeys.length = 0;
 	}
 
 	documentUpdate() {

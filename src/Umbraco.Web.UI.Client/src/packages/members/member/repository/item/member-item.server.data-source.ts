@@ -36,7 +36,7 @@ const mapper = (item: MemberItemResponseModel): UmbMemberItemModel => {
 		memberType: {
 			unique: item.memberType.id,
 			icon: item.memberType.icon,
-			hasListView: item.memberType.hasListView,
+			collection: item.memberType.collection ? { unique: item.memberType.collection.id } : null,
 		},
 		variants: item.variants.map((variant) => {
 			return {

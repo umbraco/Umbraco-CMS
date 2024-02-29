@@ -1,7 +1,12 @@
+import {
+	getAccumulatedValueOfIndex,
+	getInterpolatedIndexOfPositionInWeightMap,
+	isWithinRect,
+} from '@umbraco-cms/backoffice/utils';
 import { UmbBlockGridEntriesContext } from '../../context/block-grid-entries.context.js';
 import type { UmbBlockGridEntryElement } from '../block-grid-entry/index.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridLayoutModel } from '@umbraco-cms/backoffice/block-grid';
 import { html, customElement, state, repeat, css, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import '../block-grid-entry/index.js';
@@ -11,51 +16,17 @@ import {
 	type resolveVerticalDirectionArgs,
 } from '@umbraco-cms/backoffice/sorter';
 
-// Utils:
-// TODO: Move these methods into their own files:
-
-function getInterpolatedIndexOfPositionInWeightMap(target: number, weights: Array<number>) {
-	const map = [0];
-	weights.reduce((a, b, i) => {
-		return (map[i + 1] = a + b);
-	}, 0);
-	const foundValue = map.reduce((a, b) => {
-		const aDiff = Math.abs(a - target);
-		const bDiff = Math.abs(b - target);
-
-		if (aDiff === bDiff) {
-			return a < b ? a : b;
-		} else {
-			return bDiff < aDiff ? b : a;
-		}
-	});
-	const foundIndex = map.indexOf(foundValue);
-	const targetDiff = target - foundValue;
-	let interpolatedIndex = foundIndex;
-	if (targetDiff < 0 && foundIndex === 0) {
-		// Don't adjust.
-	} else if (targetDiff > 0 && foundIndex === map.length - 1) {
-		// Don't adjust.
-	} else {
-		const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex - 1];
-		interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : targetDiff / foundInterpolationWeight;
-	}
-	return interpolatedIndex;
-}
-
-function getAccumulatedValueOfIndex(index: number, weights: Array<number>) {
-	const len = Math.min(index, weights.length);
-	let i = 0,
-		calc = 0;
-	while (i < len) {
-		calc += weights[i++];
-	}
-	return calc;
-}
-
+/**
+ * Notice this utility method is not really shareable with others as it also takes areas into account. [NL]
+ */
 function resolveVerticalDirectionAsGrid(
 	args: resolveVerticalDirectionArgs<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>,
 ) {
+	// If this has areas, we do not want to move, unless we are at the edge
+	if (args.relatedModel.areas.length > 0 && isWithinRect(args.pointerX, args.pointerY, args.relatedRect, -10)) {
+		return null;
+	}
+
 	/** We need some data about the grid to figure out if there is room to be placed next to the found element */
 	const approvedContainerComputedStyles = getComputedStyle(args.containerElement);
 	const gridColumnGap = Number(approvedContainerComputedStyles.columnGap.split('px')[0]) || 0;
@@ -140,8 +111,23 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	//
 	#sorter = new UmbSorterController<UmbBlockGridLayoutModel, UmbBlockGridEntryElement>(this, {
 		...SORTER_CONFIG,
+		onStart: () => {
+			this.#context.onDragStart();
+		},
+		onEnd: () => {
+			this.#context.onDragEnd();
+		},
 		onChange: ({ model }) => {
 			this.#context.setLayouts(model);
+		},
+		onRequestMove: ({ item }) => {
+			return this.#context.allowDrop(item.contentUdi);
+		},
+		onDisallowed: () => {
+			this.setAttribute('disallow-drop', '');
+		},
+		onAllowed: () => {
+			this.removeAttribute('disallow-drop');
 		},
 	});
 
@@ -200,7 +186,7 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 	render() {
 		return html`
 			${this._styleElement}
-			<div class="umb-block-grid__layout-container">
+			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
 					(x) => x.contentUdi,
@@ -241,8 +227,28 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
+				position: relative;
 				display: grid;
 				gap: 1px;
+			}
+			:host([disallow-drop])::before {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				inset: 0;
+				border: 2px solid var(--uui-color-danger);
+				border-radius: calc(var(--uui-border-radius) * 2);
+				pointer-events: none;
+			}
+			:host([disallow-drop])::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				inset: 0;
+				border-radius: calc(var(--uui-border-radius) * 2);
+				background-color: var(--uui-color-danger);
+				opacity: 0.2;
+				pointer-events: none;
 			}
 			> div {
 				display: flex;
@@ -252,8 +258,17 @@ export class UmbBlockGridEntriesElement extends UmbLitElement {
 
 			uui-button-group {
 				padding-top: 1px;
-				display: grid;
 				grid-template-columns: 1fr auto;
+
+				--umb-block-grid--is-dragging--variable: var(--umb-block-grid--is-dragging) none;
+				display: var(--umb-block-grid--is-dragging--variable, grid);
+			}
+
+			.umb-block-grid__layout-container[data-area-length='0'] {
+				--umb-block-grid--is-dragging--variable: var(--umb-block-grid--is-dragging) 1;
+				min-height: calc(var(--umb-block-grid--is-dragging--variable, 0) * var(--uui-size-11));
+				border: calc(var(--umb-block-grid--is-dragging--variable, 0) * 1px) dashed var(--uui-color-border);
+				border-radius: var(--uui-border-radius);
 			}
 		`,
 	];

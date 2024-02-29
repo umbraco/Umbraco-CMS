@@ -9,3 +9,5 @@ export class UmbPartialViewDetailRepository extends UmbDetailRepositoryBase<UmbP
 		super(host, UmbPartialViewDetailServerDataSource, UMB_PARTIAL_VIEW_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbPartialViewDetailRepository;

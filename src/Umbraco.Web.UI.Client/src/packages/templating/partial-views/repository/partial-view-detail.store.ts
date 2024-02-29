@@ -20,6 +20,8 @@ export class UmbPartialViewDetailStore extends UmbDetailStoreBase<UmbPartialView
 	}
 }
 
+export default UmbPartialViewDetailStore;
+
 export const UMB_PARTIAL_VIEW_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbPartialViewDetailStore>(
 	'UmbPartialViewDetailStore',
 );

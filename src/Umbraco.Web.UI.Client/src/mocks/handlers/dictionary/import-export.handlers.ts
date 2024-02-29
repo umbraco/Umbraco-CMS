@@ -9,10 +9,10 @@ const importResponse: UmbMockDictionaryModel = {
 	name: 'Uploaded dictionary',
 	id: 'b7e7d0ab-53ba-485d-dddd-12537f9925cb',
 	hasChildren: false,
-	translatedIsoCodes: ['en', 'da'],
+	translatedIsoCodes: ['en-us', 'da'],
 	translations: [
 		{
-			isoCode: 'en',
+			isoCode: 'en-us',
 			translation: 'I am an imported US value',
 		},
 		{

@@ -9,36 +9,50 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
+type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMemberDetailModel>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	public readonly repository = new UmbMemberDetailRepository(this);
 
-	#data = new UmbObjectState<UmbMemberDetailModel | undefined>(undefined);
-	readonly data = this.#data.asObservable();
+	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
+	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
+
+	readonly email = this.#currentData.asObservablePart((data) => data?.email);
+	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_WORKSPACE_ALIAS);
 	}
 
+	resetState() {
+		super.resetState();
+		this.#persistedData.setValue(undefined);
+		this.#currentData.setValue(undefined);
+	}
+
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
 
 		if (data) {
 			this.setIsNew(false);
-			this.#data.setValue(data);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
 		}
 	}
 
 	async create(parentUnique: string | null, memberTypeUnique: string) {
+		this.resetState();
 		const { data } = await this.repository.createScaffold(parentUnique, {
 			memberType: { unique: memberTypeUnique },
 		});
 
 		if (data) {
 			this.setIsNew(true);
-			this.#data.setValue(data);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
 		}
 
 		return { data };
@@ -58,17 +72,17 @@ export class UmbMemberWorkspaceContext
 	}
 
 	// Only for CRUD demonstration purposes
-	updateData(data: Partial<UmbMemberDetailModel>) {
-		const currentData = this.#data.getValue();
+	updateData(data: Partial<EntityType>) {
+		const currentData = this.#currentData.getValue();
 		if (!currentData) throw new Error('No data to update');
-		this.#data.setValue({ ...currentData, ...data });
+		this.#currentData.setValue({ ...currentData, ...data });
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.#currentData.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique || '';
 	}
 
@@ -77,7 +91,9 @@ export class UmbMemberWorkspaceContext
 	}
 
 	public destroy(): void {
-		console.log('destroy');
+		super.destroy();
+		this.#persistedData.destroy();
+		this.#currentData.destroy();
 	}
 }
 

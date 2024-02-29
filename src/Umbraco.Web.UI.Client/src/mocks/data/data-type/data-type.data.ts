@@ -17,6 +17,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		hasChildren: false,
 		editorAlias: '',
 		values: [],
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 	},
 	{
 		name: 'Folder 2',
@@ -26,6 +28,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		hasChildren: true,
 		editorAlias: '',
 		values: [],
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 	},
 	{
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
@@ -36,6 +40,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		values: [],
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 	},
 	{
 		name: 'Text',
@@ -45,6 +51,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'maxChars',
@@ -60,6 +68,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.TextArea',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -70,6 +80,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'My.PropertyEditorUI.Custom',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -80,6 +92,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.ColorPicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'useLabel',
@@ -136,6 +150,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'validationLimit',
@@ -151,6 +167,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.EyeDropper',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				//showPalette
@@ -188,6 +206,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.MultiUrlPicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'overlaySize',
@@ -219,6 +239,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'startNode',
@@ -266,6 +288,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'format',
@@ -288,6 +312,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorAlias: 'Umbraco.DateTime',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'format',
@@ -307,6 +333,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'format',
@@ -326,6 +354,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.Email',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'inputMode',
@@ -341,6 +371,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'minNumber',
@@ -360,6 +392,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'multiple',
@@ -383,6 +417,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.Slider',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'enableRange',
@@ -418,6 +454,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'default',
@@ -445,6 +483,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.Tags',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'group',
@@ -487,6 +527,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.MarkdownEditor',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -497,6 +539,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'items',
@@ -516,6 +560,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.CheckboxList',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'items',
@@ -535,6 +581,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.BlockList',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'blocks',
@@ -598,6 +646,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -608,6 +658,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.ImageCropper',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'crops',
@@ -639,6 +691,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'fileExtensions',
@@ -658,6 +712,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.BlockGrid',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'blockGroups',
@@ -669,8 +725,11 @@ export const data: Array<UmbMockDataTypeModel> = [
 					{
 						label: 'Mocked Block Type for Block Grid',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						allowAtRoot: true,
+						allowInAreas: true,
 						rowMinSpan: 1,
 						rowMaxSpan: 2,
+						inlineEditing: true,
 						columnSpanOptions: [
 							{
 								columnSpan: 1,
@@ -696,7 +755,13 @@ export const data: Array<UmbMockDataTypeModel> = [
 								rowSpan: 1,
 								minAllowed: 1,
 								maxAllowed: 2,
-								specifiedAllowance: [],
+								specifiedAllowance: [
+									{
+										elementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+										minAllowed: 1,
+										maxAllowed: 2,
+									},
+								],
 							},
 							{
 								key: 'area2_key',
@@ -715,7 +780,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 						iconColor: '#FFFDD0',
 						backgroundColor: '#633f32',
 						editorSize: 'medium',
-						icon: 'icon-coffee',
+						allowInAreas: true,
 					},
 
 					{
@@ -723,37 +788,36 @@ export const data: Array<UmbMockDataTypeModel> = [
 						contentElementTypeKey: 'headline-umbraco-demo-block-id',
 						backgroundColor: 'gold',
 						editorSize: 'medium',
-						icon: 'icon-edit',
 						groupKey: 'demo-block-group-id',
+						allowInAreas: true,
 					},
 					{
 						label: 'Image',
 						contentElementTypeKey: 'image-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-picture',
-
 						groupKey: 'demo-block-group-id',
+						allowInAreas: true,
 					},
 					{
 						label: 'Rich Text',
 						contentElementTypeKey: 'rich-text-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-diploma',
 						groupKey: 'demo-block-group-id',
+						allowInAreas: true,
 					},
 					{
 						label: 'Two Column Layout',
 						contentElementTypeKey: 'two-column-layout-umbraco-demo-block-id',
 						editorSize: 'medium',
-						icon: 'icon-book-alt',
 						groupKey: 'demo-block-group-id',
+						allowAtRoot: false,
 					},
 					{
 						label: 'Test broken group key',
 						contentElementTypeKey: 'test-block-id',
 						editorSize: 'medium',
-						icon: 'icon-war',
 						groupKey: 'group-id-that-does-not-exist',
+						allowAtRoot: true,
 					},
 				],
 			},
@@ -767,8 +831,10 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: false,
+		canIgnoreStartNodes: false,
 		values: [
-			{ alias: 'pageSize', value: 2 },
+			{ alias: 'pageSize', value: 25 },
 			{ alias: 'orderDirection', value: 'desc' },
 			{
 				alias: 'includeProperties',
@@ -803,6 +869,51 @@ export const data: Array<UmbMockDataTypeModel> = [
 		],
 	},
 	{
+		name: 'Collection View - Media',
+		id: '3a0156c4-3b8c-4803-bdc1-6871faa83fff',
+		parent: null,
+		editorAlias: 'Umbraco.ListView',
+		editorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
+		hasChildren: false,
+		isFolder: false,
+		isDeletable: false,
+		canIgnoreStartNodes: false,
+		values: [
+			{ alias: 'pageSize', value: 2 },
+			{ alias: 'orderDirection', value: 'desc' },
+			{
+				alias: 'includeProperties',
+				value: [
+					{ alias: 'sortOrder', header: 'Sort order', isSystem: true, nameTemplate: '' },
+					{ alias: 'updateDate', header: 'Last edited', isSystem: true },
+					{ alias: 'owner', header: 'Created by', isSystem: true },
+				],
+			},
+			{ alias: 'orderBy', value: 'updateDate' },
+			{
+				alias: 'bulkActionPermissions',
+				value: {
+					allowBulkPublish: false,
+					allowBulkUnpublish: false,
+					allowBulkCopy: true,
+					allowBulkMove: true,
+					allowBulkDelete: true,
+				},
+			},
+			{
+				alias: 'layouts',
+				value: [
+					{ icon: 'icon-grid', isSystem: true, name: 'Grid', path: '', selected: true },
+					{ icon: 'icon-list', isSystem: true, name: 'Table', path: '', selected: true },
+				],
+			},
+			{ alias: 'icon', value: 'icon-layers' },
+			{ alias: 'tabName', value: 'Items' },
+			{ alias: 'showContentFirst', value: false },
+			{ alias: 'useInfiniteEditor', value: true },
+		],
+	},
+	{
 		name: 'Icon Picker',
 		id: 'dt-iconPicker',
 		parent: null,
@@ -810,6 +921,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -820,6 +933,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'hideLabel',
@@ -898,6 +1013,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.Label',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -908,6 +1025,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.Integer',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -918,6 +1037,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [
 			{
 				alias: 'step',
@@ -933,6 +1054,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.UserPicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -943,6 +1066,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.MemberPicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -953,6 +1078,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -963,6 +1090,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 	{
@@ -973,6 +1102,8 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.StaticFilePicker',
 		hasChildren: false,
 		isFolder: false,
+		isDeletable: true,
+		canIgnoreStartNodes: false,
 		values: [],
 	},
 ];

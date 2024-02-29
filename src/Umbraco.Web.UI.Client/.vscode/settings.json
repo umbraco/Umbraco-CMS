@@ -7,20 +7,24 @@
 		"ctrls",
 		"devs",
 		"Elementable",
+		"iframes",
 		"invariantable",
 		"lucide",
 		"Niels",
 		"pickable",
 		"popovertarget",
 		"Registrator",
+		"stylesheet",
 		"svgs",
 		"templating",
 		"tinymce",
 		"umbraco",
 		"Uncategorized",
+		"uninitialize",
 		"variantable"
 	],
 	"exportall.config.folderListener": [],
 	"exportall.config.relExclusion": [],
-	"conventionalCommits.scopes": ["partial views"]
+	"conventionalCommits.scopes": ["partial views"],
+	"typescript.tsdk": "node_modules/typescript/lib"
 }

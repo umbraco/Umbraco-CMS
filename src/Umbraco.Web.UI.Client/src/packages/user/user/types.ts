@@ -1,5 +1,8 @@
 import type { UmbUserEntityType } from './entity.js';
-import type { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+export type UmbUserStateEnum = UserStateModel;
+export const UmbUserStateEnum = UserStateModel;
 
 export interface UmbUserDetailModel {
 	entityType: UmbUserEntityType;
@@ -12,7 +15,7 @@ export interface UmbUserDetailModel {
 	documentStartNodeUniques: Array<string>;
 	mediaStartNodeUniques: Array<string>;
 	avatarUrls: Array<string>;
-	state: UserStateModel | null;
+	state: UmbUserStateEnum | null;
 	failedLoginAttempts: number;
 	createDate: string | null;
 	updateDate: string | null;

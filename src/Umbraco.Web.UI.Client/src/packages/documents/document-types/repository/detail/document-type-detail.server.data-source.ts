@@ -59,6 +59,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 				keepAllVersionsNewerThanDays: null,
 				keepLatestVersionPerDayForDays: null,
 			},
+			collection: null,
 		};
 
 		return { data };
@@ -126,6 +127,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			allowedTemplates: data.allowedTemplates,
 			defaultTemplate: data.defaultTemplate ? { id: data.defaultTemplate.id } : null,
 			cleanup: data.cleanup,
+			collection: data.collection ? { unique: data.collection?.id } : null,
 		};
 
 		return { data: DocumentType };

@@ -53,3 +53,5 @@ export class UmbRelationTypeStore extends UmbStoreBase {
 		this._data.remove(uniques);
 	}
 }
+
+export default UmbRelationTypeStore;

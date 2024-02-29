@@ -778,8 +778,8 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepAllVersionsNewerThanDays: null,
 			keepLatestVersionPerDayForDays: null,
 		},
+		collection: { id: 'dt-collectionView' },
 	},
-
 	{
 		allowedTemplates: [],
 		defaultTemplate: null,

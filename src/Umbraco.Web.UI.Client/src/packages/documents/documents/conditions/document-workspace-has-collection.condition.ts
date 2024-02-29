@@ -21,7 +21,7 @@ export class UmbDocumentWorkspaceHasCollectionCondition extends UmbBaseControlle
 			this.observe(
 				context.contentTypeHasCollection,
 				(hasCollection) => {
-					this.permitted = hasCollection ?? false;
+					this.permitted = hasCollection;
 					this.#onChange();
 				},
 				'observeCollection',

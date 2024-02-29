@@ -7,5 +7,6 @@ import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBa
 
 export type DataTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
     editorUiAlias?: string | null;
+    isDeletable: boolean;
 });
 

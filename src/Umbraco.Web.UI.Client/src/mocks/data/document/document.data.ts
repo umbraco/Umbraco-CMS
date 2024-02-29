@@ -23,7 +23,6 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'all-property-editors-document-type-id',
 			icon: 'icon-document',
-			hasListView: false,
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -532,7 +531,6 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: '29643452-cff9-47f2-98cd-7de4b6807681',
 			icon: 'icon-document',
-			hasListView: false,
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -656,7 +654,6 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: '29643452-cff9-47f2-98cd-7de4b6807681',
 			icon: 'icon-document',
-			hasListView: false,
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -737,7 +734,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'simple-document-type-id',
 			icon: 'icon-document',
-			hasListView: true,
+			collection: { id: 'dt-collectionView'},
 		},
 		hasChildren: false,
 		noAccess: false,

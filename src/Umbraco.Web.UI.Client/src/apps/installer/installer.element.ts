@@ -1,6 +1,5 @@
 import { UmbInstallerContext, UMB_INSTALLER_CONTEXT } from './installer.context.js';
-import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './consent/installer-consent.element.js';
@@ -57,8 +56,6 @@ export class UmbInstallerElement extends UmbLitElement {
 	render() {
 		return html`<umb-installer-layout data-test="installer">${this._renderSection()}</umb-installer-layout> `;
 	}
-
-	static styles: CSSResultGroup = [css``];
 }
 
 export default UmbInstallerElement;

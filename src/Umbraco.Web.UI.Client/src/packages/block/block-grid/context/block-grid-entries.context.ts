@@ -1,7 +1,7 @@
 import type { UmbBlockDataType } from '../../block/index.js';
 import { UMB_BLOCK_CATALOGUE_MODAL, UmbBlockEntriesContext } from '../../block/index.js';
 import { UMB_BLOCK_GRID_ENTRY_CONTEXT, type UmbBlockGridWorkspaceData } from '../index.js';
-import type { UmbBlockGridLayoutModel, UmbBlockGridTypeModel } from '../types.js';
+import type { UmbBlockGridLayoutModel, UmbBlockGridTypeAreaType, UmbBlockGridTypeModel } from '../types.js';
 import { UMB_BLOCK_GRID_MANAGER_CONTEXT } from './block-grid-manager.context.js';
 import type { UmbBlockGridScalableContainerContext } from './block-grid-scale-manager/block-grid-scale-manager.controller.js';
 import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
@@ -24,6 +24,8 @@ export class UmbBlockGridEntriesContext
 
 	#layoutColumns = new UmbNumberState(undefined);
 	readonly layoutColumns = this.#layoutColumns.asObservable();
+
+	#areaType?: UmbBlockGridTypeAreaType;
 
 	//#parentUnique?: string;
 	#areaKey?: string | null;
@@ -71,8 +73,8 @@ export class UmbBlockGridEntriesContext
 				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
 				return {
 					data: {
-						blocks: [],
-						blockGroups: [],
+						blocks: this.#retrieveAllowedElementTypes(),
+						blockGroups: this._manager?.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
 						blockOriginData: { index: index },
 					},
@@ -180,6 +182,7 @@ export class UmbBlockGridEntriesContext
 			this.observe(
 				this.#parentEntry.areaType(this.#areaKey),
 				(areaType) => {
+					this.#areaType = areaType;
 					const hostEl = this.getHostElement() as HTMLElement | undefined;
 					if (!hostEl) return;
 					hostEl.setAttribute('data-area-alias', areaType?.alias ?? '');
@@ -228,5 +231,69 @@ export class UmbBlockGridEntriesContext
 	async delete(contentUdi: string) {
 		// TODO: Loop through children and delete them as well?
 		await super.delete(contentUdi);
+	}
+
+	/**
+	 * @internal
+	 * @returns an Array of ElementTypeKeys that are allowed in the current area. Or undefined if not ready jet.
+	 */
+	#retrieveAllowedElementTypes() {
+		if (!this._manager) return [];
+
+		if (this.#areaKey) {
+			// Area entries:
+			if (!this.#areaType) return [];
+
+			if (this.#areaType.specifiedAllowance && this.#areaType.specifiedAllowance?.length > 0) {
+				return (
+					this.#areaType.specifiedAllowance
+						.flatMap((permission) => {
+							if (permission.groupKey) {
+								return (
+									this._manager?.getBlockTypes().filter((blockType) => blockType.groupKey === permission.groupKey) ?? []
+								);
+							} else if (permission.elementTypeKey) {
+								return (
+									this._manager?.getBlockTypes().filter((x) => x.contentElementTypeKey === permission.elementTypeKey) ??
+									[]
+								);
+							}
+							return [];
+						})
+						// Remove duplicates:
+						.filter((v, i, a) => a.findIndex((x) => x.contentElementTypeKey === v.contentElementTypeKey) === i)
+				);
+			}
+
+			// No specific permissions setup, so we will fallback to items allowed in areas:
+			return this._manager.getBlockTypes().filter((x) => x.allowInAreas);
+		}
+
+		// If no AreaKey, then we are in the root, looking for items allowed as root:
+		return this._manager.getBlockTypes().filter((x) => x.allowAtRoot);
+	}
+
+	/**
+	 * Check if given contentUdi is allowed in the current area.
+	 * @param contentUdi {string} - The contentUdi of the content to check.
+	 * @returns {boolean} - True if the content is allowed in the current area, otherwise false.
+	 */
+	allowDrop(contentUdi: string) {
+		const content = this._manager?.getContentOf(contentUdi);
+		if (!content) return false;
+
+		return (
+			this.#retrieveAllowedElementTypes()
+				.map((x) => x.contentElementTypeKey)
+				.indexOf(content.contentTypeKey) !== -1
+		);
+	}
+
+	onDragStart() {
+		this._manager?.onDragStart();
+	}
+
+	onDragEnd() {
+		this._manager?.onDragEnd();
 	}
 }

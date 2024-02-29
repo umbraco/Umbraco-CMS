@@ -1,30 +1,22 @@
+import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 
+// TODO: This seem fully identical with Media Workspace Editor, so we can refactor this to a generic component. [NL]
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
-	//private _defaultVariant?: VariantViewModelBaseModel;
-
-	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well.
+	//
+	// TODO: Refactor: when having a split view/variants context token, we can rename the split view/variants component to a generic and make this component generic as well. [NL]
 	private splitViewElement = new UmbDocumentWorkspaceSplitViewElement();
+
+	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	_routes?: Array<UmbRoute>;
-
-	@state()
-	_availableVariants: Array<UmbVariantModel> = [];
-
-	@state()
-	_workspaceSplitViews: Array<ActiveVariant> = [];
-
-	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -32,31 +24,13 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeVariants();
-			this.#observeSplitViews();
 		});
 	}
 
 	#observeVariants() {
 		if (!this.#workspaceContext) return;
-		this.observe(
-			this.#workspaceContext.variants,
-			(variants) => {
-				this._availableVariants = variants;
-				this._generateRoutes();
-			},
-			'_observeVariants',
-		);
-	}
-
-	#observeSplitViews() {
-		if (!this.#workspaceContext) return;
-		this.observe(
-			this.#workspaceContext.splitView.activeVariantsInfo,
-			(variants) => {
-				this._workspaceSplitViews = variants;
-			},
-			'_observeSplitViews',
-		);
+		// TODO: the variantOptions observable is like too broad as this will be triggered then there is any change in the variant options, we need to only update routes when there is a relevant change to them. [NL]
+		this.observe(this.#workspaceContext.variantOptions, (options) => this._generateRoutes(options), '_observeVariants');
 	}
 
 	private _handleVariantFolderPart(index: number, folderPart: string) {
@@ -66,17 +40,18 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
 	}
 
-	private _generateRoutes() {
-		if (!this._availableVariants || this._availableVariants.length === 0) return;
+	private async _generateRoutes(options: Array<UmbDocumentVariantOptionModel>) {
+		if (!options || options.length === 0) return;
 
 		// Generate split view routes for all available routes
 		const routes: Array<UmbRoute> = [];
 
 		// Split view routes:
-		this._availableVariants.forEach((variantA) => {
-			this._availableVariants.forEach((variantB) => {
+		options.forEach((variantA) => {
+			options.forEach((variantB) => {
 				routes.push({
-					path: new UmbVariantId(variantA).toString() + '_&_' + new UmbVariantId(variantB).toString(),
+					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
+					path: variantA.unique + '_&_' + variantB.unique,
 					component: this.splitViewElement,
 					setup: (_component, info) => {
 						// Set split view/active info..
@@ -90,9 +65,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		// Single view:
-		this._availableVariants.forEach((variant) => {
+		options.forEach((variant) => {
 			routes.push({
-				path: new UmbVariantId(variant).toString(),
+				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
+				path: variant.unique,
 				component: this.splitViewElement,
 				setup: (_component, info) => {
 					// cause we might come from a split-view, we need to reset index 1.
@@ -106,11 +82,21 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			// Using first single view as the default route for now (hence the math below):
 			routes.push({
 				path: '',
-				redirectTo: routes[this._availableVariants.length * this._availableVariants.length]?.path,
+				redirectTo: routes[options.length * options.length]?.path,
 			});
 		}
 
+		const oldValue = this._routes;
+
+		// is there any differences in the amount ot the paths? [NL]
+		// TODO: if we make a memorization function as the observer, we can avoid this check and avoid the whole build of routes. [NL]
+		if (oldValue && oldValue.length === routes.length) {
+			// is there any differences in the paths? [NL]
+			const hasDifferences = oldValue.some((route, index) => route.path !== routes[index].path);
+			if (!hasDifferences) return;
+		}
 		this._routes = routes;
+		this.requestUpdate('_routes', oldValue);
 	}
 
 	private _gotWorkspaceRoute = (e: UmbRouterSlotInitEvent) => {

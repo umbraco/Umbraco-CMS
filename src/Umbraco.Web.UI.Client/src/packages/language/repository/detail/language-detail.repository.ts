@@ -9,3 +9,5 @@ export class UmbLanguageDetailRepository extends UmbDetailRepositoryBase<UmbLang
 		super(host, UmbLanguageServerDataSource, UMB_LANGUAGE_DETAIL_STORE_CONTEXT);
 	}
 }
+
+export default UmbLanguageDetailRepository;

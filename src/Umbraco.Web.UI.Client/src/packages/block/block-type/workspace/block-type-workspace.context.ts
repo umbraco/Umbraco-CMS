@@ -23,7 +23,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	#entityType: string;
 	#data = new UmbObjectState<BlockTypeData | undefined>(undefined);
-	readonly data = this.#data.asObservable();
+	//readonly data = this.#data.asObservable();
 
 	// TODO: Get the name of the contentElementType..
 	readonly name = this.#data.asObservablePart((data) => 'block');
@@ -37,11 +37,18 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 	}
 
+	protected resetState() {
+		super.resetState();
+		this.#data.setValue(undefined);
+		this.#properties.setValue([]);
+	}
+
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
 		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.value, (value) => {
 				if (value) {
@@ -58,6 +65,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	}
 
 	async create(contentElementTypeId: string, groupKey?: string | null) {
+		this.resetState();
 		//Only set groupKey property if it exists
 		const data: BlockTypeData = {
 			contentElementTypeKey: contentElementTypeId,
@@ -73,7 +81,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()!.contentElementTypeKey;
 	}
 

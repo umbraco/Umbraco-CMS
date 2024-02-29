@@ -40,3 +40,5 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 		this.setFilter({ userGroupIds: selection });
 	}
 }
+
+export default UmbUserCollectionContext;

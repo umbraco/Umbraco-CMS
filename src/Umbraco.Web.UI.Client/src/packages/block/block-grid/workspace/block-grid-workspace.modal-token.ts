@@ -1,4 +1,4 @@
-import type { UmbBlockWorkspaceData } from '../../index.js';
+import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
 import type { UmbWorkspaceData, UmbWorkspaceValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
