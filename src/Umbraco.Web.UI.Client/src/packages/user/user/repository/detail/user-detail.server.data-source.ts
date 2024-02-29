@@ -119,8 +119,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		);
 
 		if (data) {
-			// TODO: get back to this when we get a location header
-			return this.read(data.user.id);
+			return this.read(data);
 		}
 
 		return { error };

@@ -64,17 +64,18 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 			},
 		});
 
-		modalContext?.onSubmit().catch((reason) => {
-			if (reason?.type === 'createAnotherUser') {
-				this._form?.reset();
-			} else {
-				this.#closeModal();
-			}
-		});
-	}
-
-	#closeModal() {
-		this.modalContext?.reject();
+		modalContext
+			?.onSubmit()
+			.then(() => {
+				this._submitModal();
+			})
+			.catch((reason) => {
+				if (reason?.type === 'createAnotherUser') {
+					this._form?.reset();
+				} else {
+					this._rejectModal();
+				}
+			});
 	}
 
 	render() {
@@ -85,7 +86,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 			</p>
 
 			${this.#renderForm()}
-			<uui-button @click=${this.#closeModal} slot="actions" label="Cancel" look="secondary"></uui-button>
+			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
 			<uui-button
 				form="CreateUserForm"
 				slot="actions"

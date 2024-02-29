@@ -2,11 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { CreateMemberTypePropertyTypeContainerRequestModel } from './CreateMemberTypePropertyTypeContainerRequestModel';
 import type { CreateMemberTypePropertyTypeRequestModel } from './CreateMemberTypePropertyTypeRequestModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
-
 export type CreateContentTypeForMemberTypeRequestModel = {
     alias: string;
     name: string;
