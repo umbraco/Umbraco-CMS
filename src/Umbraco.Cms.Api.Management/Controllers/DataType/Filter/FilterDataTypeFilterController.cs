@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -26,16 +27,11 @@ public class FilterDataTypeFilterController : DataTypeFilterControllerBase
     public async Task<IActionResult> Filter(
         int skip = 0,
         int take = 100,
-        [FromQuery] string? editorUiAlias = null,
+        string orderBy = "name",
+        Direction orderDirection = Direction.Ascending,
         [FromQuery] string filter = "")
     {
-        IEnumerable<IDataType> dataTypes = Enumerable.Empty<IDataType>();
-
-        if (editorUiAlias is not null)
-        {
-            dataTypes = await _dataTypeService.GetByEditorUiAlias(editorUiAlias);
-        }
-
+        IEnumerable<IDataType> dataTypes = (await _dataTypeService.GetAllAsync(orderBy, orderDirection, filter)).Skip(skip).Take(take);
         List<DataTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IDataType, DataTypeItemResponseModel>(dataTypes);
         return Ok(responseModels);
     }

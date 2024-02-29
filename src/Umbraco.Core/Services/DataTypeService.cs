@@ -246,6 +246,23 @@ namespace Umbraco.Cms.Core.Services.Implement
             return Task.FromResult<IEnumerable<IDataType>>(dataTypes);
         }
 
+        /// <inheritdoc />
+        public async Task<IEnumerable<IDataType>> GetAllAsync(string orderBy, Direction orderDirection, string filter = "")
+        {
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+            Guid.TryParse(filter, out Guid filterAsGuid);
+            IQuery<IDataType> query = Query<IDataType>()
+                .Where(dataType => dataType.EditorAlias.Contains(filter) ||
+                                   dataType.Key == filterAsGuid ||
+                                   (dataType.EditorUiAlias != null && dataType.EditorUiAlias.Contains(filter)) ||
+                                   (dataType.Name != null && dataType.Name.Contains(filter)));
+            IDataType[] dataTypes = (await _dataTypeRepository.GetAsync(orderBy, orderDirection, query)).ToArray();
+            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
+            return dataTypes;
+        }
+
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its Id
         /// </summary>

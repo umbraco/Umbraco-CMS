@@ -1,12 +1,15 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 public interface IDataTypeRepository : IReadWriteQueryRepository<int, IDataType>
 {
-    
+
     IDataType? Get(Guid key);
+
+    Task<IEnumerable<IDataType>> GetAsync(string orderBy,  Direction orderDirection, IQuery<IDataType> query);
 
     IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container);
 

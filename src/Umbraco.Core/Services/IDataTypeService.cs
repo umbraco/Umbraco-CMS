@@ -109,6 +109,15 @@ public interface IDataTypeService : IService
     Task<IEnumerable<IDataType>> GetAllAsync(params Guid[] keys);
 
     /// <summary>
+    /// Gets multiple <see cref="IDataType"/> objects by their unique keys.
+    /// </summary>
+    /// <param name="orderBy">Property to order by.</param>
+    /// <param name="orderDirection">Direction to order in..</param>
+    /// <param name="filter">Search text to filter by.</param>
+    /// <returns>An attempt with the requested data types.</returns>
+    Task<IEnumerable<IDataType>> GetAllAsync(string orderBy, Direction orderDirection, string filter = "");
+
+    /// <summary>
     ///     Gets all <see cref="IDataType" /> objects or those with the ids passed in
     /// </summary>
     /// <param name="ids">Optional array of Ids</param>
