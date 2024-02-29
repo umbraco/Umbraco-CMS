@@ -1,22 +1,21 @@
+import { UMB_WEBHOOK_ENTITY_TYPE, UMB_WEBHOOK_WORKSPACE } from '../../entity.js';
 import type { ManifestWorkspace, ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-registry';
-
-const workspaceAlias = 'Umb.Workspace.Webhooks';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: workspaceAlias,
+	alias: UMB_WEBHOOK_WORKSPACE,
 	name: 'Webhook Root Workspace',
 	js: () => import('./webhook-workspace.element.js'),
 	meta: {
-		entityType: 'webhooks',
+		entityType: UMB_WEBHOOK_ENTITY_TYPE,
 	},
 };
 
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Webhooks.Overview',
-		name: 'Webhooks Root Workspace Overview View',
+		alias: 'Umb.WorkspaceView.Webhook.Overview',
+		name: 'Webhook Root Workspace Overview View',
 		js: () => import('../views/overview/webhook-overview-view.element.js'),
 		weight: 300,
 		meta: {
@@ -33,8 +32,8 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.Webhooks.Search',
-		name: 'Webhooks Root Workspace Logs View',
+		alias: 'Umb.WorkspaceView.Webhook.Search',
+		name: 'Webhook Root Workspace Logs View',
 		js: () => import('../views/overview/webhook-overview-view.element.js'),
 		weight: 200,
 		meta: {
