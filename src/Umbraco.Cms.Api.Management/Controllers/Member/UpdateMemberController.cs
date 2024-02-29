@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -36,14 +35,8 @@ public class UpdateMemberController : MemberControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateMemberRequestModel updateRequestModel)
     {
-        IMember? member = await _memberEditingService.GetAsync(id);
-        if (member == null)
-        {
-            return MemberNotFound();
-        }
-
         MemberUpdateModel model = _memberEditingPresentationFactory.MapUpdateModel(updateRequestModel);
-        Attempt<MemberUpdateResult, MemberEditingStatus> result = await _memberEditingService.UpdateAsync(member, model, CurrentUser(_backOfficeSecurityAccessor));
+        Attempt<MemberUpdateResult, MemberEditingStatus> result = await _memberEditingService.UpdateAsync(id, model, CurrentUser(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
