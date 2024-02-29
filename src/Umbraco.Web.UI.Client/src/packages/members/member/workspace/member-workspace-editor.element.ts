@@ -1,6 +1,6 @@
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from './member-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -16,14 +16,17 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _name: string = '';
 
+	@state()
+	private _unique?: string;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
-			this.observe(this.#workspaceContext.name, (name) => {
-				this._name = name || '';
-			});
+			if (!this.#workspaceContext) return;
+			this.observe(this.#workspaceContext.name, (name) => (this._name = name ?? ''));
+			this.observe(this.#workspaceContext.unique, (unique) => (this._unique = unique));
 		});
 	}
 
@@ -45,9 +48,17 @@ export class UmbMemberWorkspaceEditorElement extends UmbLitElement {
 		`;
 	}
 
+	#renderActions() {
+		// Actions only works if we have a valid unique.
+		if (!this._unique || this.#workspaceContext?.getIsNew()) return nothing;
+
+		return html`<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>`;
+	}
+
 	render() {
 		return html`
 			<umb-workspace-editor alias="Umb.Workspace.Member">
+				${this.#renderActions()}
 				<div id="header" slot="header">
 					${this.#renderBackButton()}
 					<uui-input id="nameInput" .value=${this._name} @input="${this.#onInput}"></uui-input>
