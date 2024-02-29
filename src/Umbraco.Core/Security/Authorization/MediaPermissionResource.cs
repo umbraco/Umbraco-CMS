@@ -31,8 +31,9 @@ public class MediaPermissionResource : IPermissionResource
     /// <returns>An instance of <see cref="MediaPermissionResource" />.</returns>
     public static MediaPermissionResource WithKeys(IEnumerable<Guid?> mediaKeys)
     {
-        var hasRoot = mediaKeys.Any(x => x is null);
-        IEnumerable<Guid> keys = mediaKeys.Where(x => x.HasValue).Select(x => x!.Value);
+        IEnumerable<Guid?> mediaKeysList = mediaKeys.ToList();
+        var hasRoot = mediaKeysList.Any(x => x is null);
+        IEnumerable<Guid> keys = mediaKeysList.Where(x => x.HasValue).Select(x => x!.Value);
         return new MediaPermissionResource(keys, hasRoot, false);
     }
 

@@ -23,7 +23,9 @@ public class DictionaryPermissionHandler : MustSatisfyRequirementAuthorizationHa
         _authorizationHelper = authorizationHelper;
     }
 
-    protected override async Task<bool> IsAuthorized(AuthorizationHandlerContext context, DictionaryPermissionRequirement requirement,
+    protected override async Task<bool> IsAuthorized(
+        AuthorizationHandlerContext context,
+        DictionaryPermissionRequirement requirement,
         DictionaryPermissionResource resource)
     {
         IUser user = _authorizationHelper.GetUmbracoUser(context.User);

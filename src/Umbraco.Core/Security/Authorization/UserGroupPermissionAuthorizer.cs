@@ -15,14 +15,15 @@ internal sealed class UserGroupPermissionAuthorizer : IUserGroupPermissionAuthor
     /// <inheritdoc />
     public async Task<bool> IsDeniedAsync(IUser currentUser, IEnumerable<Guid> userGroupKeys)
     {
-        if (!userGroupKeys.Any())
+        var userGroupKeysList = userGroupKeys.ToList();
+        if (userGroupKeysList.Count == 0)
         {
             // We can't deny something that is not defined
             return false;
         }
 
         UserGroupAuthorizationStatus result =
-            await _userGroupPermissionService.AuthorizeAccessAsync(currentUser, userGroupKeys);
+            await _userGroupPermissionService.AuthorizeAccessAsync(currentUser, userGroupKeysList);
 
         return result is not UserGroupAuthorizationStatus.Success;
     }
