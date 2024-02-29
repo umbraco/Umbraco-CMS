@@ -26,9 +26,6 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
-		// If there is an existing initializer, we need to dispose it.
-		this.#actionsInitializer?.destroy();
-
 		this.#propertyEditorUiAlias = alias;
 		// TODO: Stop using string for 'propertyAction', we need to start using Const.
 		// TODO: Align property actions with entity actions.
