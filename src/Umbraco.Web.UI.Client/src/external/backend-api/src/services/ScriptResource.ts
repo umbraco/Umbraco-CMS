@@ -10,13 +10,10 @@ import type { ScriptFolderResponseModel } from '../models/ScriptFolderResponseMo
 import type { ScriptItemResponseModel } from '../models/ScriptItemResponseModel';
 import type { ScriptResponseModel } from '../models/ScriptResponseModel';
 import type { UpdateScriptRequestModel } from '../models/UpdateScriptRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class ScriptResource {
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -37,7 +34,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -60,7 +56,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -82,7 +77,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -106,7 +100,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -134,7 +127,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -162,7 +154,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -185,7 +176,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -207,7 +197,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -231,7 +220,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -258,7 +246,6 @@ export class ScriptResource {
             },
         });
     }
-
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -282,5 +269,4 @@ export class ScriptResource {
             },
         });
     }
-
 }

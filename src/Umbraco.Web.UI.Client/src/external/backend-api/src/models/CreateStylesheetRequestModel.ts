@@ -2,8 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { FileSystemFileCreateRequestModelBaseModel } from './FileSystemFileCreateRequestModelBaseModel';
-
 export type CreateStylesheetRequestModel = FileSystemFileCreateRequestModelBaseModel;
 

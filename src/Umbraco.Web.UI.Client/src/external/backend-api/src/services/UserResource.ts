@@ -31,13 +31,10 @@ import type { UserResponseModel } from '../models/UserResponseModel';
 import type { UserStateModel } from '../models/UserStateModel';
 import type { UserTwoFactorProviderModel } from '../models/UserTwoFactorProviderModel';
 import type { VerifyInviteUserRequestModel } from '../models/VerifyInviteUserRequestModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class UserResource {
-
     /**
      * @returns PagedUserResponseModel Success
      * @throws ApiError
@@ -78,7 +75,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -99,7 +95,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -122,7 +117,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -145,7 +139,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns PagedUserResponseModel Success
      * @throws ApiError
@@ -170,7 +163,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -193,7 +185,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -218,7 +209,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -247,7 +237,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -270,7 +259,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -298,7 +286,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -327,7 +314,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -351,7 +337,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -376,7 +361,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -405,7 +389,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -419,7 +402,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -434,7 +416,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -448,7 +429,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -477,7 +457,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -504,7 +483,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -527,7 +505,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -550,7 +527,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -572,7 +548,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -586,7 +561,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -600,7 +574,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -621,7 +594,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -643,7 +615,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns any Success
      * @throws ApiError
@@ -665,7 +636,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -689,7 +659,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -713,7 +682,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Created
      * @throws ApiError
@@ -736,7 +704,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -759,7 +726,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -782,7 +748,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -805,7 +770,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -827,7 +791,6 @@ export class UserResource {
             },
         });
     }
-
     /**
      * @returns string Success
      * @throws ApiError
@@ -850,5 +813,4 @@ export class UserResource {
             },
         });
     }
-
 }

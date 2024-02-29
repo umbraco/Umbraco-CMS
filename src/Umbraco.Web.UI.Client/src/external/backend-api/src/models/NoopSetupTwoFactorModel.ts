@@ -2,5 +2,4 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 export type NoopSetupTwoFactorModel = Record<string, any>;
