@@ -1,7 +1,7 @@
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement, UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-tree-picker-modal')
@@ -29,11 +29,24 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		this._selectionConfiguration.multiple = this.data?.multiple ?? false;
 	}
 
-	#onSelectionChange(e: CustomEvent) {
-		e.stopPropagation();
-		const element = e.target as UmbTreeElement;
+	#onSelectionChange(event: UmbSelectionChangeEvent) {
+		debugger;
+		event.stopPropagation();
+		const element = event.target as UmbTreeElement;
 		this.value = { selection: element.getSelection() };
-		this.dispatchEvent(new UmbSelectionChangeEvent());
+		this.modalContext?.dispatchEvent(new UmbSelectionChangeEvent());
+	}
+
+	#onSelected(event: UmbSelectedEvent) {
+		debugger;
+		event.stopPropagation();
+		this.modalContext?.dispatchEvent(new UmbSelectedEvent(event.unique));
+	}
+
+	#onDeselected(event: UmbDeselectedEvent) {
+		debugger;
+		event.stopPropagation();
+		this.modalContext?.dispatchEvent(new UmbDeselectedEvent(event.unique));
 	}
 
 	render() {
@@ -48,7 +61,9 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 							filter: this.data?.filter,
 							selectableFilter: this.data?.pickableFilter,
 						}}
-						@selection-change=${this.#onSelectionChange}></umb-tree>
+						@selection-change=${this.#onSelectionChange}
+						@selected=${this.#onSelected}
+						@deselected=${this.#onDeselected}></umb-tree>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>

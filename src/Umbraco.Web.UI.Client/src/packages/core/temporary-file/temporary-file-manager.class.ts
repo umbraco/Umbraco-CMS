@@ -1,7 +1,7 @@
 import { UmbTemporaryFileRepository } from './temporary-file.repository.js';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 export type TemporaryFileStatus = 'complete' | 'waiting' | 'error';
 
@@ -11,7 +11,7 @@ export interface TemporaryFileQueueItem {
 	status?: TemporaryFileStatus;
 }
 
-export class UmbTemporaryFileManager extends UmbBaseController {
+export class UmbTemporaryFileManager extends UmbControllerBase {
 	#temporaryFileRepository;
 
 	#queue = new UmbArrayState<TemporaryFileQueueItem>([], (item) => item.unique);

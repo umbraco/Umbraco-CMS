@@ -1,9 +1,9 @@
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from './default/collection-default.context.js';
 import type { CollectionAliasConditionConfig } from './collection-alias.manifest.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbCollectionAliasCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbCollectionAliasCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: CollectionAliasConditionConfig;
 	permitted = false;
 	#onChange: () => void;

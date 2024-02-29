@@ -5,7 +5,7 @@ import type {
 	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
@@ -26,7 +26,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
-> extends UmbBaseController {
+> extends UmbControllerBase {
 	#promiseResolvers: Array<() => void> = [];
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;

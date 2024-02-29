@@ -1,12 +1,13 @@
 import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestUserPermission extends ManifestBase {
-	type: 'userPermission';
-	meta: MetaUserPermission;
+export interface ManifestEntityUserPermission extends ManifestBase {
+	type: 'entityUserPermission';
+	meta: MetaEntityUserPermission;
 }
 
-export interface MetaUserPermission {
+export interface MetaEntityUserPermission {
 	entityType: string;
+	verbs: Array<string>;
 	label?: string;
 	labelKey?: string;
 	description?: string;

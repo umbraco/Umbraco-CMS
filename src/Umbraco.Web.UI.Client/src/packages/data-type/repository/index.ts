@@ -6,3 +6,5 @@ export {
 } from './detail/index.js';
 export { UmbDataTypeItemRepository, UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS } from './item/index.js';
 export { UmbMoveDataTypeRepository, MOVE_DATA_TYPE_REPOSITORY_ALIAS } from './move/index.js';
+
+export type { UmbDataTypeItemModel } from './item/index.js';
