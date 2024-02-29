@@ -13,6 +13,12 @@ export const manifest: ManifestPropertyEditorUi = {
 		settings: {
 			properties: [
 				{
+					alias: 'startNodeId',
+					label: 'Start node',
+					description: '',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+				},
+				{
 					alias: 'showOpenButton',
 					label: 'Show open button',
 					description: 'Opens the node in a dialog',
