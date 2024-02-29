@@ -21,18 +21,16 @@ export class UmbMemberWorkspaceContext
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
-	#data = new UmbObjectState<UmbMemberDetailModel | undefined>(undefined);
-	readonly data = this.#data.asObservable();
-	readonly name = this.#data.asObservablePart((data) => data?.variants[0].name);
-	readonly createDate = this.#data.asObservablePart((data) => data?.variants[0].createDate);
-	readonly updateDate = this.#data.asObservablePart((data) => data?.variants[0].updateDate);
-	readonly contentTypeUnique = this.#data.asObservablePart((data) => data?.memberType.unique);
+	readonly data = this.#currentData.asObservable();
+	readonly name = this.#currentData.asObservablePart((data) => data?.variants[0].name);
+	readonly createDate = this.#currentData.asObservablePart((data) => data?.variants[0].createDate);
+	readonly updateDate = this.#currentData.asObservablePart((data) => data?.variants[0].updateDate);
+	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.memberType.unique);
 	readonly structure = new UmbContentTypePropertyStructureManager<UmbMemberTypeDetailModel>(
 		this,
 		new UmbMemberTypeDetailRepository(this),
 	);
 
-	readonly email = this.#currentData.asObservablePart((data) => data?.email);
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 
 	constructor(host: UmbControllerHostElement) {
@@ -51,8 +49,8 @@ export class UmbMemberWorkspaceContext
 		propertyName: PropertyName,
 		value: UmbMemberDetailModel[PropertyName],
 	) {
-		this.#data.update({ [propertyName]: value });
-		console.log('set', propertyName, value, this.#data.getValue());
+		this.#currentData.update({ [propertyName]: value });
+		console.log('set', propertyName, value, this.#currentData.getValue());
 	}
 
 	async load(unique: string) {
@@ -113,14 +111,14 @@ export class UmbMemberWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		const oldVariants = this.#data.getValue()?.variants || [];
+		const oldVariants = this.#currentData.getValue()?.variants || [];
 		const variants = partialUpdateFrozenArray(
 			oldVariants,
 			{ name },
 			variantId ? (x) => variantId.compare(x) : () => true,
 		);
 		console.log('setName', oldVariants, variants);
-		this.#data.update({ variants });
+		this.#currentData.update({ variants });
 	}
 
 	get email() {
@@ -163,11 +161,11 @@ export class UmbMemberWorkspaceContext
 	}
 
 	#get<PropertyName extends keyof UmbMemberDetailModel>(propertyName: PropertyName) {
-		return this.#data.getValue()?.[propertyName];
+		return this.#currentData.getValue()?.[propertyName];
 	}
 
 	public destroy(): void {
-		this.#data.destroy();
+		this.#currentData.destroy();
 		super.destroy();
 		this.#persistedData.destroy();
 		this.#currentData.destroy();

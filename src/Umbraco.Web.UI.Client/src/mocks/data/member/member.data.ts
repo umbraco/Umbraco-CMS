@@ -43,10 +43,11 @@ export const data: Array<UmbMockMemberModel> = [
 		values: [],
 		variants: [
 			{
-				alias: 'prop1',
-				culture: null,
+				culture: 'en-us',
 				segment: null,
-				value: 'default value here',
+				name: 'The Simplest Member',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
 			},
 		],
 	},

@@ -23,7 +23,6 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'the-simplest-document-type-id',
 			icon: 'icon-document',
-			hasListView: true,
 		},
 		hasChildren: false,
 		noAccess: false,
@@ -743,7 +742,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		documentType: {
 			id: 'simple-document-type-id',
 			icon: 'icon-document',
-			collection: { id: 'dt-collectionView'},
+			collection: { id: 'dt-collectionView' },
 		},
 		hasChildren: false,
 		noAccess: false,
