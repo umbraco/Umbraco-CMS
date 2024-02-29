@@ -2,24 +2,18 @@
 // See LICENSE for more details.
 
 using System.Globalization;
-using System.Text;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Blocks;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Extensions;
@@ -28,74 +22,31 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 /// <summary>
-///     A value converter for TinyMCE that will ensure any macro content is rendered properly even when
+///     A value converter for TinyMCE that will ensure any blocks content are rendered properly even when
 ///     used dynamically.
 /// </summary>
 [DefaultPropertyValueConverter]
-public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDeliveryApiPropertyValueConverter
+public class RteBlockRenderingValueConverter : SimpleTinyMceValueConverter, IDeliveryApiPropertyValueConverter
 {
     private readonly HtmlImageSourceParser _imageSourceParser;
     private readonly HtmlLocalLinkParser _linkParser;
-    private readonly IMacroRenderer _macroRenderer;
-    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly HtmlUrlParser _urlParser;
     private readonly IApiRichTextElementParser _apiRichTextElementParser;
     private readonly IApiRichTextMarkupParser _apiRichTextMarkupParser;
     private readonly IPartialViewBlockEngine _partialViewBlockEngine;
     private readonly BlockEditorConverter _blockEditorConverter;
     private readonly IJsonSerializer _jsonSerializer;
-    private readonly ILogger<RteMacroRenderingValueConverter> _logger;
+    private readonly ILogger<RteBlockRenderingValueConverter> _logger;
     private readonly IApiElementBuilder _apiElementBuilder;
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
     private DeliveryApiSettings _deliveryApiSettings;
 
-    [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
-    public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
-        HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser)
-        : this(
-            umbracoContextAccessor,
-            macroRenderer,
-            linkParser,
-            urlParser,
-            imageSourceParser,
-            StaticServiceProvider.Instance.GetRequiredService<IApiRichTextElementParser>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiRichTextMarkupParser>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<DeliveryApiSettings>>())
-    {
-    }
-
-    [Obsolete("Please use the constructor that takes all arguments. Will be removed in V15.")]
-    public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
-        HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
-        IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser, IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
-        : this(
-            umbracoContextAccessor,
-            macroRenderer,
-            linkParser,
-            urlParser,
-            imageSourceParser,
-            apiRichTextElementParser,
-            apiRichTextMarkupParser,
-            StaticServiceProvider.Instance.GetRequiredService<IPartialViewBlockEngine>(),
-            StaticServiceProvider.Instance.GetRequiredService<BlockEditorConverter>(),
-            StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(),
-            StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>(),
-            StaticServiceProvider.Instance.GetRequiredService<RichTextBlockPropertyValueConstructorCache>(),
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<RteMacroRenderingValueConverter>>(),
-            deliveryApiSettingsMonitor
-        )
-    {
-    }
-
-    public RteMacroRenderingValueConverter(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
-        HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
+    public RteBlockRenderingValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
         IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
         IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
-        IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteMacroRenderingValueConverter> logger,
+        IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteBlockRenderingValueConverter> logger,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
-        _umbracoContextAccessor = umbracoContextAccessor;
-        _macroRenderer = macroRenderer;
         _linkParser = linkParser;
         _urlParser = urlParser;
         _imageSourceParser = imageSourceParser;
@@ -113,8 +64,8 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
 
-        // because that version of RTE converter parses {locallink} and executes macros, its value has
-        // to be cached at the published snapshot level, because we have no idea what the macros may depend on actually.
+        // because that version of RTE converter parses {locallink} and renders blocks, its value has
+        // to be cached at the published snapshot level, because we have no idea what the block renderings may depend on actually.
         PropertyCacheLevel.Snapshot;
 
     // to counterweigh the cache level, we're going to do as much of the heavy lifting as we can while converting source to intermediate
@@ -170,35 +121,6 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             : _apiRichTextElementParser.Parse(richTextEditorIntermediateValue.Markup, richTextEditorIntermediateValue.RichTextBlockModel);
     }
 
-    // NOT thread-safe over a request because it modifies the
-    // global UmbracoContext.Current.InPreviewMode status. So it
-    // should never execute in // over the same UmbracoContext with
-    // different preview modes.
-    private string RenderRteMacros(string source, bool preview)
-    {
-        IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        using (umbracoContext.ForcedPreview(preview)) // force for macro rendering
-        {
-            var sb = new StringBuilder();
-
-            MacroTagParser.ParseMacros(
-                source,
-
-                // callback for when text block is found
-                textBlock => sb.Append(textBlock),
-
-                // callback for when macro syntax is found
-                (macroAlias, macroAttributes) => sb.Append(_macroRenderer.RenderAsync(
-                    macroAlias,
-                    umbracoContext.PublishedRequest?.PublishedContent,
-
-                    // needs to be explicitly casted to Dictionary<string, object>
-                    macroAttributes.ConvertTo(x => (string)x, x => x)!).GetAwaiter().GetResult().Text));
-
-            return sb.ToString();
-        }
-    }
-
     private string? Convert(object? source, bool preview)
     {
         if (source is not IRichTextEditorIntermediateValue intermediateValue)
@@ -212,9 +134,6 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         sourceString = _linkParser.EnsureInternalLinks(sourceString, preview);
         sourceString = _urlParser.EnsureUrls(sourceString);
         sourceString = _imageSourceParser.EnsureImageSources(sourceString);
-
-        // ensure string is parsed for macros and macros are executed correctly
-        sourceString = RenderRteMacros(sourceString, preview);
 
         // render blocks
         sourceString = RenderRichTextBlockModel(sourceString, intermediateValue.RichTextBlockModel);

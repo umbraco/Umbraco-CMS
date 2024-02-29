@@ -86,7 +86,6 @@ public class RichTextEditorSettings
         {
             Alias = "umbblockpicker", Name = "Block", Mode = RichTextEditorCommandMode.All,
         },
-        new RichTextEditorCommand { Alias = "umbmacro", Name = "Macro", Mode = RichTextEditorCommandMode.All },
         new RichTextEditorCommand { Alias = "table", Name = "Table", Mode = RichTextEditorCommandMode.Insert },
         new RichTextEditorCommand
         {

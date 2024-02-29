@@ -48,7 +48,6 @@ public static class AuthorizationPolicies
     public const string TreeAccessDocuments = nameof(TreeAccessDocuments);
     public const string TreeAccessUsers = nameof(TreeAccessUsers);
     public const string TreeAccessPartialViews = nameof(TreeAccessPartialViews);
-    public const string TreeAccessPartialViewMacros = nameof(TreeAccessPartialViewMacros);
     public const string TreeAccessDataTypes = nameof(TreeAccessDataTypes);
     public const string TreeAccessPackages = nameof(TreeAccessPackages);
     public const string TreeAccessLogs = nameof(TreeAccessLogs);
@@ -57,7 +56,6 @@ public static class AuthorizationPolicies
     public const string TreeAccessDictionary = nameof(TreeAccessDictionary);
     public const string TreeAccessRelationTypes = nameof(TreeAccessRelationTypes);
     public const string TreeAccessMediaTypes = nameof(TreeAccessMediaTypes);
-    public const string TreeAccessMacros = nameof(TreeAccessMacros);
     public const string TreeAccessLanguages = nameof(TreeAccessLanguages);
     public const string TreeAccessMemberGroups = nameof(TreeAccessMemberGroups);
     public const string TreeAccessDocumentTypes = nameof(TreeAccessDocumentTypes);

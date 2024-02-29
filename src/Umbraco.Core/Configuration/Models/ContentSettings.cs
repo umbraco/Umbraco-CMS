@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
-using Umbraco.Cms.Core.Macros;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
@@ -149,7 +148,6 @@ public class ContentSettings
             </style>
             <script type=""text/javascript"" data-umbraco-path=""{0}"" src=""{0}/js/umbraco.websitepreview.min.js""></script>";
 
-    internal const string StaticMacroErrors = "Inline";
     internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
     internal const bool StaticShowDeprecatedPropertyEditors = false;
     internal const string StaticLoginBackgroundImage = "login/login.jpg";
@@ -187,12 +185,6 @@ public class ContentSettings
     /// </summary>
     [DefaultValue(StaticDefaultPreviewBadge)]
     public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
-
-    /// <summary>
-    ///     Gets or sets a value for the macro error behaviour.
-    /// </summary>
-    [DefaultValue(StaticMacroErrors)]
-    public MacroErrorBehaviour MacroErrors { get; set; } = Enum.Parse<MacroErrorBehaviour>(StaticMacroErrors);
 
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
