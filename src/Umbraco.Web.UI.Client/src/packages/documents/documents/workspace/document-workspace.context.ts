@@ -23,7 +23,7 @@ import {
 import {
 	appendToFrozenArray,
 	mergeObservables,
-	naiveObjectComparison,
+	jsonStringComparison,
 	UmbArrayState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
@@ -247,7 +247,7 @@ export class UmbDocumentWorkspaceContext
 			return {
 				culture: variant.culture,
 				segment: variant.segment,
-				equal: persistedVariant ? naiveObjectComparison(variant, persistedVariant) : false,
+				equal: persistedVariant ? jsonStringComparison(variant, persistedVariant) : false,
 			};
 		});
 
@@ -256,7 +256,7 @@ export class UmbDocumentWorkspaceContext
 			return {
 				culture: value.culture,
 				segment: value.segment,
-				equal: persistedValues ? naiveObjectComparison(value, persistedValues) : false,
+				equal: persistedValues ? jsonStringComparison(value, persistedValues) : false,
 			};
 		});
 

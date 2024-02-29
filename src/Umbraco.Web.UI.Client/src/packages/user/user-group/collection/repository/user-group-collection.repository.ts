@@ -5,9 +5,9 @@ import type { UmbUserGroupCollectionFilterModel } from '../types.js';
 import { UmbUserGroupCollectionServerDataSource } from './user-group-collection.server.data-source.js';
 import type { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbUserGroupCollectionRepository extends UmbBaseController implements UmbCollectionRepository {
+export class UmbUserGroupCollectionRepository extends UmbControllerBase implements UmbCollectionRepository {
 	#init;
 
 	#detailStore?: UmbUserGroupDetailStore;

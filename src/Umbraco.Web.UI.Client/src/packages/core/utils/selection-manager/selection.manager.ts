@@ -1,4 +1,4 @@
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
@@ -8,7 +8,7 @@ import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observab
  * @export
  * @class UmbSelectionManager
  */
-export class UmbSelectionManager<ValueType extends string | null = string | null> extends UmbBaseController {
+export class UmbSelectionManager<ValueType extends string | null = string | null> extends UmbControllerBase {
 	#selectable = new UmbBooleanState(false);
 	public readonly selectable = this.#selectable.asObservable();
 

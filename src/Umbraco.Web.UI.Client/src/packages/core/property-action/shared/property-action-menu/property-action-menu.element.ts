@@ -10,21 +10,19 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
 	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'propertyAction'>;
+	#value: unknown;
+	#propertyEditorUiAlias = '';
 
 	@property({ attribute: false })
 	public set value(value: unknown) {
-		this._value = value;
+		this.#value = value;
 		if (this.#actionsInitializer) {
 			this.#actionsInitializer.properties = { value };
 		}
 	}
 	public get value(): unknown {
-		return this._value;
+		return this.#value;
 	}
-
-	private _value?: unknown;
-
-	#propertyEditorUiAlias = '';
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
@@ -47,7 +45,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 
 	@state()
-	private _actions: Array<UmbExtensionElementInitializer<ManifestPropertyAction, any>> = [];
+	private _actions: Array<UmbExtensionElementInitializer<ManifestPropertyAction, never>> = [];
 
 	render() {
 		return this._actions.length > 0
