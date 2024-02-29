@@ -41,16 +41,19 @@ test.describe('Health Check Dashboard tests', () => {
     // Arrange
     const allHealthChecksData = await umbracoApi.healthCheck.getAll();
     if (allHealthChecksData !== undefined) {
-      const healthCheckName = allHealthChecksData.items[0].name;
-      const healthCheckData =  await umbracoApi.healthCheck.getByName(healthCheckName);
-  
-      // Act
-      await umbracoUi.healthCheck.clickHeathCheckGroupByName(healthCheckName);
-  
-      // Assert
-      for (const check of healthCheckData.checks) {
-        await umbracoUi.healthCheck.isCheckNameVisible(check.name);
-        await umbracoUi.healthCheck.isCheckDescriptionVisible(check.description);
+      for (const healthCheck of allHealthChecksData.items) {
+        const healthCheckName = healthCheck.name;
+        const healthCheckData =  await umbracoApi.healthCheck.getByName(healthCheckName);
+    
+        // Act
+        await umbracoUi.healthCheck.clickHeathCheckGroupByName(healthCheckName);
+    
+        // Assert
+        for (const check of healthCheckData.checks) {
+          await umbracoUi.healthCheck.isCheckNameVisible(check.name);
+          await umbracoUi.healthCheck.isCheckDescriptionVisible(check.description);
+        }
+        await umbracoUi.goBackPage();
       }
     }    
   });
