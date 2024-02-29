@@ -98,6 +98,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const linkType = (entityType as UmbLinkPickerLinkType) ?? 'external';
 
 		this._selectedKey = selectedKey;
+		if (this._selectedKey === undefined) return;
 		this._selectionConfiguration.selection = [this._selectedKey];
 		this.#partialUpdateLink({ type: linkType, unique: selectedKey, url: selectedKey });
 		this.requestUpdate();
