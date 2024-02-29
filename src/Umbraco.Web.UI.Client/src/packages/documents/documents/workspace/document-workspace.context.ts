@@ -70,6 +70,8 @@ export class UmbDocumentWorkspaceContext
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
+	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
+
 	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	constructor(host: UmbControllerHost) {
