@@ -7,5 +7,5 @@ public class NodePermissions
 {
     public Guid NodeKey { get; set; }
 
-    public IEnumerable<string> Permissions { get; set; } = Array.Empty<string>();
+    public ISet<string> Permissions { get; set; } = new HashSet<string>();
 }

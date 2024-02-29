@@ -105,7 +105,7 @@ internal class UserService : RepositoryService, IUserService
         if (permissions.Any(x => x.EntityId == nodeId))
         {
             EntityPermission found = permissions.First(x => x.EntityId == nodeId);
-            var assignedPermissionsArray = found.AssignedPermissions.ToList();
+            var assignedPermissionsArray = found.AssignedPermissions;
 
             // Working with permissions assigned directly to a user AND to their groups, so maybe several per node
             // and we need to get the most permissive set
@@ -1807,7 +1807,7 @@ internal class UserService : RepositoryService, IUserService
     ///     are removed.
     /// </param>
     /// <param name="entityIds">Specify the nodes to replace permissions for. </param>
-    public void ReplaceUserGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds)
+    public void ReplaceUserGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds)
     {
         if (entityIds.Length == 0)
         {
@@ -1821,11 +1821,10 @@ internal class UserService : RepositoryService, IUserService
             _userGroupRepository.ReplaceGroupPermissions(groupId, permissions, entityIds);
             scope.Complete();
 
-            var assigned = permissions?.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray();
-            if (assigned is not null)
+            if (permissions is not null)
             {
                 EntityPermission[] entityPermissions =
-                    entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
+                    entityIds.Select(x => new EntityPermission(groupId, x, permissions)).ToArray();
                 scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
             }
         }
@@ -1837,7 +1836,7 @@ internal class UserService : RepositoryService, IUserService
     /// <param name="groupId">Id of the user group</param>
     /// <param name="permission"></param>
     /// <param name="entityIds">Specify the nodes to replace permissions for</param>
-    public void AssignUserGroupPermission(int groupId, char permission, params int[] entityIds)
+    public void AssignUserGroupPermission(int groupId, string permission, params int[] entityIds)
     {
         if (entityIds.Length == 0)
         {
@@ -1851,7 +1850,7 @@ internal class UserService : RepositoryService, IUserService
             _userGroupRepository.AssignGroupPermission(groupId, permission, entityIds);
             scope.Complete();
 
-            var assigned = new[] { permission.ToString(CultureInfo.InvariantCulture) };
+            var assigned = new HashSet<string>() { permission };
             EntityPermission[] entityPermissions =
                 entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
             scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
@@ -2219,7 +2218,7 @@ internal class UserService : RepositoryService, IUserService
         var results = new List<NodePermissions>();
         foreach (KeyValuePair<Guid, int> node in nodes)
         {
-            var permissions = permissionsCollection.GetAllPermissions(node.Value).ToArray();
+            var permissions = permissionsCollection.GetAllPermissions(node.Value);
             results.Add(new NodePermissions { NodeKey = node.Key, Permissions = permissions });
         }
 
@@ -2271,7 +2270,7 @@ internal class UserService : RepositoryService, IUserService
         var results = new List<NodePermissions>();
         foreach (int nodeId in idKeyMap.Keys)
         {
-            var permissions = permissionCollection.GetAllPermissions(nodeId).ToArray();
+            var permissions = permissionCollection.GetAllPermissions(nodeId);
             results.Add(new NodePermissions { NodeKey = idKeyMap[nodeId], Permissions = permissions });
         }
 
@@ -2523,11 +2522,12 @@ internal class UserService : RepositoryService, IUserService
         return permissionsByEntityId[pathIds[0]];
     }
 
-    private static void AddAdditionalPermissions(List<string> assignedPermissions, string[] additionalPermissions)
+    private static void AddAdditionalPermissions(ISet<string> assignedPermissions, ISet<string> additionalPermissions)
     {
-        IEnumerable<string> permissionsToAdd = additionalPermissions
-            .Where(x => assignedPermissions.Contains(x) == false);
-        assignedPermissions.AddRange(permissionsToAdd);
+        foreach (var additionalPermission in additionalPermissions)
+        {
+            assignedPermissions.Add(additionalPermission);
+        }
     }
 
     #endregion

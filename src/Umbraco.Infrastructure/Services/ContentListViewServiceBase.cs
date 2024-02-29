@@ -189,7 +189,7 @@ internal abstract class ContentListViewServiceBase<TContent, TContentType, TCont
 
     private async Task<Attempt<ListViewConfiguration?, ContentCollectionOperationStatus>> GetListViewConfigurationFromContentTypeAsync(TContentType? contentType)
     {
-        if (contentType?.ListView is null)
+        if (contentType is not null && contentType.ListView is null)
         {
             return Attempt.FailWithStatus<ListViewConfiguration?, ContentCollectionOperationStatus>(ContentCollectionOperationStatus.ContentNotCollection, null);
         }

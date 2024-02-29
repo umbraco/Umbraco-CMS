@@ -18,7 +18,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
@@ -186,8 +185,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
 
             Services.AddSingleton<UmbracoRequestPaths>();
-
-            Services.AddSingleton<InstallStatusTracker>();
 
             Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
             Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());

@@ -105,8 +105,7 @@ public static partial class UmbracoBuilderExtensions
             .AddRepositories()
             .AddServices()
             .AddCoreMappingProfiles()
-            .AddFileSystems()
-            .AddWebAssets();
+            .AddFileSystems();
 
         // register persistence mappers - required by database factory so needs to be done here
         // means the only place the collection can be modified is in a runtime - afterwards it
