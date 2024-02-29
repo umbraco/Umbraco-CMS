@@ -247,17 +247,26 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IDataType>> GetAllAsync(string orderBy, Direction orderDirection, string filter = "")
+        public async Task<IEnumerable<IDataType>> FilterAsync(string orderBy = "name", Direction orderDirection = Direction.Ascending, string? name = null, string? editorUiAlias = null, string? editorAlias = null)
         {
-
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
-            Guid.TryParse(filter, out Guid filterAsGuid);
-            IQuery<IDataType> query = Query<IDataType>()
-                .Where(dataType => dataType.EditorAlias.Contains(filter) ||
-                                   dataType.Key == filterAsGuid ||
-                                   (dataType.EditorUiAlias != null && dataType.EditorUiAlias.Contains(filter)) ||
-                                   (dataType.Name != null && dataType.Name.Contains(filter)));
+            IQuery<IDataType> query = Query<IDataType>();
+            if (name is not null)
+            {
+                query = query.Where(datatype => datatype.Name != null && datatype.Name.Contains(name));
+            }
+
+            if (editorUiAlias is not null)
+            {
+                query = query.Where(datatype => datatype.EditorUiAlias != null && datatype.EditorUiAlias.Contains(editorUiAlias));
+            }
+
+            if (editorAlias is not null)
+            {
+                query = query.Where(datatype => datatype.EditorAlias.Contains(editorAlias));
+            }
+
             IDataType[] dataTypes = (await _dataTypeRepository.GetAsync(orderBy, orderDirection, query)).ToArray();
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
             return dataTypes;

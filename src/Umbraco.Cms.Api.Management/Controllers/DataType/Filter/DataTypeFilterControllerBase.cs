@@ -7,6 +7,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Filter;
 
 [ApiController]
+[ApiExplorerSettings(GroupName = "Data Type")]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Filter}/{Constants.UdiEntityType.DataType}")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public abstract class DataTypeFilterControllerBase : ManagementApiControllerBase
