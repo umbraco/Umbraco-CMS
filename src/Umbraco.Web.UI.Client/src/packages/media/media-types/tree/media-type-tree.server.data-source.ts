@@ -3,11 +3,8 @@ import type { UmbMediaTypeTreeItemModel } from './types.js';
 import type { MediaTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UmbTreeChildrenOfRequestArgs,
-	UmbTreeRootItemsRequestArgs,
-	UmbTreeServerDataSourceBase,
-} from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Media Type tree that fetches data from the server
