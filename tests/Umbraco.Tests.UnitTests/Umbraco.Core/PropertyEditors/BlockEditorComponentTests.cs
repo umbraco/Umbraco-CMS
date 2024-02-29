@@ -53,8 +53,6 @@ public class BlockEditorComponentTests
         var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
         Assert.IsNotEmpty(resultJson);
-        // Console.WriteLine(expectedJson);
-        // Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -87,8 +85,6 @@ public class BlockEditorComponentTests
         var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
         Assert.IsNotEmpty(resultJson);
-        // Console.WriteLine(expectedJson);
-        // Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -116,8 +112,6 @@ public class BlockEditorComponentTests
         var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
         Assert.IsNotEmpty(resultJson);
-        // Console.WriteLine(expectedJson);
-        // Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -152,8 +146,6 @@ public class BlockEditorComponentTests
         var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockListValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockListValue>(result));
         Assert.IsNotEmpty(resultJson);
-        // Console.WriteLine(expectedJson);
-        // Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -185,8 +177,6 @@ public class BlockEditorComponentTests
         var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockGridValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
         Assert.IsNotEmpty(resultJson);
-        // Console.WriteLine(expectedJson);
-        // Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -214,8 +204,6 @@ public class BlockEditorComponentTests
         var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockGridValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
         Assert.IsNotEmpty(resultJson);
-        // Console.WriteLine(expectedJson);
-        // Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
     }
 
@@ -249,8 +237,6 @@ public class BlockEditorComponentTests
         var expectedJson = _jsonSerializer.Serialize( _jsonSerializer.Deserialize<BlockGridValue>(expected));
         var resultJson = _jsonSerializer.Serialize(_jsonSerializer.Deserialize<BlockGridValue>(result));
         Assert.IsNotEmpty(resultJson);
-        // Console.WriteLine(expectedJson);
-        // Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
 
         Assert.True(result.Contains("umb://element/eb459ab17259495b90a3d2f6bb299826"));
