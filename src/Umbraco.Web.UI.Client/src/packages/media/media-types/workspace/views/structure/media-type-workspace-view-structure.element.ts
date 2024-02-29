@@ -73,7 +73,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 					</div>
 				</umb-property-layout>
 			</uui-box>
-			<uui-box headline="Presentation">
+			<uui-box headline=${this.localize.term('contentTypeEditor_presentation')}>
 				<umb-property-layout alias="Root" label="Collection view">
 					<div slot="description">Provides an overview of child content and hides it in the tree.</div>
 					<div slot="editor"><uui-toggle label="Display children in a Collection view"></uui-toggle></div>

@@ -1659,6 +1659,7 @@ export default {
 		collectionsDescription:
 			'Konfigurerer indholdselementet til at vise listen over dets underordnede elementer, underordnede elementer vil ikke blive vist i træet.',
 		structure: 'Struktur',
+		presentation: 'Præsentation',
 	},
 	languages: {
 		addLanguage: 'Tilføj sprog',

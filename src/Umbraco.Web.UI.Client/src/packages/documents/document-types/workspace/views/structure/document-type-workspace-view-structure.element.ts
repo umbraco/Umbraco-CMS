@@ -96,7 +96,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					</div>
 				</umb-property-layout>
 			</uui-box>
-			<uui-box headline="Presentation">
+			<uui-box headline=${this.localize.term('contentTypeEditor_presentation')}>
 				<umb-property-layout alias="collection" label="${this.localize.term('contentTypeEditor_collections')}">
 					<div slot="description">${this.localize.term('contentTypeEditor_collectionsDescription')}</div>
 					<div slot="editor">
