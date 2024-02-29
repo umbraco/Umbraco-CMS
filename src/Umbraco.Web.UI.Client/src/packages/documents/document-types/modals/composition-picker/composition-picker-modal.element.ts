@@ -3,12 +3,13 @@ import type {
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue,
 } from './composition-picker-modal.token.js';
-import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type {
 	UmbDocumentTypeCompositionCompatibleModel,
 	UmbDocumentTypeCompositionReferenceModel,
 } from '@umbraco-cms/backoffice/document-type';
+import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 
 interface CompatibleCompositions {
 	path: string;
@@ -108,12 +109,19 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				${repeat(
 					this._references,
 					(item) => item.unique,
-					(item) =>
-						html`<uui-ref-node-document-type
+					(item) => {
+						const [icon, color] = item.icon ? item.icon.split(' ') : [];
+						const variable = extractUmbColorVariable(color?.replace('color-', ''));
+						console.log(icon, color);
+						return html`<uui-ref-node-document-type
 							href=${'/section/settings/workspace/document-type/edit/' + item.unique}
 							name=${item.name}>
-							<uui-icon slot="icon" name=${item.icon}></uui-icon>
-						</uui-ref-node-document-type>`,
+							<uui-icon
+								slot="icon"
+								name=${icon}
+								style=${ifDefined(variable ? `--uui-icon-color:var(${variable})` : undefined)}></uui-icon>
+						</uui-ref-node-document-type>`;
+					},
 				)}
 			</div>`;
 	}
