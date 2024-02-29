@@ -1,6 +1,11 @@
 import { UmbFolderModalElementBase } from './folder-modal-element-base.js';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbFolderCreateModalData, UmbFolderCreateModalValue, UmbFolderModel } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbCreateFolderModel,
+	UmbFolderCreateModalData,
+	UmbFolderCreateModalValue,
+	UmbFolderModel,
+} from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-folder-create-modal')
 export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
@@ -17,9 +22,8 @@ export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
 
 	async init() {
 		if (!this.folderRepository) throw new Error('A folder repository is required to create a folder');
-		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create folder');
 
-		const { data } = await this.folderRepository.createScaffold(this.data.parentUnique);
+		const { data } = await this.folderRepository.createScaffold();
 
 		if (data) {
 			this._folderScaffold = data;
@@ -29,13 +33,15 @@ export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
 	async onFormSubmit({ name }: { name: string }): Promise<void> {
 		if (!this.folderRepository) throw new Error('A folder repository is required to create a folder');
 		if (!this._folderScaffold) throw new Error('The folder scaffold was not initialized correctly');
+		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create folder');
 
-		const data = {
+		const createFolderModel: UmbCreateFolderModel = {
 			...this._folderScaffold,
+			parentUnique: this.data.parentUnique,
 			name,
 		};
 
-		const { data: createdFolder } = await this.folderRepository.create(data);
+		const { data: createdFolder } = await this.folderRepository.create(createFolderModel);
 
 		if (createdFolder) {
 			this.value = { folder: createdFolder };
