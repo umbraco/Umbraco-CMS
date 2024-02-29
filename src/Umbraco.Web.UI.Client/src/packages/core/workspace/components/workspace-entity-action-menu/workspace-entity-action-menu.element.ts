@@ -8,7 +8,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_entityId?: string;
+	_unique?: string;
 
 	@state()
 	_entityType?: string;
@@ -27,7 +27,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 
 	private _observeInfo() {
 		if (!this._workspaceContext) return;
-		this._entityId = this._workspaceContext.getUnique();
+		this._unique = this._workspaceContext.getUnique();
 		this._entityType = this._workspaceContext.getEntityType();
 	}
 
@@ -47,7 +47,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	}
 
 	#renderActionsMenu() {
-		return this._entityId && this._entityType
+		return this._unique && this._entityType
 			? html`
 					<uui-button popovertarget="workspace-entity-action-menu-popover" label="Actions">
 						Actions
@@ -62,7 +62,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 								<umb-entity-action-list
 									@action-executed=${this.#onActionExecuted}
 									.entityType=${this._entityType}
-									.unique=${this._entityId}>
+									.unique=${this._unique}>
 								</umb-entity-action-list>
 							</uui-scroll-container>
 						</umb-popover-layout>

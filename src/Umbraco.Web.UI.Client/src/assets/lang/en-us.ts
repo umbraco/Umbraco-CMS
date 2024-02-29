@@ -1652,6 +1652,9 @@ export default {
 			'<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.',
 		changeDataTypeHelpText:
 			'Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.',
+		collections: 'Collections',
+		collectionsDescription:
+			'Configures the content item to show list of its children, the children will not be shown in the tree.',
 	},
 	languages: {
 		addLanguage: 'Add language',

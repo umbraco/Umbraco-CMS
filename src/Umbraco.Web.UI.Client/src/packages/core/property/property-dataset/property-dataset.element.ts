@@ -1,5 +1,5 @@
 import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
-import { UmbPropertyDatasetBaseContext } from './property-dataset-base-context.js';
+import { UmbPropertyDatasetContextBase } from './property-dataset-base-context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -14,7 +14,7 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 	// Determine wether state change should fire an event when the value is changed.
 	#allowChangeEvent = false;
 
-	public readonly context: UmbPropertyDatasetBaseContext;
+	public readonly context: UmbPropertyDatasetContextBase;
 
 	/**
 	 * The value of the dataset.
@@ -91,7 +91,7 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 			}
 		});
 
-		this.context = new UmbPropertyDatasetBaseContext(this);
+		this.context = new UmbPropertyDatasetContextBase(this);
 		// prevent the first change event from firing:
 		this.#allowChangeEvent = false;
 		this.observe(this.context.name, this.#observerCallback);

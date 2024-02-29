@@ -2,11 +2,11 @@
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export class UmbResourceController extends UmbBaseController {
+export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
 
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;

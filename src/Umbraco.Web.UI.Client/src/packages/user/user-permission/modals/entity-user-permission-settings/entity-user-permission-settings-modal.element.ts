@@ -1,11 +1,10 @@
-import { html, customElement, css, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement, css, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbEntityUserPermissionSettingsModalData,
-	UmbEntityUserPermissionSettingsModalValue} from '@umbraco-cms/backoffice/modal';
-import {
-	UmbModalBaseElement,
+	UmbEntityUserPermissionSettingsModalValue,
 } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-entity-user-permission-settings-modal')
@@ -16,7 +15,6 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	set data(data: UmbEntityUserPermissionSettingsModalData | undefined) {
 		super.data = data;
 		this._entityType = data?.entityType;
-		this._allowedPermissions = data?.allowedPermissions ?? [];
 		this._headline = data?.headline ?? this._headline;
 	}
 
@@ -26,17 +24,9 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	@state()
 	_entityType?: string;
 
-	@state()
-	_allowedPermissions: Array<string> = [];
-
-	private _handleConfirm() {
-		this.value = { allowedPermissions: this._allowedPermissions };
-		this.modalContext?.submit();
-	}
-
-	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
+	#onPermissionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as any;
-		this._allowedPermissions = target.selectedPermissions;
+		this.updateValue({ allowedVerbs: target.allowedVerbs });
 	}
 
 	render() {
@@ -44,10 +34,10 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 			<umb-body-layout headline=${this._headline}>
 				<uui-box>
 					${this._entityType
-						? html` <umb-entity-user-permission-settings-list
+						? html` <umb-input-entity-user-permission
 								.entityType=${this._entityType}
-								.selectedPermissions=${this._allowedPermissions}
-								@selection-change=${this.#onSelectedUserPermission}></umb-entity-user-permission-settings-list>`
+								.allowedVerbs=${this.value?.allowedVerbs ?? []}
+								@change=${this.#onPermissionChange}></umb-input-entity-user-permission>`
 						: nothing}
 				</uui-box>
 
@@ -58,7 +48,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 					color="positive"
 					look="primary"
 					label="Confirm"
-					@click=${this._handleConfirm}></uui-button>
+					@click=${this._submitModal}></uui-button>
 			</umb-body-layout>
 		`;
 	}

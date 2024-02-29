@@ -1,12 +1,12 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../workspace/block-workspace.context-token.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbBlockWorkspaceHasSettingsCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbBlockWorkspaceHasSettingsCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: BlockWorkspaceHasSettingsConditionConfig;
 	permitted = false;
 	#onChange: () => void;
