@@ -179,7 +179,7 @@ public class LegacyPasswordSecurity
         using HashAlgorithm hashAlgorithm = GetHashAlgorithm(algorithmType);
         if (hashAlgorithm is KeyedHashAlgorithm algorithm)
         {
-            using KeyedHashAlgorithm keyedHashAlgorithm = algorithm;
+            KeyedHashAlgorithm keyedHashAlgorithm = algorithm;
             if (keyedHashAlgorithm.Key.Length == saltBytes.Length)
             {
                 // if the salt bytes is the required key length for the algorithm, use it as-is
