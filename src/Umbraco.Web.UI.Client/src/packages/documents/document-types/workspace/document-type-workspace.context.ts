@@ -8,6 +8,8 @@ import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@u
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -181,6 +183,15 @@ export class UmbDocumentTypeWorkspaceContext
 
 		if (this.getIsNew()) {
 			if ((await this.structure.create()) === true) {
+				// TODO: this might not be the right place to alert the tree, but it works for now
+				if (!this.#parent) throw new Error('Parent is not set');
+				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+					entityType: this.#parent.entityType,
+					unique: this.#parent.unique,
+				});
+				eventContext.dispatchEvent(event);
+
 				this.setIsNew(false);
 			}
 		} else {
