@@ -36,6 +36,9 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 	async #setInitialSelection() {
 		let selected = this.value?.selection ?? [];
 
+		// Filter selection based on options:
+		selected = selected.filter((s) => this.data?.options.some((o) => o.unique === s));
+
 		if (selected.length === 0) {
 			const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
 			const appCulture = context.getAppCulture();

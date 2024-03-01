@@ -353,7 +353,10 @@ export class UmbDocumentWorkspaceContext
 
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
 		// TODO: We need to filter the selected array, so it only contains one of each variantId. [NL]
-		const selected = activeVariantIds.concat(this.#calculateChangedVariants());
+		const changedVariantIds = this.#calculateChangedVariants();
+		const selected = activeVariantIds.concat(changedVariantIds);
+		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
+
 		const options = await firstValueFrom(this.variantOptions);
 
 		// If there is only one variant, we don't need to open the modal.

@@ -253,7 +253,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	async #openTemplatePicker() {
-		console.log(this._allowedTemplates);
 		const modal = this.#modalManagerContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
