@@ -1,3 +1,5 @@
+import './index.js';
+
 export const name = 'Umbraco.Core.UmbracoNews';
 export const extensions = [
 	{
