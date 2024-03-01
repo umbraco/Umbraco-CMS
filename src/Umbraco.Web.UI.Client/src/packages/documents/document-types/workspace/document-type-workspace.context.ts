@@ -154,7 +154,7 @@ export class UmbDocumentTypeWorkspaceContext
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
 		this.#parent = parent;
-		const { data } = await this.structure.createScaffold(this.#parent.unique);
+		const { data } = await this.structure.createScaffold();
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -182,9 +182,10 @@ export class UmbDocumentTypeWorkspaceContext
 		if (data === undefined) throw new Error('Cannot save, no data');
 
 		if (this.getIsNew()) {
-			if ((await this.structure.create()) === true) {
+			if (!this.#parent) throw new Error('Parent is not set');
+
+			if ((await this.structure.create(this.#parent.unique)) === true) {
 				// TODO: this might not be the right place to alert the tree, but it works for now
-				if (!this.#parent) throw new Error('Parent is not set');
 				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
 					entityType: this.#parent.entityType,
