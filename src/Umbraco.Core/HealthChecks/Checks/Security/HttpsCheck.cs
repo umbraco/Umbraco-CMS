@@ -80,7 +80,7 @@ public class HttpsCheck : HealthCheck
         var urlBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl) { Scheme = Uri.UriSchemeHttps };
         Uri url = urlBuilder.Uri;
 
-        var request = new HttpRequestMessage(HttpMethod.Head, url);
+        using var request = new HttpRequestMessage(HttpMethod.Head, url);
 
         try
         {
