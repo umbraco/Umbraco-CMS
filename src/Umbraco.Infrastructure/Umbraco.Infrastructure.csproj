@@ -23,7 +23,6 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" />
     <PackageReference Include="MiniProfiler.Shared" />
     <PackageReference Include="ncrontab" />
-    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="NPoco" />
     <PackageReference Include="OpenIddict.Abstractions" />
     <PackageReference Include="Serilog" />

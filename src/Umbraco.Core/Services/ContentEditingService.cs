@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -37,8 +36,13 @@ internal sealed class ContentEditingService
         return await Task.FromResult(content);
     }
 
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IContent content, ContentUpdateModel updateModel)
-        => await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key);
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, ContentUpdateModel updateModel)
+    {
+        IContent? content = ContentService.GetById(key);
+        return content is not null
+            ? await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+    }
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
         => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey);
@@ -74,11 +78,17 @@ internal sealed class ContentEditingService
             : Attempt.FailWithStatus(saveStatus, new ContentCreateResult { Content = content });
     }
 
-    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, Guid userKey)
+    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey)
     {
         if (await ValidateCulturesAsync(updateModel) is false)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentUpdateResult { Content = content });
+        }
+
+        IContent? content = ContentService.GetById(key);
+        if (content is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
         }
 
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(content, updateModel);

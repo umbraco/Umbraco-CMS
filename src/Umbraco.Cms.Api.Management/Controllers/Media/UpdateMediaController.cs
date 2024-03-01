@@ -24,7 +24,7 @@ public class UpdateMediaController : UpdateMediaControllerBase
         IMediaEditingService mediaEditingService,
         IMediaEditingPresentationFactory mediaEditingPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : base(authorizationService, mediaEditingService)
+        : base(authorizationService)
     {
         _mediaEditingService = mediaEditingService;
         _mediaEditingPresentationFactory = mediaEditingPresentationFactory;
@@ -37,11 +37,11 @@ public class UpdateMediaController : UpdateMediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateMediaRequestModel requestModel)
-        => await HandleRequest(id, async media =>
+        => await HandleRequest(id, async () =>
         {
             MediaUpdateModel model = _mediaEditingPresentationFactory.MapUpdateModel(requestModel);
             Attempt<MediaUpdateResult, ContentEditingOperationStatus> result =
-                await _mediaEditingService.UpdateAsync(media, model, CurrentUserKey(_backOfficeSecurityAccessor));
+                await _mediaEditingService.UpdateAsync(id, model, CurrentUserKey(_backOfficeSecurityAccessor));
 
             return result.Success
                 ? Ok()

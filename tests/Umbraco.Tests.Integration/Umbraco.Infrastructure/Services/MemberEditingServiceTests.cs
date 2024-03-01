@@ -81,7 +81,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             }
         };
 
-        var result = await MemberEditingService.UpdateAsync(member, updateModel, SuperUser());
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
         Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
@@ -112,7 +112,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             NewPassword = "NewSuperSecret123"
         };
 
-        var result = await MemberEditingService.UpdateAsync(member, updateModel, SuperUser());
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
         Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
@@ -139,7 +139,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             Roles = new [] { "RoleTwo", "RoleThree" }
         };
 
-        var result = await MemberEditingService.UpdateAsync(member, updateModel, SuperUser());
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status.ContentEditingOperationStatus);
         Assert.AreEqual(MemberEditingOperationStatus.Success, result.Status.MemberEditingOperationStatus);
@@ -243,7 +243,7 @@ public class MemberEditingServiceTests : UmbracoIntegrationTest
             }
         };
 
-        var result = await MemberEditingService.UpdateAsync(member, updateModel, SuperUser());
+        var result = await MemberEditingService.UpdateAsync(member.Key, updateModel, SuperUser());
 
         // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
         Assert.IsTrue(result.Success);

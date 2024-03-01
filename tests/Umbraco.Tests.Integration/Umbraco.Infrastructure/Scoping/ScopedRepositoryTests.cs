@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -328,7 +329,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
     public class LocalServerMessenger : ServerMessengerBase
     {
         public LocalServerMessenger()
-            : base(false)
+            : base(false, new SystemTextJsonSerializer())
         {
         }
 
