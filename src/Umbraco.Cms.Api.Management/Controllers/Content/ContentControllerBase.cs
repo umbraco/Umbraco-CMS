@@ -60,9 +60,9 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid sorting options")
                 .WithDetail("The supplied sorting operations were invalid. Additional details can be found in the log.")
                 .Build()),
-            ContentEditingOperationStatus.LanguageNotFound => BadRequest(problemDetailsBuilder
-                .WithTitle("Invalid language")
-                .WithDetail("One or more of the supplied languages (culture codes) did not match the configured languages.")
+            ContentEditingOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid culture")
+                .WithDetail("One or more of the supplied culture codes did not match the configured languages.")
                 .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,

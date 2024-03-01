@@ -47,7 +47,7 @@ internal sealed class ContentEditingService
     {
         if (await ValidateCulturesAsync(createModel) is false)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.LanguageNotFound, new ContentCreateResult());
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentCreateResult());
         }
 
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await MapCreate<ContentCreateResult>(createModel);
@@ -78,7 +78,7 @@ internal sealed class ContentEditingService
     {
         if (await ValidateCulturesAsync(updateModel) is false)
         {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.LanguageNotFound, new ContentUpdateResult { Content = content });
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentUpdateResult { Content = content });
         }
 
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(content, updateModel);
@@ -129,7 +129,7 @@ internal sealed class ContentEditingService
         ContentEditingModelBase contentEditingModelBase,
         Guid contentTypeKey)
         => await ValidateCulturesAsync(contentEditingModelBase) is false
-            ? Attempt.FailWithStatus(ContentEditingOperationStatus.LanguageNotFound, new ContentValidationResult())
+            ? Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentValidationResult())
             : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey);
 
     private async Task<ContentEditingOperationStatus> UpdateTemplateAsync(IContent content, Guid? templateKey)

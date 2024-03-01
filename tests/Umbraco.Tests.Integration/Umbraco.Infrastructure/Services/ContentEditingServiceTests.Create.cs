@@ -592,7 +592,7 @@ public partial class ContentEditingServiceTests
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.LanguageNotFound, result.Status);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
     }
 
     private void AssertBodyTextEquals(string expected, IContent content)

@@ -61,7 +61,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
 
             var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
-            if (cultures.Any(x => x == "*") || cultures.All(x=> validCultures.Contains(x, StringComparer.InvariantCultureIgnoreCase) is false))
+            if (cultures.Any(x => x == "*") || cultures.All(x=> validCultures.Contains(x) is false))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
@@ -277,7 +277,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
 
         foreach (var culture in cultures)
         {
-            if (validCultures.Contains(culture, StringComparer.InvariantCultureIgnoreCase) is false)
+            if (validCultures.Contains(culture) is false)
             {
                 scope.Complete();
                 return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
