@@ -120,7 +120,6 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 
 		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => {
-			console.log(selectedItems);
 			this._items = selectedItems;
 		});
 	}
