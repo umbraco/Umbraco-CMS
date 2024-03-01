@@ -122,6 +122,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeIsSelectable();
 		this.#observeIsSelected();
 		this.#observeSectionPath();
+		this.#hasChildrenInitValueFlag = false;
 		this.#observeHasChildren();
 	}
 
@@ -178,6 +179,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
+			this.#hasChildrenInitValueFlag = false;
 			this.#observeHasChildren();
 		});
 
