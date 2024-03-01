@@ -110,11 +110,20 @@ export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 	public setAlias(alias: string | undefined): void {
 		this.#alias.setValue(alias);
 	}
+	public getAlias(): string | undefined {
+		return this.#alias.getValue();
+	}
 	public setLabel(label: string | undefined): void {
 		this.#label.setValue(label);
 	}
+	public getLabel(): string | undefined {
+		return this.#label.getValue();
+	}
 	public setDescription(description: string | undefined): void {
 		this.#description.setValue(description);
+	}
+	public getDescription(): string | undefined {
+		return this.#description.getValue();
 	}
 	/**
 	 * Set the value of this property.
@@ -135,6 +144,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 	}
 	public setConfig(config: Array<UmbPropertyEditorConfigProperty> | undefined): void {
 		this.#configValues.setValue(config ?? []);
+	}
+	public getConfig(): Array<UmbPropertyEditorConfigProperty> | undefined {
+		return this.#configValues.getValue();
 	}
 	public setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId.setValue(variantId);
