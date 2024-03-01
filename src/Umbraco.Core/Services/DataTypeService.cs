@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -249,27 +250,40 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public async Task<IEnumerable<IDataType>> FilterAsync(string orderBy = "name", Direction orderDirection = Direction.Ascending, string? name = null, string? editorUiAlias = null, string? editorAlias = null)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            IEnumerable<IDataType> dataTypes = _dataTypeRepository.GetMany();
 
-            IQuery<IDataType> query = Query<IDataType>();
             if (name is not null)
             {
-                query = query.Where(datatype => datatype.Name != null && datatype.Name.Contains(name));
+                dataTypes = dataTypes.Where(datatype => datatype.Name?.Contains(name) ?? false);
             }
 
-            if (editorUiAlias is not null)
+            if (editorUiAlias != null)
             {
-                query = query.Where(datatype => datatype.EditorUiAlias != null && datatype.EditorUiAlias.Contains(editorUiAlias));
+                dataTypes = dataTypes.Where(datatype => datatype.EditorUiAlias?.Contains(editorUiAlias) ?? false);
             }
 
-            if (editorAlias is not null)
+            if (editorAlias != null)
             {
-                query = query.Where(datatype => datatype.EditorAlias.Contains(editorAlias));
+                dataTypes = dataTypes.Where(datatype => datatype.EditorAlias.Contains(editorAlias));
             }
 
-            IDataType[] dataTypes = (await _dataTypeRepository.GetAsync(orderBy, orderDirection, query)).ToArray();
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
-            return dataTypes;
+
+            return OrderByProperty(dataTypes, orderBy, orderDirection);
+        }
+
+        private IEnumerable<IDataType> OrderByProperty(IEnumerable<IDataType> dataTypes, string orderBy, Direction orderDirection)
+        {
+            // Get the property info for the specified property name
+            PropertyInfo? property = typeof(IDataType).GetProperty(orderBy, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+            if (property == null)
+            {
+                throw new ArgumentException($"Property '{orderBy}' not found in IDataTypes");
+            }
+
+            // Order the data types based on the specified property
+            return orderDirection == Direction.Ascending ? dataTypes.OrderBy(x => property.GetValue(x)) : dataTypes.OrderByDescending(x => property.GetValue(x));
         }
 
         /// <summary>

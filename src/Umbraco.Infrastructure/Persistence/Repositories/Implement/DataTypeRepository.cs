@@ -53,17 +53,6 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
     public IDataType? Get(Guid key) => GetMany().FirstOrDefault(x=>x.Key == key);
 
-    public async Task<IEnumerable<IDataType>> GetAsync(string orderBy, Direction orderDirection, IQuery<IDataType> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<IDataType>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-
-        List<DataTypeDto>? dtos = await Database.FetchAsync<DataTypeDto>(sql);
-
-        return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
-    }
-
     public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
     {
         var parentId = -1;

@@ -23,15 +23,15 @@ public class FilterDataTypeFilterController : DataTypeFilterControllerBase
 
     [HttpGet]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(DataTypeItemResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<DataTypeItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Filter(
         int skip = 0,
         int take = 100,
         string orderBy = "name",
         Direction orderDirection = Direction.Ascending,
-        [FromQuery] string name = "",
-        [FromQuery] string? editorUiAlias = null,
-        [FromQuery] string? editorAlias = null)
+        string name = "",
+        string? editorUiAlias = null,
+        string? editorAlias = null)
     {
         IEnumerable<IDataType> dataTypes = (await _dataTypeService.FilterAsync(orderBy, orderDirection, name, editorUiAlias, editorAlias)).Skip(skip).Take(take);
         List<DataTypeItemResponseModel> responseModels = _mapper.MapEnumerable<IDataType, DataTypeItemResponseModel>(dataTypes);
