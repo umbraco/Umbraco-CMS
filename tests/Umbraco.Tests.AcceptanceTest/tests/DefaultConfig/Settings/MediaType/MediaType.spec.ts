@@ -2,36 +2,29 @@ import {expect} from '@playwright/test';
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 
 test.describe('Media Type tests', () => {
-
   const mediaTypeName = 'TestMediaType';
   const dataTypeName = 'Upload File';
   const groupName = 'TestGroup';
   const tabName = 'TestTab';
 
-
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName)
     await umbracoUi.goToBackOffice();
     await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
-
   });
 
   test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName)
-
-
   });
 
   // Design
   // Name and alias is removed when saving
   test.skip('can create an empty media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
+    // Act
     await umbracoUi.mediaType.clickActionsMenuForName('Media Types');
     await umbracoUi.mediaType.clickCreateThreeDotsButton();
     await umbracoUi.mediaType.clickNewMediaTypeButton();
-
     await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
-
     await umbracoUi.mediaType.clickSaveButton();
 
     // Assert
@@ -133,7 +126,7 @@ test.describe('Media Type tests', () => {
   });
 
   test('can delete a media type', async ({page, umbracoApi, umbracoUi}) => {
-// Arrange
+    // Arrange
     await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
     // Act
@@ -142,12 +135,10 @@ test.describe('Media Type tests', () => {
     await umbracoUi.mediaType.clickDeleteButton();
     await umbracoUi.mediaType.clickConfirmToDeleteButton();
 
-
     // Assert
     await umbracoUi.mediaType.isSuccessNotificationVisible();
     expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeFalsy();
   });
-
 
   test('can delete a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
@@ -156,13 +147,10 @@ test.describe('Media Type tests', () => {
 
     // Act
     await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-
-
-    const containerName =  page.locator('[container-name="TestGroup"]');
+    const containerName = page.locator('[container-name="TestGroup"]');
     await containerName.hover();
-    await containerName.getByLabel('Delete').click( {force: true} );
+    await containerName.getByLabel('Delete').click({force: true});
     await umbracoUi.mediaType.clickDeleteButton();
-
     await umbracoUi.mediaType.clickSaveButton();
 
     // Assert
@@ -211,21 +199,20 @@ test.describe('Media Type tests', () => {
 
   });
 
-  // Nothing happens when you press the composistion button
+  // Nothing happens when you press the composition button
   test.skip('can create a media type with a composition', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const compositionMediaTypeName = 'CompositionMediaType';
     await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
     const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     const compositionMediaTypeId = await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(compositionMediaTypeName, dataTypeName, dataTypeData.id, groupName);
-    await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName)
+    await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
     // Act
     await umbracoUi.mediaType.goToMediaType(mediaTypeName);
     await umbracoUi.mediaType.clickCompositionsButton();
     await umbracoUi.mediaType.clickButtonWithName(compositionMediaTypeName)
     // This is needed
-    await umbracoUi.waitForTimeout(200);
     await umbracoUi.mediaType.clickSubmitButton();
     await umbracoUi.mediaType.clickSaveButton();
 
@@ -239,7 +226,6 @@ test.describe('Media Type tests', () => {
     // Clean
     await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
   });
-
 
   // Not possible
   test.skip('can reorder a group in a media type', async ({page, umbracoApi, umbracoUi}) => {
@@ -270,5 +256,32 @@ test.describe('Media Type tests', () => {
   });
 
 // Structure
+  test('can create a media type with allow as root enabled', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
+    await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
+    // Act
+    await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+    await umbracoUi.mediaType.clickStructureTab();
+    await umbracoUi.mediaType.clickAllowAsRootButton();
+    await umbracoUi.mediaType.clickSaveButton();
+
+    // Assert
+    await umbracoUi.mediaType.isSuccessNotificationVisible();
+    const documentTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+    expect(documentTypeData.allowedAsRoot).toBeTruthy();
+  });
+
+  // It is currently not possible to add a childNodeType to a mediaType
+  test.skip('can create a media type with an allowed child node type', async ({page, umbracoApi, umbracoUi}) => {
+  });
+
+  // It is currently not possible to add a childNodeType to a mediaType
+  test.skip('can create a media type with multiple allowed child nodes types', async ({page, umbracoApi, umbracoUi}) => {
+  });
+
+  // It is currently not possible enable display children in a collection view
+  test.skip('can create a media type with display children in a collection view enabled', async ({page, umbracoApi, umbracoUi}) => {
+  });
 });
