@@ -13,9 +13,11 @@ export class UmbConfirmModalController extends UmbControllerBase {
 			data: args,
 		});
 
-		await modalContext.onSubmit().catch(() => {
+		const p = modalContext.onSubmit();
+		p.catch(() => {
 			this.destroy();
 		});
+		await p;
 
 		// This is a one time off, so we can destroy our selfs.
 		this.destroy();
