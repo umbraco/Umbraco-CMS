@@ -9,12 +9,12 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup;
 
 [ApiVersion("1.0")]
-public class ByIdMemberGroupController : MemberGroupControllerBase
+public class ByKeyMemberGroupController : MemberGroupControllerBase
 {
     private readonly IMemberGroupService _memberGroupService;
     private readonly IUmbracoMapper _mapper;
 
-    public ByIdMemberGroupController(IMemberGroupService memberGroupService, IUmbracoMapper mapper)
+    public ByKeyMemberGroupController(IMemberGroupService memberGroupService, IUmbracoMapper mapper)
     {
         _memberGroupService = memberGroupService;
         _mapper = mapper;
@@ -24,7 +24,7 @@ public class ByIdMemberGroupController : MemberGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(MemberGroupResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ById(Guid id)
+    public async Task<IActionResult> ByKey(Guid id)
     {
         IMemberGroup? memberGroup = await _memberGroupService.GetAsync(id);
         if (memberGroup is null)
