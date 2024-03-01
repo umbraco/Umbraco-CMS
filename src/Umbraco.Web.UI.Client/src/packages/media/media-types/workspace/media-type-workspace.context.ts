@@ -9,6 +9,8 @@ import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observa
 import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
@@ -147,6 +149,13 @@ export class UmbMediaTypeWorkspaceContext
 
 		if (this.getIsNew()) {
 			if ((await this.structure.create()) === true) {
+				if (!this.#parent) throw new Error('Parent is not set');
+				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+					entityType: this.#parent.entityType,
+					unique: this.#parent.unique,
+				});
+				eventContext.dispatchEvent(event);
 				this.setIsNew(false);
 			}
 		} else {
