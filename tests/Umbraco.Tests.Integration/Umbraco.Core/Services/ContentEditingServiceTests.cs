@@ -86,7 +86,7 @@ public class ContentEditingServiceTests : UmbracoIntegrationTestWithContent
             }
         };
 
-        await ContentTypeEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        await ContentTypeEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
 
         var updatedContent = ContentService.GetById(documentKey)!;
 

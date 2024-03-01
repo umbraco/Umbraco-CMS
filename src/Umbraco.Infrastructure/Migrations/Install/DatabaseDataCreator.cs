@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -73,6 +74,8 @@ internal class DatabaseDataCreator
         }
     ];
 
+    private const string ImageMediaTypeKey = "cc07b313-0843-4aa8-bbda-871c8da728c8";
+
     private readonly IDatabase _database;
 
     private readonly IDictionary<string, IList<string>> _entitiesToAlwaysCreate = new Dictionary<string, IList<string>>
@@ -130,6 +133,11 @@ internal class DatabaseDataCreator
             CreateUserGroupData();
         }
 
+        if (tableName.Equals(Constants.DatabaseSchema.Tables.UserGroup2Permission))
+        {
+            CreateUserGroup2PermissionData();
+        }
+
         if (tableName.Equals(Constants.DatabaseSchema.Tables.User2UserGroup))
         {
             CreateUser2UserGroupData();
@@ -181,6 +189,35 @@ internal class DatabaseDataCreator
         }
 
         _logger.LogInformation("Completed creating data in {TableName}", tableName);
+    }
+
+    private void CreateUserGroup2PermissionData()
+    {
+        var userGroupKeyToPermissions = new Dictionary<Guid, IEnumerable<string>>()
+        {
+            [Constants.Security.AdminGroupKey] = new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionAssignDomain.ActionLetter, ActionPublish.ActionLetter, ActionRights.ActionLetter, ActionUnpublish.ActionLetter, ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "7", "T"},
+            [Constants.Security.WriterGroupKey] =  new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionToPublish.ActionLetter, ActionBrowse.ActionLetter, ActionNotify.ActionLetter, ":"},
+            [Constants.Security.EditorGroupKey] = new []{ActionNew.ActionLetter, ActionUpdate.ActionLetter, ActionDelete.ActionLetter, ActionMove.ActionLetter, ActionCopy.ActionLetter, ActionSort.ActionLetter, ActionRollback.ActionLetter, ActionProtect.ActionLetter, ActionPublish.ActionLetter, ActionUnpublish.ActionLetter,  ActionBrowse.ActionLetter, ActionCreateBlueprintFromContent.ActionLetter, ActionNotify.ActionLetter, ":", "5", "T"},
+            [Constants.Security.TranslatorGroupKey] =  new []{ActionUpdate.ActionLetter, ActionBrowse.ActionLetter},
+        };
+
+        var i = 1;
+        foreach (var (userGroupKey, permissions) in userGroupKeyToPermissions)
+        {
+            foreach (var permission in permissions)
+            {
+                _database.Insert(
+                    Constants.DatabaseSchema.Tables.UserGroup2Permission,
+                    "id",
+                    false,
+                    new UserGroup2PermissionDto
+                    {
+                        Id = i++,
+                        UserGroupKey = userGroupKey,
+                        Permission = permission,
+                    });
+            }
+        }
     }
 
     internal static Guid CreateUniqueRelationTypeId(string alias, string name) => (alias + "____" + name).ToGuid();
@@ -893,7 +930,7 @@ internal class DatabaseDataCreator
             Constants.DatabaseSchema.Tables.Node,
             "id");
 
-        var imageUniqueId = new Guid("cc07b313-0843-4aa8-bbda-871c8da728c8");
+        var imageUniqueId = new Guid(ImageMediaTypeKey);
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
             imageUniqueId.ToString(),
@@ -1220,7 +1257,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.AdminGroupAlias,
                 Name = "Administrators",
-                DefaultPermissions = "CADMOSKTPIURZ:5F7ïN",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-medal",
@@ -1238,7 +1274,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.WriterGroupAlias,
                 Name = "Writers",
-                DefaultPermissions = "CAH:FN",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-edit",
@@ -1256,7 +1291,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.EditorGroupAlias,
                 Name = "Editors",
-                DefaultPermissions = "CADMOSKTPUZ:5FïN",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-tools",
@@ -1274,7 +1308,6 @@ internal class DatabaseDataCreator
                 StartContentId = -1,
                 Alias = Constants.Security.TranslatorGroupAlias,
                 Name = "Translators",
-                DefaultPermissions = "AF",
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-globe",
@@ -1290,7 +1323,6 @@ internal class DatabaseDataCreator
                 Key = Constants.Security.SensitiveDataGroupKey,
                 Alias = Constants.Security.SensitiveDataGroupAlias,
                 Name = "Sensitive data",
-                DefaultPermissions = string.Empty,
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
                 Icon = "icon-lock",
@@ -1911,9 +1943,9 @@ internal class DatabaseDataCreator
 
         // layouts for the list view
         const string cardLayout =
-            "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": 1, \"selected\": true}";
+            "{\"name\": \"Grid\",\"path\": \"views/propertyeditors/listview/layouts/grid/grid.html\", \"icon\": \"icon-thumbnails-small\", \"isSystem\": true, \"selected\": true}";
         const string listLayout =
-            "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": 1,\"selected\": true}";
+            "{\"name\": \"List\",\"path\": \"views/propertyeditors/listview/layouts/list/list.html\",\"icon\": \"icon-list\", \"isSystem\": true,\"selected\": true}";
         const string layouts = "[" + cardLayout + "," + listLayout + "]";
 
         // Insert data types only if the corresponding Node record exists (which may or may not have been created depending on configuration
@@ -1952,7 +1984,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.RichText,
                     DbType = "Ntext",
                     Configuration =
-                        "{\"value\":\",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|\"}",
+                        "{\"toolbar\":[\"ace\",\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"stylesheets\":[],\"maxImageSize\":500,\"mode\":\"classic\"}",
                 });
         }
 
@@ -2010,6 +2042,7 @@ internal class DatabaseDataCreator
                     NodeId = Constants.DataTypes.DateTime,
                     EditorAlias = Constants.PropertyEditors.Aliases.DateTime,
                     DbType = "Date",
+                    Configuration = "{\"format\":\"YYYY-MM-DD HH:mm:ss\"}",
                 });
         }
 
@@ -2104,7 +2137,7 @@ internal class DatabaseDataCreator
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
                         layouts +
-                        ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1},{\"alias\":\"owner\",\"header\":\"Updated by\",\"isSystem\":1}]}",
+                        ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }
 
@@ -2122,7 +2155,7 @@ internal class DatabaseDataCreator
                     Configuration =
                         "{\"pageSize\":100, \"orderBy\":\"updateDate\", \"orderDirection\":\"desc\", \"layouts\":" +
                         layouts +
-                        ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1},{\"alias\":\"owner\",\"header\":\"Updated by\",\"isSystem\":1}]}",
+                        ", \"includeProperties\":[{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true},{\"alias\":\"creator\",\"header\":\"Updated by\",\"isSystem\":true}]}",
                 });
         }
 
@@ -2138,7 +2171,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.ListView,
                     DbType = "Nvarchar",
                     Configuration =
-                        "{\"pageSize\":10, \"orderBy\":\"username\", \"orderDirection\":\"asc\", \"includeProperties\":[{\"alias\":\"username\",\"isSystem\":1},{\"alias\":\"email\",\"isSystem\":1},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":1}]}",
+                        "{\"pageSize\":10, \"orderBy\":\"username\", \"orderDirection\":\"asc\", \"includeProperties\":[{\"alias\":\"username\",\"isSystem\":true},{\"alias\":\"email\",\"isSystem\":true},{\"alias\":\"updateDate\",\"header\":\"Last edited\",\"isSystem\":true}]}",
                 });
         }
 
@@ -2185,7 +2218,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
                     DbType = "Nvarchar",
                     Configuration =
-                        "{\"fileExtensions\":[{\"id\":0, \"value\":\"mp4\"}, {\"id\":1, \"value\":\"webm\"}, {\"id\":2, \"value\":\"ogv\"}]}",
+                        "{\"fileExtensions\":[\"mp4\",\"webm\",\"ogv\"]}",
                 });
         }
 
@@ -2198,7 +2231,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
                     DbType = "Nvarchar",
                     Configuration =
-                        "{\"fileExtensions\":[{\"id\":0, \"value\":\"mp3\"}, {\"id\":1, \"value\":\"weba\"}, {\"id\":2, \"value\":\"oga\"}, {\"id\":3, \"value\":\"opus\"}]}",
+                        "{\"fileExtensions\":[\"mp3\",\"weba\",\"oga\",\"opus\"]}",
                 });
         }
 
@@ -2211,7 +2244,7 @@ internal class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
                     DbType = "Nvarchar",
                     Configuration =
-                        "{\"fileExtensions\":[{\"id\":0, \"value\":\"pdf\"}, {\"id\":1, \"value\":\"docx\"}, {\"id\":2, \"value\":\"doc\"}]}",
+                        "{\"fileExtensions\":[\"pdf\",\"docx\",\"doc\"]}",
                 });
         }
 
@@ -2223,7 +2256,7 @@ internal class DatabaseDataCreator
                     NodeId = Constants.DataTypes.UploadVectorGraphics,
                     EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
                     DbType = "Nvarchar",
-                    Configuration = "{\"fileExtensions\":[{\"id\":0, \"value\":\"svg\"}]}",
+                    Configuration = "{\"fileExtensions\":[\"svg\"]}",
                 });
         }
 
@@ -2259,7 +2292,7 @@ internal class DatabaseDataCreator
                     NodeId = 1053,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + Constants.Conventions.MediaTypes.Image +
+                    Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
                                     "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}",
                 });
         }
@@ -2272,7 +2305,7 @@ internal class DatabaseDataCreator
                     NodeId = 1054,
                     EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                     DbType = "Ntext",
-                    Configuration = "{\"filter\":\"" + Constants.Conventions.MediaTypes.Image +
+                    Configuration = "{\"filter\":\"" + ImageMediaTypeKey +
                                     "\", \"multiple\": true}",
                 });
         }

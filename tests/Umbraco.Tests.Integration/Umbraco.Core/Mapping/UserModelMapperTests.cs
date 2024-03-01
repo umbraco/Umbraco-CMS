@@ -26,12 +26,10 @@ public class UserModelMapperTests : UmbracoIntegrationTest
     public void Map_UserGroupSave_To_IUserGroup()
     {
         IUserGroup userGroup =
-            new UserGroup(ShortStringHelper, 0, "alias", "name", new List<string> { "c" }, "icon") { Id = 42 };
+            new UserGroup(ShortStringHelper, 0, "alias", "name", "icon") { Id = 42 };
 
-        // userGroup.permissions is List`1[System.String]
+        userGroup.Permissions = new HashSet<string>() { "c" };
 
-        // userGroup.permissions is System.Linq.Enumerable+WhereSelectArrayIterator`2[System.Char, System.String]
-        // fixed: now List`1[System.String]
         const string json =
             "{\"id\":@@@ID@@@,\"alias\":\"perm1\",\"name\":\"Perm1\",\"icon\":\"icon-users\",\"sections\":[\"content\"],\"users\":[],\"defaultPermissions\":[\"F\",\"C\",\"A\"],\"assignedPermissions\":{},\"startContentId\":-1,\"startMediaId\":-1,\"action\":\"save\",\"parentId\":-1}";
         var userGroupSave =

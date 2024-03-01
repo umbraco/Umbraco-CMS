@@ -31,14 +31,6 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DictionaryPermissionHandler>();
 
-        builder.Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
-        builder.Services.AddSingleton<IContentPermissionAuthorizer, ContentPermissionAuthorizer>();
-        builder.Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
-        builder.Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
-        builder.Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();
-        builder.Services.AddSingleton<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
-        builder.Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
-
         builder.Services.AddAuthorization(CreatePolicies);
         return builder;
     }
@@ -98,6 +90,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddPolicy(AuthorizationPolicies.TreeAccessScripts, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.TreeAccessStylesheets, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.TreeAccessTemplates, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
+        AddPolicy(AuthorizationPolicies.TreeAccessWebhooks, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
 
         // Contextual permissions
         // TODO: Rename policies once we have the old ones removed

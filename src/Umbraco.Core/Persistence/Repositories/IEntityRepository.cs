@@ -48,6 +48,8 @@ public interface IEntityRepository : IRepository
 
     bool Exists(Guid key);
 
+    bool Exists(IEnumerable<Guid> keys);
+
     /// <summary>
     /// Asserts if an entity with the given object type exists.
     /// </summary>

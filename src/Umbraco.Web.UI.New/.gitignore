@@ -6,7 +6,7 @@ App_Plugins/
 App_Code/
 Views/
 !Views/Partials/blocklist/
-!Views/Partials/grid/
+!Views/Partials/blockgrid/
 !Views/_ViewImports.cshtml
 appsettings.json
 appsettings.Development.json

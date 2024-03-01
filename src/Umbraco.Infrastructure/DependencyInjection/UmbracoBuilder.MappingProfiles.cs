@@ -28,10 +28,10 @@ public static partial class UmbracoBuilderExtensions
             .Add<DictionaryMapDefinition>()
             .Add<RedirectUrlMapDefinition>()
             .Add<RelationMapDefinition>()
-            .Add<SectionMapDefinition>()
             .Add<TagMapDefinition>()
             .Add<TemplateMapDefinition>()
             .Add<UserMapDefinition>()
+            .Add<MediaMapDefinition>()
             .Add<MemberMapDefinition>()
             .Add<LanguageMapDefinition>()
             .Add<IdentityMapDefinition>();

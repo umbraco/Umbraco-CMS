@@ -105,8 +105,7 @@ public static partial class UmbracoBuilderExtensions
             .AddRepositories()
             .AddServices()
             .AddCoreMappingProfiles()
-            .AddFileSystems()
-            .AddWebAssets();
+            .AddFileSystems();
 
         // register persistence mappers - required by database factory so needs to be done here
         // means the only place the collection can be modified is in a runtime - afterwards it
@@ -134,13 +133,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddTransient<DatabaseBuilder>();
 
         // register manifest parser, will be injected in collection builders where needed
-        builder.Services.AddSingleton<ILegacyManifestParser, LegacyManifestParser>();
         builder.Services.AddSingleton<IPackageManifestReader, BackOfficePackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestReader, AppPluginsPackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestService, PackageManifestService>();
-
-        // register the manifest filter collection builder (collection is empty by default)
-        builder.ManifestFilters();
 
         builder.MediaUrlGenerators()
             .Add<FileUploadPropertyEditor>()
@@ -172,7 +167,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BlockGridPropertyValueConstructorCache>();
         builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
 
-        // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
+        // both SimpleTinyMceValueConverter (in Core) and RteBlockRenderingValueConverter (in Infrastructure) will be
         // discovered when CoreBootManager configures the converters. We will remove the basic one defined
         // in core so that the more enhanced version is active.
         builder.PropertyValueConverters()
@@ -255,21 +250,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
-
-        return builder;
-    }
-
-    public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
-        builder.Services.AddSingleton<ILogLevelLoader, LogLevelLoader>();
-        builder.SetLogViewer<SerilogJsonLogViewer>();
-        builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(
-            factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
-            factory.GetRequiredService<ILogViewerConfig>(),
-            factory.GetRequiredService<ILoggingConfiguration>(),
-            factory.GetRequiredService<ILogLevelLoader>(),
-            Log.Logger));
 
         return builder;
     }
@@ -409,8 +389,6 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<RelationTypeSavedNotification, RelationTypeSavedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<DomainDeletedNotification, DomainDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<DomainSavedNotification, DomainSavedDistributedCacheNotificationHandler>()
-            .AddNotificationHandler<MacroSavedNotification, MacroSavedDistributedCacheNotificationHandler>()
-            .AddNotificationHandler<MacroDeletedNotification, MacroDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>()

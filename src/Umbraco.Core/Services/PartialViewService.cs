@@ -59,7 +59,7 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         => new(target, messages);
 
     protected override IPartialView CreateEntity(string path, string? content)
-        => new PartialView(PartialViewType.PartialView, path) { Content = content };
+        => new PartialView(path) { Content = content };
 
     /// <inheritdoc />
     public async Task<PagedModel<PartialViewSnippetSlim>> GetSnippetsAsync(int skip, int take)

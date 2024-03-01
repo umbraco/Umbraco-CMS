@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware;
