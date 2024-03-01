@@ -66,9 +66,6 @@ public static partial class Constants
             public const string TwoFactorLogin = TableNamePrefix + "TwoFactorLogin";
             public const string ExternalLoginToken = TableNamePrefix + "ExternalLoginToken";
 
-            public const string Macro = /*TableNamePrefix*/ "cms" + "Macro";
-            public const string MacroProperty = /*TableNamePrefix*/ "cms" + "MacroProperty";
-
             public const string Member = /*TableNamePrefix*/ "cms" + "Member";
             public const string MemberPropertyType = /*TableNamePrefix*/ "cms" + "MemberType";
             public const string Member2MemberGroup = /*TableNamePrefix*/ "cms" + "Member2MemberGroup";

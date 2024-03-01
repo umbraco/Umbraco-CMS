@@ -51,8 +51,6 @@ public static partial class Constants
 
         public const string PartialViews = MvcViews + "/Partials/";
 
-        public const string MacroPartials = MvcViews + "/MacroPartials/";
-
         public const string Packages = Data + "/packages";
 
         public const string CreatedPackages = Data + "/CreatedPackages";

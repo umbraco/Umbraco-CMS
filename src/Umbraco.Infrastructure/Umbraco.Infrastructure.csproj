@@ -66,4 +66,8 @@
       <_Parameter1>Umbraco.Cms.Infrastructure</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Persistence\Mappers\MacroMapper.cs" />
+  </ItemGroup>
 </Project>
