@@ -147,7 +147,7 @@ test.describe('Media Type tests', () => {
 
     // Act
     await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    const containerName = page.locator('[container-name="TestGroup"]');
+    const containerName = page.locator('[container-name="' + groupName + '"]');
     await containerName.hover();
     await containerName.getByLabel('Delete').click({force: true});
     await umbracoUi.mediaType.clickDeleteButton();
@@ -159,7 +159,69 @@ test.describe('Media Type tests', () => {
     expect(mediaTypeData.properties.length).toBe(0);
   });
 
-  // There is no button for deleting a group in the UI
+  test('can add a description to property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
+    const descriptionText = 'Test Description';
+    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id, groupName);
+
+    // Act
+    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+    await page.locator('[container-name="' + groupName + '"]').getByLabel('description').fill(descriptionText);
+    await umbracoUi.mediaType.clickSaveButton();
+
+    // Assert
+    await umbracoUi.mediaType.isSuccessNotificationVisible();
+    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+    expect(mediaTypeData.properties[0].description).toBe(descriptionText);
+  });
+
+  // When enabling the mandatory slider is not saved.
+  test.skip('can set a property as mandatory in a media type', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
+
+    // Act
+    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+    await umbracoUi.mediaType.clickEditorSettingsButton();
+    await umbracoUi.mediaType.clickMandatorySlider();
+    await umbracoUi.mediaType.clickUpdateButton();
+    await umbracoUi.mediaType.clickSaveButton();
+
+    // Assert
+    await umbracoUi.mediaType.isSuccessNotificationVisible();
+    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+    expect(mediaTypeData.properties[0].validation.mandatory).toBeTruthy();
+  });
+
+  test('can set up validation for a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
+    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    const regex = '^[a-zA-Z0-9]*$';
+    const regexMessage = 'Only letters and numbers are allowed';
+    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
+
+    // Act
+    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+    await umbracoUi.mediaType.clickEditorSettingsButton();
+    await umbracoUi.mediaType.selectValidationOption('')
+    await umbracoUi.mediaType.enterRegEx(regex);
+    await umbracoUi.mediaType.enterRegExMessage(regexMessage);
+    await umbracoUi.mediaType.clickUpdateButton();
+    await umbracoUi.mediaType.clickSaveButton();
+
+    // Assert
+    await umbracoUi.mediaType.isSuccessNotificationVisible();
+    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+    expect(mediaTypeData.properties[0].validation.regEx).toBe(regex);
+    expect(mediaTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
+  });
+
+  test('can set appearance as label on top for property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+  });
+
+    // There is no button for deleting a group in the UI
   test.skip('can delete a group in a media type', async ({page, umbracoApi, umbracoUi}) => {
   });
 
@@ -175,7 +237,7 @@ test.describe('Media Type tests', () => {
     await umbracoUi.mediaType.addPropertyEditor(dataTypeName);
   });
 
-  // There a currently frontend issues, when you try to add a property editor you have to click the button twice to focus.
+  // There a currently frontend issues, when you try to add a property editor in a tab, you have to click the button twice to focus.
   test.skip('can create a media type with properties in a group and a tab', async ({page, umbracoApi, umbracoUi}) => {
   });
 
@@ -227,7 +289,7 @@ test.describe('Media Type tests', () => {
     await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
   });
 
-  // Not possible
+  // Not possible because you can not create two groups in the ui
   test.skip('can reorder a group in a media type', async ({page, umbracoApi, umbracoUi}) => {
   });
 
@@ -264,7 +326,7 @@ test.describe('Media Type tests', () => {
     await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
     await umbracoUi.mediaType.goToMediaType(mediaTypeName);
     await umbracoUi.mediaType.clickStructureTab();
-    await umbracoUi.mediaType.clickAllowAsRootButton();
+    await umbracoUi.mediaType.clickAllowAtRootButton();
     await umbracoUi.mediaType.clickSaveButton();
 
     // Assert
