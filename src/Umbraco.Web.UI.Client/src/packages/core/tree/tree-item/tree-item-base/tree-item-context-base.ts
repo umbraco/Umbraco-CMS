@@ -258,6 +258,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		const repository = this.treeContext.getRepository();
 		if (!repository) return;
 
+		// TODO: use createObservablePart, to prevent unnesecary changes.
 		const hasChildrenObservable = (await repository.treeItemsOf(this.unique)).pipe(
 			map((children) => children.length > 0),
 		);
