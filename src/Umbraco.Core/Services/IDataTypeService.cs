@@ -114,13 +114,11 @@ public interface IDataTypeService : IService
     /// <summary>
     /// Gets multiple <see cref="IDataType"/> objects by their unique keys.
     /// </summary>
-    /// <param name="orderBy">Property to order by.</param>
-    /// <param name="orderDirection">Direction to order in..</param>
     /// <param name="name">Name to filter by.</param>
     /// <param name="editorUiAlias">Editor ui alias to filter by.</param>
     /// <param name="editorAlias">Editor alias to filter by.</param>
     /// <returns>An attempt with the requested data types.</returns>
-    Task<IEnumerable<IDataType>> FilterAsync(string orderBy = "name", Direction orderDirection = Direction.Ascending, string? name = null, string? editorUiAlias = null, string? editorAlias = null);
+    Task<IEnumerable<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null);
 
     /// <summary>
     ///     Gets all <see cref="IDataType" /> objects or those with the ids passed in
