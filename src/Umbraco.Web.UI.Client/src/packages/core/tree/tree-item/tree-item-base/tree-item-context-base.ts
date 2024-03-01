@@ -122,6 +122,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeIsSelectable();
 		this.#observeIsSelected();
 		this.#observeSectionPath();
+		this.#observeHasChildren();
 	}
 
 	public async requestChildren() {
@@ -265,8 +266,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		// observe if any children will be added runtime to a tree item. Nested items/folders etc.
 		this.observe(hasChildrenObservable, (hasChildren) => {
-			// we need to skip the first value, because it will also return false until a child is in the store
-			// we therefor rely on the value from the tree item itself
+			/* we need to skip the first value, because it will also return false until a child is in the store
+			we therefor rely on the value from the tree item itself */
 			if (this.#hasChildrenInitValueFlag === true) {
 				this.#hasChildren.setValue(hasChildren);
 			}
