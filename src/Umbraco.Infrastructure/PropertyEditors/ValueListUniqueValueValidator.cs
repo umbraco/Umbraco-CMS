@@ -25,10 +25,10 @@ public class ValueListUniqueValueValidator : IValueValidator
             yield break;
         }
 
-        ValueListConfiguration.ValueListItem[]? items = null;
+        string[]? items = null;
         try
         {
-            items = _configurationEditorJsonSerializer.Deserialize<ValueListConfiguration.ValueListItem[]>(stringValue);
+            items = _configurationEditorJsonSerializer.Deserialize<string[]>(stringValue);
         }
         catch
         {
@@ -42,7 +42,7 @@ public class ValueListUniqueValueValidator : IValueValidator
         }
 
         var duplicateValues = items
-            .Select(item => item.Value)
+            .Select(item => item)
             .GroupBy(v => v)
             .Where(group => group.Count() > 1)
             .Select(group => group.First())

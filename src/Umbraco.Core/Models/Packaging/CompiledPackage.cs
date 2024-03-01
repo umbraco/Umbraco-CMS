@@ -13,10 +13,6 @@ public class CompiledPackage
 
     public InstallWarnings Warnings { get; set; } = new();
 
-    public IEnumerable<XElement> Macros { get; set; } = null!; // TODO: make strongly typed
-
-    public IEnumerable<XElement> MacroPartialViews { get; set; } = null!; // TODO: make strongly typed
-
     public IEnumerable<XElement> Templates { get; set; } = null!; // TODO: make strongly typed
 
     public IEnumerable<XElement> Stylesheets { get; set; } = null!; // TODO: make strongly typed

@@ -78,6 +78,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     {
         var createModel = new UserCreateModel
         {
+            Id = requestModel.Id,
             Email = requestModel.Email,
             Name = requestModel.Name,
             UserName = requestModel.UserName,

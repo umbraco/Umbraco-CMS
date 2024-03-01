@@ -34,9 +34,8 @@ public class PluginRazorViewEngineOptionsSetup : IConfigureOptions<RazorViewEngi
                 string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/{1}/{0}.cshtml"),
                 string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/Shared/{0}.cshtml"),
 
-                // will be used when we have partial view and child action macros
+                // will be used when we have partial view
                 string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/Partials/{0}.cshtml"),
-                string.Concat(Constants.SystemDirectories.AppPlugins, "/{2}/Views/MacroPartials/{0}.cshtml"),
             };
 
             viewLocations = umbViewLocations.Concat(viewLocations);
