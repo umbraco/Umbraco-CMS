@@ -33667,7 +33667,7 @@
             "format": "uuid",
             "nullable": true
           },
-          "folder": {
+          "parent": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ReferenceByIdModel"
@@ -33753,7 +33753,7 @@
             "format": "uuid",
             "nullable": true
           },
-          "folder": {
+          "parent": {
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ReferenceByIdModel"
