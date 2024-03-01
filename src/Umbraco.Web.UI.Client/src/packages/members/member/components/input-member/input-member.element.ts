@@ -102,7 +102,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	private _editMemberPath = '';
 
 	@state()
-	private _items?: Array<MemberItemResponseModel>;
+	private _items?: Array<UmbMemberItemModel>;
 
 	#pickerContext = new UmbMemberPickerContext(this);
 
@@ -119,7 +119,10 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 			});
 
 		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => {
+			console.log(selectedItems);
+			this._items = selectedItems;
+		});
 	}
 
 	connectedCallback(): void {
@@ -144,8 +147,8 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		});
 	}
 
-	protected _requestRemoveItem(item: MemberItemResponseModel) {
-		this.#pickerContext.requestRemoveItem(item.id!);
+	protected _requestRemoveItem(item: UmbMemberItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique!);
 	}
 
 	protected getFormElement() {
@@ -171,7 +174,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		return html`<uui-ref-list>
 			${repeat(
 				this._items,
-				(item) => item.id,
+				(item) => item.unique,
 				(item) => this.#renderItem(item),
 			)}
 		</uui-ref-list>`;
@@ -186,8 +189,8 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
-	#renderItem(item: MemberItemResponseModel) {
-		if (!item.id) return;
+	#renderItem(item: UmbMemberItemModel) {
+		if (!item.unique) return;
 		// TODO: get the correct variant name
 		const name = item.variants[0].name;
 		return html`
@@ -205,20 +208,20 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	#renderOpenButton(item: MemberItemResponseModel) {
+	#renderOpenButton(item: UmbMemberItemModel) {
 		if (!this.showOpenButton) return;
 		// TODO: get the correct variant name
 		const name = item.variants[0].name;
 		return html`
 			<uui-button
 				compact
-				href="${this._editMemberPath}edit/${item.id}"
+				href="${this._editMemberPath}edit/${item.unique}"
 				label=${this.localize.term('general_edit') + ` ${name}`}>
 				<uui-icon name="icon-edit"></uui-icon>
 			</uui-button>
 		`;
 	}
-	#renderIsTrashed(item: MemberItemResponseModel) {
+	#renderIsTrashed(item: UmbMemberItemModel) {
 		// TODO: Uncomment, once the Management API model support deleted members. [LK]
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;

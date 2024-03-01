@@ -15,7 +15,7 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 	public config?: UmbPropertyEditorConfigCollection;
 
 	render() {
-		return html` <umb-input-member>Add</umb-input-member>`;
+		return html`<umb-input-member></umb-input-member>`;
 	}
 }
 
