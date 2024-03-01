@@ -201,7 +201,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-input id="name-input" .value=${this._name ?? ''} @input="${this.#handleInput}">
+			<uui-input
+				id="name-input"
+				label="Document name (TODO: Localize)"
+				.value=${this._name ?? ''}
+				@input=${this.#handleInput}
+			>
 				${
 					this._variants?.length
 						? html`
@@ -246,8 +251,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
 																: nothing}
 															<div>
-																${variant.title}
-																${variant.culture ? html` <i>(${variant.culture})</i>` : ''}
+																${variant.title} ${variant.culture ? html` <i>(${variant.culture})</i>` : ''}
 																${variant.segment}
 																<div class="variant-selector-state">${variant.state}</div>
 															</div>

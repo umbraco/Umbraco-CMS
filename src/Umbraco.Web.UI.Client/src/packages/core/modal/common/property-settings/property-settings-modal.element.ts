@@ -234,6 +234,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 									<uui-input
 										id="name-input"
 										name="name"
+										label="property name (TODO: Localize)"
 										@input=${this.#onNameChange}
 										.value=${this.value.name}
 										placeholder="Enter a name...">
