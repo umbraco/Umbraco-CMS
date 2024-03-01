@@ -26,7 +26,7 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: Array })
-	value: Array<LayoutConfig> = [];
+	value?: Array<LayoutConfig>;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
@@ -41,47 +41,47 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	}
 
 	#onAdd() {
-		this.value = [...this.value, { isSystem: false, icon: 'icon-stop', selected: true }];
+		this.value = [...(this.value ?? []), { isSystem: false, icon: 'icon-stop', selected: true }];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onRemove(unique: number) {
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values.splice(unique, 1);
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onChangePath(e: UUIInputEvent, index: number) {
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], path: e.target.value as string };
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onChangeName(e: UUIInputEvent, index: number) {
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], name: e.target.value as string };
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	#onChangeSelected(e: UUIBooleanInputEvent, index: number) {
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], selected: e.target.checked };
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	async #onIconChange(index: number) {
-		const icon = this.#iconReader(this.value[index].icon ?? '');
+		const icon = this.#iconReader((this.value ? this.value[index].icon : undefined) ?? '');
 
 		// TODO: send icon data to modal
 		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL);
 		const picked = await modalContext?.onSubmit();
 		if (!picked) return;
 
-		const values = [...this.value];
+		const values = [...(this.value ?? [])];
 		values[index] = { ...values[index], icon: `${picked.icon} color-${picked.color}` };
 		this.value = values;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
@@ -89,16 +89,18 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 
 	render() {
 		return html`<div id="layout-wrapper">
-				${repeat(
-					this.value,
-					(layout, index) => '' + layout.name + layout.icon,
-					(layout, index) =>
-						html` <div class="layout-item">
-							<uui-icon name="icon-navigation"></uui-icon> ${layout.isSystem
-								? this.renderSystemFieldRow(layout, index)
-								: this.renderCustomFieldRow(layout, index)}
-						</div>`,
-				)}
+				${this.value
+					? repeat(
+							this.value,
+							(layout, index) => '' + layout.name + layout.icon,
+							(layout, index) =>
+								html` <div class="layout-item">
+									<uui-icon name="icon-navigation"></uui-icon> ${layout.isSystem
+										? this.renderSystemFieldRow(layout, index)
+										: this.renderCustomFieldRow(layout, index)}
+								</div>`,
+					  )
+					: ''}
 			</div>
 			<uui-button
 				id="add"
