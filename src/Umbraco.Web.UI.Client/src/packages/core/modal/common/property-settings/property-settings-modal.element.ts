@@ -6,7 +6,7 @@ import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/doc
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertySettingsModalValue, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
@@ -234,6 +234,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 									<uui-input
 										id="name-input"
 										name="name"
+										label="property name (TODO: Localize)"
 										@input=${this.#onNameChange}
 										.value=${this.value.name}
 										placeholder="Enter a name...">
@@ -259,7 +260,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										.value=${this.value.description}></uui-textarea>
 								</div>
 								<umb-data-type-flow-input
-									.value=${this.value.dataType?.unique}
+									.value=${ifDefined(this.value.dataType?.unique)}
 									@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
 								<hr />
 								<div class="container">

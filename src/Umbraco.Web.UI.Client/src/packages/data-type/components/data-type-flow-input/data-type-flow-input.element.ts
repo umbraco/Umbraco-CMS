@@ -27,15 +27,15 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	 * @default []
 	 */
 	@property({ type: String, attribute: false })
-	get value(): string {
-		return super.value?.toString() ?? '';
-	}
 	set value(dataTypeId: string) {
 		super.value = dataTypeId ?? '';
 		this._ids = super.value
 			.split(',')
 			.map((tag) => tag.trim())
 			.filter((id) => id.length !== 0);
+	}
+	get value(): string {
+		return super.value?.toString() ?? '';
 	}
 
 	#editDataTypeModal?: UmbModalRouteRegistrationController;
