@@ -21,16 +21,22 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
-		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
+		if (this.data?.parent === undefined) throw new Error('A parent is required to create a folder');
 
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
 				folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
-				parentUnique: this.data.parentUnique,
+				parentUnique: this.data.parent.unique,
 			},
 		});
 
 		folderModalHandler?.onSubmit().then(() => this._submitModal());
+	}
+
+	#getCreateHref() {
+		return `section/settings/workspace/data-type/create/parent/${this.data?.parent.entityType}/${
+			this.data?.parent.unique || null
+		}`;
 	}
 
 	render() {
@@ -38,10 +44,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			<umb-body-layout headline="Create Data Type">
 				<uui-box>
 					<!-- TODO: construct url -->
-					<uui-menu-item
-						href=${`section/settings/workspace/data-type/create/${this.data?.parentUnique || null}`}
-						label="New Data Type..."
-						@click=${this._submitModal}>
+					<uui-menu-item href=${this.#getCreateHref()} label="New Data Type..." @click=${this._submitModal}>
 						<uui-icon slot="icon" name="icon-autofill"></uui-icon>
 					</uui-menu-item>
 					<uui-menu-item @click=${this.#onClick} label="New Folder...">

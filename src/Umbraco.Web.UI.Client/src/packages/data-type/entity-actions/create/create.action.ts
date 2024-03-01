@@ -2,7 +2,7 @@ import type { UmbDataTypeDetailRepository } from '../../repository/detail/data-t
 import { UMB_DATA_TYPE_CREATE_OPTIONS_MODAL } from './modal/index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateDataTypeEntityAction extends UmbEntityActionBase<UmbDataTypeDetailRepository> {
@@ -22,7 +22,10 @@ export class UmbCreateDataTypeEntityAction extends UmbEntityActionBase<UmbDataTy
 
 		this.#modalManagerContext?.open(UMB_DATA_TYPE_CREATE_OPTIONS_MODAL, {
 			data: {
-				parentUnique: this.unique,
+				parent: {
+					entityType: this.entityType,
+					unique: this.unique,
+				},
 			},
 		});
 	}
