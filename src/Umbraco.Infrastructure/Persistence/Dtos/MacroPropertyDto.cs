@@ -9,8 +9,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 internal class MacroPropertyDto
 {
-    public const string TableName = Constants.DatabaseSchema.Tables.MacroProperty;
-
     [Column("id")]
     [PrimaryKeyColumn]
     public int Id { get; set; }
@@ -26,7 +24,6 @@ internal class MacroPropertyDto
     [Column("macro")]
     [ForeignKey(typeof(MacroDto))]
     [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsMacroProperty_Alias", ForColumns = "macro, macroPropertyAlias")]
-    [Index(IndexTypes.NonClustered, Name = "IX_cmsMacroProperty_macro", ForColumns = "macro", IncludeColumns = "id,uniquePropertyId,editorAlias,macroPropertySortOrder,macroPropertyAlias,macroPropertyName")]
     public int Macro { get; set; }
 
     [Column("macroPropertySortOrder")]

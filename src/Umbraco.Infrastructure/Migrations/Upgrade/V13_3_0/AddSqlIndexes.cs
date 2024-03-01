@@ -35,9 +35,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V13_3_0
             DeleteIndex<NodeDto>(umbracoNodeLevelIdx);
             CreateIndex<NodeDto>(umbracoNodeLevelIdx);
 
-            var macroPropertyMacroIdx = $"IX_{MacroPropertyDto.TableName}_macro";
-            CreateIndex<MacroPropertyDto>(macroPropertyMacroIdx);
-
             var umbracoContentScheduleActionDateIdx = $"IX_{ContentScheduleDto.TableName}_action_date";
             CreateIndex<ContentScheduleDto>(umbracoContentScheduleActionDateIdx);
 
