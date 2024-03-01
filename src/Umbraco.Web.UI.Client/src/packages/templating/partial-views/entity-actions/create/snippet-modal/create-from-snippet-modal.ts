@@ -2,7 +2,8 @@ import type { UmbCreatePartialViewFromSnippetModalData } from './create-from-sni
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PartialViewResource, PartialViewSnippetItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { PartialViewSnippetItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
 
 interface UmbSnippetLinkModel {
 	name: string;
