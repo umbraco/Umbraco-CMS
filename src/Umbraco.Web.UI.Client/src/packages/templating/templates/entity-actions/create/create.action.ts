@@ -7,7 +7,7 @@ export class UmbCreateEntityAction<T extends { copy(): Promise<void> }> extends 
 	}
 
 	async execute() {
-		const url = `section/settings/workspace/template/create/${this.unique || 'null'}`;
+		const url = `section/settings/workspace/template/create/parent/${this.entityType}/${this.unique || 'null'}`;
 		// TODO: how do we handle this with a href?
 		history.pushState(null, '', url);
 	}
