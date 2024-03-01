@@ -30,6 +30,8 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -40,7 +42,7 @@ export class UmbDocumentWorkspaceContext
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
-	#parentUnique: string | null = null;
+	#parent?: { entityType: string; unique: string | null };
 
 	/**
 	 * The document is the current state/draft version of the document.
@@ -142,9 +144,9 @@ export class UmbDocumentWorkspaceContext
 		return data || undefined;
 	}
 
-	async create(parentUnique: string | null, documentTypeUnique: string) {
+	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
 		this.resetState();
-		this.#parentUnique = parentUnique;
+		this.#parent = parent;
 		this.#getDataPromise = this.repository.createScaffold({
 			documentType: {
 				unique: documentTypeUnique,
@@ -430,12 +432,23 @@ export class UmbDocumentWorkspaceContext
 		const saveData = this.#buildSaveData(selectedVariants);
 
 		if (this.getIsNew()) {
-			const { data: create, error } = await this.repository.create(saveData, this.#parentUnique);
+			if (!this.#parent) throw new Error('Parent is not set');
+
+			const { data: create, error } = await this.repository.create(saveData, this.#parent.unique);
 			if (!create || error) {
 				console.error('Error creating document', error);
 				throw new Error('Error creating document');
 			}
+
 			this.setIsNew(false);
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				entityType: this.#parent.entityType,
+				unique: this.#parent.unique,
+			});
+			eventContext.dispatchEvent(event);
 		} else {
 			const { data: save, error } = await this.repository.save(saveData);
 			if (!save || error) {

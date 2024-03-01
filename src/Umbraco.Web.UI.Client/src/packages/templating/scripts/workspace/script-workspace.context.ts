@@ -6,11 +6,13 @@ import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observa
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<UmbScriptDetailModel> {
 	public readonly repository = new UmbScriptDetailRepository(this);
 
-	#parentUnique: string | null = null;
+	#parent?: { entityType: string; unique: string | null };
 
 	#data = new UmbObjectState<UmbScriptDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -71,9 +73,9 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 		}
 	}
 
-	async create(parentUnique: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parentUnique = parentUnique;
+		this.#parent = parent;
 		const { data } = await this.repository.createScaffold();
 
 		if (data) {
@@ -88,8 +90,17 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(this.#data.value, this.#parentUnique);
+			if (!this.#parent) throw new Error('Parent is not set');
+			const { data } = await this.repository.create(this.#data.value, this.#parent.unique);
 			newData = data;
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				entityType: this.#parent.entityType,
+				unique: this.#parent.unique,
+			});
+			eventContext.dispatchEvent(event);
 		} else {
 			const { data } = await this.repository.save(this.#data.value);
 			newData = data;

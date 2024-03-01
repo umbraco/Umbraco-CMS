@@ -30,13 +30,14 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 
 		this._routes = [
 			{
-				path: 'create/:parentUnique/:documentTypeUnique',
+				path: 'create/parent/:entityType/:unique/:documentTypeUnique',
 				component: this.#editorElement,
 				setup: async (_component, info) => {
 					// TODO: Remember the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
+					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const documentTypeUnique = info.match.params.documentTypeUnique;
-					this.#workspaceContext!.create(parentUnique, documentTypeUnique);
+					this.#workspaceContext!.create({ entityType: parentEntityType, unique: parentUnique }, documentTypeUnique);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

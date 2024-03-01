@@ -19,7 +19,7 @@ export class UmbMediaTypeWorkspaceContext
 	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
 
-	#parentUnique: string | null = null;
+	#parent?: { entityType: string; unique: string | null };
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
@@ -112,9 +112,10 @@ export class UmbMediaTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ collection });
 	}
 
-	async create(parentUnique: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		const { data } = await this.structure.createScaffold(parentUnique);
+		this.#parent = parent;
+		const { data } = await this.structure.createScaffold(this.#parent.unique);
 		if (!data) return undefined;
 
 		this.setIsNew(true);

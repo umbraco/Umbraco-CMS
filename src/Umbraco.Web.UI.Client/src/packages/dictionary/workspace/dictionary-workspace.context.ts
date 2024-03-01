@@ -7,6 +7,8 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbDictionaryWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDictionaryDetailModel>
@@ -15,7 +17,7 @@ export class UmbDictionaryWorkspaceContext
 	//
 	public readonly detailRepository = new UmbDictionaryDetailRepository(this);
 
-	#parentUnique: string | null = null;
+	#parent?: { entityType: string; unique: string | null };
 
 	#data = new UmbObjectState<UmbDictionaryDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -78,9 +80,9 @@ export class UmbDictionaryWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parentUnique = parentUnique;
+		this.#parent = parent;
 		const { data } = await this.detailRepository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
@@ -92,10 +94,20 @@ export class UmbDictionaryWorkspaceContext
 		if (!this.#data.value.unique) return;
 
 		if (this.getIsNew()) {
-			const { error } = await this.detailRepository.create(this.#data.value, this.#parentUnique);
+			if (!this.#parent) throw new Error('Parent is not set');
+			const { error } = await this.detailRepository.create(this.#data.value, this.#parent.unique);
 			if (error) {
 				return;
 			}
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				entityType: this.#parent.entityType,
+				unique: this.#parent.unique,
+			});
+			eventContext.dispatchEvent(event);
+
 			this.setIsNew(false);
 		} else {
 			await this.detailRepository.save(this.#data.value);

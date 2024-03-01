@@ -18,7 +18,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly repository = new UmbDocumentTypeDetailRepository(this);
 	// Data/Draft is located in structure manager
 
-	#parentUnique: string | null = null;
+	#parent?: { entityType: string; unique: string | null };
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
@@ -149,10 +149,10 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ defaultTemplate });
 	}
 
-	async create(parentUnique: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		this.#parentUnique = parentUnique;
-		const { data } = await this.structure.createScaffold(parentUnique);
+		this.#parent = parent;
+		const { data } = await this.structure.createScaffold(this.#parent.unique);
 		if (!data) return undefined;
 
 		this.setIsNew(true);

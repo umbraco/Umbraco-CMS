@@ -8,7 +8,6 @@ import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspa
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 type EntityType = UmbUserDetailModel;
 
@@ -18,9 +17,6 @@ export class UmbUserWorkspaceContext
 {
 	public readonly detailRepository: UmbUserDetailRepository = new UmbUserDetailRepository(this);
 	public readonly avatarRepository: UmbUserAvatarRepository = new UmbUserAvatarRepository(this);
-
-	#parentUnique: string | null = null;
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_USER_WORKSPACE_ALIAS);
