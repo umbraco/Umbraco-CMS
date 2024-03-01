@@ -34,6 +34,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_DOCUMENT_TYPE_TREE_ALIAS,
 	name: 'Document Type Tree',
 	meta: {
@@ -43,7 +44,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'unique',
+	kind: 'default',
 	alias: 'Umb.TreeItem.DocumentType',
 	name: 'Document Type Tree Item',
 	meta: {

@@ -1,4 +1,5 @@
-import type { UmbTreeItemModelBase } from './types.js';
+import type { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from './types.js';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
@@ -27,20 +28,21 @@ export interface UmbTreeRepository<
 
 	/**
 	 * Requests the root items of the tree.
+	 * @param {UmbTreeRootItemsRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
-	requestRootTreeItems: () => Promise<{
+	requestRootTreeItems: (args: UmbTreeRootItemsRequestArgs) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
 
 	/**
-	 * Requests the items of a item in the tree.
-	 * @param {(string | null)} parentUnique
+	 * Requests the children of the given parent item.
+	 * @param {UmbTreeChildrenOfRequestArgs} args
 	 * @memberof UmbTreeRepository
 	 */
-	requestTreeItemsOf: (parentUnique: string | null) => Promise<{
+	requestTreeItemsOf: (args: UmbTreeChildrenOfRequestArgs) => Promise<{
 		data?: UmbPagedModel<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
