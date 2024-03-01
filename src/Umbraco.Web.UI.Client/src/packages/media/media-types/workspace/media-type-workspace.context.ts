@@ -151,7 +151,8 @@ export class UmbMediaTypeWorkspaceContext
 			await this.structure.save();
 		}
 
-		this.saveComplete(data);
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	public destroy(): void {
