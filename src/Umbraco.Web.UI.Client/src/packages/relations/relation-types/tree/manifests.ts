@@ -27,6 +27,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_RELATION_TYPE_TREE_ALIAS,
 	name: 'Relation Type Tree',
 	meta: {
@@ -36,7 +37,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'unique',
+	kind: 'default',
 	alias: 'Umb.TreeItem.RelationType',
 	name: 'RelationType Tree Item',
 	meta: {

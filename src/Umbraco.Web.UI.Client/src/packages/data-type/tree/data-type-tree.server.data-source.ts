@@ -1,4 +1,5 @@
 import type { UmbDataTypeTreeItemModel } from './types.js';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
@@ -28,16 +29,17 @@ export class UmbDataTypeTreeServerDataSource extends UmbTreeServerDataSourceBase
 	}
 }
 
-// eslint-disable-next-line local-rules/no-direct-api-import
-const getRootItems = () => DataTypeResource.getTreeDataTypeRoot({});
+const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	DataTypeResource.getTreeDataTypeRoot({ skip: args.skip, take: args.take });
 
-const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
-		return getRootItems();
+const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	if (args.parentUnique === null) {
+		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DataTypeResource.getTreeDataTypeChildren({
-			parentId: parentUnique,
+			parentId: args.parentUnique,
 		});
 	}
 };

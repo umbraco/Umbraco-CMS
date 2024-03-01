@@ -121,7 +121,8 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 			);
 		});
 
-		this.saveComplete(this.#data.value);
+		this.setIsNew(false);
+		this.workspaceComplete(this.#data.value);
 	}
 
 	public destroy(): void {

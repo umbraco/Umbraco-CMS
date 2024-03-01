@@ -175,7 +175,7 @@ ${currentContent}`;
 
 		if (newData) {
 			this.#data.setValue(newData);
-			this.saveComplete(newData);
+			this.workspaceComplete(newData);
 		}
 	}
 

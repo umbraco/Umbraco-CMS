@@ -61,7 +61,8 @@ export class UmbMemberGroupWorkspaceContext
 			await this.detailRepository.save(data);
 		}
 
-		this.saveComplete(data);
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	getData() {

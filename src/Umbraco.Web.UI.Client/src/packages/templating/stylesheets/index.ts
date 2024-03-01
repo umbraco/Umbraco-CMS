@@ -1,3 +1,5 @@
+import './components/index.js';
+
 export * from './repository/index.js';
 export { UmbStylesheetTreeRepository } from './tree/index.js';
 

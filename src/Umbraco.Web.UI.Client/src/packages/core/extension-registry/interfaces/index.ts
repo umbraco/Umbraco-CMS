@@ -6,5 +6,4 @@ export * from './property-editor-ui-element.interface.js';
 export * from './section-element.interface.js';
 export * from './section-sidebar-app-element.interface.js';
 export * from './section-view-element.interface.js';
-export * from './tree-item-element.interface.js';
 export * from './workspace-view-element.interface.js';

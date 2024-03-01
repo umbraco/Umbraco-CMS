@@ -1,5 +1,6 @@
 import type { UmbMockDBBase } from '../mock-db-base.js';
 import { createFileSystemTreeItem } from '../../utils.js';
+import { pagedResult } from '../paged-result.js';
 import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbMockFileSystemTreeManager<T extends Omit<FileSystemTreeItemPresentationModel, 'type'>> {
@@ -9,20 +10,23 @@ export class UmbMockFileSystemTreeManager<T extends Omit<FileSystemTreeItemPrese
 		this.#db = mockDb;
 	}
 
-	getRoot(): { items: Array<Omit<FileSystemTreeItemPresentationModel, 'type'>>; total: number } {
+	getRoot({ skip = 0, take = 100 }: { skip?: number; take?: number } = {}): {
+		items: Array<Omit<FileSystemTreeItemPresentationModel, 'type'>>;
+		total: number;
+	} {
 		const items = this.#db.getAll().filter((item) => item.parent === null);
-		const treeItems = items.map((item) => createFileSystemTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
+		const paged = pagedResult(items, skip, take);
+		const treeItems = paged.items.map((item) => createFileSystemTreeItem(item));
+		return { items: treeItems, total: paged.total };
 	}
 
-	getChildrenOf(parentPath: string): {
+	getChildrenOf({ parentPath, skip = 0, take = 100 }: { parentPath: string; skip?: number; take?: number }): {
 		items: Array<Omit<FileSystemTreeItemPresentationModel, 'type'>>;
 		total: number;
 	} {
 		const items = this.#db.getAll().filter((item) => item.parent?.path === parentPath);
-		const treeItems = items.map((item) => createFileSystemTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
+		const paged = pagedResult(items, skip, take);
+		const treeItems = paged.items.map((item) => createFileSystemTreeItem(item));
+		return { items: treeItems, total: paged.total };
 	}
 }

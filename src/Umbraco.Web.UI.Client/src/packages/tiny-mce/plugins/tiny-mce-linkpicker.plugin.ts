@@ -105,7 +105,8 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 		const linkPickerData = await modalHandler.onSubmit().catch(() => undefined);
 		if (!linkPickerData) return;
 
-		this.#linkPickerData = linkPickerData;
+		// TODO: This is a workaround for the issue where the link picker modal is returning a frozen object, and we need to extract the link into smaller parts to avoid the frozen object issue.
+		this.#linkPickerData = { link: { ...linkPickerData.link } };
 		this.#updateLink();
 	}
 

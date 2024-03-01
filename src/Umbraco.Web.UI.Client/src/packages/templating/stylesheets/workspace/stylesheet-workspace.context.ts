@@ -116,7 +116,7 @@ export class UmbStylesheetWorkspaceContext
 
 		if (newData) {
 			this.#data.setValue(newData);
-			this.saveComplete(newData);
+			this.workspaceComplete(newData);
 		}
 	}
 

@@ -2,6 +2,7 @@ import type { UmbRelationTypeTreeItemModel } from './types.js';
 import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { RelationTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
@@ -28,12 +29,13 @@ export class UmbRelationTypeTreeServerDataSource extends UmbTreeServerDataSource
 	}
 }
 
-// eslint-disable-next-line local-rules/no-direct-api-import
-const getRootItems = () => RelationTypeResource.getTreeRelationTypeRoot({});
+const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	RelationTypeResource.getTreeRelationTypeRoot({ skip: args.skip, take: args.take });
 
-const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
-		return getRootItems();
+const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	if (args.parentUnique === null) {
+		return getRootItems(args);
 	} else {
 		throw new Error('Not supported for the relation type tree');
 	}

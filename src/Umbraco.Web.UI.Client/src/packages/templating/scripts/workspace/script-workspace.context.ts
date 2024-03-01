@@ -108,7 +108,9 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 
 		if (newData) {
 			this.#data.setValue(newData);
-			this.saveComplete(newData);
+
+			this.setIsNew(false);
+			this.workspaceComplete(newData);
 		}
 	}
 

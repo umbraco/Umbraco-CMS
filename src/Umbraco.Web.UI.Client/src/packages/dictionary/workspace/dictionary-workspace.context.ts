@@ -114,7 +114,10 @@ export class UmbDictionaryWorkspaceContext
 		}
 
 		const data = this.getData();
-		if (data) this.saveComplete(data);
+		if (!data) return;
+
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	public destroy(): void {

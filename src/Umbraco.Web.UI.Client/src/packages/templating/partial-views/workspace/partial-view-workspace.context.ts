@@ -123,7 +123,8 @@ export class UmbPartialViewWorkspaceContext
 
 		if (newData) {
 			this.#data.setValue(newData);
-			this.saveComplete(newData);
+			this.setIsNew(false);
+			this.workspaceComplete(newData);
 		}
 	}
 

@@ -187,7 +187,8 @@ export class UmbDocumentTypeWorkspaceContext
 			await this.structure.save();
 		}
 
-		this.saveComplete(data);
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	public destroy(): void {

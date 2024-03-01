@@ -27,6 +27,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_TEMPLATE_TREE_ALIAS,
 	name: 'Template Tree',
 	meta: {
@@ -36,7 +37,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'unique',
+	kind: 'default',
 	alias: 'Umb.TreeItem.Template',
 	name: 'Template Tree Item',
 	meta: {

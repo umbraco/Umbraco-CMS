@@ -28,6 +28,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_SCRIPT_TREE_ALIAS,
 	name: 'Script Tree',
 	meta: {
@@ -37,7 +38,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'unique',
+	kind: 'default',
 	alias: 'Umb.TreeItem.Script',
 	name: 'Script Tree Item',
 	meta: {

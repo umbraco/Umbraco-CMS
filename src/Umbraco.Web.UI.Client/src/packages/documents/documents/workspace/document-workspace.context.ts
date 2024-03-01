@@ -353,12 +353,15 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async #pickVariantsForAction(type: UmbDocumentVariantPickerModalType): Promise<UmbVariantId[]> {
+	async #runUserFlorFor(type: UmbDocumentVariantPickerModalType): Promise<UmbVariantId[]> {
 		const activeVariants = this.splitView.getActiveVariants();
 
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
 		// TODO: We need to filter the selected array, so it only contains one of each variantId. [NL]
-		const selected = activeVariantIds.concat(this.#calculateChangedVariants());
+		const changedVariantIds = this.#calculateChangedVariants();
+		const selected = activeVariantIds.concat(changedVariantIds);
+		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
+
 		const options = await firstValueFrom(this.variantOptions);
 
 		// If there is only one variant, we don't need to open the modal.
@@ -461,21 +464,22 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async save() {
-		await this.#pickVariantsForAction('save');
+		await this.#runUserFlorFor('save');
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 
-		this.saveComplete(data);
+		this.workspaceComplete(data);
 	}
 
 	public async publish() {
-		const variantIds = await this.#pickVariantsForAction('publish');
+		const variantIds = await this.#runUserFlorFor('publish');
 		const unique = this.getUnique();
 		if (variantIds.length && unique) {
 			await this.publishingRepository.publish(unique, variantIds);
+			this.workspaceComplete(this.#currentData.getValue());
 		}
 	}
 
