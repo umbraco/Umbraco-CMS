@@ -117,8 +117,10 @@ public interface IDataTypeService : IService
     /// <param name="name">Name to filter by.</param>
     /// <param name="editorUiAlias">Editor ui alias to filter by.</param>
     /// <param name="editorAlias">Editor alias to filter by.</param>
+    /// <param name="skip">Number of items to skip.</param>
+    /// <param name="take">Number of items to take.</param>
     /// <returns>An attempt with the requested data types.</returns>
-    Task<IEnumerable<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null);
+    Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100);
 
     /// <summary>
     ///     Gets all <see cref="IDataType" /> objects or those with the ids passed in

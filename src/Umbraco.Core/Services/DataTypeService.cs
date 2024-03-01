@@ -249,7 +249,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null)
+        public async Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100)
         {
             IEnumerable<IDataType> dataTypes = await GetAllAsync();
 
@@ -268,7 +268,11 @@ namespace Umbraco.Cms.Core.Services.Implement
                 dataTypes = dataTypes.Where(datatype => datatype.EditorAlias.Contains(editorAlias));
             }
 
-            return dataTypes;
+            return new PagedModel<IDataType>
+            {
+                Total = dataTypes.Count(),
+                Items = dataTypes.Skip(skip).Take(take),
+            };
         }
 
         /// <summary>
