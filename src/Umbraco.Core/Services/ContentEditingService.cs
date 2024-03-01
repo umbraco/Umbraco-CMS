@@ -38,13 +38,18 @@ internal sealed class ContentEditingService
     }
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IContent content, ContentUpdateModel updateModel)
-        => await ValidatePropertiesAsync(updateModel, content.ContentType.Key);
+        => await ValidateCulturesAndPropertiesAsync(updateModel, content.ContentType.Key);
 
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
-        => await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
+        => await ValidateCulturesAndPropertiesAsync(createModel, createModel.ContentTypeKey);
 
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
+        if (await ValidateCulturesAsync(createModel) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.LanguageNotFound, new ContentCreateResult());
+        }
+
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await MapCreate<ContentCreateResult>(createModel);
         if (result.Success == false)
         {
@@ -71,6 +76,11 @@ internal sealed class ContentEditingService
 
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, Guid userKey)
     {
+        if (await ValidateCulturesAsync(updateModel) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.LanguageNotFound, new ContentUpdateResult { Content = content });
+        }
+
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(content, updateModel);
         if (result.Success == false)
         {
@@ -114,6 +124,13 @@ internal sealed class ContentEditingService
 
     public async Task<ContentEditingOperationStatus> SortAsync(Guid? parentKey, IEnumerable<SortingModel> sortingModels, Guid userKey)
         => await HandleSortAsync(parentKey, sortingModels, userKey);
+
+    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCulturesAndPropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        Guid contentTypeKey)
+        => await ValidateCulturesAsync(contentEditingModelBase) is false
+            ? Attempt.FailWithStatus(ContentEditingOperationStatus.LanguageNotFound, new ContentValidationResult())
+            : await ValidatePropertiesAsync(contentEditingModelBase, contentTypeKey);
 
     private async Task<ContentEditingOperationStatus> UpdateTemplateAsync(IContent content, Guid? templateKey)
     {

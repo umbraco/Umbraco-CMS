@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -21,6 +22,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
 {
     private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
+
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
@@ -288,6 +291,39 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             r => r.Alias == "author"
                  && r.ErrorMessages.Length == 1
                  && r.ErrorMessages.First() == "Custom regex message"));
+    }
+
+    [TestCase("en-US", true)]
+    [TestCase("en-us", false)]
+    [TestCase("da-DK", true)]
+    [TestCase("da-dk", false)]
+    [TestCase("de-DE", false)]
+    [TestCase("de-de", false)]
+    public async Task Can_Validate_Culture_Code(string cultureCode, bool expectedResult)
+    {
+        var language = new LanguageBuilder()
+            .WithCultureInfo("da-DK")
+            .Build();
+        await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+
+        var result = await ContentValidationService.ValidateCulturesAsync(
+            new ContentCreateModel
+            {
+                Variants = new []
+                {
+                    new VariantModel
+                    {
+                        Culture = cultureCode,
+                        Name = "Whatever",
+                        Properties = new []
+                        {
+                            new PropertyValueModel { Alias = "title", Value = "Something" }
+                        }
+                    }
+                }
+            });
+
+        Assert.AreEqual(expectedResult, result);
     }
 
     private async Task<(IContentType DocumentType, IContentType ElementType)> SetupBlockListTest()
