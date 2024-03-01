@@ -251,7 +251,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public async Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100)
         {
-            IEnumerable<IDataType> dataTypes = await GetAllAsync();
+            IEnumerable<IDataType> dataTypes = GetAll();
 
             if (name is not null)
             {
