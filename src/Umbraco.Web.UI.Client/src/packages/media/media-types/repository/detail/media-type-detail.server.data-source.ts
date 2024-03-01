@@ -168,7 +168,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 				};
 			}),
 			id: model.unique,
-			folder: parentUnique ? { id: parentUnique } : null,
+			parent: parentUnique ? { id: parentUnique } : null,
 			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 

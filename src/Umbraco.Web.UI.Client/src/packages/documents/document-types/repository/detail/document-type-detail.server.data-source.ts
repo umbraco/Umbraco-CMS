@@ -144,7 +144,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDocumentTypeRequestModel = {
-			folder: parentUnique ? { id: parentUnique } : null,
+			parent: parentUnique ? { id: parentUnique } : null,
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
