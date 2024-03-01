@@ -244,9 +244,8 @@ export abstract class UmbBaseExtensionInitializer<
 				const newPermission = await this._conditionsAreGood();
 				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time.
 				if (newPermission === false || this._isConditionsPositive === false) {
-					console.warn(
-						'If this happens then please inform Niels Lyngsø on CMS Team. We are still investigating wether this is a situation we should handle. Ref. No.: 1.',
-					);
+					// Then we need to revert the above work:
+					this._conditionsAreBad();
 					return;
 				}
 				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
@@ -259,9 +258,6 @@ export abstract class UmbBaseExtensionInitializer<
 
 			// Only continue if we are still negative, otherwise it means that something changed in the mean time.
 			if (this._isConditionsPositive === true) {
-				console.warn(
-					'If this happens then please inform Niels Lyngsø on CMS Team. We are still investigating wether this is a situation we should handle. Ref. No.: 2.',
-				);
 				return;
 			}
 			// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
