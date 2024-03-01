@@ -119,7 +119,8 @@ export class UmbBlockGridAreaTypeWorkspaceContext
 			context.setValue(appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.key));
 		});
 
-		this.saveComplete(this.#data.value);
+		this.setIsNew(false);
+		this.workspaceComplete(this.#data.value);
 	}
 
 	public destroy(): void {

@@ -26,13 +26,14 @@ export class UmbPickDocumentVariantModalController extends UmbControllerBase {
 		};
 
 		if (modalData.options.length === 0) {
-			// TODO: What do to when there is no options?
+			// TODO: What do to when there is no options? [NL]
 		}
 
 		const modalContext = modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
 			data: modalData,
 			// We need to turn the selected variant ids into strings for them to be serializable to the value state, in other words the value of a modal cannot hold class instances:
-			value: { selection: selected.map((x) => x.toString()) ?? [] },
+			// Make selection unique by filtering out duplicates:
+			value: { selection: selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i) ?? [] },
 		});
 
 		const result = await modalContext.onSubmit().catch(() => undefined);

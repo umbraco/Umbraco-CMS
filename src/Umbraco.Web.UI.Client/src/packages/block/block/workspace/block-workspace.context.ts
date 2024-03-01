@@ -295,7 +295,8 @@ export class UmbBlockWorkspaceContext<
 			}
 		}
 
-		this.saveComplete(layoutData);
+		this.setIsNew(false);
+		this.workspaceComplete(layoutData);
 	}
 
 	#modalRejected = () => {

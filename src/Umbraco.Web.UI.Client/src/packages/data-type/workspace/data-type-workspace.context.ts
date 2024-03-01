@@ -269,7 +269,8 @@ export class UmbDataTypeWorkspaceContext
 			await this.repository.save(this.#currentData.value);
 		}
 
-		this.saveComplete(this.#currentData.value);
+		this.setIsNew(false);
+		this.workspaceComplete(this.#currentData.value);
 	}
 
 	async delete(unique: string) {
