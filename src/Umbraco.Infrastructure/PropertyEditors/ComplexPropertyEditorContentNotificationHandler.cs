@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -55,17 +53,13 @@ public abstract class ComplexPropertyEditorContentNotificationHandler :
             foreach (IPropertyValue cultureVal in propVals)
             {
                 // Remove keys from published value & any nested properties
-                var publishedValue = cultureVal.PublishedValue is JToken jsonPublishedValue
-                    ? jsonPublishedValue.ToString(Formatting.None)
-                    : cultureVal.PublishedValue?.ToString();
+                var publishedValue = cultureVal.PublishedValue?.ToString();
                 var updatedPublishedVal =
                     FormatPropertyValue(publishedValue!, onlyMissingKeys).NullOrWhiteSpaceAsNull();
                 cultureVal.PublishedValue = updatedPublishedVal;
 
                 // Remove keys from edited/draft value & any nested properties
-                var editedValue = cultureVal.EditedValue is JToken jsonEditedValue
-                    ? jsonEditedValue.ToString(Formatting.None)
-                    : cultureVal.EditedValue?.ToString();
+                var editedValue = cultureVal.EditedValue?.ToString();
                 var updatedEditedVal = FormatPropertyValue(editedValue!, onlyMissingKeys).NullOrWhiteSpaceAsNull();
                 cultureVal.EditedValue = updatedEditedVal;
             }
