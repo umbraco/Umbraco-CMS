@@ -36,7 +36,9 @@ export class UmbPickDocumentVariantModalController extends UmbControllerBase {
 			value: { selection: selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i) ?? [] },
 		});
 
-		const result = await modalContext.onSubmit().catch(() => undefined);
+		const p = modalContext.onSubmit();
+		p.catch(() => this.destroy());
+		const result = await p;
 
 		// This is a one time off, so we can destroy our selfs.
 		this.destroy();
