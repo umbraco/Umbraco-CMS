@@ -85,6 +85,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	 * @param {ManifestCollection} manifest
 	 * @memberof UmbCollectionContext
 	 */
+	// TODO: Revisit if this instead should be a getter/setter property because it might be set by extension initializer
 	public setManifest(manifest: ManifestTreeItem | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
