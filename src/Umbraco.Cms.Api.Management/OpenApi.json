@@ -34216,6 +34216,7 @@
       "DocumentConfigurationResponseModel": {
         "required": [
           "allowEditInvariantFromNonDefault",
+          "allowNonExistingSegmentsCreation",
           "disableDeleteWhenReferenced",
           "disableUnpublishWhenReferenced",
           "sanitizeTinyMce"
@@ -34232,6 +34233,9 @@
             "type": "boolean"
           },
           "allowEditInvariantFromNonDefault": {
+            "type": "boolean"
+          },
+          "allowNonExistingSegmentsCreation": {
             "type": "boolean"
           }
         },
@@ -34506,7 +34510,8 @@
       "DocumentTypeConfigurationResponseModel": {
         "required": [
           "dataTypesCanBeChanged",
-          "disableTemplates"
+          "disableTemplates",
+          "useSegments"
         ],
         "type": "object",
         "properties": {
@@ -34514,6 +34519,9 @@
             "$ref": "#/components/schemas/DataTypeChangeModeModel"
           },
           "disableTemplates": {
+            "type": "boolean"
+          },
+          "useSegments": {
             "type": "boolean"
           }
         },
