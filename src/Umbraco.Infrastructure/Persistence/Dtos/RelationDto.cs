@@ -27,7 +27,7 @@ internal class RelationDto
 
     [Column("relType")]
     [ForeignKey(typeof(RelationTypeDto))]
-    [Index(IndexTypes.NonClustered, Name = "IX_umbracoRelation_relType", ForColumns = "relType,id", IncludeColumns ="parentId,childId,dateTime,comment")]
+    [Index(IndexTypes.NonClustered, Name = "IX_umbracoRelation_relType", ForColumns = "relType,id")]
     public int RelationType { get; set; }
 
     [Column("datetime")]

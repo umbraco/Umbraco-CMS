@@ -32,7 +32,7 @@ public class UserDto
     public bool NoConsole { get; set; }
 
     [Column("userName")]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_userName", ForColumns ="userName", IncludeColumns = "id,userDisabled,userNoConsole,userLogin,userPassword,passwordConfig,userEmail,userLanguage,securityStampToken,failedLoginAttempts,lastLockoutDate,lastPasswordChangeDate,lastLoginDate,emailConfirmedDate,invitedDate,createDate,updateDate,avatar,tourData")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_userName", ForColumns ="userName")]
     public string UserName { get; set; } = null!;
 
     [Column("userLogin")]
