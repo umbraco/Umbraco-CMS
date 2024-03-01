@@ -17,6 +17,7 @@ export class UmbDeleteEntityAction<
 			color: 'danger',
 			confirmLabel: 'Delete',
 		});
+
 		await this.repository?.delete(this.unique);
 	}
 }
