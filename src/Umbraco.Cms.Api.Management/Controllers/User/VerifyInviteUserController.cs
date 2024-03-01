@@ -23,6 +23,7 @@ public class VerifyInviteUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Invite(VerifyInviteUserRequestModel model)
     {
         Attempt<UserOperationStatus> result = await _userService.VerifyInviteAsync(model.User.Id, model.Token);

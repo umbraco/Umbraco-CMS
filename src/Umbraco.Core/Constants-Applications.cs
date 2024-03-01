@@ -74,11 +74,6 @@ public static partial class Constants
         public const string Media = "media";
 
         /// <summary>
-        ///     alias for the macro tree.
-        /// </summary>
-        public const string Macros = "macros";
-
-        /// <summary>
         ///     alias for the datatype tree.
         /// </summary>
         public const string DataTypes = "dataTypes";
@@ -142,8 +137,6 @@ public static partial class Constants
         public const string Scripts = "scripts";
 
         public const string PartialViews = "partialViews";
-
-        public const string PartialViewMacros = "partialViewMacros";
 
         public const string LogViewer = "logViewer";
 

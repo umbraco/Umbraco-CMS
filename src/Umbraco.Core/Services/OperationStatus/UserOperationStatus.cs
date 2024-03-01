@@ -24,7 +24,7 @@ public enum UserOperationStatus
     CannotDisableSelf,
     CannotDeleteSelf,
     CannotDisableInvitedUser,
-    OldPasswordRequired,
+    SelfOldPasswordRequired,
     InvalidAvatar,
     InvalidIsoCode,
     InvalidInviteToken,
@@ -35,5 +35,7 @@ public enum UserOperationStatus
     MediaNodeNotFound,
     UnknownFailure,
     CannotPasswordReset,
-    NotInInviteState
+    NotInInviteState,
+    SelfPasswordResetNotAllowed,
+    DuplicateId,
 }

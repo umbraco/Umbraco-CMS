@@ -31,14 +31,6 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DictionaryPermissionHandler>();
 
-        builder.Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
-        builder.Services.AddSingleton<IContentPermissionAuthorizer, ContentPermissionAuthorizer>();
-        builder.Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
-        builder.Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
-        builder.Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();
-        builder.Services.AddSingleton<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
-        builder.Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
-
         builder.Services.AddAuthorization(CreatePolicies);
         return builder;
     }

@@ -1,13 +1,11 @@
 using System.Globalization;
 using System.Xml.XPath;
-using Serilog.Events;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Xml;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common;
 
@@ -101,36 +99,6 @@ public class UmbracoHelper
     /// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
     public async Task<IHtmlEncodedString> RenderTemplateAsync(int contentId, int? altTemplateId = null)
         => await _componentRenderer.RenderTemplateAsync(contentId, altTemplateId);
-
-    #region RenderMacro
-
-    /// <summary>
-    ///     Renders the macro with the specified alias.
-    /// </summary>
-    /// <param name="alias">The alias.</param>
-    /// <returns></returns>
-    public async Task<IHtmlEncodedString> RenderMacroAsync(string alias)
-        => await _componentRenderer.RenderMacroAsync(AssignedContentItem.Id, alias, null);
-
-    /// <summary>
-    ///     Renders the macro with the specified alias, passing in the specified parameters.
-    /// </summary>
-    /// <param name="alias">The alias.</param>
-    /// <param name="parameters">The parameters.</param>
-    /// <returns></returns>
-    public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, object parameters)
-        => await _componentRenderer.RenderMacroAsync(AssignedContentItem.Id, alias, parameters.ToDictionary<object>());
-
-    /// <summary>
-    ///     Renders the macro with the specified alias, passing in the specified parameters.
-    /// </summary>
-    /// <param name="alias">The alias.</param>
-    /// <param name="parameters">The parameters.</param>
-    /// <returns></returns>
-    public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, IDictionary<string, object> parameters)
-        => await _componentRenderer.RenderMacroAsync(AssignedContentItem.Id, alias, parameters);
-
-    #endregion
 
     #region Dictionary
 
