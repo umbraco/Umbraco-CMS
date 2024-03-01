@@ -12,10 +12,13 @@ import type { PartialViewResponseModel } from '../models/PartialViewResponseMode
 import type { PartialViewSnippetResponseModel } from '../models/PartialViewSnippetResponseModel';
 import type { RenamePartialViewRequestModel } from '../models/RenamePartialViewRequestModel';
 import type { UpdatePartialViewRequestModel } from '../models/UpdatePartialViewRequestModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class PartialViewResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -36,6 +39,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -58,6 +62,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -79,6 +84,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -102,6 +108,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -129,6 +136,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -156,6 +164,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -178,6 +187,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -199,6 +209,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -222,6 +233,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns PagedPartialViewSnippetItemResponseModel Success
      * @throws ApiError
@@ -245,6 +257,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -266,6 +279,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -292,6 +306,7 @@ export class PartialViewResource {
             },
         });
     }
+
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -315,4 +330,5 @@ export class PartialViewResource {
             },
         });
     }
+
 }

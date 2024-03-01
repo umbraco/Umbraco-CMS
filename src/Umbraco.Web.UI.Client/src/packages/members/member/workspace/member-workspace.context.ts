@@ -88,7 +88,8 @@ export class UmbMemberWorkspaceContext
 			await this.repository.save(data);
 		}
 
-		this.saveComplete(data);
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	// Only for CRUD demonstration purposes

@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { DatabaseInstallPresentationModel } from './DatabaseInstallPresentationModel';
+
 export type DatabaseInstallRequestModel = DatabaseInstallPresentationModel;
 

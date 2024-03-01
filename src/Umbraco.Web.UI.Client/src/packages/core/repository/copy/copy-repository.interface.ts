@@ -1,5 +1,5 @@
-import type { DataSourceResponse } from '../data-source-response.interface.js';
+import type { UmbRepositoryResponse } from '../types.js';
 
 export interface UmbCopyRepository {
-	copy(unique: string, targetUnique: string): Promise<DataSourceResponse<string>>;
+	copy(unique: string, targetUnique: string): Promise<UmbRepositoryResponse<string>>;
 }

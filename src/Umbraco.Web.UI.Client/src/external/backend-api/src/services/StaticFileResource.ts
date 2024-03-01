@@ -4,10 +4,13 @@
 /* eslint-disable */
 import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
 import type { StaticFileItemResponseModel } from '../models/StaticFileItemResponseModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class StaticFileResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -28,6 +31,7 @@ export class StaticFileResource {
             },
         });
     }
+
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -54,6 +58,7 @@ export class StaticFileResource {
             },
         });
     }
+
     /**
      * @returns PagedFileSystemTreeItemPresentationModel Success
      * @throws ApiError
@@ -77,4 +82,5 @@ export class StaticFileResource {
             },
         });
     }
+
 }

@@ -2,8 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { DocumentPermissionPresentationModel } from './DocumentPermissionPresentationModel';
 import type { UnknownTypePermissionPresentationModel } from './UnknownTypePermissionPresentationModel';
+
 export type CurrentUserResponseModel = {
     id: string;
     email: string;

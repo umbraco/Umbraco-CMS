@@ -2,7 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { UserPresentationBaseModel } from './UserPresentationBaseModel';
+
 export type UpdateUserRequestModel = (UserPresentationBaseModel & {
     languageIsoCode: string;
     documentStartNodeIds: Array<string>;

@@ -14,10 +14,13 @@ import type { MoveDataTypeRequestModel } from '../models/MoveDataTypeRequestMode
 import type { PagedDataTypeTreeItemResponseModel } from '../models/PagedDataTypeTreeItemResponseModel';
 import type { UpdateDataTypeRequestModel } from '../models/UpdateDataTypeRequestModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class DataTypeResource {
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -40,6 +43,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -61,6 +65,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -84,6 +89,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -111,6 +117,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -137,6 +144,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns boolean Success
      * @throws ApiError
@@ -158,6 +166,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -184,6 +193,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -205,6 +215,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -218,6 +229,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -240,6 +252,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -261,6 +274,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -284,6 +298,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -311,6 +326,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -331,6 +347,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -351,6 +368,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns PagedDataTypeTreeItemResponseModel Success
      * @throws ApiError
@@ -380,6 +398,7 @@ export class DataTypeResource {
             },
         });
     }
+
     /**
      * @returns PagedDataTypeTreeItemResponseModel Success
      * @throws ApiError
@@ -406,4 +425,5 @@ export class DataTypeResource {
             },
         });
     }
+
 }

@@ -110,7 +110,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			},
 			{
 				alias: 'multiUrlPicker',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				value: [
 					{
@@ -509,7 +509,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				name: 'All properties',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -564,13 +564,13 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'My first blog post',
 			},
 			{
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'in the master tab',
 			},
 			{
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'which is under another group in the tab',
@@ -610,7 +610,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				name: 'Article in english',
 				createDate: '2023-02-06T15:31:46.876902',
@@ -687,13 +687,13 @@ export const data: Array<UmbMockDocumentModel> = [
 				value: 'My first blog post B',
 			},
 			{
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderMasterTab',
 				value: 'in the master tab B',
 			},
 			{
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				alias: 'blogTextStringUnderGroupUnderMasterTab',
 				value: 'which is under another group in the tab B',
@@ -721,7 +721,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				name: 'Blog post B',
 				createDate: '2023-02-06T15:32:05.350038',
@@ -752,7 +752,7 @@ export const data: Array<UmbMockDocumentModel> = [
 			{
 				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
-				culture: 'en-us',
+				culture: 'en-US',
 				segment: null,
 				name: 'Simple Document',
 				createDate: '2023-02-06T15:32:05.350038',

@@ -11,10 +11,13 @@ import type { TemplateQueryResultResponseModel } from '../models/TemplateQueryRe
 import type { TemplateQuerySettingsResponseModel } from '../models/TemplateQuerySettingsResponseModel';
 import type { TemplateResponseModel } from '../models/TemplateResponseModel';
 import type { UpdateTemplateRequestModel } from '../models/UpdateTemplateRequestModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class TemplateResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -35,6 +38,7 @@ export class TemplateResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -57,6 +61,7 @@ export class TemplateResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -78,6 +83,7 @@ export class TemplateResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -101,6 +107,7 @@ export class TemplateResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -128,6 +135,7 @@ export class TemplateResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -141,6 +149,7 @@ export class TemplateResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -160,6 +169,7 @@ export class TemplateResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -173,6 +183,7 @@ export class TemplateResource {
             },
         });
     }
+
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -199,6 +210,7 @@ export class TemplateResource {
             },
         });
     }
+
     /**
      * @returns PagedNamedEntityTreeItemResponseModel Success
      * @throws ApiError
@@ -222,4 +234,5 @@ export class TemplateResource {
             },
         });
     }
+
 }
