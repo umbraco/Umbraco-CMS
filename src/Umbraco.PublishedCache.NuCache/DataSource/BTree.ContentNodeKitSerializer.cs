@@ -23,7 +23,7 @@ internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
             PrimitiveSerializer.Int32.ReadFrom(stream), // id
             PrimitiveSerializer.Guid.ReadFrom(stream), // uid
             PrimitiveSerializer.Int32.ReadFrom(stream), // level
-            PrimitiveSerializer.String.ReadFrom(stream), // path
+            ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream), // path
             PrimitiveSerializer.Int32.ReadFrom(stream), // sort order
             PrimitiveSerializer.Int32.ReadFrom(stream), // parent id
             PrimitiveSerializer.DateTime.ReadFrom(stream), // date created
