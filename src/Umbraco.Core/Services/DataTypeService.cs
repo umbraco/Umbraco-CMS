@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using DataType = Umbraco.Cms.Core.Models.DataType;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -250,6 +251,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public async Task<IEnumerable<IDataType>> FilterAsync(string orderBy = "name", Direction orderDirection = Direction.Ascending, string? name = null, string? editorUiAlias = null, string? editorAlias = null)
         {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
             IEnumerable<IDataType> dataTypes = _dataTypeRepository.GetMany();
 
             if (name is not null)
@@ -268,14 +271,14 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
-
+            scope.Complete();
             return OrderByProperty(dataTypes, orderBy, orderDirection);
         }
 
         private IEnumerable<IDataType> OrderByProperty(IEnumerable<IDataType> dataTypes, string orderBy, Direction orderDirection)
         {
             // Get the property info for the specified property name
-            PropertyInfo? property = typeof(IDataType).GetProperty(orderBy, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            PropertyInfo? property = typeof(DataType).GetProperty(orderBy, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 
             if (property == null)
             {
