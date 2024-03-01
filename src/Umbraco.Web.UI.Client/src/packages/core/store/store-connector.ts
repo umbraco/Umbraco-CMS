@@ -24,8 +24,6 @@ export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 		this.#newStoreItemMapper = args.newStoreItemMapper;
 		this.#updateStoreItemMapper = args.updateStoreItemMapper;
 
-		console.warn('UmbStoreConnector is a work in progress and should not be used yet');
-
 		new UmbContextConsumerController(host, args.connectToStoreAlias, (instance) => {
 			this.#connectedStore = instance;
 
