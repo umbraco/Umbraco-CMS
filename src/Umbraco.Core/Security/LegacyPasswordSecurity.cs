@@ -16,8 +16,11 @@ public class LegacyPasswordSecurity
     public static string GenerateSalt()
     {
         var numArray = new byte[16];
-        new RNGCryptoServiceProvider().GetBytes(numArray);
-        return Convert.ToBase64String(numArray);
+        using (var rng = new RNGCryptoServiceProvider())
+        {
+            rng.GetBytes(numArray);
+            return Convert.ToBase64String(numArray);
+        }
     }
 
     // TODO: Remove v11
@@ -86,7 +89,7 @@ public class LegacyPasswordSecurity
     /// </summary>
     public bool VerifyLegacyHashedPassword(string password, string dbPassword)
     {
-        var hashAlgorithm = new HMACSHA1
+        using var hashAlgorithm = new HMACSHA1
         {
             // the legacy salt was actually the password :(
             Key = Encoding.Unicode.GetBytes(password),
@@ -176,7 +179,7 @@ public class LegacyPasswordSecurity
         using HashAlgorithm hashAlgorithm = GetHashAlgorithm(algorithmType);
         if (hashAlgorithm is KeyedHashAlgorithm algorithm)
         {
-            KeyedHashAlgorithm keyedHashAlgorithm = algorithm;
+            using KeyedHashAlgorithm keyedHashAlgorithm = algorithm;
             if (keyedHashAlgorithm.Key.Length == saltBytes.Length)
             {
                 // if the salt bytes is the required key length for the algorithm, use it as-is
