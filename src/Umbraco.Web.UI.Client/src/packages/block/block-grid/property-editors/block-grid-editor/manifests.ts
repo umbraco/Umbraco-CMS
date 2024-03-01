@@ -15,6 +15,11 @@ export const manifest: ManifestPropertyEditorUi = {
 		settings: {
 			properties: [
 				{
+					alias: 'blockGroups',
+					label: '',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockTypeGroupConfiguration',
+				},
+				{
 					alias: 'useLiveEditing',
 					label: 'Live editing mode',
 					description: 'Live update content when editing in overlay',
