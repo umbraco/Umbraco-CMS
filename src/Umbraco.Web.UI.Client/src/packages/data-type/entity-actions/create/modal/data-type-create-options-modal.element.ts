@@ -21,12 +21,12 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
-		if (this.data?.parent === undefined) throw new Error('A parent is required to create a folder');
+		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
 				folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
-				parentUnique: this.data.parent.unique,
+				parent: this.data.parent,
 			},
 		});
 
@@ -35,7 +35,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 
 	#getCreateHref() {
 		return `section/settings/workspace/data-type/create/parent/${this.data?.parent.entityType}/${
-			this.data?.parent.unique || null
+			this.data?.parent.unique || 'null'
 		}`;
 	}
 

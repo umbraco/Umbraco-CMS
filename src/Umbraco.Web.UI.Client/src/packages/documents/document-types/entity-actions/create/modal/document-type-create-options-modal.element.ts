@@ -10,8 +10,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
-		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
+		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		this.#createFolderAction = new UmbCreateFolderEntityAction(
 			this,
@@ -19,8 +18,8 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			// TODO: allow null for entity actions. Some actions can be executed on the root item
-			this.data.parentUnique,
-			this.data.entityType,
+			this.data.parent.unique,
+			this.data.parent.entityType,
 		);
 	}
 
@@ -40,15 +39,18 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 		this._rejectModal();
 	}
 
+	#getCreateHref() {
+		return `section/settings/workspace/document-type/create/parent/${this.data?.parent.entityType}/${
+			this.data?.parent.unique || 'null'
+		}`;
+	}
+
 	render() {
 		return html`
 			<umb-body-layout headline="Create Document Type">
 				<uui-box>
 					<!-- TODO: construct url -->
-					<uui-menu-item
-						href=${`section/settings/workspace/document-type/create/${this.data?.parentUnique || 'null'}`}
-						label="New Document Type..."
-						@click=${this.#onNavigate}>
+					<uui-menu-item href=${this.#getCreateHref()} label="New Document Type..." @click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-autofill"></uui-icon>}
 					</uui-menu-item>
 					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">

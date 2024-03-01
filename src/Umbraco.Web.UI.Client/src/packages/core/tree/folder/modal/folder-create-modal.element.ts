@@ -33,11 +33,11 @@ export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
 	async onFormSubmit({ name }: { name: string }): Promise<void> {
 		if (!this.folderRepository) throw new Error('A folder repository is required to create a folder');
 		if (!this._folderScaffold) throw new Error('The folder scaffold was not initialized correctly');
-		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create folder');
+		if (!this.data?.parent) throw new Error('A parent is required to create folder');
 
 		const createFolderModel: UmbCreateFolderModel = {
 			...this._folderScaffold,
-			parentUnique: this.data.parentUnique,
+			parentUnique: this.data.parent.unique,
 			name,
 		};
 

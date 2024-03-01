@@ -13,8 +13,7 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
-		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
+		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		this.#createFolderAction = new UmbCreateFolderEntityAction(
 			this,
@@ -22,8 +21,8 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			// TODO: allow null for entity actions. Some actions can be executed on the root item
-			this.data.parentUnique,
-			this.data.entityType,
+			this.data.parent.unique,
+			this.data.parent.entityType,
 		);
 	}
 
@@ -43,22 +42,23 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 		this._submitModal();
 	}
 
+	#getCreateHref() {
+		return `section/settings/workspace/stylesheet/create/parent/${this.data?.parent.entityType}/${
+			this.data?.parent.unique || 'null'
+		}`;
+	}
+
 	render() {
 		return html`
 			<umb-body-layout headline="Create Stylesheet">
 				<uui-box>
 					<!-- TODO: construct url -->
-					<uui-menu-item
-						href=${`section/settings/workspace/stylesheet/create/${this.data?.parentUnique || 'null'}/view/code`}
-						label="New Stylesheet"
-						@click=${this.#onNavigate}>
+					<uui-menu-item href=${`${this.#getCreateHref()}/view/code`} label="New Stylesheet" @click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-article"></uui-icon>}
 					</uui-menu-item>
 
 					<uui-menu-item
-						href=${`section/settings/workspace/stylesheet/create/${
-							this.data?.parentUnique || 'null'
-						}/view/rich-text-editor`}
+						href=${`${this.#getCreateHref()}/view/rich-text-editor`}
 						label="New Rich Text Editor Stylesheet"
 						@click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-article"></uui-icon>}

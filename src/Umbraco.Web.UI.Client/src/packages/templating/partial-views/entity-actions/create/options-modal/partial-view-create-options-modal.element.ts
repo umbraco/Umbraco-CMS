@@ -24,8 +24,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
-		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
+		if (!this.data?.parent) throw new Error('A parent unique is required to create a folder');
 
 		this.#createFolderAction = new UmbCreateFolderEntityAction(
 			this,
@@ -33,8 +32,8 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			// TODO: allow null for entity actions. Some actions can be executed on the root item
-			this.data.parentUnique,
-			this.data.entityType,
+			this.data.parent.unique,
+			this.data.parent.entityType,
 		);
 	}
 
@@ -51,11 +50,11 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 
 	async #onCreateFromSnippetClick(event: PointerEvent) {
 		event.stopPropagation();
-		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
+		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		const modalContext = this.#modalManager?.open(UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL, {
 			data: {
-				parentUnique: this.data.parentUnique,
+				parent: this.data.parent,
 			},
 		});
 
@@ -67,15 +66,18 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 		this._submitModal();
 	}
 
+	#getCreateHref() {
+		return `section/settings/workspace/partial-view/create/parent/${this.data?.parent.entityType}/${
+			this.data?.parent.unique || 'null'
+		}`;
+	}
+
 	render() {
 		return html`
 			<umb-body-layout headline="Create Partial View">
 				<uui-box>
 					<!-- TODO: construct url -->
-					<uui-menu-item
-						href=${`section/settings/workspace/partial-view/create/${this.data?.parentUnique || 'null'}`}
-						label="New empty partial view"
-						@click=${this.#onNavigate}>
+					<uui-menu-item href=${this.#getCreateHref()} label="New empty partial view" @click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-article"></uui-icon>}
 					</uui-menu-item>
 

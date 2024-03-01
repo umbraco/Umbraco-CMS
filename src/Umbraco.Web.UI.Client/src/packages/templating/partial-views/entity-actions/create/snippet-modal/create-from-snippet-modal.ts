@@ -17,6 +17,12 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 	@state()
 	_snippets: Array<UmbSnippetLinkModel> = [];
 
+	#getCreateHref(snippet) {
+		return `section/settings/workspace/partial-view/create/parent/${this.data?.parent.entityType}/${
+			this.data?.parent.unique || 'null'
+		}/snippet/${snippet.id}`;
+	}
+
 	protected async firstUpdated() {
 		const { data } = await tryExecuteAndNotify(this, PartialViewResource.getPartialViewSnippet({ take: 10000 }));
 
@@ -24,9 +30,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 			this._snippets = data.items.map((snippet) => {
 				return {
 					name: snippet.name,
-					path: `section/settings/workspace/partial-view/create/${this.data?.parentUnique || 'null'}/snippet/${
-						snippet.id
-					}`,
+					path: this.#getCreateHref(snippet),
 				};
 			});
 		}

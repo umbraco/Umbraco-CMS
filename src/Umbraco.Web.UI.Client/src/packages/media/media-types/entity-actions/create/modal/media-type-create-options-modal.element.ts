@@ -28,12 +28,12 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
-		if (this.data?.parentKey === undefined) throw new Error('A parent unique is required to create a folder');
+		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
 				folderRepositoryAlias: UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS,
-				parentUnique: this.data?.parentKey,
+				parent: this.data?.parent,
 			},
 		});
 		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());
@@ -48,15 +48,18 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 		this.modalContext?.reject();
 	}
 
+	#getCreateHref() {
+		return `section/settings/workspace/media-type/create/parent/${this.data?.parent.entityType}/${
+			this.data?.parent.unique || 'null'
+		}`;
+	}
+
 	render() {
 		return html`
 			<umb-body-layout headline="Create Media Type">
 				<uui-box>
 					<!-- TODO: construct url -->
-					<uui-menu-item
-						href=${`section/settings/workspace/media-type/create/${this.data?.parentKey || 'null'}`}
-						label="New Media Type..."
-						@click=${this.#onNavigate}>
+					<uui-menu-item href=${this.#getCreateHref()} label="New Media Type..." @click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-autofill"></uui-icon>
 					</uui-menu-item>
 					<uui-menu-item @click=${this.#onClick} label="New Folder...">

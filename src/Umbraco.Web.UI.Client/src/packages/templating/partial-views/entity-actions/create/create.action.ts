@@ -1,7 +1,7 @@
 import { UMB_PARTIAL_VIEW_CREATE_OPTIONS_MODAL } from './options-modal/index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbPartialViewCreateOptionsEntityAction extends UmbEntityActionBase<never> {
@@ -21,8 +21,10 @@ export class UmbPartialViewCreateOptionsEntityAction extends UmbEntityActionBase
 
 		this.#modalManagerContext?.open(UMB_PARTIAL_VIEW_CREATE_OPTIONS_MODAL, {
 			data: {
-				parentUnique: this.unique,
-				entityType: this.entityType,
+				parent: {
+					unique: this.unique,
+					entityType: this.entityType,
+				},
 			},
 		});
 	}
