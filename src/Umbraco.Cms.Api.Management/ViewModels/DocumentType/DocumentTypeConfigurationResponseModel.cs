@@ -7,4 +7,6 @@ public class DocumentTypeConfigurationResponseModel
     public required DataTypeChangeMode DataTypesCanBeChanged { get; set; }
 
     public required bool DisableTemplates { get; set; }
+
+    public required bool UseSegments { get; set; }
 }
