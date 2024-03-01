@@ -37,15 +37,12 @@ export class UmbDocumentVariantPickerModalElement extends UmbModalBaseElement<
 		let selected = this.value?.selection ?? [];
 
 		if (selected.length === 0) {
-			// TODO: Make it possible to use consume context without callback. [NL]
-			const ctrl = this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, () => {});
-			const context = await ctrl.asPromise();
+			const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
 			const appCulture = context.getAppCulture();
 			// If the app language is one of the options, select it by default:
 			if (appCulture && this.data?.options.some((o) => o.language.unique === appCulture)) {
 				selected = appendToFrozenArray(selected, new UmbVariantId(appCulture, null).toString());
 			}
-			ctrl.destroy();
 		}
 
 		this.#selectionManager.setMultiple(true);
