@@ -329,7 +329,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
     }

@@ -80,15 +80,15 @@ internal sealed class ContentEditingService
 
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey)
     {
-        if (await ValidateCulturesAsync(updateModel) is false)
-        {
-            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentUpdateResult { Content = content });
-        }
-
         IContent? content = ContentService.GetById(key);
         if (content is null)
         {
             return Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentUpdateResult());
+        }
+
+        if (await ValidateCulturesAsync(updateModel) is false)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.InvalidCulture, new ContentUpdateResult { Content = content });
         }
 
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(content, updateModel);
