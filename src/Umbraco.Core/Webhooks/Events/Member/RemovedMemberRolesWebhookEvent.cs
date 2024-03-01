@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
@@ -18,5 +18,5 @@ public class RemovedMemberRolesWebhookEvent : WebhookEventBase<RemovedMemberRole
     {
     }
 
-    public override string Alias => "removedMemberRoles";
+    public override string Alias => Constants.WebhookEvents.Aliases.RemovedMemberRoles;
 }

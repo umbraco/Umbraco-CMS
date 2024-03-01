@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -8,7 +9,7 @@ public abstract class BlockEditorPropertyValueConstructorCacheBase<T>
     where T : IBlockReference<IPublishedElement, IPublishedElement>
 {
     private readonly
-        Dictionary<(Guid, Guid?), Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T>>
+        ConcurrentDictionary<(Guid, Guid?), Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T>>
         _constructorCache = new();
 
     public bool TryGetValue((Guid ContentTypeKey, Guid? SettingsTypeKey) key, [MaybeNullWhen(false)] out Func<Udi, IPublishedElement, Udi?, IPublishedElement?, T> value)

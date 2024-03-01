@@ -18,7 +18,7 @@ public class LanguageDeletedWebhookEvent : WebhookEventBase<LanguageDeletedNotif
     {
     }
 
-    public override string Alias => "languageDeleted";
+    public override string Alias => Constants.WebhookEvents.Aliases.LanguageDeleted;
 
     public override object? ConvertNotificationToRequestPayload(LanguageDeletedNotification notification)
         => notification.DeletedEntities;

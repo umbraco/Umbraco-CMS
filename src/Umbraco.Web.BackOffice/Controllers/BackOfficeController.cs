@@ -426,7 +426,8 @@ public class BackOfficeController : UmbracoController
         if (user == null)
         {
             // ... this should really not happen
-            return RedirectToLogin(new { flow = "external-login", status = "localUserNotFound" });
+            TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "Local user does not exist" };
+            return RedirectToLogin(new { flow = "external-login", status = "localUserNotFound", logout = "true"});
         }
 
         ExternalLoginInfo? info =
@@ -435,7 +436,9 @@ public class BackOfficeController : UmbracoController
         if (info == null)
         {
             // Add error and redirect for it to be displayed
-            return RedirectToLogin(new { flow = "external-login", status = "externalLoginInfoNotFound" });
+            TempData[ViewDataExtensions.TokenExternalSignInError] =
+                new[] { "An error occurred, could not get external login info" };
+            return RedirectToLogin(new { flow = "external-login", status = "externalLoginInfoNotFound", logout = "true"});
         }
 
         IdentityResult addLoginResult = await _userManager.AddLoginAsync(user, info);
@@ -448,7 +451,8 @@ public class BackOfficeController : UmbracoController
         }
 
         // Add errors and redirect for it to be displayed
-        return RedirectToLogin(new { flow = "external-login", status = "failed" });
+        TempData[ViewDataExtensions.TokenExternalSignInError] = addLoginResult.Errors;
+        return RedirectToLogin(new { flow = "external-login", status = "failed", logout = "true" });
     }
 
     /// <summary>
@@ -469,8 +473,9 @@ public class BackOfficeController : UmbracoController
                 _httpContextAccessor.HttpContext,
                 ViewDataExtensions.TokenExternalSignInError,
                 _jsonSerializer) ||
-            ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) || ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
+            ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError))
         {
+            // Return early to let the client side handle the messaging
             return defaultResponse();
         }
 

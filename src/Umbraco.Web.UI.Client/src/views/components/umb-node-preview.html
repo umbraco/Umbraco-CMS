@@ -48,7 +48,7 @@
         </button>
 
         <!-- If removeUrl has a value we render a link otherwise a button -->
-        <a class="umb-node-preview__action umb-node-preview__action--red"
+        <a class="umb-node-preview__action"
             ng-href="{{changeUrl}}"
             ng-if="allowChange && changeUrl"
             ng-click="onChange()">
@@ -56,7 +56,7 @@
         </a>
     
         <button type="button"
-                class="umb-node-preview__action umb-node-preview__action--red"
+                class="umb-node-preview__action"
                 ng-if="allowChange && !changeUrl"
                 ng-click="onChange()">
             <localize key="general_change">Change</localize><span class="sr-only">&nbsp;{{name}}</span>
