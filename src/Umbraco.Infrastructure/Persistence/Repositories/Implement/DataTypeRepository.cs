@@ -32,7 +32,6 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
     private readonly ILogger<IDataType> _dataTypeLogger;
     private readonly PropertyEditorCollection _editors;
     private readonly IConfigurationEditorJsonSerializer _serializer;
-    private readonly IMapperCollection _mapperCollection;
 
     public DataTypeRepository(
         IScopeAccessor scopeAccessor,
@@ -40,12 +39,11 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         PropertyEditorCollection editors,
         ILogger<DataTypeRepository> logger,
         ILoggerFactory loggerFactory,
-        IConfigurationEditorJsonSerializer serializer, IMapperCollection mapperCollection)
+        IConfigurationEditorJsonSerializer serializer)
         : base(scopeAccessor, cache, logger)
     {
         _editors = editors;
         _serializer = serializer;
-        _mapperCollection = mapperCollection;
         _dataTypeLogger = loggerFactory.CreateLogger<IDataType>();
     }
 
@@ -209,50 +207,6 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
         return usages;
     }
-
-    private Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Expression<Func<IDataType, object?>>? orderBy, Direction orderDirection)
-    {
-        if (orderBy == null)
-        {
-            return sql;
-        }
-
-        MemberInfo? expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
-        BaseMapper mapper = _mapperCollection[typeof(IDataType)];
-        var mappedField = mapper.Map(expressionMember?.Name);
-
-        if (mappedField.IsNullOrWhiteSpace())
-        {
-            throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
-        }
-
-        // beware! NPoco paging code parses the query to isolate the ORDER BY fragment,
-        // using a regex that wants "([\w\.\[\]\(\)\s""`,]+)" - meaning that anything
-        // else in orderBy is going to break NPoco / not be detected
-
-        // beware! NPoco paging code (in PagingHelper) collapses everything [foo].[bar]
-        // to [bar] only, so we MUST use aliases, cannot use [table].[field]
-
-        // beware! pre-2012 SqlServer is using a convoluted syntax for paging, which
-        // includes "SELECT ROW_NUMBER() OVER (ORDER BY ...) poco_rn FROM SELECT (...",
-        // so anything added here MUST also be part of the inner SELECT statement, ie
-        // the original statement, AND must be using the proper alias, as the inner SELECT
-        // will hide the original table.field names entirely
-
-        var orderByField = sql.GetAliasedField(mappedField);
-
-        if (orderDirection == Direction.Ascending)
-        {
-            sql.OrderBy(orderByField);
-        }
-        else
-        {
-            sql.OrderByDescending(orderByField);
-        }
-
-        return sql;
-    }
-
 
     #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
