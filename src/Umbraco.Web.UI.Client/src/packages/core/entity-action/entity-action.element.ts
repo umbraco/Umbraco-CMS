@@ -62,9 +62,9 @@ export class UmbEntityActionElement extends UmbLitElement {
 		this.#api = await createExtensionApi(this.#manifest, [
 			this,
 			{
-				unique: this.#unique,
 				entityType: this.#entityType,
-				...this.#manifest.meta,
+				unique: this.#unique,
+				meta: this.#manifest.meta,
 			},
 		]);
 

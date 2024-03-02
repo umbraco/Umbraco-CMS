@@ -5,9 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @export
  * @interface UmbEntityAction
  */
-export interface UmbEntityAction<ArgsMetaType> {
-	args: UmbEntityActionArgs<ArgsMetaType>;
-
+export interface UmbEntityAction<ArgsMetaType> extends UmbAction<UmbEntityActionArgs<ArgsMetaType>> {
 	/**
 	 * The href location, the action will act as a link.
 	 * @returns {Promise<string | null | undefined>}
