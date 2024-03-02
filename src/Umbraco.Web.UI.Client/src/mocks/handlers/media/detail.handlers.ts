@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbMediaMockDb } from '../../data/media/media.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [

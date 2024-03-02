@@ -2,7 +2,7 @@ import type { UmbDocumentTreeItemModel } from '../../tree/types.js';
 import { UmbDocumentPickerContext } from './input-document.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
@@ -150,7 +150,6 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	#openPicker() {
 		// TODO: Configure the content picker, with `startNodeId` and `ignoreUserStartNodes` [LK]
-		console.log('#openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -164,7 +163,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._items?.length) return;
 		return html`<uui-ref-list>
 			${repeat(
 				this._items,

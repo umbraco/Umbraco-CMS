@@ -6,13 +6,11 @@ import type {
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
-	SavedLogSearchPresenationBaseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	DirectionModel,
-	LogLevelModel
-} from '@umbraco-cms/backoffice/backend-api';
+	SavedLogSearchPresenationBaseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { DirectionModel, LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { query } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
@@ -29,7 +27,7 @@ export interface LogViewerDateRange {
 }
 
 // TODO: Revisit usage of workspace for this case...
-export class UmbLogViewerWorkspaceContext extends UmbBaseController implements UmbWorkspaceContextInterface {
+export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements UmbWorkspaceContextInterface {
 	public readonly workspaceAlias: string = 'Umb.Workspace.LogViewer';
 	#repository: UmbLogViewerRepository;
 
@@ -41,7 +39,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		return 'Log Viewer';
 	}
 
-	getEntityId() {
+	getUnique() {
 		return undefined;
 	}
 

@@ -55,3 +55,5 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 		return { error };
 	}
 }
+
+export default UmbInviteUserRepository;

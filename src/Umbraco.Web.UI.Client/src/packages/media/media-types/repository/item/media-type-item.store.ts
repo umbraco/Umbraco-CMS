@@ -6,7 +6,7 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 /**
  * @export
  * @class UmbMediaTypeItemStore
- * @extends {UmbEntityItemStore}
+ * @extends {UmbItemStoreBase}
  * @description - Data Store for Media Type items
  */
 
@@ -20,5 +20,7 @@ export class UmbMediaTypeItemStore extends UmbItemStoreBase<UmbMediaTypeItemMode
 		super(host, UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT.toString());
 	}
 }
+
+export default UmbMediaTypeItemStore;
 
 export const UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbMediaTypeItemStore>('UmbMediaTypeItemStore');

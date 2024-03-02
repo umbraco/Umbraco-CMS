@@ -1,66 +1,76 @@
+import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
 import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import type { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import {
+	CompositionTypeModel,
+	type PropertyTypeContainerModelBaseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-
-const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-	getUniqueOfElement: (element) => {
-		return element.getAttribute('data-umb-tabs-id');
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.id;
-	},
-	identifier: 'content-type-tabs-sorter',
-	itemSelector: '[data-umb-tabs-id]',
-	containerSelector: '#tabs-group',
-	disabledItemSelector: '[inherited]',
-	resolveVerticalDirection: () => {
-		return false;
-	},
-};
 
 @customElement('umb-document-type-workspace-view-edit')
 export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
-	public sorter?: UmbSorterController<PropertyTypeContainerModelBaseModel>;
+	#model: Array<PropertyTypeContainerModelBaseModel> = [];
+	#sorter = new UmbSorterController<PropertyTypeContainerModelBaseModel, UUITabElement>(this, {
+		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
+		getUniqueOfModel: (modelEntry) => modelEntry.id,
+		identifier: 'document-type-tabs-sorter',
+		itemSelector: 'uui-tab',
+		containerSelector: 'uui-tab-group',
+		disabledItemSelector: '#root-tab',
+		resolveVerticalDirection: () => false,
+		onChange: ({ model }) => {
+			this.#model = model;
+			this._tabs = model;
+		},
+		onEnd: ({ item }) => {
+			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
+			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
+			 */
+			const model = this.#model;
+			const newIndex = model.findIndex((entry) => entry.id === item.id);
 
-	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
-		...SORTER_CONFIG,
-		// TODO: Missing handlers to work properly: performItemMove and performItemRemove
-		performItemInsert: async (args) => {
-			if (!this._tabs) return false;
-			const oldIndex = this._tabs.findIndex((tab) => tab.id! === args.item.id);
-			if (args.newIndex === oldIndex) return true;
+			// Doesn't exist in model
+			if (newIndex === -1) return;
 
-			let sortOrder = 0;
-			//TODO the sortOrder set is not correct
-			if (this._tabs.length > 0) {
-				if (args.newIndex === 0) {
-					sortOrder = (this._tabs[0].sortOrder ?? 0) - 1;
-				} else {
-					sortOrder = (this._tabs[Math.min(args.newIndex, this._tabs.length - 1)].sortOrder ?? 0) + 1;
-				}
-
-				if (sortOrder !== args.item.sortOrder) {
-					await this._tabsStructureHelper.partialUpdateContainer(args.item.id!, { sortOrder });
-				}
+			// First in list
+			if (newIndex === 0 && model.length > 1) {
+				this._tabsStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
+				return;
 			}
 
-			return true;
+			// Not first in list
+			if (newIndex > 0 && model.length > 1) {
+				const prevItemSortOrder = model[newIndex - 1].sortOrder;
+
+				let weight = 1;
+				this._tabsStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
+
+				// Check for overlaps
+				model.some((entry, index) => {
+					if (index <= newIndex) return;
+					if (entry.sortOrder === prevItemSortOrder + weight) {
+						weight++;
+						this._tabsStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
+					}
+					// Break the loop
+					return true;
+				});
+			}
 		},
-	};
+	});
 
 	//private _hasRootProperties = false;
 
@@ -80,7 +90,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	private _activePath = '';
 
 	@state()
-	private sortModeActive?: boolean;
+	private _sortModeActive?: boolean;
 
 	@state()
 	private _buttonDisabled: boolean = false;
@@ -89,11 +99,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbDocumentTypeDetailModel>(this);
 
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+	@state()
+	private _compositionConfiguration?: UmbCompositionPickerModalData;
 
 	constructor() {
 		super();
-		this.sorter = new UmbSorterController(this, this.config);
 
 		//TODO: We need to differentiate between local and composition tabs (and hybrids)
 
@@ -101,6 +111,12 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this._tabsStructureHelper.containers, (tabs) => {
 			this._tabs = tabs;
+			if (this._sortModeActive) {
+				this.#sorter.setModel(tabs);
+			} else {
+				this.#sorter.setModel([]);
+			}
+
 			this._createRoutes();
 		});
 
@@ -111,14 +127,30 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 			this._tabsStructureHelper.setStructureManager((workspaceContext as UmbDocumentTypeWorkspaceContext).structure);
 			this.observe(
 				this._workspaceContext.isSorting,
-				(isSorting) => (this.sortModeActive = isSorting),
+				(isSorting) => {
+					this._sortModeActive = isSorting;
+					if (isSorting) {
+						this.#sorter.setModel(this._tabs!);
+					} else {
+						this.#sorter.setModel([]);
+					}
+				},
 				'_observeIsSorting',
 			);
-			this._observeRootGroups();
-		});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
-			this._modalManagerContext = context;
+			const unique = this._workspaceContext.getUnique();
+
+			//TODO Figure out the correct data that needs to be sent to the compositions modal. Do we really have to send isElement, currentPropertyAliases - isn't unique enough?
+			this.observe(this._workspaceContext.structure.contentTypes, (contentTypes) => {
+				this._compositionConfiguration = {
+					unique: unique ?? '',
+					selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
+					isElement: contentTypes.find((contentType) => contentType.unique === unique)?.isElement ?? false,
+					currentPropertyAliases: [],
+				};
+			});
+
+			this._observeRootGroups();
 		});
 	}
 
@@ -136,13 +168,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	#changeMode() {
-		this._workspaceContext?.setIsSorting(!this.sortModeActive);
-
-		if (this.sortModeActive && this._tabs) {
-			this.sorter?.setModel(this._tabs);
-		} else {
-			this.sorter?.setModel([]);
-		}
+		this._workspaceContext?.setIsSorting(!this._sortModeActive);
 	}
 
 	private _createRoutes() {
@@ -188,7 +214,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		this._routes = routes;
 	}
 
-	#requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
+	async #requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
 		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
@@ -205,11 +231,9 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
 
-		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, { data: modalData });
+		await umbConfirmModal(this, modalData);
 
-		modalHandler?.onSubmit().then(() => {
-			this.#remove(tab?.id);
-		});
+		this.#remove(tab?.id);
 	}
 	#remove(tabId?: string) {
 		if (!tabId) return;
@@ -270,11 +294,27 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeFolderName(newName));
 	}
 
+	async #openCompositionModal() {
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManagerContext.open(this, UMB_COMPOSITION_PICKER_MODAL, {
+			data: this._compositionConfiguration,
+		});
+		await modalContext?.onSubmit();
+
+		if (!modalContext?.value) return;
+
+		const compositionIds = modalContext.getValue().selection;
+
+		this._workspaceContext?.setCompositions(
+			compositionIds.map((unique) => ({ contentType: { unique }, compositionType: CompositionTypeModel.COMPOSITION })),
+		);
+	}
+
 	render() {
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="tabs-wrapper" class="flex">
+					<div id="container-list" class="flex">
 						${this._routerPath ? this.renderTabsNavigation() : ''} ${this.renderAddButton()}
 					</div>
 					${this.renderActions()}
@@ -293,7 +333,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	renderAddButton() {
-		if (this.sortModeActive) return;
+		if (this._sortModeActive) return;
 		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
 			<uui-icon name="icon-add"></uui-icon>
 			Add tab
@@ -301,12 +341,16 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	renderActions() {
-		const sortButtonText = this.sortModeActive
+		const sortButtonText = this._sortModeActive
 			? this.localize.term('general_reorderDone')
 			: this.localize.term('general_reorder');
 
 		return html`<div class="tab-actions">
-			<uui-button look="outline" label=${this.localize.term('contentTypeEditor_compositions')} compact>
+			<uui-button
+				look="outline"
+				label=${this.localize.term('contentTypeEditor_compositions')}
+				compact
+				@click=${this.#openCompositionModal}>
 				<uui-icon name="icon-merge"></uui-icon>
 				${this.localize.term('contentTypeEditor_compositions')}
 			</uui-button>
@@ -336,6 +380,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 		const rootTabPath = this._routerPath + '/root';
 		const rootTabActive = rootTabPath === this._activePath;
 		return html`<uui-tab
+			id="root-tab"
 			class=${this._hasRootGroups || rootTabActive ? '' : 'content-tab-is-empty'}
 			label=${this.localize.term('general_content')}
 			.active=${rootTabActive}
@@ -359,7 +404,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, tabInherited: boolean) {
-		if (this.sortModeActive) {
+		if (this._sortModeActive) {
 			return html`<div class="no-edit">
 				${tabInherited
 					? html`<uui-icon class="external" name="icon-merge"></uui-icon>${tab.name!}`
@@ -369,7 +414,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
-								@keypress=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`}
+								@change=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`}
 			</div>`;
 		}
 
@@ -435,7 +480,16 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				--uui-tab-background: var(--uui-color-surface);
 			}
 
+			[drag-placeholder] {
+				opacity: 0.5;
+			}
+
+			[drag-placeholder] uui-input {
+				visibility: hidden;
+			}
+
 			/* TODO: This should be replaced with a general workspace bar — naming is hard */
+
 			#header {
 				width: 100%;
 				display: flex;
@@ -447,6 +501,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 			.flex {
 				display: flex;
 			}
+
 			uui-tab-group {
 				flex-wrap: nowrap;
 			}
@@ -495,15 +550,8 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				vertical-align: sub;
 			}
 
-			.--umb-sorter-placeholder > * {
-				visibility: hidden;
-			}
-
-			.--umb-sorter-placeholder::after {
-				content: '';
-				position: absolute;
-				inset: 2px;
-				border: 1px dashed var(--uui-color-divider-emphasis);
+			[drag-placeholder] {
+				opacity: 0.2;
 			}
 		`,
 	];

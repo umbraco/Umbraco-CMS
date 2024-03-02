@@ -1,6 +1,6 @@
 import { createExtensionElement } from '../functions/create-extension-element.function.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import type { ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
+import type { ManifestCondition, ManifestElement, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -18,9 +18,11 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export class UmbExtensionElementInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	ControllerType extends UmbExtensionElementInitializer<ManifestType, any> = any,
+	ExtensionInterface extends ManifestElement = ManifestType extends ManifestElement ? ManifestType : never,
+	ExtensionElementInterface extends HTMLElement | undefined = ExtensionInterface['ELEMENT_TYPE'],
 > extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 	#defaultElement?: string;
-	#component?: HTMLElement;
+	#component?: ExtensionElementInterface;
 
 	/**
 	 * The component that is created for this extension.
@@ -84,7 +86,7 @@ export class UmbExtensionElementInitializer<
 			// We are not positive anymore, so we will back out of this creation.
 			return false;
 		}
-		this.#component = newComponent;
+		this.#component = newComponent as ExtensionElementInterface;
 		if (this.#component) {
 			this.#assignProperties();
 			(this.#component as any).manifest = manifest;
@@ -104,5 +106,10 @@ export class UmbExtensionElementInitializer<
 			}
 			this.#component = undefined;
 		}
+	}
+
+	public destroy(): void {
+		super.destroy();
+		this.#properties = undefined;
 	}
 }

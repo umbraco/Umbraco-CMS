@@ -6,6 +6,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 	name: 'Date/Time',
 	alias: 'Umbraco.TrueFalse',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.TrueFalse',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 	},
 };

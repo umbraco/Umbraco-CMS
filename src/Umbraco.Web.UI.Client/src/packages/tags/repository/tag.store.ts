@@ -1,4 +1,4 @@
-import type { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { TagResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
@@ -73,3 +73,5 @@ export class UmbTagStore extends UmbStoreBase {
 		this._data.remove(uniques);
 	}
 }
+
+export default UmbTagStore;

@@ -1,6 +1,6 @@
 import type { UmbMediaItemModel } from './types.js';
-import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { MediaResource } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemServerDataSourceBase } from '@umbraco-cms/backoffice/repository';
 
@@ -37,7 +37,7 @@ const mapper = (item: MediaItemResponseModel): UmbMediaItemModel => {
 		mediaType: {
 			unique: item.mediaType.id,
 			icon: item.mediaType.icon,
-			hasListView: item.mediaType.hasListView,
+			collection: item.mediaType.collection ? { unique: item.mediaType.collection.id } : null,
 		},
 		variants: item.variants.map((variant) => {
 			return {

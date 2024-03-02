@@ -1,4 +1,4 @@
-import type { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbExtensionManifestInitializer } from './extension-manifest-initializer.controller.js';
 import {
 	type PermittedControllerType,
@@ -11,7 +11,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  */
 export class UmbExtensionsManifestInitializer<
 	ManifestTypes extends ManifestBase,
-	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
+	ManifestTypeName extends string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbExtensionManifestInitializer<ManifestType> = UmbExtensionManifestInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
@@ -31,8 +31,9 @@ export class UmbExtensionsManifestInitializer<
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
+		controllerAlias?: string,
 	) {
-		super(host, extensionRegistry, type, filter, onChange);
+		super(host, extensionRegistry, type, filter, onChange, controllerAlias);
 		this.#extensionRegistry = extensionRegistry;
 		this._init();
 	}
@@ -44,5 +45,10 @@ export class UmbExtensionsManifestInitializer<
 			manifest.alias,
 			this._extensionChanged,
 		) as ControllerType;
+	}
+
+	public destroy(): void {
+		super.destroy();
+		(this.#extensionRegistry as any) = undefined;
 	}
 }

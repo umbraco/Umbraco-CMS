@@ -1,8 +1,7 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../../user/workspace/user-workspace.context.js';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-workspace-action-user-group-save')
 export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 	@state()
@@ -40,8 +39,6 @@ export class UmbWorkspaceActionUserGroupSaveElement extends UmbLitElement {
 			label="save"
 			.state="${this._saveButtonState}"></uui-button>`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbWorkspaceActionUserGroupSaveElement;

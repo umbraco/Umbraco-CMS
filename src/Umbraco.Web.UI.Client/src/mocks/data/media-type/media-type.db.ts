@@ -7,12 +7,15 @@ import type { UmbMockMediaTypeModel } from './media-type.data.js';
 import { data } from './media-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
+	AllowedMediaTypeModel,
 	CreateFolderRequestModel,
 	CreateMediaTypeRequestModel,
 	MediaTypeItemResponseModel,
 	MediaTypeResponseModel,
+	MediaTypeSortModel,
 	MediaTypeTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+	PagedAllowedMediaTypeModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMediaTypeModel>(this, mediaTypeTreeItemMapper);
@@ -26,6 +29,21 @@ class UmbMediaTypeMockDB extends UmbEntityMockDbBase<UmbMockMediaTypeModel> {
 
 	constructor(data: Array<UmbMockMediaTypeModel>) {
 		super(data);
+	}
+
+	getAllowedChildren(id: string): PagedAllowedMediaTypeModel {
+		const mediaType = this.detail.read(id);
+		const allowedMediaTypes = mediaType.allowedMediaTypes.map((sortModel: MediaTypeSortModel) =>
+			this.detail.read(sortModel.mediaType.id),
+		);
+		const mappedItems = allowedMediaTypes.map((item: UmbMockMediaTypeModel) => allowedMediaTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
+	}
+
+	getAllowedAtRoot(): PagedAllowedMediaTypeModel {
+		const mockItems = this.data.filter((item) => item.allowedAsRoot);
+		const mappedItems = mockItems.map((item) => allowedMediaTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
 	}
 }
 
@@ -47,6 +65,7 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 		compositions: [],
 		isFolder: true,
 		hasChildren: false,
+		collection: null,
 	};
 };
 
@@ -68,6 +87,7 @@ const createMockMediaTypeMapper = (request: CreateMediaTypeRequestModel): UmbMoc
 		parent: request.folder ? { id: request.folder.id } : null,
 		isFolder: false,
 		hasChildren: false,
+		collection: null,
 	};
 };
 
@@ -86,6 +106,7 @@ const mediaTypeDetailMapper = (item: UmbMockMediaTypeModel): MediaTypeResponseMo
 		isElement: item.isElement,
 		allowedMediaTypes: item.allowedMediaTypes,
 		compositions: item.compositions,
+		collection: item.collection,
 	};
 };
 
@@ -104,6 +125,15 @@ const mediaTypeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeItemResponse
 	return {
 		id: item.id,
 		name: item.name,
+		icon: item.icon,
+	};
+};
+
+const allowedMediaTypeMapper = (item: UmbMockMediaTypeModel): AllowedMediaTypeModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		description: item.description,
 		icon: item.icon,
 	};
 };

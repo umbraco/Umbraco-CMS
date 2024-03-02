@@ -1,11 +1,9 @@
 const { rest } = window.MockServiceWorker;
 import type {
 	ServerStatusResponseModel,
-	ServerInformationResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	RuntimeLevelModel,
-	RuntimeModeModel
-} from '@umbraco-cms/backoffice/backend-api';
+	ServerInformationResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { RuntimeLevelModel, RuntimeModeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const serverRunningHandler = rest.get(umbracoPath('/server/status'), (_req, res, ctx) => {

@@ -34,6 +34,11 @@ export class UmbTemplateWorkspaceContext
 		this.#loadCodeEditor();
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
@@ -47,7 +52,7 @@ export class UmbTemplateWorkspaceContext
 		return 'template';
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.unique;
 	}
 
@@ -76,10 +81,11 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.detailRepository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			//this.setMasterTemplate(data.masterTemplateId ?? null);
+			this.setMasterTemplate(data.masterTemplate?.unique ?? null);
 			this.#data.setValue(data);
 		}
 	}
@@ -129,15 +135,15 @@ ${currentContent}`;
 		this.setContent(string);
 	};
 
-	async create(parentUnique: string | null) {
-		const { data } = await this.detailRepository.createScaffold(parentUnique);
+	async create(parentUnique: string | null, preset?: Partial<UmbTemplateDetailModel>) {
+		this.resetState();
+		const { data } = await this.detailRepository.createScaffold(parentUnique, preset);
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.setValue(data);
-		/*
+
 		if (!parentUnique) return;
 		await this.setMasterTemplate(parentUnique);
-		*/
 	}
 
 	async save() {
@@ -155,7 +161,7 @@ ${currentContent}`;
 
 		if (newData) {
 			this.#data.setValue(newData);
-			this.saveComplete(newData);
+			this.workspaceComplete(newData);
 		}
 	}
 

@@ -1,5 +1,4 @@
 import { UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UmbStylesheetFolderRepository } from './stylesheet-folder.repository.js';
 import { UmbDeleteFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -9,7 +8,7 @@ const folderRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS,
 	name: 'Stylesheet Folder Repository',
-	api: UmbStylesheetFolderRepository,
+	api: () => import('./stylesheet-folder.repository.js'),
 };
 
 export const UMB_DELETE_STYLESHEET_FOLDER_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.Stylesheet.Folder.Delete';

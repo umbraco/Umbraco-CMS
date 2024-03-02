@@ -11,10 +11,10 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { DirectionModel } from '@umbraco-cms/backoffice/backend-api';
+import type { AuditLogWithUsernameResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
@@ -89,7 +89,18 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<uui-box headline=${this.localize.term('general_history')}>
+		return html`<uui-box>
+				<div id="rollback" slot="header">
+					<h2><umb-localize key="general_history">History</umb-localize></h2>
+					<uui-button
+						label=${this.localize.term('actions_rollback')}
+						look="secondary"
+						slot="actions"
+						@click=${() => alert('TODO: Rollback Modal')}>
+						<uui-icon name="icon-undo"></uui-icon>
+						<umb-localize key="actions_rollback"></umb-localize>
+					</uui-button>
+				</div>
 				${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
 			</uui-box>
 			${this.#renderHistoryPagination()}`;
@@ -114,10 +125,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 									<uui-tag look=${style.look} color=${style.color}> ${this.localize.term(text.label)} </uui-tag>
 									${this.localize.term(text.desc, item.parameters)}
 								</span>
-								<uui-button label=${this.localize.term('actions_rollback')} look="secondary" slot="actions">
-									<uui-icon name="icon-undo"></uui-icon>
-									<umb-localize key="actions_rollback"></umb-localize>
-								</uui-button>
 							</umb-history-item>`;
 						},
 					)}
@@ -145,6 +152,18 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		css`
 			uui-loader-circle {
 				font-size: 2rem;
+			}
+
+			#rollback {
+				display: flex;
+				width: 100%;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			#rollback h2 {
+				font-size: var(--uui-type-h5-size);
+				margin: 0;
 			}
 
 			uui-tag uui-icon {

@@ -1,9 +1,8 @@
 import type { UmbInputToggleElement } from '../../../components/input-toggle/input-toggle.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-toggle
@@ -43,8 +42,6 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 			?showLabels="${this._showLabels}"
 			@change="${this._onChange}"></umb-input-toggle>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIToggleElement;

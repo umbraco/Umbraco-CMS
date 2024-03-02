@@ -2,7 +2,7 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-tok
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-workspace-split-view')
 export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
@@ -49,9 +49,7 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 						)}
 					</div>
 
-					<umb-workspace-footer alias="Umb.Workspace.Document">
-						<div id="breadcrumbs">Breadcrumbs</div>
-					</umb-workspace-footer>`
+					<umb-workspace-footer alias="Umb.Workspace.Document"></umb-workspace-footer>`
 			: nothing;
 	}
 

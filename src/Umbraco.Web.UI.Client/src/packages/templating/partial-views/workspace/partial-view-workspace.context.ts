@@ -3,15 +3,12 @@ import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
-import {
-	UmbEditableWorkspaceContextBase,
-} from '@umbraco-cms/backoffice/workspace';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
+import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbPartialViewWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbPartialViewDetailModel>
@@ -33,6 +30,11 @@ export class UmbPartialViewWorkspaceContext
 		this.#loadCodeEditor();
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
@@ -42,7 +44,7 @@ export class UmbPartialViewWorkspaceContext
 		}
 	}
 
-	getEntityId() {
+	getUnique() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		return data.unique;
@@ -65,6 +67,7 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
@@ -73,6 +76,7 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	async create(parentUnique: string | null, snippetId?: string) {
+		this.resetState();
 		let snippetContent = '';
 
 		if (snippetId) {
@@ -103,12 +107,14 @@ export class UmbPartialViewWorkspaceContext
 
 		if (newData) {
 			this.#data.setValue(newData);
-			this.saveComplete(newData);
+			this.setIsNew(false);
+			this.workspaceComplete(newData);
 		}
 	}
 
 	public destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 
 	#getSnippet(snippetId: string) {

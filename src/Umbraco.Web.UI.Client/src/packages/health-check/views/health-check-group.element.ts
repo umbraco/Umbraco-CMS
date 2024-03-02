@@ -1,25 +1,17 @@
 import type { UmbHealthCheckContext } from '../health-check.context.js';
-import type {
-	UmbHealthCheckDashboardContext} from '../health-check-dashboard.context.js';
-import {
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT,
-} from '../health-check-dashboard.context.js';
+import type { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context.js';
+import { UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from '../health-check-dashboard.context.js';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
-
 import type {
 	HealthCheckActionRequestModel,
 	HealthCheckGroupPresentationModel,
-	HealthCheckModel,
-	HealthCheckWithResultPresentationModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	HealthCheckResource,
-	StatusResultTypeModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import './health-check-action.element.js';
+	HealthCheckWithResultPresentationModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { StatusResultTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import './health-check-action.element.js';
 
 @customElement('umb-dashboard-health-check-group')
 export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
@@ -33,9 +25,6 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 	private _group?: HealthCheckGroupPresentationModel;
 
 	private _healthCheckContext?: UmbHealthCheckDashboardContext;
-
-	@state()
-	private _checks?: HealthCheckModel[];
 
 	@state()
 	private _idResults?: HealthCheckWithResultPresentationModel[];
@@ -53,7 +42,6 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				this._api.getGroupChecks(this.groupName);
 
 				this.observe(this._api.checks, (group) => {
-					this._checks = group?.checks;
 					this._group = group;
 				});
 
@@ -68,10 +56,6 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 		this._buttonState = 'waiting';
 		this._api?.checkGroup(this.groupName);
 		this._buttonState = 'success';
-	}
-
-	private _onActionClick(action: HealthCheckActionRequestModel) {
-		return tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckExecuteAction({ requestBody: action }));
 	}
 
 	render() {

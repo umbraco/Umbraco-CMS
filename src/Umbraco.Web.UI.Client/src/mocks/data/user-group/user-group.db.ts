@@ -5,9 +5,11 @@ import type { UmbMockUserGroupModel } from './user-group.data.js';
 import { data } from './user-group.data.js';
 import type {
 	CreateUserGroupRequestModel,
+	DocumentPermissionPresentationModel,
+	UnknownTypePermissionPresentationModel,
 	UserGroupItemResponseModel,
 	UserGroupResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupModel> {
@@ -24,14 +26,17 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	 * @return {*}  {string[]}
 	 * @memberof UmbUserGroupData
 	 */
-	getPermissions(userGroupIds: string[]): string[] {
+	getPermissions(
+		userGroupIds: string[],
+	): Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel> {
 		const permissions = this.data
-			.filter((userGroup) => userGroupIds.includes(userGroup.id || ''))
+			.filter((userGroup) => userGroupIds.includes(userGroup.id))
 			.map((userGroup) => (userGroup.permissions?.length ? userGroup.permissions : []))
 			.flat();
 
 		// Remove duplicates
-		return [...new Set(permissions)];
+		const uniqueArray = Array.from(new Set(permissions.map((e) => JSON.stringify(e)))).map((e) => JSON.parse(e));
+		return uniqueArray;
 	}
 }
 
@@ -55,6 +60,7 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 		mediaRootAccess: item.mediaRootAccess,
 		mediaStartNode: item.mediaStartNode,
 		name: item.name,
+		fallbackPermissions: item.fallbackPermissions,
 		permissions: item.permissions,
 		sections: item.sections,
 	};
@@ -72,6 +78,7 @@ const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseMod
 		mediaRootAccess: item.mediaRootAccess,
 		mediaStartNode: item.mediaStartNode,
 		name: item.name,
+		fallbackPermissions: item.fallbackPermissions,
 		permissions: item.permissions,
 		sections: item.sections,
 	};

@@ -4,7 +4,7 @@ import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collecti
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 
@@ -41,7 +41,7 @@ export class UmbDictionaryTableCollectionViewElement extends UmbLitElement {
 	async #observeCollectionItems() {
 		if (!this.#collectionContext) return;
 
-		const { data: languageData } = await this.#languageCollectionRepository.requestCollection({ skip: 0, take: 1000 });
+		const { data: languageData } = await this.#languageCollectionRepository.requestCollection({});
 		if (!languageData) return;
 
 		this.observe(

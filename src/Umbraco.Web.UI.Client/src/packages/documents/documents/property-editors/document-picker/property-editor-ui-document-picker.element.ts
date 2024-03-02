@@ -1,7 +1,7 @@
 import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-document-picker')
@@ -13,7 +13,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		return this._value;
 	}
 	public set value(value: Array<string>) {
-		this._value = value || [];
+		this._value = Array.isArray(value) ? value : value ? [value] : [];
 	}
 
 	@property({ attribute: false })

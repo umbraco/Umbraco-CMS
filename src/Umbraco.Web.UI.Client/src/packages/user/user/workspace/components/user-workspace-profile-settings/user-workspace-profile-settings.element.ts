@@ -1,7 +1,7 @@
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { html, customElement, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
@@ -57,7 +57,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 				description=${this.localize.term('user_languageHelp')}>
 				<umb-ui-culture-input
 					slot="editor"
-					value=${ifDefined(this._user?.languageIsoCode)}
+					value=${ifDefined(this._user?.languageIsoCode ?? undefined)}
 					@change="${this.#onLanguageChange}"
 					name="language"
 					label="${this.localize.term('user_language')}"></umb-ui-culture-input>

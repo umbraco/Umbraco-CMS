@@ -1,12 +1,12 @@
 import { UmbAuditLogServerDataSource } from './audit-log.server.data.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import type { AuditTypeModel, DirectionModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import type { AuditTypeModel, DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbAuditLogRepository extends UmbBaseController {
+export class UmbAuditLogRepository extends UmbControllerBase {
 	#dataSource: UmbAuditLogServerDataSource;
 	#notificationService?: UmbNotificationContext;
 	#init;

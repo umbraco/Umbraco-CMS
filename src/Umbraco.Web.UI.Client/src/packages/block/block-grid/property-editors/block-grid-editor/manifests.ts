@@ -1,5 +1,7 @@
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
+export const UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS = 'Umbraco.BlockGrid';
+
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.BlockGrid',
@@ -7,11 +9,16 @@ export const manifest: ManifestPropertyEditorUi = {
 	js: () => import('./property-editor-ui-block-grid.element.js'),
 	meta: {
 		label: 'Block Grid',
-		propertyEditorSchemaAlias: 'Umbraco.BlockGrid',
+		propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_ALIAS,
 		icon: 'icon-layout',
 		group: 'richContent',
 		settings: {
 			properties: [
+				{
+					alias: 'blockGroups',
+					label: '',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockTypeGroupConfiguration',
+				},
 				{
 					alias: 'useLiveEditing',
 					label: 'Live editing mode',
@@ -29,6 +36,18 @@ export const manifest: ManifestPropertyEditorUi = {
 					label: 'Create Button Label',
 					description: 'Override the label text for adding a new block, Example Add Widget',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+				},
+				{
+					alias: 'gridColumns',
+					label: 'Grid Columns',
+					description: 'Set the number of columns for the layout. (defaults to 12)',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+				},
+				{
+					alias: 'layoutStylesheet',
+					label: 'Layout Stylesheet',
+					description: 'Override default stylesheet for backoffice layout.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGridLayoutStylesheet',
 				},
 			],
 		},

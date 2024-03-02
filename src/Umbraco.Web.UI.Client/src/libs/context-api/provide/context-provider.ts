@@ -1,9 +1,5 @@
-import type {
-	UmbContextRequestEvent} from '../consume/context-request.event.js';
-import {
-	UMB_CONTENT_REQUEST_EVENT_TYPE,
-	UMB_DEBUG_CONTEXT_EVENT_TYPE,
-} from '../consume/context-request.event.js';
+import type { UmbContextRequestEvent } from '../consume/context-request.event.js';
+import { UMB_CONTENT_REQUEST_EVENT_TYPE, UMB_DEBUG_CONTEXT_EVENT_TYPE } from '../consume/context-request.event.js';
 import type { UmbContextToken } from '../token/context-token.js';
 import {
 	UmbContextProvideEventImplementation,
@@ -26,7 +22,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * Note this method should have a unique name for the provider controller, for it not to be confused with a consumer.
 	 * @returns {*}
 	 */
-	public providerInstance() {
+	public providerInstance(): unknown {
 		return this.#instance;
 	}
 
@@ -57,7 +53,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @param {UmbContextRequestEvent} event
 	 * @memberof UmbContextProvider
 	 */
-	#handleContextRequest = ((event: UmbContextRequestEvent) => {
+	#handleContextRequest = ((event: UmbContextRequestEvent): void => {
 		if (event.contextAlias !== this.#contextAlias) return;
 
 		if (event.stopAtContextMatch) {
@@ -75,7 +71,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	/**
 	 * @memberof UmbContextProvider
 	 */
-	public hostConnected() {
+	public hostConnected(): void {
 		//this.hostElement.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		this.#eventTarget.dispatchEvent(new UmbContextProvideEventImplementation(this.#contextAlias));
 
@@ -86,16 +82,16 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	/**
 	 * @memberof UmbContextProvider
 	 */
-	public hostDisconnected() {
+	public hostDisconnected(): void {
 		//this.hostElement.removeEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		// Out-commented for now, but kept if we like to reintroduce this:
 		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
 
 		// Stop listen to our debug event 'umb:debug-contexts'
-		this.#eventTarget.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
+		this.#eventTarget?.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
 	}
 
-	private _handleDebugContextRequest = (event: any) => {
+	private _handleDebugContextRequest = (event: any): void => {
 		// If the event doesn't have an instances property, create it.
 		if (!event.instances) {
 			event.instances = new Map();
@@ -110,8 +106,10 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	};
 
 	destroy(): void {
+		this.hostDisconnected();
 		// We want to call a destroy method on the instance, if it has one.
 		(this.#instance as any)?.destroy?.();
 		this.#instance = undefined;
+		(this.#eventTarget as any) = undefined;
 	}
 }

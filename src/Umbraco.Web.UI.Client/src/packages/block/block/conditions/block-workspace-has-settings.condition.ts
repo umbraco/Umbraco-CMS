@@ -1,13 +1,12 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../workspace/block-workspace.context-token.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
-	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbBlockWorkspaceHasSettingsCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbBlockWorkspaceHasSettingsCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: BlockWorkspaceHasSettingsConditionConfig;
 	permitted = false;
 	#onChange: () => void;
@@ -30,12 +29,7 @@ export class UmbBlockWorkspaceHasSettingsCondition extends UmbBaseController imp
 	}
 }
 
+export default UmbBlockWorkspaceHasSettingsCondition;
+
 export type BlockWorkspaceHasSettingsConditionConfig =
 	UmbConditionConfigBase<'Umb.Condition.BlockWorkspaceHasSettings'>;
-
-export const manifest: ManifestCondition = {
-	type: 'condition',
-	name: 'Block Has Settings Condition',
-	alias: 'Umb.Condition.BlockWorkspaceHasSettings',
-	api: UmbBlockWorkspaceHasSettingsCondition,
-};

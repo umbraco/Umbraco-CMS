@@ -1,27 +1,23 @@
 import type { UmbUserGroupDetailModel } from '../index.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from './user-group-workspace.context.js';
-import type { UmbUserInputElement } from '@umbraco-cms/backoffice/user';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputSectionElement } from '@umbraco-cms/backoffice/components';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 
-import './components/user-group-default-permission-list.element.js';
+import './components/user-group-entity-user-permission-list.element.js';
 import './components/user-group-granular-permission-list.element.js';
 
 @customElement('umb-user-group-workspace-editor')
 export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _userGroup?: UmbUserGroupDetailModel;
-
-	@state()
-	private _userUniques?: Array<string>;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -31,11 +27,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup), 'umbUserGroupObserver');
-			this.observe(
-				this.#workspaceContext.userUniques,
-				(userUniques) => (this._userUniques = userUniques),
-				'umbUserIdsObserver',
-			);
 		});
 	}
 
@@ -55,12 +46,6 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		event.stopPropagation();
 		const target = event.target as UmbInputMediaElement;
 		this.#workspaceContext?.updateProperty('mediaStartNode', { unique: target.selectedIds[0] });
-	}
-
-	#onUsersChange(event: UmbChangeEvent) {
-		event.stopPropagation();
-		const target = event.target as UmbUserInputElement;
-		this.#workspaceContext?.updateUserKeys(target.selectedIds);
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -138,28 +123,25 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_permissionsDefault"></umb-localize></div>
-				<umb-user-group-default-permission-list></umb-user-group-default-permission-list>
+
+				<umb-property-layout label="Entity permissions" description="Assign permissions for an entity type">
+					<umb-user-group-entity-user-permission-list slot="editor"></umb-user-group-entity-user-permission-list>
+				</umb-property-layout>
 			</uui-box>
 
-			<!-- Temp disabled because it is work in progress
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_permissionsGranular"></umb-localize></div>
 				<umb-user-group-granular-permission-list></umb-user-group-granular-permission-list>
 			</uui-box>
-	-->
 		`;
 	}
 
 	#renderRightColumn() {
-		return html`<uui-box>
-				<div slot="headline"><umb-localize key="sections_users"></umb-localize></div>
-				<umb-user-input @change=${this.#onUsersChange} .selectedIds=${this._userUniques ?? []}></umb-user-input>
-			</uui-box>
-			<uui-box headline="Actions">
-				<umb-entity-action-list
-					.entityType=${UMB_USER_GROUP_ENTITY_TYPE}
-					.unique=${this._userGroup?.unique}></umb-entity-action-list
-			></uui-box>`;
+		return html` <uui-box headline="Actions">
+			<umb-entity-action-list
+				.entityType=${UMB_USER_GROUP_ENTITY_TYPE}
+				.unique=${this._userGroup?.unique}></umb-entity-action-list
+		></uui-box>`;
 	}
 
 	static styles = [

@@ -4,8 +4,7 @@ import { UMB_BLOCK_LIST_TYPE } from '../../types.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 /**
@@ -61,8 +60,6 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 				this.value = (e.target as UmbInputBlockTypeElement).value;
 			}}></umb-input-block-type>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIBlockListBlockConfigurationElement;

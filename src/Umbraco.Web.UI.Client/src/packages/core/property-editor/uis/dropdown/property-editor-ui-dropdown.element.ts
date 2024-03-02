@@ -1,9 +1,8 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-dropdown
@@ -60,8 +59,6 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 			?multiple=${this._multiple}
 			.options="${this._list}"></umb-input-dropdown-list>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIDropdownElement;

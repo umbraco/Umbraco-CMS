@@ -1,5 +1,5 @@
 import { html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type {
 	ManifestMenuItemTreeKind,
 	UmbBackofficeManifestKind,
@@ -30,7 +30,13 @@ export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbM
 			? html`
 					<umb-tree
 						alias=${this.manifest?.meta.treeAlias}
-						?hide-tree-root=${this.manifest.meta.hideTreeRoot === true}></umb-tree>
+						.props=${{
+							hideTreeRoot: this.manifest?.meta.hideTreeRoot === true,
+							selectionConfiguration: {
+								selectable: false,
+								multiple: false,
+							},
+						}}></umb-tree>
 			  `
 			: nothing;
 	}

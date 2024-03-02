@@ -1,11 +1,10 @@
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
 import type { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
@@ -76,8 +75,6 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 			.min=${this._minNumber}
 			.urls="${this.value ?? []}"></umb-input-multi-url>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIMultiUrlPickerElement;

@@ -12,7 +12,7 @@ import {
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace, PropertyEditorSettingsProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWithGroupKey = UmbBlockTypeWithGroupKey>
 	extends UmbEditableWorkspaceContextBase<BlockTypeData>
@@ -23,19 +23,24 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 
 	#entityType: string;
 	#data = new UmbObjectState<BlockTypeData | undefined>(undefined);
-	readonly data = this.#data.asObservable();
+	//readonly data = this.#data.asObservable();
 
 	// TODO: Get the name of the contentElementType..
 	readonly name = this.#data.asObservablePart((data) => 'block');
 	readonly unique = this.#data.asObservablePart((data) => data?.contentElementTypeKey);
 
-	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
+	#properties = new UmbArrayState<PropertyEditorSettingsProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
 
 	constructor(host: UmbControllerHostElement, workspaceArgs: { manifest: ManifestWorkspace }) {
-		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
 		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
+	}
+
+	protected resetState() {
+		super.resetState();
+		this.#data.setValue(undefined);
+		this.#properties.setValue([]);
 	}
 
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
@@ -43,6 +48,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.value, (value) => {
 				if (value) {
@@ -59,6 +65,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 	}
 
 	async create(contentElementTypeId: string, groupKey?: string | null) {
+		this.resetState();
 		//Only set groupKey property if it exists
 		const data: BlockTypeData = {
 			contentElementTypeKey: contentElementTypeId,
@@ -74,7 +81,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()!.contentElementTypeKey;
 	}
 
@@ -114,11 +121,13 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeWith
 			);
 		});
 
-		this.saveComplete(this.#data.value);
+		this.setIsNew(false);
+		this.workspaceComplete(this.#data.value);
 	}
 
 	public destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }
 

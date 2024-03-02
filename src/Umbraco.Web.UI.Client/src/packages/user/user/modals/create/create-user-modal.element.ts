@@ -3,24 +3,14 @@ import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-create-user-modal')
 export class UmbCreateUserModalElement extends UmbModalBaseElement {
 	#userDetailRepository = new UmbUserDetailRepository(this);
-	#modalManagerContext?: UmbModalManagerContext;
 
 	@query('#CreateUserForm')
 	_form?: HTMLFormElement;
-
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (_instance) => {
-			this.#modalManagerContext = _instance;
-		});
-	}
 
 	async #onSubmit(e: SubmitEvent) {
 		e.preventDefault();
@@ -55,8 +45,9 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 		}
 	}
 
-	#openSuccessModal(userUnique: string) {
-		const modalContext = this.#modalManagerContext?.open(UMB_CREATE_USER_SUCCESS_MODAL, {
+	async #openSuccessModal(userUnique: string) {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_CREATE_USER_SUCCESS_MODAL, {
 			data: {
 				user: {
 					unique: userUnique,
@@ -64,17 +55,18 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 			},
 		});
 
-		modalContext?.onSubmit().catch((reason) => {
-			if (reason?.type === 'createAnotherUser') {
-				this._form?.reset();
-			} else {
-				this.#closeModal();
-			}
-		});
-	}
-
-	#closeModal() {
-		this.modalContext?.reject();
+		modalContext
+			?.onSubmit()
+			.then(() => {
+				this._submitModal();
+			})
+			.catch((reason) => {
+				if (reason?.type === 'createAnotherUser') {
+					this._form?.reset();
+				} else {
+					this._rejectModal();
+				}
+			});
 	}
 
 	render() {
@@ -85,7 +77,7 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement {
 			</p>
 
 			${this.#renderForm()}
-			<uui-button @click=${this.#closeModal} slot="actions" label="Cancel" look="secondary"></uui-button>
+			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
 			<uui-button
 				form="CreateUserForm"
 				slot="actions"

@@ -1,9 +1,8 @@
 import type { UmbCreatePartialViewFromSnippetModalData } from './create-from-snippet-modal.token.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
+import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
 
 interface UmbSnippetLinkModel {
 	name: string;
@@ -53,8 +52,6 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 			</umb-body-layout>
 		`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbPartialViewCreateFromSnippetModalElement;

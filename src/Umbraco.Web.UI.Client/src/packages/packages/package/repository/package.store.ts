@@ -3,7 +3,7 @@ import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -63,3 +63,5 @@ export class UmbPackageStore extends UmbStoreBase {
 		this.#migrations.append(migrations);
 	}
 }
+
+export default UmbPackageStore;

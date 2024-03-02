@@ -1,8 +1,8 @@
 import type { UmbLanguageCollectionFilterModel } from '../types.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UMB_LANGUAGE_ENTITY_TYPE } from '../../entity.js';
-import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
-import { LanguageResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
+import { LanguageResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

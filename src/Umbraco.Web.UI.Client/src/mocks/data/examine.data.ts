@@ -1,10 +1,9 @@
 import type {
 	IndexResponseModel,
 	PagedIndexResponseModel,
-	SearchResultResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	HealthStatusModel
-} from '@umbraco-cms/backoffice/backend-api';
+	SearchResultResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export function getIndexByName(indexName: string) {
 	return Indexers.find((index) => {

@@ -1,9 +1,8 @@
 import { UmbDictionaryWorkspaceContext } from './dictionary-workspace.context.js';
 import { UmbDictionaryWorkspaceEditorElement } from './dictionary-workspace-editor.element.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-dictionary-workspace')
@@ -13,14 +12,6 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 
 	@state()
 	_routes: UmbRoute[] = [
-		{
-			path: 'edit/:unique',
-			component: this.#createElement,
-			setup: (_component, info) => {
-				const unique = info.match.params.unique;
-				this.#workspaceContext.load(unique);
-			},
-		},
 		{
 			path: 'create/:parentUnique',
 			component: this.#createElement,
@@ -35,13 +26,19 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 				);
 			},
 		},
+		{
+			path: 'edit/:unique',
+			component: this.#createElement,
+			setup: (_component, info) => {
+				const unique = info.match.params.unique;
+				this.#workspaceContext.load(unique);
+			},
+		},
 	];
 
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbWorkspaceDictionaryElement;

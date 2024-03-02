@@ -1,6 +1,6 @@
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestGlobalContext, ManifestTheme } from '@umbraco-cms/backoffice/extension-registry';
 
-export const themes: Array<ManifestTypes> = [
+export const themes: Array<ManifestGlobalContext | ManifestTheme> = [
 	{
 		type: 'globalContext',
 		alias: 'Umb.GlobalContext.Theme',

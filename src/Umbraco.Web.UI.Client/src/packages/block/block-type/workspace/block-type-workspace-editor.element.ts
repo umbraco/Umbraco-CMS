@@ -1,7 +1,7 @@
 import { UMB_BLOCK_TYPE_WORKSPACE_CONTEXT } from './block-type-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, state, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 import { DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
@@ -29,9 +29,9 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#workspaceContext?.createPropertyDatasetContext(this);
-			this.observe(this.#workspaceContext.data, (data) => {
-				if (data) {
-					this.#itemManager.setUniques([data.contentElementTypeKey]);
+			this.observe(this.#workspaceContext.unique, (unique) => {
+				if (unique) {
+					this.#itemManager.setUniques([unique]);
 				}
 			});
 		});

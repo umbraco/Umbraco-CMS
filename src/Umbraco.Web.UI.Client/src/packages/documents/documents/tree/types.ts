@@ -1,6 +1,7 @@
 import type { UmbDocumentEntityType, UmbDocumentRootEntityType } from '../entity.js';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
-import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbDocumentTreeItemModel extends UmbUniqueTreeItemModel {
 	entityType: UmbDocumentEntityType;
@@ -10,7 +11,7 @@ export interface UmbDocumentTreeItemModel extends UmbUniqueTreeItemModel {
 	documentType: {
 		unique: string;
 		icon: string;
-		hasListView: boolean;
+		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbDocumentTreeItemVariantModel>;
 }

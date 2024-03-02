@@ -4,7 +4,7 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { ApiError } from '@umbraco-cms/backoffice/backend-api';
+import { ApiError } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -26,7 +26,13 @@ export class UmbLanguageWorkspaceContext
 		super(host, 'Umb.Workspace.Language');
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
@@ -35,6 +41,7 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	async create() {
+		this.resetState();
 		const { data } = await this.repository.createScaffold(null);
 		if (!data) return;
 		this.setIsNew(true);
@@ -51,7 +58,7 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	// TODO: Convert to uniques:
-	getEntityId() {
+	getUnique() {
 		return this.#data.getValue()?.unique;
 	}
 
@@ -105,6 +112,7 @@ export class UmbLanguageWorkspaceContext
 
 	destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }
 

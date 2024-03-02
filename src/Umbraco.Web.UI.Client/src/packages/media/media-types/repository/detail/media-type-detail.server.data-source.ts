@@ -2,8 +2,11 @@ import type { UmbMediaTypeDetailModel } from '../../types.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateMediaTypeRequestModel, UpdateMediaTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { MediaTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	CreateMediaTypeRequestModel,
+	UpdateMediaTypeRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
@@ -41,7 +44,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			alias: '',
 			description: '',
 			icon: '',
-			allowedAsRoot: false,
+			allowedAtRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
@@ -49,6 +52,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			containers: [],
 			allowedContentTypes: [],
 			compositions: [],
+			collection: null,
 		};
 
 		return { data };
@@ -78,7 +82,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			alias: data.alias,
 			description: data.description || null,
 			icon: data.icon,
-			allowedAsRoot: data.allowedAsRoot,
+			allowedAtRoot: data.allowedAsRoot,
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
@@ -110,6 +114,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 					compositionType: composition.compositionType,
 				};
 			}),
+			collection: data.collection ? { unique: data.collection.id } : null,
 		};
 
 		return { data: mediaType };
@@ -131,7 +136,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -165,6 +170,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			}),
 			id: model.unique,
 			folder: model.parentUnique ? { id: model.parentUnique } : null,
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -196,7 +202,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -228,6 +234,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 					compositionType: composition.compositionType,
 				};
 			}),
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { error } = await tryExecuteAndNotify(

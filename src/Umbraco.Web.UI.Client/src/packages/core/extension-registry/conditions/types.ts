@@ -1,4 +1,5 @@
-import type { CollectionAliasConditionConfig } from '../../collection/collection-alias.condition.js';
+import type { CollectionAliasConditionConfig } from '../../collection/collection-alias.manifest.js';
+import type { CollectionBulkActionPermissionConditionConfig } from '../../collection/collection-bulk-action-permission.manifest.js';
 import type { SectionAliasConditionConfig } from './section-alias.condition.js';
 import type { SwitchConditionConfig } from './switch.condition.js';
 import type { UserPermissionConditionConfig } from '@umbraco-cms/backoffice/user-permission';
@@ -15,6 +16,7 @@ Niels: Sadly I don't see any other solutions currently. But are very open for id
 */
 export type ConditionTypes =
 	| CollectionAliasConditionConfig
+	| CollectionBulkActionPermissionConditionConfig
 	| SectionAliasConditionConfig
 	| WorkspaceAliasConditionConfig
 	| BlockWorkspaceHasSettingsConditionConfig

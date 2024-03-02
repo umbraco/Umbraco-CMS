@@ -1,37 +1,26 @@
 import type { UmbInputMultipleTextStringItemElement } from './input-multiple-text-string-item.element.js';
 import { css, html, nothing, repeat, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-
-export type MultipleTextStringValue = Array<MultipleTextStringValueItem>;
-
-export interface MultipleTextStringValueItem {
-	value: string;
-}
-
-const SORTER_CONFIG: UmbSorterConfig<MultipleTextStringValueItem> = {
-	getUniqueOfElement: (element) => {
-		return element.getAttribute('data-sort-entry-id');
-	},
-	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.value;
-	},
-	identifier: 'Umb.SorterIdentifier.ColorEditor',
-	itemSelector: 'umb-input-multiple-text-string-item',
-	containerSelector: '#sorter-wrapper',
-};
+import type { UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 
 /**
  * @element umb-input-multiple-text-string
  */
 @customElement('umb-input-multiple-text-string')
 export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitElement) {
-	#prevalueSorter = new UmbSorterController(this, {
-		...SORTER_CONFIG,
+	#sorter = new UmbSorterController(this, {
+		getUniqueOfElement: (element) => {
+			return element.getAttribute('data-sort-entry-id');
+		},
+		getUniqueOfModel: (modelEntry: string) => {
+			return modelEntry;
+		},
+		identifier: 'Umb.SorterIdentifier.ColorEditor',
+		itemSelector: 'umb-input-multiple-text-string-item',
+		containerSelector: '#sorter-wrapper',
 		onChange: ({ model }) => {
 			const oldValue = this._items;
 			this._items = model;
@@ -120,17 +109,17 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	}
 
 	@state()
-	private _items: MultipleTextStringValue = [];
+	private _items: Array<string> = [];
 
 	@property({ type: Array })
-	public get items(): MultipleTextStringValue {
+	public get items(): Array<string> {
 		return this._items;
 	}
-	public set items(items: MultipleTextStringValue) {
+	public set items(items: Array<string>) {
 		// TODO: when we have a way to overwrite the missing value validator we can remove this
 		this.value = items?.length > 0 ? 'some value' : '';
 		this._items = items ?? [];
-		this.#prevalueSorter.setModel(this.items);
+		this.#sorter.setModel(this.items);
 	}
 
 	// TODO: Some inputs might not have a value that is either FormDataEntryValue or FormData.
@@ -146,7 +135,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	*/
 
 	#onAdd() {
-		this._items = [...this._items, { value: '' }];
+		this._items = [...this._items, ''];
 		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 		this.#focusNewItem();
@@ -156,7 +145,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		event.stopPropagation();
 		const target = event.currentTarget as UmbInputMultipleTextStringItemElement;
 		const value = target.value as string;
-		this._items = this._items.map((item, index) => (index === currentIndex ? { value } : item));
+		this._items = this._items.map((item, index) => (index === currentIndex ? value : item));
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -192,9 +181,9 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 				(item, index) => index,
 				(item, index) =>
 					html` <umb-input-multiple-text-string-item
-						value=${item.value}
+						value=${item}
 						name="item-${index}"
-						data-sort-entry-id=${item.value}
+						data-sort-entry-id=${item}
 						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
 						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
 						?disabled=${this.disabled}

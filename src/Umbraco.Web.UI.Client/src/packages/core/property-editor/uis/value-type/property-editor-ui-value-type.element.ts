@@ -1,8 +1,7 @@
 import { html, customElement, property, state, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUISelectElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
@@ -56,8 +55,6 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 			.options="${this._options}"
 			@change="${this.#onChange}"></uui-select>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUIValueTypeElement;

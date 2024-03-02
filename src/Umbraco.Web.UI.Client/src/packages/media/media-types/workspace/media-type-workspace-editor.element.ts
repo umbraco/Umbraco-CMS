@@ -1,14 +1,9 @@
 import type { UmbMediaTypeWorkspaceContext } from './media-type-workspace.context.js';
-import type { UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_ICON_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT
-} from '@umbraco-cms/backoffice/modal';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-media-type-workspace-editor')
@@ -31,18 +26,12 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 
 	#workspaceContext?: UmbMediaTypeWorkspaceContext;
 
-	private _modalContext?: UmbModalManagerContext;
-
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbMediaTypeWorkspaceContext;
 			this.#observeMediaType();
-		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
 		});
 	}
 
@@ -59,7 +48,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 					// TODO: Would be good with a more general way to bring focus to the name input.
 					(this.shadowRoot?.querySelector('#name') as HTMLElement)?.focus();
 				}
-				this.removeControllerByAlias('_observeIsNew');
+				this.removeControllerByAlias('isNewRedirectController');
 			},
 			'_observeIsNew',
 		);
@@ -78,10 +67,10 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 					const expectedOldAlias = generateAlias(oldName ?? '');
 					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
 					if (expectedOldAlias === oldAlias) {
-						this.#workspaceContext?.updateProperty('alias', generateAlias(newName));
+						this.#workspaceContext?.setAlias(generateAlias(newName));
 					}
 				}
-				this.#workspaceContext?.updateProperty('name', target.value);
+				this.#workspaceContext?.setName(target.value);
 			}
 		}
 	}
@@ -92,7 +81,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.updateProperty('alias', target.value);
+				this.#workspaceContext?.setAlias(target.value);
 			}
 		}
 		event.stopPropagation();
@@ -103,7 +92,8 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
-		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL, {
 			value: {
 				icon: this._icon,
 				color: this._iconColorAlias,
@@ -111,7 +101,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		modalContext?.onSubmit().then((value) => {
-			if (value.icon) this.#workspaceContext?.updateProperty('icon', value.icon);
+			if (value.icon) this.#workspaceContext?.setIcon(value.icon);
 			// TODO: save color ALIAS as well
 		});
 	}

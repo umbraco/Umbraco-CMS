@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbScriptMockDb } from '../../data/script/script.db.js';
 import { UMB_SLUG } from './slug.js';
-import type { CreateScriptFolderRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateScriptFolderRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const folderHandlers = [

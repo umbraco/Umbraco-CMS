@@ -1,11 +1,10 @@
+import type { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
 import type { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
-import type { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 
@@ -128,8 +127,6 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 			@change=${this.#onChange}
 			.selectedIds=${this.#selectedIds}></umb-input-member-type>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUITreePickerSourceTypePickerElement;

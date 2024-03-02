@@ -1,24 +1,17 @@
 import type { UmbDocumentDetailRepository } from '../../repository/index.js';
 import { UmbDocumentItemRepository } from '../../repository/index.js';
-import type { UmbDocumentCreateOptionsModalData } from './document-create-options-modal.token.js';
 import { UMB_DOCUMENT_CREATE_OPTIONS_MODAL } from './document-create-options-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocumentDetailRepository> {
-	#modalContext?: UmbModalManagerContext;
 	#itemRepository;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias, unique, entityType);
 
 		this.#itemRepository = new UmbDocumentItemRepository(host);
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalContext = instance;
-		});
 	}
 
 	async execute() {
@@ -34,16 +27,12 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 			documentItem = data[0];
 		}
 
-		this._openModal({
-			document: documentItem ? { unique: documentItem.unique } : null,
-			documentType: documentItem ? { unique: documentItem.documentType.unique } : null,
-		});
-	}
-
-	private async _openModal(modalData: UmbDocumentCreateOptionsModalData) {
-		if (!this.#modalContext) return;
-		this.#modalContext.open(UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
-			data: modalData,
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager.open(this, UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
+			data: {
+				document: documentItem ? { unique: documentItem.unique } : null,
+				documentType: documentItem ? { unique: documentItem.documentType.unique } : null,
+			},
 		});
 	}
 }

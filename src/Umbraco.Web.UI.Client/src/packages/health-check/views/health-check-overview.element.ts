@@ -1,12 +1,9 @@
-import type {
-	UmbHealthCheckDashboardContext} from '../health-check-dashboard.context.js';
-import {
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT,
-} from '../health-check-dashboard.context.js';
+import type { UmbHealthCheckDashboardContext } from '../health-check-dashboard.context.js';
+import { UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from '../health-check-dashboard.context.js';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './health-check-group-box-overview.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -32,8 +29,8 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box>
-				<div slot="headline" class="flex">
-					Health Check
+				<div id="header" slot="header">
+					<h2>Health Check</h2>
 					<uui-button
 						label="Perform all checks"
 						color="positive"
@@ -63,10 +60,16 @@ export class UmbDashboardHealthCheckOverviewElement extends UmbLitElement {
 				margin-top: var(--uui-size-space-5);
 			}
 
-			.flex {
+			#header {
+				width: 100%;
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
+			}
+
+			#header h2 {
+				font-size: var(--uui-type-h5-size);
+				margin: 0;
 			}
 
 			.grid {

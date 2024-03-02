@@ -1,12 +1,9 @@
-import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	RelationTypeResponseModel,
 	CreateRelationTypeRequestModel,
-	UpdateRelationTypeRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	RelationTypeResource,
-	RelationResource,
-} from '@umbraco-cms/backoffice/backend-api';
+	UpdateRelationTypeRequestModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { RelationTypeResource, RelationResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -17,10 +14,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
  * @class UmbRelationTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbRelationTypeServerDataSource
-	implements
-		UmbDataSource<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
-{
+export class UmbRelationTypeServerDataSource {
 	#host: UmbControllerHost;
 
 	/**

@@ -1,13 +1,9 @@
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbPropertyEditorConfigCollection} from '@umbraco-cms/backoffice/property-editor';
-import {
-	UmbPropertyValueChangeEvent,
-} from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-collection-view-order-by
@@ -45,8 +41,6 @@ export class UmbPropertyEditorUICollectionViewOrderByElement
 	render() {
 		return html`<uui-select label="select" .options=${this._options} @change=${this.#onChange}></uui-select>`;
 	}
-
-	static styles = [UmbTextStyles];
 }
 
 export default UmbPropertyEditorUICollectionViewOrderByElement;

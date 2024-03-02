@@ -1,5 +1,5 @@
 import type { UmbCurrentUserModel } from '../types.js';
-import { UserResource } from '@umbraco-cms/backoffice/backend-api';
+import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -35,11 +35,12 @@ export class UmbCurrentUserServerDataSource {
 				userName: data.userName,
 				name: data.name,
 				languageIsoCode: data.languageIsoCode || 'en-us', // TODO: make global variable
-				documentStartNodeIds: data.documentStartNodeIds,
-				mediaStartNodeIds: data.mediaStartNodeIds,
+				documentStartNodeUniques: data.documentStartNodeIds,
+				mediaStartNodeUniques: data.mediaStartNodeIds,
 				avatarUrls: data.avatarUrls,
 				languages: data.languages,
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,
+				fallbackPermissions: data.fallbackPermissions,
 				permissions: data.permissions,
 			};
 			return { data: user };

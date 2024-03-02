@@ -12,7 +12,7 @@ import type {
 	UmbTableOrderedEvent,
 } from '@umbraco-cms/backoffice/components';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbUserGroupItemModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupItemRepository } from '@umbraco-cms/backoffice/user-group';
 
@@ -87,8 +87,8 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 
 	async #observeUserGroups() {
 		if (this._users.length === 0) return;
-		const userGroupsIds = [...new Set(this._users.flatMap((user) => user.userGroupUniques))];
-		const { asObservable } = await this.#userGroupItemRepository.requestItems(userGroupsIds);
+		const userGroupsUniques = [...new Set(this._users.flatMap((user) => user.userGroupUniques))];
+		const { asObservable } = await this.#userGroupItemRepository.requestItems(userGroupsUniques);
 		this.observe(
 			asObservable(),
 			(userGroups) => {
@@ -116,7 +116,9 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 					{
 						columnAlias: 'userName',
 						value: {
+							unique: user.unique,
 							name: user.name,
+							avatarUrls: user.avatarUrls,
 						},
 					},
 					{

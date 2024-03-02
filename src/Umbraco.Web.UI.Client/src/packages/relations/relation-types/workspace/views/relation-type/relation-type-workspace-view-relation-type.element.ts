@@ -7,9 +7,10 @@ import type {
 	UUIToggleElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { RelationTypeResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import '@umbraco-cms/backoffice/object-type';
 
 @customElement('umb-relation-type-workspace-view-relation-type')
 export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitElement implements UmbWorkspaceViewElement {

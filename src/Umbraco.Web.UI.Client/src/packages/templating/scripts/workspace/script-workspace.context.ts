@@ -24,6 +24,11 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 		this.#loadCodeEditor();
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
@@ -37,7 +42,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 		return UMB_SCRIPT_ENTITY_TYPE;
 	}
 
-	getEntityId() {
+	getUnique() {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		return data.unique;
@@ -56,6 +61,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 	}
 
 	async load(unique: string) {
+		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
@@ -64,6 +70,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 	}
 
 	async create(parentUnique: string | null) {
+		this.resetState();
 		const { data } = await this.repository.createScaffold(parentUnique);
 
 		if (data) {
@@ -87,11 +94,14 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 
 		if (newData) {
 			this.#data.setValue(newData);
-			this.saveComplete(newData);
+
+			this.setIsNew(false);
+			this.workspaceComplete(newData);
 		}
 	}
 
 	destroy(): void {
-		throw new Error('Method not implemented.');
+		super.destroy();
+		this.#data.destroy();
 	}
 }

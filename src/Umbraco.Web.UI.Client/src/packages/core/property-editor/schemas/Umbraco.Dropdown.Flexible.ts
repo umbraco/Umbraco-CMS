@@ -6,6 +6,20 @@ export const manifest: ManifestPropertyEditorSchema = {
 	name: 'Dropdown',
 	alias: 'Umbraco.DropDown.Flexible',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.DropDown',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		settings: {
+			properties: [
+				{
+					alias: 'multiple',
+					label: 'Enable multiple choice',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				},
+				{
+					alias: 'items',
+					label: 'Add options',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
+				},
+			],
+		},
 	},
 };

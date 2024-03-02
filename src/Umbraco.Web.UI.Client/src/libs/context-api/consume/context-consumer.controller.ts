@@ -17,15 +17,16 @@ export class UmbContextConsumerController<BaseType = unknown, ResultType extends
 	constructor(
 		host: UmbControllerHost,
 		contextAlias: string | UmbContextToken<BaseType, ResultType>,
-		callback: UmbContextCallback<ResultType>,
+		callback?: UmbContextCallback<ResultType>,
 	) {
 		super(host.getHostElement(), contextAlias, callback);
 		this.#host = host;
 		host.addController(this);
 	}
 
-	public destroy() {
-		this.#host.removeController(this);
+	public destroy(): void {
+		this.#host?.removeController(this);
+		(this.#host as any) = undefined;
 		super.destroy();
 	}
 }

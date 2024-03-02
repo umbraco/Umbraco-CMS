@@ -1,4 +1,5 @@
 import type { UmbMediaEntityType, UmbMediaRootEntityType } from '../entity.js';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbMediaTreeItemModel extends UmbUniqueTreeItemModel {
@@ -8,7 +9,7 @@ export interface UmbMediaTreeItemModel extends UmbUniqueTreeItemModel {
 	mediaType: {
 		unique: string;
 		icon: string;
-		hasListView: boolean;
+		collection: UmbReferenceByUnique | null;
 	};
 	variants: Array<UmbMediaTreeItemVariantModel>;
 }

@@ -15,6 +15,7 @@ export type CreateContentTypeForDocumentTypeRequestModel = {
     allowedAsRoot: boolean;
     variesByCulture: boolean;
     variesBySegment: boolean;
+    collection?: ReferenceByIdModel | null;
     isElement: boolean;
     properties: Array<CreateDocumentTypePropertyTypeRequestModel>;
     containers: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;

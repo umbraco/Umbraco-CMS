@@ -1,7 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbDocumentTreeRepository } from './document-tree.repository.js';
-import { UmbDocumentTreeStore } from './document-tree.store.js';
 import { manifests as reloadTreeItemChildrenManifests } from './reload-tree-item-children/manifests.js';
+import { UmbDocumentTreeItemContext } from './tree-item/document-tree-item.context.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -17,18 +16,19 @@ const treeRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DOCUMENT_TREE_REPOSITORY_ALIAS,
 	name: 'Document Tree Repository',
-	api: UmbDocumentTreeRepository,
+	api: () => import('./document-tree.repository.js'),
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
 	alias: UMB_DOCUMENT_TREE_STORE_ALIAS,
 	name: 'Document Tree Store',
-	api: UmbDocumentTreeStore,
+	api: () => import('./document-tree.store.js'),
 };
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_DOCUMENT_TREE_ALIAS,
 	name: 'Document Tree',
 	meta: {
@@ -40,7 +40,8 @@ const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
 	alias: 'Umb.TreeItem.Document',
 	name: 'Document Tree Item',
-	js: () => import('./tree-item/document-tree-item.element.js'),
+	element: () => import('./tree-item/document-tree-item.element.js'),
+	api: UmbDocumentTreeItemContext,
 	meta: {
 		entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 	},

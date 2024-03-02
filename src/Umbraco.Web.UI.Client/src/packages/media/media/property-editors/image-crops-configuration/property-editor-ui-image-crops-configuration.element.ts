@@ -1,9 +1,10 @@
 import { html, customElement, property, css, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 export type UmbCrop = {
+	label: string;
 	alias: string;
 	width: number;
 	height: number;
@@ -35,12 +36,14 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		const form = this.shadowRoot?.querySelector('form') as HTMLFormElement;
 		if (!form) return;
 
+		const label = form.querySelector('#label') as HTMLInputElement;
 		const alias = form.querySelector('#alias') as HTMLInputElement;
 		const width = form.querySelector('#width') as HTMLInputElement;
 		const height = form.querySelector('#height') as HTMLInputElement;
 
 		if (!alias || !width || !height) return;
 
+		label.value = crop.label;
 		alias.value = crop.alias;
 		width.value = crop.width.toString();
 		height.value = crop.height.toString();
@@ -59,14 +62,16 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 
 		const formData = new FormData(form);
 
+		const label = formData.get('label') as string;
 		const alias = formData.get('alias') as string;
 		const width = formData.get('width') as string;
 		const height = formData.get('height') as string;
 
-		if (!alias || !width || !height) return;
+		if (!label || !alias || !width || !height) return;
 		if (!this.value) this.value = [];
 
 		const newCrop = {
+			label,
 			alias,
 			width: parseInt(width),
 			height: parseInt(height),
@@ -101,6 +106,10 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		return html`
 			<uui-form>
 				<form @submit=${this.#onSubmit}>
+				<div class="input">
+						<uui-label for="label">Label</uui-label>
+						<uui-input label="Label" id="label" name="label" type="text" autocomplete="false" value=""></uui-input>
+					</div>
 					<div class="input">
 						<uui-label for="alias">Alias</uui-label>
 						<uui-input label="Alias" id="alias" name="alias" type="text" autocomplete="false" value=""></uui-input>
@@ -127,7 +136,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 					(item) => html`
 						<div class="crop">
 							<span class="crop-drag">+</span>
-							<span class="crop-alias">${item.alias}</span>
+							<span><strong>${item.label}</strong> <em>(${item.alias})</em></span>
 							<span class="crop-size">(${item.width} x ${item.height}px)</span>
 							<div class="crop-actions">
 								<uui-button label="Edit" @click=${() => this.#onEdit(item)}>Edit</uui-button>
@@ -161,9 +170,6 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 				cursor: grab;
 				padding-inline: var(--uui-size-space-4);
 				color: var(--uui-color-disabled-contrast);
-				font-weight: bold;
-			}
-			.crop-alias {
 				font-weight: bold;
 			}
 			.crop-size {

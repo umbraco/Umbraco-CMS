@@ -65,6 +65,16 @@ declare class UmbClassMixinDeclaration extends EventTarget implements UmbClassMi
 		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
 
+	/**
+	 * @description Retrieve a context. Notice this is a one time retrieving of a context, meaning if you expect this to be up to date with reality you should instead use the consumeContext method.
+	 * @param {string} contextAlias
+	 * @return {Promise<ContextType>} A Promise with the reference to the Context Api Instance
+	 * @memberof UmbClassMixin
+	 */
+	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
+	): Promise<ResultType>;
+
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
@@ -95,15 +105,19 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			this._host.addController(this);
 		}
 
-		getHostElement() {
+		getHostElement(): Element {
 			return this._host.getHostElement();
 		}
 
-		get controllerAlias() {
+		get controllerAlias(): UmbControllerAlias {
 			return this._controllerAlias;
 		}
 
-		observe<T>(source: Observable<T>, callback: (_value: T) => void, controllerAlias?: UmbControllerAlias) {
+		observe<T>(
+			source: Observable<T>,
+			callback: (_value: T) => void,
+			controllerAlias?: UmbControllerAlias,
+		): UmbObserverController<T> {
 			return new UmbObserverController<T>(this, source, callback, controllerAlias);
 		}
 
@@ -111,18 +125,32 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			BaseType = unknown,
 			ResultType extends BaseType = BaseType,
 			InstanceType extends ResultType = ResultType,
-		>(contextAlias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType) {
+		>(
+			contextAlias: string | UmbContextToken<BaseType, ResultType>,
+			instance: InstanceType,
+		): UmbContextProviderController<BaseType, ResultType, InstanceType> {
 			return new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, contextAlias, instance);
 		}
 
 		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			callback: UmbContextCallback<ResultType>,
-		) {
+		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 
-		public destroy() {
+		async getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
+			contextAlias: string | UmbContextToken<BaseType, ResultType>,
+		): Promise<ResultType> {
+			const controller = new UmbContextConsumerController(this, contextAlias);
+			const promise = controller.asPromise().then((result) => {
+				controller.destroy();
+				return result;
+			});
+			return promise;
+		}
+
+		public destroy(): void {
 			if (this._host) {
 				this._host.removeController(this);
 				this._host = undefined as never;

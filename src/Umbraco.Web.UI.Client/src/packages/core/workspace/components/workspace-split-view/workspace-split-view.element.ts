@@ -1,7 +1,7 @@
 import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../variant-selector/index.js';
 /**
  *
@@ -21,6 +21,9 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 	public set splitViewIndex(index: number) {
 		this.splitViewContext.setSplitViewIndex(index);
 	}
+	public get splitViewIndex(): number {
+		return this.splitViewContext.getSplitViewIndex()!;
+	}
 
 	splitViewContext = new UmbWorkspaceSplitViewContext(this);
 
@@ -31,7 +34,7 @@ export class UmbWorkspaceSplitViewElement extends UmbLitElement {
 					<umb-variant-selector></umb-variant-selector>
 				</div>
 				${this.displayNavigation
-					? html`<umb-workspace-action-menu slot="action-menu"></umb-workspace-action-menu>`
+					? html`<umb-workspace-entity-action-menu slot="action-menu"></umb-workspace-entity-action-menu>`
 					: ''}
 				<slot name="action-menu" slot="action-menu"></slot>
 			</umb-workspace-editor>

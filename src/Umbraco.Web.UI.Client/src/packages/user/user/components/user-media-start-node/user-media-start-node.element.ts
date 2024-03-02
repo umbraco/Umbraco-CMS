@@ -1,6 +1,5 @@
-import { css, html, customElement, property, repeat, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement, property, repeat, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbMediaItemModel } from '@umbraco-cms/backoffice/media';
 import { UmbMediaItemRepository } from '@umbraco-cms/backoffice/media';
 
@@ -42,8 +41,6 @@ export class UmbUserMediaStartNodeElement extends UmbLitElement {
 			},
 		);
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbUserMediaStartNodeElement;

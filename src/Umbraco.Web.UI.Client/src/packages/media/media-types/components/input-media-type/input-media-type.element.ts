@@ -2,7 +2,7 @@ import type { UmbMediaTypeItemModel } from '../../repository/index.js';
 import { UmbMediaTypePickerContext } from './input-media-type.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-media-type')
@@ -124,9 +124,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 				id="add-button"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label="${this.localize.term('general_choose')}"
-				>${this.localize.term('general_choose')}</uui-button
-			>
+				label="${this.localize.term('general_choose')}"></uui-button>
 		`;
 	}
 
@@ -138,9 +136,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
-						label="Remove Media Type ${item.name}"
-						>${this.localize.term('general_remove')}</uui-button
-					>
+						label="${this.localize.term('general_remove')} ${item.name}"></uui-button>
 				</uui-action-bar>
 			</uui-ref-node-document-type>
 		`;

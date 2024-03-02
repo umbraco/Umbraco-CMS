@@ -1,8 +1,12 @@
 import type { UmbBlockTypeBaseModel } from '../../types.js';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT,
+	umbConfirmModal,
+} from '@umbraco-cms/backoffice/modal';
 import '../block-type-card/index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -38,40 +42,48 @@ export class UmbInputBlockTypeElement<
 		});
 	}
 
-	create() {
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
-			if (modalManager) {
-				// TODO: Make as mode for the Picker Modal, so the click to select immediately submits the modal(And in that mode we do not want to see a Submit button).
-				const modalContext = modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
-					data: {
-						hideTreeRoot: true,
-						multiple: false,
-						pickableFilter: (docType) =>
-							// Only pick elements:
-							docType.isElement &&
-							// Prevent picking the an already used element type:
-							this.#filter &&
-							this.#filter.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
-					},
-				});
+	async create() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
-				const modalValue = await modalContext?.onSubmit();
-				const selectedElementType = modalValue.selection[0];
-
-				if (selectedElementType) {
-					this.dispatchEvent(new CustomEvent('create', { detail: { contentElementTypeKey: selectedElementType } }));
-				}
-			}
+		// TODO: Make as mode for the Picker Modal, so the click to select immediately submits the modal(And in that mode we do not want to see a Submit button).
+		const modalContext = modalManager.open(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+			data: {
+				hideTreeRoot: true,
+				multiple: false,
+				pickableFilter: (docType) =>
+					// Only pick elements:
+					docType.isElement &&
+					// Prevent picking the an already used element type:
+					this.#filter &&
+					this.#filter.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
+			},
 		});
+
+		const modalValue = await modalContext?.onSubmit();
+		const selectedElementType = modalValue.selection[0];
+
+		if (selectedElementType) {
+			this.dispatchEvent(new CustomEvent('create', { detail: { contentElementTypeKey: selectedElementType } }));
+		}
 	}
 
 	deleteItem(contentElementTypeKey: string) {
-		this.value = this._items.filter((x) => x.contentElementTypeKey !== contentElementTypeKey);
+		this.value = this.value.filter((x) => x.contentElementTypeKey !== contentElementTypeKey);
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	protected getFormElement() {
 		return undefined;
+	}
+
+	async #onRequestDelete(item: BlockType) {
+		await umbConfirmModal(this, {
+			color: 'danger',
+			headline: `Remove [TODO: Get name]?`,
+			content: 'Are you sure you want to remove this block type?',
+			confirmLabel: 'Remove',
+		});
+		this.deleteItem(item.contentElementTypeKey);
 	}
 
 	render() {
@@ -80,12 +92,19 @@ export class UmbInputBlockTypeElement<
 		</div>`;
 	}
 
-	#renderItem = (item: BlockType) => {
+	#renderItem = (block: BlockType) => {
 		return html`
 			<umb-block-type-card
-				.workspacePath=${this.workspacePath}
-				.key=${item.contentElementTypeKey}
-				@delete=${() => this.deleteItem(item.contentElementTypeKey)}>
+				.name=${block.label}
+				.iconColor=${block.iconColor}
+				.backgroundColor=${block.backgroundColor}
+				.href="${this.workspacePath}/edit/${block.contentElementTypeKey}"
+				.contentElementTypeKey=${block.contentElementTypeKey}>
+				<uui-action-bar slot="actions">
+					<uui-button @click=${() => this.#onRequestDelete(block)} label="Remove block">
+						<uui-icon name="icon-trash"></uui-icon>
+					</uui-button>
+				</uui-action-bar>
 			</umb-block-type-card>
 		`;
 	};

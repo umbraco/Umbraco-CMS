@@ -1,6 +1,5 @@
-import { css, html, customElement, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
 
@@ -42,8 +41,6 @@ export class UmbUserDocumentStartNodeElement extends UmbLitElement {
 			},
 		);
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbUserDocumentStartNodeElement;

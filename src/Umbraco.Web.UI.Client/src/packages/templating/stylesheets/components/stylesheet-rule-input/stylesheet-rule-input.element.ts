@@ -3,9 +3,8 @@ import { UMB_STYLESHEET_RULE_SETTINGS_MODAL } from './stylesheet-rule-settings-m
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 // TODO: add sorting when we have a generic sorting component/functionality for ref lists
 
@@ -14,33 +13,23 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 	@property({ type: Array, attribute: false })
 	rules: UmbStylesheetRule[] = [];
 
-	#modalManager: UmbModalManagerContext | undefined;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
-			this.#modalManager = modalContext;
-		});
-	}
-
 	protected getFormElement() {
 		return undefined;
 	}
 
-	#openRuleSettings = (rule: UmbStylesheetRule | null = null) => {
-		if (!this.#modalManager) throw new Error('Modal context not found');
+	async #openRuleSettings(rule: UmbStylesheetRule | null = null) {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
 		const value = {
 			rule: rule ? { name: rule.name, selector: rule.selector, styles: rule.styles } : null,
 		};
 
-		const modalContext = this.#modalManager.open(UMB_STYLESHEET_RULE_SETTINGS_MODAL, {
+		const modalContext = modalManager.open(this, UMB_STYLESHEET_RULE_SETTINGS_MODAL, {
 			value,
 		});
 
 		return modalContext?.onSubmit();
-	};
+	}
 
 	#appendRule = async () => {
 		const { rule: newRule } = await this.#openRuleSettings(null);

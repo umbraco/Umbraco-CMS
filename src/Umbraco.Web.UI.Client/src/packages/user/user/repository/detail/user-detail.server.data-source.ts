@@ -2,8 +2,8 @@ import type { UmbUserDetailModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateUserRequestModel, UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { UserResource } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateUserRequestModel, UpdateUserRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UserResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -119,8 +119,7 @@ export class UmbUserServerDataSource implements UmbDetailDataSource<UmbUserDetai
 		);
 
 		if (data) {
-			// TODO: get back to this when we get a location header
-			return this.read(data.user.id);
+			return this.read(data);
 		}
 
 		return { error };

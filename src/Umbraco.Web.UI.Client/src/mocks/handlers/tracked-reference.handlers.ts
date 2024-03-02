@@ -1,7 +1,7 @@
 import { items } from '../data/tracked-reference.data.js';
 const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import type { PagedRelationItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PagedRelationItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const handlers = [
 	rest.get(umbracoPath('/tracked-reference/:id'), (_req, res, ctx) => {

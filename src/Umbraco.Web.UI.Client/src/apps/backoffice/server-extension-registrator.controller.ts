@@ -1,13 +1,13 @@
-import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/backend-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { ManifestBase} from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: consider if this can be replaced by the new extension controllers
-export class UmbServerExtensionRegistrator extends UmbBaseController {
+export class UmbServerExtensionRegistrator extends UmbControllerBase {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
 	#apiBaseUrl = OpenAPI.BASE;
 

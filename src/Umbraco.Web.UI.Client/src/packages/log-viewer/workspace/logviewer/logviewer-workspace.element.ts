@@ -1,10 +1,10 @@
 // TODO: Niels: I don't feel sure this is good, seems wrong:
 import '../../components/index.js';
 import { UmbLogViewerWorkspaceContext } from '../logviewer.context.js';
-import type { PropertyValueMap} from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 //TODO make uui-input accept min and max values
 @customElement('umb-logviewer-workspace')
@@ -33,10 +33,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`
-			<umb-workspace-editor alias="Umb.Workspace.LogViewer" headline="Log Viewer" .enforceNoFooter=${true}>
-			</umb-workspace-editor>
-		`;
+		return html` <umb-workspace-editor headline="Log Viewer" .enforceNoFooter=${true}> </umb-workspace-editor> `;
 	}
 
 	static styles = [

@@ -6,7 +6,7 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, customElement, query, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, type UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_LINK_PICKER_MODAL,
@@ -186,7 +186,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		const selectedValue = this.#editor?.getValueInRange(selection);
 
 		this._focusEditor(); // Focus before opening modal
-		const modalContext = this._modalContext.open(UMB_LINK_PICKER_MODAL, {
+		const modalContext = this._modalContext.open(this, UMB_LINK_PICKER_MODAL, {
 			data: {
 				index: null,
 				config: { overlaySize: this.overlaySize },
@@ -235,7 +235,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		const alt = this.#editor?.getValueInRange(selection) || 'alt text';
 
 		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
-		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL);
+		const modalContext = this._modalContext?.open(this, UMB_MEDIA_TREE_PICKER_MODAL);
 
 		modalContext
 			?.onSubmit()

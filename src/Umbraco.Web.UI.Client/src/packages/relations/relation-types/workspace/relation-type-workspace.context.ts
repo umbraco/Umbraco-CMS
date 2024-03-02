@@ -3,7 +3,7 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -24,7 +24,13 @@ export class UmbRelationTypeWorkspaceContext
 		super(host, 'Umb.Workspace.RelationType');
 	}
 
+	protected resetState(): void {
+		super.resetState();
+		this.#data.setValue(undefined);
+	}
+
 	async load(id: string) {
+		this.resetState();
 		const { data } = await this.repository.requestById(id);
 
 		if (data) {
@@ -33,7 +39,8 @@ export class UmbRelationTypeWorkspaceContext
 		}
 	}
 
-	async createScaffold(parentId: string | null) {
+	async create(parentId: string | null) {
+		this.resetState();
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
@@ -42,14 +49,14 @@ export class UmbRelationTypeWorkspaceContext
 
 	async getRelations() {
 		//TODO: How do we test this?
-		return await this.repository.requestRelationsById(this.getEntityId());
+		return await this.repository.requestRelationsById(this.getUnique());
 	}
 
 	getData() {
 		return this.#data.getValue();
 	}
 
-	getEntityId() {
+	getUnique() {
 		return this.getData()?.id || '';
 	}
 
@@ -89,6 +96,7 @@ export class UmbRelationTypeWorkspaceContext
 
 	public destroy(): void {
 		this.#data.destroy();
+		super.destroy();
 	}
 }
 

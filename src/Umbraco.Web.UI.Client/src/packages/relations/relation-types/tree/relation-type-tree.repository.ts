@@ -16,7 +16,7 @@ export class UmbRelationTypeTreeRepository
 
 	async requestTreeRoot() {
 		const data = {
-			id: null,
+			unique: null,
 			entityType: UMB_RELATION_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Relation Types',
 			hasChildren: true,
@@ -27,3 +27,5 @@ export class UmbRelationTypeTreeRepository
 		return { data };
 	}
 }
+
+export default UmbRelationTypeTreeRepository;

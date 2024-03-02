@@ -2,8 +2,8 @@ import type { UmbMediaDetailModel } from '../../types.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { MediaResource } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MediaResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -28,17 +28,19 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	/**
 	 * Creates a new Media scaffold
 	 * @param {(string | null)} parentUnique
+	 * @param {(string)} mediaTypeUnique
 	 * @return { UmbMediaDetailModel }
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(parentUnique: string | null, mediaType: UmbMediaDetailModel['mediaType']) {
 		const data: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: UmbId.new(),
 			parentUnique,
 			urls: [],
 			mediaType: {
-				unique: 'mediaTypeId',
+				unique: mediaType.unique,
+				collection: mediaType.collection || null,
 			},
 			isTrashed: false,
 			values: [],
@@ -88,7 +90,10 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 				};
 			}),
 			urls: data.urls,
-			mediaType: { unique: data.mediaType.id },
+			mediaType: {
+				unique: data.mediaType.id,
+				collection: data.mediaType.collection ? { unique: data.mediaType.collection.id } : null,
+			},
 			isTrashed: data.isTrashed,
 		};
 

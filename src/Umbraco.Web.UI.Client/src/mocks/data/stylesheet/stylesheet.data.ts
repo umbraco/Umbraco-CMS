@@ -2,7 +2,7 @@ import type {
 	FileSystemTreeItemPresentationModel,
 	StylesheetItemResponseModel,
 	StylesheetResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+} from '@umbraco-cms/backoffice/external/backend-api';
 
 type UmbMockStylesheetModelHack = StylesheetResponseModel &
 	FileSystemTreeItemPresentationModel &

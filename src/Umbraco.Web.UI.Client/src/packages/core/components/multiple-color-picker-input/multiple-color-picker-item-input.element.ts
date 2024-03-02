@@ -1,15 +1,9 @@
 import { css, html, nothing, customElement, property, query, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UUIColorPickerElement,
-	UUIInputElement,
-	UUIInputEvent} from '@umbraco-cms/backoffice/external/uui';
-import {
-	FormControlMixin
-} from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
+import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-multiple-color-picker-item-input
@@ -43,32 +37,18 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 	@query('#color')
 	protected _colorPicker!: UUIColorPickerElement;
 
-	private _modalContext?: UmbModalManagerContext;
-
 	@property({ type: Boolean })
 	showLabels = true;
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
-	}
-
-	#onDelete() {
-		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			data: {
-				headline: `${this.localize.term('actions_delete')} ${this.value || ''}`,
-				content: this.localize.term('content_nestedContentDeleteItem'),
-				color: 'danger',
-				confirmLabel: this.localize.term('actions_delete'),
-			},
+	async #onDelete() {
+		await umbConfirmModal(this, {
+			headline: `${this.localize.term('actions_delete')} ${this.value || ''}`,
+			content: this.localize.term('content_nestedContentDeleteItem'),
+			color: 'danger',
+			confirmLabel: this.localize.term('actions_delete'),
 		});
 
-		modalContext?.onSubmit().then(() => {
-			this.dispatchEvent(new UmbDeleteEvent());
-		});
+		this.dispatchEvent(new UmbDeleteEvent());
 	}
 
 	#onLabelInput(event: UUIInputEvent) {

@@ -1,9 +1,10 @@
 import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type { UmbScriptTreeItemModel } from './types.js';
 import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { ScriptResource } from '@umbraco-cms/backoffice/backend-api';
+import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { ScriptResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -30,14 +31,15 @@ export class UmbScriptTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	}
 }
 
-// eslint-disable-next-line local-rules/no-direct-api-import
-const getRootItems = () => ScriptResource.getTreeScriptRoot({});
+const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	ScriptResource.getTreeScriptRoot({ skip: args.skip, take: args.take });
 
-const getChildrenOf = (parentUnique: string | null) => {
-	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
+const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
 
 	if (parentPath === null) {
-		return getRootItems();
+		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return ScriptResource.getTreeScriptChildren({
@@ -56,5 +58,6 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemMod
 		name: item.name,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
+		icon: item.isFolder ? undefined : 'icon-diploma',
 	};
 };

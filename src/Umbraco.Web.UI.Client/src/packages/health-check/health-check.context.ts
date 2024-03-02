@@ -1,15 +1,15 @@
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	HealthCheckGroupPresentationModel,
-	HealthCheckGroupWithResultResponseModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	HealthCheckResource,
-} from '@umbraco-cms/backoffice/backend-api';
+	HealthCheckGroupWithResultResponseModel,
+} from '@umbraco-cms/backoffice/external/backend-api';
+import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbHealthCheckContext {
+export class UmbHealthCheckContext implements UmbApi {
 	private _checks = new BehaviorSubject<HealthCheckGroupPresentationModel | undefined>(undefined);
 	public readonly checks = this._checks.asObservable();
 
@@ -44,6 +44,14 @@ export class UmbHealthCheckContext {
 			this._results.next(undefined);
 		}
 	}
+
+	static isInstanceLike(instance: unknown): instance is UmbHealthCheckContext {
+		return typeof instance === 'object' && (instance as UmbHealthCheckContext).results !== undefined;
+	}
+
+	public destroy(): void {}
 }
+
+export default UmbHealthCheckContext;
 
 export const UMB_HEALTHCHECK_CONTEXT = new UmbContextToken<UmbHealthCheckContext>('UmbHealthCheckContext');

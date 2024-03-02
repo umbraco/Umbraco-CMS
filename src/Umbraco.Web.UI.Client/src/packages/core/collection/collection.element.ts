@@ -1,20 +1,30 @@
-import type { UmbCollectionContext } from './types.js';
-import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { ManifestCollection} from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbCollectionConfiguration, UmbCollectionContext } from './types.js';
+import { customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApi, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollection } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
-	_alias?: string;
+	#alias?: string;
 	@property({ type: String, reflect: true })
-	get alias() {
-		return this._alias;
-	}
 	set alias(newVal) {
-		this._alias = newVal;
+		this.#alias = newVal;
 		this.#observeManifest();
+	}
+	get alias() {
+		return this.#alias;
+	}
+
+	#config?: UmbCollectionConfiguration = { pageSize: 50 };
+	@property({ type: Object, attribute: false })
+	set config(newVal: UmbCollectionConfiguration | undefined) {
+		this.#config = newVal;
+		this.#setConfig();
+	}
+	get config() {
+		return this.#config;
 	}
 
 	@state()
@@ -22,10 +32,12 @@ export class UmbCollectionElement extends UmbLitElement {
 
 	#manifest?: ManifestCollection;
 
+	#api?: UmbCollectionContext;
+
 	#observeManifest() {
-		if (!this._alias) return;
+		if (!this.#alias) return;
 		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('collection', this._alias),
+			umbExtensionsRegistry.byTypeAndAlias('collection', this.#alias),
 			async (manifest) => {
 				if (!manifest) return;
 				this.#manifest = manifest;
@@ -38,9 +50,10 @@ export class UmbCollectionElement extends UmbLitElement {
 
 	async #createApi() {
 		if (!this.#manifest) throw new Error('No manifest');
-		const api = (await createExtensionApi(this.#manifest, [this])) as unknown as UmbCollectionContext;
-		if (!api) throw new Error('No api');
-		api.setManifest(this.#manifest);
+		this.#api = (await createExtensionApi(this.#manifest, [this])) as unknown as UmbCollectionContext;
+		if (!this.#api) throw new Error('No api');
+		this.#api.setManifest(this.#manifest);
+		this.#setConfig();
 	}
 
 	async #createElement() {
@@ -49,8 +62,13 @@ export class UmbCollectionElement extends UmbLitElement {
 		this.requestUpdate();
 	}
 
+	#setConfig() {
+		if (!this.#config || !this.#api) return;
+		this.#api.setConfig(this.#config);
+	}
+
 	render() {
-		return html`${this._element}`;
+		return this._element;
 	}
 }
 

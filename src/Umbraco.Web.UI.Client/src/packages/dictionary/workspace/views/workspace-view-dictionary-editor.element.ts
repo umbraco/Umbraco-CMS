@@ -3,7 +3,7 @@ import type { UmbDictionaryDetailModel } from '../../types.js';
 import type { UUITextareaElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUITextareaEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-workspace-view-dictionary-editor')
@@ -28,7 +28,7 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 	}
 
 	async firstUpdated() {
-		const { data } = await this.#languageCollectionRepository.requestCollection({ skip: 0, take: 200 });
+		const { data } = await this.#languageCollectionRepository.requestCollection({});
 		if (data) {
 			this._languages = data.items;
 		}

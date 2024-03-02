@@ -2,7 +2,7 @@ import { html, css, customElement, property, ifDefined, state, repeat } from '@u
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -87,7 +87,7 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 	});
 
 	#openDynamicRootOriginPicker() {
-		this.#openModal = this.#modalContext?.open(UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, {});
+		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, {});
 		this.#openModal?.onSubmit().then((data: UmbTreePickerDynamicRoot) => {
 			const existingData = { ...this.data };
 			existingData.originKey = undefined;
@@ -98,7 +98,7 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 	}
 
 	#openDynamicRootQueryStepPicker() {
-		this.#openModal = this.#modalContext?.open(UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL, {});
+		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL, {});
 		this.#openModal?.onSubmit().then((step) => {
 			if (this.data) {
 				const querySteps = [...(this.data.querySteps ?? []), step];

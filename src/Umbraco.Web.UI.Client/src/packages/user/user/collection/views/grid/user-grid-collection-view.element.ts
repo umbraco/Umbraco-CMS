@@ -1,11 +1,11 @@
-import { getDisplayStateFromUserStatus } from '../../../../utils.js';
+import { getDisplayStateFromUserStatus } from '../../../utils.js';
 import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbUserGroupDetailModel } from '@umbraco-cms/backoffice/user-group';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
@@ -22,6 +22,8 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 	#userGroups: Array<UmbUserGroupDetailModel> = [];
 	#collectionContext?: UmbUserCollectionContext;
+
+	// TODO: we need to use the item repository here
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	constructor() {
@@ -76,6 +78,27 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#renderUserCard(user: UmbUserDetailModel) {
+		const avatarUrls = [
+			{
+				scale: '1x',
+				url: user.avatarUrls?.[0],
+			},
+			{
+				scale: '2x',
+				url: user.avatarUrls?.[1],
+			},
+			{
+				scale: '3x',
+				url: user.avatarUrls?.[2],
+			},
+		];
+
+		let avatarSrcset = '';
+
+		avatarUrls.forEach((url) => {
+			avatarSrcset += `${url.url} ${url.scale},`;
+		});
+
 		return html`
 			<uui-card-user
 				.name=${user.name ?? 'Unnamed user'}
@@ -86,6 +109,12 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>
 				${this.#renderUserTag(user)} ${this.#renderUserGroupNames(user)} ${this.#renderUserLoginDate(user)}
+
+				<uui-avatar
+					slot="avatar"
+					.name=${user.name || 'Unknown'}
+					img-src=${ifDefined(user.avatarUrls.length > 0 ? avatarUrls[0].url : undefined)}
+					img-srcset=${ifDefined(user.avatarUrls.length > 0 ? avatarSrcset : undefined)}></uui-avatar>
 			</uui-card-user>
 		`;
 	}
