@@ -56,22 +56,18 @@ export class UmbModalElement extends UmbLitElement {
 		// Makes sure that the modal triggers the reject of the context promise when it is closed by pressing escape.
 		this.element.addEventListener(UUIModalCloseEvent, this.#onClose);
 
-		if (this.#modalContext.originTarget) {
-			// The following code is the context api proxy.
-			// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal.
-			this.element.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
-				if (!this.#modalContext) return;
-				if (this.#modalContext.originTarget) {
-					// Note for this hack (The if-sentence):
-					// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
-					// To avoid such this hack just prevents proxying the event if its a request for the Modal Context.
-					if (event.contextAlias !== UMB_MODAL_CONTEXT.contextAlias) {
-						event.stopImmediatePropagation();
-						this.#modalContext.originTarget.dispatchEvent(event.clone());
-					}
-				}
-			}) as EventListener);
-		}
+		// The following code is the context api proxy.
+		// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal. [NL]
+		this.element.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
+			if (!this.#modalContext) return;
+			// Note for this hack (The if-sentence):  [NL]
+			// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
+			// To avoid such this hack just prevents proxying the event if its a request for the Modal Context. [NL]
+			if (event.contextAlias !== UMB_MODAL_CONTEXT.contextAlias) {
+				event.stopImmediatePropagation();
+				this.#modalContext.getHostElement().dispatchEvent(event.clone());
+			}
+		}) as EventListener);
 
 		this.#modalContext.onSubmit().then(
 			() => {
