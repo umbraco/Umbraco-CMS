@@ -33836,14 +33836,6 @@
             "type": "string",
             "format": "uuid"
           },
-          "parent": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ],
-            "nullable": true
-          },
           "isDeletable": {
             "type": "boolean"
           },
@@ -35252,14 +35244,6 @@
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "parent": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ],
-            "nullable": true
           }
         },
         "additionalProperties": false
