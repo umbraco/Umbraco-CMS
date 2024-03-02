@@ -28,11 +28,13 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		}
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
+		const modalContext = modalManager.open(this, UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
 			data: {
 				document: documentItem ? { unique: documentItem.unique } : null,
 				documentType: documentItem ? { unique: documentItem.documentType.unique } : null,
 			},
 		});
+
+		await modalContext.onSubmit();
 	}
 }

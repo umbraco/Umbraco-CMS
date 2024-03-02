@@ -7,11 +7,13 @@ export class UmbStylesheetCreateOptionsEntityAction extends UmbEntityActionBase<
 		if (!this.repository) throw new Error('Repository is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, UMB_STYLESHEET_CREATE_OPTIONS_MODAL, {
+		const modalContext = modalManager.open(this, UMB_STYLESHEET_CREATE_OPTIONS_MODAL, {
 			data: {
 				parentUnique: this.unique,
 				entityType: this.entityType,
 			},
 		});
+
+		await modalContext.onSubmit();
 	}
 }
