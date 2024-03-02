@@ -1,9 +1,10 @@
 import { UmbMemberCollectionRepository } from '../../collection/index.js';
-import type { UmbMemberItemModel } from '../../repository/index.js';
+import type { UmbMemberDetailModel } from '../../types.js';
 import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './member-picker-modal.token.js';
 import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbMemberItemModel } from '../../repository/index.js';
 
 @customElement('umb-member-picker-modal')
 export class UmbMemberPickerModalElement extends UmbModalBaseElement<
@@ -11,7 +12,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 	UmbMemberPickerModalValue
 > {
 	@state()
-	private _members: Array<UmbMemberItemModel> = [];
+	private _members: Array<UmbMemberDetailModel> = [];
 
 	#collectionRepository = new UmbMemberCollectionRepository(this);
 	#selectionManager = new UmbSelectionManager(this);
@@ -30,7 +31,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 
 	get #filteredMembers() {
 		if (this.data?.filter) {
-			return this._members.filter(this.data.filter);
+			return this._members.filter(this.data.filter as any);
 		} else {
 			return this._members;
 		}
@@ -53,7 +54,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 					(item) => item.unique,
 					(item) => html`
 						<uui-menu-item
-							label=${item.name ?? 'name plz'}
+							label=${item.variants[0].name ?? ''}
 							selectable
 							@selected=${() => this.#selectionManager.select(item.unique)}
 							@deselected=${() => this.#selectionManager.deselect(item.unique)}
