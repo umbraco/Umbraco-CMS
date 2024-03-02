@@ -30,6 +30,8 @@ export interface MetaEntityAction {
 	 * ]
 	 */
 	label: string;
+
+	entityTypes: Array<string>;
 }
 
 // TODO: Warren these don't seem to be used anywhere
@@ -40,10 +42,7 @@ export interface ManifestEntityActionDeleteKind extends ManifestEntityAction {
 	meta: MetaEntityActionDeleteKind;
 }
 
-export interface MetaEntityActionDeleteKind {
-	icon: string;
-	label: string;
+export interface MetaEntityActionDeleteKind extends MetaEntityAction {
 	detailRepositoryAlias: string;
 	itemRepositoryAlias: string;
-	entityTypes: Array<string>;
 }
