@@ -1,15 +1,12 @@
-import { UmbEntityActionBase } from '../../entity-action.js';
+import { UmbEntityActionBase } from '../../entity-action-base.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbSortChildrenOfEntityAction<
-	T extends { sortChildrenOf(): Promise<void> },
-> extends UmbEntityActionBase<T> {
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
+export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<any> {
+	constructor(host: UmbControllerHostElement, args: any) {
+		super(host, args);
 	}
 
 	async execute() {
-		console.log(`execute for: ${this.unique}`);
-		await this.repository?.sortChildrenOf();
+		console.log(`execute sort for: ${this.args.unique}`);
 	}
 }

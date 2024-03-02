@@ -1,15 +1,12 @@
-import { UmbEntityActionBase } from '../../entity-action.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbEntityActionBase } from '../../entity-action-base.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-// TODO: investigate what we need to finish the generic move action. We would need to open a picker, which requires a modal token,
-// maybe we can use kinds to make a specific manifest to the move action.
-export class UmbMoveEntityAction<T extends { move(): Promise<void> }> extends UmbEntityActionBase<T> {
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
+export class UmbMoveEntityAction extends UmbEntityActionBase<any> {
+	constructor(host: UmbControllerHost, args: any) {
+		super(host, args);
 	}
 
 	async execute() {
-		console.log(`execute for: ${this.unique}`);
-		await this.repository?.move();
+		console.log(`execute move for: ${this.args.unique}`);
 	}
 }

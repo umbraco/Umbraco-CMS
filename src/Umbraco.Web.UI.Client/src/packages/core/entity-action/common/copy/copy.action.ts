@@ -1,13 +1,12 @@
-import { UmbEntityActionBase } from '../../entity-action.js';
+import { UmbEntityActionBase } from '../../entity-action-base.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbCopyEntityAction<T extends { copy(): Promise<void> }> extends UmbEntityActionBase<T> {
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
+export class UmbCopyEntityAction extends UmbEntityActionBase<any> {
+	constructor(host: UmbControllerHostElement, args: any) {
+		super(host, args);
 	}
 
 	async execute() {
-		console.log(`execute for: ${this.unique}`);
-		await this.repository?.copy();
+		console.log(`execute copy for: ${this.args.unique}`);
 	}
 }
