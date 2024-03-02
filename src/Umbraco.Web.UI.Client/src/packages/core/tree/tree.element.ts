@@ -1,9 +1,9 @@
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestTree } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionInitializerElementBase } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionElementAndApiSlotElementBase } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-tree')
-export class UmbTreeElement extends UmbExtensionInitializerElementBase<ManifestTree> {
+export class UmbTreeElement extends UmbExtensionElementAndApiSlotElementBase<ManifestTree> {
 	getExtensionType() {
 		return 'tree';
 	}

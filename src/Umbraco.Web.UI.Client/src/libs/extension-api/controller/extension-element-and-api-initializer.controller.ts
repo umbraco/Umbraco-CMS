@@ -1,5 +1,6 @@
+import { createExtensionApi } from '../functions/create-extension-api.function.js';
 import { createExtensionElement } from '../functions/create-extension-element.function.js';
-import { createExtensionApi, type UmbApi } from '../index.js';
+import type { UmbApi } from '../models/api.interface.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestElementAndApi, ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';

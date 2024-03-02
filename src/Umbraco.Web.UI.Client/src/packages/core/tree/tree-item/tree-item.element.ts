@@ -1,9 +1,13 @@
 import { customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionInitializerElementBase, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	UmbExtensionElementAndApiSlotElementBase,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
+import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-tree-item')
-export class UmbTreeItemElement extends UmbExtensionInitializerElementBase<ManifestTreeItem> {
+export class UmbTreeItemElement extends UmbExtensionElementAndApiSlotElementBase<ManifestTreeItem> {
 	_entityType?: string;
 	@property({ type: String, reflect: true })
 	get entityType() {
@@ -11,10 +15,10 @@ export class UmbTreeItemElement extends UmbExtensionInitializerElementBase<Manif
 	}
 	set entityType(newVal) {
 		this._entityType = newVal;
-		this.#observeManifest();
+		this.#observeEntityType();
 	}
 
-	#observeManifest() {
+	#observeEntityType() {
 		if (!this._entityType) return;
 
 		const filterByEntityType = (manifest: ManifestTreeItem) => {
@@ -23,15 +27,16 @@ export class UmbTreeItemElement extends UmbExtensionInitializerElementBase<Manif
 		};
 
 		this.observe(
-			umbExtensionsRegistry.byTypeAndFilter(this.getExtensionType(), filterByEntityType),
-			(manifests) => {
-				if (!manifests) return;
-				// TODO: what should we do if there are multiple tree items for an entity type?
-				const manifest = manifests[0];
-				//this.createApi(manifest);
-				//this.createElement(manifest);
+			// TODO: what should we do if there are multiple tree items for an entity type?
+			// This method gets all extensions based on a type, then filters them based on the entity type. and then we get the alias of the first one [NL]
+			createObservablePart(
+				umbExtensionsRegistry.byTypeAndFilter(this.getExtensionType(), filterByEntityType),
+				(x) => x[0].alias,
+			),
+			(alias) => {
+				this.alias = alias;
 			},
-			'umbObserveTreeManifest',
+			'umbObserveAlias',
 		);
 	}
 
