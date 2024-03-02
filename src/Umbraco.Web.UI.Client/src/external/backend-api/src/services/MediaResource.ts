@@ -7,7 +7,6 @@ import type { DirectionModel } from '../models/DirectionModel';
 import type { MediaConfigurationResponseModel } from '../models/MediaConfigurationResponseModel';
 import type { MediaItemResponseModel } from '../models/MediaItemResponseModel';
 import type { MediaResponseModel } from '../models/MediaResponseModel';
-import type { MediaTreeItemResponseModel } from '../models/MediaTreeItemResponseModel';
 import type { MoveMediaRequestModel } from '../models/MoveMediaRequestModel';
 import type { PagedMediaCollectionResponseModel } from '../models/PagedMediaCollectionResponseModel';
 import type { PagedMediaRecycleBinItemResponseModel } from '../models/PagedMediaRecycleBinItemResponseModel';
@@ -468,27 +467,6 @@ export class MediaResource {
             query: {
                 'skip': skip,
                 'take': take,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeMediaAncestors({
-        descendantId,
-    }: {
-        descendantId?: string,
-    }): CancelablePromise<Array<MediaTreeItemResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/media/ancestors',
-            query: {
-                'descendantId': descendantId,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

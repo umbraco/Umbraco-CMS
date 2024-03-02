@@ -4,7 +4,6 @@
 /* eslint-disable */
 import type { CreateScriptFolderRequestModel } from '../models/CreateScriptFolderRequestModel';
 import type { CreateScriptRequestModel } from '../models/CreateScriptRequestModel';
-import type { FileSystemTreeItemPresentationModel } from '../models/FileSystemTreeItemPresentationModel';
 import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
 import type { RenameScriptRequestModel } from '../models/RenameScriptRequestModel';
 import type { ScriptFolderResponseModel } from '../models/ScriptFolderResponseModel';
@@ -229,27 +228,6 @@ export class ScriptResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeScriptAncestors({
-        descendantPath,
-    }: {
-        descendantPath?: string,
-    }): CancelablePromise<Array<FileSystemTreeItemPresentationModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/script/ancestors',
-            query: {
-                'descendantPath': descendantPath,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

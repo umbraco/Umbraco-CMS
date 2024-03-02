@@ -3,16 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateDictionaryItemRequestModel } from '../models/CreateDictionaryItemRequestModel';
-import type { DataTypeTreeItemResponseModel } from '../models/DataTypeTreeItemResponseModel';
 import type { DictionaryItemItemResponseModel } from '../models/DictionaryItemItemResponseModel';
 import type { DictionaryItemResponseModel } from '../models/DictionaryItemResponseModel';
-import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
-import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
-import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
 import type { ImportDictionaryRequestModel } from '../models/ImportDictionaryRequestModel';
-import type { MediaTypeTreeItemResponseModel } from '../models/MediaTypeTreeItemResponseModel';
 import type { MoveDictionaryRequestModel } from '../models/MoveDictionaryRequestModel';
-import type { NamedEntityTreeItemResponseModel } from '../models/NamedEntityTreeItemResponseModel';
 import type { PagedDictionaryOverviewResponseModel } from '../models/PagedDictionaryOverviewResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { UpdateDictionaryItemRequestModel } from '../models/UpdateDictionaryItemRequestModel';
@@ -242,27 +236,6 @@ export class DictionaryResource {
             url: '/umbraco/management/api/v1/item/dictionary',
             query: {
                 'id': id,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getTreeDictionaryAncestors({
-        descendantId,
-    }: {
-        descendantId?: string,
-    }): CancelablePromise<Array<(NamedEntityTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTypeTreeItemResponseModel)>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/tree/dictionary/ancestors',
-            query: {
-                'descendantId': descendantId,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
