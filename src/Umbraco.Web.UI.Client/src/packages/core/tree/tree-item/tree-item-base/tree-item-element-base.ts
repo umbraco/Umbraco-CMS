@@ -51,6 +51,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	constructor() {
 		super();
 
+		// TODO: Notice this can be retrieve via a api property. [NL]
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;

@@ -115,8 +115,9 @@ export class UmbExtensionElementAndApiInitializer<
 		}
 
 		this.#api = newApi;
-		if (!this.#api) {
+		if (this.#api) {
 			(this.#api as any).manifest = manifest;
+		} else {
 			console.warn('Manifest did not provide any useful data for a api to be created.');
 		}
 
