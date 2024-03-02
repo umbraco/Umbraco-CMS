@@ -1,8 +1,8 @@
-import { umbExtensionsRegistry } from './registry.js';
+//import { umbExtensionsRegistry } from './registry.js';
 import { html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionElementInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+//import { UmbExtensionElementInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: Eslint: allow abstract element class to end with "ElementBase" instead of "Element"
 // eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
