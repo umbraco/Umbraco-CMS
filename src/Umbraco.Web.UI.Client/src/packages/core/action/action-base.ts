@@ -1,12 +1,12 @@
 import type { UmbAction } from './action.interface.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export abstract class UmbActionBase<ArgsType> implements UmbAction<ArgsType> {
+export abstract class UmbActionBase<ArgsType> extends UmbControllerBase implements UmbAction<ArgsType> {
 	public args: ArgsType;
-	protected _host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost, args: ArgsType) {
-		this._host = host;
+		super(host);
 		this.args = args;
 	}
 

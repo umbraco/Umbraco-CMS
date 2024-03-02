@@ -1,5 +1,5 @@
-import type { UmbEntityAction } from './entity-action.interface.js';
 import type { UmbEntityActionArgs } from './types.js';
+import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -11,13 +11,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @implements {UmbEntityAction}
  * @template RepositoryType
  */
-export abstract class UmbEntityActionBase<ArgsMetaType> implements UmbEntityAction<ArgsMetaType> {
-	public args: UmbEntityActionArgs<ArgsMetaType>;
-	protected _host: UmbControllerHost;
-
+export abstract class UmbEntityActionBase<ArgsMetaType> extends UmbActionBase<UmbEntityActionArgs<ArgsMetaType>> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<ArgsMetaType>) {
-		this._host = host;
-		this.args = args;
+		super(host, args);
 	}
 
 	/**
