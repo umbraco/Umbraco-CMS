@@ -1,5 +1,5 @@
 import { UMB_STYLESHEET_ENTITY_TYPE } from '../../entity.js';
-import { UmbRenameEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_RENAME_STYLESHEET_REPOSITORY_ALIAS = 'Umb.Repository.Stylesheet.Rename';
@@ -16,12 +16,10 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'entityAction',
 		alias: UMB_RENAME_STYLESHEET_ENTITY_ACTION_ALIAS,
 		name: 'Rename Stylesheet Entity Action',
-		api: UmbRenameEntityAction,
-		weight: 200,
+		kind: 'rename',
 		meta: {
-			icon: 'icon-edit',
-			label: 'Rename...',
-			repositoryAlias: UMB_RENAME_STYLESHEET_REPOSITORY_ALIAS,
+			renameRepositoryAlias: UMB_RENAME_STYLESHEET_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS,
 			entityTypes: [UMB_STYLESHEET_ENTITY_TYPE],
 		},
 	},

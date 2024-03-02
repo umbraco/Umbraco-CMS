@@ -34,8 +34,7 @@ export interface MetaEntityAction {
 	entityTypes: Array<string>;
 }
 
-// TODO: Warren these don't seem to be used anywhere
-
+// DELETE
 export interface ManifestEntityActionDeleteKind extends ManifestEntityAction {
 	type: 'entityAction';
 	kind: 'delete';
@@ -44,5 +43,17 @@ export interface ManifestEntityActionDeleteKind extends ManifestEntityAction {
 
 export interface MetaEntityActionDeleteKind extends MetaEntityAction {
 	detailRepositoryAlias: string;
+	itemRepositoryAlias: string;
+}
+
+// RENAME
+export interface ManifestEntityActionRenameKind extends ManifestEntityAction {
+	type: 'entityAction';
+	kind: 'rename';
+	meta: MetaEntityActionRenameKind;
+}
+
+export interface MetaEntityActionRenameKind extends MetaEntityAction {
+	renameRepositoryAlias: string;
 	itemRepositoryAlias: string;
 }

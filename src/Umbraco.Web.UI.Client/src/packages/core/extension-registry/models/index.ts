@@ -3,7 +3,11 @@ import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
 import type { ManifestDashboardCollection } from './dashboard-collection.model.js';
-import type { ManifestEntityAction, ManifestEntityActionDeleteKind } from './entity-action.model.js';
+import type {
+	ManifestEntityAction,
+	ManifestEntityActionDeleteKind,
+	ManifestEntityActionRenameKind,
+} from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
 import type { ManifestExternalLoginProvider } from './external-login-provider.model.js';
@@ -95,6 +99,7 @@ export type ManifestTypes =
 	| ManifestDynamicRootQueryStep
 	| ManifestEntityAction
 	| ManifestEntityActionDeleteKind
+	| ManifestEntityActionRenameKind
 	| ManifestEntityBulkAction
 	| ManifestEntryPoint
 	| ManifestExternalLoginProvider
