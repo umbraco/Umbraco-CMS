@@ -19,7 +19,6 @@ export type UmbModalContextClassArgs<
 	data?: ModalAliasTypeAsToken['DATA'];
 	value?: ModalAliasTypeAsToken['VALUE'];
 	modal?: UmbModalConfig;
-	originTarget?: Element;
 };
 
 // TODO: consider splitting this into two separate handlers

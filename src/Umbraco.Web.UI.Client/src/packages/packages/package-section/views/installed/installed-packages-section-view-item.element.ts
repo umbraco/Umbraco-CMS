@@ -29,7 +29,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	@property()
 	version?: string | null;
 
-	@property()
+	@property({ type: Boolean, attribute: false })
 	hasPendingMigrations = false;
 
 	@property()
@@ -132,7 +132,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		// TODO: add dedicated modal for package views, and register it in a manifest.
 		alert('package view modal temporarily disabled. See comment in code.');
 		/*
-		this._modalContext?.open(element, {
+		this._modalContext?.open(this, element, {
 			data: { name: this.name, version: this.version },
 			size: 'full',
 			type: 'sidebar',

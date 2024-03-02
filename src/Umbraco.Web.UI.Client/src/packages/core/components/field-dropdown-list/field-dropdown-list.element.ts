@@ -88,7 +88,7 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	async #getDocumentTypeFields() {
 		if (!this.#modalManager) return;
-		const modalContext = this.#modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+		const modalContext = this.#modalManager.open(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: false,
@@ -108,7 +108,7 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	async #getMediaTypeFields() {
 		if (!this.#modalManager) return;
-		const modalContext = this.#modalManager.open(UMB_MEDIA_TYPE_PICKER_MODAL, {
+		const modalContext = this.#modalManager.open(this, UMB_MEDIA_TYPE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: false,
