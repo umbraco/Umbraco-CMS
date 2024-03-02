@@ -1,9 +1,11 @@
 import { UmbModalToken } from '../token/modal-token.js';
 import type { UmbModalConfig, UmbModalType } from './modal-manager.context.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 export interface UmbModalRejectReason {
 	type: string;
@@ -17,11 +19,10 @@ export type UmbModalContextClassArgs<
 	data?: ModalAliasTypeAsToken['DATA'];
 	value?: ModalAliasTypeAsToken['VALUE'];
 	modal?: UmbModalConfig;
-	originTarget?: Element;
 };
 
 // TODO: consider splitting this into two separate handlers
-export class UmbModalContext<ModalPreset extends object = object, ModalValue = any> extends EventTarget {
+export class UmbModalContext<ModalPreset extends object = object, ModalValue = any> extends UmbControllerBase {
 	//
 	#submitPromise: Promise<ModalValue>;
 	#submitResolver?: (value: ModalValue) => void;
@@ -32,20 +33,19 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 	public readonly router: IRouterSlot | null = null;
-	public readonly originTarget?: Element;
 	public readonly alias: string | UmbModalToken<ModalPreset, ModalValue>;
 
 	#value;
 	public readonly value;
 
 	constructor(
+		host: UmbControllerHost,
 		modalAlias: string | UmbModalToken<ModalPreset, ModalValue>,
 		args: UmbModalContextClassArgs<UmbModalToken>,
 	) {
-		super();
+		super(host);
 		this.key = args.modal?.key || UmbId.new();
 		this.router = args.router ?? null;
-		this.originTarget = args.originTarget;
 		this.alias = modalAlias;
 
 		if (this.alias instanceof UmbModalToken) {
@@ -129,5 +129,12 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	 */
 	public updateValue(partialValue: Partial<ModalValue>) {
 		this.#value.update(partialValue);
+	}
+
+	public destroy(): void {
+		this.#value.destroy();
+		(this as any).router = null;
+		(this as any).data = undefined;
+		super.destroy();
 	}
 }

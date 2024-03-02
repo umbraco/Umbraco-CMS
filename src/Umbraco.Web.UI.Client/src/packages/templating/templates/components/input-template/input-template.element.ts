@@ -4,7 +4,6 @@ import type { UmbTemplateItemModel } from '../../repository/item/index.js';
 import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
@@ -72,7 +71,6 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		super.value = newId;
 	}
 
-	private _modalContext?: UmbModalManagerContext;
 	private _templateItemRepository = new UmbTemplateItemRepository(this);
 
 	@state()
@@ -82,10 +80,6 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('template')
@@ -132,7 +126,8 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	async #openPicker() {
-		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: true,

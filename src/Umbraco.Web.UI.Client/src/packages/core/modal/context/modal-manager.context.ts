@@ -26,8 +26,9 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	/**
 	 * Opens a modal or sidebar modal
 	 * @public
-	 * @param {(string | UmbModalToken)} modalAlias
-	 * @param {UmbModalContextClassArgs} args
+	 * @param {UmbControllerHost} host - The host that the modal should be attached to, this is usually the controller/element that is opening the modal. This additionally acts as the modal origin for the context api.
+	 * @param {(string | UmbModalToken)} modalAlias - The alias or token of the modal to open
+	 * @param {UmbModalContextClassArgs} args - The arguments for this setup.
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalManagerContext
 	 */
@@ -36,10 +37,11 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 		ModalValue = unknown,
 		ModalAliasTypeAsToken extends UmbModalToken = UmbModalToken<ModalData, ModalValue>,
 	>(
+		host: UmbControllerHost,
 		modalAlias: UmbModalToken<ModalData, ModalValue> | string,
 		args: UmbModalContextClassArgs<ModalAliasTypeAsToken> = {},
 	) {
-		const modalContext = new UmbModalContext(modalAlias, args);
+		const modalContext = new UmbModalContext(host, modalAlias, args);
 
 		// Append to store:
 		this.#modals.setValue(

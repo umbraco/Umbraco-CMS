@@ -65,7 +65,7 @@ export class UmbDebugElement extends UmbLitElement {
 	}
 
 	private _openDialog() {
-		this._modalContext?.open(UMB_CONTEXT_DEBUGGER_MODAL, {
+		this._modalContext?.open(this, UMB_CONTEXT_DEBUGGER_MODAL, {
 			data: {
 				content: html`${this._renderContextAliases()}`,
 			},

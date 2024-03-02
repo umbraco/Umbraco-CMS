@@ -1,5 +1,5 @@
 import { type TinyMcePluginArguments, UmbTinyMcePluginBase } from '../components/input-tiny-mce/tiny-mce-plugin.js';
-import type { UmbLinkPickerModalValue, UmbLinkPickerLink, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import type { UmbLinkPickerModalValue, UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import { UMB_LINK_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 type AnchorElementAttributes = {
@@ -12,18 +12,12 @@ type AnchorElementAttributes = {
 };
 
 export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
-	#modalContext?: UmbModalManagerContext;
-
 	#linkPickerData?: UmbLinkPickerModalValue;
 
 	#anchorElement?: HTMLAnchorElement;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
-			this.#modalContext = modalContext;
-		});
 
 		// const editorEventSetupCallback = (buttonApi: { setEnabled: (state: boolean) => void }) => {
 		// 	const editorEventCallback = (eventApi: { element: Element}) => {
@@ -88,7 +82,8 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 	}
 
 	async #openLinkPicker(currentTarget?: UmbLinkPickerLink) {
-		const modalHandler = this.#modalContext?.open(UMB_LINK_PICKER_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalHandler = modalManager.open(this, UMB_LINK_PICKER_MODAL, {
 			data: {
 				config: {
 					ignoreUserStartNodes: this.configuration?.getValueByAlias<boolean>('ignoreUserStartNodes') ?? false,

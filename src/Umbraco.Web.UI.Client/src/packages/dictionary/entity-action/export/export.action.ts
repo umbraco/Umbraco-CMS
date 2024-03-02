@@ -1,25 +1,12 @@
 import type { UmbDictionaryExportRepository } from '../../repository/index.js';
 import { UMB_EXPORT_DICTIONARY_MODAL } from './export-dictionary-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryExportRepository> {
-	#modalContext?: UmbModalManagerContext;
-
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalContext = instance;
-		});
-	}
-
 	async execute() {
-		if (!this.#modalContext) return;
-
-		const modalContext = this.#modalContext?.open(UMB_EXPORT_DICTIONARY_MODAL, { data: { unique: this.unique } });
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_EXPORT_DICTIONARY_MODAL, { data: { unique: this.unique } });
 
 		const { includeChildren } = await modalContext.onSubmit();
 

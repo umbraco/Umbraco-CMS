@@ -9,7 +9,7 @@ export class UmbConfirmModalController extends UmbControllerBase {
 	async open(args: UmbConfirmModalArgs): Promise<void> {
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
-		const modalContext = modalManagerContext.open(UMB_CONFIRM_MODAL, {
+		const modalContext = modalManagerContext.open(this, UMB_CONFIRM_MODAL, {
 			data: args,
 		});
 

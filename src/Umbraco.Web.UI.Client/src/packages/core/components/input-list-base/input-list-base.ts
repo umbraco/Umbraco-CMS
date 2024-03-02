@@ -1,11 +1,6 @@
 import { html, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbModalManagerContext,
-	UmbModalToken,
-	UmbModalType,
-	UmbPickerModalValue,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalToken, UmbModalType, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -25,19 +20,12 @@ export class UmbInputListBaseElement extends UmbLitElement {
 
 	// TODO: not great that we use any, any here. Investigate if we can have some interface or base modal token for this type.
 	protected pickerToken?: UmbModalToken<any, any>;
-	private _modalContext?: UmbModalManagerContext;
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
-	}
-
-	private _openPicker() {
+	async #openPicker() {
 		if (!this.pickerToken) return;
 
-		const modalContext = this._modalContext?.open(this.pickerToken, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, this.pickerToken, {
 			data: {
 				multiple: this.multiple,
 				selection: this.value,
@@ -62,7 +50,7 @@ export class UmbInputListBaseElement extends UmbLitElement {
 	}
 
 	protected renderButton() {
-		return html`<uui-button id="add-button" look="placeholder" @click=${this._openPicker} label="open">
+		return html`<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">
 			${this.localize.term('general_add')}
 		</uui-button>`;
 	}

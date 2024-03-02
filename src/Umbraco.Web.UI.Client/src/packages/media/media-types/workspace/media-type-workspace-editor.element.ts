@@ -3,7 +3,6 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
@@ -27,18 +26,12 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 
 	#workspaceContext?: UmbMediaTypeWorkspaceContext;
 
-	private _modalContext?: UmbModalManagerContext;
-
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbMediaTypeWorkspaceContext;
 			this.#observeMediaType();
-		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
 		});
 	}
 
@@ -99,7 +92,8 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
-		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL, {
 			value: {
 				icon: this._icon,
 				color: this._iconColorAlias,

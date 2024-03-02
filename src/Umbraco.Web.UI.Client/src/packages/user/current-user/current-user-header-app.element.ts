@@ -2,7 +2,6 @@ import { UMB_CURRENT_USER_MODAL } from './modals/current-user/current-user-modal
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
@@ -16,14 +15,9 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	private _userAvatarUrls: Array<{ url: string; descriptor: string }> = [];
 
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-	#modalManagerContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalManagerContext = instance;
-		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
 			this.#currentUserContext = instance;
@@ -45,8 +39,9 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 		);
 	}
 
-	private _handleUserClick() {
-		this.#modalManagerContext?.open(UMB_CURRENT_USER_MODAL);
+	async #handleUserClick() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager.open(this, UMB_CURRENT_USER_MODAL);
 	}
 
 	#setUserAvatarUrls = async (user: UmbCurrentUserModel | undefined) => {
@@ -87,7 +82,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-button
-				@click=${this._handleUserClick}
+				@click=${this.#handleUserClick}
 				look="primary"
 				label="${this.localize.term('visuallyHiddenTexts_openCloseBackofficeProfileOptions')}"
 				compact>

@@ -55,7 +55,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	async #openPropertyEditorUIPicker() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const value = await modalManager
-			.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
+			.open(this, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
 				value: {
 					selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 				},
