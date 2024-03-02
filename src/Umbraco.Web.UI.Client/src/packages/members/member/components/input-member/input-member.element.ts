@@ -193,7 +193,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		// TODO: get the correct variant name
 		const name = item.variants[0].name;
 		return html`
-			<uui-ref-node name=${ifDefined(item.variants[0].name)} detail=${ifDefined(item.id)}>
+			<uui-ref-node name=${ifDefined(item.variants[0].name)} detail=${ifDefined(item.unique)}>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
@@ -222,8 +222,8 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	}
 	#renderIsTrashed(item: UmbMemberItemModel) {
 		// TODO: Uncomment, once the Management API model support deleted members. [LK]
-		if (!item.isTrashed) return;
-		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
+		// if (!item.isTrashed) return;
+		// return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
 	static styles = [
