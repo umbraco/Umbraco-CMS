@@ -29,7 +29,7 @@ export interface MetaEntityAction {
 	 *   "Create Content Template"
 	 * ]
 	 */
-	label: string;
+	label?: string;
 
 	entityTypes: Array<string>;
 }
