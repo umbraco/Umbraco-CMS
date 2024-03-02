@@ -1,4 +1,4 @@
-import { UmbEntityActionBase } from '../../entity-action.js';
+import { UmbEntityActionBase } from '../../entity-action-base.js';
 import type { UmbEntityActionArgs } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
