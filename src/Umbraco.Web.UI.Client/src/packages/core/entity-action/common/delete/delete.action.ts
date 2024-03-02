@@ -1,12 +1,11 @@
 import { UmbEntityActionBase } from '../../entity-action-base.js';
 import type { UmbEntityActionArgs } from '../../types.js';
+import type { MetaEntityActionDeleteKind } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
-export class UmbDeleteEntityAction<
-	DetailMetaArgs extends UmbEntityActionArgs<DetailMetaArgs>,
-> extends UmbEntityActionBase<DetailMetaArgs> {
-	constructor(host: UmbControllerHost, args: DetailMetaArgs) {
+export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionDeleteKind> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionDeleteKind>) {
 		super(host, args);
 	}
 
