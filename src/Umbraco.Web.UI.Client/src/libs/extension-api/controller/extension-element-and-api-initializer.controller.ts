@@ -1,5 +1,5 @@
 import { createExtensionElement } from '../functions/create-extension-element.function.js';
-import type { UmbApi } from '../index.js';
+import { createExtensionApi, type UmbApi } from '../index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestElementAndApi, ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
@@ -35,6 +35,15 @@ export class UmbExtensionElementAndApiInitializer<
 	 */
 	public get component() {
 		return this.#component;
+	}
+
+	/**
+	 * The api that is created for this extension.
+	 * @readonly
+	 * @type {(class | undefined)}
+	 */
+	public get api() {
+		return this.#api;
 	}
 
 	/**
@@ -87,15 +96,36 @@ export class UmbExtensionElementAndApiInitializer<
 	protected async _conditionsAreGood() {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
-		const newComponent = await createExtensionElement(manifest, this.#defaultElement);
+		const promises = await Promise.all([
+			createExtensionApi(manifest, this.#constructorArguments),
+			createExtensionElement(manifest, this.#defaultElement),
+		]);
+
+		const newApi = promises[0] as ExtensionApiInterface;
+		const newComponent = promises[1] as ExtensionElementInterface;
+
 		if (!this._isConditionsPositive) {
+			newApi?.destroy?.();
+			if (newComponent && 'destroy' in newComponent) {
+				(newComponent as unknown as { destroy: () => void }).destroy();
+			}
 			// We are not positive anymore, so we will back out of this creation.
 			return false;
 		}
-		this.#component = newComponent as ExtensionElementInterface;
+
+		this.#api = newApi;
+		if (!this.#api) {
+			(this.#api as any).manifest = manifest;
+			console.warn('Manifest did not provide any useful data for a api to be created.');
+		}
+
+		this.#component = newComponent;
 		if (this.#component) {
 			this.#assignProperties();
 			(this.#component as any).manifest = manifest;
+			if (this.#api) {
+				(this.#component as any).api = newApi;
+			}
 			return true; // we will confirm we have a component and are still good to go.
 		} else {
 			console.warn('Manifest did not provide any useful data for a web component to be created.');
@@ -112,10 +142,18 @@ export class UmbExtensionElementAndApiInitializer<
 			}
 			this.#component = undefined;
 		}
+		// Destroy the api:
+		if (this.#api) {
+			if ('destroy' in this.#api) {
+				(this.#api as unknown as { destroy: () => void }).destroy();
+			}
+			this.#api = undefined;
+		}
 	}
 
 	public destroy(): void {
 		super.destroy();
+		this.#constructorArguments = undefined;
 		this.#properties = undefined;
 	}
 }
