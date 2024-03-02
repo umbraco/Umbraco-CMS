@@ -31,7 +31,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 	}
 
 	async #requestContentTypes() {
-		const { data } = await this.#contentTypeRepository.requestRootTreeItems();
+		const { data } = await this.#contentTypeRepository.requestRootTreeItems({});
 
 		if (data) {
 			this._contentTypes = data.items.map((item) => ({
