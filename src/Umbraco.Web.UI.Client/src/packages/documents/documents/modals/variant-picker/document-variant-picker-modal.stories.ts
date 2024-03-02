@@ -94,7 +94,7 @@ import { UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, UmbDocumentVariantState } from '@um
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
-	modalManager.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
+	modalManager.open(this, UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
 		data: {
 			type: 'save',
 			variants: [

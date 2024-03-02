@@ -2,7 +2,6 @@ import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/i
 import { UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL } from '../snippet-modal/create-from-snippet-modal.token.js';
 import type { UmbPartialViewCreateOptionsModalData } from './index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
@@ -11,16 +10,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 	UmbPartialViewCreateOptionsModalData,
 	string
 > {
-	#modalManager?: UmbModalManagerContext;
 	#createFolderAction?: UmbCreateFolderEntityAction<any>;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalManager = instance;
-		});
-	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -52,7 +42,8 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 		event.stopPropagation();
 		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
-		const modalContext = this.#modalManager?.open(UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL, {
 			data: {
 				parent: this.data.parent,
 			},

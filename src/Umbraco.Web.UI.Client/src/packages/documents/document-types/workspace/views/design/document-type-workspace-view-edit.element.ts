@@ -296,7 +296,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 	async #openCompositionModal() {
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManagerContext.open(UMB_COMPOSITION_PICKER_MODAL, {
+		const modalContext = modalManagerContext.open(this, UMB_COMPOSITION_PICKER_MODAL, {
 			data: this._compositionConfiguration,
 		});
 		await modalContext?.onSubmit();

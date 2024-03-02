@@ -2,7 +2,6 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import { html, customElement, property, repeat, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
@@ -30,15 +29,6 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
-
-	private _modalContext?: UmbModalManagerContext;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
-	}
 
 	#onAdd() {
 		this.value = [...(this.value ?? []), { isSystem: false, icon: 'icon-stop', selected: true }];
@@ -74,11 +64,13 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	}
 
 	async #onIconChange(index: number) {
-		const icon = this.#iconReader((this.value ? this.value[index].icon : undefined) ?? '');
+		// This is not begin used? [NL]
+		//const icon = this.#iconReader((this.value ? this.value[index].icon : undefined) ?? '');
 
 		// TODO: send icon data to modal
-		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL);
-		const picked = await modalContext?.onSubmit();
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modal = modalManager.open(this, UMB_ICON_PICKER_MODAL);
+		const picked = await modal?.onSubmit();
 		if (!picked) return;
 
 		const values = [...(this.value ?? [])];

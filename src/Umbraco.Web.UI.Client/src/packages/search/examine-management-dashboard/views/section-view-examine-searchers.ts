@@ -1,6 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, UMB_EXAMINE_FIELDS_SETTINGS_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { SearchResultResponseModel, FieldPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { SearcherResource } from '@umbraco-cms/backoffice/external/backend-api';
@@ -17,8 +16,6 @@ interface ExposedSearchResultField {
 
 @customElement('umb-dashboard-examine-searcher')
 export class UmbDashboardExamineSearcherElement extends UmbLitElement {
-	private _modalContext?: UmbModalManagerContext;
-
 	@property()
 	searcherName!: string;
 
@@ -33,13 +30,6 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 
 	@query('#search-input')
 	private _searchInput!: HTMLInputElement;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
-		});
-	}
 
 	private _onNameClick() {
 		// TODO:
@@ -91,12 +81,24 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 		});
 	}
 
-	private _onFieldFilterClick() {
-		const modalContext = this._modalContext?.open(UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
+	async #onFieldFilterClick() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_EXAMINE_FIELDS_SETTINGS_MODAL, {
 			value: { fields: this._exposedFields ?? [] },
 		});
 		modalContext?.onSubmit().then((value) => {
 			this._exposedFields = value.fields;
+		});
+	}
+
+	async #onFieldViewClick(rowData: SearchResultResponseModel) {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager.open(this, 'umb-modal-element-fields-viewer', {
+			modal: {
+				type: 'sidebar',
+				size: 'medium',
+			},
+			data: { ...rowData, name: this.getSearchResultNodeName(rowData) },
 		});
 	}
 
@@ -155,14 +157,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 									class="bright"
 									look="secondary"
 									label="Open sidebar to see all fields"
-									@click="${() =>
-										this._modalContext?.open('umb-modal-element-fields-viewer', {
-											modal: {
-												type: 'sidebar',
-												size: 'medium',
-											},
-											data: { ...rowData, name: this.getSearchResultNodeName(rowData) },
-										})}">
+									@click=${() => this.#onFieldViewClick(rowData)}>
 									${rowData.fields ? Object.keys(rowData.fields).length : ''} fields
 								</uui-button>
 							</uui-table-cell>
@@ -171,7 +166,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 					})}
 				</uui-table>
 			</uui-scroll-container>
-			<button class="field-adder" @click="${this._onFieldFilterClick}">
+			<button class="field-adder" @click="${this.#onFieldFilterClick}">
 				<uui-icon-registry-essential>
 					<uui-tag look="secondary">
 						<uui-icon name="add"></uui-icon>

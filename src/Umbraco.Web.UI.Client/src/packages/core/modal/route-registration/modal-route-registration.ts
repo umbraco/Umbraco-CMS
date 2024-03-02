@@ -5,6 +5,7 @@ import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { Params } from '@umbraco-cms/backoffice/router';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
@@ -20,7 +21,7 @@ export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = Um
 			value: UmbModalTokenValue;
 	  };
 
-export class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenValue = any> {
+export abstract class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenValue = any> {
 	#key: string;
 	#path: string | null;
 	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string;
@@ -41,9 +42,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	/**
 	 * Should returns the host element of the modal, but this simple registration is not capable of that. So it has to be overwritten by a more specific implementation.
 	 */
-	protected getControllerHostElement(): Element | undefined {
-		return undefined;
-	}
+	protected abstract getControllerHost(): UmbControllerHost;
 
 	// Notice i removed the key in the transferring to this class.
 	constructor(modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string, path: string | null = null) {
@@ -140,11 +139,10 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 				modal: {},
 				...modalData,
 				router,
-				originTarget: this.getControllerHostElement(),
 			};
 			args.modal.key = this.#key;
 
-			this.#modalContext = modalManagerContext.open(this.#modalAlias, args);
+			this.#modalContext = modalManagerContext.open(this.getControllerHost(), this.#modalAlias, args);
 			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalContext;
 		}

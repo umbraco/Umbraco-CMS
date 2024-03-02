@@ -7,14 +7,8 @@ import type {
 import { UMB_EMBEDDED_MEDIA_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase {
-	#modalContext?: UmbModalManagerContext;
-
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
-			this.#modalContext = modalContext;
-		});
 
 		this.editor.ui.registry.addButton('umbembeddialog', {
 			icon: 'embed',
@@ -76,7 +70,8 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 	}
 
 	async #showModal(selectedElm: HTMLElement, embeddedMediaModalData: UmbEmbeddedMediaModalData) {
-		const modalHandler = this.#modalContext?.open(UMB_EMBEDDED_MEDIA_MODAL, { data: embeddedMediaModalData });
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalHandler = modalManager.open(this, UMB_EMBEDDED_MEDIA_MODAL, { data: embeddedMediaModalData });
 
 		if (!modalHandler) return;
 

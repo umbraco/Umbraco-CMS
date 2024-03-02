@@ -4,21 +4,15 @@ import type { UmbMediaCreateOptionsModalData } from './media-create-options-moda
 import { UMB_MEDIA_CREATE_OPTIONS_MODAL } from './media-create-options-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateMediaEntityAction extends UmbEntityActionBase<UmbMediaDetailRepository> {
-	#modalContext?: UmbModalManagerContext;
 	#itemRepository;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias, unique, entityType);
 
 		this.#itemRepository = new UmbMediaItemRepository(host);
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalContext = instance;
-		});
 	}
 
 	async execute() {
@@ -43,8 +37,8 @@ export class UmbCreateMediaEntityAction extends UmbEntityActionBase<UmbMediaDeta
 	}
 
 	private async _openModal(modalData: UmbMediaCreateOptionsModalData) {
-		if (!this.#modalContext) return;
-		this.#modalContext.open(UMB_MEDIA_CREATE_OPTIONS_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager.open(this, UMB_MEDIA_CREATE_OPTIONS_MODAL, {
 			data: modalData,
 		});
 	}

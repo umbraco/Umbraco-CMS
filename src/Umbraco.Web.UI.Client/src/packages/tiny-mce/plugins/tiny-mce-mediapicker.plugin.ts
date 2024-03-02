@@ -26,7 +26,6 @@ interface MediaPickerResultData {
 
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#currentUser?: UmbCurrentUserModel;
-	#modalContext?: UmbModalManagerContext;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#temporaryFileRepository;
 
@@ -34,10 +33,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		super(args);
 
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(args.host);
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
-			this.#modalContext = modalContext;
-		});
 
 		// TODO => this breaks tests. disabling for now
 		// will ignore user media start nodes
@@ -136,7 +131,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		*/
 
 		// TODO => startNodeId and startNodeIsVirtual do not exist on ContentTreeItemResponseModel
-		const modalHandler = this.#modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalHandler = modalManager.open(this, UMB_MEDIA_TREE_PICKER_MODAL, {
 			data: {
 				multiple: false,
 				//startNodeId,

@@ -17,7 +17,7 @@ export interface UmbPickDocumentVariantModalArgs {
 
 export class UmbPickDocumentVariantModalController extends UmbControllerBase {
 	async open(args: UmbPickDocumentVariantModalArgs): Promise<UmbVariantId[]> {
-		const modalManagerContext = await this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, () => {}).asPromise();
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const selected = args.selected ?? [];
 
 		const modalData: UmbDocumentVariantPickerModalData = {
@@ -29,14 +29,14 @@ export class UmbPickDocumentVariantModalController extends UmbControllerBase {
 			// TODO: What do to when there is no options? [NL]
 		}
 
-		const modalContext = modalManagerContext.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
+		const modal = modalManager.open(this, UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
 			data: modalData,
 			// We need to turn the selected variant ids into strings for them to be serializable to the value state, in other words the value of a modal cannot hold class instances:
 			// Make selection unique by filtering out duplicates:
 			value: { selection: selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i) ?? [] },
 		});
 
-		const p = modalContext.onSubmit();
+		const p = modal.onSubmit();
 		p.catch(() => this.destroy());
 		const result = await p;
 
