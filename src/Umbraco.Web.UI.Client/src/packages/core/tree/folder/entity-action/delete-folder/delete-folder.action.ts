@@ -1,4 +1,4 @@
-import { UmbEntityActionBase } from '../../../../entity-action/entity-action.js';
+import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import type { UmbFolderRepository } from '@umbraco-cms/backoffice/tree';
 
