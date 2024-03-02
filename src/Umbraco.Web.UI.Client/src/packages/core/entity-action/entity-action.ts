@@ -1,20 +1,12 @@
-import type { UmbAction } from '../action/index.js';
-import { UmbActionBase } from '../action/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Interface for an entity action.
  * @export
- * @interface UmbEntityAction<RepositoryType>
- * @extends {UmbAction<RepositoryType>}
- * @template RepositoryType
+ * @interface UmbEntityAction
  */
-export interface UmbEntityAction<RepositoryType> extends UmbAction<RepositoryType> {
-	/**
-	 * The unique identifier of the entity.
-	 * @type {string}
-	 */
-	unique: string;
+export interface UmbEntityAction<ArgsMetaType> {
+	args: UmbEntityActionArgs<ArgsMetaType>;
 
 	/**
 	 * The href location, the action will act as a link.
@@ -33,32 +25,18 @@ export interface UmbEntityAction<RepositoryType> extends UmbAction<RepositoryTyp
  * Base class for an entity action.
  * @export
  * @abstract
- * @class UmbEntityActionBase<RepositoryType>
- * @extends {UmbActionBase<RepositoryType>}
- * @implements {UmbEntityAction<RepositoryType>}
+ * @class UmbEntityActionBase
+ * @extends {UmbActionBase}
+ * @implements {UmbEntityAction}
  * @template RepositoryType
  */
-export abstract class UmbEntityActionBase<RepositoryType>
-	extends UmbActionBase<RepositoryType>
-	implements UmbEntityAction<RepositoryType>
-{
-	entityType: string;
-	unique: string;
-	repositoryAlias: string;
+export abstract class UmbEntityActionBase<ArgsMetaType> implements UmbEntityAction<ArgsMetaType> {
+	public args: UmbEntityActionArgs<ArgsMetaType>;
+	protected _host: UmbControllerHost;
 
-	/**
-	 * Creates an instance of UmbEntityActionBase<RepositoryType>.
-	 * @param {UmbControllerHost} host
-	 * @param {string} repositoryAlias
-	 * @param {string} unique
-	 * @param {string} entityType
-	 * @memberof UmbEntityActionBase<RepositoryType>
-	 */
-	constructor(host: UmbControllerHost, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias);
-		this.entityType = entityType;
-		this.unique = unique;
-		this.repositoryAlias = repositoryAlias;
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<ArgsMetaType>) {
+		this._host = host;
+		this.args = args;
 	}
 
 	/**
