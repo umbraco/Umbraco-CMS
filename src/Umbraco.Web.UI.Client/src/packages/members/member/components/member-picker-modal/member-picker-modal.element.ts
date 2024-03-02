@@ -4,7 +4,6 @@ import type { UmbMemberPickerModalValue, UmbMemberPickerModalData } from './memb
 import { html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbMemberItemModel } from '../../repository/index.js';
 
 @customElement('umb-member-picker-modal')
 export class UmbMemberPickerModalElement extends UmbModalBaseElement<

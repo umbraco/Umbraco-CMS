@@ -1,3 +1,4 @@
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -9,15 +10,18 @@ import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
  */
 @customElement('umb-property-editor-ui-member-picker')
 export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _value: Array<string> = [];
+	// private _value: Array<string> = [];
 
-	@property({ type: Array })
-	public get value(): Array<string> {
-		return this._value;
-	}
-	public set value(value: Array<string>) {
-		this._value = Array.isArray(value) ? value : value ? [value] : [];
-	}
+	// @property({ type: Array })
+	// public get value(): Array<string> {
+	// 	return this._value;
+	// }
+	// public set value(value: Array<string>) {
+	// 	this._value = Array.isArray(value) ? value : value ? [value] : [];
+	// }
+
+	@property({ type: String })
+	public value: string = '';
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -28,23 +32,33 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 	}
 
 	@state()
+	_items: Array<string> = [];
+
+	@state()
 	private _limitMin?: number;
 	@state()
 	private _limitMax?: number;
 
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('value')) {
+			this._items = this.value ? this.value.split(',') : [];
+		}
+	}
+
 	private _onChange(event: CustomEvent) {
-		console.log('event', event);
-		this.value = (event.target as UmbInputMemberElement).selectedIds;
-		console.log('this.value', this.value);
+		//TODO: This is a hack, something changed so now we need to convert the array to a comma separated string to make it work with the server.
+		const toCommaSeparatedString = (event.target as UmbInputMemberElement).selectedIds.join(',');
+		// this.value = (event.target as UmbInputMemberElement).selectedIds;
+		this.value = toCommaSeparatedString;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
-	// TODO: Implement mandatory?
 	render() {
 		return html`
 			<umb-input-member
 				@change=${this._onChange}
-				.selectedIds=${this._value}
+				.selectedIds=${this._items}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}
 				>Add</umb-input-member
