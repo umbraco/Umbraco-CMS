@@ -65,19 +65,23 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 	/**
 	 * Sets the manifest
-	 * @param {ManifestCollection} manifest
-	 * @memberof UmbCollectionContext
+	 * @param {ManifestTree} manifest
+	 * @memberof UmbDefaultTreeContext
 	 */
-	public setManifest(manifest: ManifestTree | undefined) {
+	public set manifest(manifest: ManifestTree | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
 		this.#observeRepository(this.#manifest?.meta.repositoryAlias);
 	}
+	public get manifest() {
+		return this.#manifest;
+	}
 
+	// TODO: getManifest, could be refactored to use the getter method [NL]
 	/**
 	 * Returns the manifest.
-	 * @return {ManifestCollection}
-	 * @memberof UmbCollectionContext
+	 * @return {ManifestTree}
+	 * @memberof UmbDefaultTreeContext
 	 */
 	public getManifest() {
 		return this.#manifest;
