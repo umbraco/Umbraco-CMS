@@ -12,7 +12,6 @@ const entityActions: Array<ManifestTypes> = [
 		kind: 'delete',
 		alias: 'Umb.EntityAction.DataType.Delete',
 		name: 'Delete Data Type Entity Action',
-		weight: 900,
 		meta: {
 			detailRepositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
