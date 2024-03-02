@@ -4,13 +4,13 @@ import {
 	UMB_ENABLE_USER_REPOSITORY_ALIAS,
 	UMB_UNLOCK_USER_REPOSITORY_ALIAS,
 	UMB_USER_DETAIL_REPOSITORY_ALIAS,
+	UMB_USER_ITEM_REPOSITORY_ALIAS,
 } from '../repository/index.js';
 import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbDisableUserEntityAction } from './disable/disable-user.action.js';
 import { UmbEnableUserEntityAction } from './enable/enable-user.action.js';
 import { UmbChangeUserPasswordEntityAction } from './change-password/change-user-password.action.js';
 import { UmbUnlockUserEntityAction } from './unlock/unlock-user.action.js';
-import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -18,12 +18,10 @@ const entityActions: Array<ManifestTypes> = [
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.User.Delete',
 		name: 'Delete User Entity Action',
-		weight: 900,
-		api: UmbDeleteEntityAction,
+		kind: 'delete',
 		meta: {
-			icon: 'icon-trash',
-			label: 'Delete',
-			repositoryAlias: UMB_USER_DETAIL_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_USER_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_USER_ITEM_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [

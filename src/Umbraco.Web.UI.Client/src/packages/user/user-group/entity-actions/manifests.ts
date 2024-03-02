@@ -1,19 +1,16 @@
-import { UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS, UMB_USER_GROUP_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
-import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestEntityAction> = [
+const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.UserGroup.Delete',
 		name: 'Delete User Group Entity Action',
-		weight: 900,
-		api: UmbDeleteEntityAction,
+		kind: 'delete',
 		meta: {
-			icon: 'icon-trash',
-			label: 'Delete...',
-			repositoryAlias: UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_USER_GROUP_ITEM_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_GROUP_ENTITY_TYPE],
 		},
 	},

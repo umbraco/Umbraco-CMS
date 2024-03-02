@@ -1,26 +1,23 @@
-import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS, DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import {
 	UmbCopyEntityAction,
 	UmbMoveEntityAction,
-	UmbDeleteEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'document-type';
 
-const entityActions: Array<ManifestEntityAction> = [
+const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.DocumentType.Delete',
 		name: 'Delete Document-Type Entity Action',
-		weight: 900,
-		api: UmbDeleteEntityAction,
+		kind: 'delete',
 		meta: {
-			icon: 'icon-trash',
-			label: 'Delete',
-			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+			detailRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [entityType],
 		},
 	},

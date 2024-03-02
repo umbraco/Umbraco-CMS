@@ -3,14 +3,15 @@ import {
 	UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 	UMB_DICTIONARY_EXPORT_REPOSITORY_ALIAS,
 	UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS,
+	UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
 } from '../repository/index.js';
 import UmbImportDictionaryEntityAction from './import/import.action.js';
 import UmbExportDictionaryEntityAction from './export/export.action.js';
 import UmbCreateDictionaryEntityAction from './create/create.action.js';
-import { UmbDeleteEntityAction, UmbMoveEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbMoveEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestEntityAction> = [
+const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Dictionary.Create',
@@ -67,12 +68,10 @@ const entityActions: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Dictionary.Delete',
 		name: 'Delete Dictionary Entity Action',
-		weight: 100,
-		api: UmbDeleteEntityAction,
+		kind: 'delete',
 		meta: {
-			icon: 'icon-trash',
-			label: 'Delete',
-			repositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
