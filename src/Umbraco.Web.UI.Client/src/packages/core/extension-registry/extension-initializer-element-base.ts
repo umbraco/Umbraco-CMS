@@ -16,20 +16,23 @@ export abstract class UmbExtensionInitializerElementBase<
 	}
 	set alias(newVal) {
 		this._alias = newVal;
-		this.#observeManifest();
+		//this.#observeManifest();
 	}
 
 	@property({ type: Object, attribute: false })
 	get props() {
-		return this.#props;
+		//return this.#props;
+		return {};
 	}
 	set props(newVal: Record<string, unknown> | undefined) {
 		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
-		this.#props = newVal;
+		/*this.#props = newVal;
 		if (this.#extensionElementController) {
 			this.#extensionElementController.properties = newVal;
-		}
+		}*/
 	}
+
+	/*
 	#props?: Record<string, unknown> = {};
 
 	#extensionElementController?: UmbExtensionElementInitializer<ManifestType>;
@@ -85,4 +88,5 @@ export abstract class UmbExtensionInitializerElementBase<
 	render() {
 		return html`${this._element}`;
 	}
+	*/
 }

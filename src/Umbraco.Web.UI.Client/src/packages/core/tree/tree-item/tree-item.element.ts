@@ -28,8 +28,8 @@ export class UmbTreeItemElement extends UmbExtensionInitializerElementBase<Manif
 				if (!manifests) return;
 				// TODO: what should we do if there are multiple tree items for an entity type?
 				const manifest = manifests[0];
-				this.createApi(manifest);
-				this.createElement(manifest);
+				//this.createApi(manifest);
+				//this.createElement(manifest);
 			},
 			'umbObserveTreeManifest',
 		);
