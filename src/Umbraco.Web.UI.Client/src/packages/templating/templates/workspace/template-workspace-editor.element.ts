@@ -14,6 +14,8 @@ import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
+	#modalContext?: UmbModalManagerContext;
+
 	@state()
 	private _name?: string | null = '';
 
@@ -43,7 +45,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
+			this.#modalContext = instance;
 		});
 
 		this.consumeContext(UMB_TEMPLATE_WORKSPACE_CONTEXT, (workspaceContext) => {
@@ -105,10 +107,8 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		this._codeEditor?.insert(value);
 	}
 
-	private _modalContext?: UmbModalManagerContext;
-
 	#openInsertSectionModal() {
-		const sectionModal = this._modalContext?.open(UMB_TEMPLATING_SECTION_PICKER_MODAL);
+		const sectionModal = this.#modalContext?.open(this, UMB_TEMPLATING_SECTION_PICKER_MODAL);
 
 		sectionModal?.onSubmit().then((insertSectionModalValue) => {
 			if (insertSectionModalValue?.value) {
@@ -122,7 +122,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#openMasterTemplatePicker() {
-		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalContext = this.#modalContext?.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				pickableFilter: (item) => {
@@ -141,7 +141,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#openQueryBuilder() {
-		const queryBuilderModal = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
+		const queryBuilderModal = this.#modalContext?.open(this, UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
 		queryBuilderModal?.onSubmit().then((queryBuilderModalValue) => {
 			if (queryBuilderModalValue?.value) {
