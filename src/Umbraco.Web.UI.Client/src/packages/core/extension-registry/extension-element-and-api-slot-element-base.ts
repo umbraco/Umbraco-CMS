@@ -44,7 +44,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 	#observeManifest() {
 		if (!this._alias) return;
 
-		new UmbExtensionElementAndApiInitializer<ManifestType>(
+		this.#extensionController = new UmbExtensionElementAndApiInitializer<ManifestType>(
 			this,
 			umbExtensionsRegistry,
 			this._alias,
@@ -52,6 +52,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 			this.#extensionChanged,
 			this.getDefaultElementName(),
 		);
+		this.#extensionController.properties = this.#props;
 	}
 
 	#extensionChanged = (isPermitted: boolean, controller: UmbExtensionElementAndApiInitializer<ManifestType>) => {
