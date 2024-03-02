@@ -37,7 +37,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 
 	// close the modal when navigating to data type
 	#onNavigate() {
-		this._rejectModal();
+		this._submitModal();
 	}
 
 	render() {
