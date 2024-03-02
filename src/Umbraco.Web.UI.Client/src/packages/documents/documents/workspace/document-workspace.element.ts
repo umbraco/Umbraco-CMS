@@ -30,7 +30,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 
 		this._routes = [
 			{
-				path: 'create/parent/:entityType/:unique/:documentTypeUnique',
+				path: 'create/parent/:entityType/:parentUnique/:documentTypeUnique',
 				component: this.#editorElement,
 				setup: async (_component, info) => {
 					// TODO: Remember the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
