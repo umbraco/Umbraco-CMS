@@ -1,6 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbControllerHostProviderElement } from './controller-host-provider.element.js';
 import { UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
+import type { UmbControllerHostElement } from './controller-host-element.interface.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 
