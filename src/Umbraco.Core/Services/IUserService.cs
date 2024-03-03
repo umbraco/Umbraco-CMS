@@ -246,7 +246,7 @@ public interface IUserService : IMembershipUserService
     /// Get paged UserGroups
     /// </summary>
     /// <param name="page"></param>
-    /// <param name="pageSize">Default is 20</param>
+    /// <param name="pageSize"></param>
     /// <returns></returns>
     IEnumerable<IUserGroup> GetPagedUserGroups(int page, out long totalGroups, int pageSize, string searchTerm = "");
 

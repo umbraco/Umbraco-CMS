@@ -8,7 +8,7 @@ public interface IUserGroupRepository : IReadWriteQueryRepository<int, IUserGrou
     ///     Gets a group by it's alias
     /// </summary>
     /// <param name="alias"></param>
-    /// <returns></returns>GetPagedUserGroups
+    /// <returns></returns>
     IUserGroup? Get(string alias);
 
     /// <summary>
