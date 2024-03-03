@@ -1,14 +1,15 @@
-import type { UmbDocumentDetailRepository } from '../../repository/index.js';
+import type { UmbEntityBulkActionArgs } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbDocumentDeleteEntityBulkAction extends UmbEntityBulkActionBase<UmbDocumentDetailRepository> {
-	constructor(host: UmbControllerHost, repositoryAlias: string, selection: Array<string>) {
-		super(host, repositoryAlias, selection);
+export class UmbDocumentDeleteEntityBulkAction extends UmbEntityBulkActionBase<never> {
+	constructor(host: UmbControllerHost, args: UmbEntityBulkActionArgs<never>) {
+		super(host, args);
 	}
 
 	async execute() {
-		console.log(`execute delete for: ${this.selection}`);
-		//await this.repository?.delete();
+		console.log('execute bulk delete');
 	}
+
+	destroy(): void {}
 }

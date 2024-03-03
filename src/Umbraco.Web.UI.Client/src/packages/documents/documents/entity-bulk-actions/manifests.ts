@@ -3,7 +3,7 @@ import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_PUBLISHING_REPOSITOR
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action.js';
 import { UmbDocumentDeleteEntityBulkAction } from './delete/delete.action.js';
-import { UmbDocumentMoveEntityBulkAction } from './move/move.action.js';
+import { UmbMoveDocumentEntityBulkAction } from './move/move.action.js';
 import { UmbDocumentPublishEntityBulkAction } from './publish/publish.action.js';
 import { UmbDocumentUnpublishEntityBulkAction } from './unpublish/unpublish.action.js';
 import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
@@ -81,7 +81,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		alias: 'Umb.EntityBulkAction.Document.Move',
 		name: 'Move Document Entity Bulk Action',
 		weight: 20,
-		api: UmbDocumentMoveEntityBulkAction,
+		api: UmbMoveDocumentEntityBulkAction,
 		meta: {
 			label: 'Move',
 			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
