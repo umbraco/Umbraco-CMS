@@ -3,12 +3,12 @@ import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction, MetaEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-entity-action')
 export class UmbEntityActionElement<
-	ArgsMetaType extends object = object,
-	ApiType extends UmbEntityAction<ArgsMetaType> = UmbEntityAction<ArgsMetaType>,
+	MetaType extends MetaEntityAction = MetaEntityAction,
+	ApiType extends UmbEntityAction<MetaType> = UmbEntityAction<MetaType>,
 > extends UmbLitElement {
 	#api?: ApiType;
 
@@ -19,7 +19,7 @@ export class UmbEntityActionElement<
 	public unique?: string | null;
 
 	@property({ attribute: false })
-	public manifest?: ManifestEntityAction<ArgsMetaType>;
+	public manifest?: ManifestEntityAction<MetaType>;
 
 	@property({ attribute: false })
 	public set api(api: ApiType | undefined) {
