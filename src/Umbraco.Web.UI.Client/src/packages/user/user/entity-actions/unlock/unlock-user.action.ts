@@ -1,23 +1,20 @@
-import type { UmbUnlockUserRepository } from '../../repository/index.js';
+import { UmbUnlockUserRepository } from '../../repository/index.js';
 import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
+import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
-export class UmbUnlockUserEntityAction extends UmbEntityActionBase<UmbUnlockUserRepository> {
-	#itemRepository: UmbUserItemRepository;
-
-	constructor(host: UmbControllerHost, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
-
-		this.#itemRepository = new UmbUserItemRepository(this);
+export class UmbUnlockUserEntityAction extends UmbEntityActionBase<never> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
+		super(host, args);
 	}
 
 	async execute() {
-		if (!this.unique) throw new Error('Unique is not available');
-		if (!this.repository) return;
+		if (!this.args.unique) throw new Error('Unique is not available');
 
-		const { data } = await this.#itemRepository.requestItems([this.unique]);
+		const itemRepository = new UmbUserItemRepository(this);
+		const { data } = await itemRepository.requestItems([this.args.unique]);
 
 		if (data) {
 			const item = data[0];
@@ -28,7 +25,10 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<UmbUnlockUser
 				confirmLabel: 'Unlock',
 			});
 
-			await this.repository?.unlock([this.unique]);
+			const unlockUserRepository = new UmbUnlockUserRepository(this);
+			await unlockUserRepository?.unlock([this.args.unique]);
 		}
 	}
+
+	destroy(): void {}
 }
