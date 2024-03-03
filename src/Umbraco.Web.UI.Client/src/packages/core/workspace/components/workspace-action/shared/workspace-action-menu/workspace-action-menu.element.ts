@@ -59,8 +59,8 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				const containsAlias = Array.isArray(action.meta.workspaceActions)
 					? action.meta.workspaceActions
 					: [action.meta.workspaceActions].some((alias) => this.workspaceActions.includes(alias));
-				const isValidEntityType = !action.meta.entityTypes.length || action.meta.entityTypes.includes(entityType);
-				return containsAlias && isValidEntityType;
+				//const isValidEntityType = !action.forEntityTypes.length || action.forEntityTypes.includes(entityType);
+				return containsAlias; // && isValidEntityType;
 			},
 			(ctrls) => {
 				this._actions = ctrls;
