@@ -1,8 +1,5 @@
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import { UmbPublishDocumentEntityAction } from './publish.action.js';
-import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action.js';
-import { UmbUnpublishDocumentEntityAction } from './unpublish.action.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
@@ -18,7 +15,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Document.CreateBlueprint',
 		name: 'Create Document Blueprint Entity Action',
 		weight: 800,
-		api: UmbCreateDocumentBlueprintEntityAction,
+		api: () => import('./create-blueprint.action.js'),
 		kind: 'default',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
@@ -55,6 +52,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Document.Publish',
 		name: 'Publish Document Entity Action',
 		api: UmbPublishDocumentEntityAction,
+		api: () => import('./publish.action.js'),
 		kind: 'default',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
@@ -66,7 +64,7 @@ const entityActions: Array<ManifestTypes> = [
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.Unpublish',
 		name: 'Unpublish Document Entity Action',
-		api: UmbUnpublishDocumentEntityAction,
+		api: () => import('./unpublish.action.js'),
 		kind: 'default',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {

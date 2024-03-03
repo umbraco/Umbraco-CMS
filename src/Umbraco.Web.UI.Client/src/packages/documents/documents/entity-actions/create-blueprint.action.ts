@@ -14,3 +14,4 @@ export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<
 
 	destroy(): void {}
 }
+export default UmbCreateDocumentBlueprintEntityAction;
