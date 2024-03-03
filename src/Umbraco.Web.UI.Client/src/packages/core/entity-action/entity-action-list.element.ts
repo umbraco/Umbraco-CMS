@@ -1,6 +1,6 @@
 import type { UmbEntityActionArgs } from './types.js';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction, MetaEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-entity-action-list')
@@ -13,13 +13,13 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		if (value === undefined || value === this._props.entityType) return;
 		this._props.entityType = value;
 		const oldValue = this._filter;
-		this._filter = (extension: ManifestEntityAction<unknown>) => extension.meta.entityTypes.includes(value);
+		this._filter = (extension: ManifestEntityAction<MetaEntityAction>) => extension.meta.entityTypes.includes(value);
 		this.requestUpdate('_filter', oldValue);
 		this.requestUpdate('_props');
 	}
 
 	@state()
-	_filter?: (extension: ManifestEntityAction<unknown>) => boolean;
+	_filter?: (extension: ManifestEntityAction<MetaEntityAction>) => boolean;
 
 	@property({ type: String })
 	public get unique(): string | null | undefined {
