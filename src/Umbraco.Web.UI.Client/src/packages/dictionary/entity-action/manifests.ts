@@ -1,8 +1,5 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
-import {
-	UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
-	UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
-} from '../repository/index.js';
+import { UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS, UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -12,7 +9,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Dictionary.Create',
 		name: 'Create Dictionary Entity Action',
 		weight: 600,
-		api: import('./create/create.action.js'),
+		api: () => import('./create/create.action.js'),
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
@@ -36,7 +33,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Dictionary.Export',
 		name: 'Export Dictionary Entity Action',
 		weight: 400,
-		api: import('./export/export.action.js'),
+		api: () => import('./export/export.action.js'),
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-download-alt',
@@ -49,7 +46,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Dictionary.Import',
 		name: 'Import Dictionary Entity Action',
 		weight: 300,
-		api: import('./import/import.action.js'),
+		api: () => import('./import/import.action.js'),
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-page-up',
@@ -58,9 +55,9 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.Dictionary.Delete',
 		name: 'Delete Dictionary Entity Action',
-		kind: 'delete',
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
