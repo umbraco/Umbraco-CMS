@@ -53,21 +53,45 @@ export class UmbExtensionElementAndApiInitializer<
 	 * @example
 	 * ```ts
 	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);
-	 * controller.props = { foo: 'bar' };
+	 * controller.elementProps = { foo: 'bar' };
 	 * ```
 	 * Is equivalent to:
 	 * ```ts
 	 * controller.component.foo = 'bar';
 	 * ```
 	 */
-	#properties?: Record<string, unknown>;
-	get properties() {
-		return this.#properties;
+	#elProps?: Record<string, unknown>;
+	get elementProps() {
+		return this.#elProps;
 	}
-	set properties(newVal) {
-		this.#properties = newVal;
+	set elementProps(newVal) {
+		this.#elProps = newVal;
 		// TODO: we could optimize this so we only re-set the changed props.
-		this.#assignProperties();
+		this.#assignElProps();
+	}
+
+	/**
+	 * The props that are passed to the api.
+	 * @type {Record<string, any>}
+	 * @memberof UmbElementExtensionController
+	 * @example
+	 * ```ts
+	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);
+	 * controller.apiProperties = { foo: 'bar' };
+	 * ```
+	 * Is equivalent to:
+	 * ```ts
+	 * controller.api.foo = 'bar';
+	 * ```
+	 */
+	#apiProps?: Record<string, unknown>;
+	get apiProps() {
+		return this.#apiProps;
+	}
+	set apiProps(newVal) {
+		this.#apiProps = newVal;
+		// TODO: we could optimize this so we only re-set the changed props.
+		this.#assignApiProps();
 	}
 
 	constructor(
@@ -84,12 +108,20 @@ export class UmbExtensionElementAndApiInitializer<
 		this._init();
 	}
 
-	#assignProperties = () => {
-		if (!this.#component || !this.#properties) return;
+	#assignElProps = () => {
+		if (!this.#component || !this.#elProps) return;
 
 		// TODO: we could optimize this so we only re-set the updated props.
-		Object.keys(this.#properties).forEach((key) => {
-			(this.#component as any)[key] = this.#properties![key];
+		Object.keys(this.#elProps).forEach((key) => {
+			(this.#component as any)[key] = this.#elProps![key];
+		});
+	};
+	#assignApiProps = () => {
+		if (!this.#api || !this.#apiProps) return;
+
+		// TODO: we could optimize this so we only re-set the updated props.
+		Object.keys(this.#apiProps).forEach((key) => {
+			(this.#component as any)[key] = this.#apiProps![key];
 		});
 	};
 
@@ -112,6 +144,7 @@ export class UmbExtensionElementAndApiInitializer<
 
 		this.#api = newApi;
 		if (this.#api) {
+			this.#assignApiProps();
 			(this.#api as any).manifest = manifest;
 		} else {
 			console.warn('Manifest did not provide any useful data for a api to be created.');
@@ -119,7 +152,7 @@ export class UmbExtensionElementAndApiInitializer<
 
 		this.#component = newComponent;
 		if (this.#component) {
-			this.#assignProperties();
+			this.#assignElProps();
 			(this.#component as any).manifest = manifest;
 			if (this.#api) {
 				(this.#component as any).api = newApi;
@@ -152,6 +185,6 @@ export class UmbExtensionElementAndApiInitializer<
 	public destroy(): void {
 		super.destroy();
 		this.#constructorArguments = undefined;
-		this.#properties = undefined;
+		this.#elProps = undefined;
 	}
 }

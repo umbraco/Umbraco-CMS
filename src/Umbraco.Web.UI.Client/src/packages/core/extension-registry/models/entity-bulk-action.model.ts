@@ -8,7 +8,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * For example for content you may wish to move one or more documents in bulk
  */
 export interface ManifestEntityBulkAction<MetaType extends MetaEntityBulkAction>
-	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityBulkActionBase>,
+	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityBulkActionBase<MetaType>>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'entityBulkAction';
 	meta: MetaType;
