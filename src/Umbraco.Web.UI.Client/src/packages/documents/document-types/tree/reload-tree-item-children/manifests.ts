@@ -11,12 +11,10 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.DocumentType.Tree.ReloadChildrenOf',
 		name: 'Reload Document Type Tree Item Children Entity Action',
 		kind: 'reloadTreeItemChildren',
-		meta: {
-			entityTypes: [
-				UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-				UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-				UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-			],
-		},
+		forEntityTypes: [
+			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+		],
 	},
 ];

@@ -18,11 +18,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Create Dictionary Entity Action',
 		weight: 600,
 		api: UmbCreateDictionaryEntityAction,
+		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -31,11 +31,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Move Dictionary Entity Action',
 		weight: 500,
 		api: UmbMoveEntityAction,
+		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move',
 			repositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
 	{
@@ -44,11 +44,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Export Dictionary Entity Action',
 		weight: 400,
 		api: UmbExportDictionaryEntityAction,
+		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-download-alt',
 			label: 'Export',
 			repositoryAlias: UMB_DICTIONARY_EXPORT_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
 	{
@@ -57,11 +57,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Import Dictionary Entity Action',
 		weight: 300,
 		api: UmbImportDictionaryEntityAction,
+		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-page-up',
 			label: 'Import',
 			repositoryAlias: UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -69,10 +69,10 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Dictionary.Delete',
 		name: 'Delete Dictionary Entity Action',
 		kind: 'delete',
+		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
 ];

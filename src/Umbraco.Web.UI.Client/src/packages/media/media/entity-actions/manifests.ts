@@ -9,10 +9,10 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Media.Delete',
 		name: 'Delete Media Entity Action ',
 		kind: 'delete',
+		forEntityTypes: ['media'],
 		meta: {
 			itemRepositoryAlias: UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: ['media'],
 		},
 	},
 ];

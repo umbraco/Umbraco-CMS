@@ -13,7 +13,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 		if (value === undefined || value === this._props.entityType) return;
 		this._props.entityType = value;
 		const oldValue = this._filter;
-		this._filter = (extension: ManifestEntityAction<MetaEntityAction>) => extension.meta.entityTypes.includes(value);
+		this._filter = (extension: ManifestEntityAction<MetaEntityAction>) => extension.forEntityTypes.includes(value);
 		this.requestUpdate('_filter', oldValue);
 		this.requestUpdate('_props');
 	}

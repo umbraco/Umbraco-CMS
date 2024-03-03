@@ -11,10 +11,10 @@ export const manifest: UmbBackofficeManifestKind = {
 		kind: 'reloadTreeItemChildren',
 		api: UmbReloadTreeItemChildrenEntityAction,
 		weight: 100,
+		forEntityTypes: [],
 		meta: {
 			icon: 'icon-refresh',
 			label: 'Reload children',
-			entityTypes: [],
 		},
 	},
 };

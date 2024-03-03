@@ -11,10 +11,10 @@ export const manifest: UmbBackofficeManifestKind = {
 		kind: 'rename',
 		api: UmbRenameEntityAction,
 		weight: 200,
+		forEntityTypes: [],
 		meta: {
 			icon: 'icon-edit',
 			label: 'Rename...',
-			entityTypes: [],
 			renameRepositoryAlias: '',
 			itemRepositoryAlias: '',
 		},

@@ -47,13 +47,11 @@ const treeItem: ManifestTreeItem = {
 	kind: 'default',
 	alias: 'Umb.TreeItem.DocumentType',
 	name: 'Document Type Tree Item',
-	meta: {
-		entityTypes: [
-			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-		],
-	},
+	forEntityTypes: [
+		UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+		UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+		UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+	],
 };
 
 export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests, ...reloadManifests];

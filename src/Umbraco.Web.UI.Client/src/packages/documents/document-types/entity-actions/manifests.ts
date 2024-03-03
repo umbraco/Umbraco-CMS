@@ -15,10 +15,10 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.DocumentType.Delete',
 		name: 'Delete Document-Type Entity Action',
 		kind: 'delete',
+		forEntityTypes: [entityType],
 		meta: {
 			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [entityType],
 		},
 	},
 	{
@@ -27,11 +27,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Move Document-Type Entity Action',
 		weight: 700,
 		api: UmbMoveEntityAction,
+		forEntityTypes: [entityType],
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move',
 			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [entityType],
 		},
 	},
 	{
@@ -40,11 +40,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Copy Document-Type Entity Action',
 		weight: 600,
 		api: UmbDuplicateEntityAction,
+		forEntityTypes: [entityType],
 		meta: {
 			icon: 'icon-documents',
 			label: 'Copy',
 			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [entityType],
 		},
 	},
 	{
@@ -53,11 +53,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Sort Document-Type Entity Action',
 		weight: 500,
 		api: UmbSortChildrenOfEntityAction,
+		forEntityTypes: [entityType],
 		meta: {
 			icon: 'icon-navigation-vertical',
 			label: 'Sort',
 			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [entityType],
 		},
 	},
 ];

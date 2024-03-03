@@ -9,11 +9,11 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Document.PublicAccess',
 		name: 'Document Permissions Entity Action',
 		api: UmbDocumentPublicAccessEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-lock',
 			label: 'Restrict Public Access',
 			repositoryAlias: UMB_DOCUMENT_PUBLIC_ACCESS_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 ];
