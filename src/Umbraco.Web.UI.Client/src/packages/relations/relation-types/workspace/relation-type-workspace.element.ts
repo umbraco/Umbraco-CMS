@@ -22,11 +22,12 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create/:parentId',
+			path: 'create/parent/:entityType/:parentUnique',
 			component: this.#createElement,
 			setup: (_component, info) => {
-				const parentId = info.match.params.parentId;
-				this.#workspaceContext.create(parentId);
+				const parentEntityType = info.match.params.entityType;
+				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+				this.#workspaceContext.create({ entityType: parentEntityType, unique: parentUnique });
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
@@ -36,11 +37,11 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 			},
 		},
 		{
-			path: 'edit/:id',
+			path: 'edit/:unique',
 			component: this.#createElement,
 			setup: (_component, info) => {
-				const id = info.match.params.id;
-				this.#workspaceContext.load(id);
+				const unique = info.match.params.unique;
+				this.#workspaceContext.load(unique);
 			},
 		},
 	];

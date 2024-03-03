@@ -20,6 +20,8 @@ import type {
 } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 type EntityType = UmbDataTypeDetailModel;
 export class UmbDataTypeWorkspaceContext
@@ -29,6 +31,7 @@ export class UmbDataTypeWorkspaceContext
 	//
 	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
+	#parent?: { entityType: string; unique: string | null };
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
 
@@ -184,9 +187,10 @@ export class UmbDataTypeWorkspaceContext
 		this.#currentData.setValue(data);
 	}
 
-	async create(parentUnique: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		const request = this.repository.createScaffold(parentUnique);
+		this.#parent = parent;
+		const request = this.repository.createScaffold();
 		this.#getDataPromise = request;
 		let { data } = await request;
 		if (!data) return undefined;
@@ -267,7 +271,16 @@ export class UmbDataTypeWorkspaceContext
 		if (!this.#currentData.value.unique) return;
 
 		if (this.getIsNew()) {
-			await this.repository.create(this.#currentData.value);
+			if (!this.#parent) throw new Error('Parent is not set');
+			await this.repository.create(this.#currentData.value, this.#parent.unique);
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				entityType: this.#parent.entityType,
+				unique: this.#parent.unique,
+			});
+			eventContext.dispatchEvent(event);
 		} else {
 			await this.repository.save(this.#currentData.value);
 		}

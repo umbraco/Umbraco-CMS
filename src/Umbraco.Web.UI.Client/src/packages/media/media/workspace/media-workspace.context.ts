@@ -19,6 +19,8 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
@@ -27,6 +29,8 @@ export class UmbMediaWorkspaceContext
 {
 	//
 	public readonly repository = new UmbMediaDetailRepository(this);
+
+	#parent?: { entityType: string; unique: string | null };
 
 	/**
 	 * The media is the current state/draft version of the media.
@@ -92,9 +96,10 @@ export class UmbMediaWorkspaceContext
 		return data || undefined;
 	}
 
-	async create(parentUnique: string | null, mediaTypeUnique: string) {
+	async create(parent: { entityType: string; unique: string | null }, mediaTypeUnique: string) {
 		this.resetState();
-		this.#getDataPromise = this.repository.createScaffold(parentUnique, { unique: mediaTypeUnique });
+		this.#parent = parent;
+		this.#getDataPromise = this.repository.createScaffold({ mediaType: { unique: mediaTypeUnique, collection: null } });
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
@@ -199,10 +204,20 @@ export class UmbMediaWorkspaceContext
 		if (!this.#currentData.value?.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
+			if (!this.#parent) throw new Error('Parent is not set');
+			await this.repository.create(this.#currentData.value, this.#parent.unique);
 			const value = this.#currentData.value;
 
-			if ((await this.repository.create(value)).data !== undefined) {
+			if ((await this.repository.create(value, this.#parent.unique)).data !== undefined) {
 				this.setIsNew(false);
+
+				// TODO: this might not be the right place to alert the tree, but it works for now
+				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+					entityType: this.#parent.entityType,
+					unique: this.#parent.unique,
+				});
+				eventContext.dispatchEvent(event);
 			}
 		} else {
 			await this.repository.save(this.#currentData.value);

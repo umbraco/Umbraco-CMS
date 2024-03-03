@@ -6,10 +6,8 @@ export class UmbCreateEntityAction<T extends { copy(): Promise<void> }> extends 
 		super(host, repositoryAlias, unique, entityType);
 	}
 
-	// TODO: can we make this a generic create action
 	async execute() {
-		// TODO: get entity type from repository?
-		const url = `section/settings/workspace/template/create/${this.unique || 'null'}`;
+		const url = `section/settings/workspace/template/create/parent/${this.entityType}/${this.unique || 'null'}`;
 		// TODO: how do we handle this with a href?
 		history.pushState(null, '', url);
 	}

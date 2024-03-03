@@ -30,13 +30,13 @@ export class UmbMediaWorkspaceElement extends UmbLitElement {
 
 		this._routes = [
 			{
-				path: 'create/:parentUnique/:mediaTypeUnique',
+				path: 'create/parent/:entityType/:parentUnique/:mediaTypeUnique',
 				component: this.#editorElement,
 				setup: async (_component, info) => {
-					// TODO: Remember the perspective of permissions here, we need to check if the user has access to create a media of this type under this parent?
+					const parentEntityType = info.match.params.entityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 					const mediaTypeUnique = info.match.params.mediaTypeUnique;
-					this.#workspaceContext!.create(parentUnique, mediaTypeUnique);
+					this.#workspaceContext!.create({ entityType: parentEntityType, unique: parentUnique }, mediaTypeUnique);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

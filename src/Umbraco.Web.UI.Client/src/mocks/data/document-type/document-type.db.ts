@@ -89,7 +89,7 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 		isElement: request.isElement,
 		allowedDocumentTypes: request.allowedDocumentTypes,
 		compositions: request.compositions,
-		parent: request.folder,
+		parent: request.parent,
 		isFolder: false,
 		hasChildren: false,
 		allowedTemplates: [],

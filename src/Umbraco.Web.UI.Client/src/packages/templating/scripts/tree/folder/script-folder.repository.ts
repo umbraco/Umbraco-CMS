@@ -14,10 +14,10 @@ export class UmbScriptFolderRepository extends UmbFolderRepositoryBase<UmbScript
 
 export default UmbScriptFolderRepository;
 
-const folderToScriptTreeItemFolder = (folder: UmbFolderModel): UmbScriptTreeItemModel => {
+const folderToScriptTreeItemFolder = (folder: UmbFolderModel, parentUnique: string | null): UmbScriptTreeItemModel => {
 	return {
 		unique: folder.unique,
-		parentUnique: folder.parentUnique,
+		parentUnique,
 		name: folder.name,
 		entityType: UMB_SCRIPT_FOLDER_ENTITY_TYPE,
 		isFolder: true,

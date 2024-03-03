@@ -9,31 +9,32 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 
 @customElement('umb-template-workspace')
 export class UmbTemplateWorkspaceElement extends UmbLitElement {
-	#templateWorkspaceContext = new UmbTemplateWorkspaceContext(this);
+	#workspaceContext = new UmbTemplateWorkspaceContext(this);
 	#createElement = () => new UmbTemplateWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create/:parentId',
+			path: 'create/parent/:entityType/:parentUnique',
 			component: this.#createElement,
 			setup: (component: PageComponent, info: IRoutingInfo) => {
-				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
-				this.#templateWorkspaceContext.create(parentId);
+				const parentEntityType = info.match.params.entityType;
+				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+				this.#workspaceContext.create({ entityType: parentEntityType, unique: parentUnique });
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
-					this.#templateWorkspaceContext,
+					this.#workspaceContext,
 					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
 			},
 		},
 		{
-			path: 'edit/:key',
+			path: 'edit/:unique',
 			component: this.#createElement,
 			setup: (component: PageComponent, info: IRoutingInfo): void => {
-				const key = info.match.params.key;
-				this.#templateWorkspaceContext.load(key);
+				const unique = info.match.params.unique;
+				this.#workspaceContext.load(unique);
 			},
 		},
 	];

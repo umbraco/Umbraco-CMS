@@ -10,6 +10,7 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<any> {
 	async execute() {
 		console.log(`execute trash for: ${this.args.unique}`);
 		/*
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) return;
 
 		const { data } = await this.repository.requestItems([this.unique]);

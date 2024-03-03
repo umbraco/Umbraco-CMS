@@ -115,7 +115,7 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 		if (!item.unique) return;
 		return html`
 			<umb-user-group-ref name="${ifDefined(item.name)}">
-				${item.icon ? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>` : nothing}
+				${item.icon ? html`<umb-icon slot="icon" name=${item.icon}></umb-icon>` : nothing}
 
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique)} label="Remove ${item.name}"

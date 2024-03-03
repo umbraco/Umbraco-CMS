@@ -99,7 +99,7 @@ export class UmbEntityActionElement extends UmbLitElement {
 				@click-label=${this.#onClickLabel}
 				@click=${this.#onClick}>
 				${this.manifest?.meta.icon
-					? html`<uui-icon slot="icon" name="${this.manifest?.meta.icon}"></uui-icon>`
+					? html`<umb-icon slot="icon" name="${this.manifest?.meta.icon}"></umb-icon>`
 					: nothing}
 			</uui-menu-item>
 		`;

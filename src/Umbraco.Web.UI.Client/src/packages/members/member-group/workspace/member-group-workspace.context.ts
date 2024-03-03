@@ -39,9 +39,9 @@ export class UmbMemberGroupWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null) {
+	async create() {
 		this.resetState();
-		const { data } = await this.detailRepository.createScaffold(parentUnique);
+		const { data } = await this.detailRepository.createScaffold();
 
 		if (data) {
 			this.setIsNew(true);

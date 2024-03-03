@@ -20,6 +20,6 @@ export type CreateContentTypeForMediaTypeRequestModel = {
     properties: Array<CreateMediaTypePropertyTypeRequestModel>;
     containers: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
     id?: string | null;
-    folder?: ReferenceByIdModel | null;
+    parent?: ReferenceByIdModel | null;
 };
 

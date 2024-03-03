@@ -6,13 +6,10 @@ import type {
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbDetailRepository<DetailModelType> {
-	createScaffold(
-		parentUnique: string | null,
-		preset?: Partial<DetailModelType>,
-	): Promise<UmbRepositoryResponse<DetailModelType>>;
+	createScaffold(preset?: Partial<DetailModelType>): Promise<UmbRepositoryResponse<DetailModelType>>;
 	requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>>;
 	byUnique(unique: string): Promise<Observable<DetailModelType | undefined>>;
-	create(data: DetailModelType): Promise<UmbRepositoryResponse<DetailModelType>>;
+	create(data: DetailModelType, parentUnique: string | null): Promise<UmbRepositoryResponse<DetailModelType>>;
 	save(data: DetailModelType): Promise<UmbRepositoryResponse<DetailModelType>>;
 	delete(unique: string): Promise<UmbRepositoryErrorResponse>;
 }
