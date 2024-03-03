@@ -77,13 +77,13 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 * @type {Record<string, any>}
 	 * @memberof UmbExtensionSlot
 	 * @example
-	 * <umb-extension-with-api-slot type="my-extension-type" .props=${{foo: 'bar'}}></umb-extension-with-api-slot>
+	 * <umb-extension-with-api-slot type="my-extension-type" .elementProps=${{foo: 'bar'}}></umb-extension-with-api-slot>
 	 */
-	@property({ type: Object, attribute: false })
-	get props(): Record<string, unknown> | undefined {
+	@property({ attribute: false })
+	get elementProps(): Record<string, unknown> | undefined {
 		return this.#props;
 	}
-	set props(newVal: Record<string, unknown> | undefined) {
+	set elementProps(newVal: Record<string, unknown> | undefined) {
 		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
 		this.#props = newVal;
 		if (this.#extensionsController) {
