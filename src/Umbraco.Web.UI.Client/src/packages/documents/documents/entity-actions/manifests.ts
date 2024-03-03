@@ -20,8 +20,8 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 800,
 		api: UmbCreateDocumentBlueprintEntityAction,
 		kind: 'default',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 			icon: 'icon-blueprint',
 			label: 'Create Document Blueprint (TBD)',
 		},
@@ -31,8 +31,8 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Document.Move',
 		name: 'Move Document Entity Action ',
 		kind: 'move',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 			moveRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			pickerModelAlias: UMB_DOCUMENT_PICKER_MODAL.toString(),
@@ -43,8 +43,8 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Document.Copy',
 		name: 'Duplicate Document Entity Action',
 		kind: 'duplicate',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 			duplicateRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			pickerModalAlias: UMB_DOCUMENT_PICKER_MODAL.toString(),
@@ -56,8 +56,8 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Publish Document Entity Action',
 		api: UmbPublishDocumentEntityAction,
 		kind: 'default',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 			icon: 'icon-globe',
 			label: 'Publish',
 		},
@@ -68,8 +68,8 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Unpublish Document Entity Action',
 		api: UmbUnpublishDocumentEntityAction,
 		kind: 'default',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 			icon: 'icon-globe',
 			label: 'Unpublish',
 		},

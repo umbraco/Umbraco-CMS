@@ -9,10 +9,10 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Language.Delete',
 		name: 'Delete Language Entity Action',
 		kind: 'delete',
+		forEntityTypes: [UMB_LANGUAGE_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_LANGUAGE_ITEM_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_LANGUAGE_ENTITY_TYPE],
 		},
 	},
 	{
@@ -21,11 +21,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Create Language Entity Action',
 		weight: 900,
 		api: UmbLanguageCreateEntityAction,
+		forEntityTypes: [UMB_LANGUAGE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias: UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_LANGUAGE_ROOT_ENTITY_TYPE],
 		},
 	},
 ];

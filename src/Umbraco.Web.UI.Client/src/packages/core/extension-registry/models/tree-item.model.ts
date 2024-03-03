@@ -5,9 +5,5 @@ import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-ap
 export interface ManifestTreeItem
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbTreeItemContext<UmbTreeItemModelBase>> {
 	type: 'treeItem';
-	meta: MetaTreeItem;
-}
-
-export interface MetaTreeItem {
-	entityTypes: Array<string>;
+	forEntityTypes: Array<string>;
 }

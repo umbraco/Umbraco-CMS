@@ -11,10 +11,10 @@ export const manifest: UmbBackofficeManifestKind = {
 		kind: 'duplicate',
 		api: UmbDuplicateEntityAction,
 		weight: 600,
+		forEntityTypes: [],
 		meta: {
 			icon: 'icon-documents',
 			label: 'Duplicate to...',
-			entityTypes: [],
 			itemRepositoryAlias: '',
 			duplicateRepositoryAlias: '',
 			pickerModalAlias: '',

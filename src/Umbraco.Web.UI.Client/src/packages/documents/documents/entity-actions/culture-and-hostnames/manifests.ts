@@ -9,10 +9,10 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Culture And Hostnames Document Entity Action',
 		weight: 400,
 		api: UmbDocumentCultureAndHostnamesEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-home',
 			label: 'Culture and Hostnames',
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 ];

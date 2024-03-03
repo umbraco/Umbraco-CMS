@@ -11,6 +11,7 @@ export interface ManifestEntityBulkAction<MetaType extends MetaEntityBulkAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityBulkActionBase<MetaType>>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'entityBulkAction';
+	forEntityTypes: Array<string>;
 	meta: MetaType;
 }
 
@@ -24,6 +25,4 @@ export interface MetaEntityBulkAction {
 	 * ]
 	 */
 	label?: string;
-
-	entityTypes: Array<string>;
 }

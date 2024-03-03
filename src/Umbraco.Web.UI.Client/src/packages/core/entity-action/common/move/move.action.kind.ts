@@ -11,10 +11,10 @@ export const manifest: UmbBackofficeManifestKind = {
 		kind: 'move',
 		api: UmbMoveEntityAction,
 		weight: 700,
+		forEntityTypes: [],
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move to (TBD)...',
-			entityTypes: [],
 			itemRepositoryAlias: '',
 			moveRepositoryAlias: '',
 			pickerModalAlias: '',

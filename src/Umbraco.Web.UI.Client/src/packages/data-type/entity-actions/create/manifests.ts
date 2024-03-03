@@ -9,10 +9,10 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Create Data Type Entity Action',
 		weight: 1000,
 		api: UmbCreateDataTypeEntityAction,
+		forEntityTypes: [UMB_DATA_TYPE_ROOT_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create...',
-			entityTypes: [UMB_DATA_TYPE_ROOT_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{

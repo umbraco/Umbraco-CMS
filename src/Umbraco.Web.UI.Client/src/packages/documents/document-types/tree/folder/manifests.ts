@@ -19,11 +19,11 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Rename Document Type Folder Entity Action',
 		weight: 800,
 		api: UmbFolderUpdateEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-edit',
 			label: 'Rename Folder...',
 			repositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{
@@ -32,11 +32,11 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Delete Document Type Folder Entity Action',
 		weight: 700,
 		api: UmbDeleteFolderEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete Folder...',
 			repositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
 ];

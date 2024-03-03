@@ -162,12 +162,12 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		name: 'Unpublish',
 		weight: 10,
 		api: UmbUnpublishDocumentEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			workspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 			label: 'Unpublish',
 			icon: 'icon-globe',
 			repositoryAlias: 'Umb.Repository.Document.Detail',
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -176,12 +176,12 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		name: 'Publish with descendants',
 		weight: 20,
 		api: UmbPublishDocumentEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			workspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 			label: 'Publish with descendants (TBD)',
 			icon: 'icon-globe',
 			repositoryAlias: 'Umb.Repository.Document.Detail',
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -190,12 +190,12 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		name: 'Schedule publishing',
 		weight: 20,
 		api: UmbPublishDocumentEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			workspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 			label: 'Schedule publishing (TBD)',
 			icon: 'icon-globe',
 			repositoryAlias: 'Umb.Repository.Document.Detail',
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
 ];

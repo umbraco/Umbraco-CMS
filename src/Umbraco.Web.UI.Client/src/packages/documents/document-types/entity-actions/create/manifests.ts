@@ -13,14 +13,14 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Create Document Type Entity Action',
 		weight: 1000,
 		api: UmbCreateDataTypeEntityAction,
+		forEntityTypes: [
+			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+		],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create...',
-			entityTypes: [
-				UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-				UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-				UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-			],
 		},
 	},
 	{

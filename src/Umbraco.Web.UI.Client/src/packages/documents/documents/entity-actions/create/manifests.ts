@@ -9,10 +9,10 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Create Document Entity Action',
 		weight: 1000,
 		api: UmbCreateDocumentEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		},
 		/* removed until we have permissions in place
 		conditions: [

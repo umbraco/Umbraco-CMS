@@ -10,7 +10,7 @@ export interface ManifestEntityAction<MetaType extends MetaEntityAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityAction<MetaType>>,
 		ManifestWithDynamicConditions {
 	type: 'entityAction';
-	entityTypes: Array<string>;
+	forEntityTypes: Array<string>;
 	meta: MetaType;
 }
 
