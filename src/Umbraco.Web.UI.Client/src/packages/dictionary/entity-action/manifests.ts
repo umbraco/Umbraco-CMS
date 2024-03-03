@@ -23,8 +23,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Move Dictionary Entity Action',
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-enter',
-			label: 'Move',
+			moveRepositoryAlias: UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
 		},
 	},
 	{
@@ -71,19 +70,19 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.Dictionary.Create',
 		name: 'Create Dictionary Modal',
-		js: () => import('./create/create-dictionary-modal.element.js'),
+		element: () => import('./create/create-dictionary-modal.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Dictionary.Export',
 		name: 'Export Dictionary Modal',
-		js: () => import('./export/export-dictionary-modal.element.js'),
+		element: () => import('./export/export-dictionary-modal.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Dictionary.Import',
 		name: 'Import Dictionary Modal',
-		js: () => import('./import/import-dictionary-modal.element.js'),
+		element: () => import('./import/import-dictionary-modal.element.js'),
 	},
 ];
 
