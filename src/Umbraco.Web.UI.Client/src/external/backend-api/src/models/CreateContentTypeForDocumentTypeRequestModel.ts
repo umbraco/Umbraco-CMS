@@ -2,9 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { CreateDocumentTypePropertyTypeContainerRequestModel } from './CreateDocumentTypePropertyTypeContainerRequestModel';
 import type { CreateDocumentTypePropertyTypeRequestModel } from './CreateDocumentTypePropertyTypeRequestModel';
 import type { ReferenceByIdModel } from './ReferenceByIdModel';
+
 export type CreateContentTypeForDocumentTypeRequestModel = {
     alias: string;
     name: string;
@@ -18,6 +20,6 @@ export type CreateContentTypeForDocumentTypeRequestModel = {
     properties: Array<CreateDocumentTypePropertyTypeRequestModel>;
     containers: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
     id?: string | null;
-    folder?: ReferenceByIdModel | null;
+    parent?: ReferenceByIdModel | null;
 };
 

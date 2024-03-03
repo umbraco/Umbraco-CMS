@@ -10,6 +10,10 @@ export class UmbCreateMemberTypeEntityAction extends UmbEntityActionBase<UmbMemb
 
 	async execute() {
 		// TODO: Generate the href or retrieve it from something?
-		history.pushState(null, '', `section/settings/workspace/member-type/create`);
+		history.pushState(
+			null,
+			'',
+			`section/settings/workspace/member-type/create/parent/${this.entityType}/${this.unique}`,
+		);
 	}
 }

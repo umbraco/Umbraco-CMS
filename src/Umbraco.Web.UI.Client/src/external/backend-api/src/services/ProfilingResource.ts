@@ -4,10 +4,13 @@
 /* eslint-disable */
 import type { ProfilingStatusRequestModel } from '../models/ProfilingStatusRequestModel';
 import type { ProfilingStatusResponseModel } from '../models/ProfilingStatusResponseModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class ProfilingResource {
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -21,6 +24,7 @@ export class ProfilingResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -41,4 +45,5 @@ export class ProfilingResource {
             },
         });
     }
+
 }

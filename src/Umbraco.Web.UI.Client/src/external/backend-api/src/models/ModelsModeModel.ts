@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 export enum ModelsModeModel {
     NOTHING = 'Nothing',
     IN_MEMORY_AUTO = 'InMemoryAuto',

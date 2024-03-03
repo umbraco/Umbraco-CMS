@@ -98,7 +98,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	async #init() {
 		// TODO: Get ALL items, or traverse the structure aka. multiple recursive calls.
 		this.observe(
-			(await this.#treeRepository.requestRootTreeItems()).asObservable(),
+			(await this.#treeRepository.requestRootTreeItems({ skip: 0, take: 100 })).asObservable(),
 			(items) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore

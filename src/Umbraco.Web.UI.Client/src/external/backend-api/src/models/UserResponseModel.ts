@@ -2,8 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { UserPresentationBaseModel } from './UserPresentationBaseModel';
 import type { UserStateModel } from './UserStateModel';
+
 export type UserResponseModel = (UserPresentationBaseModel & {
     id: string;
     languageIsoCode?: string | null;

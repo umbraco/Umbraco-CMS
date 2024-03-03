@@ -1,16 +1,23 @@
-import type { UmbTreeItemContext } from '../tree-item-default/index.js';
-import type { UmbTreeItemModelBase } from '../types.js';
-import { UMB_TREE_ITEM_CONTEXT } from './tree-item-base.context.js';
-import { html, nothing, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbTreeItemContext } from '../index.js';
+import type { UmbTreeItemModelBase } from '../../types.js';
+import { UMB_TREE_ITEM_CONTEXT } from './tree-item-context-base.js';
+import { html, nothing, state, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-tree-item-base')
-export class UmbTreeItemBaseElement extends UmbLitElement {
-	@state()
-	private _item?: UmbTreeItemModelBase;
+// eslint-disable-next-line local-rules/enforce-element-suffix-on-element-class-name
+export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeItemModelBase> extends UmbLitElement {
+	_item?: TreeItemModelType;
+	@property({ type: Object, attribute: false })
+	get item(): TreeItemModelType | undefined {
+		return this._item;
+	}
+	set item(newVal: TreeItemModelType) {
+		this._item = newVal;
+		this.#initTreeItem();
+	}
 
 	@state()
-	private _childItems?: UmbTreeItemModelBase[];
+	private _childItems?: TreeItemModelType[];
 
 	@state()
 	private _href?: string;
@@ -33,14 +40,24 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	@state()
 	private _iconSlotHasChildren = false;
 
-	#treeItemContext?: UmbTreeItemContext<UmbTreeItemModelBase>;
+	@state()
+	private _totalPages = 1;
+
+	@state()
+	private _currentPage = 1;
+
+	#treeItemContext?: UmbTreeItemContext<TreeItemModelType>;
 
 	constructor() {
 		super();
 
+		// TODO: Notice this can be retrieve via a api property. [NL]
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;
+
+			this.#initTreeItem();
+
 			// TODO: investigate if we can make an observe decorator
 			this.observe(this.#treeItemContext.treeItem, (value) => (this._item = value));
 			this.observe(this.#treeItemContext.hasChildren, (value) => (this._hasChildren = value));
@@ -49,7 +66,15 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 			this.observe(this.#treeItemContext.isSelectable, (value) => (this._isSelectable = value));
 			this.observe(this.#treeItemContext.isSelected, (value) => (this._isSelected = value));
 			this.observe(this.#treeItemContext.path, (value) => (this._href = value));
+			this.observe(this.#treeItemContext.pagination.currentPage, (value) => (this._currentPage = value));
+			this.observe(this.#treeItemContext.pagination.totalPages, (value) => (this._totalPages = value));
 		});
+	}
+
+	#initTreeItem() {
+		if (!this.#treeItemContext) return;
+		if (!this._item) return;
+		this.#treeItemContext.setTreeItem(this._item);
 	}
 
 	private _handleSelectedItem(event: Event) {
@@ -81,9 +106,11 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		});
 	}
 
-	private _openActions() {
-		this.#treeItemContext?.toggleContextMenu();
-	}
+	#onLoadMoreClick = (event: any) => {
+		event.stopPropagation();
+		const next = (this._currentPage = this._currentPage + 1);
+		this.#treeItemContext?.pagination.setCurrentPageNumber(next);
+	};
 
 	// Note: Currently we want to prevent opening when the item is in a selectable context, but this might change in the future.
 	// If we like to be able to open items in selectable context, then we might want to make it as a menu item action, so you have to click ... and chose an action called 'Edit'
@@ -100,8 +127,9 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				.hasChildren=${this._hasChildren}
 				label="${ifDefined(this._item?.name)}"
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.#renderIconContainer()} ${this.#renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
+				${this.renderIconContainer()} ${this.renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
+				${this.#renderPaging()}
 			</uui-menu-item>
 		`;
 	}
@@ -110,7 +138,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	};
 
-	#renderIconContainer() {
+	renderIconContainer() {
 		return html`
 			<slot
 				name="icon"
@@ -137,7 +165,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		return html`<umb-icon slot="icon" name="icon-circle-dotted"></umb-icon>`;
 	}
 
-	#renderLabel() {
+	renderLabel() {
 		return html`<slot name="label" slot="label"></slot>`;
 	}
 
@@ -157,17 +185,18 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 			${this._childItems
 				? repeat(
 						this._childItems,
-						// TODO: get unique here instead of name. we might be able to get it from the context
-						(item) => item.name,
-						(item) => html`<umb-tree-item-default .item=${item}></umb-tree-item-default>`,
+						(item, index) => item.name + '___' + index,
+						(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
 				  )
 				: ''}
 		`;
 	}
-}
 
-declare global {
-	interface HTMLElementTagNameMap {
-		'umb-tree-item-base': UmbTreeItemBaseElement;
+	#renderPaging() {
+		if (this._totalPages <= 1 || this._currentPage === this._totalPages) {
+			return nothing;
+		}
+
+		return html` <uui-button @click=${this.#onLoadMoreClick} label="Load more"></uui-button> `;
 	}
 }

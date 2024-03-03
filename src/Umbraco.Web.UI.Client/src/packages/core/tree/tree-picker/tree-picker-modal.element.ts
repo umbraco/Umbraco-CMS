@@ -1,8 +1,9 @@
+import type { UmbTreeSelectionConfiguration } from '../types.js';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbTreePickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbTreeElement, UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeElement, UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
@@ -51,14 +52,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			<umb-body-layout headline="Select">
 				<uui-box>
 					<umb-tree
-						?hide-tree-root=${this.data?.hideTreeRoot}
 						alias=${ifDefined(this.data?.treeAlias)}
+						.props=${{
+							hideTreeRoot: this.data?.hideTreeRoot,
+							selectionConfiguration: this._selectionConfiguration,
+							filter: this.data?.filter,
+							selectableFilter: this.data?.pickableFilter,
+						}}
 						@selection-change=${this.#onSelectionChange}
 						@selected=${this.#onSelected}
-						@deselected=${this.#onDeselected}
-						.selectionConfiguration=${this._selectionConfiguration}
-						.filter=${this.data?.filter}
-						.selectableFilter=${this.data?.pickableFilter}></umb-tree>
+						@deselected=${this.#onDeselected}></umb-tree>
 				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>

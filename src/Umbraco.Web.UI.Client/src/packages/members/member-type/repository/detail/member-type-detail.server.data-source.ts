@@ -31,15 +31,14 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 
 	/**
 	 * Creates a new Member Type scaffold
-	 * @param {(string | null)} parentUnique
+	 * @param {Partial<UmbMemberTypeDetailModel>} [preset]
 	 * @return { CreateMemberTypeRequestModel }
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbMemberTypeDetailModel> = {}) {
 		const data: UmbMemberTypeDetailModel = {
 			entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
 			name: '',
 			alias: '',
 			description: '',
@@ -53,6 +52,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			allowedContentTypes: [],
 			compositions: [],
 			collection: null,
+			...preset,
 		};
 
 		return { data };
@@ -77,7 +77,6 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		const memberType: UmbMemberTypeDetailModel = {
 			entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: null,
 			name: data.name,
 			alias: data.alias,
 			description: data.description || null,

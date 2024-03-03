@@ -42,7 +42,7 @@ export class UmbLanguageWorkspaceContext
 
 	async create() {
 		this.resetState();
-		const { data } = await this.repository.createScaffold(null);
+		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.update(data);

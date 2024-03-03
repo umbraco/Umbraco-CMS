@@ -163,7 +163,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderItems() {
-		if (!this._items) return;
+		if (!this._items?.length) return;
 		return html`<uui-ref-list>
 			${repeat(
 				this._items,

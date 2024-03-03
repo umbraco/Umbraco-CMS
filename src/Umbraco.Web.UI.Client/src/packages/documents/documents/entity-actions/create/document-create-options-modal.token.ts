@@ -1,9 +1,10 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbDocumentCreateOptionsModalData {
-	document: {
-		unique: string;
-	} | null;
+	parent: {
+		unique: string | null;
+		entityType: string;
+	};
 	documentType: {
 		unique: string;
 	} | null;

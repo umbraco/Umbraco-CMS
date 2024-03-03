@@ -26,13 +26,13 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	private _headline: string = 'Create';
 
 	async firstUpdated() {
-		const documentUnique = this.data?.document?.unique || null;
+		const parentUnique = this.data?.parent.unique;
 		const documentTypeUnique = this.data?.documentType?.unique || null;
 
 		this.#retrieveAllowedDocumentTypesOf(documentTypeUnique);
 
-		if (documentUnique) {
-			this.#retrieveHeadline(documentUnique);
+		if (parentUnique) {
+			this.#retrieveHeadline(parentUnique);
 		}
 	}
 
@@ -45,9 +45,9 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		}
 	}
 
-	async #retrieveHeadline(unique: string) {
-		if (!unique) return;
-		const { data } = await this.#documentItemRepository.requestItems([unique]);
+	async #retrieveHeadline(parentUnique: string) {
+		if (!parentUnique) return;
+		const { data } = await this.#documentItemRepository.requestItems([parentUnique]);
 		if (data) {
 			// TODO: we need to get the correct variant context here
 			this._headline = `Create at ${data[0].variants?.[0].name}`;
@@ -68,9 +68,9 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 						(documentType) => html`
 							<uui-menu-item
 								data-id=${ifDefined(documentType.unique)}
-								href="${`section/content/workspace/document/create/${this.data?.document?.unique ?? 'null'}/${
-									documentType.unique
-								}`}"
+								href="${`section/content/workspace/document/create/parent/${this.data?.parent.entityType}/${
+									this.data?.parent.unique ?? 'null'
+								}/${documentType.unique}`}"
 								label="${documentType.name}"
 								@click=${this.#onNavigate}>
 								> ${documentType.icon ? html`<umb-icon slot="icon" name=${documentType.icon}></umb-icon>` : nothing}

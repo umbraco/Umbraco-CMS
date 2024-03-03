@@ -3,6 +3,7 @@ import type { UmbMediaTypeTreeItemModel } from './types.js';
 import type { MediaTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
@@ -29,16 +30,17 @@ export class UmbMediaTypeTreeServerDataSource extends UmbTreeServerDataSourceBas
 	}
 }
 
-// eslint-disable-next-line local-rules/no-direct-api-import
-const getRootItems = () => MediaTypeResource.getTreeMediaTypeRoot({});
+const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	MediaTypeResource.getTreeMediaTypeRoot({ skip: args.skip, take: args.take });
 
-const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
-		return getRootItems();
+const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	if (args.parentUnique === null) {
+		return getRootItems(args);
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return MediaTypeResource.getTreeMediaTypeChildren({
-			parentId: parentUnique,
+			parentId: args.parentUnique,
 		});
 	}
 };

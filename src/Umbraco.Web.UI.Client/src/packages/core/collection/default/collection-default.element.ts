@@ -1,5 +1,6 @@
 import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from './collection-default.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -33,6 +34,11 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			this.#collectionContext = instance;
 			this.#observeCollectionRoutes();
 		});
+	}
+
+	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+		this.#collectionContext?.requestCollection();
 	}
 
 	#observeCollectionRoutes() {

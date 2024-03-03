@@ -68,7 +68,7 @@ export class UmbPickerInputContext<ItemType extends { name: string; unique: stri
 	async openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
 		await this.#itemManager.init;
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this.modalAlias, {
+		const modalContext = modalManager.open(this, this.modalAlias, {
 			data: {
 				multiple: this._max === 1 ? false : true,
 				...pickerData,

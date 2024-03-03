@@ -8,6 +8,8 @@ import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspa
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 export class UmbTemplateWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbTemplateDetailModel>
@@ -15,6 +17,8 @@ export class UmbTemplateWorkspaceContext
 {
 	public readonly detailRepository = new UmbTemplateDetailRepository(this);
 	public readonly itemRepository = new UmbTemplateItemRepository(this);
+
+	#parent?: { entityType: string; unique: string | null };
 
 	#data = new UmbObjectState<UmbTemplateDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -135,15 +139,16 @@ ${currentContent}`;
 		this.setContent(string);
 	};
 
-	async create(parentUnique: string | null, preset?: Partial<UmbTemplateDetailModel>) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		const { data } = await this.detailRepository.createScaffold(parentUnique, preset);
+		this.#parent = parent;
+		const { data } = await this.detailRepository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.setValue(data);
 
-		if (!parentUnique) return;
-		await this.setMasterTemplate(parentUnique);
+		if (!this.#parent) return;
+		await this.setMasterTemplate(this.#parent.unique);
 	}
 
 	async save() {
@@ -152,8 +157,17 @@ ${currentContent}`;
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.detailRepository.create(this.#data.value);
+			if (!this.#parent) throw new Error('Parent is not set');
+			const { data } = await this.detailRepository.create(this.#data.value, this.#parent.unique);
 			newData = data;
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				entityType: this.#parent.entityType,
+				unique: this.#parent.unique,
+			});
+			eventContext.dispatchEvent(event);
 		} else {
 			const { data } = await this.detailRepository.save(this.#data.value);
 			newData = data;
@@ -161,7 +175,7 @@ ${currentContent}`;
 
 		if (newData) {
 			this.#data.setValue(newData);
-			this.saveComplete(newData);
+			this.workspaceComplete(newData);
 		}
 	}
 

@@ -2,7 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
+
 export type UserGroupItemResponseModel = (NamedItemResponseModelBaseModel & {
     icon?: string | null;
 });

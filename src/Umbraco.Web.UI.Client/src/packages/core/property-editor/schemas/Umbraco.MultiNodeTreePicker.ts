@@ -26,6 +26,12 @@ export const manifest: ManifestPropertyEditorSchema = {
 					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
+				{
+					alias: 'startNode',
+					label: 'Node type',
+					description: '',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.SourcePicker',
+				},
 			],
 			defaultData: [
 				{

@@ -62,7 +62,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
 	private _editTemplatePath = '';
 
-	#modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 	#workspaceContext?: UmbDocumentWorkspaceContext;
 
 	#templateRepository = new UmbTemplateDetailRepository(this);
@@ -85,10 +84,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			this._documentTypeUnique = this.#workspaceContext.getContentTypeId()!;
 			this.#getData();
 			this._observeContent();
-		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManagerContext) => {
-			this.#modalManagerContext = modalManagerContext;
 		});
 	}
 
@@ -253,8 +248,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	async #openTemplatePicker() {
-		console.log(this._allowedTemplates);
-		const modal = this.#modalManagerContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modal = modalManager.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: false,

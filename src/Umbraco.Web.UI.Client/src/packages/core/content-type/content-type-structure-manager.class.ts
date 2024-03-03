@@ -14,6 +14,7 @@ import {
 	partialUpdateFrozenArray,
 	appendToFrozenArray,
 	filterFrozenArray,
+	createObservablePart,
 } from '@umbraco-cms/backoffice/observable-api';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -27,6 +28,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	#contentTypeObservers = new Array<UmbController>();
 	#contentTypes = new UmbArrayState<T>([], (x) => x.unique);
 	readonly contentTypes = this.#contentTypes.asObservable();
+	readonly ownerContentType = this.#contentTypes.asObservablePart((x) =>
+		x.find((y) => y.unique === this.#ownerContentTypeUnique),
+	);
 	private readonly _contentTypeContainers = this.#contentTypes.asObservablePart((x) =>
 		x.flatMap((x) => x.containers ?? []),
 	);
@@ -65,12 +69,10 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		return promiseResult;
 	}
 
-	public async createScaffold(parentUnique: string | null) {
+	public async createScaffold() {
 		this._reset();
 
-		if (parentUnique === undefined) return {};
-
-		const { data } = await this.#contentTypeRepository.createScaffold(parentUnique);
+		const { data } = await this.#contentTypeRepository.createScaffold();
 		if (!data) return {};
 
 		this.#ownerContentTypeUnique = data.unique;
@@ -101,11 +103,11 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
 	 * @returns
 	 */
-	public async create() {
+	public async create(parentUnique: string | null) {
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) return false;
 
-		const { data } = await this.#contentTypeRepository.create(contentType);
+		const { data } = await this.#contentTypeRepository.create(contentType, parentUnique);
 		if (!data) return false;
 
 		// Update state with latest version:
@@ -126,6 +128,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	private async _loadType(unique?: string) {
 		if (!unique) return {};
 
+		// Lets initiate the content type:
 		const { data } = await this.#contentTypeRepository.requestByUnique(unique);
 		if (!data) return {};
 
@@ -136,11 +139,14 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	private async _observeContentType(data: T) {
 		if (!data.unique) return;
 
+		// Notice we do not store the content type in the store here, cause it will happen shortly after when the observations gets its first initial callback. [NL]
+
 		// Load inherited and composed types:
-		this._loadContentTypeCompositions(data);
+		//this._loadContentTypeCompositions(data);// Should not be necessary as this will be done when appended to the contentTypes state. [NL]
 
 		this.#contentTypeObservers.push(
 			this.observe(
+				// Then lets start observation of the content type:
 				await this.#contentTypeRepository.byUnique(data.unique),
 				(docType) => {
 					if (docType) {
@@ -164,8 +170,8 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	/** Public methods for consuming structure: */
 
-	ownerContentType() {
-		return this.#contentTypes.asObservablePart((x) => x.find((y) => y.unique === this.#ownerContentTypeUnique));
+	ownerContentTypePart<R>(mappingFunction: MappingFunction<T | undefined, R>) {
+		return createObservablePart(this.ownerContentType, mappingFunction);
 	}
 
 	getOwnerContentType() {

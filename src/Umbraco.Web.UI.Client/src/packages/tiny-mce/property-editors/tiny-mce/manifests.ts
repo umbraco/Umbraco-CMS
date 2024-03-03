@@ -231,12 +231,6 @@ export const manifest: ManifestPropertyEditorUi = {
 					label: 'Hide Label',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
-				{
-					alias: 'blocks',
-					label: 'Available Blocks',
-					description: 'Define the available blocks.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockRteTypeConfiguration',
-				},
 			],
 		},
 	},

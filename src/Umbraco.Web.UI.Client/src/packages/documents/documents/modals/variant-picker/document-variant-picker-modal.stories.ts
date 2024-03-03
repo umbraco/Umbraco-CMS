@@ -15,6 +15,8 @@ const modalData: UmbDocumentVariantPickerModalData = {
 	options: [
 		{
 			unique: 'en-us',
+			culture: 'en-us',
+			segment: null,
 			variant: {
 				name: 'English variant name',
 				culture: 'en-us',
@@ -47,6 +49,8 @@ const modalData: UmbDocumentVariantPickerModalData = {
 		*/
 		{
 			unique: 'da-dk',
+			culture: 'da-dk',
+			segment: null,
 			variant: {
 				name: 'Danish variant name',
 				culture: 'da-dk',
@@ -90,7 +94,7 @@ import { UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, UmbDocumentVariantState } from '@um
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
-	modalManager.open(UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
+	modalManager.open(this, UMB_DOCUMENT_LANGUAGE_PICKER_MODAL, {
 		data: {
 			type: 'save',
 			variants: [

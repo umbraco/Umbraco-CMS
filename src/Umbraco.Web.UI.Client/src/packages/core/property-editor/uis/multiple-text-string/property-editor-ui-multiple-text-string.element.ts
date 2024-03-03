@@ -4,7 +4,7 @@ import { html, customElement, property, state, ifDefined } from '@umbraco-cms/ba
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { MultipleTextStringValue, UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
+import type { UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-multiple-text-string
@@ -12,7 +12,7 @@ import type { MultipleTextStringValue, UmbInputMultipleTextStringElement } from 
 @customElement('umb-property-editor-ui-multiple-text-string')
 export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Array })
-	public value: MultipleTextStringValue = [];
+	public value: Array<string> = [];
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {

@@ -3,10 +3,16 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { SavedLogSearchPresenationBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
+export interface UmbContextSaveSearchModalData {
+	query: string;
+}
+
+export interface UmbContextSaveSearchModalValue extends SavedLogSearchPresenationBaseModel {}
+
 @customElement('umb-log-viewer-save-search-modal')
 export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElement<
-	{ query: string },
-	SavedLogSearchPresenationBaseModel
+	UmbContextSaveSearchModalData,
+	UmbContextSaveSearchModalValue
 > {
 	@query('uui-input')
 	private _input!: UUIInputElement;

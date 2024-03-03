@@ -1,8 +1,10 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbScriptCreateOptionsModalData {
-	parentUnique: string | null;
-	entityType: string;
+	parent: {
+		unique: string | null;
+		entityType: string;
+	};
 }
 
 export const UMB_SCRIPT_CREATE_OPTIONS_MODAL = new UmbModalToken<UmbScriptCreateOptionsModalData>(

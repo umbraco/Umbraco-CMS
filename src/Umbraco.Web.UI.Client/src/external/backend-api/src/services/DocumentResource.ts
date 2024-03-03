@@ -24,10 +24,13 @@ import type { UnpublishDocumentRequestModel } from '../models/UnpublishDocumentR
 import type { UpdateDocumentNotificationsRequestModel } from '../models/UpdateDocumentNotificationsRequestModel';
 import type { UpdateDocumentRequestModel } from '../models/UpdateDocumentRequestModel';
 import type { UpdateDomainsRequestModel } from '../models/UpdateDomainsRequestModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class DocumentResource {
+
     /**
      * @returns PagedDocumentCollectionResponseModel Success
      * @throws ApiError
@@ -73,6 +76,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -96,6 +100,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -118,6 +123,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -142,6 +148,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -170,6 +177,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -197,6 +205,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -218,6 +227,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns void
      * @throws ApiError
@@ -245,6 +255,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -272,6 +283,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -296,6 +308,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -318,6 +331,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -344,6 +358,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Created
      * @throws ApiError
@@ -371,6 +386,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -394,6 +410,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns void
      * @throws ApiError
@@ -416,6 +433,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -443,6 +461,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -471,6 +490,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -499,6 +519,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -527,6 +548,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -555,6 +577,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -568,6 +591,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -591,6 +615,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -614,6 +639,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -634,6 +660,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -650,6 +677,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -674,6 +702,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns any Success
      * @throws ApiError
@@ -697,6 +726,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns string Success
      * @throws ApiError
@@ -725,6 +755,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns PagedDocumentRecycleBinItemResponseModel Success
      * @throws ApiError
@@ -751,6 +782,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns PagedDocumentRecycleBinItemResponseModel Success
      * @throws ApiError
@@ -774,6 +806,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns PagedDocumentTreeItemResponseModel Success
      * @throws ApiError
@@ -803,6 +836,7 @@ export class DocumentResource {
             },
         });
     }
+
     /**
      * @returns PagedDocumentTreeItemResponseModel Success
      * @throws ApiError
@@ -829,4 +863,5 @@ export class DocumentResource {
             },
         });
     }
+
 }

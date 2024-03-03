@@ -2,8 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { ContentForMemberResponseModel } from './ContentForMemberResponseModel';
 import type { MemberTypeReferenceResponseModel } from './MemberTypeReferenceResponseModel';
+
 export type MemberResponseModel = (ContentForMemberResponseModel & {
     email: string;
     username: string;

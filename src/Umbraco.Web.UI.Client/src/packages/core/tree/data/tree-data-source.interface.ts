@@ -1,5 +1,6 @@
 import type { UmbTreeItemModelBase } from '../types.js';
-import type { UmbPagedModel, DataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from './types.js';
+import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -21,16 +22,15 @@ export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbTreeItemMo
 export interface UmbTreeDataSource<TreeItemType extends UmbTreeItemModelBase> {
 	/**
 	 * Gets the root items of the tree.
-	 * @return {*}  {Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>>}
+	 * @return {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>}
 	 * @memberof UmbTreeDataSource
 	 */
-	getRootItems(): Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>>;
+	getRootItems(args: UmbTreeRootItemsRequestArgs): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
 
 	/**
 	 * Gets the children of the given parent item.
-	 * @param {(string | null)} parentUnique
-	 * @return {*}  {Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>}
+	 * @return {*}  {Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>}
 	 * @memberof UmbTreeDataSource
 	 */
-	getChildrenOf(parentUnique: string | null): Promise<DataSourceResponse<UmbPagedModel<TreeItemType>>>;
+	getChildrenOf(args: UmbTreeChildrenOfRequestArgs): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
 }

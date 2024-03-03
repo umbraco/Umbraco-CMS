@@ -31,6 +31,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_STATIC_FILE_TREE_ALIAS,
 	name: 'Static File Tree',
 	meta: {
@@ -40,7 +41,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'unique',
+	kind: 'default',
 	alias: UMB_STATIC_FILE_TREE_ITEM_ALIAS,
 	name: 'Static File Tree Item',
 	meta: {

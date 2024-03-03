@@ -2,7 +2,6 @@ import { UMB_CURRENT_USER_MODAL } from './modals/current-user/current-user-modal
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUserModel } from '@umbraco-cms/backoffice/current-user';
@@ -13,17 +12,12 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	private _currentUser?: UmbCurrentUserModel;
 
 	@state()
-	private _userAvatarUrls: Array<{ url: string; scale: string }> = [];
+	private _userAvatarUrls: Array<{ url: string; descriptor: string }> = [];
 
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-	#modalManagerContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalManagerContext = instance;
-		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
 			this.#currentUserContext = instance;
@@ -45,8 +39,9 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 		);
 	}
 
-	private _handleUserClick() {
-		this.#modalManagerContext?.open(UMB_CURRENT_USER_MODAL);
+	async #handleUserClick() {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		modalManager.open(this, UMB_CURRENT_USER_MODAL);
 	}
 
 	#setUserAvatarUrls = async (user: UmbCurrentUserModel | undefined) => {
@@ -57,15 +52,15 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 
 		this._userAvatarUrls = [
 			{
-				scale: '1x',
+				descriptor: '1x',
 				url: user.avatarUrls?.[0],
 			},
 			{
-				scale: '2x',
+				descriptor: '2x',
 				url: user.avatarUrls?.[1],
 			},
 			{
-				scale: '3x',
+				descriptor: '3x',
 				url: user.avatarUrls?.[2],
 			},
 		];
@@ -75,7 +70,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 		let string = '';
 
 		this._userAvatarUrls?.forEach((url) => {
-			string += `${url.url} ${url.scale},`;
+			string += `${url.url} ${url.descriptor},`;
 		});
 		return string;
 	}
@@ -87,7 +82,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-button
-				@click=${this._handleUserClick}
+				@click=${this.#handleUserClick}
 				look="primary"
 				label="${this.localize.term('visuallyHiddenTexts_openCloseBackofficeProfileOptions')}"
 				compact>

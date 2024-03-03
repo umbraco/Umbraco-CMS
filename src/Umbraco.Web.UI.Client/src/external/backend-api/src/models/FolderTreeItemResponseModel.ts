@@ -2,7 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 import type { NamedEntityTreeItemResponseModel } from './NamedEntityTreeItemResponseModel';
+
 export type FolderTreeItemResponseModel = (NamedEntityTreeItemResponseModel & {
     isFolder: boolean;
 });

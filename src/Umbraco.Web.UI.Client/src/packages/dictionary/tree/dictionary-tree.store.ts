@@ -21,30 +21,13 @@ export class UmbDictionaryTreeStore extends UmbUniqueTreeStore {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DICTIONARY_TREE_STORE_CONTEXT.toString());
 
-		new UmbStoreConnector<UmbDictionaryTreeItemModel, UmbDictionaryDetailModel>(
-			host,
-			this,
-			UMB_DICTIONARY_DETAIL_STORE_CONTEXT,
-			(item) => this.#createTreeItemMapper(item),
-			(item) => this.#updateTreeItemMapper(item),
-		);
+		new UmbStoreConnector<UmbDictionaryTreeItemModel, UmbDictionaryDetailModel>(host, {
+			store: this,
+			connectToStoreAlias: UMB_DICTIONARY_DETAIL_STORE_CONTEXT,
+			updateStoreItemMapper: (item) => this.#updateTreeItemMapper(item),
+		});
 	}
 
-	// TODO: revisit this when we have decided on detail model sizes
-	#createTreeItemMapper = (item: UmbDictionaryDetailModel) => {
-		const treeItem: UmbDictionaryTreeItemModel = {
-			unique: item.unique,
-			parentUnique: null,
-			name: item.name,
-			entityType: item.entityType,
-			isFolder: false,
-			hasChildren: false,
-		};
-
-		return treeItem;
-	};
-
-	// TODO: revisit this when we have decided on detail model sizes
 	#updateTreeItemMapper = (model: UmbDictionaryDetailModel) => {
 		return {
 			name: model.name,

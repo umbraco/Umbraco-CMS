@@ -18,14 +18,14 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	@property()
 	value = '';
 
-	private _modalContext?: UmbModalManagerContext;
+	#modalContext?: UmbModalManagerContext;
 
 	#dictionaryDetailRepository = new UmbDictionaryDetailRepository(this);
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
+			this.#modalContext = instance;
 		});
 	}
 
@@ -58,7 +58,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	async #openTemplatingItemPickerModal() {
-		const itemPickerContext = this._modalContext?.open(UMB_TEMPLATING_ITEM_PICKER_MODAL);
+		const itemPickerContext = this.#modalContext?.open(this, UMB_TEMPLATING_ITEM_PICKER_MODAL);
 		await itemPickerContext?.onSubmit();
 
 		const value = itemPickerContext?.getValue();
@@ -68,7 +68,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	async #openPartialViewPickerModal() {
-		const partialViewPickerContext = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+		const partialViewPickerContext = this.#modalContext?.open(this, UMB_PARTIAL_VIEW_PICKER_MODAL);
 		await partialViewPickerContext?.onSubmit();
 
 		const path = partialViewPickerContext?.getValue().selection[0];
@@ -78,7 +78,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	async #openDictionaryItemPickerModal() {
-		const dictionaryItemPickerContext = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL);
+		const dictionaryItemPickerContext = this.#modalContext?.open(this, UMB_DICTIONARY_ITEM_PICKER_MODAL);
 		await dictionaryItemPickerContext?.onSubmit();
 
 		const item = dictionaryItemPickerContext?.getValue().selection[0];
@@ -88,7 +88,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	async #openPageFieldBuilderModal() {
-		const pageFieldBuilderContext = this._modalContext?.open(UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
+		const pageFieldBuilderContext = this.#modalContext?.open(this, UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
 		await pageFieldBuilderContext?.onSubmit();
 
 		const output = pageFieldBuilderContext?.getValue().output;

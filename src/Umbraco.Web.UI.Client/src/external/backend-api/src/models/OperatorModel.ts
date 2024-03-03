@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+
 export enum OperatorModel {
     EQUALS = 'Equals',
     NOT_EQUALS = 'NotEquals',

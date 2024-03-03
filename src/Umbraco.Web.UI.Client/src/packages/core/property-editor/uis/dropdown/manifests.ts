@@ -10,19 +10,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		propertyEditorSchemaAlias: 'Umbraco.DropDown.Flexible',
 		icon: 'icon-time',
 		group: 'pickers',
-		settings: {
-			properties: [
-				{
-					alias: 'multiple',
-					label: 'Enable multiple choice',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
-				{
-					alias: 'items',
-					label: 'Add options',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
-				},
-			],
-		},
 	},
 };

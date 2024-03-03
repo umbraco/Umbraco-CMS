@@ -2,12 +2,17 @@ import { UmbDocumentTypeDetailRepository } from '../../document-types/repository
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
-import type { UmbDocumentDetailModel, UmbDocumentVariantModel, UmbDocumentVariantOptionModel } from '../types.js';
+import type {
+	UmbDocumentDetailModel,
+	UmbDocumentValueModel,
+	UmbDocumentVariantModel,
+	UmbDocumentVariantOptionModel,
+} from '../types.js';
 import { umbPickDocumentVariantModal, type UmbDocumentVariantPickerModalType } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
@@ -25,6 +30,8 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -34,6 +41,8 @@ export class UmbDocumentWorkspaceContext
 	//
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
+
+	#parent?: { entityType: string; unique: string | null };
 
 	/**
 	 * The document is the current state/draft version of the document.
@@ -55,27 +64,58 @@ export class UmbDocumentWorkspaceContext
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
-	readonly variantOptions = mergeObservables([this.variants, this.languages], ([variants, languages]) => {
-		return languages.map((language) => {
-			return {
-				variant: variants.find((x) => x.culture === language.unique),
-				language,
-				// TODO: When including segments, this should be updated to include the segment as well. [NL]
-				unique: language.unique, // This must be a variantId string!
-			} as UmbDocumentVariantOptionModel;
-		});
-	});
 
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.unique || null);
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
+	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
+	//#variesByCulture?: boolean;
+	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
+	//#variesBySegment?: boolean;
+	readonly varies = this.structure.ownerContentTypePart((x) =>
+		x ? x.variesByCulture || x.variesBySegment : undefined,
+	);
+	#varies?: boolean;
+
 	readonly splitView = new UmbWorkspaceSplitViewManager();
+
+	readonly variantOptions = mergeObservables(
+		[this.varies, this.variants, this.languages],
+		([varies, variants, languages]) => {
+			// TODO: When including segments, when be aware about the case of segment varying when not culture varying. [NL]
+			if (varies === true) {
+				return languages.map((language) => {
+					return {
+						variant: variants.find((x) => x.culture === language.unique),
+						language,
+						// TODO: When including segments, this object should be updated to include a object for the segment. [NL]
+						// TODO: When including segments, the unique should be updated to include the segment as well. [NL]
+						unique: language.unique, // This must be a variantId string!
+						culture: language.unique,
+						segment: null,
+					} as UmbDocumentVariantOptionModel;
+				});
+			} else if (varies === false) {
+				return [
+					{
+						variant: variants.find((x) => x.culture === null),
+						language: languages.find((x) => x.isDefault),
+						culture: null,
+						segment: null,
+						unique: UMB_INVARIANT_CULTURE, // This must be a variantId string!
+					} as UmbDocumentVariantOptionModel,
+				];
+			}
+			return [] as Array<UmbDocumentVariantOptionModel>;
+		},
+	);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DOCUMENT_WORKSPACE_ALIAS);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
+		this.observe(this.varies, (varies) => (this.#varies = varies));
 
 		this.loadLanguages();
 	}
@@ -104,9 +144,10 @@ export class UmbDocumentWorkspaceContext
 		return data || undefined;
 	}
 
-	async create(parentUnique: string | null, documentTypeUnique: string) {
+	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
 		this.resetState();
-		this.#getDataPromise = this.repository.createScaffold(parentUnique, {
+		this.#parent = parent;
+		this.#getDataPromise = this.repository.createScaffold({
 			documentType: {
 				unique: documentTypeUnique,
 				collection: null,
@@ -136,6 +177,18 @@ export class UmbDocumentWorkspaceContext
 	getContentTypeId() {
 		return this.getData()?.documentType.unique;
 	}
+
+	// TODO: Check if this is used:
+	getVaries() {
+		return this.#varies;
+	}
+	/*
+	getVariesByCulture() {
+		return this.#variesByCulture;
+	}
+	getVariesBySegment() {
+		return this.#variesBySegment;
+	}*/
 
 	variantById(variantId: UmbVariantId) {
 		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
@@ -258,30 +311,57 @@ export class UmbDocumentWorkspaceContext
 	#updateVariantData(variantId: UmbVariantId, update?: Partial<UmbDocumentVariantModel>) {
 		const currentData = this.getData();
 		if (!currentData) throw new Error('Data is missing');
-		const variant = currentData.variants.find((x) => variantId.compare(x));
-		const newVariants = appendToFrozenArray(
-			currentData.variants,
-			{
-				state: null,
-				name: '',
-				publishDate: null,
-				createDate: null,
-				updateDate: null,
-				...variantId.toObject(),
-				...variant,
-				...update,
-			},
-			(x) => variantId.compare(x),
-		);
-		this.#currentData.update({ variants: newVariants });
+		if (this.#varies === true) {
+			// If variant Id is invariant, we don't to have the variant appended to our data.
+			if (variantId.isInvariant()) return;
+			const variant = currentData.variants.find((x) => variantId.compare(x));
+			const newVariants = appendToFrozenArray(
+				currentData.variants,
+				{
+					state: null,
+					name: '',
+					publishDate: null,
+					createDate: null,
+					updateDate: null,
+					...variantId.toObject(),
+					...variant,
+					...update,
+				},
+				(x) => variantId.compare(x),
+			);
+			this.#currentData.update({ variants: newVariants });
+		} else if (this.#varies === false) {
+			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
+			const invariantVariantId = UmbVariantId.CreateInvariant();
+			const variant = currentData.variants.find((x) => invariantVariantId.compare(x));
+			// Cause we are invariant, we will just overwrite all variants with this one:
+			const newVariants = [
+				{
+					state: null,
+					name: '',
+					publishDate: null,
+					createDate: null,
+					updateDate: null,
+					...invariantVariantId.toObject(),
+					...variant,
+					...update,
+				},
+			];
+			this.#currentData.update({ variants: newVariants });
+		} else {
+			throw new Error('Varies by culture is missing');
+		}
 	}
 
-	async #pickVariantsForAction(type: UmbDocumentVariantPickerModalType): Promise<UmbVariantId[]> {
+	async #runUserFlorFor(type: UmbDocumentVariantPickerModalType): Promise<UmbVariantId[]> {
 		const activeVariants = this.splitView.getActiveVariants();
 
-		// TODO: Picked variants should include the ones that has been changed (but not jet saved) this requires some more awareness about the state of runtime data. [NL]
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
-		const selected = activeVariantIds.concat(this.#calculateChangedVariants());
+		// TODO: We need to filter the selected array, so it only contains one of each variantId. [NL]
+		const changedVariantIds = this.#calculateChangedVariants();
+		const selected = activeVariantIds.concat(changedVariantIds);
+		// Selected can contain entries that are not part of the options, therefor the modal filters selection based on options.
+
 		const options = await firstValueFrom(this.variantOptions);
 
 		// If there is only one variant, we don't need to open the modal.
@@ -289,8 +369,8 @@ export class UmbDocumentWorkspaceContext
 			throw new Error('No variants are available');
 		} else if (options.length === 1) {
 			// If only one option we will skip ahead and save the document with the only variant available:
-			const firstVariant = new UmbVariantId(options[0].language.unique, null);
-			return await this.#performSaveOrCreate([firstVariant]);
+			const firstVariant = UmbVariantId.Create(options[0]);
+			return this.#performSaveOrCreate([firstVariant]);
 		}
 
 		const selectedVariants = await umbPickDocumentVariantModal(this, { type, options, selected });
@@ -298,41 +378,108 @@ export class UmbDocumentWorkspaceContext
 		// If no variants are selected, we don't save anything.
 		if (!selectedVariants.length) return [];
 
-		return await this.#performSaveOrCreate(selectedVariants);
+		return this.#performSaveOrCreate(selectedVariants);
 	}
 
-	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>) {
+	#buildSaveData(selectedVariants: Array<UmbVariantId>): UmbDocumentDetailModel {
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		if (!data.unique) throw new Error('Unique is missing');
+		const invariantVariantId = UmbVariantId.CreateInvariant();
+		if (this.#varies === false) {
+			// If we do not vary, we wil just do this for the invariant variant id.
+			selectedVariants = [invariantVariantId];
+		}
+
+		const persistedData = this.#persistedData.getValue();
+
+		const variantIdsToParseForValues = [...selectedVariants];
+		if (this.#varies === true) {
+			// If we vary then We need to include the invariant variant id for invariant values to be saved, as we always want to save the invariant values.
+			variantIdsToParseForValues.push(invariantVariantId);
+		}
+
+		// Combine data and persisted data depending on the selectedVariants. Always use the invariant values from the data.
+		// loops over each entry in values, determine wether the value should be from the data or the persisted data, depending on wether its a selectedVariant or an invariant value.
+		// loops over each entry in variants, determine wether the variant should be from the data or the persisted data, depending on the selectedVariants.
+		return {
+			...data,
+			values: data.values
+				.map((value) => {
+					// Should this value be saved?
+					if (variantIdsToParseForValues.some((x) => x.compare(value))) {
+						return value;
+					} else {
+						// If not we will find the value in the persisted data and use that instead.
+						return persistedData?.values.find(
+							(x) => x.alias === value.alias && x.culture === value.culture && x.segment === value.segment,
+						);
+					}
+				})
+				.filter((x) => x !== undefined) as Array<UmbDocumentValueModel<unknown>>,
+			variants: data.variants
+				.map((variant) => {
+					// Should this value be saved?
+					if (selectedVariants.some((x) => x.compare(variant))) {
+						return variant;
+					} else {
+						// If not we will find the value in the persisted data and use that instead.
+						return persistedData?.variants.find((x) => x.culture === variant.culture && x.segment === variant.segment);
+					}
+				})
+				.filter((x) => x !== undefined) as Array<UmbDocumentVariantModel>,
+		};
+	}
+
+	async #performSaveOrCreate(selectedVariants: Array<UmbVariantId>) {
+		const saveData = this.#buildSaveData(selectedVariants);
 
 		if (this.getIsNew()) {
-			if ((await this.repository.create(data)).data !== undefined) {
-				this.setIsNew(false);
+			if (!this.#parent) throw new Error('Parent is not set');
+
+			const { data: create, error } = await this.repository.create(saveData, this.#parent.unique);
+			if (!create || error) {
+				console.error('Error creating document', error);
+				throw new Error('Error creating document');
 			}
+
+			this.setIsNew(false);
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				entityType: this.#parent.entityType,
+				unique: this.#parent.unique,
+			});
+			eventContext.dispatchEvent(event);
 		} else {
-			await this.repository.save(data);
+			const { data: save, error } = await this.repository.save(saveData);
+			if (!save || error) {
+				console.error('Error saving document', error);
+				throw new Error('Error saving document');
+			}
 		}
 
 		return selectedVariants;
 	}
 
 	async save() {
-		await this.#pickVariantsForAction('save');
+		await this.#runUserFlorFor('save');
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 
-		this.saveComplete(data);
+		this.workspaceComplete(data);
 	}
 
 	public async publish() {
-		const variantIds = await this.#pickVariantsForAction('publish');
+		const variantIds = await this.#runUserFlorFor('publish');
 		const unique = this.getUnique();
 		if (variantIds.length && unique) {
 			await this.publishingRepository.publish(unique, variantIds);
+			this.workspaceComplete(this.#currentData.getValue());
 		}
 	}
 

@@ -27,8 +27,11 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: String })
-	public set label(label: string) {
+	public set label(label: string | undefined) {
 		this.#propertyContext.setLabel(label);
+	}
+	public get label() {
+		return this.#propertyContext.getLabel();
 	}
 
 	/**
@@ -38,8 +41,11 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: String })
-	public set description(description: string) {
+	public set description(description: string | undefined) {
 		this.#propertyContext.setDescription(description);
+	}
+	public get description() {
+		return this.#propertyContext.getDescription();
 	}
 
 	/**
@@ -53,6 +59,9 @@ export class UmbPropertyElement extends UmbLitElement {
 	public set alias(alias: string) {
 		this.#propertyContext.setAlias(alias);
 	}
+	public get alias() {
+		return this.#propertyContext.getAlias() ?? '';
+	}
 
 	/**
 	 * Property Editor UI Alias. Render the Property Editor UI registered for this alias.
@@ -62,12 +71,14 @@ export class UmbPropertyElement extends UmbLitElement {
 	 * @default ''
 	 */
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
-	public set propertyEditorUiAlias(value: string) {
-		if (this._propertyEditorUiAlias === value) return;
+	public set propertyEditorUiAlias(value: string | undefined) {
 		this._propertyEditorUiAlias = value;
 		this._observePropertyEditorUI();
 	}
-	private _propertyEditorUiAlias = '';
+	public get propertyEditorUiAlias(): string {
+		return this._propertyEditorUiAlias ?? '';
+	}
+	private _propertyEditorUiAlias?: string;
 
 	/**
 	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
@@ -79,6 +90,9 @@ export class UmbPropertyElement extends UmbLitElement {
 	@property({ type: Array, attribute: false })
 	public set config(value: UmbPropertyEditorConfig | undefined) {
 		this.#propertyContext.setConfig(value);
+	}
+	public get config(): UmbPropertyEditorConfig | undefined {
+		return this.#propertyContext.getConfig();
 	}
 
 	@state()
@@ -130,13 +144,15 @@ export class UmbPropertyElement extends UmbLitElement {
 	};
 
 	private _observePropertyEditorUI(): void {
-		this.observe(
-			umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
-			(manifest) => {
-				this._gotEditorUI(manifest);
-			},
-			'_observePropertyEditorUI',
-		);
+		if (this._propertyEditorUiAlias) {
+			this.observe(
+				umbExtensionsRegistry.byTypeAndAlias('propertyEditorUi', this._propertyEditorUiAlias),
+				(manifest) => {
+					this._gotEditorUI(manifest);
+				},
+				'_observePropertyEditorUI',
+			);
+		}
 	}
 
 	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null): Promise<void> {

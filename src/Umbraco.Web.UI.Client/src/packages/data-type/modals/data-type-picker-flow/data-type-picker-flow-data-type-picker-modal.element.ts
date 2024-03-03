@@ -38,7 +38,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 		// TODO: This is a hack to get the data types of a property editor ui alias.
 		// TODO: Make sure filtering works data-type that does not have a property editor ui, but should be using the default property editor UI for those.
 		// TODO: make an end-point just retrieving the data types using a given property editor ui alias.
-		const { data } = await dataTypeTreeRepository.requestRootTreeItems();
+		const { data } = await dataTypeTreeRepository.requestRootTreeItems({ skip: 0, take: 100 });
 
 		if (!data) return;
 

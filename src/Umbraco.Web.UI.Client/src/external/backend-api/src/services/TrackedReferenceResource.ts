@@ -3,10 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { PagedRelationItemResponseModel } from '../models/PagedRelationItemResponseModel';
+
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+
 export class TrackedReferenceResource {
+
     /**
      * @returns PagedRelationItemResponseModel Success
      * @throws ApiError
@@ -38,6 +41,7 @@ export class TrackedReferenceResource {
             },
         });
     }
+
     /**
      * @returns PagedRelationItemResponseModel Success
      * @throws ApiError
@@ -69,6 +73,7 @@ export class TrackedReferenceResource {
             },
         });
     }
+
     /**
      * @returns PagedRelationItemResponseModel Success
      * @throws ApiError
@@ -98,4 +103,5 @@ export class TrackedReferenceResource {
             },
         });
     }
+
 }

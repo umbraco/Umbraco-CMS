@@ -6,6 +6,7 @@ export class UmbTrashEntityAction<
 	T extends UmbItemRepository<any> & { trash(unique: string): Promise<void> },
 > extends UmbEntityActionBase<T> {
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) return;
 
 		const { data } = await this.repository.requestItems([this.unique]);

@@ -9,13 +9,15 @@ export class UmbConfirmModalController extends UmbControllerBase {
 	async open(args: UmbConfirmModalArgs): Promise<void> {
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
-		const modalContext = modalManagerContext.open(UMB_CONFIRM_MODAL, {
+		const modalContext = modalManagerContext.open(this, UMB_CONFIRM_MODAL, {
 			data: args,
 		});
 
-		await modalContext.onSubmit().catch(() => {
+		const p = modalContext.onSubmit();
+		p.catch(() => {
 			this.destroy();
 		});
+		await p;
 
 		// This is a one time off, so we can destroy our selfs.
 		this.destroy();

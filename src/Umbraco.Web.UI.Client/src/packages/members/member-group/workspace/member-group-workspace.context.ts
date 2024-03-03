@@ -39,9 +39,9 @@ export class UmbMemberGroupWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null) {
+	async create() {
 		this.resetState();
-		const { data } = await this.detailRepository.createScaffold(parentUnique);
+		const { data } = await this.detailRepository.createScaffold();
 
 		if (data) {
 			this.setIsNew(true);
@@ -61,7 +61,8 @@ export class UmbMemberGroupWorkspaceContext
 			await this.detailRepository.save(data);
 		}
 
-		this.saveComplete(data);
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	getData() {

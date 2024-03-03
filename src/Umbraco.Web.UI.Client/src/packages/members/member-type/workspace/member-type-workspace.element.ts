@@ -15,10 +15,12 @@ export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create',
+			path: 'create/parent/:entityType/:parentUnique',
 			component: this.#createElement,
 			setup: (_component, info) => {
-				this.#workspaceContext.create(null);
+				const parentEntityType = info.match.params.entityType;
+				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+				this.#workspaceContext.create({ entityType: parentEntityType, unique: parentUnique });
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
