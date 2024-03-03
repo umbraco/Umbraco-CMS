@@ -9,9 +9,9 @@ import type { UmbAction } from '@umbraco-cms/backoffice/action';
 export interface UmbEntityAction<ArgsMetaType> extends UmbAction<UmbEntityActionArgs<ArgsMetaType>> {
 	/**
 	 * The href location, the action will act as a link.
-	 * @returns {Promise<string | null | undefined>}
+	 * @returns {Promise<string | undefined>}
 	 */
-	getHref(): Promise<string | null | undefined>;
+	getHref(): Promise<string | undefined>;
 
 	/**
 	 * The `execute` method, the action will act as a button.
