@@ -45,3 +45,4 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<undefi
 
 	destroy(): void {}
 }
+export default UmbUnpublishDocumentEntityAction;

@@ -60,3 +60,4 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<object> 
 
 	destroy(): void {}
 }
+export default UmbPublishDocumentEntityAction;
