@@ -204,7 +204,7 @@ public class UserGroupsController : BackOfficeNotificationsController
     /// <returns></returns>
     public PagedUserGroupResult GetPagedUserGroups(int page, string searchTerm = "", bool onlyCurrentUserGroups = true)
     {
-        var pageSize = 100;
+        var pageSize = 25;
         IEnumerable<IUserGroup> result = _userService.GetPagedUserGroups(page, out long totalGroups, pageSize, searchTerm);
         var currentPage = _umbracoMapper.MapEnumerable<IUserGroup, UserGroupBasic>(result)
             .ToList();
