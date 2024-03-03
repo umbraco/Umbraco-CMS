@@ -82,13 +82,14 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					${this._renderSelectionCount()}
 				</div>
 
-				<umb-extension-slot
+				<umb-extension-with-api-slot
 					id="actions"
 					type="entityBulkAction"
 					default-element="umb-entity-bulk-action"
 					.props=${this._extensionProps}
+					.apiArgs=${[this._extensionProps]}
 					@action-executed=${this.#onActionExecuted}>
-				</umb-extension-slot>
+				</umb-extension-with-api-slot>
 			</div>
 		`;
 	}

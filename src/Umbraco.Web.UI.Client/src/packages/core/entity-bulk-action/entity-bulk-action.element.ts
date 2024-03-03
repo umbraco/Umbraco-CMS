@@ -1,58 +1,23 @@
-import type { UmbEntityBulkActionBase } from './entity-bulk-action.js';
+import type { UmbEntityBulkActionBase } from './entity-bulk-action-base.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityBulkAction, MetaEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-bulk-action')
-export class UmbEntityBulkActionElement extends UmbLitElement {
-	private _selection: Array<string> = [];
-	@property({ type: Array, attribute: false })
-	public get selection() {
-		return this._selection;
-	}
-	public set selection(value: Array<string>) {
-		if (!value || value === this._selection) return;
-		const oldValue = this._selection;
-		this._selection = value;
-		this.#api ? this.#api.setSelection(this._selection) : this.#createApi();
-		this.requestUpdate('selection', oldValue);
-	}
+export class UmbEntityBulkActionElement<
+	MetaType = MetaEntityBulkAction,
+	ApiType extends UmbEntityBulkActionBase<MetaType> = UmbEntityBulkActionBase<MetaType>,
+> extends UmbLitElement {
+	@property({ attribute: false })
+	manifest?: ManifestEntityBulkAction<MetaEntityBulkAction>;
 
-	private _manifest?: ManifestEntityBulkAction;
-	@property({ type: Object, attribute: false })
-	public get manifest() {
-		return this._manifest;
-	}
-	public set manifest(value: ManifestEntityBulkAction | undefined) {
-		if (!value) return;
-		const oldValue = this._manifest;
-		this._manifest = value;
-		if (oldValue !== this._manifest) {
-			this.#createApi();
-			this.requestUpdate('manifest', oldValue);
-		}
-	}
-
-	async #createApi() {
-		if (!this._manifest) return;
-
-		this.#api = await createExtensionApi(this._manifest, [
-			this,
-			{
-				meta: this._manifest.meta,
-			},
-			this._selection,
-		]);
-	}
-
-	#api?: UmbEntityBulkActionBase;
+	api?: ApiType;
 
 	async #onClick(event: PointerEvent) {
-		if (!this.#api) return;
+		if (!this.api) return;
 		event.stopPropagation();
-		await this.#api.execute();
+		await this.api.execute();
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 

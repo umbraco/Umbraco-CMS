@@ -6,7 +6,6 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * An action to perform on an entity
  * For example for content you may wish to create a new document etc
  */
-// TODO: create interface for API
 export interface ManifestEntityAction<MetaType extends MetaEntityAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityAction<MetaType>>,
 		ManifestWithDynamicConditions {
