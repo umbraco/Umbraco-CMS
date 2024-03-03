@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbCreateDocumentEntityAction } from './create.action.js';
-import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{
@@ -28,7 +28,7 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-const modals: Array<ManifestModal> = [
+const modals: Array<ManifestTypes> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.Document.CreateOptions',
