@@ -3,6 +3,7 @@ import type { ManifestElementAndApi } from '../types/base.types.js';
 import type { ClassConstructor } from '../types/utils.js';
 import { loadManifestApi } from './load-manifest-api.function.js';
 import { loadManifestElement } from './load-manifest-element.function.js';
+import type { UmbApiConstructorArgumentsMethodType } from './types.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export async function createExtensionElementWithApi<
@@ -11,7 +12,7 @@ export async function createExtensionElementWithApi<
 >(
 	manifest: ManifestElementAndApi<ElementType, ApiType>,
 	fallbackElement?: string,
-	constructorArgs?: unknown[],
+	constructorArgs?: unknown[] | UmbApiConstructorArgumentsMethodType<ManifestElementAndApi<ElementType, ApiType>>,
 ): Promise<{ element?: ElementType; api?: ApiType }> {
 	const apiPropValue = manifest.api ?? manifest.js;
 	if (!apiPropValue) {
@@ -53,7 +54,10 @@ export async function createExtensionElementWithApi<
 	}
 
 	if (element && apiConstructor) {
-		const api = new apiConstructor(element, ...(constructorArgs ?? []));
+		// If constructorArgs is a function, call it with the manifest to get the arguments:
+		const additionalArgs = (typeof constructorArgs === 'function' ? constructorArgs(manifest) : constructorArgs) ?? [];
+
+		const api = new apiConstructor(element, ...additionalArgs);
 		// Return object with element & api:
 		return { element, api };
 	}
