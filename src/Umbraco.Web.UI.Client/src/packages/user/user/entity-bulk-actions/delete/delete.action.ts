@@ -3,7 +3,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
-export class UmbUserDeleteEntityBulkAction extends UmbEntityBulkActionBase<never> {
+export class UmbUserDeleteEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		if (this.selection.length === 0) return;
 

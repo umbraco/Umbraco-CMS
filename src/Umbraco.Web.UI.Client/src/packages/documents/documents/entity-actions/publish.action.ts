@@ -7,8 +7,8 @@ import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
-	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
+export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<object> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<object>) {
 		super(host, args);
 	}
 

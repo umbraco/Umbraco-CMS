@@ -1,6 +1,6 @@
 import type { UmbCollectionBulkActionPermissions } from '../../../core/collection/types.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_PUBLISHING_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action.js';
 import { UmbDocumentDeleteEntityBulkAction } from './delete/delete.action.js';
 import { UmbMoveDocumentEntityBulkAction } from './move/move.action.js';
@@ -21,8 +21,8 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		api: UmbDocumentPublishEntityBulkAction,
 		meta: {
 			label: 'Publish',
-			repositoryAlias: UMB_DOCUMENT_PUBLISHING_REPOSITORY_ALIAS,
 		},
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
@@ -42,8 +42,8 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		api: UmbDocumentUnpublishEntityBulkAction,
 		meta: {
 			label: 'Unpublish',
-			repositoryAlias: UMB_DOCUMENT_PUBLISHING_REPOSITORY_ALIAS,
 		},
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
@@ -63,8 +63,8 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		api: UmbDocumentCopyEntityBulkAction,
 		meta: {
 			label: 'Copy',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 		},
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
@@ -84,8 +84,8 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		api: UmbMoveDocumentEntityBulkAction,
 		meta: {
 			label: 'Move',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 		},
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
@@ -105,8 +105,8 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		api: UmbDocumentDeleteEntityBulkAction,
 		meta: {
 			label: 'Delete',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 		},
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
