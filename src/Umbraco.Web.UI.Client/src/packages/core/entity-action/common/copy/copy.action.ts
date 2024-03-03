@@ -9,4 +9,6 @@ export class UmbCopyEntityAction extends UmbEntityActionBase<any> {
 	async execute() {
 		console.log(`execute copy for: ${this.args.unique}`);
 	}
+
+	destroy(): void {}
 }
