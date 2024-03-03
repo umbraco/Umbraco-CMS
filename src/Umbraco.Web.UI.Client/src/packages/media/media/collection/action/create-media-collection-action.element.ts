@@ -122,7 +122,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 							this._allowedMediaTypes,
 							(item) => html`
 								<uui-menu-item label=${item.name} href=${this.#getCreateUrl(item)}>
-									<uui-icon slot="icon" name=${item.icon ?? 'icon-picture'}></uui-icon>
+									<umb-icon slot="icon" name=${item.icon ?? 'icon-picture'}></umb-icon>
 								</uui-menu-item>
 							`,
 						)}

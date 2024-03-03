@@ -73,7 +73,7 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 								}/${documentType.unique}`}"
 								label="${documentType.name}"
 								@click=${this.#onNavigate}>
-								> ${documentType.icon ? html`<uui-icon slot="icon" name=${documentType.icon}></uui-icon>` : nothing}
+								> ${documentType.icon ? html`<umb-icon slot="icon" name=${documentType.icon}></umb-icon>` : nothing}
 							</uui-menu-item>
 						`,
 					)}

@@ -112,7 +112,7 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				@open=${() => this.#onOpen(item.unique ?? '')}
 				@selected=${() => this.#onSelect(item)}
 				@deselected=${() => this.#onDeselect(item)}>
-				<uui-icon slot="icon" name=${item.icon}></uui-icon>
+				<umb-icon slot="icon" name=${item.icon}></umb-icon>
 				${this.#renderState(item)} ${this.#renderProperties(sortOrder, item)}
 			</uui-card-content-node>
 		`;
@@ -151,7 +151,8 @@ export class UmbDocumentGridCollectionViewElement extends UmbLitElement {
 				${repeat(
 					this._userDefinedProperties,
 					(column) => column.alias,
-					(column) => html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(sortOrder, item, column.alias)}</li>`,
+					(column) =>
+						html`<li><span>${column.header}:</span> ${getPropertyValueByAlias(sortOrder, item, column.alias)}</li>`,
 				)}
 			</ul>
 		`;

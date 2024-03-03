@@ -71,7 +71,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 								}}/${mediaType.unique}`}"
 								label="${mediaType.name}"
 								@click=${this.#onNavigate}>
-								> ${mediaType.icon ? html`<uui-icon slot="icon" name=${mediaType.icon}></uui-icon>` : nothing}
+								> ${mediaType.icon ? html`<umb-icon slot="icon" name=${mediaType.icon}></umb-icon>` : nothing}
 							</uui-menu-item>
 						`,
 					)}
