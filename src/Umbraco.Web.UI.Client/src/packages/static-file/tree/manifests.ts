@@ -44,9 +44,7 @@ const treeItem: ManifestTreeItem = {
 	kind: 'default',
 	alias: UMB_STATIC_FILE_TREE_ITEM_ALIAS,
 	name: 'Static File Tree Item',
-	meta: {
-		entityTypes: [UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_ROOT_ENTITY_TYPE, UMB_STATIC_FILE_FOLDER_ENTITY_TYPE],
-	},
+	forEntityTypes: [UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_ROOT_ENTITY_TYPE, UMB_STATIC_FILE_FOLDER_ENTITY_TYPE],
 };
 
 export const manifests = [treeRepository, treeStore, tree, treeItem];

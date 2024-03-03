@@ -13,10 +13,10 @@ const scriptViewActions: Array<ManifestTypes> = [
 		alias: UMB_DELETE_SCRIPT_ENTITY_ACTION_ALIAS,
 		name: 'Delete Script Entity Action',
 		kind: 'delete',
+		forEntityTypes: [UMB_SCRIPT_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_SCRIPT_ITEM_REPOSITORY_ALIAS,
-			entityTypes: [UMB_SCRIPT_ENTITY_TYPE],
 		},
 	},
 ];

@@ -7,8 +7,6 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Media.Tree.ReloadChildrenOf',
 		name: 'Reload Media Tree Item Children Entity Action',
 		kind: 'reloadTreeItemChildren',
-		meta: {
-			entityTypes: [UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE],
-		},
+		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE],
 	},
 ];

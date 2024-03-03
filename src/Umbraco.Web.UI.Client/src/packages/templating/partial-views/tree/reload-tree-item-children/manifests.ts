@@ -11,12 +11,10 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.PartialView.Tree.ReloadChildrenOf',
 		name: 'Reload Partial View Tree Item Children Entity Action',
 		kind: 'reloadTreeItemChildren',
-		meta: {
-			entityTypes: [
-				UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
-				UMB_PARTIAL_VIEW_ENTITY_TYPE,
-				UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
-			],
-		},
+		forEntityTypes: [
+			UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+			UMB_PARTIAL_VIEW_ENTITY_TYPE,
+			UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+		],
 	},
 ];

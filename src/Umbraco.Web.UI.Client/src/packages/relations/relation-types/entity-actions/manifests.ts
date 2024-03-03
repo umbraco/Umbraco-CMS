@@ -9,10 +9,10 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.RelationType.Delete',
 		name: 'Delete RelationType Entity Action',
 		kind: 'delete',
+		forEntityTypes: [UMB_RELATION_TYPE_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_RELATION_TYPE_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_RELATION_TYPE_REPOSITORY_ALIAS,
-			entityTypes: [UMB_RELATION_TYPE_ENTITY_TYPE],
 		},
 	},
 	{
@@ -21,11 +21,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Create RelationType Entity Action',
 		weight: 900,
 		api: UmbCreateRelationTypeEntityAction,
+		forEntityTypes: [UMB_RELATION_TYPE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias: UMB_RELATION_TYPE_REPOSITORY_ALIAS,
-			entityTypes: [UMB_RELATION_TYPE_ROOT_ENTITY_TYPE],
 		},
 	},
 ];

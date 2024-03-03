@@ -19,11 +19,11 @@ const entityActions = [
 		alias: UMB_DELETE_SCRIPT_FOLDER_ENTITY_ACTION_ALIAS,
 		name: 'Delete Script folder',
 		api: UmbDeleteFolderEntityAction,
+		forEntityTypes: [UMB_SCRIPT_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete folder...',
 			repositoryAlias: UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_SCRIPT_FOLDER_ENTITY_TYPE],
 		},
 	},
 ];

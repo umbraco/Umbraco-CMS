@@ -1,7 +1,5 @@
 import {
 	UMB_CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
-	UMB_DISABLE_USER_REPOSITORY_ALIAS,
-	UMB_ENABLE_USER_REPOSITORY_ALIAS,
 	UMB_UNLOCK_USER_REPOSITORY_ALIAS,
 	UMB_USER_DETAIL_REPOSITORY_ALIAS,
 	UMB_USER_ITEM_REPOSITORY_ALIAS,
@@ -19,10 +17,10 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.User.Delete',
 		name: 'Delete User Entity Action',
 		kind: 'delete',
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_USER_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_USER_ITEM_REPOSITORY_ALIAS,
-			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
 			{
@@ -36,10 +34,10 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Enable User Entity Action',
 		weight: 800,
 		api: UmbEnableUserEntityAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-check',
 			label: 'Enable',
-			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
 			{
@@ -53,10 +51,10 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Disable User Entity Action',
 		weight: 700,
 		api: UmbDisableUserEntityAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-block',
 			label: 'Disable',
-			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
 			{
@@ -70,11 +68,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Change User Password Entity Action',
 		weight: 600,
 		api: UmbChangeUserPasswordEntityAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-key',
 			label: 'Change Password',
 			repositoryAlias: UMB_CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
-			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 	},
 	{
@@ -83,11 +81,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Unlock User Entity Action',
 		weight: 600,
 		api: UmbUnlockUserEntityAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-unlocked',
 			label: 'Unlock',
 			repositoryAlias: UMB_UNLOCK_USER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
 			{

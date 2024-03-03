@@ -11,8 +11,6 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Stylesheet.Tree.ReloadChildrenOf',
 		name: 'Reload Stylesheet Tree Item Children Entity Action',
 		kind: 'reloadTreeItemChildren',
-		meta: {
-			entityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
-		},
+		forEntityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 	},
 ];

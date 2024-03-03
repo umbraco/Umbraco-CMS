@@ -9,10 +9,10 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Create Media Entity Action',
 		weight: 1000,
 		api: UmbCreateMediaEntityAction,
+		forEntityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			entityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_ENTITY_TYPE],
 		},
 	},
 ];

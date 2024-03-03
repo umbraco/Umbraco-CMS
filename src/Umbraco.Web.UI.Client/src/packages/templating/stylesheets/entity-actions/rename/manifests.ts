@@ -17,10 +17,10 @@ export const manifests: Array<ManifestTypes> = [
 		alias: UMB_RENAME_STYLESHEET_ENTITY_ACTION_ALIAS,
 		name: 'Rename Stylesheet Entity Action',
 		kind: 'rename',
+		forEntityTypes: [UMB_STYLESHEET_ENTITY_TYPE],
 		meta: {
 			renameRepositoryAlias: UMB_RENAME_STYLESHEET_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS,
-			entityTypes: [UMB_STYLESHEET_ENTITY_TYPE],
 		},
 	},
 ];
