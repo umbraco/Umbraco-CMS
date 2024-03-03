@@ -12,14 +12,14 @@ export async function createExtensionElementWithApi<
 	manifest: ManifestElementAndApi<ElementType, ApiType>,
 	fallbackElement?: string,
 	constructorArgs?: unknown[],
-): Promise<{ element: ElementType; api: ApiType } | undefined> {
+): Promise<{ element?: ElementType; api?: ApiType }> {
 	const apiPropValue = manifest.api ?? manifest.js;
 	if (!apiPropValue) {
 		console.error(
 			`-- Extension of alias "${manifest.alias}" did not succeed creating an api class instance, missing a JavaScript file via the 'api' or 'js' property, using either a 'api' or 'default'(not supported on the JS property) export`,
 			manifest,
 		);
-		return undefined;
+		return {};
 	}
 	const apiPromise = loadManifestApi<ApiType>(apiPropValue);
 	let apiConstructor: ClassConstructor<ApiType> | undefined;
@@ -62,5 +62,5 @@ export async function createExtensionElementWithApi<
 		`-- Extension of alias "${manifest.alias}" did not succeed creating an element with api, missing one or two JavaScript files via the 'element' and 'api' or the 'js' property or with just 'api' and the Element Name in 'elementName' in the manifest.`,
 		manifest,
 	);
-	return undefined;
+	return {};
 }

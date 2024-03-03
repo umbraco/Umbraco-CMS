@@ -1,10 +1,9 @@
-import { createExtensionApi } from '../functions/create-extension-api.function.js';
-import { createExtensionElement } from '../functions/create-extension-element.function.js';
+import { createExtensionElementWithApi } from '../functions/create-extension-element-with-api.function.js';
 import type { UmbApi } from '../models/api.interface.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestElementAndApi, ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * This Controller manages a single Extension initializing its Element and API.
@@ -21,8 +20,8 @@ export class UmbExtensionElementAndApiInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	ControllerType extends UmbExtensionElementAndApiInitializer<ManifestType, any> = any,
 	ExtensionInterface extends ManifestElementAndApi = ManifestType extends ManifestElementAndApi ? ManifestType : never,
-	ExtensionElementInterface extends HTMLElement | undefined = ExtensionInterface['ELEMENT_TYPE'],
-	ExtensionApiInterface extends UmbApi | undefined = ExtensionInterface['API_TYPE'],
+	ExtensionElementInterface extends UmbControllerHostElement = NonNullable<ExtensionInterface['ELEMENT_TYPE']>,
+	ExtensionApiInterface extends UmbApi = NonNullable<ExtensionInterface['API_TYPE']>,
 > extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 	#defaultElement?: string;
 	#component?: ExtensionElementInterface;
@@ -97,13 +96,10 @@ export class UmbExtensionElementAndApiInitializer<
 	protected async _conditionsAreGood() {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
-		const promises = await Promise.all([
-			createExtensionApi(manifest, this.#constructorArguments),
-			createExtensionElement(manifest, this.#defaultElement),
-		]);
-
-		const newApi = promises[0] as ExtensionApiInterface;
-		const newComponent = promises[1] as ExtensionElementInterface;
+		const { element: newComponent, api: newApi } = await createExtensionElementWithApi<
+			ExtensionElementInterface,
+			ExtensionApiInterface
+		>(manifest, this.#defaultElement, this.#constructorArguments);
 
 		if (!this._isConditionsPositive) {
 			newApi?.destroy?.();

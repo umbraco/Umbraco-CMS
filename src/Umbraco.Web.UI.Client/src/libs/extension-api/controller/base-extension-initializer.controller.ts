@@ -317,6 +317,5 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#onPermissionChanged = undefined;
 		(this.#extensionRegistry as any) = undefined;
 		super.destroy();
-		// Destroy the conditions controllers, they are begin destroyed cause they are controllers...
 	}
 }
