@@ -56,7 +56,6 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-block',
 			label: 'Disable',
-			repositoryAlias: UMB_DISABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
