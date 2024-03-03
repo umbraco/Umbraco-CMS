@@ -10,7 +10,7 @@ import type { UmbCopyRepository, UmbItemRepository } from '@umbraco-cms/backoffi
 export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateKind> {
 	// TODO: make base type for item and detail models
 	#itemRepository?: UmbItemRepository<any>;
-	#copyRepository?: UmbCopyRepository;
+	#duplicateRepository?: UmbCopyRepository;
 	#init: Promise<unknown>;
 
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionDuplicateKind>) {
@@ -32,10 +32,10 @@ export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActi
 			new UmbExtensionApiInitializer(
 				this._host,
 				umbExtensionsRegistry,
-				this.args.meta.copyRepositoryAlias,
+				this.args.meta.duplicateRepositoryAlias,
 				[this._host],
 				(permitted, ctrl) => {
-					this.#copyRepository = permitted ? (ctrl.api as UmbCopyRepository) : undefined;
+					this.#duplicateRepository = permitted ? (ctrl.api as UmbCopyRepository) : undefined;
 				},
 			).asPromise(),
 		]);
@@ -49,7 +49,7 @@ export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActi
 		const modalContext = modalManager.open(this, this.args.meta.pickerModalAlias) as any; // TODO: make generic picker interface with selection
 		const value = await modalContext.onSubmit();
 		if (!value) return;
-		await this.#copyRepository!.copy(this.args.unique, value.selection[0]);
+		await this.#duplicateRepository!.copy(this.args.unique, value.selection[0]);
 	}
 
 	destroy(): void {}
