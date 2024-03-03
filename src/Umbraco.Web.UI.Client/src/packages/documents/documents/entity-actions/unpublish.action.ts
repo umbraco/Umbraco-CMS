@@ -5,7 +5,7 @@ import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/languag
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<undefined> {
+export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<object> {
 	async execute() {
 		if (!this.args.unique) throw new Error('The document unique identifier is missing');
 
