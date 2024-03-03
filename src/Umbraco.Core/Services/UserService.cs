@@ -892,6 +892,20 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
+    /// <summary>
+    ///     Gets paged UserGroups
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    public IEnumerable<IUserGroup> GetPagedUserGroups(int page, out long totalGroups, int pageSize, string searchTerm = "")
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _userGroupRepository.GetPagedUserGroups(page, pageSize, out totalGroups, searchTerm);
+        }
+    }
+
     public IEnumerable<IUserGroup> GetUserGroupsByAlias(params string[] aliases)
     {
         if (aliases.Length == 0)

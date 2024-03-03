@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -194,6 +196,51 @@ public class UserGroupsController : BackOfficeNotificationsController
     }
 
     /// <summary>
+    ///     Returns paged user groups
+    /// </summary>
+    /// <param name="page">Current page</param>
+    /// <param name="searchTerm"></param>
+    /// <param name="onlyCurrentUserGroups"></param>
+    /// <returns></returns>
+    public PagedUserGroupResult GetPagedUserGroups(int page, string searchTerm = "", bool onlyCurrentUserGroups = true)
+    {
+        var pageSize = 1;
+        IEnumerable<IUserGroup> result = _userService.GetPagedUserGroups(page, out long totalGroups, pageSize, searchTerm);
+        var currentPage = _umbracoMapper.MapEnumerable<IUserGroup, UserGroupBasic>(result)
+            .ToList();
+
+        var isAdmin = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin() ?? false;
+        if (isAdmin)
+        {
+            return new PagedUserGroupResult(totalGroups, page, pageSize)
+            {
+                Groups = currentPage,
+            };
+        }
+
+        if (onlyCurrentUserGroups == false)
+        {
+            //this user is not an admin so in that case we need to exclude all admin users
+            currentPage.RemoveAt(
+                currentPage.IndexOf(currentPage.Find(basic => basic.Alias == Constants.Security.AdminGroupAlias)!));
+
+            return new PagedUserGroupResult(totalGroups, page, pageSize)
+            {
+                Groups = currentPage,
+            };
+        }
+
+        //we cannot return user groups that this user does not have access to
+        var currentUserGroups = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups.Select(x => x.Alias)
+            .ToArray();
+
+        return new PagedUserGroupResult(totalGroups, page, pageSize)
+        {
+            Groups = currentPage.WhereNotNull().Where(x => currentUserGroups?.Contains(x.Alias) ?? false).ToList(),
+        };
+    }
+
+    /// <summary>
     ///     Return a user group
     /// </summary>
     /// <returns></returns>
@@ -231,5 +278,18 @@ public class UserGroupsController : BackOfficeNotificationsController
         }
 
         return Ok(_localizedTextService.Localize("speechBubbles", "deleteUserGroupSuccess", new[] { userGroups[0].Name }));
+    }
+
+    public class PagedUserGroupResult : PagedResult<UserBasic>
+    {
+        public PagedUserGroupResult(long totalItems, long pageNumber, long pageSize) :
+            base(totalItems, pageNumber, pageSize)
+        { }
+
+        /// <summary>
+        /// Contains paged groups
+        /// </summary>
+        [JsonProperty("groups")]
+        public IEnumerable<UserGroupBasic> Groups { get; init; } = [];
     }
 }

@@ -243,6 +243,14 @@ public interface IUserService : IMembershipUserService
     IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids);
 
     /// <summary>
+    /// Get paged UserGroups
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="pageSize">Default is 20</param>
+    /// <returns></returns>
+    IEnumerable<IUserGroup> GetPagedUserGroups(int page, out long totalGroups, int pageSize, string searchTerm = "");
+
+    /// <summary>
     ///     Gets a UserGroup by its Alias
     /// </summary>
     /// <param name="alias">Alias of the UserGroup to retrieve</param>
