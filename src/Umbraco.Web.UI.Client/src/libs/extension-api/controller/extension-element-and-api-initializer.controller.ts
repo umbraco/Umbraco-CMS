@@ -1,4 +1,5 @@
 import { createExtensionElementWithApi } from '../functions/create-extension-element-with-api.function.js';
+import type { UmbApiConstructorArgumentsMethodType } from '../index.js';
 import type { UmbApi } from '../models/api.interface.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestElementAndApi, ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
@@ -26,7 +27,7 @@ export class UmbExtensionElementAndApiInitializer<
 	#defaultElement?: string;
 	#component?: ExtensionElementInterface;
 	#api?: ExtensionApiInterface;
-	#constructorArguments?: Array<unknown>;
+	#constructorArguments?: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType>;
 
 	/**
 	 * The component that is created for this extension.
@@ -98,7 +99,7 @@ export class UmbExtensionElementAndApiInitializer<
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		constructorArguments: Array<unknown> | undefined,
+		constructorArguments: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType> | undefined,
 		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void,
 		defaultElement?: string,
 	) {

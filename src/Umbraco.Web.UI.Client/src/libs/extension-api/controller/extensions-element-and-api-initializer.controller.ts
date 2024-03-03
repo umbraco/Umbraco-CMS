@@ -1,6 +1,7 @@
 import type { ManifestBase } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import type { UmbApiConstructorArgumentsMethodType } from '../index.js';
 import { UmbExtensionElementAndApiInitializer } from './extension-element-and-api-initializer.controller.js';
 import {
 	type PermittedControllerType,
@@ -27,7 +28,7 @@ export class UmbExtensionsElementAndApiInitializer<
 	//
 	#extensionRegistry;
 	#defaultElement?: string;
-	#constructorArgs: Array<unknown> | undefined;
+	#constructorArgs: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType> | undefined;
 	#elProps?: Record<string, unknown>;
 	#apiProps?: Record<string, unknown>;
 
