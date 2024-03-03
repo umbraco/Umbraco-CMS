@@ -28,4 +28,6 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<any> {
 		}
 		*/
 	}
+
+	destroy(): void {}
 }

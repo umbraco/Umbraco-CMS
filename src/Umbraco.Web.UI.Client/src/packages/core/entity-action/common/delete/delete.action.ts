@@ -57,4 +57,6 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 
 		await this.#detailRepository!.delete(this.args.unique);
 	}
+
+	destroy(): void {}
 }

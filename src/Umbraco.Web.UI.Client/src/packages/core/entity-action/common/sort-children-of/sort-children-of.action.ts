@@ -9,4 +9,6 @@ export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<any> {
 	async execute() {
 		console.log(`execute sort for: ${this.args.unique}`);
 	}
+
+	destroy(): void {}
 }

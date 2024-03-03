@@ -9,4 +9,6 @@ export class UmbMoveEntityAction extends UmbEntityActionBase<any> {
 	async execute() {
 		console.log(`execute move for: ${this.args.unique}`);
 	}
+
+	destroy(): void {}
 }
