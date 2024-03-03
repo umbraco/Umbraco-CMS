@@ -1,5 +1,4 @@
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UmbCreateDocumentEntityAction } from './create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -8,7 +7,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Document.Create',
 		name: 'Create Document Entity Action',
 		weight: 1000,
-		api: UmbCreateDocumentEntityAction,
+		api: () => import('./create.action.js'),
 		forEntityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',

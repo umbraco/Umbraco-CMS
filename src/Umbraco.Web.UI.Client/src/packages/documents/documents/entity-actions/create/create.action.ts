@@ -35,3 +35,4 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<never> {
 
 	destroy(): void {}
 }
+export default UmbCreateDocumentEntityAction;
