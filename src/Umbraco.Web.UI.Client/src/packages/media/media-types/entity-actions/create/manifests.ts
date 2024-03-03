@@ -17,8 +17,8 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create...',
-			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE, UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE],
+			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 	{

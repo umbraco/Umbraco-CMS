@@ -13,8 +13,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_ENTITY_TYPE],
+			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 		},
 		/* removed until we have permissions in place
 		conditions: [
