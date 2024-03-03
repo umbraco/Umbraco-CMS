@@ -1,13 +1,11 @@
-import type { UmbEnableUserRepository } from '../../repository/enable/enable-user.repository.js';
+import { UmbEnableUserRepository } from '../../repository/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbEnableUserEntityBulkAction extends UmbEntityBulkActionBase<UmbEnableUserRepository> {
-	constructor(host: UmbControllerHost, repositoryAlias: string, selection: Array<string>) {
-		super(host, repositoryAlias, selection);
-	}
-
+export class UmbEnableUserEntityBulkAction extends UmbEntityBulkActionBase<never> {
 	async execute() {
-		await this.repository?.enable(this.selection);
+		const repository = new UmbEnableUserRepository(this._host);
+		await repository.enable(this.selection);
 	}
+
+	destroy(): void {}
 }
