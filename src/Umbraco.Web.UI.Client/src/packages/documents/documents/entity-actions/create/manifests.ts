@@ -13,7 +13,6 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		},
 		/* removed until we have permissions in place

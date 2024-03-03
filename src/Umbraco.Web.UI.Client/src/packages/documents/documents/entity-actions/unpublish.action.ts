@@ -2,18 +2,19 @@ import { umbPickDocumentVariantModal } from '../modals/pick-document-variant-mod
 import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentVariantState } from '../types.js';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<unknown> {
+export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<UmbEntityActionArgs<never>> {
 	async execute() {
-		if (!this.unique) throw new Error('The document unique identifier is missing');
+		if (!this.args.unique) throw new Error('The document unique identifier is missing');
 
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestCollection({});
 
 		const documentRepository = new UmbDocumentDetailRepository(this._host);
-		const { data: documentData } = await documentRepository.requestByUnique(this.unique);
+		const { data: documentData } = await documentRepository.requestByUnique(this.args.unique);
 
 		if (!documentData) throw new Error('The document was not found');
 
@@ -39,7 +40,9 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<unknow
 
 		if (selectedVariants.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			await publishingRepository.unpublish(this.unique, selectedVariants);
+			await publishingRepository.unpublish(this.args.unique, selectedVariants);
 		}
 	}
+
+	destroy(): void {}
 }
