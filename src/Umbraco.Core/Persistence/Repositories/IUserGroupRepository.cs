@@ -8,8 +8,18 @@ public interface IUserGroupRepository : IReadWriteQueryRepository<int, IUserGrou
     ///     Gets a group by it's alias
     /// </summary>
     /// <param name="alias"></param>
-    /// <returns></returns>
+    /// <returns></returns>GetPagedUserGroups
     IUserGroup? Get(string alias);
+
+    /// <summary>
+    /// Get paged user group results
+    /// </summary>
+    /// <param name="pageIndex"></param>
+    /// <param name="pageSize"></param>
+    /// <param name="totalRecords"></param>
+    /// <param name="searchTerm"></param>
+    /// <returns></returns>
+    public IEnumerable<IUserGroup> GetPagedUserGroups(int pageIndex, int pageSize, out long totalRecords, string searchTerm = "");
 
     /// <summary>
     ///     This is useful when an entire section is removed from config

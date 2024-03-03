@@ -169,6 +169,28 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
     public static string GetByAliasCacheKey(string alias) => CacheKeys.UserGroupGetByAliasCacheKeyPrefix + alias;
 
+    public IEnumerable<IUserGroup> GetPagedUserGroups(int pageIndex, int pageSize, out long totalRecords, string searchTerm = "")
+    {
+        Sql<ISqlContext> sql = SqlContext.Sql()
+           .Select<UserGroupDto>()
+           .From<UserGroupDto>();
+
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            sql = sql.Where<UserGroupDto>(x=>x.Name != null && x.Name.ToLower().Contains(searchTerm.ToLower()));
+        }
+
+        Page<UserGroupDto> pagedResult = Database.Page<UserGroupDto>(pageIndex, pageSize, sql);
+        List<UserGroupDto> dtos = pagedResult.Items;
+
+        var result = dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x))
+            .ToList();
+
+        totalRecords = pagedResult.TotalItems;
+
+        return result;
+    }
+
     /// <summary>
     ///     used to persist a user group with associated users at once
     /// </summary>
@@ -502,6 +524,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             List<UserGroup2LanguageDto> userGroupLanguages = Database.Fetch<UserGroup2LanguageDto>(query);
             return userGroupLanguages.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
         }
+
 
     #endregion
 }
