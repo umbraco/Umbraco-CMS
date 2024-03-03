@@ -161,7 +161,6 @@
     }
 
     var unbindFilterWatcher = $scope.$watch("vm.filter", function (newVal, oldVal) {
-      /*vm.filteredUserGroups = $filter('filter')(vm.userGroups, vm.filter);*/
       vm.pagination.pageNumber = 1;
       getGroups();
     });
