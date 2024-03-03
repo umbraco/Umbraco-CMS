@@ -81,16 +81,16 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 */
 	@property({ attribute: false })
 	get elementProps(): Record<string, unknown> | undefined {
-		return this.#props;
+		return this.#elProps;
 	}
 	set elementProps(newVal: Record<string, unknown> | undefined) {
 		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
-		this.#props = newVal;
+		this.#elProps = newVal;
 		if (this.#extensionsController) {
-			this.#extensionsController.properties = newVal;
+			this.#extensionsController.elementProperties = newVal;
 		}
 	}
-	#props?: Record<string, unknown> = {};
+	#elProps?: Record<string, unknown> = {};
 
 	/**
 	 * constructor arguments to pass to the extensions apis.
@@ -109,6 +109,27 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 		this.#constructorArgs = newVal;
 	}
 	#constructorArgs?: Array<unknown> = [];
+
+	/**
+	 * Properties to pass to the extensions apis.
+	 * Notice: The individual manifest of the extension is parsed to each extension api no matter if this is set or not.
+	 * @type {Record<string, any>}
+	 * @memberof UmbExtensionSlot
+	 * @example
+	 * <umb-extension-with-api-slot type="my-extension-type" .apiProps=${{foo: 'bar'}}></umb-extension-with-api-slot>
+	 */
+	@property({ attribute: false })
+	get apiProps(): Record<string, unknown> | undefined {
+		return this.#apiProps;
+	}
+	set apiProps(newVal: Record<string, unknown> | undefined) {
+		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
+		this.#apiProps = newVal;
+		if (this.#extensionsController) {
+			this.#extensionsController.apiProperties = newVal;
+		}
+	}
+	#apiProps?: Record<string, unknown> = {};
 
 	@property({ type: String, attribute: 'default-element' })
 	public defaultElement?: string;
@@ -139,7 +160,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 				undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 				this.defaultElement,
 			);
-			this.#extensionsController.properties = this.#props;
+			this.#extensionsController.elementProperties = this.#elProps;
 		}
 	}
 
