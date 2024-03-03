@@ -106,8 +106,11 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		modalContext?.onSubmit().then((saved) => {
-			if (saved.icon && saved.color) this.#workspaceContext?.setIcon(`${saved.icon} color-${saved.color}`);
-			else if (saved.icon) this.#workspaceContext?.setIcon(saved.icon);
+			if (saved.icon && saved.color) {
+				this.#workspaceContext?.setIcon(`${saved.icon} color-${saved.color}`);
+			} else if (saved.icon) {
+				this.#workspaceContext?.setIcon(saved.icon);
+			}
 		});
 	}
 
