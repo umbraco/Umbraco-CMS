@@ -59,11 +59,23 @@ export abstract class UmbBaseExtensionsInitializer<
 		this.#onChange = onChange;
 	}
 	protected _init() {
-		let source = Array.isArray(this.#type)
-			? this.#extensionRegistry.byTypes<ManifestType>(this.#type as string[])
-			: this.#extensionRegistry.byType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
-		if (this.#filter) {
-			source = createObservablePart(source, (extensions: Array<ManifestType>) => extensions.filter(this.#filter!));
+		let source;
+
+		if (Array.isArray(this.#type)) {
+			if (this.#filter) {
+				source = this.#extensionRegistry.byTypesAndFilter<ManifestType>(this.#type as string[], this.#filter);
+			} else {
+				source = this.#extensionRegistry.byTypes<ManifestType>(this.#type as string[]);
+			}
+		} else {
+			if (this.#filter) {
+				source = this.#extensionRegistry.byTypeAndFilter<ManifestTypeName, ManifestType>(
+					this.#type as ManifestTypeName,
+					this.#filter,
+				);
+			} else {
+				source = this.#extensionRegistry.byType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
+			}
 		}
 		this.observe(source, this.#gotManifests, '_observeManifests') as any;
 	}
