@@ -46,7 +46,7 @@ export class UmbInputBlockTypeElement<
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
 		// TODO: Make as mode for the Picker Modal, so the click to select immediately submits the modal(And in that mode we do not want to see a Submit button).
-		const modalContext = modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+		const modalContext = modalManager.open(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: false,

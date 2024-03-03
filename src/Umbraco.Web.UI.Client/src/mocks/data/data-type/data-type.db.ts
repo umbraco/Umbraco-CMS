@@ -47,17 +47,16 @@ const createDetailMockMapper = (request: CreateDataTypeRequestModel): UmbMockDat
 		editorAlias: request.editorAlias,
 		editorUiAlias: request.editorUiAlias,
 		values: request.values,
+		canIgnoreStartNodes: false,
 		isFolder: false,
 		hasChildren: false,
 		isDeletable: true,
-		canIgnoreStartNodes: false,
 	};
 };
 
 const detailResponseMapper = (item: UmbMockDataTypeModel): DataTypeResponseModel => {
 	return {
 		id: item.id,
-		parent: item.parent,
 		name: item.name,
 		editorAlias: item.editorAlias,
 		editorUiAlias: item.editorUiAlias,

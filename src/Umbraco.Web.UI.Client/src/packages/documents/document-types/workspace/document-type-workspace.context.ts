@@ -1,11 +1,15 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTypeDetailModel } from '../types.js';
-import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -16,6 +20,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly repository = new UmbDocumentTypeDetailRepository(this);
 	// Data/Draft is located in structure manager
 
+	#parent?: { entityType: string; unique: string | null };
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
@@ -25,12 +30,13 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly description;
 	readonly icon;
 
-	readonly allowedAsRoot;
+	readonly allowedAtRoot;
 	readonly variesByCulture;
 	readonly variesBySegment;
 	readonly isElement;
 	readonly allowedContentTypes;
 	readonly compositions;
+	readonly collection;
 
 	// Document type specific:
 	readonly allowedTemplateIds;
@@ -51,12 +57,13 @@ export class UmbDocumentTypeWorkspaceContext
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
 		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
-		this.allowedAsRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAsRoot);
+		this.allowedAtRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAtRoot);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((data) => data?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((data) => data?.variesBySegment);
 		this.isElement = this.structure.ownerContentTypeObservablePart((data) => data?.isElement);
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
+		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 
 		// Document type specific:
 		this.allowedTemplateIds = this.structure.ownerContentTypeObservablePart((data) => data?.allowedTemplates);
@@ -87,15 +94,17 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	getEntityType() {
-		return 'document-type';
+		return UMB_DOCUMENT_TYPE_ENTITY_TYPE;
 	}
 
 	setName(name: string) {
 		this.structure.updateOwnerContentType({ name });
 	}
+
 	setAlias(alias: string) {
 		this.structure.updateOwnerContentType({ alias });
 	}
+
 	setDescription(description: string) {
 		this.structure.updateOwnerContentType({ description });
 	}
@@ -105,36 +114,47 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ icon });
 	}
 
-	setAllowedAsRoot(allowedAsRoot: boolean) {
-		this.structure.updateOwnerContentType({ allowedAsRoot });
+	setAllowedAtRoot(allowedAtRoot: boolean) {
+		this.structure.updateOwnerContentType({ allowedAtRoot });
 	}
+
 	setVariesByCulture(variesByCulture: boolean) {
 		this.structure.updateOwnerContentType({ variesByCulture });
 	}
+
 	setVariesBySegment(variesBySegment: boolean) {
 		this.structure.updateOwnerContentType({ variesBySegment });
 	}
+
 	setIsElement(isElement: boolean) {
 		this.structure.updateOwnerContentType({ isElement });
 	}
+
 	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
 		this.structure.updateOwnerContentType({ allowedContentTypes });
 	}
+
 	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
 		this.structure.updateOwnerContentType({ compositions });
+	}
+
+	setCollection(collection: UmbReferenceByUnique) {
+		this.structure.updateOwnerContentType({ collection });
 	}
 
 	// Document type specific:
 	setAllowedTemplateIds(allowedTemplates: Array<{ id: string }>) {
 		this.structure.updateOwnerContentType({ allowedTemplates });
 	}
+
 	setDefaultTemplate(defaultTemplate: { id: string }) {
 		this.structure.updateOwnerContentType({ defaultTemplate });
 	}
 
-	async create(parentUnique: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		const { data } = await this.structure.createScaffold(parentUnique);
+		this.#parent = parent;
+		const { data } = await this.structure.createScaffold();
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -162,14 +182,25 @@ export class UmbDocumentTypeWorkspaceContext
 		if (data === undefined) throw new Error('Cannot save, no data');
 
 		if (this.getIsNew()) {
-			if ((await this.structure.create()) === true) {
+			if (!this.#parent) throw new Error('Parent is not set');
+
+			if ((await this.structure.create(this.#parent.unique)) === true) {
+				// TODO: this might not be the right place to alert the tree, but it works for now
+				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+					entityType: this.#parent.entityType,
+					unique: this.#parent.unique,
+				});
+				eventContext.dispatchEvent(event);
+
 				this.setIsNew(false);
 			}
 		} else {
 			await this.structure.save();
 		}
 
-		this.saveComplete(data);
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	public destroy(): void {

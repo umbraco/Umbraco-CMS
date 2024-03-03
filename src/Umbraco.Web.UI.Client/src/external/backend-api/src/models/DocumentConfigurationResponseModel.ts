@@ -8,5 +8,6 @@ export type DocumentConfigurationResponseModel = {
     disableDeleteWhenReferenced: boolean;
     disableUnpublishWhenReferenced: boolean;
     allowEditInvariantFromNonDefault: boolean;
+    allowNonExistingSegmentsCreation: boolean;
 };
 

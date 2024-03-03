@@ -1,3 +1,4 @@
+import { pagedResult } from '../paged-result.js';
 import type { UmbEntityMockDbBase } from './entity-base.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -11,18 +12,27 @@ export class UmbMockEntityTreeManager<T extends Omit<EntityTreeItemResponseModel
 		this.#treeItemMapper = treeItemMapper;
 	}
 
-	getRoot() {
+	getRoot({ skip = 0, take = 100 }: { skip?: number; take?: number } = {}) {
 		const items = this.#db.getAll().filter((item) => item.parent === null);
-		const treeItems = items.map((item) => this.#treeItemMapper(item));
-		const total = items.length;
-		return { items: treeItems, total };
+		return this.#pagedTreeResult({ items, skip, take });
 	}
 
-	getChildrenOf(parentId: string) {
+	getChildrenOf({ parentId, skip = 0, take = 100 }: { parentId: string; skip?: number; take?: number }) {
 		const items = this.#db.getAll().filter((item) => item.parent?.id === parentId);
-		const treeItems = items.map((item) => this.#treeItemMapper(item));
-		const total = items.length;
-		return { items: treeItems, total };
+		return this.#pagedTreeResult({ items, skip, take });
+	}
+
+	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {
+		const paged = pagedResult(items, skip, take);
+		const treeItems = paged.items.map((item) => this.#treeItemMapper(item));
+		const treeItemsHasChildren = treeItems.map((item) => {
+			const children = this.#db.getAll().filter((child) => child.parent?.id === item.id);
+			return {
+				...item,
+				hasChildren: children.length > 0,
+			};
+		});
+		return { items: treeItemsHasChildren, total: paged.total };
 	}
 
 	move(ids: Array<string>, destinationId: string) {

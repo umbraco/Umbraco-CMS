@@ -1,12 +1,16 @@
 import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
-import type { UmbMediaTypeDetailModel } from '../types.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
+import type { UmbMediaTypeDetailModel } from '../types.js';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
@@ -17,6 +21,7 @@ export class UmbMediaTypeWorkspaceContext
 	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
 
+	#parent?: { entityType: string; unique: string | null };
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
@@ -26,9 +31,10 @@ export class UmbMediaTypeWorkspaceContext
 	readonly description;
 	readonly icon;
 
-	readonly allowedAsRoot;
+	readonly allowedAtRoot;
 	readonly allowedContentTypes;
 	readonly compositions;
+	readonly collection;
 
 	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
@@ -44,9 +50,10 @@ export class UmbMediaTypeWorkspaceContext
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
 		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
-		this.allowedAsRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAsRoot);
+		this.allowedAtRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAtRoot);
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
+		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 	}
 
 	protected resetState() {
@@ -74,13 +81,43 @@ export class UmbMediaTypeWorkspaceContext
 		return UMB_MEDIA_TYPE_ENTITY_TYPE;
 	}
 
-	updateProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
-		this.structure.updateOwnerContentType({ [propertyName]: value });
+	setName(name: string) {
+		this.structure.updateOwnerContentType({ name });
 	}
 
-	async create(parentId: string | null) {
+	setAlias(alias: string) {
+		this.structure.updateOwnerContentType({ alias });
+	}
+
+	setDescription(description: string) {
+		this.structure.updateOwnerContentType({ description });
+	}
+
+	// TODO: manage setting icon color alias?
+	setIcon(icon: string) {
+		this.structure.updateOwnerContentType({ icon });
+	}
+
+	setAllowedAtRoot(allowedAtRoot: boolean) {
+		this.structure.updateOwnerContentType({ allowedAtRoot });
+	}
+
+	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
+		this.structure.updateOwnerContentType({ allowedContentTypes });
+	}
+
+	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
+		this.structure.updateOwnerContentType({ compositions });
+	}
+
+	setCollection(collection: UmbReferenceByUnique) {
+		this.structure.updateOwnerContentType({ collection });
+	}
+
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		const { data } = await this.structure.createScaffold(parentId);
+		this.#parent = parent;
+		const { data } = await this.structure.createScaffold();
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -111,14 +148,23 @@ export class UmbMediaTypeWorkspaceContext
 		}
 
 		if (this.getIsNew()) {
-			if ((await this.structure.create()) === true) {
+			if (!this.#parent) throw new Error('Parent is not set');
+			if ((await this.structure.create(this.#parent.unique)) === true) {
+				if (!this.#parent) throw new Error('Parent is not set');
+				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+					entityType: this.#parent.entityType,
+					unique: this.#parent.unique,
+				});
+				eventContext.dispatchEvent(event);
 				this.setIsNew(false);
 			}
 		} else {
 			await this.structure.save();
 		}
 
-		this.saveComplete(data);
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	public destroy(): void {

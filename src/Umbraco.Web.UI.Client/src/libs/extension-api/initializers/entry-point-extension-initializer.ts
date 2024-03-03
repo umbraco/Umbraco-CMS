@@ -1,10 +1,10 @@
 import type { ManifestEntryPoint } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { hasInitExport, loadManifestPlainJs } from '../functions/index.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 
-export class UmbEntryPointExtensionInitializer extends UmbBaseController {
+export class UmbEntryPointExtensionInitializer extends UmbControllerBase {
 	#host;
 	#extensionRegistry;
 	#entryPointMap = new Map();

@@ -23,17 +23,17 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	private _itemModalContext?: UmbModalManagerContext;
+	#modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._itemModalContext = instance;
+			this.#modalContext = instance;
 		});
 	}
 
 	async #openTemplatingPageFieldModal() {
-		const pageFieldBuilderContext = this._itemModalContext?.open(UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
+		const pageFieldBuilderContext = this.#modalContext?.open(this, UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
 		await pageFieldBuilderContext?.onSubmit();
 
 		const output = pageFieldBuilderContext?.getValue().output;
@@ -45,7 +45,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 	}
 
 	async #openPartialViewPickerModal() {
-		const partialViewPickerContext = this._itemModalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
+		const partialViewPickerContext = this.#modalContext?.open(this, UMB_PARTIAL_VIEW_PICKER_MODAL);
 		await partialViewPickerContext?.onSubmit();
 
 		const path = partialViewPickerContext?.getValue().selection[0];
@@ -62,7 +62,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 	}
 
 	async #openDictionaryItemPickerModal() {
-		const dictionaryItemPickerModal = this._itemModalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
+		const dictionaryItemPickerModal = this.#modalContext?.open(this, UMB_DICTIONARY_ITEM_PICKER_MODAL, {
 			data: {
 				pickableFilter: (item) => item.unique !== null,
 			},

@@ -1,4 +1,4 @@
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -7,7 +7,7 @@ import type {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 
-export class UmbSectionAliasCondition extends UmbBaseController implements UmbExtensionCondition {
+export class UmbSectionAliasCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: SectionAliasConditionConfig;
 	permitted = false;
 	#onChange: () => void;

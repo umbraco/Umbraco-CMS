@@ -1,4 +1,5 @@
 import type { CompositionTypeModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export type UmbPropertyContainerTypes = 'Group' | 'Tab';
 export interface UmbPropertyTypeContainerModel {
@@ -11,12 +12,11 @@ export interface UmbPropertyTypeContainerModel {
 
 export interface UmbContentTypeModel {
 	unique: string;
-	parentUnique: string | null;
 	name: string;
 	alias: string;
 	description: string | null;
 	icon: string;
-	allowedAsRoot: boolean;
+	allowedAtRoot: boolean;
 	variesByCulture: boolean;
 	variesBySegment: boolean;
 	isElement: boolean;
@@ -24,7 +24,7 @@ export interface UmbContentTypeModel {
 	containers: Array<UmbPropertyTypeContainerModel>;
 	allowedContentTypes: Array<UmbContentTypeSortModel>;
 	compositions: Array<UmbContentTypeCompositionModel>;
-	collection: { unique: string } | null;
+	collection: UmbReferenceByUnique | null;
 }
 
 export interface UmbPropertyTypeScaffoldModel extends Omit<UmbPropertyTypeModel, 'dataType'> {

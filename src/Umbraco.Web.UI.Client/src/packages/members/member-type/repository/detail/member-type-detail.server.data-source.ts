@@ -31,20 +31,19 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 
 	/**
 	 * Creates a new Member Type scaffold
-	 * @param {(string | null)} parentUnique
+	 * @param {Partial<UmbMemberTypeDetailModel>} [preset]
 	 * @return { CreateMemberTypeRequestModel }
 	 * @memberof UmbMemberTypeServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbMemberTypeDetailModel> = {}) {
 		const data: UmbMemberTypeDetailModel = {
 			entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
 			name: '',
 			alias: '',
 			description: '',
 			icon: '',
-			allowedAsRoot: false,
+			allowedAtRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
@@ -53,6 +52,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			allowedContentTypes: [],
 			compositions: [],
 			collection: null,
+			...preset,
 		};
 
 		return { data };
@@ -77,12 +77,11 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 		const memberType: UmbMemberTypeDetailModel = {
 			entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: null,
 			name: data.name,
 			alias: data.alias,
 			description: data.description || null,
 			icon: data.icon,
-			allowedAsRoot: data.allowedAsRoot,
+			allowedAtRoot: data.allowedAsRoot,
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
@@ -138,7 +137,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -196,7 +195,7 @@ export class UmbMemberTypeServerDataSource implements UmbDetailDataSource<UmbMem
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,

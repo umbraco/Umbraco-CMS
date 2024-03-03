@@ -19,10 +19,13 @@ export class UmbStylesheetFolderRepository extends UmbFolderRepositoryBase<UmbSt
 
 export default UmbStylesheetFolderRepository;
 
-const folderToStylesheetTreeItemFolder = (folder: UmbFolderModel): UmbStylesheetTreeItemModel => {
+const folderToStylesheetTreeItemFolder = (
+	folder: UmbFolderModel,
+	parentUnique: string | null,
+): UmbStylesheetTreeItemModel => {
 	return {
 		unique: folder.unique,
-		parentUnique: folder.parentUnique,
+		parentUnique,
 		name: folder.name,
 		entityType: UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
 		isFolder: true,

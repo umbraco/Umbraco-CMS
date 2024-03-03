@@ -2,11 +2,11 @@
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export class UmbResourceController extends UmbBaseController {
+export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
 
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
@@ -32,7 +32,7 @@ export class UmbResourceController extends UmbBaseController {
 	/**
 	 * Base execute function with a try/catch block and return a tuple with the result and the error.
 	 */
-	static async tryExecute<T>(promise: Promise<T>): Promise<DataSourceResponse<T>> {
+	static async tryExecute<T>(promise: Promise<T>): Promise<UmbDataSourceResponse<T>> {
 		try {
 			return { data: await promise };
 		} catch (error) {
@@ -49,7 +49,7 @@ export class UmbResourceController extends UmbBaseController {
 	 * Wrap the {tryExecute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
-	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<DataSourceResponse<T>> {
+	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
 		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
 
 		if (error) {

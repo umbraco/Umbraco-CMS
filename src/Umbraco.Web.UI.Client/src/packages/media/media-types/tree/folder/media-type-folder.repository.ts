@@ -14,10 +14,10 @@ export class UmbMediaTypeFolderRepository extends UmbFolderRepositoryBase<UmbMed
 
 export default UmbMediaTypeFolderRepository;
 
-const folderToMediaTypeTreeItemMapper = (folder: UmbFolderModel) => {
+const folderToMediaTypeTreeItemMapper = (folder: UmbFolderModel, parentUnique: string | null) => {
 	const folderTreeItem: UmbMediaTypeFolderTreeItemModel = {
 		unique: folder.unique,
-		parentUnique: folder.parentUnique,
+		parentUnique,
 		name: folder.name,
 		entityType: UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE,
 		hasChildren: false,

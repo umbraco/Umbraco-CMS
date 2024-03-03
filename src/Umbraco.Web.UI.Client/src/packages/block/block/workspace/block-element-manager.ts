@@ -4,10 +4,10 @@ import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 
-export class UmbBlockElementManager extends UmbBaseController {
+export class UmbBlockElementManager extends UmbControllerBase {
 	//
 	#data = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	readonly data = this.#data.asObservable();

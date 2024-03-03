@@ -27,14 +27,14 @@ export class UmbVariantId {
 		const split = str.split('_');
 		const culture = split[0] === UMB_INVARIANT_CULTURE ? null : split[0];
 		const segment = split[1] ?? null;
-		return Object.freeze(new UmbVariantId(segment, culture));
+		return Object.freeze(new UmbVariantId(culture, segment));
 	}
 
 	public readonly culture: string | null = null;
 	public readonly segment: string | null = null;
 
 	constructor(culture?: string | null, segment?: string | null) {
-		this.culture = (culture === UMB_INVARIANT_CULTURE ? null : culture?.toLowerCase()) ?? null;
+		this.culture = (culture === UMB_INVARIANT_CULTURE ? null : culture) ?? null;
 		this.segment = segment ?? null;
 	}
 

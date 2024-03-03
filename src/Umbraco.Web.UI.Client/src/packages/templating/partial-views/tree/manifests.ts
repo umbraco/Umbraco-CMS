@@ -32,6 +32,7 @@ const treeStore: ManifestTreeStore = {
 
 const tree: ManifestTree = {
 	type: 'tree',
+	kind: 'default',
 	alias: UMB_PARTIAL_VIEW_TREE_ALIAS,
 	name: 'Partial View Tree',
 	meta: {
@@ -41,7 +42,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'unique',
+	kind: 'default',
 	alias: 'Umb.TreeItem.PartialView',
 	name: 'Partial View Tree Item',
 	meta: {

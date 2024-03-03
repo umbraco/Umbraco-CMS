@@ -4,6 +4,7 @@ import type { UmbFolderRepository } from '@umbraco-cms/backoffice/tree';
 
 export class UmbDeleteFolderEntityAction<T extends UmbFolderRepository> extends UmbEntityActionBase<T> {
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) return;
 
 		const { data: folder } = await this.repository.request(this.unique);

@@ -1,7 +1,7 @@
 import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/index.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbArrayState,
@@ -15,7 +15,7 @@ import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/pr
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
+export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 	private _providerController: UmbContextProviderController;
 
 	#alias = new UmbStringState(undefined);
@@ -110,11 +110,20 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	public setAlias(alias: string | undefined): void {
 		this.#alias.setValue(alias);
 	}
+	public getAlias(): string | undefined {
+		return this.#alias.getValue();
+	}
 	public setLabel(label: string | undefined): void {
 		this.#label.setValue(label);
 	}
+	public getLabel(): string | undefined {
+		return this.#label.getValue();
+	}
 	public setDescription(description: string | undefined): void {
 		this.#description.setValue(description);
+	}
+	public getDescription(): string | undefined {
+		return this.#description.getValue();
 	}
 	/**
 	 * Set the value of this property.
@@ -135,6 +144,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	}
 	public setConfig(config: Array<UmbPropertyEditorConfigProperty> | undefined): void {
 		this.#configValues.setValue(config ?? []);
+	}
+	public getConfig(): Array<UmbPropertyEditorConfigProperty> | undefined {
+		return this.#configValues.getValue();
 	}
 	public setVariantId(variantId: UmbVariantId | undefined): void {
 		this.#variantId.setValue(variantId);

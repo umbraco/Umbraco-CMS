@@ -15,11 +15,6 @@ export const manifest: ManifestPropertyEditorSchema = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGridTypeConfiguration',
 				},
 				{
-					alias: 'blockGroups',
-					label: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockTypeGroupConfiguration',
-				},
-				{
 					alias: 'validationLimit',
 					label: 'Amount',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',

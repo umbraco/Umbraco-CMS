@@ -11,6 +11,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	//
 	#host;
 	#init;
+	#contextConsumer;
 
 	#additionalPath?: string;
 	#uniquePaths: Map<string, string | undefined> = new Map();
@@ -21,8 +22,8 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	public get controllerAlias() {
 		return this.alias.toString();
 	}
-	protected getControllerHostElement() {
-		return this.#host.getHostElement();
+	protected getControllerHost() {
+		return this.#host;
 	}
 
 	/**
@@ -35,10 +36,11 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		super(alias, null);
 		this.#host = host;
 
-		this.#init = new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT, (_routeContext) => {
+		this.#contextConsumer = new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT, (_routeContext) => {
 			this.#routeContext = _routeContext;
 			this.#registerModal();
-		}).asPromise();
+		});
+		this.#init = this.#contextConsumer.asPromise();
 	}
 
 	/**
@@ -172,6 +174,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	public destroy(): void {
 		this.#host?.removeController(this);
 		this.#host = undefined as any;
+		this.#contextConsumer.destroy();
 		this.#modalRegistration = undefined;
 		this.#uniquePaths = undefined as any;
 		this.#routeContext = undefined;

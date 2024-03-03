@@ -17,10 +17,13 @@ export class UmbPartialViewFolderRepository extends UmbFolderRepositoryBase<UmbP
 	}
 }
 
-const folderToPartialViewTreeItemFolder = (folder: UmbFolderModel): UmbPartialViewTreeItemModel => {
+const folderToPartialViewTreeItemFolder = (
+	folder: UmbFolderModel,
+	parentUnique: string | null,
+): UmbPartialViewTreeItemModel => {
 	return {
 		unique: folder.unique,
-		parentUnique: folder.parentUnique,
+		parentUnique,
 		name: folder.name,
 		entityType: UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
 		isFolder: true,

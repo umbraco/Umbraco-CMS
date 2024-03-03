@@ -2,11 +2,11 @@ import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
+export class UmbAppLanguageContext extends UmbControllerBase implements UmbApi {
 	#languageCollectionRepository: UmbLanguageCollectionRepository;
 	#languages: Array<UmbLanguageDetailModel> = [];
 	#appLanguage = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);

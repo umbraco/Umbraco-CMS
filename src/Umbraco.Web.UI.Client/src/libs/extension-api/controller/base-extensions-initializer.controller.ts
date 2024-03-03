@@ -5,8 +5,9 @@ import type {
 	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
@@ -26,7 +27,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
-> extends UmbBaseController {
+> extends UmbControllerBase {
 	#promiseResolvers: Array<() => void> = [];
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
@@ -62,7 +63,7 @@ export abstract class UmbBaseExtensionsInitializer<
 			? this.#extensionRegistry.byTypes<ManifestType>(this.#type as string[])
 			: this.#extensionRegistry.byType<ManifestTypeName, ManifestType>(this.#type as ManifestTypeName);
 		if (this.#filter) {
-			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(this.#filter!)));
+			source = createObservablePart(source, (extensions: Array<ManifestType>) => extensions.filter(this.#filter!));
 		}
 		this.observe(source, this.#gotManifests, '_observeManifests') as any;
 	}
@@ -88,10 +89,6 @@ export abstract class UmbBaseExtensionsInitializer<
 			}
 			return true;
 		});
-
-		// ---------------------------------------------------------------
-		// May change this into a Extensions Manager Controller???
-		// ---------------------------------------------------------------
 
 		manifests.forEach((manifest) => {
 			const existing = this._extensions.find((x) => x.alias === manifest.alias);

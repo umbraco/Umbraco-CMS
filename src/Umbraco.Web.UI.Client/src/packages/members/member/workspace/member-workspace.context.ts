@@ -43,9 +43,9 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null, memberTypeUnique: string) {
+	async create(memberTypeUnique: string) {
 		this.resetState();
-		const { data } = await this.repository.createScaffold(parentUnique, {
+		const { data } = await this.repository.createScaffold({
 			memberType: { unique: memberTypeUnique },
 		});
 
@@ -68,7 +68,8 @@ export class UmbMemberWorkspaceContext
 			await this.repository.save(data);
 		}
 
-		this.saveComplete(data);
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	// Only for CRUD demonstration purposes

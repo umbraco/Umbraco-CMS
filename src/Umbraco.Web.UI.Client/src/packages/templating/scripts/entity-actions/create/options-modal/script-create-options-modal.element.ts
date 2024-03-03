@@ -20,8 +20,7 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
-		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
+		if (!this.data?.parent) throw new Error('A parent is required to create a folder');
 
 		this.#createFolderAction = new UmbCreateFolderEntityAction(
 			this,
@@ -29,8 +28,8 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			// TODO: allow null for entity actions. Some actions can be executed on the root item
-			this.data.parentUnique,
-			this.data.entityType,
+			this.data.parent.unique,
+			this.data.parent.entityType,
 		);
 	}
 
@@ -50,15 +49,18 @@ export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbS
 		this._submitModal();
 	}
 
+	#getCreateHref() {
+		return `section/settings/workspace/script/create/parent/${this.data?.parent.entityType}/${
+			this.data?.parent.unique || 'null'
+		}`;
+	}
+
 	render() {
 		return html`
 			<umb-body-layout headline="Create Script">
 				<uui-box>
 					<!-- TODO: construct url -->
-					<uui-menu-item
-						href=${`section/settings/workspace/script/create/${this.data?.parentUnique || 'null'}`}
-						label="New Javascript file"
-						@click=${this.#onNavigate}>
+					<uui-menu-item href=${this.#getCreateHref()} label="New Javascript file" @click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-article"></uui-icon>}
 					</uui-menu-item>
 
