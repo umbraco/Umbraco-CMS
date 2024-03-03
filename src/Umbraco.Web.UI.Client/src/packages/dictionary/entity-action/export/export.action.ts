@@ -3,7 +3,7 @@ import { UMB_EXPORT_DICTIONARY_MODAL } from './export-dictionary-modal.token.js'
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase<never> {
+export class UmbExportDictionaryEntityAction extends UmbEntityActionBase<object> {
 	async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 
@@ -35,3 +35,5 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 
 	destroy(): void {}
 }
+
+export default UmbExportDictionaryEntityAction;

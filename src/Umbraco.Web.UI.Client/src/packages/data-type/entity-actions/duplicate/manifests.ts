@@ -7,9 +7,9 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'duplicate',
 		alias: 'Umb.EntityAction.DataType.Duplicate',
 		name: 'Duplicate Data Type Entity Action',
-		kind: 'duplicate',
 		forEntityTypes: [UMB_DATA_TYPE_ENTITY_TYPE],
 		meta: {
 			duplicateRepositoryAlias: UMB_COPY_DATA_TYPE_REPOSITORY_ALIAS,

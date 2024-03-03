@@ -1,67 +1,59 @@
 import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import {
 	UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
-	UMB_DICTIONARY_EXPORT_REPOSITORY_ALIAS,
-	UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS,
 	UMB_DICTIONARY_ITEM_REPOSITORY_ALIAS,
 } from '../repository/index.js';
-import UmbImportDictionaryEntityAction from './import/import.action.js';
-import UmbExportDictionaryEntityAction from './export/export.action.js';
-import UmbCreateDictionaryEntityAction from './create/create.action.js';
-import { UmbMoveEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Create',
 		name: 'Create Dictionary Entity Action',
 		weight: 600,
-		api: UmbCreateDictionaryEntityAction,
+		api: import('./create/create.action.js'),
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 	{
 		type: 'entityAction',
+		kind: 'move',
 		alias: 'Umb.EntityAction.Dictionary.Move',
 		name: 'Move Dictionary Entity Action',
-		weight: 500,
-		api: UmbMoveEntityAction,
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move',
-			repositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Export',
 		name: 'Export Dictionary Entity Action',
 		weight: 400,
-		api: UmbExportDictionaryEntityAction,
+		api: import('./export/export.action.js'),
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-download-alt',
 			label: 'Export',
-			repositoryAlias: UMB_DICTIONARY_EXPORT_REPOSITORY_ALIAS,
 		},
 	},
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Dictionary.Import',
 		name: 'Import Dictionary Entity Action',
 		weight: 300,
-		api: UmbImportDictionaryEntityAction,
+		api: import('./import/import.action.js'),
 		forEntityTypes: [UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-page-up',
 			label: 'Import',
-			repositoryAlias: UMB_DICTIONARY_IMPORT_REPOSITORY_ALIAS,
 		},
 	},
 	{

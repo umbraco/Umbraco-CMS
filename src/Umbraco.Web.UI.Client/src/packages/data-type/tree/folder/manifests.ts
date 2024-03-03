@@ -14,9 +14,9 @@ const folderRepository: ManifestRepository = {
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'folderRename',
 		alias: 'Umb.EntityAction.DataType.Folder.Rename',
 		name: 'Rename Data Type Folder Entity Action',
-		kind: 'folderRename',
 		forEntityTypes: [UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
 			folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
@@ -24,9 +24,9 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
+		kind: 'folderDelete',
 		alias: 'Umb.EntityAction.DataType.Folder.Delete',
 		name: 'Delete Data Type Folder Entity Action',
-		kind: 'folderDelete',
 		forEntityTypes: [UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
 			folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
