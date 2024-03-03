@@ -2,6 +2,7 @@ import type { UmbControllerAlias } from './controller-alias.type.js';
 import { UmbControllerHostMixin } from './controller-host.mixin.js';
 import type { UmbControllerHostElement } from './controller-host-element.interface.js';
 import type { UmbController } from './controller.interface.js';
+import type { UmbControllerHost } from './controller-host.interface.js';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 export declare class UmbControllerHostImplementationElement extends HTMLElement implements UmbControllerHostElement {
