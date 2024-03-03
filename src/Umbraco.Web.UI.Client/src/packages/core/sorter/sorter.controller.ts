@@ -198,6 +198,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	static activeDragElement?: Element;
 
 	#host;
+	#isConnected = false;
 	#config: INTERNAL_UmbSorterConfig<T, ElementType>;
 	#observer;
 
@@ -251,12 +252,16 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	enable(): void {
 		if (this.#enabled) return;
 		this.#enabled = true;
-		this.#initialize();
+		if (this.#isConnected) {
+			this.#initialize();
+		}
 	}
 	disable(): void {
 		if (!this.#enabled) return;
 		this.#enabled = false;
-		this.#uninitialize();
+		if (this.#isConnected) {
+			this.#uninitialize();
+		}
 	}
 
 	setModel(model: Array<T>): void {
@@ -275,11 +280,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	hostConnected() {
+		this.#isConnected = true;
 		if (this.#enabled) {
 			requestAnimationFrame(this.#initialize);
 		}
 	}
 	hostDisconnected() {
+		this.#isConnected = false;
 		if (this.#enabled) {
 			this.#uninitialize();
 		}
