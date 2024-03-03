@@ -51,7 +51,6 @@ const entityActions: Array<ManifestTypes> = [
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.Publish',
 		name: 'Publish Document Entity Action',
-		api: UmbPublishDocumentEntityAction,
 		api: () => import('./publish.action.js'),
 		kind: 'default',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
