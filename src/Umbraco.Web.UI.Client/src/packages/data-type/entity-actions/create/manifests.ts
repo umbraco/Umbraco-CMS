@@ -5,6 +5,7 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.DataType.Create',
 		name: 'Create Data Type Entity Action',
 		weight: 1000,
