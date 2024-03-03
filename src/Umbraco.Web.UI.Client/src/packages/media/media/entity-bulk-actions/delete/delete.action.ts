@@ -1,4 +1,3 @@
-import type { UmbMediaDetailRepository } from '../../repository/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 
 export class UmbMediaDeleteEntityBulkAction extends UmbEntityBulkActionBase<object> {
