@@ -1,11 +1,10 @@
-import type { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
+import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbCreateRelationTypeEntityAction extends UmbEntityActionBase<UmbRelationTypeRepository> {
-	// TODO: Could EntityActions take the manifest instead, for more flexibility?
-	constructor(host: UmbControllerHost, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
+export class UmbCreateRelationTypeEntityAction extends UmbEntityActionBase<UmbEntityActionArgs<never>> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
+		super(host, args);
 	}
 
 	async execute() {
@@ -13,7 +12,9 @@ export class UmbCreateRelationTypeEntityAction extends UmbEntityActionBase<UmbRe
 		history.pushState(
 			null,
 			'',
-			`section/settings/workspace/relation-type/create/parent/${this.entityType}/${this.unique}`,
+			`section/settings/workspace/relation-type/create/parent/${this.args.entityType}/${this.args.unique}`,
 		);
 	}
+
+	destroy(): void {}
 }

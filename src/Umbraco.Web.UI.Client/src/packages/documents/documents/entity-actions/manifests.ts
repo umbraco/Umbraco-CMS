@@ -8,7 +8,7 @@ import { manifests as createManifests } from './create/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import {
-	UmbCopyEntityAction,
+	UmbDuplicateEntityAction,
 	UmbMoveEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -49,7 +49,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Document.Copy',
 		name: 'Copy Document Entity Action',
 		weight: 600,
-		api: UmbCopyEntityAction,
+		api: UmbDuplicateEntityAction,
 		meta: {
 			icon: 'icon-documents',
 			label: 'Copy (TBD)',

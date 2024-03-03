@@ -1,7 +1,7 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
-import { UmbMoveEntityAction, UmbCopyEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UmbMoveEntityAction, UmbDuplicateEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -23,7 +23,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.MediaType.Copy',
 		name: 'Copy Media Type Entity Action',
 		weight: 300,
-		api: UmbCopyEntityAction,
+		api: UmbDuplicateEntityAction,
 		meta: {
 			icon: 'icon-documents',
 			label: 'Copy',

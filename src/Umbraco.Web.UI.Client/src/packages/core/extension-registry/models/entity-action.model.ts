@@ -66,3 +66,16 @@ export interface ManifestEntityActionReloadTreeItemChildrenKind extends Manifest
 }
 
 export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityAction {}
+
+// COPY
+export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction {
+	type: 'entityAction';
+	kind: 'duplicate';
+	meta: MetaEntityActionDuplicateKind;
+}
+
+export interface MetaEntityActionDuplicateKind extends MetaEntityAction {
+	duplicateRepositoryAlias: string;
+	itemRepositoryAlias: string;
+	pickerModalAlias: string;
+}

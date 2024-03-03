@@ -1,19 +1,20 @@
-import type { UmbDictionaryExportRepository } from '../../repository/index.js';
+import { UmbDictionaryExportRepository } from '../../repository/index.js';
 import { UMB_EXPORT_DICTIONARY_MODAL } from './export-dictionary-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryExportRepository> {
+export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase<never> {
 	async execute() {
-		if (!this.unique) throw new Error('Unique is not available');
+		if (!this.args.unique) throw new Error('Unique is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, UMB_EXPORT_DICTIONARY_MODAL, { data: { unique: this.unique } });
+		const modalContext = modalManager.open(this, UMB_EXPORT_DICTIONARY_MODAL, { data: { unique: this.args.unique } });
 
 		const { includeChildren } = await modalContext.onSubmit();
 
 		// Export the file
-		const result = await this.repository?.requestExport(this.unique, includeChildren);
+		const repository = new UmbDictionaryExportRepository(this);
+		const result = await repository.requestExport(this.args.unique, includeChildren);
 		const blobContent = await result?.data;
 
 		if (!blobContent) return;
@@ -23,7 +24,7 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 
 		// Download
 		a.href = url;
-		a.download = `${this.unique}.udt`;
+		a.download = `${this.args.unique}.udt`;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -31,4 +32,6 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 		// Clean up
 		window.URL.revokeObjectURL(url);
 	}
+
+	destroy(): void {}
 }

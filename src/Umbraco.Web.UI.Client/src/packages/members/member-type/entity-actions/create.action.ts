@@ -1,11 +1,10 @@
-import type { UmbMemberTypeDetailRepository } from '../repository/detail/index.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 
-export class UmbCreateMemberTypeEntityAction extends UmbEntityActionBase<UmbMemberTypeDetailRepository> {
-	// TODO: Could EntityActions take the manifest instead, for more flexibility?
-	constructor(host: UmbControllerHost, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
+export class UmbCreateMemberTypeEntityAction extends UmbEntityActionBase<UmbEntityActionArgs<never>> {
+	constructor(host: UmbControllerHostElement, args: UmbEntityActionArgs<never>) {
+		super(host, args);
 	}
 
 	async execute() {
@@ -13,7 +12,9 @@ export class UmbCreateMemberTypeEntityAction extends UmbEntityActionBase<UmbMemb
 		history.pushState(
 			null,
 			'',
-			`section/settings/workspace/member-type/create/parent/${this.entityType}/${this.unique}`,
+			`section/settings/workspace/member-type/create/parent/${this.args.entityType}/${this.args.unique}`,
 		);
 	}
+
+	destroy(): void {}
 }

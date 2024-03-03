@@ -1,4 +1,3 @@
-import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbCreateMediaEntityAction } from './create.action.js';
 import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
@@ -13,7 +12,6 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_MEDIA_ROOT_ENTITY_TYPE, UMB_MEDIA_ENTITY_TYPE],
 		},
 		/* removed until we have permissions in place
