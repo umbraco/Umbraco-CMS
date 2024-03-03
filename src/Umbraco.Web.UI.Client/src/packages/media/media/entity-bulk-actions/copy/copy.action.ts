@@ -8,6 +8,6 @@ export class UmbMediaCopyEntityBulkAction extends UmbEntityBulkActionBase<UmbMed
 	}
 
 	async execute() {
-		console.log(`execute bulk copy');
+		console.log('execute bulk copy');
 	}
 }
