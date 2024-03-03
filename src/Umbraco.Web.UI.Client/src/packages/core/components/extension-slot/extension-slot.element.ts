@@ -24,7 +24,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementInitializer;
 
 	@state()
-	private _permittedExts: Array<UmbExtensionElementInitializer> = [];
+	private _permitted: Array<UmbExtensionElementInitializer> = [];
 
 	/**
 	 * The type or types of extensions to render.
@@ -113,7 +113,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				this.#type,
 				this.filter,
 				(extensionControllers) => {
-					this._permittedExts = extensionControllers;
+					this._permitted = extensionControllers;
 				},
 				'extensionsInitializer',
 				this.defaultElement,
@@ -123,9 +123,9 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._permittedExts.length > 0
+		return this._permitted.length > 0
 			? repeat(
-					this._permittedExts,
+					this._permitted,
 					(ext) => ext.alias,
 					(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
 			  )

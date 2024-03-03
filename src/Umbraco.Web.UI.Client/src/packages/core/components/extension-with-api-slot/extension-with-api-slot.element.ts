@@ -24,7 +24,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementAndApiInitializer;
 
 	@state()
-	private _permittedExts: Array<UmbExtensionElementAndApiInitializer> = [];
+	private _permitted: Array<UmbExtensionElementAndApiInitializer> = [];
 
 	/**
 	 * The type or types of extensions to render.
@@ -134,7 +134,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 				this.#constructorArgs,
 				this.filter,
 				(extensionControllers) => {
-					this._permittedExts = extensionControllers;
+					this._permitted = extensionControllers;
 				},
 				'extensionsInitializer',
 				this.defaultElement,
@@ -144,9 +144,9 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._permittedExts.length > 0
+		return this._permitted.length > 0
 			? repeat(
-					this._permittedExts,
+					this._permitted,
 					(ext) => ext.alias,
 					(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
 			  )
