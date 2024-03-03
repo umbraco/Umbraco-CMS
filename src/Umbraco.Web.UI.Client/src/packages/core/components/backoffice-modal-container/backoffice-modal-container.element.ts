@@ -41,6 +41,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		const oldModals = oldValue.filter((oldModal) => !modals.some((modal) => modal.key === oldModal.key));
 
 		oldModals.forEach((modal) => {
+			// TODO: I would not think this works as expected, the callback method has to be the exact same instance as the one added: [NL]
 			this._modalElementMap.get(modal.key)?.removeEventListener('close-end', this.#onCloseEnd.bind(this, modal.key));
 			this._modalElementMap.delete(modal.key);
 		});
@@ -57,6 +58,7 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 			modalElement.modalContext = modal;
 
 			modalElement.element?.addEventListener('close-end', this.#onCloseEnd.bind(this, modal.key));
+			modal.addEventListener('umb:destroy', this.#onCloseEnd.bind(this, modal.key));
 
 			this._modalElementMap.set(modal.key, modalElement);
 			this.requestUpdate();
