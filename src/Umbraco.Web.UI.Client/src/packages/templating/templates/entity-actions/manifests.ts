@@ -9,11 +9,11 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Template.Create',
 		name: 'Create Template Entity Action',
 		api: UmbCreateEntityAction,
+		forEntityTypes: [UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -21,10 +21,10 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.Template.Delete',
 		name: 'Delete Template Entity Action',
 		kind: 'delete',
+		forEntityTypes: [UMB_TEMPLATE_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_TEMPLATE_ITEM_REPOSITORY_ALIAS,
-			entityTypes: [UMB_TEMPLATE_ENTITY_TYPE],
 		},
 	},
 ];

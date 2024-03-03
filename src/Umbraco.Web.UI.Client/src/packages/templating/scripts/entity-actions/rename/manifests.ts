@@ -17,10 +17,10 @@ export const manifests: Array<ManifestTypes> = [
 		alias: UMB_RENAME_SCRIPT_ENTITY_ACTION_ALIAS,
 		name: 'Rename Script Entity Action',
 		kind: 'rename',
+		forEntityTypes: [UMB_SCRIPT_ENTITY_TYPE],
 		meta: {
 			renameRepositoryAlias: UMB_RENAME_SCRIPT_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_SCRIPT_ITEM_REPOSITORY_ALIAS,
-			entityTypes: [UMB_SCRIPT_ENTITY_TYPE],
 		},
 	},
 ];

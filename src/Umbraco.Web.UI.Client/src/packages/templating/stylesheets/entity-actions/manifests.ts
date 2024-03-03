@@ -9,10 +9,10 @@ const stylesheetActions: Array<ManifestTypes> = [
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Stylesheet.Delete',
 		name: 'Delete Stylesheet Entity Action',
+		forEntityTypes: [UMB_STYLESHEET_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_STYLESHEET_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS,
-			entityTypes: [UMB_STYLESHEET_ENTITY_TYPE],
 		},
 	},
 ];

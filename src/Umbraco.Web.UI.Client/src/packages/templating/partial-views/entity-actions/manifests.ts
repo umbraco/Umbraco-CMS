@@ -11,10 +11,10 @@ const partialViewActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.PartialView.Delete',
 		name: 'Delete Partial View Entity Action',
 		kind: 'delete',
+		forEntityTypes: [UMB_PARTIAL_VIEW_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS,
-			entityTypes: [UMB_PARTIAL_VIEW_ENTITY_TYPE],
 		},
 	},
 ];

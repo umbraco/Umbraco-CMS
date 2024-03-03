@@ -10,11 +10,11 @@ export const manifests: Array<ManifestTypes> = [
 		name: 'Script Create Options Entity Action',
 		weight: 1000,
 		api: UmbScriptCreateOptionsEntityAction,
+		forEntityTypes: [UMB_SCRIPT_ROOT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create...',
 			repositoryAlias: UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_SCRIPT_ROOT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{

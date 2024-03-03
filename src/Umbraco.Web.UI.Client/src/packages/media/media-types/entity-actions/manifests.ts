@@ -11,11 +11,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Move Media Type Entity Action',
 		weight: 400,
 		api: UmbMoveEntityAction,
+		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move',
 			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		},
 	},
 	{
@@ -24,11 +24,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Copy Media Type Entity Action',
 		weight: 300,
 		api: UmbDuplicateEntityAction,
+		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-documents',
 			label: 'Copy',
 			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		},
 	},
 	{
@@ -36,10 +36,10 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.MediaType.Delete',
 		name: 'Delete Media Type Entity Action',
 		kind: 'delete',
+		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS,
-			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		},
 	},
 ];

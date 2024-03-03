@@ -10,10 +10,10 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Resend Invite User Entity Action',
 		weight: 500,
 		api: UmbResendInviteToUserEntityAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-message',
 			label: 'Resend Invite',
-			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
 			{

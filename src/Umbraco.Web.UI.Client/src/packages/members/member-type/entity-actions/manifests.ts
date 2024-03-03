@@ -11,11 +11,11 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Create Member Type Entity Action',
 		weight: 1000,
 		api: UmbCreateMemberTypeEntityAction,
+		forEntityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create...',
 			repositoryAlias: UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -23,10 +23,10 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.MemberType.Delete',
 		name: 'Delete Member Type Entity Action',
 		kind: 'delete',
+		forEntityTypes: [UMB_MEMBER_TYPE_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_MEMBER_TYPE_ITEM_REPOSITORY_ALIAS,
-			entityTypes: [UMB_MEMBER_TYPE_ENTITY_TYPE],
 		},
 	},
 ];

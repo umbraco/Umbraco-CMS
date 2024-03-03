@@ -20,11 +20,11 @@ const entityActions = [
 		alias: UMB_DELETE_PARTIAL_VIEW_FOLDER_ENTITY_ACTION_ALIAS,
 		name: 'Delete Partial View folder Entity Action',
 		api: UmbDeleteFolderEntityAction,
+		forEntityTypes: [UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete folder...',
 			repositoryAlias: UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 		},
 	},
 ];
