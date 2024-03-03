@@ -1,1 +1,3 @@
-export type UmbApiConstructorArgumentsMethodType<ManifestType> = (manifest: ManifestType) => unknown[];
+export type UmbApiConstructorArgumentsMethodType<ManifestType, ReturnType extends Array<unknown> = Array<unknown>> = (
+	manifest: ManifestType,
+) => ReturnType;

@@ -5,6 +5,7 @@ import { css, repeat, customElement, property, state, html } from '@umbraco-cms/
 import {
 	type UmbExtensionElementAndApiInitializer,
 	UmbExtensionsElementAndApiInitializer,
+	type UmbApiConstructorArgumentsMethodType,
 } from '@umbraco-cms/backoffice/extension-api';
 
 /**
@@ -100,15 +101,15 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 	 * @example
 	 * <umb-extension-with-api-slot type="my-extension-type" .apiArgs=${{foo: 'bar'}}></umb-extension-with-api-slot>
 	 */
-	@property({ type: Array, attribute: false })
-	get apiArgs(): Array<unknown> | undefined {
+	@property({ attribute: false })
+	get apiArgs(): Array<unknown> | UmbApiConstructorArgumentsMethodType<any> | undefined {
 		return this.#constructorArgs;
 	}
-	set apiArgs(newVal: Array<unknown> | undefined) {
+	set apiArgs(newVal: Array<unknown> | UmbApiConstructorArgumentsMethodType<any> | undefined) {
 		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
 		this.#constructorArgs = newVal;
 	}
-	#constructorArgs?: Array<unknown> = [];
+	#constructorArgs?: Array<unknown> | UmbApiConstructorArgumentsMethodType<any> = [];
 
 	/**
 	 * Properties to pass to the extensions apis.

@@ -56,7 +56,7 @@ export class UmbExtensionsElementAndApiInitializer<
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
-		constructorArguments: Array<unknown> | undefined,
+		constructorArguments: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType> | undefined,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,
