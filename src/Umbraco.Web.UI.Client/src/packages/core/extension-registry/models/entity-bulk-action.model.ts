@@ -16,17 +16,14 @@ export interface ManifestEntityBulkAction<MetaType extends MetaEntityBulkAction>
 
 export interface MetaEntityBulkAction {
 	/**
-	 * A friendly label for the action
-	 */
-	label: string;
-
-	/**
-	 * The alias for the repsoitory of the entity type this action is for
-	 * such as 'Umb.Repository.Documents'
+	 * The friendly name of the action to perform
 	 *
 	 * @examples [
-	 *   "Umb.Repository.Documents"
+	 *   "Create",
+	 *   "Create Content Template"
 	 * ]
 	 */
-	repositoryAlias: string;
+	label?: string;
+
+	entityTypes: Array<string>;
 }
