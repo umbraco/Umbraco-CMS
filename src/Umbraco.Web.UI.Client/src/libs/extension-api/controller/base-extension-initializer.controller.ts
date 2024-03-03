@@ -234,8 +234,7 @@ export abstract class UmbBaseExtensionInitializer<
 
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
 		const isPositive =
-			this.#conditionsAreInitialized() &&
-			this.#conditionControllers.find((condition) => condition.permitted === false) === undefined;
+			this.#conditionsAreInitialized() && this.#conditionControllers.some((condition) => condition.permitted === false);
 
 		this._isConditionsPositive = isPositive;
 
