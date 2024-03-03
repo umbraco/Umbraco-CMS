@@ -40,7 +40,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 						type="entityAction"
 						default-element="umb-entity-action"
 						.filter=${this._filter}
-						.props=${this._props}
+						.elementProps=${this._props}
 						.apiArgs=${[this._props]}></umb-extension-with-api-slot>
 			  `
 			: '';

@@ -13,7 +13,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	private _selectionLength = 0;
 
 	@state()
-	private _extensionProps = {};
+	private _elementProps = {};
 
 	private _selection: Array<string | null> = [];
 
@@ -53,7 +53,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 			(selection) => {
 				this._selectionLength = selection.length;
 				this._selection = selection;
-				this._extensionProps = { selection: this._selection };
+				this._elementProps = { selection: this._selection };
 			},
 			'umbSelectionObserver',
 		);
@@ -86,8 +86,8 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					id="actions"
 					type="entityBulkAction"
 					default-element="umb-entity-bulk-action"
-					.props=${this._extensionProps}
-					.apiArgs=${[this._extensionProps]}
+					.elementProps=${this._elementProps}
+					.apiArgs=${[this._elementProps]}
 					@action-executed=${this.#onActionExecuted}>
 				</umb-extension-with-api-slot>
 			</div>
