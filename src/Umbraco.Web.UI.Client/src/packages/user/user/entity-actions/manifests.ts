@@ -39,7 +39,6 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-check',
 			label: 'Enable',
-			repositoryAlias: UMB_ENABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [

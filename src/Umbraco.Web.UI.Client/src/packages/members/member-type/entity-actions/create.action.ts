@@ -2,7 +2,7 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 
-export class UmbCreateMemberTypeEntityAction extends UmbEntityActionBase<UmbEntityActionArgs<never>> {
+export class UmbCreateMemberTypeEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHostElement, args: UmbEntityActionArgs<never>) {
 		super(host, args);
 	}
