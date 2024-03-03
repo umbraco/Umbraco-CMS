@@ -7,10 +7,6 @@ export interface ManifestWorkspaceActionMenuItem
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceAction>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'workspaceActionMenuItem';
-	meta: MetaWorkspaceActionMenuItem;
-}
-
-export interface MetaWorkspaceActionMenuItem {
 	/**
 	 * Define which workspace actions this menu item should be shown for.
 	 * @examples [
@@ -19,8 +15,11 @@ export interface MetaWorkspaceActionMenuItem {
 	 * ]
 	 * @required
 	 */
-	workspaceActions: string | string[];
+	forWorkspaceActions: string | string[];
+	meta: MetaWorkspaceActionMenuItem;
+}
 
+export interface MetaWorkspaceActionMenuItem {
 	/**
 	 * An icon to represent the action to be performed
 	 *
