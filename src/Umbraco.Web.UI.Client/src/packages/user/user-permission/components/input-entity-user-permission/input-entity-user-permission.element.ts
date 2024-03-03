@@ -43,7 +43,7 @@ export class UmbInputEntityUserPermissionElement extends FormControlMixin(UmbLit
 			umbExtensionsRegistry.byType('entityUserPermission'),
 			(userPermissionManifests) => {
 				this._manifests = userPermissionManifests.filter((manifest) =>
-					manifest.forEntityTypes.some((x) => x === this.entityType),
+					manifest.forEntityTypes.includes(this.entityType),
 				);
 			},
 			'umbUserPermissionManifestsObserver',
