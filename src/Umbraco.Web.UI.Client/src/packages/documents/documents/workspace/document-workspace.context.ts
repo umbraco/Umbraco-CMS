@@ -494,7 +494,7 @@ export class UmbDocumentWorkspaceContext
 		if (!entityType) throw new Error('Entity type is missing');
 
 		// TODO: remove meta
-		new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: undefined }).execute();
+		new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} }).execute();
 	}
 
 	async delete() {
