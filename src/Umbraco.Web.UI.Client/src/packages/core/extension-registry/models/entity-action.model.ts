@@ -57,3 +57,12 @@ export interface MetaEntityActionRenameKind extends MetaEntityAction {
 	renameRepositoryAlias: string;
 	itemRepositoryAlias: string;
 }
+
+// RELOAD TREE ITEM CHILDREN
+export interface ManifestEntityActionReloadTreeItemChildrenKind extends ManifestEntityAction {
+	type: 'entityAction';
+	kind: 'reloadTreeItemChildren';
+	meta: MetaEntityActionRenameKind;
+}
+
+export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityAction {}

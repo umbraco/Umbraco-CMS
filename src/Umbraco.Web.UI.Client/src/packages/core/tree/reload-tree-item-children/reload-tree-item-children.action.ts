@@ -1,27 +1,25 @@
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from './reload-tree-item-children-request.event.js';
-import type { UmbCopyDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
+import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import type { MetaEntityActionReloadTreeItemChildrenKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbReloadTreeItemChildrenEntityAction extends UmbEntityActionBase<UmbCopyDataTypeRepository> {
-	#actionEventContext?: UmbActionEventContext;
-
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
-
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#actionEventContext = instance;
-		});
+export class UmbReloadTreeItemChildrenEntityAction extends UmbEntityActionBase<MetaEntityActionReloadTreeItemChildrenKind> {
+	constructor(host: UmbControllerHostElement, args: UmbEntityActionArgs<MetaEntityActionReloadTreeItemChildrenKind>) {
+		super(host, args);
 	}
 
 	async execute() {
-		if (!this.#actionEventContext) throw new Error('Action Event context is not available');
-		this.#actionEventContext.dispatchEvent(
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+
+		eventContext.dispatchEvent(
 			new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				unique: this.unique,
-				entityType: this.entityType,
+				unique: this.args.unique,
+				entityType: this.args.entityType,
 			}),
 		);
 	}
+
+	destroy(): void {}
 }
