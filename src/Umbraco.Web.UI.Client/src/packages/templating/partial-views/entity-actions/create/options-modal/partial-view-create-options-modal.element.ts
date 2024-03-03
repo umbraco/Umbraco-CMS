@@ -10,7 +10,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 	UmbPartialViewCreateOptionsModalData,
 	string
 > {
-	#createFolderAction?: UmbCreateFolderEntityAction<any>;
+	#createFolderAction?: UmbCreateFolderEntityAction;
 
 	connectedCallback(): void {
 		super.connectedCallback();
