@@ -94,7 +94,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 
 	/**
 	 * constructor arguments to pass to the extensions apis.
-	 * Notice: The host argument will be send as the first argument no matter if this is set or not.
+	 * Notice: The host argument will be prepended as the first argument no matter if this is set or not.
 	 * @type {Array<unknown>}
 	 * @memberof UmbExtensionSlot
 	 * @example
