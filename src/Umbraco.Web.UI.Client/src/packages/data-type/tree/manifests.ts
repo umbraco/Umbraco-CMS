@@ -42,7 +42,6 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.DataType',
 	name: 'Data Type Tree Item',
 	forEntityTypes: ['data-type-root', 'data-type', 'data-type-folder'],
-	meta: {},
 };
 
 export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests, ...reloadManifests];
