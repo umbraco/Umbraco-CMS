@@ -4,6 +4,7 @@ import { UMB_MODAL_MANAGER_CONTEXT, UMB_CHANGE_PASSWORD_MODAL } from '@umbraco-c
 
 export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<UmbChangeUserPasswordRepository> {
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) return;
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

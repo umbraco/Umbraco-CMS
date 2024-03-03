@@ -6,6 +6,7 @@ export class UmbDeleteEntityAction<
 	T extends UmbDetailRepository<any> & UmbItemRepository<any>,
 > extends UmbEntityActionBase<T> {
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) return;
 
 		// TOOD: add back when entity actions can support multiple repositories

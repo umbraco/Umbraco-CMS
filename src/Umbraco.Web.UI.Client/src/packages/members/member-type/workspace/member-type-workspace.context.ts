@@ -7,12 +7,16 @@ import {
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 export class UmbMemberTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberTypeDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	public readonly detailRepository = new UmbMemberTypeDetailRepository(this);
+
+	#parent?: { entityType: string; unique: string | null };
 
 	#data = new UmbObjectState<UmbMemberTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -38,9 +42,10 @@ export class UmbMemberTypeWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		const { data } = await this.detailRepository.createScaffold(parentUnique);
+		this.#parent = parent;
+		const { data } = await this.detailRepository.createScaffold();
 
 		if (data) {
 			this.setIsNew(true);
@@ -55,7 +60,16 @@ export class UmbMemberTypeWorkspaceContext
 		if (!data) throw new Error('No data to save');
 
 		if (this.getIsNew()) {
-			await this.detailRepository.create(data);
+			if (!this.#parent) throw new Error('Parent is not set');
+			await this.detailRepository.create(data, this.#parent.unique);
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				entityType: this.#parent.entityType,
+				unique: this.#parent.unique,
+			});
+			eventContext.dispatchEvent(event);
 		} else {
 			await this.detailRepository.save(data);
 		}

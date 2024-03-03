@@ -10,7 +10,10 @@ export class UmbCreateDataTypeEntityAction extends UmbEntityActionBase<UmbDataTy
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, UMB_DATA_TYPE_CREATE_OPTIONS_MODAL, {
 			data: {
-				parentUnique: this.unique,
+				parent: {
+					entityType: this.entityType,
+					unique: this.unique,
+				},
 			},
 		});
 

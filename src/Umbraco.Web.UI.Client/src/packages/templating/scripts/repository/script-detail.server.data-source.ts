@@ -18,25 +18,24 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		this.#host = host;
 	}
 
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbScriptDetailModel> = {}) {
 		const data: UmbScriptDetailModel = {
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
-			parentUnique,
 			unique: '',
 			path: '',
 			name: '',
 			content: '',
+			...preset,
 		};
 
 		return { data };
 	}
 
-	async create(model: UmbScriptDetailModel) {
+	async create(model: UmbScriptDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Data is missing');
-		if (!model.parentUnique === undefined) throw new Error('Parent Unique is missing');
 		if (!model.name) throw new Error('Name is missing');
 
-		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(model.parentUnique);
+		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(parentUnique);
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateScriptRequestModel = {
@@ -79,7 +78,6 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const script: UmbScriptDetailModel = {
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
-			parentUnique: data.parent ? this.#serverFilePathUniqueSerializer.toUnique(data.parent.path) : null,
 			path: data.path,
 			name: data.name,
 			content: data.content,

@@ -8,6 +8,10 @@ export default class UmbCreateDictionaryEntityAction extends UmbEntityActionBase
 	}
 
 	async execute() {
-		history.pushState({}, '', `/section/dictionary/workspace/dictionary/create/${this.unique ?? 'null'}`);
+		history.pushState(
+			{},
+			'',
+			`/section/dictionary/workspace/dictionary/create/parent/${this.entityType}/${this.unique ?? 'null'}`,
+		);
 	}
 }

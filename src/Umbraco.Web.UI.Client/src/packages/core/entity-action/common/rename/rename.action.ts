@@ -5,6 +5,7 @@ import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbRenameEntityAction extends UmbEntityActionBase<UmbRenameRepository<{ unique: string }>> {
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) throw new Error('Repository is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

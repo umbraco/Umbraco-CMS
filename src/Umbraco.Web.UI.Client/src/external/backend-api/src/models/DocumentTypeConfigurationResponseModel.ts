@@ -8,5 +8,6 @@ import type { DataTypeChangeModeModel } from './DataTypeChangeModeModel';
 export type DocumentTypeConfigurationResponseModel = {
     dataTypesCanBeChanged: DataTypeChangeModeModel;
     disableTemplates: boolean;
+    useSegments: boolean;
 };
 

@@ -11,6 +11,7 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export type UmbFolderToTreeItemMapper<FolderTreeItemType extends UmbTreeItemModelBase> = (
 	item: UmbFolderModel,
+	parentUnique: string | null,
 ) => FolderTreeItemType;
 
 export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTreeItemModelBase>
@@ -44,13 +45,15 @@ export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTree
 		]);
 	}
 
-	async createScaffold(parentUnique: string | null) {
-		if (parentUnique === undefined) throw new Error('Parent unique is missing');
-
+	/**
+	 * Creates a scaffold for a folder
+	 * @return {*}
+	 * @memberof UmbFolderRepositoryBase
+	 */
+	async createScaffold() {
 		const scaffold = {
 			unique: UmbId.new(),
 			name: '',
-			parentUnique,
 		};
 
 		return { data: scaffold };
@@ -70,7 +73,7 @@ export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTree
 		const { data, error } = await this.#folderDataSource.create(args);
 
 		if (data) {
-			const folderTreeItem = this.#folderToTreeItemMapper(data);
+			const folderTreeItem = this.#folderToTreeItemMapper(data, args.parentUnique);
 			this._treeStore!.append(folderTreeItem);
 
 			const notification = { data: { message: `Folder created` } };

@@ -9,8 +9,10 @@ export class UmbScriptCreateOptionsEntityAction extends UmbEntityActionBase<neve
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, UMB_SCRIPT_CREATE_OPTIONS_MODAL, {
 			data: {
-				parentUnique: this.unique,
-				entityType: this.entityType,
+				parent: {
+					entityType: this.entityType,
+					unique: this.unique,
+				},
 			},
 		});
 

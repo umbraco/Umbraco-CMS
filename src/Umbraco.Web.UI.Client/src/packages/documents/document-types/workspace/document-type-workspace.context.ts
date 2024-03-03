@@ -8,6 +8,8 @@ import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@u
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
@@ -18,6 +20,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly repository = new UmbDocumentTypeDetailRepository(this);
 	// Data/Draft is located in structure manager
 
+	#parent?: { entityType: string; unique: string | null };
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
@@ -148,9 +151,10 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ defaultTemplate });
 	}
 
-	async create(parentUnique: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		const { data } = await this.structure.createScaffold(parentUnique);
+		this.#parent = parent;
+		const { data } = await this.structure.createScaffold();
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -178,7 +182,17 @@ export class UmbDocumentTypeWorkspaceContext
 		if (data === undefined) throw new Error('Cannot save, no data');
 
 		if (this.getIsNew()) {
-			if ((await this.structure.create()) === true) {
+			if (!this.#parent) throw new Error('Parent is not set');
+
+			if ((await this.structure.create(this.#parent.unique)) === true) {
+				// TODO: this might not be the right place to alert the tree, but it works for now
+				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+					entityType: this.#parent.entityType,
+					unique: this.#parent.unique,
+				});
+				eventContext.dispatchEvent(event);
+
 				this.setIsNew(false);
 			}
 		} else {

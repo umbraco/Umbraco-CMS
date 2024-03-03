@@ -5,6 +5,7 @@ import type { UmbDocumentDetailRepository } from '@umbraco-cms/backoffice/docume
 
 export class UmbDocumentPublicAccessEntityAction extends UmbEntityActionBase<UmbDocumentDetailRepository> {
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		modalManager.open(this, UMB_PUBLIC_ACCESS_MODAL, { data: { unique: this.unique } });
 	}

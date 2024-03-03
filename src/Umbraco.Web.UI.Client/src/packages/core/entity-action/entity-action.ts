@@ -12,9 +12,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export interface UmbEntityAction<RepositoryType> extends UmbAction<RepositoryType> {
 	/**
 	 * The unique identifier of the entity.
-	 * @type {string}
+	 * @type {string | null}
 	 */
-	unique: string;
+	unique: string | null;
 
 	/**
 	 * The href location, the action will act as a link.
@@ -43,18 +43,18 @@ export abstract class UmbEntityActionBase<RepositoryType>
 	implements UmbEntityAction<RepositoryType>
 {
 	entityType: string;
-	unique: string;
+	unique: string | null;
 	repositoryAlias: string;
 
-	/**
-	 * Creates an instance of UmbEntityActionBase<RepositoryType>.
-	 * @param {UmbControllerHost} host
-	 * @param {string} repositoryAlias
-	 * @param {string} unique
-	 * @param {string} entityType
-	 * @memberof UmbEntityActionBase<RepositoryType>
-	 */
-	constructor(host: UmbControllerHost, repositoryAlias: string, unique: string, entityType: string) {
+	constructor(host: UmbControllerHost, repositoryAlias: string, unique: string | null, entityType: string) {
+		/**
+		 * Creates an instance of UmbEntityActionBase<RepositoryType>.
+		 * @param {UmbControllerHost} host
+		 * @param {string} repositoryAlias
+		 * @param {string} unique
+		 * @param {string} entityType
+		 * @memberof UmbEntityActionBase<RepositoryType>
+		 */
 		super(host, repositoryAlias);
 		this.entityType = entityType;
 		this.unique = unique;

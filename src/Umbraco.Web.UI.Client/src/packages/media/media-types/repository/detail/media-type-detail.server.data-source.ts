@@ -31,15 +31,14 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 
 	/**
 	 * Creates a new Media Type scaffold
-	 * @param {(string | null)} parentUnique
+	 * @param {Partial<UmbMediaTypeDetailModel>} [preset]
 	 * @return { CreateMediaTypeRequestModel }
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbMediaTypeDetailModel> = {}) {
 		const data: UmbMediaTypeDetailModel = {
 			entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
 			name: '',
 			alias: '',
 			description: '',
@@ -53,6 +52,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			allowedContentTypes: [],
 			compositions: [],
 			collection: null,
+			...preset,
 		};
 
 		return { data };
@@ -77,7 +77,6 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		const mediaType: UmbMediaTypeDetailModel = {
 			entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: null, // TODO: map to parent/folder id
 			name: data.name,
 			alias: data.alias,
 			description: data.description || null,
@@ -126,7 +125,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	 * @return {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
-	async create(model: UmbMediaTypeDetailModel) {
+	async create(model: UmbMediaTypeDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Media Type is missing');
 		if (!model.unique) throw new Error('Media Type unique is missing');
 
@@ -169,7 +168,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 				};
 			}),
 			id: model.unique,
-			folder: model.parentUnique ? { id: model.parentUnique } : null,
+			parent: parentUnique ? { id: parentUnique } : null,
 			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 

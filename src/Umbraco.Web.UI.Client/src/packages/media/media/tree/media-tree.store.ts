@@ -21,35 +21,13 @@ export class UmbMediaTreeStore extends UmbUniqueTreeStore {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEDIA_TREE_STORE_CONTEXT.toString());
 
-		new UmbStoreConnector<UmbMediaTreeItemModel, UmbMediaDetailModel>(
-			host,
-			this,
-			UMB_MEDIA_DETAIL_STORE_CONTEXT,
-			(item) => this.#createTreeItemMapper(item),
-			(item) => this.#updateTreeItemMapper(item),
-		);
+		new UmbStoreConnector<UmbMediaTreeItemModel, UmbMediaDetailModel>(host, {
+			store: this,
+			connectToStoreAlias: UMB_MEDIA_DETAIL_STORE_CONTEXT,
+			updateStoreItemMapper: (item) => this.#updateTreeItemMapper(item),
+		});
 	}
 
-	// TODO: revisit this when we have decided on detail model sizes
-	// TODO: Fix tree model
-	#createTreeItemMapper = (item: UmbMediaDetailModel) => {
-		const treeItem: UmbMediaTreeItemModel = {
-			unique: item.unique,
-			parentUnique: item.parentUnique,
-			name: item.variants[0].name,
-			entityType: item.entityType,
-			isFolder: false,
-			hasChildren: false,
-			variants: item.variants,
-			isTrashed: item.isTrashed,
-			mediaType: { unique: item.mediaType.unique, icon: '', collection: null },
-			noAccess: false,
-		};
-
-		return treeItem;
-	};
-
-	// TODO: revisit this when we have decided on detail model sizes
 	#updateTreeItemMapper = (item: UmbMediaDetailModel) => {
 		return {
 			name: item.variants[0].name,

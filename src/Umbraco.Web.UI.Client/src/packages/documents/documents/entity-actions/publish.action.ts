@@ -7,6 +7,8 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<unknown> {
 	async execute() {
+		if (!this.unique) throw new Error('The document unique identifier is missing');
+
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestCollection({});
 

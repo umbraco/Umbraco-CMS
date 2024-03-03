@@ -15,9 +15,7 @@ export class UmbMockFileSystemTreeManager<T extends Omit<FileSystemTreeItemPrese
 		total: number;
 	} {
 		const items = this.#db.getAll().filter((item) => item.parent === null);
-		const paged = pagedResult(items, skip, take);
-		const treeItems = paged.items.map((item) => createFileSystemTreeItem(item));
-		return { items: treeItems, total: paged.total };
+		return this.#pagedTreeResult({ items, skip, take });
 	}
 
 	getChildrenOf({ parentPath, skip = 0, take = 100 }: { parentPath: string; skip?: number; take?: number }): {
@@ -25,8 +23,19 @@ export class UmbMockFileSystemTreeManager<T extends Omit<FileSystemTreeItemPrese
 		total: number;
 	} {
 		const items = this.#db.getAll().filter((item) => item.parent?.path === parentPath);
+		return this.#pagedTreeResult({ items, skip, take });
+	}
+
+	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {
 		const paged = pagedResult(items, skip, take);
 		const treeItems = paged.items.map((item) => createFileSystemTreeItem(item));
-		return { items: treeItems, total: paged.total };
+		const treeItemsHasChildren = treeItems.map((item) => {
+			const children = this.#db.getAll().filter((child) => child.parent?.path === item.path);
+			return {
+				...item,
+				hasChildren: children.length > 0,
+			};
+		});
+		return { items: treeItemsHasChildren, total: paged.total };
 	}
 }
