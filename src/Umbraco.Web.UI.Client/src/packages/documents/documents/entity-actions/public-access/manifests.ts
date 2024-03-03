@@ -1,10 +1,9 @@
-//import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../../repository/manifests.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_PUBLIC_ACCESS_REPOSITORY_ALIAS } from './repository/manifests.js';
 import { UmbDocumentPublicAccessEntityAction } from './public-access.action.js';
-import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestEntityAction> = [
+const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.PublicAccess',
