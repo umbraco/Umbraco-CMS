@@ -3,17 +3,17 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { MetaEntityActionCopyKind } from '@umbraco-cms/backoffice/extension-registry';
+import type { MetaEntityActionDuplicateKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbCopyRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbCopyEntityAction extends UmbEntityActionBase<MetaEntityActionCopyKind> {
+export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateKind> {
 	// TODO: make base type for item and detail models
 	#itemRepository?: UmbItemRepository<any>;
 	#copyRepository?: UmbCopyRepository;
 	#init: Promise<unknown>;
 
-	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionCopyKind>) {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionDuplicateKind>) {
 		super(host, args);
 
 		// TODO: We should properly look into how we can simplify the one time usage of a extension api, as its a bit of overkill to take conditions/overwrites and observation of extensions into play here: [NL]

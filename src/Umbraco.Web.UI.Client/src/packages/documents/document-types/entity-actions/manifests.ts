@@ -1,7 +1,7 @@
 import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS, DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import {
-	UmbCopyEntityAction,
+	UmbDuplicateEntityAction,
 	UmbMoveEntityAction,
 	UmbSortChildrenOfEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
@@ -39,7 +39,7 @@ const entityActions: Array<ManifestTypes> = [
 		alias: 'Umb.EntityAction.DocumentType.Copy',
 		name: 'Copy Document-Type Entity Action',
 		weight: 600,
-		api: UmbCopyEntityAction,
+		api: UmbDuplicateEntityAction,
 		meta: {
 			icon: 'icon-documents',
 			label: 'Copy',

@@ -1,22 +1,22 @@
-import { UmbCopyEntityAction } from './copy.action.js';
+import { UmbDuplicateEntityAction } from './duplicate.action.js';
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.EntityAction.Copy',
-	matchKind: 'copy',
+	alias: 'Umb.Kind.EntityAction.Duplicate',
+	matchKind: 'duplicate',
 	matchType: 'entityAction',
 	manifest: {
 		type: 'entityAction',
-		kind: 'copy',
-		api: UmbCopyEntityAction,
-		weight: 900,
+		kind: 'duplicate',
+		api: UmbDuplicateEntityAction,
+		weight: 600,
 		meta: {
-			icon: 'icon-trash',
-			label: 'Delete...',
+			icon: 'icon-documents',
+			label: 'Duplicate to...',
 			entityTypes: [],
 			itemRepositoryAlias: '',
-			copyRepositoryAlias: '',
+			duplicateRepositoryAlias: '',
 			pickerModalAlias: '',
 		},
 	},

@@ -8,7 +8,7 @@ import type {
 	ManifestEntityActionDeleteKind,
 	ManifestEntityActionRenameKind,
 	ManifestEntityActionReloadTreeItemChildrenKind,
-	ManifestEntityActionCopyKind,
+	ManifestEntityActionDuplicateKind,
 } from './entity-action.model.js';
 import type { ManifestDynamicRootOrigin, ManifestDynamicRootQueryStep } from './dynamic-root.model.js';
 import type { ManifestEntityBulkAction } from './entity-bulk-action.model.js';
@@ -103,7 +103,7 @@ export type ManifestTypes =
 	| ManifestEntityActionDeleteKind
 	| ManifestEntityActionRenameKind
 	| ManifestEntityActionReloadTreeItemChildrenKind
-	| ManifestEntityActionCopyKind
+	| ManifestEntityActionDuplicateKind
 	| ManifestEntityBulkAction
 	| ManifestEntryPoint
 	| ManifestExternalLoginProvider
