@@ -6,6 +6,7 @@ export class UmbFolderUpdateEntityAction<
 	T extends UmbFolderRepository = UmbFolderRepository,
 > extends UmbEntityActionBase<T> {
 	async execute() {
+		if (!this.unique) throw new Error('Unique is not available');
 		if (!this.repository) return;
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

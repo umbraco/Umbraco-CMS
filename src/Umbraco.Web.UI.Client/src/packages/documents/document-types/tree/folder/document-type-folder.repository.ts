@@ -17,10 +17,13 @@ export class UmbDocumentTypeFolderRepository extends UmbFolderRepositoryBase<Umb
 	}
 }
 
-const folderToDocumentTypeTreeItemMapper = (folder: UmbFolderModel): UmbDocumentTypeFolderTreeItemModel => {
+const folderToDocumentTypeTreeItemMapper = (
+	folder: UmbFolderModel,
+	parentUnique: string | null,
+): UmbDocumentTypeFolderTreeItemModel => {
 	return {
 		unique: folder.unique,
-		parentUnique: folder.parentUnique,
+		parentUnique,
 		name: folder.name,
 		entityType: UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 		hasChildren: false,

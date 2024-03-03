@@ -38,7 +38,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 
 	render() {
 		return html`<uui-menu-item href="${ifDefined(this.href)}" label=${this.label} ?has-children=${this.hasChildren}>
-			<uui-icon slot="icon" name=${this.iconName}></uui-icon>
+			<umb-icon slot="icon" name=${this.iconName}></umb-icon>
 			${this.entityType
 				? html`<umb-entity-actions-bundle
 						slot="actions"

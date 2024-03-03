@@ -13,11 +13,12 @@ export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create/:parentId',
+			path: 'create/parent/:entityType/:parentUnique',
 			component: this.#createElement,
 			setup: (_component, info) => {
-				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
-				this.#workspaceContext.create(parentId);
+				const parentEntityType = info.match.params.entityType;
+				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+				this.#workspaceContext.create({ entityType: parentEntityType, unique: parentUnique });
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,

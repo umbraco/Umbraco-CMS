@@ -7,11 +7,15 @@ export class UmbScriptCreateOptionsEntityAction extends UmbEntityActionBase<neve
 		if (!this.repository) throw new Error('Repository is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, UMB_SCRIPT_CREATE_OPTIONS_MODAL, {
+		const modalContext = modalManager.open(this, UMB_SCRIPT_CREATE_OPTIONS_MODAL, {
 			data: {
-				parentUnique: this.unique,
-				entityType: this.entityType,
+				parent: {
+					entityType: this.entityType,
+					unique: this.unique,
+				},
 			},
 		});
+
+		await modalContext.onSubmit();
 	}
 }

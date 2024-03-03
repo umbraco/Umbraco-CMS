@@ -40,7 +40,7 @@ export class UmbUserGroupWorkspaceContext
 
 	async create() {
 		this.resetState();
-		const { data } = await this.repository.createScaffold(null);
+		const { data } = await this.repository.createScaffold();
 		this.setIsNew(true);
 		this.#data.setValue(data);
 		return { data };

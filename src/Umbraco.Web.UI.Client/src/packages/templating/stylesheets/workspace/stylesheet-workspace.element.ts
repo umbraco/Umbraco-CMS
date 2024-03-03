@@ -13,11 +13,12 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create/:parentUnique',
+			path: 'create/parent/:entityType/:parentUnique',
 			component: this.#createElement,
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
+				const parentEntityType = info.match.params.entityType;
 				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-				await this.#workspaceContext.create(parentUnique);
+				this.#workspaceContext.create({ entityType: parentEntityType, unique: parentUnique });
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,

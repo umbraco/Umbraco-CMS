@@ -118,7 +118,7 @@ export class UmbSearchModalElement extends LitElement {
 		return html`
 			<a href="${item.href}" class="item">
 				<span class="item-icon">
-					${item.icon ? html`<uui-icon name="${item.icon}"></uui-icon>` : this.#renderHashTag()}
+					${item.icon ? html`<umb-icon name="${item.icon}"></umb-icon>` : this.#renderHashTag()}
 				</span>
 				<span class="item-name">
 					${item.name} ${item.url ? html`<span class="item-url">${item.url}</span>` : nothing}

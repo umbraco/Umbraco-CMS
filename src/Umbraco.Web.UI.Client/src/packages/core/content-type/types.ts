@@ -12,7 +12,6 @@ export interface UmbPropertyTypeContainerModel {
 
 export interface UmbContentTypeModel {
 	unique: string;
-	parentUnique: string | null;
 	name: string;
 	alias: string;
 	description: string | null;

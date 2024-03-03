@@ -144,7 +144,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 
 	#renderIcon(item: UmbMediaTypeItemModel) {
 		if (!item.icon) return;
-		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
+		return html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`;
 	}
 
 	static styles = [

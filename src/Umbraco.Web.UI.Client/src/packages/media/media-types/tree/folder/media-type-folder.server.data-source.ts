@@ -41,7 +41,6 @@ export class UmbMediaTypeFolderServerDataSource implements UmbFolderDataSource {
 			const mappedData = {
 				unique: data.id,
 				name: data.name,
-				parentUnique: data.parent ? data.parent.id : null,
 			};
 
 			return { data: mappedData };

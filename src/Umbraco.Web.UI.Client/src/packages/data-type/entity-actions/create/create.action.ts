@@ -8,10 +8,15 @@ export class UmbCreateDataTypeEntityAction extends UmbEntityActionBase<UmbDataTy
 		if (!this.repository) throw new Error('Repository is not available');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, UMB_DATA_TYPE_CREATE_OPTIONS_MODAL, {
+		const modalContext = modalManager.open(this, UMB_DATA_TYPE_CREATE_OPTIONS_MODAL, {
 			data: {
-				parentUnique: this.unique,
+				parent: {
+					entityType: this.entityType,
+					unique: this.unique,
+				},
 			},
 		});
+
+		await modalContext.onSubmit();
 	}
 }

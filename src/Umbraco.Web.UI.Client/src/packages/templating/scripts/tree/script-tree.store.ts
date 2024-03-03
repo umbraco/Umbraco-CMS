@@ -1,4 +1,3 @@
-import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import type { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_DETAIL_STORE_CONTEXT } from '../repository/index.js';
 import type { UmbScriptTreeItemModel } from './types.js';
@@ -22,31 +21,13 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_SCRIPT_TREE_STORE_CONTEXT.toString());
 
-		new UmbStoreConnector<UmbScriptTreeItemModel, UmbScriptDetailModel>(
-			host,
-			this,
-			UMB_SCRIPT_DETAIL_STORE_CONTEXT,
-			(item) => this.#createTreeItemMapper(item),
-			(item) => this.#updateTreeItemMapper(item),
-		);
+		new UmbStoreConnector<UmbScriptTreeItemModel, UmbScriptDetailModel>(host, {
+			store: this,
+			connectToStoreAlias: UMB_SCRIPT_DETAIL_STORE_CONTEXT,
+			updateStoreItemMapper: (item) => this.#updateTreeItemMapper(item),
+		});
 	}
 
-	// TODO: revisit this when we have decided on detail model sizes
-	#createTreeItemMapper = (item: UmbScriptDetailModel) => {
-		const treeItem: UmbScriptTreeItemModel = {
-			unique: item.unique,
-			parentUnique: item.parentUnique,
-			entityType: UMB_SCRIPT_ENTITY_TYPE,
-			name: item.name,
-			hasChildren: false,
-			isFolder: false,
-			icon: 'icon-diploma',
-		};
-
-		return treeItem;
-	};
-
-	// TODO: revisit this when we have decided on detail model sizes
 	#updateTreeItemMapper = (item: UmbScriptDetailModel) => {
 		return {
 			name: item.name,

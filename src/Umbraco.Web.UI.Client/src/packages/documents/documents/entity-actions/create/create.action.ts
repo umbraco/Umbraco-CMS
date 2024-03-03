@@ -10,7 +10,6 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias, unique, entityType);
-
 		this.#itemRepository = new UmbDocumentItemRepository(host);
 	}
 
@@ -28,11 +27,13 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		}
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
+		const modalContext = modalManager.open(this, UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
 			data: {
-				document: documentItem ? { unique: documentItem.unique } : null,
+				parent: { unique: this.unique, entityType: this.entityType },
 				documentType: documentItem ? { unique: documentItem.documentType.unique } : null,
 			},
 		});
+
+		await modalContext.onSubmit();
 	}
 }
