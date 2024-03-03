@@ -132,7 +132,7 @@ export class UmbExtensionElementAndApiInitializer<
 		const { element: newComponent, api: newApi } = await createExtensionElementWithApi<
 			ExtensionElementInterface,
 			ExtensionApiInterface
-		>(manifest, this.#defaultElement, this.#constructorArguments);
+		>(manifest, this.#defaultElement, this.#constructorArguments as any);
 
 		if (!this._isConditionsPositive) {
 			newApi?.destroy?.();

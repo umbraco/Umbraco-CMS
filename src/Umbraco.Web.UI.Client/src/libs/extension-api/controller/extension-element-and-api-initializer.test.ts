@@ -19,7 +19,9 @@ class UmbTestApiController extends UmbControllerBase {
 	}
 }
 
-interface TestManifest extends ManifestWithDynamicConditions, ManifestElementAndApi<HTMLElement, UmbTestApiController> {
+interface TestManifest
+	extends ManifestWithDynamicConditions,
+		ManifestElementAndApi<UmbControllerHostElement, UmbTestApiController> {
 	type: 'test-type';
 }
 

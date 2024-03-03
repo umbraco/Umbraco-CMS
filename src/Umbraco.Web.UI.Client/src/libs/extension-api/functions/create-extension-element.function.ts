@@ -1,7 +1,8 @@
 import type { ManifestElement, ManifestElementAndApi } from '../types/base.types.js';
 import { loadManifestElement } from './load-manifest-element.function.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export async function createExtensionElement<ElementType extends HTMLElement>(
+export async function createExtensionElement<ElementType extends UmbControllerHostElement>(
 	manifest: ManifestElement<ElementType> | ManifestElementAndApi<ElementType>,
 	fallbackElement?: string,
 ): Promise<ElementType | undefined> {
