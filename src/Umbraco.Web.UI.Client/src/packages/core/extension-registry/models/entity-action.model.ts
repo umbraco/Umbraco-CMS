@@ -67,7 +67,7 @@ export interface ManifestEntityActionReloadTreeItemChildrenKind extends Manifest
 
 export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityAction {}
 
-// COPY
+// DUPLICATE
 export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction {
 	type: 'entityAction';
 	kind: 'duplicate';
@@ -77,5 +77,19 @@ export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction 
 export interface MetaEntityActionDuplicateKind extends MetaEntityAction {
 	duplicateRepositoryAlias: string;
 	itemRepositoryAlias: string;
+	pickerModalAlias: string;
+}
+
+// MOVE
+
+export interface ManifestEntityActionMoveKind extends ManifestEntityAction {
+	type: 'entityAction';
+	kind: 'move';
+	meta: MetaEntityActionMoveKind;
+}
+
+export interface MetaEntityActionMoveKind extends MetaEntityAction {
+	itemRepositoryAlias: string;
+	moveRepositoryAlias: string;
 	pickerModalAlias: string;
 }
