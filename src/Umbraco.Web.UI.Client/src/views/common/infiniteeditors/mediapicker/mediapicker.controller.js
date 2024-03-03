@@ -269,7 +269,7 @@ angular.module("umbraco")
                         });
                 } else {
                     $scope.path = [];
-					performGotoFolder(folder);
+                    performGotoFolder(folder);
                 }
             }
 			
