@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/document-workspace-has-collection.condition.js';
-import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
-import { UmbPublishDocumentEntityAction } from '../entity-actions/publish.action.js';
+//import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
+//import { UmbPublishDocumentEntityAction } from '../entity-actions/publish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
 //import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
 //import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
@@ -163,9 +163,8 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		name: 'Unpublish',
 		weight: 10,
 		api: UmbDocumentSaveAndPublishWorkspaceAction,
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			workspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 			label: 'Unpublish',
 			icon: 'icon-globe',
 		},
@@ -177,9 +176,8 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		name: 'Publish with descendants',
 		weight: 20,
 		api: UmbDocumentSaveAndPublishWorkspaceAction,
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			workspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 			label: 'Publish with descendants (TBD)',
 			icon: 'icon-globe',
 		},
@@ -191,9 +189,8 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		name: 'Schedule publishing',
 		weight: 20,
 		api: UmbDocumentSaveAndPublishWorkspaceAction,
-		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			workspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 			label: 'Schedule publishing (TBD)',
 			icon: 'icon-globe',
 		},
