@@ -489,9 +489,12 @@ export class UmbDocumentWorkspaceContext
 
 	public async unpublish() {
 		const unique = this.getUnique();
-
+		const entityType = this.getEntityType();
 		if (!unique) throw new Error('Unique is missing');
-		new UmbUnpublishDocumentEntityAction(this, '', unique, '').execute();
+		if (!entityType) throw new Error('Entity type is missing');
+
+		// TODO: remove meta
+		new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: undefined }).execute();
 	}
 
 	async delete() {

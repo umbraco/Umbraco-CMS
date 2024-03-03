@@ -10,10 +10,17 @@ export interface ManifestEntityAction<MetaType extends MetaEntityAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityAction<MetaType>>,
 		ManifestWithDynamicConditions {
 	type: 'entityAction';
+	entityTypes: Array<string>;
 	meta: MetaType;
 }
 
-export interface MetaEntityAction {
+export interface MetaEntityAction {}
+export interface ManifestEntityActionDefaultKind extends ManifestEntityAction<MetaEntityActionDefaultKind> {
+	type: 'entityAction';
+	kind: 'default';
+}
+
+export interface MetaEntityActionDefaultKind extends MetaEntityAction {
 	/**
 	 * An icon to represent the action to be performed
 	 *
@@ -22,7 +29,7 @@ export interface MetaEntityAction {
 	 *   "icon-grid"
 	 * ]
 	 */
-	icon?: string;
+	icon: string;
 
 	/**
 	 * The friendly name of the action to perform
@@ -32,9 +39,7 @@ export interface MetaEntityAction {
 	 *   "Create Content Template"
 	 * ]
 	 */
-	label?: string;
-
-	entityTypes: Array<string>;
+	label: string;
 }
 
 // DELETE
@@ -43,7 +48,7 @@ export interface ManifestEntityActionDeleteKind extends ManifestEntityAction<Met
 	kind: 'delete';
 }
 
-export interface MetaEntityActionDeleteKind extends MetaEntityAction {
+export interface MetaEntityActionDeleteKind extends MetaEntityActionDefaultKind {
 	detailRepositoryAlias: string;
 	itemRepositoryAlias: string;
 }
@@ -54,7 +59,7 @@ export interface ManifestEntityActionRenameKind extends ManifestEntityAction<Met
 	kind: 'rename';
 }
 
-export interface MetaEntityActionRenameKind extends MetaEntityAction {
+export interface MetaEntityActionRenameKind extends MetaEntityActionDefaultKind {
 	renameRepositoryAlias: string;
 	itemRepositoryAlias: string;
 }
@@ -66,7 +71,7 @@ export interface ManifestEntityActionReloadTreeItemChildrenKind
 	kind: 'reloadTreeItemChildren';
 }
 
-export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityAction {}
+export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityActionDefaultKind {}
 
 // DUPLICATE
 export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction<MetaEntityActionDuplicateKind> {
@@ -74,20 +79,19 @@ export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction<
 	kind: 'duplicate';
 }
 
-export interface MetaEntityActionDuplicateKind extends MetaEntityAction {
+export interface MetaEntityActionDuplicateKind extends MetaEntityActionDefaultKind {
 	duplicateRepositoryAlias: string;
 	itemRepositoryAlias: string;
 	pickerModalAlias: string;
 }
 
 // MOVE
-
 export interface ManifestEntityActionMoveKind extends ManifestEntityAction<MetaEntityActionMoveKind> {
 	type: 'entityAction';
 	kind: 'move';
 }
 
-export interface MetaEntityActionMoveKind extends MetaEntityAction {
+export interface MetaEntityActionMoveKind extends MetaEntityActionDefaultKind {
 	moveRepositoryAlias: string;
 	itemRepositoryAlias: string;
 	pickerModalAlias: string;
