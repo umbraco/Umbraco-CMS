@@ -14,7 +14,7 @@ const entityActions: Array<ManifestTypes> = [
 			entityTypes: [UMB_DATA_TYPE_ENTITY_TYPE],
 			duplicateRepositoryAlias: UMB_COPY_DATA_TYPE_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
-			pickerModalAlias: UMB_DATA_TYPE_PICKER_MODAL,
+			pickerModalAlias: UMB_DATA_TYPE_PICKER_MODAL.toString(),
 		},
 	},
 ];
