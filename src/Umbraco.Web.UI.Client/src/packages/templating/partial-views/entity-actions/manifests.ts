@@ -1,5 +1,6 @@
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS } from '../repository/item/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as renameManifests } from './rename/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
@@ -12,7 +13,7 @@ const partialViewActions: Array<ManifestTypes> = [
 		kind: 'delete',
 		meta: {
 			detailRepositoryAlias: UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS,
-			itemRepositoryAlias: UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS, // TODO: implement partial view item repo
+			itemRepositoryAlias: UMB_PARTIAL_VIEW_ITEM_REPOSITORY_ALIAS,
 			entityTypes: [UMB_PARTIAL_VIEW_ENTITY_TYPE],
 		},
 	},
