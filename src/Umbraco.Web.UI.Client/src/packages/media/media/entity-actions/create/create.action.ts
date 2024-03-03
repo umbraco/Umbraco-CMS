@@ -6,7 +6,7 @@ import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export class UmbCreateMediaEntityAction extends UmbEntityActionBase<UmbEntityActionArgs<never>> {
+export class UmbCreateMediaEntityAction extends UmbEntityActionBase<never> {
 	#itemRepository;
 
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
