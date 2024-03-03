@@ -1,3 +1,4 @@
+import type { UmbEntityActionArgs } from './types.js';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -5,32 +6,42 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 @customElement('umb-entity-action-list')
 export class UmbEntityActionListElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
-	public get entityType(): string {
-		return this._entityType;
+	public get entityType(): string | undefined {
+		return this._props.entityType;
 	}
-	public set entityType(value: string) {
-		if (value === this._entityType) return;
-		this._entityType = value;
+	public set entityType(value: string | undefined) {
+		if (value === undefined || value === this._props.entityType) return;
+		this._props.entityType = value;
 		const oldValue = this._filter;
-		this._filter = (extension: ManifestEntityAction) => extension.meta.entityTypes.includes(this.entityType);
+		this._filter = (extension: ManifestEntityAction<unknown>) => extension.meta.entityTypes.includes(value);
 		this.requestUpdate('_filter', oldValue);
+		this.requestUpdate('_props');
 	}
-	private _entityType: string = '';
 
 	@state()
-	_filter?: (extension: ManifestEntityAction) => boolean;
+	_filter?: (extension: ManifestEntityAction<unknown>) => boolean;
 
 	@property({ type: String })
-	public unique?: string | null;
+	public get unique(): string | null | undefined {
+		return this._props.unique;
+	}
+	public set unique(value: string | null | undefined) {
+		this._props.unique = value;
+		this.requestUpdate('_props');
+	}
+
+	@state()
+	_props: Partial<UmbEntityActionArgs<unknown>> = {};
 
 	render() {
 		return this._filter
 			? html`
-					<umb-extension-slot
+					<umb-extension-with-api-slot
 						type="entityAction"
 						default-element="umb-entity-action"
 						.filter=${this._filter}
-						.props=${{ unique: this.unique, entityType: this.entityType }}></umb-extension-slot>
+						.props=${this._props}
+						.apiArgs=${[this._props]}></umb-extension-with-api-slot>
 			  `
 			: '';
 	}

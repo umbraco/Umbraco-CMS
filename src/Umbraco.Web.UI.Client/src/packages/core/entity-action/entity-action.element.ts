@@ -1,78 +1,36 @@
+import type { UmbEntityAction } from './entity-action.interface.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, nothing, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-action')
-export class UmbEntityActionElement extends UmbLitElement {
-	#entityType?: string | null;
+export class UmbEntityActionElement<
+	ArgsMetaType extends object = object,
+	ApiType extends UmbEntityAction<ArgsMetaType> = UmbEntityAction<ArgsMetaType>,
+> extends UmbLitElement {
+	#api?: ApiType;
 
 	@property({ type: String })
-	public set entityType(value: string | undefined | null) {
-		const oldValue = this.#entityType;
-		this.#entityType = value;
-		if (oldValue !== this.#entityType) {
-			this.#createApi();
-			this.requestUpdate('entityType', oldValue);
-		}
-	}
-	public get entityType() {
-		return this.#entityType;
-	}
-
-	#unique?: string | null;
+	entityType?: string | null;
 
 	@property({ type: String })
-	public set unique(value: string | undefined | null) {
-		const oldValue = this.#unique;
-		this.#unique = value;
-		if (oldValue !== this.#unique) {
-			this.#createApi();
-			this.requestUpdate('unique', oldValue);
-		}
-	}
-	public get unique() {
-		return this.#unique;
-	}
+	public unique?: string | null;
 
-	#manifest?: ManifestEntityAction;
+	@property({ attribute: false })
+	public manifest?: ManifestEntityAction<ArgsMetaType>;
 
-	@property({ type: Object, attribute: false })
-	public set manifest(value: ManifestEntityAction | undefined) {
-		if (!value) return;
-		const oldValue = this.#manifest;
-		this.#manifest = value;
-		if (oldValue !== this.#manifest) {
-			this.#createApi();
-			this.requestUpdate('manifest', oldValue);
-		}
-	}
-	public get manifest() {
-		return this.#manifest;
-	}
-
-	async #createApi() {
-		// only create the api if we have all the required properties
-		if (!this.#manifest) return;
-		if (this.#unique === undefined) return;
-		if (!this.#entityType) return;
-
-		this.#api = await createExtensionApi(this.#manifest, [
-			this,
-			{
-				entityType: this.#entityType,
-				unique: this.#unique,
-				meta: this.#manifest.meta,
-			},
-		]);
+	@property({ attribute: false })
+	public set api(api: ApiType | undefined) {
+		this.#api = api;
 
 		// TODO: Fix so when we use a HREF it does not refresh the page?
-		this._href = await this.#api.getHref?.();
+		this.#api?.getHref?.().then((href) => {
+			this._href = href;
+			// TODO: Do we need to update the component here? [NL]
+		});
 	}
-
-	#api: any;
 
 	@state()
 	_href?: string;
@@ -80,7 +38,7 @@ export class UmbEntityActionElement extends UmbLitElement {
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
-			await this.#api.execute();
+			await this.#api?.execute();
 		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}

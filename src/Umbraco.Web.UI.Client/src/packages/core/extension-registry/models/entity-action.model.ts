@@ -1,3 +1,5 @@
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 /**
@@ -5,7 +7,9 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * For example for content you may wish to create a new document etc
  */
 // TODO: create interface for API
-export interface ManifestEntityAction extends ManifestElementAndApi, ManifestWithDynamicConditions {
+export interface ManifestEntityAction<MetaType>
+	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityAction<MetaType>>,
+		ManifestWithDynamicConditions {
 	type: 'entityAction';
 	meta: MetaEntityAction;
 }
@@ -35,7 +39,7 @@ export interface MetaEntityAction {
 }
 
 // DELETE
-export interface ManifestEntityActionDeleteKind extends ManifestEntityAction {
+export interface ManifestEntityActionDeleteKind extends ManifestEntityAction<MetaEntityActionDeleteKind> {
 	type: 'entityAction';
 	kind: 'delete';
 	meta: MetaEntityActionDeleteKind;
@@ -47,7 +51,7 @@ export interface MetaEntityActionDeleteKind extends MetaEntityAction {
 }
 
 // RENAME
-export interface ManifestEntityActionRenameKind extends ManifestEntityAction {
+export interface ManifestEntityActionRenameKind extends ManifestEntityAction<MetaEntityActionRenameKind> {
 	type: 'entityAction';
 	kind: 'rename';
 	meta: MetaEntityActionRenameKind;
@@ -59,7 +63,8 @@ export interface MetaEntityActionRenameKind extends MetaEntityAction {
 }
 
 // RELOAD TREE ITEM CHILDREN
-export interface ManifestEntityActionReloadTreeItemChildrenKind extends ManifestEntityAction {
+export interface ManifestEntityActionReloadTreeItemChildrenKind
+	extends ManifestEntityAction<MetaEntityActionRenameKind> {
 	type: 'entityAction';
 	kind: 'reloadTreeItemChildren';
 	meta: MetaEntityActionRenameKind;
@@ -68,7 +73,7 @@ export interface ManifestEntityActionReloadTreeItemChildrenKind extends Manifest
 export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityAction {}
 
 // COPY
-export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction {
+export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction<MetaEntityActionDuplicateKind> {
 	type: 'entityAction';
 	kind: 'duplicate';
 	meta: MetaEntityActionDuplicateKind;
