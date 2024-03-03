@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UmbDocumentTypeFolderRepository } from './document-type-folder.repository.js';
-import { UmbDeleteFolderEntityAction, UmbFolderUpdateEntityAction } from '@umbraco-cms/backoffice/tree';
+import { UmbDeleteFolderEntityAction, UmbUpdateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import type { ManifestEntityAction, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.DocumentType.Folder';
@@ -18,7 +18,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		alias: 'Umb.EntityAction.DocumentType.RenameFolder',
 		name: 'Rename Document Type Folder Entity Action',
 		weight: 800,
-		api: UmbFolderUpdateEntityAction,
+		api: UmbUpdateFolderEntityAction,
 		forEntityTypes: [UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-edit',

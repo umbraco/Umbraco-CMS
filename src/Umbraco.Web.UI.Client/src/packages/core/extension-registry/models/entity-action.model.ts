@@ -6,7 +6,7 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * An action to perform on an entity
  * For example for content you may wish to create a new document etc
  */
-export interface ManifestEntityAction<MetaType extends MetaEntityAction>
+export interface ManifestEntityAction<MetaType extends MetaEntityAction = MetaEntityAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityAction<MetaType>>,
 		ManifestWithDynamicConditions {
 	type: 'entityAction';
@@ -95,4 +95,24 @@ export interface MetaEntityActionMoveKind extends MetaEntityActionDefaultKind {
 	moveRepositoryAlias: string;
 	itemRepositoryAlias: string;
 	pickerModalAlias: string;
+}
+
+// FOLDER
+export interface ManifestEntityActionCreateFolderKind extends ManifestEntityAction<MetaEntityActionFolderKind> {
+	type: 'entityAction';
+	kind: 'folderCreate';
+}
+
+export interface ManifestEntityActionUpdateFolderKind extends ManifestEntityAction<MetaEntityActionFolderKind> {
+	type: 'entityAction';
+	kind: 'folderUpdate';
+}
+
+export interface ManifestEntityActionDeleteFolderKind extends ManifestEntityAction<MetaEntityActionFolderKind> {
+	type: 'entityAction';
+	kind: 'folderDelete';
+}
+
+export interface MetaEntityActionFolderKind extends MetaEntityActionDefaultKind {
+	folderRepositoryAlias: string;
 }
