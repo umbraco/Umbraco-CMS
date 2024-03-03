@@ -1,6 +1,6 @@
 import type { UmbAction } from '@umbraco-cms/backoffice/action';
 import { UmbActionBase } from '@umbraco-cms/backoffice/action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbEntityBulkAction<RepositoryType = unknown> extends UmbAction<RepositoryType> {
 	selection: Array<string>;
@@ -14,7 +14,7 @@ export abstract class UmbEntityBulkActionBase<RepositoryType = unknown>
 {
 	selection: Array<string> = [];
 
-	constructor(host: UmbControllerHostElement, args: any, selection: Array<string>) {
+	constructor(host: UmbControllerHost, args: any, selection: Array<string>) {
 		super(host, args);
 		this.selection = selection;
 	}

@@ -1,5 +1,5 @@
 import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
@@ -12,7 +12,7 @@ export class UmbPropertyTypeWorkspaceContext
 	extends UmbContextBase<UmbPropertyTypeWorkspaceContext>
 	implements UmbWorkspaceContextInterface
 {
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT);
 	}
 

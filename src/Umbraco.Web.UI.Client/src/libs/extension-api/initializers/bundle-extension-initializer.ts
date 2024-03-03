@@ -2,13 +2,13 @@ import type { ManifestBase, ManifestBundle } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { loadManifestPlainJs } from '../functions/load-manifest-plain-js.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbBundleExtensionInitializer extends UmbControllerBase {
 	#extensionRegistry;
 	#bundleMap = new Map();
 
-	constructor(host: UmbControllerHostElement, extensionRegistry: UmbExtensionRegistry<ManifestBundle>) {
+	constructor(host: UmbControllerHost, extensionRegistry: UmbExtensionRegistry<ManifestBundle>) {
 		super(host);
 		this.#extensionRegistry = extensionRegistry;
 		this.observe(extensionRegistry.byType('bundle'), (bundles) => {

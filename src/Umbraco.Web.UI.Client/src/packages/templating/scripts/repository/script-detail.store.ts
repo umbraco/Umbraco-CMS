@@ -1,6 +1,6 @@
 import type { UmbScriptDetailModel } from '../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
@@ -15,7 +15,7 @@ export class UmbScriptDetailStore extends UmbDetailStoreBase<UmbScriptDetailMode
 	 * @param {UmbControllerHostInterface} host
 	 * @memberof UmbScriptDetailStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_SCRIPT_DETAIL_STORE_CONTEXT.toString());
 	}
 }

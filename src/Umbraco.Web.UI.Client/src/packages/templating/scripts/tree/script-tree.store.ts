@@ -2,7 +2,7 @@ import type { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_DETAIL_STORE_CONTEXT } from '../repository/index.js';
 import type { UmbScriptTreeItemModel } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 
@@ -15,10 +15,10 @@ import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbScriptTreeStore.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbScriptTreeStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_SCRIPT_TREE_STORE_CONTEXT.toString());
 
 		new UmbStoreConnector<UmbScriptTreeItemModel, UmbScriptDetailModel>(host, {

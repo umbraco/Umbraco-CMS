@@ -5,7 +5,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
@@ -16,9 +16,9 @@ export class UmbHealthCheckContext implements UmbApi {
 	private _results = new BehaviorSubject<HealthCheckGroupWithResultResponseModel | undefined>(undefined);
 	public readonly results = this._results.asObservable();
 
-	public host: UmbControllerHostElement;
+	public host: UmbControllerHost;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.host = host;
 	}
 

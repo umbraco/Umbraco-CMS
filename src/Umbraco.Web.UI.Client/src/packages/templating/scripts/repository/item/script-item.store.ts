@@ -1,6 +1,6 @@
 import type { UmbScriptItemModel } from '../../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
@@ -13,10 +13,10 @@ import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';
 export class UmbScriptItemStore extends UmbItemStoreBase<UmbScriptItemModel> {
 	/**
 	 * Creates an instance of UmbScriptItemStore.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbScriptItemStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_SCRIPT_ITEM_STORE_CONTEXT.toString());
 	}
 }

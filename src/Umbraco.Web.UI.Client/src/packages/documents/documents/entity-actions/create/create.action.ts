@@ -2,13 +2,13 @@ import type { UmbDocumentDetailRepository } from '../../repository/index.js';
 import { UmbDocumentItemRepository } from '../../repository/index.js';
 import { UMB_DOCUMENT_CREATE_OPTIONS_MODAL } from './document-create-options-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocumentDetailRepository> {
 	#itemRepository;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+	constructor(host: UmbControllerHost, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias, unique, entityType);
 		this.#itemRepository = new UmbDocumentItemRepository(host);
 	}

@@ -1,6 +1,6 @@
 import { UmbTemporaryFileRepository } from './temporary-file.repository.js';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 export type TemporaryFileStatus = 'complete' | 'waiting' | 'error';
@@ -20,7 +20,7 @@ export class UmbTemporaryFileManager extends UmbControllerBase {
 	#isReady = new UmbBooleanState(true);
 	public readonly isReady = this.#isReady.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
 	}

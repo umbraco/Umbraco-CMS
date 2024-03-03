@@ -1,10 +1,10 @@
 import type { UmbControllerAlias } from './controller-alias.type.js';
 import { UmbControllerHostMixin } from './controller-host.mixin.js';
-import type { UmbControllerHost } from './controller-host.interface.js';
+import type { UmbControllerHostElement } from './controller-host-element.interface.js';
 import type { UmbController } from './controller.interface.js';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
-export declare class UmbControllerHostElement extends HTMLElement implements UmbControllerHost {
+export declare class UmbControllerHostElementImplementation extends HTMLElement implements UmbControllerHostElement {
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;
@@ -39,7 +39,7 @@ export const UmbControllerHostElementMixin = <T extends HTMLElementConstructor>(
 		}
 	}
 
-	return UmbControllerHostElementClass as unknown as HTMLElementConstructor<UmbControllerHostElement> & T;
+	return UmbControllerHostElementClass as unknown as HTMLElementConstructor<UmbControllerHostElementImplementation> & T;
 };
 
 declare global {

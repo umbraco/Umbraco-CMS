@@ -3,13 +3,13 @@ import { UmbMediaItemRepository } from '../../repository/index.js';
 import type { UmbMediaCreateOptionsModalData } from './media-create-options-modal.token.js';
 import { UMB_MEDIA_CREATE_OPTIONS_MODAL } from './media-create-options-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateMediaEntityAction extends UmbEntityActionBase<UmbMediaDetailRepository> {
 	#itemRepository;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+	constructor(host: UmbControllerHost, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias, unique, entityType);
 
 		this.#itemRepository = new UmbMediaItemRepository(host);
