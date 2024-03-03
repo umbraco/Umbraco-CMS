@@ -89,7 +89,6 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-globe',
 			label: 'Unpublish',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
