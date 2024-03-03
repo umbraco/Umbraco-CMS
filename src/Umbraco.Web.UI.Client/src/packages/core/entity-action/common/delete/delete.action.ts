@@ -16,6 +16,8 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionDeleteKind>) {
 		super(host, args);
 
+		// TODO: We should properly look into how we can simplify the one time usage of a extension api, as its a bit of overkill to take conditions/overwrites and observation of extensions into play here: [NL]
+		// But since this happens when we execute an action, it does most likely not hurt any users, but it is a bit of a overkill to do this for every action: [NL]
 		this.#init = Promise.all([
 			new UmbExtensionApiInitializer(
 				this._host,
