@@ -3,9 +3,9 @@ import {
 	UMB_PARTIAL_VIEW_ENTITY_TYPE,
 	UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
 } from '../../entity.js';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestEntityAction> = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.PartialView.Tree.ReloadChildrenOf',
