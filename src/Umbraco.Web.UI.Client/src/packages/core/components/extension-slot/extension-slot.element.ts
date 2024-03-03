@@ -115,7 +115,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				(extensionControllers) => {
 					this._permitted = extensionControllers;
 				},
-				'extensionsInitializer',
+				undefined, // We can leave the alias undefined as we destroy this our selfs.
 				this.defaultElement,
 			);
 			this.#extensionsController.properties = this.#props;
