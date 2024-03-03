@@ -7,11 +7,11 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
  * For example for content you may wish to create a new document etc
  */
 // TODO: create interface for API
-export interface ManifestEntityAction<MetaType>
+export interface ManifestEntityAction<MetaType extends MetaEntityAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbEntityAction<MetaType>>,
 		ManifestWithDynamicConditions {
 	type: 'entityAction';
-	meta: MetaEntityAction;
+	meta: MetaType;
 }
 
 export interface MetaEntityAction {
@@ -42,7 +42,6 @@ export interface MetaEntityAction {
 export interface ManifestEntityActionDeleteKind extends ManifestEntityAction<MetaEntityActionDeleteKind> {
 	type: 'entityAction';
 	kind: 'delete';
-	meta: MetaEntityActionDeleteKind;
 }
 
 export interface MetaEntityActionDeleteKind extends MetaEntityAction {
@@ -54,7 +53,6 @@ export interface MetaEntityActionDeleteKind extends MetaEntityAction {
 export interface ManifestEntityActionRenameKind extends ManifestEntityAction<MetaEntityActionRenameKind> {
 	type: 'entityAction';
 	kind: 'rename';
-	meta: MetaEntityActionRenameKind;
 }
 
 export interface MetaEntityActionRenameKind extends MetaEntityAction {
@@ -67,7 +65,6 @@ export interface ManifestEntityActionReloadTreeItemChildrenKind
 	extends ManifestEntityAction<MetaEntityActionRenameKind> {
 	type: 'entityAction';
 	kind: 'reloadTreeItemChildren';
-	meta: MetaEntityActionRenameKind;
 }
 
 export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityAction {}
@@ -76,7 +73,6 @@ export interface MetaEntityActionReloadTreeItemChildrenKind extends MetaEntityAc
 export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction<MetaEntityActionDuplicateKind> {
 	type: 'entityAction';
 	kind: 'duplicate';
-	meta: MetaEntityActionDuplicateKind;
 }
 
 export interface MetaEntityActionDuplicateKind extends MetaEntityAction {
