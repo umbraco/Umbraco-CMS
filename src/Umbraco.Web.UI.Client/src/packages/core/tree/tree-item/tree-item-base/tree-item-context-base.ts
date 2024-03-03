@@ -250,7 +250,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.observe(
 			umbExtensionsRegistry
 				.byType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
+				.pipe(map((actions) => actions.filter((action) => action.forEntityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this.#hasActions.setValue(actions.length > 0);
 			},
