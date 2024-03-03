@@ -4,16 +4,12 @@ import { html, nothing, ifDefined, customElement, property, state } from '@umbra
 import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntityAction, MetaEntityActionDefaultKind } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 @customElement('umb-entity-action')
 export class UmbEntityActionElement<
-		MetaType extends MetaEntityActionDefaultKind = MetaEntityActionDefaultKind,
-		ApiType extends UmbEntityAction<MetaType> = UmbEntityAction<MetaType>,
-	>
-	extends UmbLitElement
-	implements UmbControllerHostElement
-{
+	MetaType extends MetaEntityActionDefaultKind = MetaEntityActionDefaultKind,
+	ApiType extends UmbEntityAction<MetaType> = UmbEntityAction<MetaType>,
+> extends UmbLitElement {
 	#api?: ApiType;
 
 	@property({ type: String })
@@ -67,6 +63,7 @@ export class UmbEntityActionElement<
 		`;
 	}
 }
+export default UmbEntityActionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
