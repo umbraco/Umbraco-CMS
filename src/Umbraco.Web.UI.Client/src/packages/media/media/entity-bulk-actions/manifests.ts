@@ -2,7 +2,7 @@ import type { UmbCollectionBulkActionPermissions } from '../../../core/collectio
 import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbMediaMoveEntityBulkAction } from './move/move.action.js';
-import { UmbMediaCopyEntityBulkAction } from './copy/copy.action.js';
+import { UmbDuplicateMediaEntityBulkAction } from './copy/copy.action.js';
 import { UmbMediaDeleteEntityBulkAction } from './delete/delete.action.js';
 import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import {
@@ -16,7 +16,7 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 		alias: 'Umb.EntityBulkAction.Media.Copy',
 		name: 'Copy Media Entity Bulk Action',
 		weight: 30,
-		api: UmbMediaCopyEntityBulkAction,
+		api: UmbDuplicateMediaEntityBulkAction,
 		meta: {
 			label: 'Copy',
 			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
