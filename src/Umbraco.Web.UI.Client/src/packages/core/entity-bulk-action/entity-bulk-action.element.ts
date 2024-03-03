@@ -6,7 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-entity-bulk-action')
 export class UmbEntityBulkActionElement<
-	MetaType = MetaEntityBulkAction,
+	MetaType extends MetaEntityBulkAction = MetaEntityBulkAction,
 	ApiType extends UmbEntityBulkActionBase<MetaType> = UmbEntityBulkActionBase<MetaType>,
 > extends UmbLitElement {
 	@property({ attribute: false })
