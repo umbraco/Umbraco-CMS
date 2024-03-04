@@ -14,11 +14,11 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 	 * @default 0
 	 */
 	@property({ type: Number })
-	public get min(): number {
-		return this.#pickerContext.min;
-	}
 	public set min(value: number) {
 		this.#pickerContext.min = value;
+	}
+	public get min(): number {
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -37,11 +37,11 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public get max(): number {
-		return this.#pickerContext.max;
-	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -64,6 +64,9 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selectedIds = splitStringToArray(idsString);
+	}
+	public get value() {
+		return this.#pickerContext.getSelection().join(',');
 	}
 
 	@state()
