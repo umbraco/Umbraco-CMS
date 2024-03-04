@@ -29,7 +29,7 @@ export class UmbMemberTypeWorkspaceViewEditElement extends UmbLitElement impleme
 		itemSelector: 'uui-tab',
 		containerSelector: 'uui-tab-group',
 		disabledItemSelector: '#root-tab',
-		resolveVerticalDirection: () => false,
+		resolvePlacement: () => false,
 		onChange: ({ model }) => {
 			this.#model = model;
 			this._tabs = model;
