@@ -199,45 +199,7 @@ export class MemberResource {
     }
 
     /**
-     * @returns PagedMemberResponseModel Success
-     * @throws ApiError
-     */
-    public static getMemberFilter({
-        memberTypeId,
-        orderBy = 'username',
-        orderDirection,
-        filter,
-        skip,
-        take = 100,
-    }: {
-        memberTypeId?: string,
-        orderBy?: string,
-        orderDirection?: DirectionModel,
-        filter?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedMemberResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/member/filter',
-            query: {
-                'memberTypeId': memberTypeId,
-                'orderBy': orderBy,
-                'orderDirection': orderDirection,
-                'filter': filter,
-                'skip': skip,
-                'take': take,
-            },
-            errors: {
-                400: `Bad Request`,
-                401: `The resource is protected and requires an authentication token`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postMemberValidate({

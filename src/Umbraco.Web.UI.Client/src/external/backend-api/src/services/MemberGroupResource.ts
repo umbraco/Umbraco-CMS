@@ -85,6 +85,52 @@ export class MemberGroupResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getMemberGroupById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<MemberGroupResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/member-group/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns string Success
+     * @throws ApiError
+     */
+    public static deleteMemberGroupById({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/member-group/{id}',
+            path: {
+                'id': id,
+            },
+            responseHeader: 'Umb-Notifications',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static putMemberGroupById({
         id,
         requestBody,
@@ -100,30 +146,6 @@ export class MemberGroupResource {
             },
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                400: `Bad Request`,
-                401: `The resource is protected and requires an authentication token`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns string Success
-     * @throws ApiError
-     */
-    public static deleteMemberGroupByKey({
-        key,
-    }: {
-        key: string,
-    }): CancelablePromise<string> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/umbraco/management/api/v1/member-group/{key}',
-            path: {
-                'key': key,
-            },
-            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
