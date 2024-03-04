@@ -3,6 +3,8 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
+import '../../components/index.js';
+
 type RichTextEditorValue = {
 	blocks: object;
 	markup: string;
