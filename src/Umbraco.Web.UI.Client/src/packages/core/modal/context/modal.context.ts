@@ -132,6 +132,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	}
 
 	public destroy(): void {
+		this.dispatchEvent(new CustomEvent('umb:destroy'));
 		this.#value.destroy();
 		(this as any).router = null;
 		(this as any).data = undefined;
