@@ -15,6 +15,7 @@ export interface ManifestEntityAction<MetaType extends MetaEntityAction = MetaEn
 }
 
 export interface MetaEntityAction {}
+
 export interface ManifestEntityActionDefaultKind extends ManifestEntityAction<MetaEntityActionDefaultKind> {
 	type: 'entityAction';
 	kind: 'default';

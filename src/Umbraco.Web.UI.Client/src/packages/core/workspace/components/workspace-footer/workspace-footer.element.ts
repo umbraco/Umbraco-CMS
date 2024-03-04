@@ -5,6 +5,11 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { ManifestWorkspaceAction, MetaWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
+
+function ExtensionApiArgsMethod(manifest: ManifestWorkspaceAction<MetaWorkspaceAction>) {
+	return [{ meta: manifest.meta }];
+}
 
 /**
  * @element umb-workspace-footer
@@ -54,10 +59,12 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 							@click=${this.#rejectModal}></uui-button>`
 					: ''}
 				<slot name="actions" slot="actions"></slot>
-				<umb-extension-slot
+				<umb-extension-with-api-slot
 					slot="actions"
 					type="workspaceAction"
-					default-element="umb-workspace-action"></umb-extension-slot>
+					default-element="umb-workspace-action"
+					.apiArgs=${ExtensionApiArgsMethod}></umb-extension-with-api-slot>
+
 				<slot name="actions" slot="actions"></slot>
 			</umb-footer-layout>
 		`;

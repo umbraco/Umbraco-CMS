@@ -1,5 +1,5 @@
 import type { UmbSaveableWorkspaceContextInterface } from '../../../../workspace-context/saveable-workspace-context.interface.js';
-import { UmbWorkspaceActionBase } from '../workspace-action-base.js';
+import { UmbWorkspaceActionBase } from '../../workspace-action-base.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: add interface for repo/partial repo/save-repo
