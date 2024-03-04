@@ -36,9 +36,9 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				</p>
 				<p>
 					Please refer to the
-					<a target="_blank" href="https://docs.umbraco.com/umbraco-backoffice/">documentation</a> to learn more about
-					what is possible. Here you will find excellent tutorials, guides, and references to help you get started
-					extending the Backoffice.
+					<a target="_blank" href="https://docs.umbraco.com/umbraco-cms/v/14.latest-beta/">documentation</a> to learn
+					more about what is possible. Here you will find excellent tutorials, guides, and references to help you get
+					started extending the Backoffice.
 				</p>
 			</uui-box>
 		`;
