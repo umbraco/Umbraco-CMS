@@ -6,9 +6,9 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.Language.Delete',
 		name: 'Delete Language Entity Action',
-		kind: 'delete',
 		forEntityTypes: [UMB_LANGUAGE_ENTITY_TYPE],
 		meta: {
 			itemRepositoryAlias: UMB_LANGUAGE_ITEM_REPOSITORY_ALIAS,
@@ -17,6 +17,7 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Language.Create',
 		name: 'Create Language Entity Action',
 		weight: 900,
@@ -25,7 +26,6 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 ];

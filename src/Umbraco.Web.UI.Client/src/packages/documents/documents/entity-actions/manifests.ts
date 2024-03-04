@@ -12,11 +12,10 @@ const entityActions: Array<ManifestTypes> = [
 	...cultureAndHostnamesManifests,
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Document.CreateBlueprint',
 		name: 'Create Document Blueprint Entity Action',
-		weight: 800,
 		api: () => import('./create-blueprint.action.js'),
-		kind: 'default',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-blueprint',
@@ -37,9 +36,9 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
+		kind: 'duplicate',
 		alias: 'Umb.EntityAction.Document.Copy',
 		name: 'Duplicate Document Entity Action',
-		kind: 'duplicate',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			duplicateRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
@@ -49,10 +48,10 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Document.Publish',
 		name: 'Publish Document Entity Action',
 		api: () => import('./publish.action.js'),
-		kind: 'default',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-globe',
@@ -61,10 +60,10 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Document.Unpublish',
 		name: 'Unpublish Document Entity Action',
 		api: () => import('./unpublish.action.js'),
-		kind: 'default',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-globe',

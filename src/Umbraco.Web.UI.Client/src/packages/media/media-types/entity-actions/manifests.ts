@@ -1,41 +1,39 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS, UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
-import { UmbMoveEntityAction, UmbDuplicateEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_MEDIA_TREE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'move',
 		alias: 'Umb.EntityAction.MediaType.Move',
 		name: 'Move Media Type Entity Action',
-		weight: 400,
-		api: UmbMoveEntityAction,
 		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-enter',
-			label: 'Move',
-			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			moveRepositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS,
+			pickerModalAlias: UMB_MEDIA_TREE_PICKER_MODAL.toString(),
 		},
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.MediaType.Copy',
-		name: 'Copy Media Type Entity Action',
-		weight: 300,
-		api: UmbDuplicateEntityAction,
+		kind: 'duplicate',
+		alias: 'Umb.EntityAction.MediaType.Duplicate',
+		name: 'Duplicate Media Type Entity Action',
 		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-documents',
-			label: 'Copy',
-			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			duplicateRepositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			itemRepositoryAlias: UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS,
+			pickerModalAlias: UMB_MEDIA_TREE_PICKER_MODAL.toString(),
 		},
 	},
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.MediaType.Delete',
 		name: 'Delete Media Type Entity Action',
-		kind: 'delete',
 		forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
