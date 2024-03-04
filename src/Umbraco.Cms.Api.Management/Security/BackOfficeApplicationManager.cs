@@ -31,7 +31,9 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
 
     public async Task EnsureBackOfficeApplicationAsync(Uri backOfficeUrl, CancellationToken cancellationToken = default)
     {
-        if (_runtimeState.Level < RuntimeLevel.Run)
+        // Install is okay without this, because we do not need a token to install,
+        // but upgrades do, so we need to execute for everything higher then or equal to upgrade.
+        if (_runtimeState.Level < RuntimeLevel.Upgrade)
         {
             return;
         }

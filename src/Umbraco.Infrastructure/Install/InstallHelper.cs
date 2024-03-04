@@ -29,7 +29,6 @@ namespace Umbraco.Cms.Infrastructure.Install
         private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
         private readonly IFireAndForgetRunner _fireAndForgetRunner;
         private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
-        private InstallationType? _installationType;
 
         public InstallHelper(DatabaseBuilder databaseBuilder,
             ILogger<InstallHelper> logger,
@@ -52,9 +51,6 @@ namespace Umbraco.Cms.Infrastructure.Install
             _umbracoDatabaseFactory = umbracoDatabaseFactory;
             _fireAndForgetRunner = fireAndForgetRunner;
             _databaseProviderMetadata = databaseProviderMetadata;
-
-            // We need to initialize the type already, as we can't detect later, if the connection string is added on the fly.
-            GetInstallationType();
         }
 
         [Obsolete("Please use constructor that takes an IEnumerable<IDatabaseProviderMetadata> instead, scheduled for removal in Umbraco 12")]
@@ -108,8 +104,6 @@ namespace Umbraco.Cms.Infrastructure.Install
         {
 
         }
-
-        public InstallationType GetInstallationType() => _installationType ??= IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade;
 
         public async Task SetInstallStatusAsync(bool isCompleted, string errorMsg)
         {

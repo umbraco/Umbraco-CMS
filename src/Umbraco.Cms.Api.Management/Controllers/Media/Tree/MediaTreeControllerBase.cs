@@ -59,23 +59,17 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         return responseModel;
     }
 
-    // TODO: delete these (faking start node setup for unlimited editor)
-    protected override int[] GetUserStartNodeIds() => new[] { -1 };
+    protected override int[] GetUserStartNodeIds()
+        => _backofficeSecurityAccessor
+               .BackOfficeSecurity?
+               .CurrentUser?
+               .CalculateMediaStartNodeIds(EntityService, _appCaches)
+           ?? Array.Empty<int>();
 
-    protected override string[] GetUserStartNodePaths() => Array.Empty<string>();
-
-    // TODO: use these implementations instead of the dummy ones above once we have backoffice auth in place
-    // protected override int[] GetUserStartNodeIds()
-    //     => _backofficeSecurityAccessor
-    //            .BackOfficeSecurity?
-    //            .CurrentUser?
-    //            .CalculateMediaStartNodeIds(EntityService, _appCaches)
-    //        ?? Array.Empty<int>();
-    //
-    // protected override string[] GetUserStartNodePaths()
-    //     => _backofficeSecurityAccessor
-    //            .BackOfficeSecurity?
-    //            .CurrentUser?
-    //            .GetMediaStartNodePaths(EntityService, _appCaches)
-    //        ?? Array.Empty<string>();
+    protected override string[] GetUserStartNodePaths()
+        => _backofficeSecurityAccessor
+               .BackOfficeSecurity?
+               .CurrentUser?
+               .GetMediaStartNodePaths(EntityService, _appCaches)
+           ?? Array.Empty<string>();
 }

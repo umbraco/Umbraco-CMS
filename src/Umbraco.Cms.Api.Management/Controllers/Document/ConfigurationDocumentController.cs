@@ -12,11 +12,16 @@ public class ConfigurationDocumentController : DocumentControllerBase
 {
     private readonly GlobalSettings _globalSettings;
     private readonly ContentSettings _contentSettings;
+    private readonly SegmentSettings _segmentSettings;
 
-    public ConfigurationDocumentController(IOptionsSnapshot<GlobalSettings> globalSettings, IOptionsSnapshot<ContentSettings> contentSettings)
+    public ConfigurationDocumentController(
+        IOptionsSnapshot<GlobalSettings> globalSettings,
+        IOptionsSnapshot<ContentSettings> contentSettings,
+        IOptionsSnapshot<SegmentSettings> segmentSettings)
     {
         _contentSettings = contentSettings.Value;
         _globalSettings = globalSettings.Value;
+        _segmentSettings = segmentSettings.Value;
     }
 
     [HttpGet("configuration")]
@@ -30,7 +35,9 @@ public class ConfigurationDocumentController : DocumentControllerBase
             DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
             SanitizeTinyMce = _globalSettings.SanitizeTinyMce,
             AllowEditInvariantFromNonDefault = _contentSettings.AllowEditInvariantFromNonDefault,
+            AllowNonExistingSegmentsCreation = _segmentSettings.AllowCreation,
         };
+
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }
 }

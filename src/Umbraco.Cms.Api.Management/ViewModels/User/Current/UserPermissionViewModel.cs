@@ -4,5 +4,5 @@ public class UserPermissionViewModel
 {
     public Guid NodeKey { get; set; }
 
-    public IEnumerable<string> Permissions { get; set; } = Enumerable.Empty<string>();
+    public ISet<string> Permissions { get; set; } = new HashSet<string>();
 }

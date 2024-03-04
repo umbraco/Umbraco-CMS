@@ -106,11 +106,11 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
 
     /// <inheritdoc />
-    public async Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId)
+    public async Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId, string? filter = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem[] items = _dictionaryRepository.GetDictionaryItemDescendants(parentId).ToArray();
+            IDictionaryItem[] items = _dictionaryRepository.GetDictionaryItemDescendants(parentId, filter).ToArray();
             return await Task.FromResult(items);
         }
     }

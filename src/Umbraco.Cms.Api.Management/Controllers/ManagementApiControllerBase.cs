@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Api.Common.Mvc.ActionResults;
 using Umbraco.Cms.Api.Management.DependencyInjection;
+using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Models.Membership;
@@ -19,6 +20,7 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [Authorize(Policy = "New" + AuthorizationPolicies.UmbracoFeatureEnabled)]
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
+[AppendEventMessages]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected IActionResult CreatedAtId<T>(Expression<Func<T, string>> action, Guid id)

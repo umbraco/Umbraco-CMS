@@ -54,7 +54,7 @@ public class ConfigurationEnabledDirectoryFactory : DirectoryFactoryBase
             case LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory:
                 return _services.GetRequiredService<SyncedFileSystemDirectoryFactory>();
             case LuceneDirectoryFactory.TempFileSystemDirectoryFactory:
-                return _services.GetRequiredService<TempEnvFileSystemDirectoryFactory>();
+                return _services.GetRequiredService<UmbracoTempEnvFileSystemDirectoryFactory>();
             case LuceneDirectoryFactory.Default:
             default:
                 return _services.GetRequiredService<FileSystemDirectoryFactory>();

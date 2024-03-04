@@ -19,7 +19,8 @@ for (const uploadType of uploadTypes) {
       }
     });
 
-    test("can add accepted file extension", async ({ umbracoApi, umbracoUi }) => {
+    //TODO: Remove skip when the frontend is ready
+    test.skip("can add accepted file extension", async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const fileExtensionValue = 'zip';
       const expectedDataTypeValues = [
@@ -48,7 +49,8 @@ for (const uploadType of uploadTypes) {
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });
 
-    test("can remove accepted file extension", async ({ umbracoApi, umbracoUi }) => {
+    //TODO: Remove skip when the frontend is ready
+    test.skip("can remove accepted file extension", async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const removedFileExtensionValue = "bat";
       const removedFileExtensionsValues = [

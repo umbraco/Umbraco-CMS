@@ -25,7 +25,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         VerifyUpdate(result.Result.Content);
@@ -76,7 +76,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         VerifyUpdate(result.Result.Content);
@@ -112,7 +112,7 @@ public partial class ContentEditingServiceTests
             TemplateKey = templateTwo.Key
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
@@ -141,7 +141,7 @@ public partial class ContentEditingServiceTests
             TemplateKey = null
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
@@ -169,7 +169,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
         VerifyUpdate(result.Result.Content);
@@ -209,7 +209,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
 
         // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
         Assert.IsTrue(result.Success);
@@ -254,7 +254,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch, result.Status);
 
@@ -281,7 +281,7 @@ public partial class ContentEditingServiceTests
             }
         };
 
-        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
         Assert.IsNotNull(result.Result.Content);
@@ -293,5 +293,44 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual("The initial invariant title", content.GetValue<string>("invariantTitle"));
         Assert.AreEqual("The initial English title", content.GetValue<string>("variantTitle", "en-US"));
         Assert.AreEqual("The initial Danish title", content.GetValue<string>("variantTitle", "da-DK"));
+    }
+
+    [Test]
+    public async Task Cannot_Update_Variant_With_Incorrect_Culture_Casing()
+    {
+        var content = await CreateVariantContent();
+
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "invariantTitle", Value = "The updated invariant title" }
+            },
+            Variants = new []
+            {
+                new VariantModel
+                {
+                    Culture = "en-us",
+                    Name = "Updated English Name",
+                    Properties = new []
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated English title" }
+                    }
+                },
+                new VariantModel
+                {
+                    Culture = "da-dk",
+                    Name = "Updated Danish Name",
+                    Properties = new []
+                    {
+                        new PropertyValueModel { Alias = "variantTitle", Value = "The updated Danish title" }
+                    }
+                }
+            }
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
     }
 }
