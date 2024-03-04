@@ -1,10 +1,10 @@
 import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
 import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from './types.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeModel> {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 	#init;
 	#initResolver?: (value: unknown) => void;
 
@@ -33,7 +33,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	#hasProperties = new UmbBooleanState(false);
 	readonly hasProperties = this.#hasProperties.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 		this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;

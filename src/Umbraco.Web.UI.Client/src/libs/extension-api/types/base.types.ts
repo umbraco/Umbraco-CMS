@@ -7,6 +7,7 @@ import type {
 	ElementLoaderProperty,
 	JsLoaderProperty,
 } from './utils.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export interface ManifestWithView<ElementType extends HTMLElement = HTMLElement> extends ManifestElement<ElementType> {
 	meta: MetaManifestWithView;
@@ -93,8 +94,10 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement> 
 	meta?: unknown;
 }
 
-export interface ManifestElementAndApi<ElementType extends HTMLElement = HTMLElement, ApiType extends UmbApi = UmbApi>
-	extends ManifestBase {
+export interface ManifestElementAndApi<
+	ElementType extends UmbControllerHostElement = UmbControllerHostElement,
+	ApiType extends UmbApi = UmbApi,
+> extends ManifestBase {
 	/**
 	 * @TJS-ignore
 	 */

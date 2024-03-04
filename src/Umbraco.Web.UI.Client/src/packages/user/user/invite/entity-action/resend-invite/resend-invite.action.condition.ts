@@ -3,15 +3,13 @@ import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbUserAllowResendInviteActionCondition extends UmbUserActionConditionBase {
-	async onUserDataChange() {
+	async _onUserDataChange() {
 		if (!this.userUnique) {
 			this.permitted = false;
-			super.onUserDataChange();
 			return;
 		}
 
 		this.permitted = this.userState === UserStateModel.INVITED;
-		super.onUserDataChange();
 	}
 }
 

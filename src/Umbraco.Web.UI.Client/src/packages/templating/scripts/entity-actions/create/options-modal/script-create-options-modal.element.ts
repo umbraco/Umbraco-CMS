@@ -8,7 +8,7 @@ import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 @customElement('umb-script-create-options-modal')
 export class UmbScriptCreateOptionsModalElement extends UmbModalBaseElement<UmbScriptCreateOptionsModalData, string> {
 	#modalManager?: UmbModalManagerContext;
-	#createFolderAction?: UmbCreateFolderEntityAction<any>;
+	#createFolderAction?: UmbCreateFolderEntityAction;
 
 	constructor() {
 		super();

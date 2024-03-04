@@ -9,7 +9,7 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 	UmbStylesheetCreateOptionsModalData,
 	string
 > {
-	#createFolderAction?: UmbCreateFolderEntityAction<any>;
+	#createFolderAction?: UmbCreateFolderEntityAction;
 
 	connectedCallback(): void {
 		super.connectedCallback();

@@ -1,12 +1,10 @@
-import type { UmbMediaDetailRepository } from '../../repository/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 
-export class UmbMediaDeleteEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaDetailRepository> {
+export class UmbMediaDeleteEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		console.log(`execute delete for: ${this.selection}`);
 
 		// TODO: show error
-		if (!this.repository) return;
 
 		// TODO: should we subscribe in cases like this?
 		/*

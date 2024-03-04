@@ -19,11 +19,11 @@ const entityActions = [
 		alias: UMB_DELETE_STYLESHEET_FOLDER_ENTITY_ACTION_ALIAS,
 		name: 'Delete Stylesheet folder Entity Action',
 		api: UmbDeleteFolderEntityAction,
+		forEntityTypes: [UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete folder...',
 			repositoryAlias: UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 		},
 	},
 ];

@@ -162,6 +162,4 @@ export class UmbDefaultCollectionContext<
 	}
 }
 
-export const UMB_DEFAULT_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext<any, any>>(
-	'UmbCollectionContext',
-);
+export const UMB_DEFAULT_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext>('UmbCollectionContext');

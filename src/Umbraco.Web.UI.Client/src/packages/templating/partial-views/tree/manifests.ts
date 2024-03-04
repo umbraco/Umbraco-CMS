@@ -45,9 +45,11 @@ const treeItem: ManifestTreeItem = {
 	kind: 'default',
 	alias: 'Umb.TreeItem.PartialView',
 	name: 'Partial View Tree Item',
-	meta: {
-		entityTypes: [UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE, UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
-	},
+	forEntityTypes: [
+		UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+		UMB_PARTIAL_VIEW_ENTITY_TYPE,
+		UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+	],
 };
 
 export const manifests = [

@@ -1,6 +1,7 @@
 import type { ManifestBase } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
+import type { UmbApiConstructorArgumentsMethodType } from '../index.js';
 import { UmbExtensionElementAndApiInitializer } from './extension-element-and-api-initializer.controller.js';
 import {
 	type PermittedControllerType,
@@ -27,16 +28,27 @@ export class UmbExtensionsElementAndApiInitializer<
 	//
 	#extensionRegistry;
 	#defaultElement?: string;
-	#constructorArgs: Array<unknown> | undefined;
-	#props?: Record<string, unknown>;
+	#constructorArgs: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType> | undefined;
+	#elProps?: Record<string, unknown>;
+	#apiProps?: Record<string, unknown>;
 
-	public get properties() {
-		return this.#props;
+	public get elementProperties() {
+		return this.#elProps;
 	}
-	public set properties(props: Record<string, unknown> | undefined) {
-		this.#props = props;
+	public set elementProperties(props: Record<string, unknown> | undefined) {
+		this.#elProps = props;
 		this._extensions.forEach((controller) => {
-			controller.properties = props;
+			controller.elementProps = props;
+		});
+	}
+
+	public get apiProperties() {
+		return this.#apiProps;
+	}
+	public set apiProperties(props: Record<string, unknown> | undefined) {
+		this.#apiProps = props;
+		this._extensions.forEach((controller) => {
+			controller.apiProps = props;
 		});
 	}
 
@@ -44,7 +56,7 @@ export class UmbExtensionsElementAndApiInitializer<
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
-		constructorArguments: Array<unknown> | undefined,
+		constructorArguments: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType> | undefined,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,
@@ -67,7 +79,8 @@ export class UmbExtensionsElementAndApiInitializer<
 			this.#defaultElement,
 		) as ControllerType;
 
-		extController.properties = this.#props;
+		extController.elementProps = this.#elProps;
+		extController.apiProps = this.#apiProps;
 
 		return extController;
 	}
@@ -75,7 +88,8 @@ export class UmbExtensionsElementAndApiInitializer<
 	public destroy(): void {
 		super.destroy();
 		this.#constructorArgs = undefined;
-		this.#props = undefined;
+		this.#elProps = undefined;
+		this.#apiProps = undefined;
 		(this.#extensionRegistry as any) = undefined;
 	}
 }

@@ -40,9 +40,7 @@ const treeItem: ManifestTreeItem = {
 	kind: 'default',
 	alias: 'Umb.TreeItem.RelationType',
 	name: 'RelationType Tree Item',
-	meta: {
-		entityTypes: [UMB_RELATION_TYPE_ROOT_ENTITY_TYPE, UMB_RELATION_TYPE_ENTITY_TYPE],
-	},
+	forEntityTypes: [UMB_RELATION_TYPE_ROOT_ENTITY_TYPE, UMB_RELATION_TYPE_ENTITY_TYPE],
 };
 
 export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifest];

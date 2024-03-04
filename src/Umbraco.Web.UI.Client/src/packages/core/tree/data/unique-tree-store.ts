@@ -2,7 +2,7 @@ import type { UmbUniqueTreeItemModel } from '../types.js';
 import type { UmbTreeStore } from './tree-store.interface.js';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: remove Unique from name when we have switched to uniques
 /**
@@ -15,7 +15,7 @@ export class UmbUniqueTreeStore
 	extends UmbStoreBase<UmbUniqueTreeItemModel>
 	implements UmbTreeStore<UmbUniqueTreeItemModel>
 {
-	constructor(host: UmbControllerHostElement, storeAlias: string) {
+	constructor(host: UmbControllerHost, storeAlias: string) {
 		super(host, storeAlias, new UmbArrayState<UmbUniqueTreeItemModel>([], (x) => x.unique));
 	}
 

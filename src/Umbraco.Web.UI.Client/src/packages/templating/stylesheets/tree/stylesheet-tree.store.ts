@@ -3,7 +3,7 @@ import { UMB_STYLESHEET_DETAIL_STORE_CONTEXT } from '../repository/index.js';
 import type { UmbStylesheetTreeItemModel } from './types.js';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 
 /**
@@ -15,10 +15,10 @@ import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbStylesheetTreeStore.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbStylesheetTreeStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_STYLESHEET_TREE_STORE_CONTEXT.toString());
 
 		new UmbStoreConnector<UmbStylesheetTreeItemModel, UmbStylesheetDetailModel>(host, {

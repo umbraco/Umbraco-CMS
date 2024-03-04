@@ -1,6 +1,6 @@
 import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/index.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
@@ -50,7 +50,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (variantContext) => {

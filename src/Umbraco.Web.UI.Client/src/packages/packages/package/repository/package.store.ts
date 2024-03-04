@@ -1,7 +1,7 @@
 import type { UmbPackage } from '../../types.js';
 import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import type { PackageMigrationStatusResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
@@ -38,10 +38,10 @@ export class UmbPackageStore extends UmbStoreBase {
 
 	/**
 	 * Creates an instance of PackageStore.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof PackageStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		// TODO: revisit this store. Is it ok to have multiple data sets?
 		// temp hack to satisfy the base class
 		super(host, UMB_PACKAGE_STORE_TOKEN.toString(), new UmbArrayState<UmbPackage>([], (x) => x.name));

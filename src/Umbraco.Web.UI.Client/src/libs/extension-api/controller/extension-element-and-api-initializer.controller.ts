@@ -1,10 +1,10 @@
-import { createExtensionApi } from '../functions/create-extension-api.function.js';
-import { createExtensionElement } from '../functions/create-extension-element.function.js';
+import { createExtensionElementWithApi } from '../functions/create-extension-element-with-api.function.js';
+import type { UmbApiConstructorArgumentsMethodType } from '../index.js';
 import type { UmbApi } from '../models/api.interface.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { ManifestElementAndApi, ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * This Controller manages a single Extension initializing its Element and API.
@@ -21,13 +21,13 @@ export class UmbExtensionElementAndApiInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	ControllerType extends UmbExtensionElementAndApiInitializer<ManifestType, any> = any,
 	ExtensionInterface extends ManifestElementAndApi = ManifestType extends ManifestElementAndApi ? ManifestType : never,
-	ExtensionElementInterface extends HTMLElement | undefined = ExtensionInterface['ELEMENT_TYPE'],
-	ExtensionApiInterface extends UmbApi | undefined = ExtensionInterface['API_TYPE'],
+	ExtensionElementInterface extends UmbControllerHostElement = NonNullable<ExtensionInterface['ELEMENT_TYPE']>,
+	ExtensionApiInterface extends UmbApi = NonNullable<ExtensionInterface['API_TYPE']>,
 > extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 	#defaultElement?: string;
 	#component?: ExtensionElementInterface;
 	#api?: ExtensionApiInterface;
-	#constructorArguments?: Array<unknown>;
+	#constructorArguments?: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType>;
 
 	/**
 	 * The component that is created for this extension.
@@ -54,28 +54,52 @@ export class UmbExtensionElementAndApiInitializer<
 	 * @example
 	 * ```ts
 	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);
-	 * controller.props = { foo: 'bar' };
+	 * controller.elementProps = { foo: 'bar' };
 	 * ```
 	 * Is equivalent to:
 	 * ```ts
 	 * controller.component.foo = 'bar';
 	 * ```
 	 */
-	#properties?: Record<string, unknown>;
-	get properties() {
-		return this.#properties;
+	#elProps?: Record<string, unknown>;
+	get elementProps() {
+		return this.#elProps;
 	}
-	set properties(newVal) {
-		this.#properties = newVal;
+	set elementProps(newVal) {
+		this.#elProps = newVal;
 		// TODO: we could optimize this so we only re-set the changed props.
-		this.#assignProperties();
+		this.#assignElProps();
+	}
+
+	/**
+	 * The props that are passed to the api.
+	 * @type {Record<string, any>}
+	 * @memberof UmbElementExtensionController
+	 * @example
+	 * ```ts
+	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);
+	 * controller.apiProperties = { foo: 'bar' };
+	 * ```
+	 * Is equivalent to:
+	 * ```ts
+	 * controller.api.foo = 'bar';
+	 * ```
+	 */
+	#apiProps?: Record<string, unknown>;
+	get apiProps() {
+		return this.#apiProps;
+	}
+	set apiProps(newVal) {
+		this.#apiProps = newVal;
+		// TODO: we could optimize this so we only re-set the changed props.
+		this.#assignApiProps();
 	}
 
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		constructorArguments: Array<unknown> | undefined,
+		constructorArguments: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestType> | undefined,
 		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void,
 		defaultElement?: string,
 	) {
@@ -85,25 +109,30 @@ export class UmbExtensionElementAndApiInitializer<
 		this._init();
 	}
 
-	#assignProperties = () => {
-		if (!this.#component || !this.#properties) return;
+	#assignElProps = () => {
+		if (!this.#component || !this.#elProps) return;
 
 		// TODO: we could optimize this so we only re-set the updated props.
-		Object.keys(this.#properties).forEach((key) => {
-			(this.#component as any)[key] = this.#properties![key];
+		Object.keys(this.#elProps).forEach((key) => {
+			(this.#component as any)[key] = this.#elProps![key];
+		});
+	};
+	#assignApiProps = () => {
+		if (!this.#api || !this.#apiProps) return;
+
+		// TODO: we could optimize this so we only re-set the updated props.
+		Object.keys(this.#apiProps).forEach((key) => {
+			(this.#component as any)[key] = this.#apiProps![key];
 		});
 	};
 
 	protected async _conditionsAreGood() {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
-		const promises = await Promise.all([
-			createExtensionApi(manifest, this.#constructorArguments),
-			createExtensionElement(manifest, this.#defaultElement),
-		]);
-
-		const newApi = promises[0] as ExtensionApiInterface;
-		const newComponent = promises[1] as ExtensionElementInterface;
+		const { element: newComponent, api: newApi } = await createExtensionElementWithApi<
+			ExtensionElementInterface,
+			ExtensionApiInterface
+		>(manifest, this.#defaultElement, this.#constructorArguments as any);
 
 		if (!this._isConditionsPositive) {
 			newApi?.destroy?.();
@@ -116,6 +145,7 @@ export class UmbExtensionElementAndApiInitializer<
 
 		this.#api = newApi;
 		if (this.#api) {
+			this.#assignApiProps();
 			(this.#api as any).manifest = manifest;
 		} else {
 			console.warn('Manifest did not provide any useful data for a api to be created.');
@@ -123,7 +153,7 @@ export class UmbExtensionElementAndApiInitializer<
 
 		this.#component = newComponent;
 		if (this.#component) {
-			this.#assignProperties();
+			this.#assignElProps();
 			(this.#component as any).manifest = manifest;
 			if (this.#api) {
 				(this.#component as any).api = newApi;
@@ -156,6 +186,6 @@ export class UmbExtensionElementAndApiInitializer<
 	public destroy(): void {
 		super.destroy();
 		this.#constructorArguments = undefined;
-		this.#properties = undefined;
+		this.#elProps = undefined;
 	}
 }
