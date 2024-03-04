@@ -50,7 +50,6 @@ export class UmbMemberWorkspaceContext
 		value: UmbMemberDetailModel[PropertyName],
 	) {
 		this.#currentData.update({ [propertyName]: value });
-		console.log('set', propertyName, value, this.#currentData.getValue());
 	}
 
 	async load(unique: string) {
@@ -118,7 +117,6 @@ export class UmbMemberWorkspaceContext
 			{ name },
 			variantId ? (x) => variantId.compare(x) : () => true,
 		);
-		console.log('setName', oldVariants, variants);
 		this.#currentData.update({ variants });
 	}
 
