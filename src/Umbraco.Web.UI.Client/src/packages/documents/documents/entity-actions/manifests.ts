@@ -37,7 +37,7 @@ const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
 		kind: 'duplicate',
-		alias: 'Umb.EntityAction.Document.Copy',
+		alias: 'Umb.EntityAction.Document.Duplicate',
 		name: 'Duplicate Document Entity Action',
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
