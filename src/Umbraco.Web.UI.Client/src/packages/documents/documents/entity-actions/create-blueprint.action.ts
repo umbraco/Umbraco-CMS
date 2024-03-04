@@ -11,7 +11,5 @@ export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<
 		console.log(`execute for: ${this.args.unique}`);
 		//await this.repository?.createBlueprint();
 	}
-
-	destroy(): void {}
 }
 export default UmbCreateDocumentBlueprintEntityAction;

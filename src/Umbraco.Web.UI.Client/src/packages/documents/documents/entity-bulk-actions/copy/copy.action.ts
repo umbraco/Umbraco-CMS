@@ -4,6 +4,4 @@ export class UmbDocumentCopyEntityBulkAction extends UmbEntityBulkActionBase<obj
 	async execute() {
 		console.log('execute bulk copy');
 	}
-
-	destroy(): void {}
 }

@@ -15,6 +15,4 @@ export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionB
 			data: { unique: this.args.unique },
 		});
 	}
-
-	destroy(): void {}
 }

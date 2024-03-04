@@ -15,6 +15,4 @@ export class UmbCreateRelationTypeEntityAction extends UmbEntityActionBase<never
 			`section/settings/workspace/relation-type/create/parent/${this.args.entityType}/${this.args.unique}`,
 		);
 	}
-
-	destroy(): void {}
 }

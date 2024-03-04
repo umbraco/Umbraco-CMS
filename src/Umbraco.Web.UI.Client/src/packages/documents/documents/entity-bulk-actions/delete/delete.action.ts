@@ -5,5 +5,5 @@ export class UmbDocumentDeleteEntityBulkAction extends UmbEntityBulkActionBase<o
 		console.log('execute bulk delete');
 	}
 
-	destroy(): void {}
+
 }

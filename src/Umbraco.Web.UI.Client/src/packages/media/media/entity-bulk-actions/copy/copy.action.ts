@@ -4,6 +4,4 @@ export class UmbDuplicateMediaEntityBulkAction extends UmbEntityBulkActionBase<o
 	async execute() {
 		console.log('execute bulk duplicate');
 	}
-
-	destroy(): void {}
 }

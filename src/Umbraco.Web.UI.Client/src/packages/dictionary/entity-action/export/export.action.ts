@@ -32,8 +32,6 @@ export class UmbExportDictionaryEntityAction extends UmbEntityActionBase<object>
 		// Clean up
 		window.URL.revokeObjectURL(url);
 	}
-
-	destroy(): void {}
 }
 
 export default UmbExportDictionaryEntityAction;

@@ -48,6 +48,4 @@ export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 			await this.#folderRepository?.delete(this.args.unique);
 		}
 	}
-
-	destroy(): void {}
 }

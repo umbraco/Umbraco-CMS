@@ -5,6 +5,4 @@ export class UmbSetGroupUserEntityBulkAction extends UmbEntityBulkActionBase<obj
 		//TODO: Implement
 		alert('Bulk set group is not implemented yet');
 	}
-
-	destroy(): void {}
 }

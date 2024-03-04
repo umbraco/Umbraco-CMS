@@ -11,6 +11,4 @@ export class UmbLanguageCreateEntityAction extends UmbEntityActionBase<never> {
 		// TODO: Generate the href or retrieve it from something?
 		history.pushState(null, '', `section/settings/workspace/language/create`);
 	}
-
-	destroy(): void {}
 }

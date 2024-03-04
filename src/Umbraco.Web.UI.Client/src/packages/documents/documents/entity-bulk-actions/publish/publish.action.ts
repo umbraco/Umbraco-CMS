@@ -39,6 +39,4 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			}
 		}
 	}
-
-	destroy(): void {}
 }

@@ -30,6 +30,4 @@ export class UmbMediaDeleteEntityBulkAction extends UmbEntityBulkActionBase<obje
 		}
 		*/
 	}
-
-	destroy(): void {}
 }

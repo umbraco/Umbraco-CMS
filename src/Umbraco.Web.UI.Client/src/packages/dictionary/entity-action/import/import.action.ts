@@ -8,8 +8,6 @@ export class UmbImportDictionaryEntityAction extends UmbEntityActionBase<object>
 		const modalContext = modalManager.open(this, UMB_IMPORT_DICTIONARY_MODAL, { data: { unique: this.args.unique } });
 		await modalContext.onSubmit();
 	}
-
-	destroy(): void {}
 }
 
 export default UmbImportDictionaryEntityAction;

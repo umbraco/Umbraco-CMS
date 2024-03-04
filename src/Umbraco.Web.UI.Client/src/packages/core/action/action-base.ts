@@ -11,5 +11,4 @@ export abstract class UmbActionBase<ArgsType> extends UmbControllerBase implemen
 	}
 
 	abstract execute(): Promise<void>;
-	abstract destroy(): void;
 }

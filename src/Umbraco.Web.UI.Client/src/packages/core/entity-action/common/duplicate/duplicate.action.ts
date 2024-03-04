@@ -51,6 +51,4 @@ export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActi
 		if (!value) return;
 		await this.#duplicateRepository!.copy(this.args.unique, value.selection[0]);
 	}
-
-	destroy(): void {}
 }

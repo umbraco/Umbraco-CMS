@@ -32,7 +32,5 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<never> {
 
 		await modalContext.onSubmit();
 	}
-
-	destroy(): void {}
 }
 export default UmbCreateDocumentEntityAction;

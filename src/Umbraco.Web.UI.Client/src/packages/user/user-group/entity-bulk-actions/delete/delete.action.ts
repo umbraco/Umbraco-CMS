@@ -24,6 +24,4 @@ export class UmbDeleteUserGroupEntityBulkAction extends UmbEntityBulkActionBase<
 			await repository?.delete(element);
 		}
 	}
-
-	destroy(): void {}
 }

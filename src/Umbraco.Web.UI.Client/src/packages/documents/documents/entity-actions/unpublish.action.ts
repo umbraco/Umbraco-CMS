@@ -47,7 +47,5 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<object
 			await publishingRepository.unpublish(this.args.unique, selectedVariants);
 		}
 	}
-
-	destroy(): void {}
 }
 export default UmbUnpublishDocumentEntityAction;

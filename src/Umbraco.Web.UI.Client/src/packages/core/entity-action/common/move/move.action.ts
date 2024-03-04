@@ -50,6 +50,4 @@ export class UmbMoveEntityAction extends UmbEntityActionBase<any> {
 		if (!value) return;
 		await this.#moveRepository!.move(this.args.unique, value.selection[0]);
 	}
-
-	destroy(): void {}
 }

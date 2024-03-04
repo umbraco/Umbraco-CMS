@@ -18,6 +18,4 @@ export class UmbCreateFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 
 		await modalContext.onSubmit();
 	}
-
-	destroy(): void {}
 }

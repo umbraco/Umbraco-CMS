@@ -24,6 +24,4 @@ export class UmbResendInviteToUserEntityAction extends UmbEntityActionBase<UmbEn
 
 		await modalContext.onSubmit();
 	}
-
-	destroy(): void {}
 }

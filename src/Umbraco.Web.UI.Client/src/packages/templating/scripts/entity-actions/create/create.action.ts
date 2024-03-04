@@ -23,5 +23,5 @@ export class UmbScriptCreateOptionsEntityAction extends UmbEntityActionBase<neve
 		await modalContext.onSubmit();
 	}
 
-	destroy(): void {}
+
 }

@@ -14,8 +14,6 @@ export class UmbCreateDictionaryEntityAction extends UmbEntityActionBase<never> 
 			`/section/dictionary/workspace/dictionary/create/parent/${this.args.entityType}/${this.args.unique ?? 'null'}`,
 		);
 	}
-
-	destroy(): void {}
 }
 
 export default UmbCreateDictionaryEntityAction;

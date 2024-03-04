@@ -26,6 +26,4 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<never
 		const repository = new UmbChangeUserPasswordRepository(this);
 		await repository.changePassword(this.args.unique, data.newPassword);
 	}
-
-	destroy(): void {}
 }

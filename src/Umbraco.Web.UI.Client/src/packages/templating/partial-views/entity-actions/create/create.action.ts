@@ -22,6 +22,4 @@ export class UmbPartialViewCreateOptionsEntityAction extends UmbEntityActionBase
 
 		await modalContext.onSubmit();
 	}
-
-	destroy(): void {}
 }

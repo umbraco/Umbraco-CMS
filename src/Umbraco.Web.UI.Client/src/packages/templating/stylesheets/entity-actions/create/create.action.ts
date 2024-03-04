@@ -16,6 +16,4 @@ export class UmbStylesheetCreateOptionsEntityAction extends UmbEntityActionBase<
 
 		await modalContext.onSubmit();
 	}
-
-	destroy(): void {}
 }

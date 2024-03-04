@@ -4,6 +4,4 @@ export class UmbMoveDocumentEntityBulkAction extends UmbEntityBulkActionBase<obj
 	async execute() {
 		console.log(`execute bulk move`);
 	}
-
-	destroy(): void {}
 }

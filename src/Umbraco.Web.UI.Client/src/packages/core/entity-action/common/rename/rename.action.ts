@@ -18,6 +18,4 @@ export class UmbRenameEntityAction extends UmbEntityActionBase<MetaEntityActionR
 
 		await modalContext.onSubmit();
 	}
-
-	destroy(): void {}
 }

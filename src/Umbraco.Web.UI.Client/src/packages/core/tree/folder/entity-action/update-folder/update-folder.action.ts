@@ -19,6 +19,4 @@ export class UmbUpdateFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 
 		await modalContext.onSubmit();
 	}
-
-	destroy(): void {}
 }

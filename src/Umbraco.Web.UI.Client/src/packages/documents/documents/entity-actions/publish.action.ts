@@ -57,7 +57,5 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<object> 
 			await publishingRepository.publish(this.args.unique, selectedVariants);
 		}
 	}
-
-	destroy(): void {}
 }
 export default UmbPublishDocumentEntityAction;

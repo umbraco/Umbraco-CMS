@@ -49,7 +49,7 @@ export class UmbHealthCheckContext implements UmbApi {
 		return typeof instance === 'object' && (instance as UmbHealthCheckContext).results !== undefined;
 	}
 
-	public destroy(): void {}
+	public;
 }
 
 export default UmbHealthCheckContext;

@@ -14,6 +14,4 @@ export class UmbDocumentPublicAccessEntityAction extends UmbEntityActionBase<nev
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		modalManager.open(this, UMB_PUBLIC_ACCESS_MODAL, { data: { unique: this.args.unique } });
 	}
-
-	destroy(): void {}
 }

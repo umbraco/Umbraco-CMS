@@ -14,6 +14,4 @@ export class UmbCreateEntityAction extends UmbEntityActionBase<never> {
 		// TODO: how do we handle this with a href?
 		history.pushState(null, '', url);
 	}
-
-	destroy(): void {}
 }

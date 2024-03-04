@@ -22,6 +22,4 @@ export class UmbCreateMediaTypeEntityAction extends UmbEntityActionBase<never> {
 
 		await modalContext.onSubmit();
 	}
-
-	destroy(): void {}
 }

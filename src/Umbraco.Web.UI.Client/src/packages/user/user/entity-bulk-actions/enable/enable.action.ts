@@ -6,6 +6,4 @@ export class UmbEnableUserEntityBulkAction extends UmbEntityBulkActionBase<objec
 		const repository = new UmbEnableUserRepository(this._host);
 		await repository.enable(this.selection);
 	}
-
-	destroy(): void {}
 }

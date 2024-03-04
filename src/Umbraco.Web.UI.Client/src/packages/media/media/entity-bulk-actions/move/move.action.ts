@@ -19,6 +19,4 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<object
 			//await this.repository?.move(this.selection, destination);
 		}
 	}
-
-	destroy(): void {}
 }

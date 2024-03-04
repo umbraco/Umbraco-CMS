@@ -15,6 +15,4 @@ export class UmbCreateMemberTypeEntityAction extends UmbEntityActionBase<never> 
 			`section/settings/workspace/member-type/create/parent/${this.args.entityType}/${this.args.unique}`,
 		);
 	}
-
-	destroy(): void {}
 }

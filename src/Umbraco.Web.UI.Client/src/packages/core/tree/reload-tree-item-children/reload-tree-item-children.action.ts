@@ -20,7 +20,5 @@ export class UmbReloadTreeItemChildrenEntityAction extends UmbEntityActionBase<M
 			}),
 		);
 	}
-
-	destroy(): void {}
 }
 export default UmbReloadTreeItemChildrenEntityAction;
