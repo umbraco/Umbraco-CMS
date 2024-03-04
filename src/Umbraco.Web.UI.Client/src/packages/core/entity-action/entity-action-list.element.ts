@@ -44,7 +44,7 @@ export class UmbEntityActionListElement extends UmbLitElement {
 	>;
 
 	#generateApiArgs() {
-		if (!this._props.entityType || !this._props.unique) return;
+		if (!this._props.entityType || this._props.unique !== undefined) return;
 
 		this._apiArgs = (manifest: ManifestEntityAction<MetaEntityAction>) => {
 			return [{ entityType: this._props.entityType!, unique: this._props.unique!, meta: manifest.meta }];
