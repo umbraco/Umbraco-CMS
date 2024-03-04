@@ -45,7 +45,7 @@ public class RemoveUsersFromUserGroupController : UserGroupControllerBase
             UserGroupPermissionResource.WithKeys(id),
             AuthorizationPolicies.UserBelongsToUserGroupInRequest);
 
-        if (!authorizationResult.Succeeded)
+        if (authorizationResult.Succeeded is false)
         {
             return Forbidden();
         }

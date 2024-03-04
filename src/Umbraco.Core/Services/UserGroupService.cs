@@ -345,68 +345,114 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        UserGroupOperationStatus result = await SafelyManipulateUsersBasedOnGroupAsync(addUsersModel, performingUserKey, (users, group) =>
-        {
-            IReadOnlyUserGroup readOnlyGroup = group.ToReadOnlyGroup();
+        Attempt<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus> resolveAttempt = await ResolveUserGroupManipulationModel(addUsersModel, performingUserKey);
 
-            foreach (IUser user in users)
-            {
-                user.AddGroup(readOnlyGroup);
-            }
-        });
+        if (resolveAttempt.Success is false)
+        {
+            return resolveAttempt.Status;
+        }
+
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+
+        // This should never happen, but we need to check it to avoid null reference exceptions
+        if (resolvedModel is null)
+        {
+            throw new InvalidOperationException("The resolved model should not be null.");
+        }
+
+        IReadOnlyUserGroup readOnlyGroup = resolvedModel.UserGroup.ToReadOnlyGroup();
+
+        foreach (IUser user in resolvedModel.Users)
+        {
+            user.AddGroup(readOnlyGroup);
+        }
+
+        _userService.Save(resolvedModel.Users);
 
         scope.Complete();
-        return result;
+
+        return UserGroupOperationStatus.Success;
     }
 
     public async Task<UserGroupOperationStatus> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        UserGroupOperationStatus result = await SafelyManipulateUsersBasedOnGroupAsync(removeUsersModel, performingUserKey, (users, group) =>
+        Attempt<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus> resolveAttempt = await ResolveUserGroupManipulationModel(removeUsersModel, performingUserKey);
+
+        if (resolveAttempt.Success is false)
         {
-            foreach (IUser user in users)
+            return resolveAttempt.Status;
+        }
+
+        ResolvedUserToUserGroupManipulationModel? resolvedModel = resolveAttempt.Result;
+
+        // This should never happen, but we need to check it to avoid null reference exceptions
+        if (resolvedModel is null)
+        {
+            throw new InvalidOperationException("The resolved model should not be null.");
+        }
+
+        foreach (IUser user in resolvedModel.Users)
+        {
+            // We can't remove a user from a group they're not part of.
+            if (user.Groups.Select(x => x.Key).Contains(resolvedModel.UserGroup.Key) is false)
             {
-                user.RemoveGroup(group.Alias);
+                return UserGroupOperationStatus.UserNotInGroup;
             }
-        });
+
+            user.RemoveGroup(resolvedModel.UserGroup.Alias);
+        }
+
+        // Ensure that that the admin group is never empty.
+        // This would mean that you could never add a user to the admin group again, since you need to be part of the admin group to do so.
+        if (resolvedModel.UserGroup.Key == Constants.Security.AdminGroupKey
+            && resolvedModel.UserGroup.UserCount <= resolvedModel.Users.Length)
+        {
+            return UserGroupOperationStatus.AdminGroupCannotBeEmpty;
+        }
+
+        _userService.Save(resolvedModel.Users);
 
         scope.Complete();
-        return result;
+
+        return UserGroupOperationStatus.Success;
     }
 
     /// <summary>
-    /// Checks whether all users that are part of the manipulation exist,
-    /// performs the manipulation,
-    /// saves the users
+    /// Resolves the user group manipulation model keys into actual entities.
+    /// Checks whether the performing user exists.
+    /// Checks whether all users that are part of the manipulation exist.
     /// </summary>
-    private async Task<UserGroupOperationStatus> SafelyManipulateUsersBasedOnGroupAsync(UsersToUserGroupManipulationModel assignModel, Guid performingUserKey, Action<IUser[], IUserGroup> manipulation)
+    private async Task<Attempt<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>> ResolveUserGroupManipulationModel(UsersToUserGroupManipulationModel model, Guid performingUserKey)
     {
         IUser? performingUser = await _userService.GetAsync(performingUserKey);
         if (performingUser is null)
         {
-            return UserGroupOperationStatus.MissingUser;
+            return Attempt.FailWithStatus<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>(UserGroupOperationStatus.MissingUser, null);
         }
 
-        IUserGroup? existingUserGroup = await GetAsync(assignModel.UserGroupKey);
+        IUserGroup? existingUserGroup = await GetAsync(model.UserGroupKey);
 
         if (existingUserGroup is null)
         {
-            return UserGroupOperationStatus.NotFound;
+            return Attempt.FailWithStatus<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>(UserGroupOperationStatus.NotFound, null);
         }
 
-        IUser[] users = (await _userService.GetAsync(assignModel.UserKeys)).ToArray();
+        IUser[] users = (await _userService.GetAsync(model.UserKeys)).ToArray();
 
-        if (users.Length != assignModel.UserKeys.Length)
+        if (users.Length != model.UserKeys.Length)
         {
-            return UserGroupOperationStatus.UserNotFound;
+            return Attempt.FailWithStatus<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>(UserGroupOperationStatus.UserNotFound, null);
         }
 
-        manipulation(users, existingUserGroup);
+        var resolvedModel = new ResolvedUserToUserGroupManipulationModel
+        {
+            UserGroup = existingUserGroup,
+            Users = users,
+        };
 
-        _userService.Save(users);
-
-        return UserGroupOperationStatus.Success;
+        return Attempt.SucceedWithStatus<ResolvedUserToUserGroupManipulationModel?, UserGroupOperationStatus>(UserGroupOperationStatus.Success, resolvedModel);
     }
 
     private async Task<UserGroupOperationStatus> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
