@@ -49,7 +49,15 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			lastPasswordChangeDate: null,
 			groups: [],
 			values: [],
-			variants: [],
+			variants: [
+				{
+					name: '',
+					culture: null,
+					segment: null,
+					createDate: new Date().toISOString(),
+					updateDate: new Date().toISOString(),
+				},
+			],
 			...preset,
 		};
 
@@ -124,7 +132,7 @@ export class UmbMemberServerDataSource implements UmbDetailDataSource<UmbMemberD
 			id: model.unique,
 			email: model.email,
 			username: model.username,
-			password: '', // TODO: figure out what to get password from
+			password: model.newPassword || '',
 			memberType: { id: model.memberType.unique },
 			groups: model.groups,
 			isApproved: model.isApproved,

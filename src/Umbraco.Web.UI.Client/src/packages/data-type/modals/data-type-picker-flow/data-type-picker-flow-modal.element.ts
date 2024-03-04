@@ -1,6 +1,7 @@
 import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
 import type { UmbDataTypeTreeItemModel } from '../../tree/types.js';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/data-type-workspace.modal-token.js';
+import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { css, html, repeat, customElement, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -92,7 +93,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	private _createDataType(propertyEditorUiAlias: string) {
 		// TODO: Could be nice with a more pretty way to prepend to the URL:
 		// Open create modal:
-		this._createDataTypeModal.open({ uiAlias: propertyEditorUiAlias }, 'create/null');
+		this._createDataTypeModal.open(
+			{ uiAlias: propertyEditorUiAlias },
+			`create/parent/${UMB_DATA_TYPE_ENTITY_TYPE}/null`,
+		);
 	}
 
 	async #init() {
@@ -136,8 +140,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 	private _performFiltering() {
 		if (this.#currentFilterQuery) {
-			const filteredDataTypes = this.#dataTypes.filter(
-				(dataType) => dataType.name?.toLowerCase().includes(this.#currentFilterQuery),
+			const filteredDataTypes = this.#dataTypes.filter((dataType) =>
+				dataType.name?.toLowerCase().includes(this.#currentFilterQuery),
 			);
 
 			/* TODO: data type items doesn't have a group property. We will need a reference to the Property Editor UI to get the group.
@@ -157,7 +161,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 						propertyEditorUI.name.toLowerCase().includes(this.#currentFilterQuery) ||
 						propertyEditorUI.alias.toLowerCase().includes(this.#currentFilterQuery)
 					);
-			  });
+				});
 
 		// TODO: groupBy is not known by TS yet
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -265,7 +269,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 									</div>
 								</uui-button>
 							</li>`,
-				  )
+					)
 				: ''}
 		</ul>`;
 	}
