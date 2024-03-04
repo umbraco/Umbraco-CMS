@@ -61,7 +61,7 @@ export class UmbPropertyActionElement<
 	}
 }
 
-export { UmbPropertyActionElement as element };
+export default UmbPropertyActionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {

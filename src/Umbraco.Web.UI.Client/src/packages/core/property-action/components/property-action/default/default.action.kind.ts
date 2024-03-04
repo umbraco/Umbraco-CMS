@@ -11,7 +11,7 @@ export const manifest: UmbBackofficeManifestKind = {
 		weight: 1000,
 		element: () => import('./property-action.element.js'),
 		meta: {
-			icon: '',
+			icon: 'icon-bug',
 			label: '(Missing label in manifest)',
 		},
 	},

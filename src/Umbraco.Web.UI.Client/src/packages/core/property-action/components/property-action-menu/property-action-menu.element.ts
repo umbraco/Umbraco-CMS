@@ -13,20 +13,7 @@ function ExtensionApiArgsMethod(manifest: ManifestPropertyAction) {
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
 	#actionsInitializer?: UmbExtensionsElementAndApiInitializer<ManifestTypes, 'propertyAction'>;
-	#value: unknown;
 	#propertyEditorUiAlias = '';
-
-	@property({ attribute: false })
-	public set value(value: unknown) {
-		this.#value = value;
-		if (this.#actionsInitializer) {
-			this.#actionsInitializer.elementProperties = { value };
-			this.#actionsInitializer.apiProperties = { value };
-		}
-	}
-	public get value(): unknown {
-		return this.#value;
-	}
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
@@ -62,7 +49,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 						compact>
 						<uui-symbol-more id="more-symbol"></uui-symbol-more>
 					</uui-button>
-					<uui-popover-container id="property-action-popover" margin="5" placement="top-end">
+					<uui-popover-container id="property-action-popover">
 						<umb-popover-layout>
 							${repeat(
 								this._actions,

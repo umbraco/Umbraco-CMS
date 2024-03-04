@@ -100,7 +100,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 					</uui-button>
 					<uui-popover-container
 						id="workspace-action-popover"
-						margin="5"
+						margin="6"
 						placement="top-end"
 						@toggle=${this.#onPopoverToggle}>
 						<umb-popover-layout>
