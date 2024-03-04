@@ -42,7 +42,7 @@ export async function createExtensionElementWithApi<
 			);
 		}
 	} else {
-		await apiPromise;
+		apiConstructor = await apiPromise;
 	}
 
 	if (manifest.elementName) {
@@ -53,6 +53,7 @@ export async function createExtensionElementWithApi<
 		element = document.createElement(fallbackElement) as ElementType;
 	}
 
+	console.log('element', element, 'apiConstructor', apiConstructor);
 	if (element && apiConstructor) {
 		// If constructorArgs is a function, call it with the manifest to get the arguments:
 		const additionalArgs = (typeof constructorArgs === 'function' ? constructorArgs(manifest) : constructorArgs) ?? [];
