@@ -1,6 +1,7 @@
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 /**
  * An action to perform on an entity
@@ -94,7 +95,7 @@ export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction<
 export interface MetaEntityActionDuplicateKind extends MetaEntityActionDefaultKind {
 	duplicateRepositoryAlias: string;
 	itemRepositoryAlias: string;
-	pickerModalAlias: string;
+	pickerModal: UmbModalToken | string;
 }
 
 // MOVE
@@ -106,7 +107,7 @@ export interface ManifestEntityActionMoveKind extends ManifestEntityAction<MetaE
 export interface MetaEntityActionMoveKind extends MetaEntityActionDefaultKind {
 	moveRepositoryAlias: string;
 	itemRepositoryAlias: string;
-	pickerModalAlias: string;
+	pickerModal: UmbModalToken | string;
 }
 
 // FOLDER

@@ -31,7 +31,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			moveRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			pickerModelAlias: UMB_DOCUMENT_PICKER_MODAL.toString(),
+			pickerModelAlias: UMB_DOCUMENT_PICKER_MODAL,
 		},
 	},
 	{
@@ -43,7 +43,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			duplicateRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			pickerModalAlias: UMB_DOCUMENT_PICKER_MODAL.toString(),
+			pickerModal: UMB_DOCUMENT_PICKER_MODAL,
 		},
 	},
 	{

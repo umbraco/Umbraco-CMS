@@ -18,7 +18,7 @@ export const manifest: UmbBackofficeManifestKind = {
 			label: 'Move to (TBD)...',
 			itemRepositoryAlias: '',
 			moveRepositoryAlias: '',
-			pickerModalAlias: '',
+			pickerModal: '',
 		},
 	},
 };

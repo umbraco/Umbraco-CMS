@@ -45,7 +45,7 @@ export class UmbMoveEntityAction extends UmbEntityActionBase<any> {
 		await this.#init;
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, this.args.meta.pickerModalAlias) as any; // TODO: make generic picker interface with selection
+		const modalContext = modalManager.open(this, this.args.meta.pickerModal) as any; // TODO: make generic picker interface with selection
 		const value = await modalContext.onSubmit();
 		if (!value) return;
 		await this.#moveRepository!.move(this.args.unique, value.selection[0]);
