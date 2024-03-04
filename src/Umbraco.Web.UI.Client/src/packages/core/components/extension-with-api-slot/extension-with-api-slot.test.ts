@@ -1,12 +1,18 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbExtensionWithApiSlotElement } from './extension-with-api-slot.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import type { ManifestDashboard } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type {
+	ManifestElementAndApi,
+	ManifestWithDynamicConditions,
+	UmbApi,
+	UmbExtensionElementInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 @customElement('umb-test-extension-with-api-slot-manifest-element')
-class UmbTestExtensionSlotManifestElement extends HTMLElement {}
+class UmbTestExtensionSlotManifestElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 function sleep(timeMs: number) {
 	return new Promise((resolve) => {
@@ -14,12 +20,22 @@ function sleep(timeMs: number) {
 	});
 }
 
+class UmbTestApiController extends UmbControllerBase implements UmbApi {
+	public i_am_test_api_controller = true;
+}
+
+interface TestManifest
+	extends ManifestWithDynamicConditions,
+		ManifestElementAndApi<UmbControllerHostElement, UmbTestApiController> {
+	type: 'test-type';
+}
+
 describe('UmbExtensionWithApiSlotElement', () => {
 	let element: UmbExtensionWithApiSlotElement;
 
 	describe('general', () => {
 		beforeEach(async () => {
-			element = await fixture(html`<umb-extension-slot></umb-extension-slot>`);
+			element = await fixture(html`<umb-extension-with-api-slot></umb-extension-with-api-slot>`);
 		});
 
 		it('is defined with its own instance', () => {
@@ -53,14 +69,15 @@ describe('UmbExtensionWithApiSlotElement', () => {
 	describe('rendering', () => {
 		beforeEach(async () => {
 			umbExtensionsRegistry.register({
-				type: 'dashboard',
+				type: 'test-type',
 				alias: 'unit-test-ext-slot-element-manifest',
 				name: 'unit-test-extension',
-				elementName: 'umb-test-extension-slot-manifest-element',
+				api: UmbTestApiController,
+				elementName: 'umb-test-extension-with-api-slot-manifest-element',
 				meta: {
 					pathname: 'test/test',
 				},
-			});
+			} as TestManifest);
 		});
 
 		afterEach(async () => {
@@ -68,35 +85,35 @@ describe('UmbExtensionWithApiSlotElement', () => {
 		});
 
 		it('renders a manifest element', async () => {
-			element = await fixture(html`<umb-extension-slot type="dashboard"></umb-extension-slot>`);
+			element = await fixture(html`<umb-extension-with-api-slot type="test-type"></umb-extension-with-api-slot>`);
 
-			await sleep(20);
+			await sleep(200);
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
 
 		it('works with the filtering method', async () => {
 			element = await fixture(
-				html`<umb-extension-slot
-					type="dashboard"
-					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`,
+				html`<umb-extension-with-api-slot
+					type="test-type"
+					.filter=${(x: any) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-with-api-slot>`,
 			);
 
-			await sleep(20);
+			await sleep(200);
 
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
 		});
 
 		it('use the render method', async () => {
 			element = await fixture(
-				html` <umb-extension-slot
-					type="dashboard"
-					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
+				html` <umb-extension-with-api-slot
+					type="test-type"
+					.filter=${(x: any) => x.alias === 'unit-test-ext-slot-element-manifest'}
 					.renderMethod=${(controller: UmbExtensionElementInitializer) => html`<bla>${controller.component}</bla>`}>
-				</umb-extension-slot>`,
+				</umb-extension-with-api-slot>`,
 			);
 
-			await sleep(20);
+			await sleep(200);
 
 			expect(element.shadowRoot!.firstElementChild?.nodeName).to.be.equal('BLA');
 			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(
@@ -106,14 +123,14 @@ describe('UmbExtensionWithApiSlotElement', () => {
 
 		it('parses the props', async () => {
 			element = await fixture(
-				html` <umb-extension-slot
-					type="dashboard"
-					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
-					.props=${{ testProp: 'fooBar' }}>
-				</umb-extension-slot>`,
+				html` <umb-extension-with-api-slot
+					type="test-type"
+					.filter=${(x: any) => x.alias === 'unit-test-ext-slot-element-manifest'}
+					.elementProps=${{ testProp: 'fooBar' }}>
+				</umb-extension-with-api-slot>`,
 			);
 
-			await sleep(20);
+			await sleep(200);
 
 			expect((element.shadowRoot!.firstElementChild as any).testProp).to.be.equal('fooBar');
 			expect(element.shadowRoot!.firstElementChild).to.be.instanceOf(UmbTestExtensionSlotManifestElement);
