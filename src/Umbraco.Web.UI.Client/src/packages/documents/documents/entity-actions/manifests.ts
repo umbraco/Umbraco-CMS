@@ -43,7 +43,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			duplicateRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			pickerModalAlias: UMB_DOCUMENT_PICKER_MODAL,
+			pickerModal: UMB_DOCUMENT_PICKER_MODAL,
 		},
 	},
 	{

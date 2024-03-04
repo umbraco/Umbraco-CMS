@@ -94,7 +94,7 @@ export interface ManifestEntityActionDuplicateKind extends ManifestEntityAction<
 export interface MetaEntityActionDuplicateKind extends MetaEntityActionDefaultKind {
 	duplicateRepositoryAlias: string;
 	itemRepositoryAlias: string;
-	pickerModalAlias: string;
+	pickerModal: UmbModalToken | string;
 }
 
 // MOVE
@@ -106,7 +106,7 @@ export interface ManifestEntityActionMoveKind extends ManifestEntityAction<MetaE
 export interface MetaEntityActionMoveKind extends MetaEntityActionDefaultKind {
 	moveRepositoryAlias: string;
 	itemRepositoryAlias: string;
-	pickerModalAlias: string;
+	pickerModal: UmbModalToken | string;
 }
 
 // FOLDER

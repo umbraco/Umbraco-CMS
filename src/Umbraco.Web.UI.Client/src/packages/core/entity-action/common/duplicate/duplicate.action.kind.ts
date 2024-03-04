@@ -18,7 +18,7 @@ export const manifest: UmbBackofficeManifestKind = {
 			label: 'Duplicate to...',
 			itemRepositoryAlias: '',
 			duplicateRepositoryAlias: '',
-			pickerModalAlias: '',
+			pickerModal: '',
 		},
 	},
 };
