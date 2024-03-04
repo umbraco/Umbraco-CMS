@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Security;
 [ApiController]
 [VersionedApiBackOfficeRoute("security")]
 [ApiExplorerSettings(GroupName = "Security")]
-[Authorize(Policy = "New" + AuthorizationPolicies.DenyLocalLoginIfConfigured)]
+[Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public abstract class SecurityControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserOperationStatusResult(UserOperationStatus status, ErrorMessageResult? errorMessageResult = null) =>

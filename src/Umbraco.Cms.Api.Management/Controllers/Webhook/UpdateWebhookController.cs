@@ -15,7 +15,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessWebhooks)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 public class UpdateWebhookController : WebhookControllerBase
 {
     private readonly IWebhookService _webhookService;

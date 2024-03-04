@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DocumentType}")]
 [ApiExplorerSettings(GroupName = "Document Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentTypeTreeItemResponseModel>
 {
     private readonly IContentTypeService _contentTypeService;

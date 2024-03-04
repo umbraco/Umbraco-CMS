@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.TrackedReference;
 [ApiController]
 [VersionedApiBackOfficeRoute("tracked-reference")]
 [ApiExplorerSettings(GroupName = "Tracked Reference")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessContentOrMedia)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContentOrMedia)]
 public abstract class TrackedReferenceControllerBase : ManagementApiControllerBase
 {
 }

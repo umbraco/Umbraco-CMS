@@ -11,7 +11,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.DenyLocalLoginIfConfigured)]
+[Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public class VerifyInviteUserController : UserControllerBase
 {
     private readonly IUserService _userService;

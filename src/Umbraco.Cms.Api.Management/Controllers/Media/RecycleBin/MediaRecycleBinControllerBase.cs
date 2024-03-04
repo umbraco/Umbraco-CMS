@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Media}")]
 [RequireMediaTreeRootAccess]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMedia)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecycleBinItemResponseModel>
 {
     private readonly IMediaPresentationFactory _mediaPresentationFactory;

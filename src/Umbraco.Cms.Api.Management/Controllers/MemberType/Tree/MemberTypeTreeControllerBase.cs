@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberType.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberType}")]
 [ApiExplorerSettings(GroupName = "Member Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessMemberTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMemberTypes)]
 public class MemberTypeTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
     public MemberTypeTreeControllerBase(IEntityService entityService)

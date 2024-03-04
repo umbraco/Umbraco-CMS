@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}/folder")]
 [ApiExplorerSettings(GroupName = "Script")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessScripts)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]
 public class ScriptFolderControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult OperationStatusResult(ScriptFolderOperationStatus status) =>

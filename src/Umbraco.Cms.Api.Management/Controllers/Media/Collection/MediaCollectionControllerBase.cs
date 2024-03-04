@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Collection;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Collection}/{Constants.UdiEntityType.Media}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMedia)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public abstract class MediaCollectionControllerBase : ContentCollectionControllerBase<IMedia, MediaCollectionResponseModel, MediaValueModel, MediaVariantResponseModel>
 {
     protected MediaCollectionControllerBase(IUmbracoMapper mapper)
