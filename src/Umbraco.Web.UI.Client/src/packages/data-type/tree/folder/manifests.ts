@@ -14,7 +14,7 @@ const folderRepository: ManifestRepository = {
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
-		kind: 'folderRename',
+		kind: 'folderUpdate',
 		alias: 'Umb.EntityAction.DataType.Folder.Rename',
 		name: 'Rename Data Type Folder Entity Action',
 		forEntityTypes: [UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],

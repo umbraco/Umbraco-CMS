@@ -1,4 +1,4 @@
-import { UmbMoveEntityAction } from './move.action.js';
+import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbBackofficeManifestKind = {
@@ -7,9 +7,10 @@ export const manifest: UmbBackofficeManifestKind = {
 	matchKind: 'move',
 	matchType: 'entityAction',
 	manifest: {
+		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'move',
-		api: UmbMoveEntityAction,
+		api: () => import('./move.action.js'),
 		weight: 700,
 		forEntityTypes: [],
 		meta: {

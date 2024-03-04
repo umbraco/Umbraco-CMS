@@ -30,3 +30,5 @@ export class UmbTrashEntityAction extends UmbEntityActionBase<any> {
 		*/
 	}
 }
+
+export default UmbTrashEntityAction;

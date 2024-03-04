@@ -49,6 +49,8 @@ export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActi
 		const modalContext = modalManager.open(this, this.args.meta.pickerModalAlias) as any; // TODO: make generic picker interface with selection
 		const value = await modalContext.onSubmit();
 		if (!value) return;
-		await this.#duplicateRepository!.copy(this.args.unique, value.selection[0]);
+		await this.#duplicateRepository!.duplicate(this.args.unique, value.selection[0]);
 	}
 }
+
+export default UmbDuplicateEntityAction;
