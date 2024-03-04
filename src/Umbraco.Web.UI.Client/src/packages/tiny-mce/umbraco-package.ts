@@ -1,5 +1,3 @@
-import './index.js';
-
 export const name = 'Umbraco.Core.TinyMce';
 export const extensions = [
 	{
