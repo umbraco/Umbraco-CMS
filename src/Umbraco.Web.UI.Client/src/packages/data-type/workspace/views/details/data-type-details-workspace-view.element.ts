@@ -60,7 +60,8 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 					selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 				},
 			})
-			.onSubmit();
+			.onSubmit()
+			.catch(() => undefined);
 
 		this._workspaceContext?.setPropertyEditorUiAlias(value?.selection[0]);
 	}
@@ -90,7 +91,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 									<uui-button label="Change" @click=${this.#openPropertyEditorUIPicker}></uui-button>
 								</uui-action-bar>
 							</umb-ref-property-editor-ui>
-					  `
+						`
 					: html`
 							<uui-button
 								slot="editor"
@@ -98,7 +99,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 								look="placeholder"
 								color="default"
 								@click=${this.#openPropertyEditorUIPicker}></uui-button>
-					  `}
+						`}
 			</umb-property-layout>
 		`;
 	}

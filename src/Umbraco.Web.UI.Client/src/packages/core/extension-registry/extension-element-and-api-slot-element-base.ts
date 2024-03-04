@@ -60,7 +60,14 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 		this.requestUpdate('_element');
 	};
 
-	render() {
-		return html`${this._element}`;
+	protected render() {
+		return this._element;
+	}
+
+	/**
+	 * Disable the Shadow DOM for this element. This is needed because this is a wrapper element and should not stop the event propagation.
+	 */
+	protected createRenderRoot() {
+		return this;
 	}
 }
