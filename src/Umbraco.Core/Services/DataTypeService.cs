@@ -235,6 +235,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public Task<IEnumerable<IDataType>> GetAllAsync(params Guid[] keys)
         {
+            // Nothing requested, return nothing
+            if (keys.Any() is false)
+            {
+                return Task.FromResult(Enumerable.Empty<IDataType>());
+            }
+
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
 
             IDataType[] dataTypes = _dataTypeRepository.Get(Query<IDataType>().Where(x => keys.Contains(x.Key))).ToArray();
@@ -245,7 +251,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public async Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100)
         {
-            IEnumerable<IDataType> dataTypes = await GetAllAsync();
+            IEnumerable<IDataType> dataTypes = GetAll();
 
             if (name is not null)
             {
