@@ -2,14 +2,14 @@ import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extensio
 
 export const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
-	alias: 'Umb.Kind.WorkspaceActionMenuItem.Default',
+	alias: 'Umb.Kind.PropertyAction.Default',
 	matchKind: 'default',
-	matchType: 'workspaceActionMenuItem',
+	matchType: 'propertyAction',
 	manifest: {
-		type: 'workspaceActionMenuItem',
+		type: 'propertyAction',
 		kind: 'default',
 		weight: 1000,
-		element: () => import('./workspace-action-menu-item.element.js'),
+		element: () => import('./property-action.element.js'),
 		meta: {
 			icon: '',
 			label: '(Missing label in manifest)',

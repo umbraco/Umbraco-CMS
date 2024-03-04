@@ -1,22 +1,22 @@
-import type { ManifestPropertyAction } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as defaultManifests } from './components/property-action/manifests.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestPropertyAction> = [
+export const manifests: Array<ManifestTypes> = [
+	...defaultManifests,
 	{
 		type: 'propertyAction',
+		kind: 'default',
 		alias: 'Umb.PropertyAction.Copy',
 		name: 'Copy Property Action',
-		js: () => import('./common/copy/property-action-copy.element.js'),
-		meta: {
-			propertyEditors: ['Umb.PropertyEditorUi.TextBox'],
-		},
+		api: () => import('./common/copy/property-action-copy.controller.js'),
+		forPropertyEditorUis: ['Umb.PropertyEditorUi.TextBox'],
 	},
 	{
 		type: 'propertyAction',
+		kind: 'default',
 		alias: 'Umb.PropertyAction.Clear',
 		name: 'Clear Property Action',
-		js: () => import('./common/clear/property-action-clear.element.js'),
-		meta: {
-			propertyEditors: ['Umb.PropertyEditorUi.TextBox'],
-		},
+		api: () => import('./common/clear/property-action-clear.controller.js'),
+		forPropertyEditorUis: ['Umb.PropertyEditorUi.TextBox'],
 	},
 ];

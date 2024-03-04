@@ -1,7 +1,7 @@
 import type { ConditionTypes } from '../conditions/types.js';
+import type { UmbWorkspaceActionMenuItem } from '../../workspace/components/workspace-action-menu-item/workspace-action-menu-item.interface.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbWorkspaceActionMenuItem } from '@umbraco-cms/backoffice/workspace';
 
 export interface ManifestWorkspaceActionMenuItem<
 	MetaType extends MetaWorkspaceActionMenuItem = MetaWorkspaceActionMenuItem,

@@ -86,11 +86,6 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	#onActionExecuted(event: MouseEvent) {
-		// TODO: Explicit close the popover?
-		// Should we stop the event as well?
-	}
-
 	render() {
 		return this._items && this._items.length > 0
 			? html`

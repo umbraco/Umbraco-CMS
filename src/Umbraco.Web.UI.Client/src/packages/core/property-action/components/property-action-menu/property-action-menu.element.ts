@@ -3,13 +3,16 @@ import { css, html, customElement, property, state, repeat, nothing } from '@umb
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { ManifestPropertyAction, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+function ExtensionApiArgsMethod(manifest: ManifestPropertyAction) {
+	return [{ meta: manifest.meta }];
+}
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
-	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'propertyAction'>;
+	#actionsInitializer?: UmbExtensionsElementAndApiInitializer<ManifestTypes, 'propertyAction'>;
 	#value: unknown;
 	#propertyEditorUiAlias = '';
 
@@ -17,7 +20,8 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	public set value(value: unknown) {
 		this.#value = value;
 		if (this.#actionsInitializer) {
-			this.#actionsInitializer.properties = { value };
+			this.#actionsInitializer.elementProperties = { value };
+			this.#actionsInitializer.apiProperties = { value };
 		}
 	}
 	public get value(): unknown {
@@ -27,13 +31,13 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	@property()
 	set propertyEditorUiAlias(alias: string) {
 		this.#propertyEditorUiAlias = alias;
-		// TODO: Stop using string for 'propertyAction', we need to start using Const.
-		// TODO: Align property actions with entity actions.
-		this.#actionsInitializer = new UmbExtensionsElementInitializer(
+		// TODO: Stop using string for 'propertyAction', we need to start using Const. [NL]
+		this.#actionsInitializer = new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			'propertyAction',
-			(propertyAction) => propertyAction.meta.propertyEditors.includes(alias),
+			ExtensionApiArgsMethod,
+			(propertyAction) => propertyAction.forPropertyEditorUis.includes(alias),
 			(ctrls) => {
 				this._actions = ctrls;
 			},
@@ -45,7 +49,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 
 	@state()
-	private _actions: Array<UmbExtensionElementInitializer<ManifestPropertyAction, never>> = [];
+	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestPropertyAction, never>> = [];
 
 	render() {
 		return this._actions.length > 0
@@ -54,13 +58,17 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 						id="popover-trigger"
 						popovertarget="property-action-popover"
 						look="secondary"
-						label="More"
+						label="Open actions menu"
 						compact>
 						<uui-symbol-more id="more-symbol"></uui-symbol-more>
 					</uui-button>
-					<uui-popover-container id="property-action-popover">
+					<uui-popover-container id="property-action-popover" margin="5" placement="top-end">
 						<umb-popover-layout>
-							<div id="dropdown">${repeat(this._actions, (action) => action.component)}</div>
+							${repeat(
+								this._actions,
+								(action) => action.alias,
+								(action) => action.component,
+							)}
 						</umb-popover-layout>
 					</uui-popover-container>
 			  `
