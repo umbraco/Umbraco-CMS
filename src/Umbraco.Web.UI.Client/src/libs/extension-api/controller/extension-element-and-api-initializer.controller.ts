@@ -122,7 +122,7 @@ export class UmbExtensionElementAndApiInitializer<
 
 		// TODO: we could optimize this so we only re-set the updated props.
 		Object.keys(this.#apiProps).forEach((key) => {
-			(this.#component as any)[key] = this.#apiProps![key];
+			(this.#api as any)[key] = this.#apiProps![key];
 		});
 	};
 

@@ -156,6 +156,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 	}
 
 	public resetValue(): void {
+		this.setValue(undefined); // TODO: We should get the value from the server aka. the value from the persisted data.
+	}
+	public clearValue(): void {
 		this.setValue(undefined); // TODO: We should get the default value from Property Editor maybe even later the DocumentType, as that would hold the default value for the property.
 	}
 

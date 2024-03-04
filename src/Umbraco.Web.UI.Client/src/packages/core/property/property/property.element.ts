@@ -220,8 +220,7 @@ export class UmbPropertyElement extends UmbLitElement {
 			? html`<umb-property-action-menu
 					slot="action-menu"
 					id="action-menu"
-					.propertyEditorUiAlias=${this._propertyEditorUiAlias}
-					.value=${this._value}></umb-property-action-menu>`
+					.propertyEditorUiAlias=${this._propertyEditorUiAlias}></umb-property-action-menu>`
 			: ''}`;
 	}
 
@@ -238,6 +237,7 @@ export class UmbPropertyElement extends UmbLitElement {
 
 			#action-menu {
 				opacity: 0;
+				transition: opacity 90ms;
 			}
 
 			#layout:focus-within #action-menu,
