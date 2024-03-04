@@ -45,7 +45,7 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	 * Fetches a Member Group with the given id from the server
 	 * @param {string} unique
 	 * @return {*}
-	 * @memberof UmbMemberServerDataSource
+	 * @memberof UmbMemberGroupServerDataSource
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
