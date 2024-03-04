@@ -178,15 +178,32 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public async Task UpdateUserGroupsOnUsers(
+    public async Task<UserGroupOperationStatus> UpdateUserGroupsOnUsersAsync(
         ISet<Guid> userGroupKeys,
         ISet<Guid> userKeys)
     {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
         IUser[] users = (await _userService.GetAsync(userKeys)).ToArray();
 
         IReadOnlyUserGroup[] userGroups = (await GetAsync(userGroupKeys))
             .Select(x => x.ToReadOnlyGroup())
             .ToArray();
+
+        // This means that we're potentially de-admining a user, which might cause the admin group to be empty.
+        if (userGroupKeys.Contains(Constants.Security.AdminGroupKey) is false)
+        {
+            IUser[] usersToDeAdmin = users.Where(x => x.IsAdmin()).ToArray();
+            if (usersToDeAdmin.Length > 0)
+            {
+                // Unfortunately we have to resolve the admin group to ensure that it would not be left empty.
+                IUserGroup? adminGroup = await GetAsync(Constants.Security.AdminGroupKey);
+                if (adminGroup is not null && adminGroup.UserCount <= usersToDeAdmin.Length)
+                {
+                    return UserGroupOperationStatus.AdminGroupCannotBeEmpty;
+                }
+            }
+        }
 
         foreach (IUser user in users)
         {
@@ -198,6 +215,10 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         _userService.Save(users);
+
+        scope.Complete();
+
+        return UserGroupOperationStatus.Success;
     }
 
     private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
