@@ -1,6 +1,6 @@
 import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbStylesheetPickerContext } from './stylesheet-input.context.js';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -70,7 +70,7 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items?: Array<UmbStylesheetItemModel>;
+	private _items: Array<UmbStylesheetItemModel> = [];
 
 	#pickerContext = new UmbStylesheetPickerContext(this);
 
@@ -99,10 +99,18 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 
 	render() {
 		return html`
-			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
-				>Add</uui-button
-			>
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this._renderItem(item),
+				)}
+			</uui-ref-list>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${() => this.#pickerContext.openPicker()}
+				label="Add stylesheet"></uui-button>
 		`;
 	}
 
@@ -113,9 +121,9 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.unique!)}
-						label="Remove Data Type ${item.name}"
-						>Remove</uui-button
-					>
+						label="Remove Data Type ${item.name}">
+						Remove
+					</uui-button>
 				</uui-action-bar>
 			</uui-ref-node-data-type>
 		`;
