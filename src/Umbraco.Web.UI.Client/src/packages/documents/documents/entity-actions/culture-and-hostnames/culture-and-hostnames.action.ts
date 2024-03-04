@@ -11,8 +11,9 @@ export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionB
 
 	async execute() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		modalManager.open(this, UMB_CULTURE_AND_HOSTNAMES_MODAL, {
+		const modalContext = modalManager.open(this, UMB_CULTURE_AND_HOSTNAMES_MODAL, {
 			data: { unique: this.args.unique },
 		});
+		await modalContext.onSubmit();
 	}
 }
