@@ -3,7 +3,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-import '../../components/index.js';
+import '../../components/input-tiny-mce/input-tiny-mce.element.js';
 
 type RichTextEditorValue = {
 	blocks: object;
@@ -26,6 +26,9 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.#configuration = config;
+	}
+	public get config() {
+		return this.#configuration;
 	}
 
 	#onChange(event: InputEvent) {
