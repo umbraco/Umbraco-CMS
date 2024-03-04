@@ -6,9 +6,9 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 
 /**
- * @element umb-property-editor-ui-member-group-group-picker
+ * @element umb-property-editor-ui-member-group-picker
  */
-@customElement('umb-property-editor-ui-member-group-group-picker')
+@customElement('umb-property-editor-ui-member-group-picker')
 export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	// private _value: Array<string> = [];
 
@@ -71,6 +71,6 @@ export default UmbPropertyEditorUIMemberGroupPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-member-group-group-picker': UmbPropertyEditorUIMemberGroupPickerElement;
+		'umb-property-editor-ui-member-group-picker': UmbPropertyEditorUIMemberGroupPickerElement;
 	}
 }
