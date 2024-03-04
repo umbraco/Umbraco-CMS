@@ -1,6 +1,7 @@
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 /**
  * An action to perform on an entity
