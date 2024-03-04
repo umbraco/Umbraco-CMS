@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
-using Umbraco.Cms.Api.Management.Security.Authorization;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 using Umbraco.Cms.Api.Management.Security.Authorization.Dictionary;
-using Umbraco.Cms.Api.Management.Security.Authorization.Feature;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
@@ -25,11 +23,11 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         // any auth defining a matching requirement and scheme.
         builder.Services.AddSingleton<IAuthorizationHandler, ContentPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, DictionaryPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
-        builder.Services.AddSingleton<IAuthorizationHandler, DictionaryPermissionHandler>();
 
         builder.Services.AddAuthorization(CreatePolicies);
         return builder;
@@ -93,13 +91,6 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddPolicy(AuthorizationPolicies.TreeAccessWebhooks, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
 
         // Contextual permissions
-        // TODO: Rename policies once we have the old ones removed
-        options.AddPolicy(AuthorizationPolicies.AdminUserEditsRequireAdmin, policy =>
-        {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new UserPermissionRequirement());
-        });
-
         options.AddPolicy(AuthorizationPolicies.ContentPermissionByResource, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
@@ -110,6 +101,12 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new DenyLocalLoginRequirement());
+        });
+
+        options.AddPolicy(AuthorizationPolicies.DictionaryPermissionByResource, policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new DictionaryPermissionRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.MediaPermissionByResource, policy =>
@@ -130,10 +127,10 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             policy.Requirements.Add(new UserGroupPermissionRequirement());
         });
 
-        options.AddPolicy(AuthorizationPolicies.DictionaryPermissionByResource, policy =>
+        options.AddPolicy(AuthorizationPolicies.UserPermissionByResource, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new DictionaryPermissionRequirement());
+            policy.Requirements.Add(new UserPermissionRequirement());
         });
     }
 }
