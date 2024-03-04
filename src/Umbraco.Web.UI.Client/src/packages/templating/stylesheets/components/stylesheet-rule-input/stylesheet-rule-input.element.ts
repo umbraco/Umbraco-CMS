@@ -67,7 +67,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 					`,
 				)}
 			</uui-ref-list>
-			<uui-button label="Add rule" look="placeholder" @click=${() => this.#appendRule()}>Add</uui-button>
+			<uui-button label="Add rule" look="placeholder" @click=${this.#appendRule}>Add</uui-button>
 		`;
 	}
 
