@@ -105,7 +105,7 @@ export class UmbWorkspaceActionElement<
 					label=${this.#manifest?.meta.label || ''}
 					.state=${this._buttonState}></uui-button>
 				<umb-workspace-action-menu
-					.workspaceActions=${this._aliases}
+					.forWorkspaceActions=${this._aliases}
 					color="${this.#manifest?.meta.color || 'default'}"
 					look="${this.#manifest?.meta.look || 'default'}"></umb-workspace-action-menu>
 			</uui-button-group>
