@@ -5,25 +5,19 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { HealthCheckResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbHealthCheckContext implements UmbApi {
+export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 	private _checks = new BehaviorSubject<HealthCheckGroupPresentationModel | undefined>(undefined);
 	public readonly checks = this._checks.asObservable();
 
 	private _results = new BehaviorSubject<HealthCheckGroupWithResultResponseModel | undefined>(undefined);
 	public readonly results = this._results.asObservable();
 
-	public host: UmbControllerHost;
-
-	constructor(host: UmbControllerHost) {
-		this.host = host;
-	}
-
 	async getGroupChecks(name: string) {
-		const { data } = await tryExecuteAndNotify(this.host, HealthCheckResource.getHealthCheckGroupByName({ name }));
+		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroupByName({ name }));
 
 		if (data) {
 			this._checks.next(data);
@@ -33,10 +27,7 @@ export class UmbHealthCheckContext implements UmbApi {
 	}
 
 	async checkGroup(name: string) {
-		const { data } = await tryExecuteAndNotify(
-			this.host,
-			HealthCheckResource.postHealthCheckGroupByNameCheck({ name }),
-		);
+		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckGroupByNameCheck({ name }));
 
 		if (data) {
 			this._results.next(data);
@@ -48,8 +39,6 @@ export class UmbHealthCheckContext implements UmbApi {
 	static isInstanceLike(instance: unknown): instance is UmbHealthCheckContext {
 		return typeof instance === 'object' && (instance as UmbHealthCheckContext).results !== undefined;
 	}
-
-	public;
 }
 
 export default UmbHealthCheckContext;
