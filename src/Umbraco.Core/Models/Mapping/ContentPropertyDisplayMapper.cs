@@ -86,5 +86,7 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         // Translate
         dest.Label = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Label);
         dest.Description = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Description);
+        dest.Validation.MandatoryMessage = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Validation.MandatoryMessage);
+        dest.Validation.PatternMessage = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Validation.PatternMessage);
     }
 }
