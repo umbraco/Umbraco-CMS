@@ -1,5 +1,4 @@
 import type { UmbCollectionBulkActionPermissions } from '../../../core/collection/types.js';
-import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbMediaMoveEntityBulkAction } from './move/move.action.js';
 import { UmbDuplicateMediaEntityBulkAction } from './copy/copy.action.js';

@@ -3,11 +3,11 @@ import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-regis
 
 export const UMB_DUPLICATE_DATA_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Duplicate';
 
-const copyRepository: ManifestRepository = {
+const duplicateRepository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_DUPLICATE_DATA_TYPE_REPOSITORY_ALIAS,
 	name: 'Duplicate Data Type Repository',
 	api: UmbDuplicateDataTypeRepository,
 };
 
-export const manifests = [copyRepository];
+export const manifests = [duplicateRepository];
