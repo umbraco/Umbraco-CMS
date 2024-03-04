@@ -93,6 +93,20 @@ export type * from './workspace-footer-app.model.js';
 export type * from './workspace-view.model.js';
 export type * from './workspace.model.js';
 
+export type ManifestEntityActions =
+	| ManifestEntityAction
+	| ManifestEntityActionDefaultKind
+	| ManifestEntityActionDeleteKind
+	| ManifestEntityActionRenameKind
+	| ManifestEntityActionReloadTreeItemChildrenKind
+	| ManifestEntityActionDuplicateKind
+	| ManifestEntityActionMoveKind
+	| ManifestEntityActionCreateFolderKind
+	| ManifestEntityActionUpdateFolderKind
+	| ManifestEntityActionDeleteFolderKind;
+
+export type ManifestWorkspaceActions = ManifestWorkspaceAction | ManifestWorkspaceActionDefaultKind;
+
 export type ManifestTypes =
 	| ManifestBundle<ManifestTypes>
 	| ManifestCondition
@@ -104,16 +118,7 @@ export type ManifestTypes =
 	| ManifestDashboardCollection
 	| ManifestDynamicRootOrigin
 	| ManifestDynamicRootQueryStep
-	| ManifestEntityAction
-	| ManifestEntityActionDefaultKind
-	| ManifestEntityActionDeleteKind
-	| ManifestEntityActionRenameKind
-	| ManifestEntityActionReloadTreeItemChildrenKind
-	| ManifestEntityActionDuplicateKind
-	| ManifestEntityActionMoveKind
-	| ManifestEntityActionCreateFolderKind
-	| ManifestEntityActionUpdateFolderKind
-	| ManifestEntityActionDeleteFolderKind
+	| ManifestEntityActions
 	| ManifestEntityBulkAction
 	| ManifestEntryPoint
 	| ManifestExternalLoginProvider
@@ -144,8 +149,7 @@ export type ManifestTypes =
 	| ManifestTreeStore
 	| ManifestUserProfileApp
 	| ManifestWorkspace
-	| ManifestWorkspaceAction
-	| ManifestWorkspaceActionDefaultKind
+	| ManifestWorkspaceActions
 	| ManifestWorkspaceActionMenuItem
 	| ManifestWorkspaceContext
 	| ManifestWorkspaceFooterApp

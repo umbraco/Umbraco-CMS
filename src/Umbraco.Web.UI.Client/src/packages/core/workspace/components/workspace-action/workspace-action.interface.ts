@@ -1,7 +1,7 @@
 import type { UmbWorkspaceActionArgs } from './types.js';
 import type { UmbAction } from '@umbraco-cms/backoffice/action';
 
-export interface UmbWorkspaceAction<ArgsMetaType> extends UmbAction<UmbWorkspaceActionArgs<ArgsMetaType>> {
+export interface UmbWorkspaceAction<ArgsMetaType = never> extends UmbAction<UmbWorkspaceActionArgs<ArgsMetaType>> {
 	/**
 	 * The href location, the action will act as a link.
 	 * @returns {Promise<string | undefined>}

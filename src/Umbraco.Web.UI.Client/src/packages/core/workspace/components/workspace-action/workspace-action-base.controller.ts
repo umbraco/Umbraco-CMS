@@ -11,7 +11,7 @@ import { UmbActionBase } from '@umbraco-cms/backoffice/action';
  * @implements {UmbEntityAction}
  * @template RepositoryType
  */
-export abstract class UmbWorkspaceActionBase<ArgsMetaType>
+export abstract class UmbWorkspaceActionBase<ArgsMetaType = never>
 	extends UmbActionBase<UmbWorkspaceActionArgs<ArgsMetaType>>
 	implements UmbWorkspaceAction<ArgsMetaType>
 {
