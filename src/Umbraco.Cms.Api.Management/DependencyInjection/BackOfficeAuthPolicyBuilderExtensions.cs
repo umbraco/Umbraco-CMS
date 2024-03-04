@@ -39,20 +39,20 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
     {
         void AddPolicy(string policyName, string claimType, params string[] allowedClaimValues)
         {
-            options.AddPolicy($"New{policyName}", policy =>
+            options.AddPolicy(policyName, policy =>
             {
                 policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
                 policy.RequireClaim(claimType, allowedClaimValues);
             });
         }
 
-        options.AddPolicy($"New{AuthorizationPolicies.BackOfficeAccess}", policy =>
+        options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.RequireAuthenticatedUser();
         });
 
-        options.AddPolicy($"New{AuthorizationPolicies.RequireAdminAccess}", policy =>
+        options.AddPolicy(AuthorizationPolicies.RequireAdminAccess, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.RequireRole(Constants.Security.AdminGroupAlias);
