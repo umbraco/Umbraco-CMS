@@ -51,3 +51,5 @@ export class UmbMoveEntityAction extends UmbEntityActionBase<any> {
 		await this.#moveRepository!.move(this.args.unique, value.selection[0]);
 	}
 }
+
+export default UmbMoveEntityAction;

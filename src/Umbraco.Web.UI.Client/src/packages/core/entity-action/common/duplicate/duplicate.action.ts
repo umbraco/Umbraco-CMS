@@ -52,3 +52,5 @@ export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActi
 		await this.#duplicateRepository!.duplicate(this.args.unique, value.selection[0]);
 	}
 }
+
+export default UmbDuplicateEntityAction;
