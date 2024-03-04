@@ -104,7 +104,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 												${dataType.name}
 											</div>
 										</uui-button>
-								  </li>`
+									</li>`
 								: '',
 					)}
 				</ul>`,
@@ -112,7 +112,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	}
 	private _renderCreate() {
 		return html`
-			<uui-button id="create-button" type="button" look="placeholder" @click="${() => this._handleCreate()}">
+			<uui-button id="create-button" type="button" look="placeholder" @click="${this._handleCreate}">
 				<div class="content">
 					<uui-icon name="icon-add" class="icon"></uui-icon>
 					Create new
