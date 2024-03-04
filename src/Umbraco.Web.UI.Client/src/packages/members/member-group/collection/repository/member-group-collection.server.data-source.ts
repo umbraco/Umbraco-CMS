@@ -1,9 +1,11 @@
-import type { UmbMemberGroupCollectionFilterModel, UmbMemberGroupCollectionModel } from '../types.js';
+import type { UmbMemberGroupCollectionFilterModel } from '../types.js';
 import type { UmbMemberGroupDetailModel } from '../../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { MemberGroupResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { MemberGroupResource } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  * A data source that fetches the member collection data from the server.
@@ -30,29 +32,28 @@ export class UmbMemberGroupCollectionServerDataSource implements UmbCollectionDa
 	 * @memberof UmbMemberGroupCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbMemberGroupCollectionFilterModel) {
-		//const { data, error } = await tryExecuteAndNotify(this.#host, MemberGroupResource.getCollectionMemberGroup(filter));
+		const { data, error } = await tryExecuteAndNotify(this.#host, MemberGroupResource.getMemberGroup(filter));
 
-		// TODO => use backend cli when available.
-		const { data, error } = (await tryExecuteAndNotify(
-			this.#host,
-			fetch(`/umbraco/management/api/v1/member-group/filter`),
-		)) as any;
-
-		if (data) {
-			const json = await data.json(); // remove this line when backend cli is available
-			const items = json.items.map((item: any) => {
-				const model: UmbMemberGroupCollectionModel = {
-					unique: item.id,
-					name: item.name,
-					entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
-				};
-
-				return model;
-			});
-
-			return { data: { items, total: json.total } };
+		if (error) {
+			return { error };
 		}
 
-		return { error };
+		if (!data) {
+			return { data: { items: [], total: 0 } };
+		}
+
+		const { items, total } = data;
+
+		const mappedItems: Array<UmbMemberGroupDetailModel> = items.map((item: MemberGroupResponseModel) => {
+			const memberDetail: UmbMemberGroupDetailModel = {
+				entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
+				unique: item.id,
+				name: item.name,
+			};
+
+			return memberDetail;
+		});
+
+		return { data: { items: mappedItems, total } };
 	}
 }
