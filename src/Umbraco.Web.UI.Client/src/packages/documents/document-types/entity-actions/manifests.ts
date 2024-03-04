@@ -26,7 +26,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 			moveRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			pickerModalAlias: UMB_DOCUMENT_TYPE_PICKER_MODAL.toString(),
+			pickerModalAlias: UMB_DOCUMENT_TYPE_PICKER_MODAL,
 		},
 	},
 	{
@@ -38,7 +38,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 			duplicateRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			pickerModalAlias: UMB_DOCUMENT_TYPE_PICKER_MODAL.toString(),
+			pickerModalAlias: UMB_DOCUMENT_TYPE_PICKER_MODAL,
 		},
 	},
 ];

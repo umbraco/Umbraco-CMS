@@ -14,7 +14,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			itemRepositoryAlias: UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
 			moveRepositoryAlias: UMB_MOVE_DATA_TYPE_REPOSITORY_ALIAS,
-			pickerModalAlias: UMB_DATA_TYPE_PICKER_MODAL.toString(),
+			pickerModalAlias: UMB_DATA_TYPE_PICKER_MODAL,
 		},
 	},
 ];
