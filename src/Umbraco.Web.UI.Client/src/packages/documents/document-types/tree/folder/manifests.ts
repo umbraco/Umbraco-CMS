@@ -1,6 +1,5 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UmbDocumentTypeFolderRepository } from './document-type-folder.repository.js';
-import { UmbDeleteFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import type { ManifestEntityActions, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.DocumentType.Folder';

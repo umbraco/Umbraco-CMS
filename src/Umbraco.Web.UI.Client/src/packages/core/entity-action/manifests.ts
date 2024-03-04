@@ -3,6 +3,7 @@ import { manifests as deleteEntityActionManifests } from './common/delete/manife
 import { manifests as moveEntityActionManifests } from './common/move/manifests.js';
 import { manifests as renameEntityActionManifests } from './common/rename/manifests.js';
 import { manifests as defaultEntityActionManifests } from './default/manifests.js';
+import { manifests as trashEntityActionManifests } from './common/trash/manifests.js';
 
 export const manifests = [
 	...copyEntityActionManifests,
@@ -10,4 +11,5 @@ export const manifests = [
 	...moveEntityActionManifests,
 	...renameEntityActionManifests,
 	...defaultEntityActionManifests,
+	...trashEntityActionManifests,
 ];

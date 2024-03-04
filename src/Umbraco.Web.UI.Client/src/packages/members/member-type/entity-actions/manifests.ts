@@ -7,6 +7,7 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.MemberType.Create',
 		name: 'Create Member Type Entity Action',
 		weight: 1000,
@@ -15,14 +16,13 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create...',
-			repositoryAlias: UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.MemberType.Delete',
 		name: 'Delete Member Type Entity Action',
-		kind: 'delete',
 		forEntityTypes: [UMB_MEMBER_TYPE_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS,

@@ -5,6 +5,7 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Stylesheet.CreateOptions',
 		name: 'Stylesheet Create Options Entity Action',
 		weight: 1000,

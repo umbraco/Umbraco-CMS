@@ -54,6 +54,17 @@ export interface MetaEntityActionDeleteKind extends MetaEntityActionDefaultKind 
 	itemRepositoryAlias: string;
 }
 
+// TRASH
+export interface ManifestEntityActionTrashKind extends ManifestEntityAction<MetaEntityActionTrashKind> {
+	type: 'entityAction';
+	kind: 'trash';
+}
+
+export interface MetaEntityActionTrashKind extends MetaEntityActionDefaultKind {
+	trashRepositoryAlias: string;
+	itemRepositoryAlias: string;
+}
+
 // RENAME
 export interface ManifestEntityActionRenameKind extends ManifestEntityAction<MetaEntityActionRenameKind> {
 	type: 'entityAction';

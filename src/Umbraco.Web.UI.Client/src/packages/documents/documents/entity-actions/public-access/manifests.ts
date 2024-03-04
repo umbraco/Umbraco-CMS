@@ -1,11 +1,11 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_PUBLIC_ACCESS_REPOSITORY_ALIAS } from './repository/manifests.js';
 import { UmbDocumentPublicAccessEntityAction } from './public-access.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Document.PublicAccess',
 		name: 'Document Permissions Entity Action',
 		api: UmbDocumentPublicAccessEntityAction,
@@ -13,7 +13,6 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-lock',
 			label: 'Restrict Public Access',
-			repositoryAlias: UMB_DOCUMENT_PUBLIC_ACCESS_REPOSITORY_ALIAS,
 		},
 	},
 ];
