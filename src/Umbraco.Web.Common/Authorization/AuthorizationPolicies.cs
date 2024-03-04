@@ -10,6 +10,8 @@ public static class AuthorizationPolicies
     public const string BackOfficeAccess = nameof(BackOfficeAccess);
     public const string DenyLocalLoginIfConfigured = nameof(DenyLocalLoginIfConfigured);
     public const string RequireAdminAccess = nameof(RequireAdminAccess);
+    public const string UserBelongsToUserGroupInRequest = nameof(UserBelongsToUserGroupInRequest);
+    public const string UserPermissionByResource = nameof(UserPermissionByResource);
 
     // Content permission access
     public const string ContentPermissionByResource = nameof(ContentPermissionByResource);
