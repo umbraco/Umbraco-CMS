@@ -15,7 +15,7 @@ import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
@@ -220,7 +220,7 @@ export class UmbMemberTypeWorkspaceViewEditElement extends UmbLitElement impleme
 		this._routes = routes;
 	}
 
-	#requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
+	async #requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
 		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
@@ -237,12 +237,11 @@ export class UmbMemberTypeWorkspaceViewEditElement extends UmbLitElement impleme
 
 		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
 
-		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, { data: modalData });
+		await umbConfirmModal(this, modalData);
 
-		modalHandler?.onSubmit().then(() => {
-			this.#remove(tab?.id);
-		});
+		this.#remove(tab?.id);
 	}
+
 	#remove(tabId?: string) {
 		if (!tabId) return;
 		this._workspaceContext?.structure.removeContainer(null, tabId);

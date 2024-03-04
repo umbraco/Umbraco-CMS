@@ -31,7 +31,7 @@ export class UmbMemberTypeWorkspaceContext
 	readonly description;
 	readonly icon;
 
-	readonly allowedAsRoot;
+	readonly allowedAtRoot;
 	readonly variesByCulture;
 	readonly variesBySegment;
 	readonly isElement;
@@ -49,7 +49,7 @@ export class UmbMemberTypeWorkspaceContext
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
 		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
-		this.allowedAsRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAsRoot);
+		this.allowedAtRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAtRoot);
 		this.variesByCulture = this.structure.ownerContentTypeObservablePart((data) => data?.variesByCulture);
 		this.variesBySegment = this.structure.ownerContentTypeObservablePart((data) => data?.variesBySegment);
 		this.isElement = this.structure.ownerContentTypeObservablePart((data) => data?.isElement);

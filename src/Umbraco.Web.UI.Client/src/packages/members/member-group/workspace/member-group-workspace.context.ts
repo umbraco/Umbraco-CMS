@@ -49,7 +49,7 @@ export class UmbMemberGroupWorkspaceContext
 
 	async create() {
 		this.resetState();
-		this.#getDataPromise = this.repository.createScaffold(parentUnique);
+		this.#getDataPromise = this.repository.createScaffold();
 		const { data } = await this.#getDataPromise;
 
 		if (data) {

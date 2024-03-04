@@ -151,8 +151,8 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 
 		return tryExecuteAndNotify(
 			this.#host,
-			MemberGroupResource.deleteMemberGroupByKey({
-				key: unique,
+			MemberGroupResource.deleteMemberGroupById({
+				id: unique,
 			}),
 		);
 	}

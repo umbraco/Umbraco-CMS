@@ -1,5 +1,4 @@
 import { UMB_MEMBER_TYPE_WORKSPACE_CONTEXT } from './member-type-workspace.context.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
@@ -100,16 +99,21 @@ export class UmbMemberTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
-		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
+		const [alias, color] = this._icon?.replace('color-', '')?.split(' ') ?? [];
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL, {
 			value: {
-				icon: this._icon,
-				color: this._iconColorAlias,
+				icon: alias,
+				color: color,
 			},
 		});
 
 		modalContext?.onSubmit().then((saved) => {
-			if (saved.icon) this.#workspaceContext?.set('icon', saved.icon);
-			// TODO: save color ALIAS as well
+			if (saved.icon && saved.color) {
+				this.#workspaceContext?.set('icon', `${saved.icon} color-${saved.color}`);
+			} else if (saved.icon) {
+				this.#workspaceContext?.set('icon', saved.icon);
+			}
 		});
 	}
 
