@@ -4,10 +4,12 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = UmbMemberTypeDetailModel;
 export class UmbMemberTypeWorkspaceContext
@@ -18,6 +20,7 @@ export class UmbMemberTypeWorkspaceContext
 	isSorting = this.#isSorting.asObservable();
 
 	public readonly repository = new UmbMemberTypeDetailRepository(this);
+	#parent?: { entityType: string; unique: string | null };
 
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 
@@ -37,7 +40,7 @@ export class UmbMemberTypeWorkspaceContext
 
 	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.MemberType');
 
 		// General for content types:
@@ -77,10 +80,10 @@ export class UmbMemberTypeWorkspaceContext
 		return { data } || undefined;
 	}
 
-	async create(parentUnique: string | null) {
-		const { data } = await this.structure.createScaffold(parentUnique);
-		if (!data) return undefined;
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
+		this.#parent = parent;
+		const { data } = await this.repository.createScaffold();
 
 		this.setIsNew(true);
 		this.setIsSorting(false);
@@ -93,9 +96,16 @@ export class UmbMemberTypeWorkspaceContext
 		if (data === undefined) throw new Error('Cannot save, no data');
 
 		if (this.getIsNew()) {
-			if ((await this.structure.create()) === true) {
-				this.setIsNew(false);
-			}
+			if (!this.#parent) throw new Error('Parent is not set');
+			await this.repository.create(data, this.#parent.unique);
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				entityType: this.#parent.entityType,
+				unique: this.#parent.unique,
+			});
+			eventContext.dispatchEvent(event);
 		} else {
 			await this.structure.save();
 		}

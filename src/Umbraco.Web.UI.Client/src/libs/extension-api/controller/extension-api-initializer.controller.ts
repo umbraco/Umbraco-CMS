@@ -98,6 +98,7 @@ export class UmbExtensionApiInitializer<
 		this.#api = newApi;
 
 		if (this.#api) {
+			(this.#api as any).manifest = manifest;
 			//this.#assignProperties();
 			return true; // we will confirm we have a component and are still good to go.
 		}

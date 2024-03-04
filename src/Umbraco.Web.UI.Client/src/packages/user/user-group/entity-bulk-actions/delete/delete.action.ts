@@ -1,9 +1,9 @@
-import type { UmbUserGroupDetailRepository } from '../../repository/index.js';
+import { UmbUserGroupDetailRepository } from '../../repository/index.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
-export class UmbDeleteUserGroupEntityBulkAction extends UmbEntityBulkActionBase<UmbUserGroupDetailRepository> {
+export class UmbDeleteUserGroupEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
 		if (this.selection.length === 0) return;
 
@@ -16,9 +16,12 @@ export class UmbDeleteUserGroupEntityBulkAction extends UmbEntityBulkActionBase<
 
 		//TODO: How should we handle bulk actions? right now we send a request per item we want to change.
 		//TODO: For now we have to reload the page to see the update
+
+		const repository = new UmbUserGroupDetailRepository(this._host);
+
 		for (let index = 0; index < this.selection.length; index++) {
 			const element = this.selection[index];
-			await this.repository?.delete(element);
+			await repository?.delete(element);
 		}
 	}
 }

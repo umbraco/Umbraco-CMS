@@ -1,5 +1,5 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user/current-user.context.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -7,22 +7,18 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbUserPermissionCondition extends UmbControllerBase implements UmbExtensionCondition {
-	config: UserPermissionConditionConfig;
-	permitted = false;
-	#onChange: () => void;
-
+export class UmbUserPermissionCondition
+	extends UmbConditionBase<UserPermissionConditionConfig>
+	implements UmbExtensionCondition
+{
 	constructor(args: UmbConditionControllerArguments<UserPermissionConditionConfig>) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+		super(args);
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
 				context.currentUser,
 				(currentUser) => {
 					//this.permitted = currentUser?.permissions?.includes(this.config.match) || false;
-					this.#onChange();
 				},
 				'umbUserPermissionConditionObserver',
 			);

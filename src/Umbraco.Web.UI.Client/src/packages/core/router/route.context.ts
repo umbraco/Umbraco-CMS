@@ -2,7 +2,7 @@ import type { UmbRoute } from './route.interface.js';
 import { createRoutePathBuilder } from './generate-route-path-builder.function.js';
 import type { IRoutingInfo, IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
@@ -20,7 +20,7 @@ export class UmbRouteContext extends UmbControllerBase {
 	#routerActiveLocalPath?: string;
 	#activeModalPath?: string;
 
-	constructor(host: UmbControllerHostElement, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
+	constructor(host: UmbControllerHost, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
 		super(host);
 		this.#mainRouter = mainRouter;
 		this.#modalRouter = modalRouter;

@@ -1,21 +1,16 @@
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from './condition-base.controller.js';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
+	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbSwitchCondition extends UmbControllerBase implements UmbExtensionCondition {
+export class UmbSwitchCondition extends UmbConditionBase<SwitchConditionConfig> implements UmbExtensionCondition {
 	#timer?: ReturnType<typeof setTimeout>;
-	config: SwitchConditionConfig;
-	permitted = false;
-	#onChange: () => void;
 
-	constructor(args: { host: UmbControllerHost; config: SwitchConditionConfig; onChange: () => void }) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+	constructor(args: UmbConditionControllerArguments<SwitchConditionConfig>) {
+		super(args);
 		this.startApprove();
 	}
 
@@ -23,7 +18,6 @@ export class UmbSwitchCondition extends UmbControllerBase implements UmbExtensio
 		clearTimeout(this.#timer);
 		this.#timer = setTimeout(() => {
 			this.permitted = true;
-			this.#onChange();
 			this.startDisapprove();
 		}, parseInt(this.config.frequency));
 	}
@@ -32,7 +26,6 @@ export class UmbSwitchCondition extends UmbControllerBase implements UmbExtensio
 		clearTimeout(this.#timer);
 		this.#timer = setTimeout(() => {
 			this.permitted = false;
-			this.#onChange();
 			this.startApprove();
 		}, parseInt(this.config.frequency));
 	}
@@ -50,6 +43,6 @@ export const manifest: ManifestCondition = {
 	api: UmbSwitchCondition,
 };
 
-export type SwitchConditionConfig = UmbConditionConfigBase & {
+export type SwitchConditionConfig = UmbConditionConfigBase<'Umb.Condition.Switch'> & {
 	frequency: string;
 };

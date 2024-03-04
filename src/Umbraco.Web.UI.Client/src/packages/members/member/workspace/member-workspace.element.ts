@@ -17,7 +17,7 @@ export class UmbMemberWorkspaceElement extends UmbLitElement {
 			component: this.#createElement,
 			setup: (_component, info) => {
 				const memberTypeUnique = info.match.params.memberTypeUnique;
-				this.#workspaceContext.create(null, memberTypeUnique);
+				this.#workspaceContext.create(memberTypeUnique);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,

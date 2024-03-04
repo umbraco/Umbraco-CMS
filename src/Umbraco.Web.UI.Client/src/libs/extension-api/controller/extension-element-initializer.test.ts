@@ -1,8 +1,7 @@
 import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { UmbExtensionElementInitializer } from './index.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { type ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 

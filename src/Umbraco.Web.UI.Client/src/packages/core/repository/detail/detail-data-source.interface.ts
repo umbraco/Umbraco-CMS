@@ -6,8 +6,8 @@ export interface UmbDetailDataSourceConstructor<DetailType = any> {
 }
 
 export interface UmbDetailDataSource<DetailType> {
-	createScaffold(parentUnique: string | null, preset?: Partial<DetailType>): Promise<UmbDataSourceResponse<DetailType>>;
-	create(data: DetailType): Promise<UmbDataSourceResponse<DetailType>>;
+	createScaffold(preset?: Partial<DetailType>): Promise<UmbDataSourceResponse<DetailType>>;
+	create(data: DetailType, parentUnique: string | null): Promise<UmbDataSourceResponse<DetailType>>;
 	read(unique: string): Promise<UmbDataSourceResponse<DetailType>>;
 	update(data: DetailType): Promise<UmbDataSourceResponse<DetailType>>;
 	delete(unique: string): Promise<UmbDataSourceResponse>;

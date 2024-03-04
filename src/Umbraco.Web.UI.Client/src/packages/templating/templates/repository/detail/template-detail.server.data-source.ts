@@ -30,23 +30,24 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 
 	/**
 	 * Creates a new Template scaffold
-	 * @param {(string | null)} parentUnique
+	 * @param {Partial<UmbTemplateDetailModel>} [preset]
 	 * @return { CreateTemplateRequestModel }
 	 * @memberof UmbTemplateServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null, preset?: Partial<UmbTemplateDetailModel>) {
+	async createScaffold(preset: Partial<UmbTemplateDetailModel> = {}) {
 		const scaffold =
 			'@using Umbraco.Cms.Web.Common.PublishedModels;\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n@{\n\tLayout = null;\n}';
 
 		const data: UmbTemplateDetailModel = {
 			entityType: UMB_TEMPLATE_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
-			name: preset?.name ?? '',
-			alias: preset?.alias ?? '',
-			content: preset?.content ?? scaffold,
-			masterTemplate: preset?.masterTemplate ?? null,
+			name: '',
+			alias: '',
+			content: scaffold,
+			masterTemplate: null,
+			...preset,
 		};
+
 		return { data };
 	}
 
@@ -69,7 +70,6 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 		const template: UmbTemplateDetailModel = {
 			entityType: UMB_TEMPLATE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: null,
 			name: data.name,
 			content: data.content || null,
 			alias: data.alias,

@@ -1,10 +1,10 @@
 import type { UmbSaveableWorkspaceContextInterface } from '../../../../workspace-context/saveable-workspace-context.interface.js';
 import { UmbWorkspaceActionBase } from '../workspace-action-base.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // TODO: add interface for repo/partial repo/save-repo
 export class UmbSaveWorkspaceAction extends UmbWorkspaceActionBase<UmbSaveableWorkspaceContextInterface> {
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 
 		// TODO: Could we make change label depending on the state?

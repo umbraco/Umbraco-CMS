@@ -44,6 +44,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		super();
 
 		this.#init = Promise.all([
+			// TODO: Notice this can be retrieve via a api property. [NL]
 			this.consumeContext(UMB_DEFAULT_TREE_CONTEXT, (instance) => {
 				this.#treeContext = instance;
 
@@ -53,11 +54,6 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 				this.#observeTreeRoot();
 			}).asPromise(),
 		]);
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.#init;
 	}
 
 	protected async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {

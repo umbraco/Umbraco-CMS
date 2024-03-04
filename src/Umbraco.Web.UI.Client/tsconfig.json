@@ -62,6 +62,7 @@
 			"@umbraco-cms/backoffice/lit-element": ["./src/packages/core/lit-element/index.ts"],
 			"@umbraco-cms/backoffice/localization": ["./src/packages/core/localization/index.ts"],
 			"@umbraco-cms/backoffice/log-viewer": ["./src/packages/log-viewer/index.ts"],
+			"@umbraco-cms/backoffice/markdown-editor": ["./src/packages/markdown-editor/index.ts"],
 			"@umbraco-cms/backoffice/media-type": ["./src/packages/media/media-types/index.ts"],
 			"@umbraco-cms/backoffice/media": ["./src/packages/media/media/index.ts"],
 			"@umbraco-cms/backoffice/member-group": ["./src/packages/members/member-group/index.ts"],

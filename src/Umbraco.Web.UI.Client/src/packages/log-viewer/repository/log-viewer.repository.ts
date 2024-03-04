@@ -1,6 +1,6 @@
 import { UmbLogMessagesServerDataSource, UmbLogSearchesServerDataSource } from './sources/log-viewer.server.data.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type {
@@ -14,13 +14,13 @@ import type {
 // element -> context -> repository -> (store) -> data source
 // All methods should be async and return a promise. Some methods might return an observable as part of the promise response.
 export class UmbLogViewerRepository {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 	#searchDataSource: UmbLogSearchesServerDataSource;
 	#messagesDataSource: UmbLogMessagesServerDataSource;
 	#notificationService?: UmbNotificationContext;
 	#init;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 		this.#searchDataSource = new UmbLogSearchesServerDataSource(this.#host);
 		this.#messagesDataSource = new UmbLogMessagesServerDataSource(this.#host);

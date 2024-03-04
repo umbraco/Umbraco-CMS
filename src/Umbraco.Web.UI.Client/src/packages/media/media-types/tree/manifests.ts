@@ -45,9 +45,7 @@ const treeItem: ManifestTreeItem = {
 	kind: 'default',
 	alias: 'Umb.TreeItem.MediaType',
 	name: 'Media Type Tree Item',
-	meta: {
-		entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE, UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE],
-	},
+	forEntityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE, UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE],
 };
 
 export const manifests = [

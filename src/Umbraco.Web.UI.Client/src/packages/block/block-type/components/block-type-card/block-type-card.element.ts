@@ -68,7 +68,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 				href=${ifDefined(this.href)}
 				.name=${this.name ?? this._fallbackName ?? ''}
 				.background=${this.backgroundColor}>
-				<uui-icon name=${this._fallbackIcon ?? ''} style="color:${this.iconColor}"></uui-icon>
+				<umb-icon name=${this._fallbackIcon ?? ''} style="color:${this.iconColor}"></umb-icon>
 				<slot name="actions" slot="actions"> </slot>
 			</uui-card-block-type>
 		`;

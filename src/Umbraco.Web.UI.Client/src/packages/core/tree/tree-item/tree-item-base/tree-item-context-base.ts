@@ -85,12 +85,15 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	 * @param {ManifestCollection} manifest
 	 * @memberof UmbCollectionContext
 	 */
-	// TODO: Revisit if this instead should be a getter/setter property because it might be set by extension initializer
-	public setManifest(manifest: ManifestTreeItem | undefined) {
+	public set manifest(manifest: ManifestTreeItem | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
 	}
+	public get manifest() {
+		return this.#manifest;
+	}
 
+	// TODO: Be aware that this method, could be removed and we can use the getter method instead [NL]
 	/**
 	 * Returns the manifest.
 	 * @return {ManifestCollection}
@@ -122,6 +125,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeIsSelectable();
 		this.#observeIsSelected();
 		this.#observeSectionPath();
+		this.#hasChildrenInitValueFlag = false;
+		this.#observeHasChildren();
 	}
 
 	public async requestChildren() {
@@ -177,6 +182,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
+			this.#hasChildrenInitValueFlag = false;
 			this.#observeHasChildren();
 		});
 
@@ -244,7 +250,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.observe(
 			umbExtensionsRegistry
 				.byType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
+				.pipe(map((actions) => actions.filter((action) => action.forEntityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this.#hasActions.setValue(actions.length > 0);
 			},
@@ -265,8 +271,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		// observe if any children will be added runtime to a tree item. Nested items/folders etc.
 		this.observe(hasChildrenObservable, (hasChildren) => {
-			// we need to skip the first value, because it will also return false until a child is in the store
-			// we therefor rely on the value from the tree item itself
+			/* we need to skip the first value, because it will also return false until a child is in the store
+			we therefor rely on the value from the tree item itself */
 			if (this.#hasChildrenInitValueFlag === true) {
 				this.#hasChildren.setValue(hasChildren);
 			}

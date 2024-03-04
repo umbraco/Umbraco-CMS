@@ -69,12 +69,10 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		return promiseResult;
 	}
 
-	public async createScaffold(parentUnique: string | null) {
+	public async createScaffold() {
 		this._reset();
 
-		if (parentUnique === undefined) return {};
-
-		const { data } = await this.#contentTypeRepository.createScaffold(parentUnique);
+		const { data } = await this.#contentTypeRepository.createScaffold();
 		if (!data) return {};
 
 		this.#ownerContentTypeUnique = data.unique;
@@ -105,11 +103,11 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
 	 * @returns
 	 */
-	public async create() {
+	public async create(parentUnique: string | null) {
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) return false;
 
-		const { data } = await this.#contentTypeRepository.create(contentType);
+		const { data } = await this.#contentTypeRepository.create(contentType, parentUnique);
 		if (!data) return false;
 
 		// Update state with latest version:

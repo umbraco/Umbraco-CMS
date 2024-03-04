@@ -1,9 +1,9 @@
 import type { UmbDocumentWorkspaceContext } from '../document-workspace.context.js';
 import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceActionBase<UmbDocumentWorkspaceContext> {
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 	}
 

@@ -27,20 +27,18 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 
 	/**
 	 * Creates a new Media scaffold
-	 * @param {(string | null)} parentUnique
-	 * @param {(string)} mediaTypeUnique
+	 * @param {Partial<UmbMediaDetailModel>} [preset]
 	 * @return { UmbMediaDetailModel }
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null, mediaType: UmbMediaDetailModel['mediaType']) {
+	async createScaffold(preset: Partial<UmbMediaDetailModel> = {}) {
 		const data: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
 			urls: [],
 			mediaType: {
-				unique: mediaType.unique,
-				collection: mediaType.collection || null,
+				unique: '',
+				collection: null,
 			},
 			isTrashed: false,
 			values: [],
@@ -53,6 +51,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 					updateDate: null,
 				},
 			],
+			...preset,
 		};
 
 		return { data };
@@ -77,7 +76,6 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		const media: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: null, // TODO: this is not correct. It will be solved when we know where to get the parent from
 			values: data.values,
 			variants: data.variants.map((variant) => {
 				return {
@@ -106,14 +104,14 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 	 * @return {*}
 	 * @memberof UmbMediaServerDataSource
 	 */
-	async create(model: UmbMediaDetailModel) {
+	async create(model: UmbMediaDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Media is missing');
 		if (!model.unique) throw new Error('Media unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateMediaRequestModel = {
 			id: model.unique,
-			parent: model.parentUnique ? { id: model.parentUnique } : null,
+			parent: parentUnique ? { id: parentUnique } : null,
 			mediaType: { id: model.mediaType.unique },
 			values: model.values,
 			variants: model.variants,

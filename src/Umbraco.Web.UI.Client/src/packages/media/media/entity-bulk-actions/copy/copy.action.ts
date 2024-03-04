@@ -1,14 +1,7 @@
-import type { UmbMediaDetailRepository } from '../../repository/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbMediaCopyEntityBulkAction extends UmbEntityBulkActionBase<UmbMediaDetailRepository> {
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
-		super(host, repositoryAlias, selection);
-	}
-
+export class UmbDuplicateMediaEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
-		console.log(`execute copy for: ${this.selection}`);
-		//await this.repository?.copy([], '');
+		console.log('execute bulk duplicate');
 	}
 }

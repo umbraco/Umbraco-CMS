@@ -51,6 +51,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 	constructor() {
 		super();
 
+		// TODO: Notice this can be retrieve via a api property. [NL]
 		this.consumeContext(UMB_TREE_ITEM_CONTEXT, (instance) => {
 			this.#treeItemContext = instance;
 			if (!this.#treeItemContext) return;
@@ -154,14 +155,14 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 		const isFolder = this._item?.isFolder;
 
 		if (icon) {
-			return html`<uui-icon slot="icon" name="${icon}"></uui-icon>`;
+			return html`<umb-icon slot="icon" name="${icon}"></umb-icon>`;
 		}
 
 		if (isFolder) {
-			return html`<uui-icon slot="icon" name="icon-folder"></uui-icon>`;
+			return html`<umb-icon slot="icon" name="icon-folder"></umb-icon>`;
 		}
 
-		return html`<uui-icon slot="icon" name="icon-circle-dotted"></uui-icon>`;
+		return html`<umb-icon slot="icon" name="icon-circle-dotted"></umb-icon>`;
 	}
 
 	renderLabel() {

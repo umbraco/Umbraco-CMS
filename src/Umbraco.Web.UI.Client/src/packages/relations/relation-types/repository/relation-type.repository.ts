@@ -49,10 +49,8 @@ export class UmbRelationTypeRepository extends UmbControllerBase implements UmbA
 
 	// DETAILS:
 
-	async createScaffold(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
-		await this.#init;
-		return this.#detailDataSource.createScaffold(parentId);
+	async createScaffold() {
+		return this.#detailDataSource.createScaffold(null);
 	}
 
 	async requestRelationsById(id: string) {

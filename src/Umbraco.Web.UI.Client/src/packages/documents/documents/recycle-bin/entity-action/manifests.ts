@@ -9,11 +9,11 @@ export const manifests = [
 		name: 'Trash Document Entity Action',
 		weight: 900,
 		api: UmbTrashEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-trash',
 			label: 'Trash',
 			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 		conditions: [
 			{

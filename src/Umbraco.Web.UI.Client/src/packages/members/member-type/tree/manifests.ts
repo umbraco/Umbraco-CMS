@@ -42,9 +42,7 @@ const treeItem: ManifestTreeItem = {
 	kind: 'default',
 	alias: 'Umb.TreeItem.MemberType',
 	name: 'Member Type Tree Item',
-	meta: {
-		entityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE, UMB_MEMBER_TYPE_ENTITY_TYPE],
-	},
+	forEntityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE, UMB_MEMBER_TYPE_ENTITY_TYPE],
 };
 
 export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifest];

@@ -9,7 +9,7 @@ import {
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbPaginationManager, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -45,7 +45,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		this.#initialized ? resolve() : (this.#initResolver = resolve);
 	});
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_DEFAULT_TREE_CONTEXT);
 		this.pagination.setPageSize(this.#paging.take);
 		this.#consumeContexts();
@@ -65,19 +65,23 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 	/**
 	 * Sets the manifest
-	 * @param {ManifestCollection} manifest
-	 * @memberof UmbCollectionContext
+	 * @param {ManifestTree} manifest
+	 * @memberof UmbDefaultTreeContext
 	 */
-	public setManifest(manifest: ManifestTree | undefined) {
+	public set manifest(manifest: ManifestTree | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
 		this.#observeRepository(this.#manifest?.meta.repositoryAlias);
 	}
+	public get manifest() {
+		return this.#manifest;
+	}
 
+	// TODO: getManifest, could be refactored to use the getter method [NL]
 	/**
 	 * Returns the manifest.
-	 * @return {ManifestCollection}
-	 * @memberof UmbCollectionContext
+	 * @return {ManifestTree}
+	 * @memberof UmbDefaultTreeContext
 	 */
 	public getManifest() {
 		return this.#manifest;

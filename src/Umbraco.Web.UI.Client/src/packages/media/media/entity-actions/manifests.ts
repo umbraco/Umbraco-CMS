@@ -1,7 +1,5 @@
-import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_MEDIA_DETAIL_REPOSITORY_ALIAS, UMB_MEDIA_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
-import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
-
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -10,12 +8,11 @@ const entityActions: Array<ManifestTypes> = [
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Media.Delete',
 		name: 'Delete Media Entity Action ',
-		api: UmbDeleteEntityAction,
+		kind: 'delete',
+		forEntityTypes: ['media'],
 		meta: {
-			icon: 'icon-delete',
-			label: 'Delete',
-			repositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: ['media'],
+			itemRepositoryAlias: UMB_MEDIA_ITEM_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_MEDIA_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 ];

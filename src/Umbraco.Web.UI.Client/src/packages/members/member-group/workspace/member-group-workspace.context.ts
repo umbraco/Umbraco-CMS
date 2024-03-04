@@ -5,7 +5,7 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -22,7 +22,7 @@ export class UmbMemberGroupWorkspaceContext
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEMBER_GROUP_WORKSPACE_ALIAS);
 	}
 
@@ -47,7 +47,7 @@ export class UmbMemberGroupWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null) {
+	async create() {
 		this.resetState();
 		this.#getDataPromise = this.repository.createScaffold(parentUnique);
 		const { data } = await this.#getDataPromise;

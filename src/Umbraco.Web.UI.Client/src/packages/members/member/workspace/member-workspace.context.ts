@@ -6,7 +6,7 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbObjectState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -33,7 +33,7 @@ export class UmbMemberWorkspaceContext
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEMBER_WORKSPACE_ALIAS);
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
@@ -63,9 +63,9 @@ export class UmbMemberWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null, memberTypeUnique: string) {
+	async create(memberTypeUnique: string) {
 		this.resetState();
-		const { data } = await this.repository.createScaffold(parentUnique, {
+		const { data } = await this.repository.createScaffold({
 			memberType: { unique: memberTypeUnique },
 		});
 

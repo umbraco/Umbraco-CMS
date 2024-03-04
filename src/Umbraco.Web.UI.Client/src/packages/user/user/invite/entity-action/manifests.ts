@@ -1,4 +1,3 @@
-import { UMB_INVITE_USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbResendInviteToUserEntityAction } from './resend-invite/resend-invite.action.js';
 import { manifest as conditionManifest } from './resend-invite/resend-invite.action.condition.js';
@@ -11,11 +10,10 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Resend Invite User Entity Action',
 		weight: 500,
 		api: UmbResendInviteToUserEntityAction,
+		forEntityTypes: [UMB_USER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-message',
 			label: 'Resend Invite',
-			repositoryAlias: UMB_INVITE_USER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
 			{

@@ -14,16 +14,25 @@ export class UmbMockEntityTreeManager<T extends Omit<EntityTreeItemResponseModel
 
 	getRoot({ skip = 0, take = 100 }: { skip?: number; take?: number } = {}) {
 		const items = this.#db.getAll().filter((item) => item.parent === null);
-		const paged = pagedResult(items, skip, take);
-		const treeItems = paged.items.map((item) => this.#treeItemMapper(item));
-		return { items: treeItems, total: paged.total };
+		return this.#pagedTreeResult({ items, skip, take });
 	}
 
 	getChildrenOf({ parentId, skip = 0, take = 100 }: { parentId: string; skip?: number; take?: number }) {
 		const items = this.#db.getAll().filter((item) => item.parent?.id === parentId);
+		return this.#pagedTreeResult({ items, skip, take });
+	}
+
+	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {
 		const paged = pagedResult(items, skip, take);
 		const treeItems = paged.items.map((item) => this.#treeItemMapper(item));
-		return { items: treeItems, total: paged.total };
+		const treeItemsHasChildren = treeItems.map((item) => {
+			const children = this.#db.getAll().filter((child) => child.parent?.id === item.id);
+			return {
+				...item,
+				hasChildren: children.length > 0,
+			};
+		});
+		return { items: treeItemsHasChildren, total: paged.total };
 	}
 
 	move(ids: Array<string>, destinationId: string) {
