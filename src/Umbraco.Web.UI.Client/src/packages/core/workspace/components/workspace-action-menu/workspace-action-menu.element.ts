@@ -75,7 +75,6 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 					this._items = extensionControllers;
 				},
 				undefined, // We can leave the alias to undefined, as we destroy this our selfs.
-				'umb-workspace-action-menu-item',
 			);
 			//this.#extensionsController.elementProperties = this.#elProps;
 		}
