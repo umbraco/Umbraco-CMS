@@ -28,9 +28,6 @@ export class UmbWorkspaceActionElement<
 	_href?: string;
 
 	@property({ type: Object, attribute: false })
-	public get manifest() {
-		return this.#manifest;
-	}
 	public set manifest(value: ManifestWorkspaceAction<MetaType> | undefined) {
 		if (!value) return;
 		const oldValue = this.#manifest;
@@ -39,6 +36,9 @@ export class UmbWorkspaceActionElement<
 			this.#createAliases();
 			this.requestUpdate('manifest', oldValue);
 		}
+	}
+	public get manifest() {
+		return this.#manifest;
 	}
 
 	@property({ attribute: false })
@@ -50,6 +50,9 @@ export class UmbWorkspaceActionElement<
 			this._href = href;
 			// TODO: Do we need to update the component here? [NL]
 		});
+	}
+	public get api(): ApiType | undefined {
+		return this.#api;
 	}
 
 	/**
@@ -80,8 +83,8 @@ export class UmbWorkspaceActionElement<
 		this._buttonState = 'waiting';
 
 		try {
-			if (!this.api) throw new Error('No api defined');
-			await this.api.execute();
+			if (!this.#api) throw new Error('No api defined');
+			await this.#api.execute();
 			this._buttonState = 'success';
 		} catch (error) {
 			this._buttonState = 'failed';
