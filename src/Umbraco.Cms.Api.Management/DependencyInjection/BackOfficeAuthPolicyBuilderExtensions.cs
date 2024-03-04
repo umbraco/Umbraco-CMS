@@ -94,43 +94,43 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
 
         // Contextual permissions
         // TODO: Rename policies once we have the old ones removed
-        options.AddPolicy($"New{AuthorizationPolicies.AdminUserEditsRequireAdmin}", policy =>
+        options.AddPolicy(AuthorizationPolicies.AdminUserEditsRequireAdmin, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new UserPermissionRequirement());
         });
 
-        options.AddPolicy($"New{AuthorizationPolicies.ContentPermissionByResource}", policy =>
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionByResource, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new ContentPermissionRequirement());
         });
 
-        options.AddPolicy($"New{AuthorizationPolicies.DenyLocalLoginIfConfigured}", policy =>
+        options.AddPolicy(AuthorizationPolicies.DenyLocalLoginIfConfigured, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new DenyLocalLoginRequirement());
         });
 
-        options.AddPolicy($"New{AuthorizationPolicies.MediaPermissionByResource}", policy =>
+        options.AddPolicy(AuthorizationPolicies.MediaPermissionByResource, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new MediaPermissionRequirement());
         });
 
-        options.AddPolicy($"New{AuthorizationPolicies.UmbracoFeatureEnabled}", policy =>
+        options.AddPolicy(AuthorizationPolicies.UmbracoFeatureEnabled, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new FeatureAuthorizeRequirement());
         });
 
-        options.AddPolicy($"New{AuthorizationPolicies.UserBelongsToUserGroupInRequest}", policy =>
+        options.AddPolicy(AuthorizationPolicies.UserBelongsToUserGroupInRequest, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new UserGroupPermissionRequirement());
         });
 
-        options.AddPolicy($"New{AuthorizationPolicies.DictionaryPermissionByResource}", policy =>
+        options.AddPolicy(AuthorizationPolicies.DictionaryPermissionByResource, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new DictionaryPermissionRequirement());
