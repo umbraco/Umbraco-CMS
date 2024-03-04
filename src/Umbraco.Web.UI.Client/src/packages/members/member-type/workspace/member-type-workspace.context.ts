@@ -21,8 +21,7 @@ export class UmbMemberTypeWorkspaceContext
 
 	public readonly repository = new UmbMemberTypeDetailRepository(this);
 	#parent?: { entityType: string; unique: string | null };
-
-	#data = new UmbObjectState<EntityType | undefined>(undefined);
+	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
 	readonly data;
@@ -67,7 +66,8 @@ export class UmbMemberTypeWorkspaceContext
 
 	protected resetState(): void {
 		super.resetState();
-		this.#data.setValue(undefined);
+		this.#persistedData.setValue(undefined);
+		this.#isSorting.setValue(undefined);
 	}
 
 	async load(unique: string) {
@@ -83,12 +83,13 @@ export class UmbMemberTypeWorkspaceContext
 	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
 		this.#parent = parent;
-		const { data } = await this.repository.createScaffold();
+		const { data } = await this.structure.createScaffold();
+		if (!data) return undefined;
 
 		this.setIsNew(true);
 		this.setIsSorting(false);
-		//this.#draft.next(data);
-		return { data } || undefined;
+		this.#persistedData.setValue(data);
+		return data;
 	}
 
 	async save() {
