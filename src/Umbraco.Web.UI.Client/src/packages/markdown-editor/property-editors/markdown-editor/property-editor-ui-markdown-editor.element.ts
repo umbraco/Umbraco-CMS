@@ -1,5 +1,5 @@
-import type { UmbInputMarkdownElement } from '../../../components/input-markdown-editor/index.js';
-import '../../../components/input-markdown-editor/index.js';
+import type { UmbInputMarkdownElement } from '../../components/input-markdown-editor/index.js';
+import '../../components/input-markdown-editor/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
