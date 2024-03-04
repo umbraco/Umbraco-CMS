@@ -6,15 +6,15 @@ import type { UmbDuplicateDataSource } from '@umbraco-cms/backoffice/repository'
 /**
  * A data source for Data Type items that fetches data from the server
  * @export
- * @class UmbDataTypeCopyServerDataSource
+ * @class UmbDataTypeDuplicateServerDataSource
  */
 export class UmbDataTypeDuplicateServerDataSource implements UmbDuplicateDataSource {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of UmbDataTypeCopyServerDataSource.
+	 * Creates an instance of UmbDataTypeDuplicateServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof UmbDataTypeCopyServerDataSource
+	 * @memberof UmbDataTypeDuplicateServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
