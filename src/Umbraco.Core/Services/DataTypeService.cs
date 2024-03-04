@@ -251,27 +251,29 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100)
         {
-            IEnumerable<IDataType> dataTypes = GetAll().ToArray();
+            IEnumerable<IDataType> query = GetAll();
 
             if (name is not null)
             {
-                dataTypes = dataTypes.Where(datatype => datatype.Name?.InvariantContains(name) ?? false);
+                query = query.Where(datatype => datatype.Name?.InvariantContains(name) ?? false);
             }
 
             if (editorUiAlias != null)
             {
-                dataTypes = dataTypes.Where(datatype => datatype.EditorUiAlias?.InvariantContains(editorUiAlias) ?? false);
+                query = query.Where(datatype => datatype.EditorUiAlias?.InvariantContains(editorUiAlias) ?? false);
             }
 
             if (editorAlias != null)
             {
-                dataTypes = dataTypes.Where(datatype => datatype.EditorAlias.InvariantContains(editorAlias));
+                query = query.Where(datatype => datatype.EditorAlias.InvariantContains(editorAlias));
             }
+
+            IDataType[] result = query.ToArray();
 
             return Task.FromResult(new PagedModel<IDataType>
             {
-                Total = dataTypes.Count(),
-                Items = dataTypes.Skip(skip).Take(take),
+                Total = result.Length,
+                Items = result.Skip(skip).Take(take),
             });
         }
 
