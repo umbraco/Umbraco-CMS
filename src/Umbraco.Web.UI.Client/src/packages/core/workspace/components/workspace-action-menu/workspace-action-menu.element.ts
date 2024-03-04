@@ -1,15 +1,28 @@
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { ManifestWorkspaceActionMenuItem } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	umbExtensionsRegistry,
+	type ManifestWorkspaceActionMenuItem,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+import {
+	type UmbExtensionElementAndApiInitializer,
+	UmbExtensionsElementAndApiInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
 
 function ExtensionApiArgsMethod(manifest: ManifestWorkspaceActionMenuItem) {
 	return [{ meta: manifest.meta }];
 }
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
+	#extensionsController?: UmbExtensionsElementAndApiInitializer<
+		ManifestWorkspaceActionMenuItem,
+		'workspaceActionMenuItem',
+		ManifestWorkspaceActionMenuItem
+	>;
+
 	/**
 	 * The workspace actions to filter the available actions by.
 	 * @example ['Umb.WorkspaceAction.Document.Save', 'Umb.WorkspaceAction.Document.SaveAndPublishNew']
@@ -23,6 +36,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 				? action.forWorkspaceActions.some((alias) => this.forWorkspaceActions.includes(alias))
 				: this.forWorkspaceActions.includes(action.forWorkspaceActions);
 		};
+		this.#observeExtensions();
 	}
 	public get forWorkspaceActions(): Array<string> {
 		return this._forWorkspaceActions;
@@ -39,7 +53,33 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	color: UUIInterfaceColor = 'default';
 
 	@state()
+	_items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
+
+	@state()
 	_popoverOpen = false;
+
+	#observeExtensions(): void {
+		this.#extensionsController?.destroy();
+		if (this._filter) {
+			this.#extensionsController = new UmbExtensionsElementAndApiInitializer<
+				ManifestWorkspaceActionMenuItem,
+				'workspaceActionMenuItem',
+				ManifestWorkspaceActionMenuItem
+			>(
+				this,
+				umbExtensionsRegistry,
+				'workspaceActionMenuItem',
+				ExtensionApiArgsMethod,
+				this._filter,
+				(extensionControllers) => {
+					this._items = extensionControllers;
+				},
+				undefined, // We can leave the alias to undefined, as we destroy this our selfs.
+				'umb-workspace-action-menu-item',
+			);
+			//this.#extensionsController.elementProperties = this.#elProps;
+		}
+	}
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
@@ -53,7 +93,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._filter
+		return this._items && this._items.length > 0
 			? html`
 					<uui-button
 						id="popover-trigger"
@@ -71,13 +111,13 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						@toggle=${this.#onPopoverToggle}>
 						<umb-popover-layout>
 							<uui-scroll-container>
-								<umb-extension-with-api-slot
-									type="workspaceActionMenuItem"
-									default-element="umb-workspace-action-menu-item"
-									.filter=${this._filter}
-									.apiArgs=${ExtensionApiArgsMethod}
-									@action-executed=${this.#onActionExecuted}>
-								</umb-extension-with-api-slot>
+								${this._items.length > 0
+									? repeat(
+											this._items,
+											(ext) => ext.alias,
+											(ext) => ext.component,
+									  )
+									: ''}
 							</uui-scroll-container>
 						</umb-popover-layout>
 					</uui-popover-container>
@@ -93,6 +133,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			}
 
 			#expand-symbol {
+				/* TODO: remove this hack and use a proper UUI symbol for this */
 				transform: rotate(-90deg);
 			}
 
