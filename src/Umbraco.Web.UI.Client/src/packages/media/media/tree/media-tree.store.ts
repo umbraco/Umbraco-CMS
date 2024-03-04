@@ -2,7 +2,7 @@ import type { UmbMediaDetailModel } from '../types.js';
 import { UMB_MEDIA_DETAIL_STORE_CONTEXT } from '../repository/detail/media-detail.store.js';
 import type { UmbMediaTreeItemModel } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
@@ -15,10 +15,10 @@ import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 export class UmbMediaTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbMediaTreeStore.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbMediaTreeStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEDIA_TREE_STORE_CONTEXT.toString());
 
 		new UmbStoreConnector<UmbMediaTreeItemModel, UmbMediaDetailModel>(host, {

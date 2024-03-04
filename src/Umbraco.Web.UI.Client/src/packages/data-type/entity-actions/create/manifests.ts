@@ -1,20 +1,19 @@
 import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE, UMB_DATA_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/manifests.js';
 import { UmbCreateDataTypeEntityAction } from './create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.DataType.Create',
 		name: 'Create Data Type Entity Action',
 		weight: 1000,
 		api: UmbCreateDataTypeEntityAction,
+		forEntityTypes: [UMB_DATA_TYPE_ROOT_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create...',
-			repositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DATA_TYPE_ROOT_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{

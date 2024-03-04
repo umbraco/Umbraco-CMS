@@ -42,9 +42,7 @@ const treeItem: ManifestTreeItem = {
 	kind: 'default',
 	alias: 'Umb.TreeItem.DocumentRecycleBin',
 	name: 'DocumentRecycleBin Tree Item',
-	meta: {
-		entityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE, UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE],
-	},
+	forEntityTypes: [UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE, UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE],
 };
 
 export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadTreeItemChildrenManifests];

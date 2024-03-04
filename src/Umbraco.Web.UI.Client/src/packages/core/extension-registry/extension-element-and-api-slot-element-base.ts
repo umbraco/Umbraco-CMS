@@ -24,7 +24,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 		// TODO, compare changes since last time. only reset the ones that changed. This might be better done by the controller is self:
 		this.#props = newVal;
 		if (this.#extensionController) {
-			this.#extensionController.properties = newVal;
+			this.#extensionController.elementProps = newVal;
 		}
 	}
 	get props() {
@@ -52,7 +52,7 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 			this.#extensionChanged,
 			this.getDefaultElementName(),
 		);
-		this.#extensionController.properties = this.#props;
+		this.#extensionController.elementProps = this.#props;
 	}
 
 	#extensionChanged = (isPermitted: boolean, controller: UmbExtensionElementAndApiInitializer<ManifestType>) => {
@@ -60,7 +60,14 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 		this.requestUpdate('_element');
 	};
 
-	render() {
-		return html`${this._element}`;
+	protected render() {
+		return this._element;
+	}
+
+	/**
+	 * Disable the Shadow DOM for this element. This is needed because this is a wrapper element and should not stop the event propagation.
+	 */
+	protected createRenderRoot() {
+		return this;
 	}
 }

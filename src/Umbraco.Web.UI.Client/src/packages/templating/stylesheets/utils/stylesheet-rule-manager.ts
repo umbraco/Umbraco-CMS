@@ -31,7 +31,6 @@ export class UmbStylesheetRuleManager {
 	 */
 	insertRules(stylesheetContent: string, rules: Array<any>): string {
 		const regex = this.#umbRuleRegex;
-		if (!stylesheetContent) throw Error('No Stylesheet content');
 		if (!stylesheetContent && !rules) return '';
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -42,13 +41,13 @@ export class UmbStylesheetRuleManager {
       ${rules
 				?.map(
 					(rule) => `
-/**umb_name:${rule.name}*/ 
-${rule.selector} { 
-	${rule.styles} 
+/**umb_name:${rule.name}*/
+${rule.selector} {
+	${rule.styles}
 }
 `,
 				)
 				.join('')}`;
-		return newContent;
+		return newContent.trim();
 	}
 }

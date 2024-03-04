@@ -1,6 +1,6 @@
 import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbStylesheetPickerContext } from './stylesheet-input.context.js';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -14,11 +14,11 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 	 * @default 0
 	 */
 	@property({ type: Number })
-	public get min(): number {
-		return this.#pickerContext.min;
-	}
 	public set min(value: number) {
 		this.#pickerContext.min = value;
+	}
+	public get min(): number {
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -37,11 +37,11 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public get max(): number {
-		return this.#pickerContext.max;
-	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -65,9 +65,12 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selectedIds = splitStringToArray(idsString);
 	}
+	public get value() {
+		return this.#pickerContext.getSelection().join(',');
+	}
 
 	@state()
-	private _items?: Array<UmbStylesheetItemModel>;
+	private _items: Array<UmbStylesheetItemModel> = [];
 
 	#pickerContext = new UmbStylesheetPickerContext(this);
 
@@ -96,10 +99,18 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 
 	render() {
 		return html`
-			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
-				>Add</uui-button
-			>
+			<uui-ref-list>
+				${repeat(
+					this._items,
+					(item) => item.unique,
+					(item) => this._renderItem(item),
+				)}
+			</uui-ref-list>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${() => this.#pickerContext.openPicker()}
+				label="Add stylesheet"></uui-button>
 		`;
 	}
 
@@ -110,9 +121,9 @@ export class UmbStylesheetInputElement extends FormControlMixin(UmbLitElement) {
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.unique!)}
-						label="Remove Data Type ${item.name}"
-						>Remove</uui-button
-					>
+						label="Remove Data Type ${item.name}">
+						Remove
+					</uui-button>
 				</uui-action-bar>
 			</uui-ref-node-data-type>
 		`;

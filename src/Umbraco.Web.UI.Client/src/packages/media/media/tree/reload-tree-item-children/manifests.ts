@@ -1,19 +1,12 @@
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { UmbReloadTreeItemChildrenEntityAction } from '@umbraco-cms/backoffice/tree';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<ManifestEntityAction> = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Media.Tree.ReloadTreeItemChildren',
+		kind: 'reloadTreeItemChildren',
+		alias: 'Umb.EntityAction.Media.Tree.ReloadChildrenOf',
 		name: 'Reload Media Tree Item Children Entity Action',
-		weight: 10,
-		api: UmbReloadTreeItemChildrenEntityAction,
-		meta: {
-			icon: 'icon-refresh',
-			label: 'Reload children...',
-			repositoryAlias: 'Umb.Repository.Media.Tree',
-			entityTypes: [UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE],
-		},
+		forEntityTypes: [UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE],
 	},
 ];

@@ -125,7 +125,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 							this._allowedDocumentTypes,
 							(item) => html`
 								<uui-menu-item label=${item.name} href=${this.#getCreateUrl(item)}>
-									<uui-icon slot="icon" name=${item.icon ?? 'icon-document'}></uui-icon>
+									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,
 						)}

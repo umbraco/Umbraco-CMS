@@ -1,16 +1,13 @@
 import type { ConditionTypes } from '../conditions/types.js';
-import type { MetaEntityAction } from './entity-action.model.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceActionMenuItem } from '@umbraco-cms/backoffice/workspace';
 
-export interface ManifestWorkspaceActionMenuItem
-	extends ManifestElementAndApi<HTMLElement, UmbWorkspaceAction>,
+export interface ManifestWorkspaceActionMenuItem<
+	MetaType extends MetaWorkspaceActionMenuItem = MetaWorkspaceActionMenuItem,
+> extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceActionMenuItem<MetaType>>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'workspaceActionMenuItem';
-	meta: MetaWorkspaceActionMenuItem;
-}
-
-export interface MetaWorkspaceActionMenuItem extends MetaEntityAction {
 	/**
 	 * Define which workspace actions this menu item should be shown for.
 	 * @examples [
@@ -19,5 +16,37 @@ export interface MetaWorkspaceActionMenuItem extends MetaEntityAction {
 	 * ]
 	 * @required
 	 */
-	workspaceActions: string | string[];
+	forWorkspaceActions: string | string[];
+	meta: MetaType;
+}
+
+export interface MetaWorkspaceActionMenuItem {}
+
+export interface ManifestWorkspaceActionMenuItemDefaultKind<
+	MetaType extends MetaWorkspaceActionMenuItemDefaultKind = MetaWorkspaceActionMenuItemDefaultKind,
+> extends ManifestWorkspaceActionMenuItem<MetaType> {
+	type: 'workspaceActionMenuItem';
+	kind: 'default';
+}
+
+export interface MetaWorkspaceActionMenuItemDefaultKind extends MetaWorkspaceActionMenuItem {
+	/**
+	 * An icon to represent the action to be performed
+	 *
+	 * @examples [
+	 *   "icon-box",
+	 *   "icon-grid"
+	 * ]
+	 */
+	icon: string;
+
+	/**
+	 * The friendly name of the action to perform
+	 *
+	 * @examples [
+	 *   "Create",
+	 *   "Create Content Template"
+	 * ]
+	 */
+	label: string;
 }

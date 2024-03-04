@@ -7,7 +7,7 @@ import type {
 } from '../types/index.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
-import type { UmbControllerHostElement } from '../../controller-api/controller-host-element.mixin.js';
+import type { UmbControllerHostElement } from '../../controller-api/controller-host-element.interface.js';
 import { UmbControllerHostElementMixin } from '../../controller-api/controller-host-element.mixin.js';
 import { UmbBaseExtensionInitializer } from './index.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';

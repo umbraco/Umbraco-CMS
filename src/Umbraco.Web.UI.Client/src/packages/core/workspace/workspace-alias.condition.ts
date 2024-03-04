@@ -1,5 +1,5 @@
 import { UMB_WORKSPACE_CONTEXT, type UmbWorkspaceContextInterface } from './workspace-context/index.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -7,15 +7,12 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbWorkspaceAliasCondition extends UmbControllerBase implements UmbExtensionCondition {
-	config: WorkspaceAliasConditionConfig;
-	permitted = false;
-	#onChange: () => void;
-
+export class UmbWorkspaceAliasCondition
+	extends UmbConditionBase<WorkspaceAliasConditionConfig>
+	implements UmbExtensionCondition
+{
 	constructor(args: UmbConditionControllerArguments<WorkspaceAliasConditionConfig>) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+		super(args);
 
 		let permissionCheck: ((context: UmbWorkspaceContextInterface) => boolean) | undefined = undefined;
 		if (this.config.match) {
@@ -28,7 +25,6 @@ export class UmbWorkspaceAliasCondition extends UmbControllerBase implements Umb
 		if (permissionCheck !== undefined) {
 			this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 				this.permitted = permissionCheck!(context);
-				this.#onChange();
 			});
 		} else {
 			throw new Error(

@@ -23,7 +23,7 @@ export class UmbTreeItemElement extends UmbExtensionElementAndApiSlotElementBase
 
 		const filterByEntityType = (manifest: ManifestTreeItem) => {
 			if (!this._entityType) return false;
-			return manifest.meta.entityTypes.includes(this._entityType);
+			return manifest.forEntityTypes.includes(this._entityType);
 		};
 
 		this.observe(

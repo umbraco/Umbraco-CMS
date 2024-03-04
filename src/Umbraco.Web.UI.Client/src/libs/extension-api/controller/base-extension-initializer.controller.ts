@@ -235,7 +235,7 @@ export abstract class UmbBaseExtensionInitializer<
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
 		const isPositive =
 			this.#conditionsAreInitialized() &&
-			this.#conditionControllers.find((condition) => condition.permitted === false) === undefined;
+			this.#conditionControllers.some((condition) => condition.permitted === false) === false;
 
 		this._isConditionsPositive = isPositive;
 
@@ -318,6 +318,5 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#onPermissionChanged = undefined;
 		(this.#extensionRegistry as any) = undefined;
 		super.destroy();
-		// Destroy the conditions controllers, they are begin destroyed cause they are controllers...
 	}
 }

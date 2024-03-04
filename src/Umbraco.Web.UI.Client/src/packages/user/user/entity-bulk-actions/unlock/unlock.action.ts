@@ -1,13 +1,9 @@
-import type { UmbUnlockUserRepository } from '../../repository/index.js';
+import { UmbUnlockUserRepository } from '../../repository/index.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbUnlockUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUnlockUserRepository> {
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
-		super(host, repositoryAlias, selection);
-	}
-
+export class UmbUnlockUserEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
-		await this.repository?.unlock(this.selection);
+		const repository = new UmbUnlockUserRepository(this._host);
+		await repository.unlock(this.selection);
 	}
 }

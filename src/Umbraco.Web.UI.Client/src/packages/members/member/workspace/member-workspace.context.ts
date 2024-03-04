@@ -1,13 +1,16 @@
 import { UmbMemberDetailRepository } from '../repository/index.js';
 import type { UmbMemberDetailModel } from '../types.js';
 import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbMemberTypeDetailRepository, type UmbMemberTypeDetailModel } from '@umbraco-cms/backoffice/member-type';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState, partialUpdateFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 type EntityType = UmbMemberDetailModel;
 export class UmbMemberWorkspaceContext
@@ -18,12 +21,22 @@ export class UmbMemberWorkspaceContext
 
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
+	readonly data = this.#currentData.asObservable();
+	readonly name = this.#currentData.asObservablePart((data) => data?.variants[0].name);
+	readonly createDate = this.#currentData.asObservablePart((data) => data?.variants[0].createDate);
+	readonly updateDate = this.#currentData.asObservablePart((data) => data?.variants[0].updateDate);
+	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.memberType.unique);
+	readonly structure = new UmbContentTypePropertyStructureManager<UmbMemberTypeDetailModel>(
+		this,
+		new UmbMemberTypeDetailRepository(this),
+	);
 
-	readonly email = this.#currentData.asObservablePart((data) => data?.email);
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_MEMBER_WORKSPACE_ALIAS);
+
+		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
 	}
 
 	resetState() {
@@ -32,10 +45,16 @@ export class UmbMemberWorkspaceContext
 		this.#currentData.setValue(undefined);
 	}
 
+	set<PropertyName extends keyof UmbMemberDetailModel>(
+		propertyName: PropertyName,
+		value: UmbMemberDetailModel[PropertyName],
+	) {
+		this.#currentData.update({ [propertyName]: value });
+	}
+
 	async load(unique: string) {
 		this.resetState();
 		const { data } = await this.repository.requestByUnique(unique);
-
 		if (data) {
 			this.setIsNew(false);
 			this.#persistedData.setValue(data);
@@ -91,7 +110,61 @@ export class UmbMemberWorkspaceContext
 		return 'member';
 	}
 
+	setName(name: string, variantId?: UmbVariantId) {
+		const oldVariants = this.#currentData.getValue()?.variants || [];
+		const variants = partialUpdateFrozenArray(
+			oldVariants,
+			{ name },
+			variantId ? (x) => variantId.compare(x) : () => true,
+		);
+		this.#currentData.update({ variants });
+	}
+
+	get email() {
+		return this.#get('email') || '';
+	}
+
+	get username() {
+		return this.#get('username') || '';
+	}
+
+	get isLockedOut() {
+		return this.#get('isLockedOut') || false;
+	}
+
+	get isTwoFactorEnabled() {
+		return this.#get('isTwoFactorEnabled') || false;
+	}
+
+	get isApproved() {
+		return this.#get('isApproved') || false;
+	}
+
+	get failedPasswordAttempts() {
+		return this.#get('failedPasswordAttempts') || 0;
+	}
+
+	//TODO Use localization for "never"
+	get lastLockOutDate() {
+		return this.#get('lastLockoutDate') || 'never';
+	}
+
+	get lastLoginDate() {
+		return this.#get('lastLoginDate') || 'never';
+	}
+
+	get lastPasswordChangeDate() {
+		const date = this.#get('lastPasswordChangeDate');
+		if (!date) return 'never';
+		return new Date(date).toLocaleString();
+	}
+
+	#get<PropertyName extends keyof UmbMemberDetailModel>(propertyName: PropertyName) {
+		return this.#currentData.getValue()?.[propertyName];
+	}
+
 	public destroy(): void {
+		this.#currentData.destroy();
 		super.destroy();
 		this.#persistedData.destroy();
 		this.#currentData.destroy();

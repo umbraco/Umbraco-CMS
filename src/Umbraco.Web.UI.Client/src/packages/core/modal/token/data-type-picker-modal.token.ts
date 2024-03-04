@@ -13,7 +13,7 @@ export const UMB_DATA_TYPE_PICKER_MODAL = new UmbModalToken<UmbDataTypePickerMod
 			size: 'small',
 		},
 		data: {
-			treeAlias: 'Umb.Tree.DataTypes',
+			treeAlias: 'Umb.Tree.DataType',
 		},
 	},
 );

@@ -1,19 +1,16 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
-import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 
 export const manifests = [
 	{
 		type: 'entityAction',
+		kind: 'trash',
 		alias: 'Umb.EntityAction.Document.Trash',
 		name: 'Trash Document Entity Action',
-		weight: 900,
-		api: UmbTrashEntityAction,
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-trash',
-			label: 'Trash',
-			repositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
+			itemRepositoryAlias: UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS,
+			trashRepositoryAlias: UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

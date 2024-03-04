@@ -113,7 +113,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 										.label="${view.meta.label || view.name}"
 										href="${this._routerPath}/view/${view.meta.pathname}"
 										?active="${'view/' + view.meta.pathname === this._activePath}">
-										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+										<umb-icon slot="icon" name="${view.meta.icon}"></umb-icon>
 										${view.meta.label || view.name}
 									</uui-tab>
 								`,

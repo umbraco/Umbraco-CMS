@@ -1,5 +1,5 @@
 import { UMB_MENU_CONTEXT } from '../../menu/menu.context.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from './condition-base.controller.js';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -11,19 +11,13 @@ export type MenuAliasConditionConfig = UmbConditionConfigBase & {
 	match: string;
 };
 
-export class UmbMenuAliasCondition extends UmbControllerBase implements UmbExtensionCondition {
-	config: MenuAliasConditionConfig;
-	permitted = false;
-	#onChange: () => void;
-
+export class UmbMenuAliasCondition extends UmbConditionBase<MenuAliasConditionConfig> implements UmbExtensionCondition {
 	constructor(args: UmbConditionControllerArguments<MenuAliasConditionConfig>) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+		super(args);
+
 		this.consumeContext(UMB_MENU_CONTEXT, (context) => {
 			this.observe(context.alias, (MenuAlias) => {
 				this.permitted = MenuAlias === this.config.match;
-				this.#onChange();
 			});
 		});
 	}

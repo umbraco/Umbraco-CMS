@@ -1,6 +1,6 @@
 import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '../index.js';
+import type { ManifestElementAndApi, ManifestWithDynamicConditions, UmbApi } from '../index.js';
 import { UmbExtensionElementAndApiInitializer } from './extension-element-and-api-initializer.controller.js';
 import type { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
@@ -11,7 +11,10 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 @customElement('umb-test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-class UmbTestApiController extends UmbControllerBase {
+@customElement('umb-test-extension-element')
+class UmbTestExtensionElement extends UmbControllerHostElementMixin(HTMLElement) {}
+
+class UmbTestApiController extends UmbControllerBase implements UmbApi {
 	public i_am_test_api_controller = true;
 
 	constructor(host: UmbControllerHost) {
@@ -19,7 +22,9 @@ class UmbTestApiController extends UmbControllerBase {
 	}
 }
 
-interface TestManifest extends ManifestWithDynamicConditions, ManifestElementAndApi<HTMLElement, UmbTestApiController> {
+interface TestManifest
+	extends ManifestWithDynamicConditions,
+		ManifestElementAndApi<UmbControllerHostElement, UmbTestApiController> {
 	type: 'test-type';
 }
 
@@ -36,7 +41,7 @@ describe('UmbExtensionElementAndApiController', () => {
 				type: 'test-type',
 				name: 'test-type-1',
 				alias: 'Umb.Test.Type-1',
-				elementName: 'section',
+				elementName: 'umb-test-extension-element',
 				api: UmbTestApiController,
 			};
 
@@ -56,7 +61,7 @@ describe('UmbExtensionElementAndApiController', () => {
 						expect(permitted).to.be.true;
 						if (permitted) {
 							expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Type-1');
-							expect(extensionController.component?.nodeName).to.eq('SECTION');
+							expect(extensionController.component?.nodeName).to.eq('UMB-TEST-EXTENSION-ELEMENT');
 							done();
 							extensionController.destroy();
 						}
@@ -83,13 +88,13 @@ describe('UmbExtensionElementAndApiController', () => {
 						expect(permitted).to.be.true;
 						if (permitted) {
 							expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Type-1');
-							expect(extensionController.component?.nodeName).to.eq('UMB-TEST-FALLBACK-ELEMENT');
+							expect(extensionController.component?.nodeName).to.eq('UMB-TEST-EXTENSION-ELEMENT');
 							done();
 							extensionController.destroy();
 						}
 					}
 				},
-				'umb-test-fallback-element',
+				'umb-test-extension-element',
 			);
 		});
 	});
@@ -107,7 +112,7 @@ describe('UmbExtensionElementAndApiController', () => {
 				type: 'test-type',
 				name: 'test-type-1',
 				alias: 'Umb.Test.Type-1',
-				elementName: 'section',
+				elementName: 'umb-test-extension-element',
 				api: UmbTestApiController,
 				conditions: [
 					{
@@ -152,7 +157,7 @@ describe('UmbExtensionElementAndApiController', () => {
 					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Type-1');
 					if (count === 1) {
 						expect(extensionController?.permitted).to.be.true;
-						expect(extensionController.component?.nodeName).to.eq('SECTION');
+						expect(extensionController.component?.nodeName).to.eq('UMB-TEST-EXTENSION-ELEMENT');
 					} else if (count === 2) {
 						expect(extensionController?.permitted).to.be.false;
 						expect(extensionController.component).to.be.undefined;
@@ -176,7 +181,7 @@ describe('UmbExtensionElementAndApiController', () => {
 				type: 'test-type',
 				name: 'test-type-1',
 				alias: 'Umb.Test.Type-1',
-				elementName: 'section',
+				elementName: 'umb-test-extension-element',
 				api: UmbTestApiController,
 			};
 
@@ -240,7 +245,7 @@ describe('UmbExtensionElementAndApiController', () => {
 				type: 'test-type',
 				name: 'test-type-1',
 				alias: 'Umb.Test.Type-1',
-				elementName: 'section',
+				elementName: 'umb-test-extension-element',
 				api: UmbTestApiController,
 				conditions: [
 					{

@@ -253,6 +253,7 @@ export type { PagedAllowedMediaTypeModel } from './models/PagedAllowedMediaTypeM
 export type { PagedAuditLogResponseModel } from './models/PagedAuditLogResponseModel';
 export type { PagedAuditLogWithUsernameResponseModel } from './models/PagedAuditLogWithUsernameResponseModel';
 export type { PagedCultureReponseModel } from './models/PagedCultureReponseModel';
+export type { PagedDataTypeItemResponseModel } from './models/PagedDataTypeItemResponseModel';
 export type { PagedDataTypeTreeItemResponseModel } from './models/PagedDataTypeTreeItemResponseModel';
 export type { PagedDictionaryOverviewResponseModel } from './models/PagedDictionaryOverviewResponseModel';
 export type { PagedDocumentBlueprintTreeItemResponseModel } from './models/PagedDocumentBlueprintTreeItemResponseModel';
