@@ -50,23 +50,19 @@ export class UmbMemberGroupServerDataSource implements UmbDetailDataSource<UmbMe
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		//TODO: Use the getById Endpoint when available
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			MemberGroupResource.getItemMemberGroup({ id: [unique] }),
+			MemberGroupResource.getMemberGroupById({ id: unique }),
 		);
 
 		if (error || !data) {
 			return { error };
 		}
 
-		//TODO: Use the getById Endpoint when available
-		const temp = data[0];
-
 		const MemberGroup: UmbMemberGroupDetailModel = {
 			entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
-			unique: temp.id,
-			name: temp.name,
+			unique: data.id,
+			name: data.name,
 		};
 
 		return { data: MemberGroup };
