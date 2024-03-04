@@ -1,5 +1,5 @@
 import { UMB_WORKSPACE_CONTEXT } from './workspace-context/index.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -7,18 +7,14 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbWorkspaceEntityTypeCondition extends UmbControllerBase implements UmbExtensionCondition {
-	config: WorkspaceEntityTypeConditionConfig;
-	permitted = false;
-	#onChange: () => void;
-
+export class UmbWorkspaceEntityTypeCondition
+	extends UmbConditionBase<WorkspaceEntityTypeConditionConfig>
+	implements UmbExtensionCondition
+{
 	constructor(args: UmbConditionControllerArguments<WorkspaceEntityTypeConditionConfig>) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+		super(args);
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this.permitted = context.getEntityType().toLowerCase() === this.config.match.toLowerCase();
-			this.#onChange();
 		});
 	}
 }

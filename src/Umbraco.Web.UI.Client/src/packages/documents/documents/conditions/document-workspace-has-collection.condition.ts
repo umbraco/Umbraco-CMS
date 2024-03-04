@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../workspace/document-workspace.context-token.js';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -7,22 +7,18 @@ import type {
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbDocumentWorkspaceHasCollectionCondition extends UmbControllerBase implements UmbExtensionCondition {
-	config: DocumentWorkspaceHasCollectionConditionConfig;
-	permitted = false;
-	#onChange: () => void;
-
+export class UmbDocumentWorkspaceHasCollectionCondition
+	extends UmbConditionBase<DocumentWorkspaceHasCollectionConditionConfig>
+	implements UmbExtensionCondition
+{
 	constructor(args: UmbConditionControllerArguments<DocumentWorkspaceHasCollectionConditionConfig>) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+		super(args);
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
 				context.contentTypeHasCollection,
 				(hasCollection) => {
 					this.permitted = hasCollection;
-					this.#onChange();
 				},
 				'observeCollection',
 			);

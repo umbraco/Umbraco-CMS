@@ -3,16 +3,14 @@ import { UmbUserActionConditionBase } from './user-allow-action-base.condition.j
 import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbUserAllowEnableActionCondition extends UmbUserActionConditionBase {
-	async onUserDataChange() {
+	async _onUserDataChange() {
 		// don't allow the current user to enable themselves
 		if (!this.userUnique || (await this.isCurrentUser())) {
 			this.permitted = false;
-			super.onUserDataChange();
 			return;
 		}
 
 		this.permitted = this.userState === UmbUserStateEnum.DISABLED;
-		super.onUserDataChange();
 	}
 }
 
