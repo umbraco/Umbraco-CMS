@@ -5,6 +5,7 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Document.CultureAndHostnames',
 		name: 'Culture And Hostnames Document Entity Action',
 		weight: 400,

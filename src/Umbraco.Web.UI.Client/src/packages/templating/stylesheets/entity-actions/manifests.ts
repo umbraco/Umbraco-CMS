@@ -7,6 +7,7 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const stylesheetActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.Stylesheet.Delete',
 		name: 'Delete Stylesheet Entity Action',
 		forEntityTypes: [UMB_STYLESHEET_ENTITY_TYPE],

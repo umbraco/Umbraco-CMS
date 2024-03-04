@@ -6,9 +6,9 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.RelationType.Delete',
 		name: 'Delete RelationType Entity Action',
-		kind: 'delete',
 		forEntityTypes: [UMB_RELATION_TYPE_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_RELATION_TYPE_REPOSITORY_ALIAS,
@@ -17,6 +17,7 @@ const entityActions: Array<ManifestTypes> = [
 	},
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.RelationType.Create',
 		name: 'Create RelationType Entity Action',
 		weight: 900,
@@ -25,7 +26,6 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: UMB_RELATION_TYPE_REPOSITORY_ALIAS,
 		},
 	},
 ];

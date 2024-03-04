@@ -1,10 +1,11 @@
 import type { ConditionTypes } from '../conditions/types.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceActionMenuItem } from '@umbraco-cms/backoffice/workspace';
 
-export interface ManifestWorkspaceActionMenuItem
-	extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceAction>,
+export interface ManifestWorkspaceActionMenuItem<
+	MetaType extends MetaWorkspaceActionMenuItem = MetaWorkspaceActionMenuItem,
+> extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceActionMenuItem<MetaType>>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'workspaceActionMenuItem';
 	/**
@@ -16,10 +17,19 @@ export interface ManifestWorkspaceActionMenuItem
 	 * @required
 	 */
 	forWorkspaceActions: string | string[];
-	meta: MetaWorkspaceActionMenuItem;
+	meta: MetaType;
 }
 
-export interface MetaWorkspaceActionMenuItem {
+export interface MetaWorkspaceActionMenuItem {}
+
+export interface ManifestWorkspaceActionMenuItemDefaultKind<
+	MetaType extends MetaWorkspaceActionMenuItemDefaultKind = MetaWorkspaceActionMenuItemDefaultKind,
+> extends ManifestWorkspaceActionMenuItem<MetaType> {
+	type: 'workspaceActionMenuItem';
+	kind: 'default';
+}
+
+export interface MetaWorkspaceActionMenuItemDefaultKind extends MetaWorkspaceActionMenuItem {
 	/**
 	 * An icon to represent the action to be performed
 	 *

@@ -2,7 +2,7 @@ import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
-	ManifestWorkspaceAction,
+	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -19,9 +19,10 @@ const workspace: ManifestWorkspace = {
 };
 
 const workspaceViews: Array<ManifestWorkspaceView> = [];
-const workspaceActions: Array<ManifestWorkspaceAction> = [
+const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.User.Save',
 		name: 'Save User Workspace Action',
 		api: UmbSaveWorkspaceAction,
