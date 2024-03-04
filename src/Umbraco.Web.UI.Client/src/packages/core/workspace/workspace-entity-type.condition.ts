@@ -6,13 +6,14 @@ import type {
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbWorkspaceEntityTypeCondition
 	extends UmbConditionBase<WorkspaceEntityTypeConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(args: UmbConditionControllerArguments<WorkspaceEntityTypeConditionConfig>) {
-		super(args);
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceEntityTypeConditionConfig>) {
+		super(host, args);
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this.permitted = context.getEntityType().toLowerCase() === this.config.match.toLowerCase();
 		});

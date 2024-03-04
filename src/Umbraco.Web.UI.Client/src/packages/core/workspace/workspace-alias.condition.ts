@@ -6,13 +6,14 @@ import type {
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbWorkspaceAliasCondition
 	extends UmbConditionBase<WorkspaceAliasConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(args: UmbConditionControllerArguments<WorkspaceAliasConditionConfig>) {
-		super(args);
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceAliasConditionConfig>) {
+		super(host, args);
 
 		let permissionCheck: ((context: UmbWorkspaceContextInterface) => boolean) | undefined = undefined;
 		if (this.config.match) {

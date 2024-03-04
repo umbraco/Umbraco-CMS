@@ -18,8 +18,8 @@ export class UmbConditionBase<ConditionConfigType extends UmbConditionConfigBase
 	}
 	#onChange: () => void;
 
-	constructor(args: { host: UmbControllerHost; config: ConditionConfigType; onChange: () => void }) {
-		super(args.host);
+	constructor(host: UmbControllerHost, args: { config: ConditionConfigType; onChange: () => void }) {
+		super(host);
 		this.config = args.config;
 		this.#onChange = args.onChange;
 	}
