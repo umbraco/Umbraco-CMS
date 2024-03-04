@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Language.Item;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.Language}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Language))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessLanguages)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
 public class LanguageEntityControllerBase : ManagementApiControllerBase
 {
 }

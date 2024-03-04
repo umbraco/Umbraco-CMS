@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DataType}")]
 [ApiExplorerSettings(GroupName = "Data Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDataTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDataTypes)]
 public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeItemResponseModel>
 {
     private readonly IDataTypeService _dataTypeService;

@@ -16,8 +16,8 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
-[Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
-[Authorize(Policy = "New" + AuthorizationPolicies.UmbracoFeatureEnabled)]
+[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+[Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)]
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 [AppendEventMessages]

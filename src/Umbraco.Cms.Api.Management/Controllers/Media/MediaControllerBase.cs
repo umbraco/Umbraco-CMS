@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media;
 [ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Media)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMedia)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public class MediaControllerBase : ContentControllerBase
 {
     protected IActionResult MediaNotFound()

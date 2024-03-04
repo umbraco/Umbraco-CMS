@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Item;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.Script}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Script))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessScripts)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]
 public class ScriptItemControllerBase : ManagementApiControllerBase
 {
 }

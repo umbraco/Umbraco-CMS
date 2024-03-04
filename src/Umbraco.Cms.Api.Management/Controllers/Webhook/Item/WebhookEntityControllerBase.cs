@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook.Item;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Webhook}")]
 [ApiExplorerSettings(GroupName = "Webhook")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessWebhooks)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 public class WebhookEntityControllerBase : ManagementApiControllerBase
 {
 }

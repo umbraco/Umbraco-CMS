@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member;
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Member)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Member))]
 // FIXME: implement authorization
-// [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMembers)]
+// [Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]
 public class MemberControllerBase : ContentControllerBase
 {
     protected IActionResult MemberNotFound() => OperationStatusResult(MemberEditingOperationStatus.MemberNotFound, MemberNotFound);
