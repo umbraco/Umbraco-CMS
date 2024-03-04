@@ -6,7 +6,7 @@ import type {
 	ManifestElementAndApi,
 	ManifestWithDynamicConditions,
 	UmbApi,
-	UmbExtensionElementInitializer,
+	UmbExtensionElementAndApiInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbControllerHostElementMixin, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -109,7 +109,8 @@ describe('UmbExtensionWithApiSlotElement', () => {
 				html` <umb-extension-with-api-slot
 					type="test-type"
 					.filter=${(x: any) => x.alias === 'unit-test-ext-slot-element-manifest'}
-					.renderMethod=${(controller: UmbExtensionElementInitializer) => html`<bla>${controller.component}</bla>`}>
+					.renderMethod=${(controller: UmbExtensionElementAndApiInitializer) =>
+						html`<bla>${controller.component}</bla>`}>
 				</umb-extension-with-api-slot>`,
 			);
 

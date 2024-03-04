@@ -8,9 +8,9 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const partialViewActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.PartialView.Delete',
 		name: 'Delete Partial View Entity Action',
-		kind: 'delete',
 		forEntityTypes: [UMB_PARTIAL_VIEW_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS,

@@ -1,7 +1,7 @@
 import type { UmbCollectionBulkActionPermissions } from '../../../core/collection/types.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action.js';
+import { UmbDocumentDuplicateEntityBulkAction } from './duplicate/duplicate.action.js';
 import { UmbDocumentDeleteEntityBulkAction } from './delete/delete.action.js';
 import { UmbMoveDocumentEntityBulkAction } from './move/move.action.js';
 import { UmbDocumentPublishEntityBulkAction } from './publish/publish.action.js';
@@ -57,12 +57,12 @@ export const manifests: Array<ManifestEntityBulkAction> = [
 	},
 	{
 		type: 'entityBulkAction',
-		alias: 'Umb.EntityBulkAction.Document.Copy',
-		name: 'Copy Document Entity Bulk Action',
+		alias: 'Umb.EntityBulkAction.Document.Duplicate',
+		name: 'Duplicate Document Entity Bulk Action',
 		weight: 30,
-		api: UmbDocumentCopyEntityBulkAction,
+		api: UmbDocumentDuplicateEntityBulkAction,
 		meta: {
-			label: 'Copy',
+			label: 'Duplicate...',
 		},
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		conditions: [

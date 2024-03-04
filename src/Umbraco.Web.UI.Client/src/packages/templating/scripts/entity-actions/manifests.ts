@@ -10,9 +10,9 @@ export const UMB_DELETE_SCRIPT_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.Script.De
 const scriptViewActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: UMB_DELETE_SCRIPT_ENTITY_ACTION_ALIAS,
 		name: 'Delete Script Entity Action',
-		kind: 'delete',
 		forEntityTypes: [UMB_SCRIPT_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS,
