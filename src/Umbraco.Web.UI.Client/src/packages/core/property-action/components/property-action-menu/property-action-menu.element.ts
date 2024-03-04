@@ -1,3 +1,4 @@
+import type { UmbPropertyActionArgs } from '../property-action/types.js';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -7,7 +8,7 @@ import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffi
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-function ExtensionApiArgsMethod(manifest: ManifestPropertyAction) {
+function ExtensionApiArgsMethod(manifest: ManifestPropertyAction): [UmbPropertyActionArgs<ManifestPropertyAction>] {
 	return [{ meta: manifest.meta }];
 }
 @customElement('umb-property-action-menu')
