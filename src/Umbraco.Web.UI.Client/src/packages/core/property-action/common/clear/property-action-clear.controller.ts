@@ -4,7 +4,7 @@ import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 export class UmbClearPropertyAction extends UmbPropertyActionBase {
 	async execute() {
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		propertyContext.resetValue();
+		propertyContext.clearValue();
 	}
 }
 export default UmbClearPropertyAction;
