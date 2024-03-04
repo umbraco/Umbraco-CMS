@@ -1,14 +1,14 @@
 import { DataTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbCopyDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDuplicateDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * A data source for Data Type items that fetches data from the server
  * @export
  * @class UmbDataTypeCopyServerDataSource
  */
-export class UmbDataTypeCopyServerDataSource implements UmbCopyDataSource {
+export class UmbDataTypeDuplicateServerDataSource implements UmbDuplicateDataSource {
 	#host: UmbControllerHost;
 
 	/**
@@ -24,9 +24,9 @@ export class UmbDataTypeCopyServerDataSource implements UmbCopyDataSource {
 	 * Copy an item for the given unique to the target unique
 	 * @param {Array<string>} unique
 	 * @return {*}
-	 * @memberof UmbDataTypeCopyServerDataSource
+	 * @memberof UmbDataTypeDuplicateServerDataSource
 	 */
-	async copy(unique: string, targetUnique: string | null) {
+	async duplicate(unique: string, targetUnique: string | null) {
 		if (!unique) throw new Error('Unique is missing');
 		if (targetUnique === undefined) throw new Error('Target unique is missing');
 

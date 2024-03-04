@@ -1,23 +1,23 @@
 import type { UmbDataTypeTreeStore } from '../../tree/data-type-tree.store.js';
 import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from '../../tree/data-type-tree.store.js';
 import { UmbDataTypeDetailRepository } from '../detail/data-type-detail.repository.js';
-import { UmbDataTypeCopyServerDataSource } from './data-type-copy.server.data-source.js';
+import { UmbDataTypeDuplicateServerDataSource } from './data-type-copy.server.data-source.js';
 import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbCopyDataSource, UmbCopyRepository} from '@umbraco-cms/backoffice/repository';
+import type { UmbDuplicateDataSource, UmbDuplicateDataSource } from '@umbraco-cms/backoffice/repository';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
-export class UmbCopyDataTypeRepository extends UmbRepositoryBase implements UmbCopyRepository {
+export class UmbDuplicateDataTypeRepository extends UmbRepositoryBase implements UmbDuplicateRepository {
 	#init: Promise<unknown>;
-	#copySource: UmbCopyDataSource;
+	#duplicateSource: UmbDuplicateDataSource;
 	#detailRepository: UmbDataTypeDetailRepository;
 	#treeStore?: UmbDataTypeTreeStore;
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#copySource = new UmbDataTypeCopyServerDataSource(this);
+		this.#duplicateSource = new UmbDataTypeDuplicateServerDataSource(this);
 		this.#detailRepository = new UmbDataTypeDetailRepository(this);
 
 		this.#init = Promise.all([
@@ -31,9 +31,9 @@ export class UmbCopyDataTypeRepository extends UmbRepositoryBase implements UmbC
 		]);
 	}
 
-	async copy(unique: string, targetUnique: string | null) {
+	async duplicate(unique: string, targetUnique: string | null) {
 		await this.#init;
-		const { data: dataTypeCopyUnique, error } = await this.#copySource.copy(unique, targetUnique);
+		const { data: dataTypeCopyUnique, error } = await this.#duplicateSource.duplicate(unique, targetUnique);
 		if (error) return { error };
 
 		if (dataTypeCopyUnique) {
