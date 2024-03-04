@@ -4,11 +4,11 @@ import type { ManifestElementAndApi, ManifestWithDynamicConditions } from '@umbr
 import type { UmbWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export interface ManifestWorkspaceAction<MetaType extends MetaWorkspaceAction = MetaWorkspaceAction>
+export interface ManifestWorkspaceAction<MetaType extends MetaWorkspaceAction>
 	extends ManifestElementAndApi<UmbControllerHostElement, UmbWorkspaceAction<MetaType>>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'workspaceAction';
-	meta: MetaWorkspaceAction;
+	meta: MetaType;
 }
 
 export interface MetaWorkspaceAction {}

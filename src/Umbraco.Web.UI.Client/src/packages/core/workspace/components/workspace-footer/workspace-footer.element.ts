@@ -62,7 +62,6 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 				<umb-extension-with-api-slot
 					slot="actions"
 					type="workspaceAction"
-					default-element="umb-workspace-action"
 					.apiArgs=${ExtensionApiArgsMethod}></umb-extension-with-api-slot>
 
 				<slot name="actions" slot="actions"></slot>
