@@ -17,333 +17,370 @@ test.describe('Media Type tests', () => {
     await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName)
   });
 
-  // Design
-  // Name and alias is removed when saving
-  test.skip('can create an empty media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Act
-    await umbracoUi.mediaType.clickActionsMenuForName('Media Types');
-    await umbracoUi.mediaType.clickCreateThreeDotsButton();
-    await umbracoUi.mediaType.clickNewMediaTypeButton();
-    await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
-    await umbracoUi.mediaType.clickSaveButton();
+  test.describe('Design Tab', () => {
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
-  });
+    // Design
+    // Name and alias is removed when saving
+    test.skip('can create an empty media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Act
+      await umbracoUi.mediaType.clickActionsMenuForName('Media Types');
+      await umbracoUi.mediaType.clickCreateThreeDotsButton();
+      await umbracoUi.mediaType.clickNewMediaTypeButton();
+      await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
+      await umbracoUi.mediaType.clickSaveButton();
 
-  test('can create a media type with a single property', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
+    });
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await umbracoUi.mediaType.clickAddGroupButton();
-    await umbracoUi.mediaType.addPropertyEditor(dataTypeName);
-    await umbracoUi.mediaType.enterMediaTypeGroupName(groupName);
-    await umbracoUi.mediaType.clickSaveButton();
+    test('can create a media type with a single property', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    const dataType = await umbracoApi.dataType.getByName(dataTypeName);
-    // Checks if the correct property was added to the media type
-    expect(mediaTypeData.properties[0].dataType.id).toBe(dataType.id);
-  });
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.clickAddGroupButton();
+      await umbracoUi.mediaType.addPropertyEditor(dataTypeName);
+      await umbracoUi.mediaType.enterMediaTypeGroupName(groupName);
+      await umbracoUi.mediaType.clickSaveButton();
 
-  test('can rename a media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    const wrongName = 'NotAMediaTypeName';
-    await umbracoApi.mediaType.ensureNameNotExists(wrongName);
-    await umbracoApi.mediaType.createDefaultMediaType(wrongName);
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      const dataType = await umbracoApi.dataType.getByName(dataTypeName);
+      // Checks if the correct property was added to the media type
+      expect(mediaTypeData.properties[0].dataType.id).toBe(dataType.id);
+    });
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(wrongName);
-    await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
-    await umbracoUi.mediaType.clickSaveButton();
+    test('can rename a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const wrongName = 'NotAMediaTypeName';
+      await umbracoApi.mediaType.ensureNameNotExists(wrongName);
+      await umbracoApi.mediaType.createDefaultMediaType(wrongName);
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
-  });
+      // Act
+      await umbracoUi.mediaType.goToMediaType(wrongName);
+      await umbracoUi.mediaType.enterMediaTypeName(mediaTypeName);
+      await umbracoUi.mediaType.clickSaveButton();
 
-  test('can update alias for a media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    const updatedAlias = 'TestMediaAlias';
-    await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
+    });
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    // Unlocks the alias field
-    await page.locator('#name #alias-lock').click();
-    // Updates the alias
-    await page.locator('#name').getByLabel('alias').clear();
-    await page.locator('#name').getByLabel('alias').fill(updatedAlias);
+    test('can update alias for a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const updatedAlias = 'TestMediaAlias';
+      await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
-    await umbracoUi.mediaType.clickSaveButton();
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      // Unlocks the alias field
+      await page.locator('#name #alias-lock').click();
+      // Updates the alias
+      await page.locator('#name').getByLabel('alias').clear();
+      await page.locator('#name').getByLabel('alias').fill(updatedAlias);
+      await umbracoUi.mediaType.clickSaveButton();
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    expect(mediaTypeData.alias).toBe(updatedAlias);
-  });
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.alias).toBe(updatedAlias);
+    });
 
-  test('can update a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    const newDataTypeName = 'Media Picker';
-    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
+    test('can update a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      const newDataTypeName = 'Media Picker';
+      await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await umbracoUi.mediaType.updatePropertyEditor(newDataTypeName);
-    await umbracoUi.mediaType.clickSaveButton();
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.updatePropertyEditor(newDataTypeName);
+      await umbracoUi.mediaType.clickSaveButton();
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    const dataType = await umbracoApi.dataType.getByName(newDataTypeName);
-    // Checks if the correct property was added to the media type
-    expect(mediaTypeData.properties[0].dataType.id).toBe(dataType.id);
-  });
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      const dataType = await umbracoApi.dataType.getByName(newDataTypeName);
+      // Checks if the correct property was added to the media type
+      expect(mediaTypeData.properties[0].dataType.id).toBe(dataType.id);
+    });
 
-  test('can update group name in a media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    const updatedGroupName = 'UpdatedGroupName';
-    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id, groupName);
+    test('can update group name in a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      const updatedGroupName = 'UpdatedGroupName';
+      await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id, groupName);
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await umbracoUi.mediaType.enterMediaTypeGroupName(updatedGroupName);
-    await umbracoUi.mediaType.clickSaveButton();
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.enterMediaTypeGroupName(updatedGroupName);
+      await umbracoUi.mediaType.clickSaveButton();
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    expect(mediaTypeData.containers[0].name).toBe(updatedGroupName);
-  });
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.containers[0].name).toBe(updatedGroupName);
+    });
 
-  test('can delete a media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
+    test('can delete a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
-    // Act
-    await umbracoUi.mediaType.clickRootFolderCaretButton();
-    await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeName);
-    await umbracoUi.mediaType.clickDeleteButton();
-    await umbracoUi.mediaType.clickConfirmToDeleteButton();
+      // Act
+      await umbracoUi.mediaType.clickRootFolderCaretButton();
+      await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeName);
+      await umbracoUi.mediaType.clickDeleteButton();
+      await umbracoUi.mediaType.clickConfirmToDeleteButton();
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeFalsy();
-  });
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeFalsy();
+    });
 
-  test('can delete a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id, groupName);
+    test('can delete a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id, groupName);
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    const containerName = page.locator('[container-name="' + groupName + '"]');
-    await containerName.hover();
-    await containerName.getByLabel('Delete').click({force: true});
-    await umbracoUi.mediaType.clickDeleteButton();
-    await umbracoUi.mediaType.clickSaveButton();
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      const containerName = page.locator('[container-name="' + groupName + '"]');
+      await containerName.hover();
+      await containerName.getByLabel('Delete').click({force: true});
+      await umbracoUi.mediaType.clickDeleteButton();
+      await umbracoUi.mediaType.clickSaveButton();
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    expect(mediaTypeData.properties.length).toBe(0);
-  });
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.properties.length).toBe(0);
+    });
 
-  test('can add a description to property in a media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    const descriptionText = 'Test Description';
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id, groupName);
+    test('can add a description to property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const descriptionText = 'Test Description';
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id, groupName);
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await page.locator('[container-name="' + groupName + '"]').getByLabel('description').fill(descriptionText);
-    await umbracoUi.mediaType.clickSaveButton();
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await page.locator('[container-name="' + groupName + '"]').getByLabel('description').fill(descriptionText);
+      await umbracoUi.mediaType.clickSaveButton();
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    expect(mediaTypeData.properties[0].description).toBe(descriptionText);
-  });
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.properties[0].description).toBe(descriptionText);
+    });
 
-  // When enabling the mandatory slider is not saved.
-  test.skip('can set a property as mandatory in a media type', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
+    // When enabling the mandatory slider it is not saved.
+    test.skip('can set a property as mandatory in a media type', async ({umbracoApi, umbracoUi}) => {
+      // Arrange
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await umbracoUi.mediaType.clickEditorSettingsButton();
-    await umbracoUi.mediaType.clickMandatorySlider();
-    await umbracoUi.mediaType.clickUpdateButton();
-    await umbracoUi.mediaType.clickSaveButton();
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.clickEditorSettingsButton();
+      await umbracoUi.mediaType.clickMandatorySlider();
+      await umbracoUi.mediaType.clickUpdateButton();
+      await umbracoUi.mediaType.clickSaveButton();
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    expect(mediaTypeData.properties[0].validation.mandatory).toBeTruthy();
-  });
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.properties[0].validation.mandatory).toBeTruthy();
+    });
 
-  test('can set up validation for a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    const regex = '^[a-zA-Z0-9]*$';
-    const regexMessage = 'Only letters and numbers are allowed';
-    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
+    test('can set up validation for a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      const regex = '^[a-zA-Z0-9]*$';
+      const regexMessage = 'Only letters and numbers are allowed';
+      await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await umbracoUi.mediaType.clickEditorSettingsButton();
-    await umbracoUi.mediaType.selectValidationOption('')
-    await umbracoUi.mediaType.enterRegEx(regex);
-    await umbracoUi.mediaType.enterRegExMessage(regexMessage);
-    await umbracoUi.mediaType.clickUpdateButton();
-    await umbracoUi.mediaType.clickSaveButton();
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.clickEditorSettingsButton();
+      await umbracoUi.mediaType.selectValidationOption('');
+      await umbracoUi.mediaType.enterRegEx(regex);
+      await umbracoUi.mediaType.enterRegExMessage(regexMessage);
+      await umbracoUi.mediaType.clickUpdateButton();
+      await umbracoUi.mediaType.clickSaveButton();
 
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    expect(mediaTypeData.properties[0].validation.regEx).toBe(regex);
-    expect(mediaTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
-  });
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.properties[0].validation.regEx).toBe(regex);
+      expect(mediaTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
+    });
 
-  test('can set appearance as label on top for property in a media type', async ({page, umbracoApi, umbracoUi}) => {
-  });
+    test('can set appearance as label on top for property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
+
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.clickEditorSettingsButton();
+      await umbracoUi.mediaType.clickLabelOnTopButton();
+      await umbracoUi.mediaType.clickUpdateButton();
+      await umbracoUi.mediaType.clickSaveButton();
+
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.properties[0].appearance.labelOnTop).toBeTruthy();
+    });
 
     // There is no button for deleting a group in the UI
-  test.skip('can delete a group in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test.skip('can delete a group in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    });
+
+    // There a currently frontend issues, when you try to add a property editor you have to click the button twice to focus.
+    test.skip('can create a media type with a property in a tab', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
+
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.clickAddTabButton();
+      await umbracoUi.mediaType.enterTabName(tabName);
+      await umbracoUi.mediaType.addPropertyEditor(dataTypeName);
+    });
+
+    // There a currently frontend issues, when you try to add a property editor in a tab, you have to click the button twice to focus.
+    test.skip('can create a media type with properties in a group and a tab', async ({page, umbracoApi, umbracoUi}) => {
+    });
+
+    // There a currently frontend issues, when you try to add a property editor to the second group. the editor ends up in the first group
+    test.skip('can create a media type with multiple groups', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      const secondDataTypeName = 'Media Picker';
+      await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
+
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.clickAddGroupButton();
+      await umbracoUi.mediaType.addPropertyEditor(secondDataTypeName, 1);
+      await umbracoUi.mediaType.enterGroupName('TesterGroup', 1);
+      await umbracoUi.mediaType.clickSaveButton();
+    });
+
+    // There a currently frontend issues, when you try to add a property editor you have to click the button twice to focus.
+    test.skip('can create a media type with multiple tabs', async ({page, umbracoApi, umbracoUi}) => {
+    });
+
+    // Nothing happens when you press the composition button
+    test.skip('can create a media type with a composition', async ({umbracoApi, umbracoUi}) => {
+      // Arrange
+      const compositionMediaTypeName = 'CompositionMediaType';
+      await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      const compositionMediaTypeId = await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(compositionMediaTypeName, dataTypeName, dataTypeData.id, groupName);
+      await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
+
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.clickCompositionsButton();
+      await umbracoUi.mediaType.clickButtonWithName(compositionMediaTypeName)
+      // This is needed
+      await umbracoUi.mediaType.clickSubmitButton();
+      await umbracoUi.mediaType.clickSaveButton();
+
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      expect(umbracoUi.mediaType.doesGroupHaveValue(groupName)).toBeTruthy();
+      // Checks if the composition in the media type is correct
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.compositions[0].mediaType.id).toBe(compositionMediaTypeId);
+
+      // Clean
+      await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
+    });
+
+    // Not possible because you can not create two groups in the ui
+    test.skip('can reorder a group in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    });
+
+    // It's not possible to reorder
+    test.skip('can reorder a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+      const dataTypeNameTwo = "Upload Second File";
+      await umbracoApi.mediaType.createMediaTypeWithTwoPropertyEditors(mediaTypeName, dataTypeName, dataTypeData.id, dataTypeNameTwo, dataTypeData.id);
+
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+
+      await umbracoUi.mediaType.clickReorderButton();
+      // Drag and Drop
+      const dragFromLocator = page.getByText(dataTypeNameTwo);
+      const dragToLocator = page.getByText(dataTypeName);
+      await umbracoUi.mediaType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 5);
+      await umbracoUi.mediaType.clickIAmDoneReorderingButton();
+      await umbracoUi.mediaType.clickSaveButton();
+
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.properties[0].name).toBe(dataTypeNameTwo);
+    }
+    );
+
+    test('can add an icon to a media type', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      const iconName = 'icon-bug';
+      await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
+
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await page.getByLabel('icon').click({force: true});
+      await page.getByLabel('Type to filter icons').fill('bug');
+      await page.getByLabel('icon-bug').getByRole('img').click();
+      await umbracoUi.mediaType.clickSubmitButton();
+      await umbracoUi.mediaType.clickSaveButton();
+
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      // Checks if the mediaType has the correct icon
+      await expect(page.locator('umb-unique-tree-item').filter({hasText: mediaTypeName}).locator('[name="' + iconName + '"]')).toBeVisible();
+      const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(mediaTypeData.icon).toBe(iconName);
+    });
   });
 
-  // There a currently frontend issues, when you try to add a property editor you have to click the button twice to focus.
-  test.skip('can create a media type with a property in a tab', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
+  test.describe('Structure Tab', () => {
+    test('can create a media type with allow as root enabled', async ({page, umbracoApi, umbracoUi}) => {
+      // Arrange
+      await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await umbracoUi.mediaType.clickAddTabButton();
-    await umbracoUi.mediaType.enterTabName(tabName);
-    await umbracoUi.mediaType.addPropertyEditor(dataTypeName);
-  });
+      // Act
+      await umbracoUi.mediaType.goToMediaType(mediaTypeName);
+      await umbracoUi.mediaType.clickStructureTab();
+      await umbracoUi.mediaType.clickAllowAtRootButton();
+      await umbracoUi.mediaType.clickSaveButton();
 
-  // There a currently frontend issues, when you try to add a property editor in a tab, you have to click the button twice to focus.
-  test.skip('can create a media type with properties in a group and a tab', async ({page, umbracoApi, umbracoUi}) => {
-  });
+      // Assert
+      await umbracoUi.mediaType.isSuccessNotificationVisible();
+      const documentTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
+      expect(documentTypeData.allowedAsRoot).toBeTruthy();
+    });
 
-  // There a currently frontend issues, when you try to add a property editor to the second group. the editor ends up in the first group
-  test.skip('can create a media type with multiple groups', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    const secondDataTypeName = 'Media Picker';
-    await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
+    // It is currently not possible to add a childNodeType to a mediaType
+    test.skip('can create a media type with an allowed child node type', async ({page, umbracoApi, umbracoUi}) => {
+    });
 
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await umbracoUi.mediaType.clickAddGroupButton();
-    await umbracoUi.mediaType.addPropertyEditor(secondDataTypeName, 1);
-    await umbracoUi.mediaType.enterGroupName('TesterGroup', 1);
-    await umbracoUi.mediaType.clickSaveButton();
-  });
+    // It is currently not possible to add a childNodeType to a mediaType
+    test.skip('can create a media type with multiple allowed child nodes types', async ({page, umbracoApi, umbracoUi}) => {
+    });
 
-  // There a currently frontend issues, when you try to add a property editor you have to click the button twice to focus.
-  test.skip('can create a media type with multiple tabs', async ({page, umbracoApi, umbracoUi}) => {
-
-  });
-
-  // Nothing happens when you press the composition button
-  test.skip('can create a media type with a composition', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const compositionMediaTypeName = 'CompositionMediaType';
-    await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    const compositionMediaTypeId = await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(compositionMediaTypeName, dataTypeName, dataTypeData.id, groupName);
-    await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
-
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await umbracoUi.mediaType.clickCompositionsButton();
-    await umbracoUi.mediaType.clickButtonWithName(compositionMediaTypeName)
-    // This is needed
-    await umbracoUi.mediaType.clickSubmitButton();
-    await umbracoUi.mediaType.clickSaveButton();
-
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    expect(umbracoUi.mediaType.doesGroupHaveValue(groupName)).toBeTruthy();
-    // Checks if the composition in the media type is correct
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    expect(mediaTypeData.compositions[0].mediaType.id).toBe(compositionMediaTypeId);
-
-    // Clean
-    await umbracoApi.mediaType.ensureNameNotExists(compositionMediaTypeName);
-  });
-
-  // Not possible because you can not create two groups in the ui
-  test.skip('can reorder a group in a media type', async ({page, umbracoApi, umbracoUi}) => {
-  });
-
-  // It's not possible to reorder
-  test.skip('can reorder a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    const dataTypeNameTwo = "Upload Second File";
-    await umbracoApi.mediaType.createMediaTypeWithTwoPropertyEditors(mediaTypeName, dataTypeName, dataTypeData.id, dataTypeNameTwo, dataTypeData.id);
-
-    // Act
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-
-    await umbracoUi.mediaType.clickReorderButton();
-    // Drag and Drop
-    const dragFromLocator = page.getByText(dataTypeNameTwo);
-    const dragToLocator = page.getByText(dataTypeName);
-    await umbracoUi.mediaType.dragAndDrop(dragFromLocator, dragToLocator, 0, 0, 5);
-    await umbracoUi.mediaType.clickIAmDoneReorderingButton();
-    await umbracoUi.mediaType.clickSaveButton();
-
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    const mediaTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    expect(mediaTypeData.properties[0].name).toBe(dataTypeNameTwo);
-  });
-
-// Structure
-  test('can create a media type with allow as root enabled', async ({page, umbracoApi, umbracoUi}) => {
-    // Arrange
-    await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
-
-    // Act
-    await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
-    await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-    await umbracoUi.mediaType.clickStructureTab();
-    await umbracoUi.mediaType.clickAllowAtRootButton();
-    await umbracoUi.mediaType.clickSaveButton();
-
-    // Assert
-    await umbracoUi.mediaType.isSuccessNotificationVisible();
-    const documentTypeData = await umbracoApi.mediaType.getByName(mediaTypeName);
-    expect(documentTypeData.allowedAsRoot).toBeTruthy();
-  });
-
-  // It is currently not possible to add a childNodeType to a mediaType
-  test.skip('can create a media type with an allowed child node type', async ({page, umbracoApi, umbracoUi}) => {
-  });
-
-  // It is currently not possible to add a childNodeType to a mediaType
-  test.skip('can create a media type with multiple allowed child nodes types', async ({page, umbracoApi, umbracoUi}) => {
-  });
-
-  // It is currently not possible enable display children in a collection view
-  test.skip('can create a media type with display children in a collection view enabled', async ({page, umbracoApi, umbracoUi}) => {
+    // It is currently not possible enable display children in a collection view
+    test.skip('can create a media type with display children in a collection view enabled', async ({page, umbracoApi, umbracoUi}) => {
+    });
   });
 });
