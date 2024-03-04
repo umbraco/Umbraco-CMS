@@ -11,6 +11,7 @@ import type { DataTypeReferenceResponseModel } from '../models/DataTypeReference
 import type { DataTypeResponseModel } from '../models/DataTypeResponseModel';
 import type { FolderResponseModel } from '../models/FolderResponseModel';
 import type { MoveDataTypeRequestModel } from '../models/MoveDataTypeRequestModel';
+import type { PagedDataTypeItemResponseModel } from '../models/PagedDataTypeItemResponseModel';
 import type { PagedDataTypeTreeItemResponseModel } from '../models/PagedDataTypeTreeItemResponseModel';
 import type { UpdateDataTypeRequestModel } from '../models/UpdateDataTypeRequestModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
@@ -328,6 +329,39 @@ export class DataTypeResource {
     }
 
     /**
+     * @returns PagedDataTypeItemResponseModel Success
+     * @throws ApiError
+     */
+    public static getFilterDataType({
+        skip,
+        take = 100,
+        name = '',
+        editorUiAlias,
+        editorAlias,
+    }: {
+        skip?: number,
+        take?: number,
+        name?: string,
+        editorUiAlias?: string,
+        editorAlias?: string,
+    }): CancelablePromise<PagedDataTypeItemResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/filter/data-type',
+            query: {
+                'skip': skip,
+                'take': take,
+                'name': name,
+                'editorUiAlias': editorUiAlias,
+                'editorAlias': editorAlias,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns any Success
      * @throws ApiError
      */
@@ -341,27 +375,6 @@ export class DataTypeResource {
             url: '/umbraco/management/api/v1/item/data-type',
             query: {
                 'id': id,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getItemDataTypeByAlias({
-        alias,
-    }: {
-        alias: string,
-    }): CancelablePromise<DataTypeItemResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/item/data-type/{alias}',
-            path: {
-                'alias': alias,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
