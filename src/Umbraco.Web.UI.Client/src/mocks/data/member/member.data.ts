@@ -19,11 +19,11 @@ export const data: Array<UmbMockMemberModel> = [
 		values: [],
 		variants: [
 			{
-				name: 'Member 1',
 				culture: 'en-us',
 				segment: null,
-				createDate: '2023-02-06T15:31:46.876902',
-				updateDate: '2023-02-06T15:31:51.354764',
+				name: 'The Simplest Member',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
 			},
 		],
 	},
@@ -43,11 +43,11 @@ export const data: Array<UmbMockMemberModel> = [
 		values: [],
 		variants: [
 			{
-				name: 'Member 2',
 				culture: 'en-us',
 				segment: null,
-				createDate: '2023-02-06T15:31:46.876902',
-				updateDate: '2023-02-06T15:31:51.354764',
+				name: 'The Simplest Member',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
 			},
 		],
 	},

@@ -8,9 +8,10 @@ export const UMB_MEMBER_COLLECTION_ALIAS = 'Umb.Collection.Member';
 
 const collectionManifest: ManifestTypes = {
 	type: 'collection',
-	kind: 'default',
 	alias: UMB_MEMBER_COLLECTION_ALIAS,
 	name: 'Member Collection',
+	api: () => import('./member-collection.context.js'),
+	element: () => import('./member-collection.element.js'),
 	meta: {
 		repositoryAlias: UMB_MEMBER_COLLECTION_REPOSITORY_ALIAS,
 	},
