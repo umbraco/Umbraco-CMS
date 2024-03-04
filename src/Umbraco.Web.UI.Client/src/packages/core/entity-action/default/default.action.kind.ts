@@ -1,6 +1,6 @@
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifest: UmbBackofficeManifestKind = {
+export const UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST: UmbBackofficeManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.EntityAction.Default',
 	matchKind: 'default',
@@ -16,3 +16,5 @@ export const manifest: UmbBackofficeManifestKind = {
 		},
 	},
 };
+
+export const manifest = UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST;

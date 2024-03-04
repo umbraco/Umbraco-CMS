@@ -10,3 +10,5 @@ export class UmbSortChildrenOfEntityAction extends UmbEntityActionBase<any> {
 		console.log(`execute sort for: ${this.args.unique}`);
 	}
 }
+
+export default UmbSortChildrenOfEntityAction;

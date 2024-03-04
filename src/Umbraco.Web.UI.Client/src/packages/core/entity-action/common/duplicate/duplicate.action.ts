@@ -5,12 +5,12 @@ import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-ap
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { MetaEntityActionDuplicateKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import type { UmbCopyRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbDuplicateRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateKind> {
 	// TODO: make base type for item and detail models
 	#itemRepository?: UmbItemRepository<any>;
-	#duplicateRepository?: UmbCopyRepository;
+	#duplicateRepository?: UmbDuplicateRepository;
 	#init: Promise<unknown>;
 
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<MetaEntityActionDuplicateKind>) {
@@ -35,7 +35,7 @@ export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActi
 				this.args.meta.duplicateRepositoryAlias,
 				[this._host],
 				(permitted, ctrl) => {
-					this.#duplicateRepository = permitted ? (ctrl.api as UmbCopyRepository) : undefined;
+					this.#duplicateRepository = permitted ? (ctrl.api as UmbDuplicateRepository) : undefined;
 				},
 			).asPromise(),
 		]);
@@ -46,9 +46,11 @@ export class UmbDuplicateEntityAction extends UmbEntityActionBase<MetaEntityActi
 		await this.#init;
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this, this.args.meta.pickerModalAlias) as any; // TODO: make generic picker interface with selection
+		const modalContext = modalManager.open(this, this.args.meta.pickerModal) as any; // TODO: make generic picker interface with selection
 		const value = await modalContext.onSubmit();
 		if (!value) return;
-		await this.#duplicateRepository!.copy(this.args.unique, value.selection[0]);
+		await this.#duplicateRepository!.duplicate(this.args.unique, value.selection[0]);
 	}
 }
+
+export default UmbDuplicateEntityAction;

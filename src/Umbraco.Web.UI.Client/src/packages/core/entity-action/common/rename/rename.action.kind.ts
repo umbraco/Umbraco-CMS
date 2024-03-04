@@ -1,4 +1,4 @@
-import { UmbRenameEntityAction } from './rename.action.js';
+import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '../../default/default.action.kind.js';
 import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbBackofficeManifestKind = {
@@ -7,9 +7,10 @@ export const manifest: UmbBackofficeManifestKind = {
 	matchKind: 'rename',
 	matchType: 'entityAction',
 	manifest: {
+		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'rename',
-		api: UmbRenameEntityAction,
+		api: () => import('./rename.action.js'),
 		weight: 200,
 		forEntityTypes: [],
 		meta: {

@@ -1,7 +1,7 @@
 import type {
 	ManifestModal,
 	ManifestWorkspace,
-	ManifestWorkspaceAction,
+	ManifestWorkspaceActions,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -56,7 +56,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-const workspaceActions: Array<ManifestWorkspaceAction> = [];
+const workspaceActions: Array<ManifestWorkspaceActions> = [];
 
 const modals: Array<ManifestModal> = [
 	{
