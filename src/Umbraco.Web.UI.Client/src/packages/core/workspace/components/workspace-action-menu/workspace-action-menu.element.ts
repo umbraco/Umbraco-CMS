@@ -1,25 +1,50 @@
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, customElement, property, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { ManifestTypes, ManifestWorkspaceActionMenuItem } from '@umbraco-cms/backoffice/extension-registry';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import {
+	umbExtensionsRegistry,
+	type ManifestWorkspaceActionMenuItem,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UUIInterfaceColor, UUIInterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+import {
+	type UmbExtensionElementAndApiInitializer,
+	UmbExtensionsElementAndApiInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
 
+function ExtensionApiArgsMethod(manifest: ManifestWorkspaceActionMenuItem) {
+	return [{ meta: manifest.meta }];
+}
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
-	#workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
-	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'workspaceActionMenuItem'>;
+	#extensionsController?: UmbExtensionsElementAndApiInitializer<
+		ManifestWorkspaceActionMenuItem,
+		'workspaceActionMenuItem',
+		ManifestWorkspaceActionMenuItem
+	>;
 
 	/**
 	 * The workspace actions to filter the available actions by.
 	 * @example ['Umb.WorkspaceAction.Document.Save', 'Umb.WorkspaceAction.Document.SaveAndPublishNew']
 	 */
 	@property({ attribute: false })
-	forWorkspaceActions: Array<string> = [];
+	public set forWorkspaceActions(value: Array<string>) {
+		if (value === this._forWorkspaceActions) return;
+		this._forWorkspaceActions = value;
+		this._filter = (action) => {
+			return Array.isArray(action.forWorkspaceActions)
+				? action.forWorkspaceActions.some((alias) => this.forWorkspaceActions.includes(alias))
+				: this.forWorkspaceActions.includes(action.forWorkspaceActions);
+		};
+		this.#observeExtensions();
+	}
+	public get forWorkspaceActions(): Array<string> {
+		return this._forWorkspaceActions;
+	}
+	private _forWorkspaceActions: Array<string> = [];
+
+	@state()
+	_filter?: (action: ManifestWorkspaceActionMenuItem) => boolean;
 
 	@property()
 	look: UUIInterfaceLook = 'secondary';
@@ -28,48 +53,31 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	color: UUIInterfaceColor = 'default';
 
 	@state()
-	private _actions: Array<UmbExtensionElementInitializer<ManifestWorkspaceActionMenuItem, never>> = [];
+	_items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
 
 	@state()
 	_popoverOpen = false;
 
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
-			this.#workspaceContext = context;
-			this.#initialise();
-		});
-	}
-
-	#initialise() {
-		if (!this.#workspaceContext) throw new Error('No workspace context');
-
-		// If there are no workspace action aliases, then there is no need to initialize the actions.
-		if (!this.forWorkspaceActions.length) return;
-
-		const unique = this.#workspaceContext.getUnique();
-		const entityType = this.#workspaceContext.getEntityType();
-
-		this.#actionsInitializer = new UmbExtensionsElementInitializer(
-			this,
-			umbExtensionsRegistry,
-			'workspaceActionMenuItem', // TODO: Stop using string for 'workspaceActionMenuItem', we need to start using Const.
-			(action) => {
-				const containsAlias = Array.isArray(action.forWorkspaceActions)
-					? action.forWorkspaceActions.some((alias) => this.forWorkspaceActions.includes(alias))
-					: this.forWorkspaceActions.includes(action.forWorkspaceActions);
-				//const isValidEntityType = !action.forEntityTypes.length || action.forEntityTypes.includes(entityType);
-				return containsAlias; // && isValidEntityType;
-			},
-			(ctrls) => {
-				this._actions = ctrls;
-			},
-			'workspaceActionExtensionsInitializer',
-			'umb-entity-action',
-		);
-
-		this.#actionsInitializer.properties = { unique, entityType };
+	#observeExtensions(): void {
+		this.#extensionsController?.destroy();
+		if (this._filter) {
+			this.#extensionsController = new UmbExtensionsElementAndApiInitializer<
+				ManifestWorkspaceActionMenuItem,
+				'workspaceActionMenuItem',
+				ManifestWorkspaceActionMenuItem
+			>(
+				this,
+				umbExtensionsRegistry,
+				'workspaceActionMenuItem',
+				ExtensionApiArgsMethod,
+				this._filter,
+				(extensionControllers) => {
+					this._items = extensionControllers;
+				},
+				undefined, // We can leave the alias to undefined, as we destroy this our selfs.
+			);
+			//this.#extensionsController.elementProperties = this.#elProps;
+		}
 	}
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -78,8 +86,13 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		this._popoverOpen = event.newState === 'open';
 	}
 
+	#onActionExecuted(event: MouseEvent) {
+		// TODO: Explicit close the popover?
+		// Should we stop the event as well?
+	}
+
 	render() {
-		return this._actions.length > 0
+		return this._items && this._items.length > 0
 			? html`
 					<uui-button
 						id="popover-trigger"
@@ -97,11 +110,13 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 						@toggle=${this.#onPopoverToggle}>
 						<umb-popover-layout>
 							<uui-scroll-container>
-								${repeat(
-									this._actions,
-									(action) => action.alias,
-									(action) => action.component,
-								)}
+								${this._items.length > 0
+									? repeat(
+											this._items,
+											(ext) => ext.alias,
+											(ext) => ext.component,
+									  )
+									: ''}
 							</uui-scroll-container>
 						</umb-popover-layout>
 					</uui-popover-container>
@@ -117,6 +132,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			}
 
 			#expand-symbol {
+				/* TODO: remove this hack and use a proper UUI symbol for this */
 				transform: rotate(-90deg);
 			}
 

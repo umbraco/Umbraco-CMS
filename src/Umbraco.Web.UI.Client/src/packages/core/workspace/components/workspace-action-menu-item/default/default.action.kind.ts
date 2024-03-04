@@ -4,12 +4,12 @@ export const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.WorkspaceAction.Default',
 	matchKind: 'default',
-	matchType: 'workspaceAction',
+	matchType: 'workspaceActionMenuItem',
 	manifest: {
-		type: 'workspaceAction',
+		type: 'workspaceActionMenuItem',
 		kind: 'default',
 		weight: 1000,
-		element: () => import('./workspace-action.element.js'),
+		element: () => import('./workspace-action-menu-item.element.js'),
 		meta: {
 			icon: '',
 			label: '(Missing label in manifest)',
