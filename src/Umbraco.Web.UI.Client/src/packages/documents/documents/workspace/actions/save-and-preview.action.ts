@@ -8,5 +8,6 @@ export class UmbDocumentSaveAndPreviewWorkspaceAction extends UmbWorkspaceAction
 		// TODO: handle errors
 		//if (!document) return;
 		//this.workspaceContext.repository?.saveAndPreview();
+		//Remember to return a promise.
 	}
 }

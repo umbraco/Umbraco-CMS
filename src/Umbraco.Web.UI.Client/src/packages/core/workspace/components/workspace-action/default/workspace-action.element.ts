@@ -8,7 +8,7 @@ import type {
 	MetaWorkspaceActionDefaultKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-import '../workspace-action-menu/index.js';
+import '../../workspace-action-menu/index.js';
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement<

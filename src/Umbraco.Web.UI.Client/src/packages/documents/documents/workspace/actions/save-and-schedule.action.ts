@@ -5,5 +5,6 @@ export class UmbSaveAndScheduleDocumentWorkspaceAction extends UmbWorkspaceActio
 	async execute() {
 		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
 		//workspaceContext.repository.saveAndSchedule();
+		//Remember to return a promise.
 	}
 }
