@@ -214,7 +214,7 @@
 		"msw": "^1.3.2",
 		"openapi-typescript-codegen": "0.25.0",
 		"playwright-msw": "^3.0.1",
-		"prettier": "3.0.3",
+		"prettier": "3.2.5",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"remark-gfm": "^3.0.1",
