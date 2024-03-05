@@ -5,13 +5,17 @@ import type {
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbBlockEntryShowContentEditCondition
 	extends UmbConditionBase<BlockEntryShowContentEditConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(args: UmbConditionControllerArguments<BlockEntryShowContentEditConditionConfig>) {
-		super(args);
+	constructor(
+		host: UmbControllerHost,
+		args: UmbConditionControllerArguments<BlockEntryShowContentEditConditionConfig>,
+	) {
+		super(host, args);
 
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.observe(
