@@ -9,6 +9,7 @@ import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertySettingsModalValue, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { focus } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 // TODO: Could base take a token to get its types?.
 @customElement('umb-property-settings-modal')
@@ -92,10 +93,12 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
+		/*
 		// TODO: Make a general way to put focus on a input in a modal. (also make sure it only happens if its the top-most-modal.)
 		requestAnimationFrame(() => {
 			(this.shadowRoot!.querySelector('#name-input') as HTMLElement).focus();
 		});
+		*/
 	}
 
 	#onSubmit(event: SubmitEvent) {
@@ -233,6 +236,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 									<!-- TODO: Align styling across this and the property of document type workspace editor, or consider if this can go away for a different UX flow -->
 									<uui-input
 										id="name-input"
+										${focus()}
 										name="name"
 										label="property name (TODO: Localize)"
 										@input=${this.#onNameChange}
@@ -357,7 +361,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 							name="pattern-message"
 							@change=${this.#onValidationMessageChange}
 							.value=${this.value.validation?.regExMessage ?? ''}></uui-textarea>
-				  `
+					`
 				: nothing} `;
 	}
 
