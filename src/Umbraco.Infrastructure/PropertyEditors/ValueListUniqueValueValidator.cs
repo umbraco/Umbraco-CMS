@@ -19,38 +19,22 @@ public class ValueListUniqueValueValidator : IValueValidator
 
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
     {
-        string[]? items = null;
-
-        switch (value)
+        if (value is null)
         {
-            case string stringValue:
-                if (!string.IsNullOrWhiteSpace(stringValue))
-                {
-                    try
-                    {
-                        items = _configurationEditorJsonSerializer.Deserialize<string[]>(stringValue);
-                    }
-                    catch
-                    {
-                        // swallow and report error below
-                    }
-                }
-                break;
+            yield break;
+        }
 
-            case string[] stringArray:
-                items = stringArray;
-                break;
-
-            case List<string> stringList:
-                items = stringList.ToArray();
-                break;
-
-            case IEnumerable<string> stringEnumerable:
-                items = stringEnumerable.ToArray();
-                break;
-
-            default:
-                break;
+        var items = value as IEnumerable<string>;
+        if (items is null)
+        {
+            try
+            {
+                items = _configurationEditorJsonSerializer.Deserialize<string[]>(value.ToString() ?? string.Empty);
+            }
+            catch
+            {
+                // swallow and report error below
+            }
         }
 
         if (items is null)
