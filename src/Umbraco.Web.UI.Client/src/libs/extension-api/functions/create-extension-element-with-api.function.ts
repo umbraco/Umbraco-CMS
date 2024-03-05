@@ -61,9 +61,37 @@ export async function createExtensionElementWithApi<
 		return { element, api };
 	}
 
-	console.error(
-		`-- Extension of alias "${manifest.alias}" did not succeed creating an element with api, missing one or two JavaScript files via the 'element' and 'api' or the 'js' property or with just 'api' and the Element Name in 'elementName' in the manifest.`,
-		manifest,
-	);
+	// Debug messages:
+	if (!element && apiConstructor) {
+		// If we have a elementPropValue, that means that element or js property was defined, but the element was not created.
+		if (elementPropValue) {
+			console.error(
+				`-- Extension of alias "${manifest.alias}" did not succeed creating an Element with Api, Api was created but the imported Element JS file did not export a 'element' or 'default'. Alternatively define the 'elementName' in the manifest.`,
+				manifest,
+			);
+		} else {
+			console.error(
+				`-- Extension of alias "${manifest.alias}" did not succeed creating an Element with Api, Api was created but the Element was missing a JavaScript file via the 'element' or the 'js' property. Alternatively define a Element Name in 'elementName' in the manifest.`,
+				manifest,
+			);
+		}
+	} else if (element && !apiConstructor) {
+		if (apiPropValue) {
+			console.error(
+				`-- Extension of alias "${manifest.alias}" did not succeed creating an Element with Api, Element was created but the imported Api JS file did not export a 'api' or 'default'.`,
+				manifest,
+			);
+		} else {
+			console.error(
+				`-- Extension of alias "${manifest.alias}" did not succeed creating an Element with Api, Element was created but the Api is missing a JavaScript file via the 'api' or 'js' property.`,
+				manifest,
+			);
+		}
+	} else {
+		console.error(
+			`-- Extension of alias "${manifest.alias}" did not succeed creating an Element with Api, neither an Element or Api was created, missing one or two JavaScript files via the 'element' and 'api' or the 'js' property or with just 'api' and the Element Name in 'elementName' in the manifest.`,
+			manifest,
+		);
+	}
 	return {};
 }
