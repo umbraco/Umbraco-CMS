@@ -39,6 +39,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	#masterTemplateUnique: string | null = null;
 
+	// TODO: Revisit this code, to not use RxJS directly:
 	private inputQuery$ = new Subject<string>();
 
 	constructor() {

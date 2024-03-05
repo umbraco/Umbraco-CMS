@@ -8,7 +8,7 @@
  * @example <caption>Example append new entry for a Array. Where the key is unique and the item will be updated if matched with existing.</caption>
  * const entry = {key: 'myKey', value: 'myValue'};
  * const newDataSet = pushToUniqueArray([], entry, x => x.key === key);
- * mySubject.next(newDataSet);
+ * myState.setValue(newDataSet);
  */
 export function pushToUniqueArray<T>(data: T[], entry: T, getUniqueMethod: (entry: T) => unknown): T[] {
 	const unique = getUniqueMethod(entry);
