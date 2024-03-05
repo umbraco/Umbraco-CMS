@@ -79,9 +79,12 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const queryBuilderModal = modalManager.open(this, UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
-		queryBuilderModal?.onSubmit().then((queryBuilderModalValue) => {
-			if (queryBuilderModalValue.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
-		});
+		queryBuilderModal
+			?.onSubmit()
+			.then((queryBuilderModalValue) => {
+				if (queryBuilderModalValue.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
+			})
+			.catch(() => undefined);
 	}
 
 	#renderCodeEditor() {

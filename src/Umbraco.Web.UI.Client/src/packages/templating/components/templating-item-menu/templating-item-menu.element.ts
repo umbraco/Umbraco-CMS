@@ -59,9 +59,12 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	async #openTemplatingItemPickerModal() {
 		const itemPickerContext = this.#modalContext?.open(this, UMB_TEMPLATING_ITEM_PICKER_MODAL);
-		await itemPickerContext?.onSubmit();
+		const result = await itemPickerContext?.onSubmit().catch(() => undefined);
+
+		if (result === undefined) return;
 
 		const value = itemPickerContext?.getValue();
+
 		if (!value) return;
 
 		this.determineInsertValue(value);
@@ -69,33 +72,42 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	async #openPartialViewPickerModal() {
 		const partialViewPickerContext = this.#modalContext?.open(this, UMB_PARTIAL_VIEW_PICKER_MODAL);
-		await partialViewPickerContext?.onSubmit();
+		const result = await partialViewPickerContext?.onSubmit().catch(() => undefined);
 
-		const path = partialViewPickerContext?.getValue().selection[0];
-		if (!path) return;
+		if (result === undefined) return;
 
-		this.determineInsertValue({ type: CodeSnippetType.partialView, value: path });
+		const value = partialViewPickerContext?.getValue().selection[0];
+
+		if (!value) return;
+
+		this.determineInsertValue({ type: CodeSnippetType.partialView, value });
 	}
 
 	async #openDictionaryItemPickerModal() {
 		const dictionaryItemPickerContext = this.#modalContext?.open(this, UMB_DICTIONARY_ITEM_PICKER_MODAL);
-		await dictionaryItemPickerContext?.onSubmit();
+		const result = await dictionaryItemPickerContext?.onSubmit().catch(() => undefined);
 
-		const item = dictionaryItemPickerContext?.getValue().selection[0];
-		if (!item) return;
+		if (result === undefined) return;
 
-		this.determineInsertValue({ type: CodeSnippetType.dictionaryItem, value: item });
+		const value = dictionaryItemPickerContext?.getValue().selection[0];
+
+		if (!value) return;
+
+		this.determineInsertValue({ type: CodeSnippetType.dictionaryItem, value });
 	}
 
 	async #openPageFieldBuilderModal() {
 		const pageFieldBuilderContext = this.#modalContext?.open(this, UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
-		await pageFieldBuilderContext?.onSubmit();
+		const result = await pageFieldBuilderContext?.onSubmit().catch(() => undefined);
 
-		const output = pageFieldBuilderContext?.getValue().output;
-		if (!output) return;
+		if (result === undefined) return;
+
+		const value = pageFieldBuilderContext?.getValue().output;
+
+		if (!value) return;
 
 		// The output is already built due to the preview in the modal. Can insert it directly now.
-		this.value = output;
+		this.value = value;
 		this.#dispatchInsertEvent();
 	}
 
