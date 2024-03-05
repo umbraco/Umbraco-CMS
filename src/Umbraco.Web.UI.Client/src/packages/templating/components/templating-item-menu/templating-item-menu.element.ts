@@ -59,44 +59,50 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	async #openTemplatingItemPickerModal() {
 		const itemPickerContext = this.#modalContext?.open(this, UMB_TEMPLATING_ITEM_PICKER_MODAL);
-		await itemPickerContext?.onSubmit();
-
-		const value = itemPickerContext?.getValue();
-		if (!value) return;
-
-		this.determineInsertValue(value);
+		await itemPickerContext
+			?.onSubmit()
+			.then((value) => {
+				if (value) this.determineInsertValue(value);
+			})
+			.catch(() => undefined);
 	}
 
 	async #openPartialViewPickerModal() {
 		const partialViewPickerContext = this.#modalContext?.open(this, UMB_PARTIAL_VIEW_PICKER_MODAL);
-		await partialViewPickerContext?.onSubmit();
-
-		const path = partialViewPickerContext?.getValue().selection[0];
-		if (!path) return;
-
-		this.determineInsertValue({ type: CodeSnippetType.partialView, value: path });
+		await partialViewPickerContext
+			?.onSubmit()
+			.then((value) => {
+				if (value.selection[0]) {
+					this.determineInsertValue({ type: CodeSnippetType.partialView, value: value.selection[0] });
+				}
+			})
+			.catch(() => undefined);
 	}
 
 	async #openDictionaryItemPickerModal() {
 		const dictionaryItemPickerContext = this.#modalContext?.open(this, UMB_DICTIONARY_ITEM_PICKER_MODAL);
-		await dictionaryItemPickerContext?.onSubmit();
-
-		const item = dictionaryItemPickerContext?.getValue().selection[0];
-		if (!item) return;
-
-		this.determineInsertValue({ type: CodeSnippetType.dictionaryItem, value: item });
+		await dictionaryItemPickerContext
+			?.onSubmit()
+			.then((value) => {
+				if (value.selection[0]) {
+					this.determineInsertValue({ type: CodeSnippetType.dictionaryItem, value: value.selection[0] });
+				}
+			})
+			.catch(() => undefined);
 	}
 
 	async #openPageFieldBuilderModal() {
 		const pageFieldBuilderContext = this.#modalContext?.open(this, UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
-		await pageFieldBuilderContext?.onSubmit();
-
-		const output = pageFieldBuilderContext?.getValue().output;
-		if (!output) return;
-
-		// The output is already built due to the preview in the modal. Can insert it directly now.
-		this.value = output;
-		this.#dispatchInsertEvent();
+		await pageFieldBuilderContext
+			?.onSubmit()
+			.then((value) => {
+				if (value.output) {
+					// The output is already built due to the preview in the modal. Can insert it directly now.
+					this.value = value.output;
+					this.#dispatchInsertEvent();
+				}
+			})
+			.catch(() => undefined);
 	}
 
 	#dispatchInsertEvent() {
