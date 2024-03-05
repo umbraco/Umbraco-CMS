@@ -1,4 +1,13 @@
-import { css, html, nothing, customElement, property, query, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	nothing,
+	customElement,
+	property,
+	query,
+	ifDefined,
+	state,
+} from '@umbraco-cms/backoffice/external/lit';
 import type { UUIColorPickerElement, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -10,6 +19,23 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 @customElement('umb-multiple-color-picker-item-input')
 export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(UmbLitElement) {
+	@property({ type: String })
+	public set value(value: string) {
+		if (value.startsWith('#')) {
+			this._valueHex = value;
+			super.value = value.substring(1);
+		} else {
+			super.value = value;
+			this._valueHex = `#${value}`;
+		}
+	}
+	public get value() {
+		return super.value as string;
+	}
+
+	@state()
+	private _valueHex = '';
+
 	/**
 	 * Disables the input
 	 * @type {boolean}
@@ -65,13 +91,13 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 
 	#onValueChange(event: UUIInputEvent) {
 		event.stopPropagation();
-		this.value = event.target.value;
+		this.value = event.target.value as string;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onValueInput(event: UUIInputEvent) {
 		event.stopPropagation();
-		this.value = event.target.value;
+		this.value = event.target.value as string;
 		this.dispatchEvent(new UmbInputEvent());
 	}
 
@@ -123,7 +149,7 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 							<uui-color-swatch
 								slot="prepend"
 								label=${this.value}
-								value="${this.value}"
+								value="${this._valueHex}"
 								@click=${this.#onColorClick}></uui-color-swatch>
 						</uui-input>
 						<input aria-hidden="${true}" type="color" id="color" value=${this.value} @input=${this.#onColorInput} />
