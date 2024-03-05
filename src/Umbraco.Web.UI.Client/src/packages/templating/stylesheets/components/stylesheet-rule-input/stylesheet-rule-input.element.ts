@@ -41,7 +41,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 			.catch(() => undefined);
 	};
 
-	#editRule = async (rule: UmbStylesheetRule, index: number) => {
+	#editRule = (rule: UmbStylesheetRule, index: number) => {
 		this.#openRuleSettings(rule)
 			.then((value) => {
 				if (!value.rule) return;
