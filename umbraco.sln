@@ -152,25 +152,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.UI", "src\Umbra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Api.Common", "src\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj", "{D48B5D6B-82FF-4235-986C-CDE646F41DEC}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.New.Client", "src\Umbraco.Web.UI.New.Client\", "{D88A926B-E8D6-495A-A2ED-8EFD0C847C62}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "src\Umbraco.Web.UI.Client\", "{D88A926B-E8D6-495A-A2ED-8EFD0C847C62}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_55211"
-		Debug.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.New.Client\"
+		Debug.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.Client\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55211\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/localhost_55211"
-		Release.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.New.Client\"
+		Release.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.Client\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55211\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "55211"
-		SlnRelativePath = "src\Umbraco.Web.UI.New.Client\"
+		SlnRelativePath = "src\Umbraco.Web.UI.Client\"
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Api.Delivery", "src\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj", "{9AA3D21F-81A9-4F27-85D1-CE850B59DC2D}"
