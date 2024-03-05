@@ -23,7 +23,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 
 	async firstUpdated() {
 		const mediaUnique = this.data?.parent.unique;
-		const mediaTypeUnique = this.data?.mediaType.unique || null;
+		const mediaTypeUnique = this.data?.mediaType?.unique || null;
 
 		this.#retrieveAllowedMediaTypesOf(mediaTypeUnique);
 

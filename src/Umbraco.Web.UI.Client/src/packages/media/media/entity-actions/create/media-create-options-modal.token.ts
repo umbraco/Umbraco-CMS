@@ -7,7 +7,7 @@ export interface UmbMediaCreateOptionsModalData {
 	};
 	mediaType: {
 		unique: string;
-	};
+	} | null;
 }
 
 export interface UmbMediaCreateOptionsModalValue {}
