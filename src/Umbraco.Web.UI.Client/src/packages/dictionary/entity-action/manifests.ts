@@ -68,12 +68,6 @@ const entityActions: Array<ManifestTypes> = [
 const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.Dictionary.Create',
-		name: 'Create Dictionary Modal',
-		element: () => import('./create/create-dictionary-modal.element.js'),
-	},
-	{
-		type: 'modal',
 		alias: 'Umb.Modal.Dictionary.Export',
 		name: 'Export Dictionary Modal',
 		element: () => import('./export/export-dictionary-modal.element.js'),
