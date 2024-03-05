@@ -4,31 +4,13 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { UmbRenameDataSource, UmbRenameDataSourceConstructor } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 
 export abstract class UmbRenameRepositoryBase<DetailModelType extends { unique: string }> extends UmbRepositoryBase {
-	#detailStore?: UmbDetailStore<DetailModelType>;
 	#renameSource: UmbRenameDataSource<DetailModelType>;
-	#notificationContext?: UmbNotificationContext;
-	#init: Promise<unknown>;
 
-	constructor(
-		host: UmbControllerHost,
-		detailSource: UmbRenameDataSourceConstructor<DetailModelType>,
-		detailStoreContextAlias: string | UmbContextToken<any, any>,
-	) {
+	constructor(host: UmbControllerHost, detailSource: UmbRenameDataSourceConstructor<DetailModelType>) {
 		super(host);
 		this.#renameSource = new detailSource(host);
-
-		this.#init = Promise.all([
-			this.consumeContext(detailStoreContextAlias, (instance) => {
-				this.#detailStore = instance;
-			}).asPromise(),
-
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
-				this.#notificationContext = instance;
-			}).asPromise(),
-		]);
 	}
 
 	/**
@@ -41,17 +23,13 @@ export abstract class UmbRenameRepositoryBase<DetailModelType extends { unique: 
 	async rename(unique: string, name: string) {
 		if (!unique) throw new Error('Unique is missing');
 		if (!name) throw new Error('Name is missing');
-		await this.#init;
 
 		const { data, error } = await this.#renameSource.rename(unique, name);
 
 		if (data) {
-			this.#detailStore?.removeItem(unique);
-			this.#detailStore?.append(data);
-
-			// TODO: how do we handle generic notifications? Is this the correct place to do it?
+			const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 			const notification = { data: { message: `Renamed` } };
-			this.#notificationContext!.peek('positive', notification);
+			notificationContext.peek('positive', notification);
 		}
 
 		return { data, error };
