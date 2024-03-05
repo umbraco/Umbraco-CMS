@@ -1,6 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { UmbObjectState } from './states/object-state.js';
 import { UmbObserverController } from './observer.controller.js';
+import { simpleHashCode } from './utils/simple-hash-code.function.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 
@@ -48,8 +49,8 @@ describe('UmbObserverController', () => {
 
 			const callbackMethod = (state: unknown) => {};
 
-			const firstCtrl = new UmbObserverController(hostElement, observable, callbackMethod);
-			const secondCtrl = new UmbObserverController(hostElement, observable, callbackMethod);
+			const firstCtrl = new UmbObserverController(hostElement, observable, callbackMethod, undefined);
+			const secondCtrl = new UmbObserverController(hostElement, observable, callbackMethod, undefined);
 
 			expect(hostElement.hasController(firstCtrl)).to.be.false;
 			expect(hostElement.hasController(secondCtrl)).to.be.true;
@@ -61,8 +62,15 @@ describe('UmbObserverController', () => {
 
 			const callbackMethod = (state: unknown) => {};
 
-			const firstCtrl = new UmbObserverController(hostElement, observable, callbackMethod, null);
-			const secondCtrl = new UmbObserverController(hostElement, observable, callbackMethod, null);
+			// Imitates the behavior of the observe method in the UmbClassMixin
+			let controllerAlias1 = null;
+			controllerAlias1 ??= controllerAlias1 === undefined ? simpleHashCode(callbackMethod.toString()) : undefined;
+
+			const firstCtrl = new UmbObserverController(hostElement, observable, callbackMethod, controllerAlias1);
+
+			let controllerAlias2 = null;
+			controllerAlias2 ??= controllerAlias2 === undefined ? simpleHashCode(callbackMethod.toString()) : undefined;
+			const secondCtrl = new UmbObserverController(hostElement, observable, callbackMethod, controllerAlias2);
 
 			expect(hostElement.hasController(firstCtrl)).to.be.true;
 			expect(hostElement.hasController(secondCtrl)).to.be.true;
