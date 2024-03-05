@@ -22,7 +22,6 @@ export * from './input-list-base/index.js';
 export * from './input-multi-url/index.js';
 export * from './input-number-range/index.js';
 export * from './input-radio-button-list/index.js';
-export * from './input-section/index.js';
 export * from './input-slider/index.js';
 export * from './input-tree-picker-source/index.js';
 export * from './input-toggle/index.js';

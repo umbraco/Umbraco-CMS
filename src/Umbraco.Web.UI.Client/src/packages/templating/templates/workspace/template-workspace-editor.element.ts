@@ -8,7 +8,8 @@ import { toCamelCase } from '@umbraco-cms/backoffice/utils';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -39,6 +40,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	#masterTemplateUnique: string | null = null;
 
+	// TODO: Revisit this code, to not use RxJS directly:
 	private inputQuery$ = new Subject<string>();
 
 	constructor() {

@@ -2,10 +2,10 @@ import type { UmbTemplateCardElement } from '../template-card/template-card.elem
 import '../template-card/template-card.element.js';
 import type { UmbTemplateItemModel } from '../../repository/item/index.js';
 import { UmbTemplateItemRepository } from '../../repository/item/index.js';
+import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
-	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,

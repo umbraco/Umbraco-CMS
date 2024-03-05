@@ -8,16 +8,12 @@ import type {
 } from './query-builder-modal.token.js';
 import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbModalBaseElement,
-	UMB_DOCUMENT_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type {
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
+import { UmbDocumentItemRepository, UMB_DOCUMENT_PICKER_MODAL } from '@umbraco-cms/backoffice/document';
 import './query-builder-filter.element.js';
 
 enum SortOrder {

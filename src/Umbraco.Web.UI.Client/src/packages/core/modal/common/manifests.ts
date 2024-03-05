@@ -27,12 +27,6 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.SectionPicker',
-		name: 'Section Picker Modal',
-		js: () => import('./section-picker/section-picker-modal.element.js'),
-	},
-	{
-		type: 'modal',
 		alias: 'Umb.Modal.CodeEditor',
 		name: 'Code Editor Modal',
 		js: () => import('./code-editor/code-editor-modal.element.js'),
