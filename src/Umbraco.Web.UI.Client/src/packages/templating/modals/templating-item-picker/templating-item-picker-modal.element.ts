@@ -34,34 +34,35 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 
 	async #openTemplatingPageFieldModal() {
 		const pageFieldBuilderContext = this.#modalContext?.open(this, UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
-		await pageFieldBuilderContext
-			?.onSubmit()
-			.then((value) => {
-				if (value.output) {
-					this.value = { value: value.output, type: CodeSnippetType.pageField };
-					this.modalContext?.submit();
-				}
-			})
-			.catch(() => undefined);
+		const result = await pageFieldBuilderContext?.onSubmit().catch(() => undefined);
+
+		if (result === undefined) return;
+
+		const value = pageFieldBuilderContext?.getValue().output;
+
+		if (!value) return;
+
+		this.value = { value, type: CodeSnippetType.pageField };
+		this.modalContext?.submit();
 	}
 
 	async #openPartialViewPickerModal() {
 		const partialViewPickerContext = this.#modalContext?.open(this, UMB_PARTIAL_VIEW_PICKER_MODAL);
-		await partialViewPickerContext
-			?.onSubmit()
-			.then((value) => {
-				const path = value.selection[0];
-				if (path) {
-					const regex = /^%2F|%25dot%25cshtml$/g;
-					const prettyPath = path.replace(regex, '').replace(/%2F/g, '/');
-					this.value = {
-						value: prettyPath,
-						type: CodeSnippetType.partialView,
-					};
-					this.modalContext?.submit();
-				}
-			})
-			.catch(() => undefined);
+		const result = await partialViewPickerContext?.onSubmit().catch(() => undefined);
+
+		if (result === undefined) return;
+
+		const value = partialViewPickerContext?.getValue().selection[0];
+
+		if (!value) return;
+
+		const regex = /^%2F|%25dot%25cshtml$/g;
+		const prettyPath = value.replace(regex, '').replace(/%2F/g, '/');
+		this.value = {
+			value: prettyPath,
+			type: CodeSnippetType.partialView,
+		};
+		this.modalContext?.submit();
 	}
 
 	async #openDictionaryItemPickerModal() {
