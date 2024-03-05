@@ -59,12 +59,15 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	async #openTemplatingItemPickerModal() {
 		const itemPickerContext = this.#modalContext?.open(this, UMB_TEMPLATING_ITEM_PICKER_MODAL);
-		await itemPickerContext
-			?.onSubmit()
-			.then((value) => {
-				if (value) this.determineInsertValue(value);
-			})
-			.catch(() => undefined);
+		const result = await itemPickerContext?.onSubmit().catch(() => undefined);
+		
+		if (result === undefined) return;
+		
+		const value = itemPickerContext?.getValue();
+		
+		if (!value) return;
+		
+		this.determineInsertValue(value);
 	}
 
 	async #openPartialViewPickerModal() {
