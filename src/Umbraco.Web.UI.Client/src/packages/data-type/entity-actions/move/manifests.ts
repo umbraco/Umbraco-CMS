@@ -1,7 +1,7 @@
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DATA_TYPE_PICKER_MODAL } from '../../modals/index.js';
 import { UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UMB_MOVE_DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/move/manifests.js';
-import { UMB_DATA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
