@@ -44,9 +44,9 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 				@change=${this._onChange}
 				.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : splitStringToArray(this.value)) : []}
 				.min=${this._limitMin}
-				.max=${this._limitMax}
-				>Add</umb-input-media
-			>
+				.max=${this._limitMax}>
+				<umb-localize key="general_add">Add</umb-localize>
+			</umb-input-media>
 		`;
 	}
 }
