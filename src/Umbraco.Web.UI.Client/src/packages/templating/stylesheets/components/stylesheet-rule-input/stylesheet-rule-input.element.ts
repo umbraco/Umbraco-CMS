@@ -31,7 +31,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 		return modalContext?.onSubmit();
 	}
 
-	#appendRule = async () => {
+	#appendRule = () => {
 		this.#openRuleSettings(null)
 			.then((value) => {
 				if (!value.rule) return;
