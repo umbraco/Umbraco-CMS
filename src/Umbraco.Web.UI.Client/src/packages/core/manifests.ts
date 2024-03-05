@@ -7,6 +7,7 @@ import { manifests as localizationManifests } from './localization/manifests.js'
 import { manifests as modalManifests } from './modal/common/manifests.js';
 import { manifests as propertyActionManifests } from './property-action/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
+import { manifests as sectionManifests } from './section/manifests.js';
 import { manifests as settingsManifests } from './settings/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as treeManifests } from './tree/manifests.js';
@@ -24,6 +25,7 @@ export const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...modalManifests,
 	...propertyActionManifests,
 	...propertyEditorManifests,
+	...sectionManifests,
 	...settingsManifests,
 	...themeManifests,
 	...treeManifests,

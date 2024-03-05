@@ -19,6 +19,7 @@ export class UmbPackageStore extends UmbStoreBase {
 	 * Array of packages with extensions
 	 * @private
 	 */
+	// TODO: Revisit this code, to not use RxJS directly:
 	#packages = new ReplaySubject<Array<UmbPackage>>(1);
 
 	#extensions = new UmbArrayState<ManifestBase>([], (e) => e.alias);

@@ -1,4 +1,3 @@
-import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	HealthCheckGroupPresentationModel,
 	HealthCheckGroupWithResultResponseModel,
@@ -8,21 +7,22 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
-	private _checks = new BehaviorSubject<HealthCheckGroupPresentationModel | undefined>(undefined);
-	public readonly checks = this._checks.asObservable();
+	#checks = new UmbBasicState<HealthCheckGroupPresentationModel | undefined>(undefined);
+	public readonly checks = this.#checks.asObservable();
 
-	private _results = new BehaviorSubject<HealthCheckGroupWithResultResponseModel | undefined>(undefined);
-	public readonly results = this._results.asObservable();
+	#results = new UmbBasicState<HealthCheckGroupWithResultResponseModel | undefined>(undefined);
+	public readonly results = this.#results.asObservable();
 
 	async getGroupChecks(name: string) {
 		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.getHealthCheckGroupByName({ name }));
 
 		if (data) {
-			this._checks.next(data);
+			this.#checks.setValue(data);
 		} else {
-			this._checks.next(undefined);
+			this.#checks.setValue(undefined);
 		}
 	}
 
@@ -30,9 +30,9 @@ export class UmbHealthCheckContext extends UmbControllerBase implements UmbApi {
 		const { data } = await tryExecuteAndNotify(this, HealthCheckResource.postHealthCheckGroupByNameCheck({ name }));
 
 		if (data) {
-			this._results.next(data);
+			this.#results.setValue(data);
 		} else {
-			this._results.next(undefined);
+			this.#results.setValue(undefined);
 		}
 	}
 

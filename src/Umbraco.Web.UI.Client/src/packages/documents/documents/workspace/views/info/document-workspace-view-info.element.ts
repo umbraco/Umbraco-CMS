@@ -5,7 +5,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import {
 	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
@@ -17,7 +16,7 @@ import {
 	type UmbDocumentTypeDetailModel,
 	UmbDocumentTypeDetailRepository,
 } from '@umbraco-cms/backoffice/document-type';
-import { UmbTemplateDetailRepository } from '@umbraco-cms/backoffice/template';
+import { UmbTemplateDetailRepository, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {

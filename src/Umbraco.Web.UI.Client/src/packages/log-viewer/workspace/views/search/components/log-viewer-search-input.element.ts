@@ -42,6 +42,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	@state()
 	private _isQuerySaved = false;
 
+	// TODO: Revisit this code, to not use RxJS directly:
 	private inputQuery$ = new Subject<string>();
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
