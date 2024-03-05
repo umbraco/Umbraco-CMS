@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-[ApiController]
 [ApiExplorerSettings(GroupName = "User")]
 public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerBase
 {

@@ -24,7 +24,6 @@ using Umbraco.Cms.Web.Common.Security;
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiVersion("1.0")]
-[ApiController]
 [VersionedApiBackOfficeRoute(Common.Security.Paths.BackOfficeApi.EndpointTemplate)]
 [ApiExplorerSettings(IgnoreApi = true)]
 public class BackOfficeController : SecurityControllerBase

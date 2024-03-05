@@ -9,7 +9,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Folder;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MediaType}/folder")]
 [ApiExplorerSettings(GroupName = "Media Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]

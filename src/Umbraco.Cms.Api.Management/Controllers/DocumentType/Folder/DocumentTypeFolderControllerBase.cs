@@ -9,7 +9,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Folder;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.DocumentType}/folder")]
 [ApiExplorerSettings(GroupName = "Document Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]

@@ -7,7 +7,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Relation;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("relation")]
 [ApiExplorerSettings(GroupName = "Relation")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]

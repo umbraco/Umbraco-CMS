@@ -5,7 +5,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Preview;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("preview")]
 [ApiExplorerSettings(GroupName = "Preview")]
 public class PreviewControllerBase : ManagementApiControllerBase

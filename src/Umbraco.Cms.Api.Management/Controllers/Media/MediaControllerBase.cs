@@ -13,7 +13,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
-[ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Media)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]

@@ -13,7 +13,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Document}")]
 [RequireDocumentTreeRootAccess]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]

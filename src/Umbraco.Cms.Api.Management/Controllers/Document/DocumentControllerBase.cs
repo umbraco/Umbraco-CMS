@@ -13,7 +13,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
-[ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Document)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]

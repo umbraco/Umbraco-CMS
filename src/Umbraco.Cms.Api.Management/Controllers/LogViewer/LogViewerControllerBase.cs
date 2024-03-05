@@ -7,7 +7,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("log-viewer")]
 [ApiExplorerSettings(GroupName = "Log Viewer")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

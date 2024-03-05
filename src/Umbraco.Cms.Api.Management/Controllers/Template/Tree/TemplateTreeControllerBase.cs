@@ -10,7 +10,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Template}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]

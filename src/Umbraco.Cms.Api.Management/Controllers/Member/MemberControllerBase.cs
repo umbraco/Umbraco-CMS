@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
-[ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Member)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Member))]
 // FIXME: implement authorization

@@ -11,7 +11,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]

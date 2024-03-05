@@ -10,7 +10,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberGroup}")]
 [ApiExplorerSettings(GroupName = "Member Group")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberGroups)]

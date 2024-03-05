@@ -10,7 +10,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Upgrade;
 
-[ApiController]
 [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
 [VersionedApiBackOfficeRoute("upgrade")]
 [ApiExplorerSettings(GroupName = "Upgrade")]

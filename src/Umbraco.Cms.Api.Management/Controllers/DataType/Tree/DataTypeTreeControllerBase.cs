@@ -12,7 +12,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.DataType}")]
 [ApiExplorerSettings(GroupName = "Data Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDataTypes)]

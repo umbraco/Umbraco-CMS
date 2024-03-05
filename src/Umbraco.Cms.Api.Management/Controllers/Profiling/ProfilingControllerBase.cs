@@ -7,7 +7,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Profiling;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("profiling")]
 [ApiExplorerSettings(GroupName = "Profiling")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

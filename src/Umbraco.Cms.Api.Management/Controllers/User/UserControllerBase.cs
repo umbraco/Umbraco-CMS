@@ -5,7 +5,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("user")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
 public abstract class UserControllerBase : UserOrCurrentUserControllerBase

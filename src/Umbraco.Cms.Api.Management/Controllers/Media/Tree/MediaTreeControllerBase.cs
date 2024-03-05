@@ -15,7 +15,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Media}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Media))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForMediaTree)]
