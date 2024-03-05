@@ -10,14 +10,14 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbClassInterface extends UmbControllerHost {
 	/**
-	 * @description Observe a RxJS source of choice.
-	 * @param {Observable<T>} source RxJS source
+	 * @description Observe an Observable. An Observable is a declared source of data that can be observed. An observables is declared from a UmbState.
+	 * @param {Observable<T>} source An Observable to observe from.
 	 * @param {method} callback Callback method called when data is changed.
-	 * @return {UmbObserverController} Reference to a Observer Controller instance
-	 * @memberof UmbElementMixin
+	 * @return {UmbObserverController} Reference to the created Observer Controller instance.
+	 * @memberof UmbClassMixin
 	 */
 	observe<T, R extends UmbObserverController<T> = UmbObserverController<T>>(
-		source: Observable<T> | { asObservable: () => Observable<T> },
+		source: Observable<T>,
 		callback: ObserverCallback<T>,
 		unique?: string,
 	): R;
@@ -26,7 +26,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 * @description Provide a context API for this or child elements.
 	 * @param {string} contextAlias
 	 * @param {instance} instance The API instance to be exposed.
-	 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
+	 * @return {UmbContextProviderController} Reference to the created Context Provider Controller instance
 	 * @memberof UmbClassMixin
 	 */
 	provideContext<R = unknown>(alias: string | UmbContextToken<R>, instance: R): UmbContextProviderController<R>;
@@ -35,7 +35,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 * @description Setup a subscription for a context. The callback is called when the context is resolved.
 	 * @param {string} contextAlias
 	 * @param {method} callback Callback method called when context is resolved.
-	 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
+	 * @return {UmbContextConsumerController} Reference to the created Context Consumer Controller instance
 	 * @memberof UmbClassMixin
 	 */
 	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
