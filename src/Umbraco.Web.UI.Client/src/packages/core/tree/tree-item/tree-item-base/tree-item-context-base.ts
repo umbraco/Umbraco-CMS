@@ -14,7 +14,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
 	x: TreeItemType,
@@ -172,7 +172,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.treeContext?.selection.deselect(this.unique);
 	}
 
-	#consumeContexts() {
+	async #consumeContexts() {
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
 			this.#sectionContext = instance;
 			this.#observeSectionPath();
@@ -190,17 +190,17 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.#observeHasChildren();
 		});
 
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#actionEventContext = instance;
-			this.#actionEventContext.removeEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-			this.#actionEventContext.addEventListener(
-				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
-				this.#onReloadRequest as EventListener,
-			);
-		});
+		this.#actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+
+		this.#actionEventContext.addEventListener(
+			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+			this.#onReloadRequest as EventListener,
+		);
+
+		this.#actionEventContext.addEventListener(
+			UmbRequestReloadStructureForEntityEvent.TYPE,
+			this.#onReloadStructureRequest as unknown as EventListener,
+		);
 	}
 
 	getTreeItem() {
@@ -290,6 +290,13 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
 		this.loadChildren();
+	};
+
+	#onReloadStructureRequest = async (event: UmbRequestReloadStructureForEntityEvent) => {
+		if (!this.unique) return;
+		if (event.getUnique() !== this.unique) return;
+		if (event.getEntityType() !== this.entityType) return;
+		console.log('reload structure for entity', event);
 	};
 
 	#onPageChange = (event: UmbChangeEvent) => {
