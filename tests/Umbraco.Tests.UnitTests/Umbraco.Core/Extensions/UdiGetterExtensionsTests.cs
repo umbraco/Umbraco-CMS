@@ -2,8 +2,11 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
@@ -47,6 +50,21 @@ public class UdiGetterExtensionsTests
             .WithViewType(viewType)
             .Build();
         var result = partialView.GetUdi();
+        Assert.AreEqual(expected, result.ToString());
+    }
+
+    [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://webhook/6ad82c70685c4e049b36d81bd779d16f")]
+    public void GetUdiForWebhook(string key, string expected)
+    {
+        var builder = new WebhookBuilder();
+        var webhook = builder
+            .WithKey(Guid.Parse(key))
+            .Build();
+
+        Udi result = webhook.GetUdi();
+        Assert.AreEqual(expected, result.ToString());
+
+        result = ((IEntity)webhook).GetUdi();
         Assert.AreEqual(expected, result.ToString());
     }
 }

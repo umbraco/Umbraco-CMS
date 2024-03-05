@@ -103,12 +103,9 @@
 
             localizationService.localize("blockEditor_headlineCreateBlock").then(localizedTitle => {
 
-                const contentTypePicker = {
+                const dialog = {
                     title: localizedTitle,
-                    section: "settings",
-                    treeAlias: "documentTypes",
                     entityType: "documentType",
-                    isDialog: true,
                     filter: function (node) {
                         if (node.metaData.isElement === true) {
                             var key = udiService.getKey(node.udi);
@@ -142,7 +139,7 @@
                     ]
                 };
                 
-                editorService.treePicker(contentTypePicker);
+                editorService.contentTypePicker(dialog);
             });
         };
 

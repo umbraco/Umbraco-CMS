@@ -107,7 +107,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     }
 
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken cancellationToken)
+    public virtual Task StartAsync(CancellationToken cancellationToken)
     {
         using (!ExecutionContext.IsFlowSuppressed() ? (IDisposable)ExecutionContext.SuppressFlow() : null)
         {
@@ -118,7 +118,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     }
 
     /// <inheritdoc />
-    public Task StopAsync(CancellationToken cancellationToken)
+    public virtual Task StopAsync(CancellationToken cancellationToken)
     {
         _period = Timeout.InfiniteTimeSpan;
         _timer?.Change(Timeout.Infinite, 0);

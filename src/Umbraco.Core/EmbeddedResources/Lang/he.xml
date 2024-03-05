@@ -453,6 +453,13 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="renewSession">יש לבצע חידוש פעילות על מנת לשמור על התוכן</key>
   </area>
   <area alias="login">
+    <key alias="greeting0">ברוכים הבאים</key>
+    <key alias="greeting1">ברוכים הבאים</key>
+    <key alias="greeting2">ברוכים הבאים</key>
+    <key alias="greeting3">ברוכים הבאים</key>
+    <key alias="greeting4">ברוכים הבאים</key>
+    <key alias="greeting5">ברוכים הבאים</key>
+    <key alias="greeting6">ברוכים הבאים</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">

@@ -283,15 +283,21 @@ function dependencies() {
             "base": "./node_modules/wicg-inert"
         },
         {
-            "name": "umbraco-ui",
-            "src": [
-                "./node_modules/@umbraco-ui/uui/dist/uui.min.js",
-                "./node_modules/@umbraco-ui/uui/dist/uui.min.js.map",
-                "./node_modules/@umbraco-ui/uui-css/dist/custom-properties.css",
-                "./node_modules/@umbraco-ui/uui-css/dist/uui-text.css"
-            ],
-            "base": "./node_modules/@umbraco-ui"
-        }
+          "name": "umbraco-ui",
+          "src": [
+            "./node_modules/@umbraco-ui/uui/dist/uui.min.js",
+            "./node_modules/@umbraco-ui/uui/dist/uui.min.js.map",
+            "./node_modules/@umbraco-ui/uui-css/dist/custom-properties.css",
+            "./node_modules/@umbraco-ui/uui-css/dist/uui-text.css",
+            "./node_modules/@umbraco-ui/uui-css/dist/uui-css.css",
+            "./node_modules/@umbraco-ui/uui-css/assets/fonts/lato/LatoLatin-Black.woff2",
+            "./node_modules/@umbraco-ui/uui-css/assets/fonts/lato/LatoLatin-Light.woff2",
+            "./node_modules/@umbraco-ui/uui-css/assets/fonts/lato/LatoLatin-Regular.woff2",
+            "./node_modules/@umbraco-ui/uui-css/assets/fonts/lato/LatoLatin-Italic.woff2",
+            "./node_modules/@umbraco-ui/uui-css/assets/fonts/lato/LatoLatin-Bold.woff2"
+          ],
+          "base": "./node_modules/@umbraco-ui"
+        },
     ];
 
     // add streams for node modules
