@@ -2,7 +2,6 @@ export * from './change-password-modal.token.js';
 export * from './code-editor-modal.token.js';
 export * from './confirm-modal.token.js';
 export * from './debug-modal.token.js';
-export * from './dictionary-item-picker-modal.token.js';
 export * from './embedded-media-modal.token.js';
 export * from './entity-user-permission-settings-modal.token.js';
 export * from './examine-fields-settings-modal.token.js';

@@ -8,11 +8,8 @@ import type {
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_DICTIONARY_ITEM_PICKER_MODAL,
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_DICTIONARY_PICKER_MODAL } from '@umbraco-cms/backoffice/dictionary';
 
 @customElement('umb-templating-item-picker-modal')
 export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
@@ -66,7 +63,7 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 	}
 
 	async #openDictionaryItemPickerModal() {
-		const dictionaryItemPickerModal = this.#modalContext?.open(this, UMB_DICTIONARY_ITEM_PICKER_MODAL, {
+		const dictionaryItemPickerModal = this.#modalContext?.open(this, UMB_DICTIONARY_PICKER_MODAL, {
 			data: {
 				pickableFilter: (item) => item.unique !== null,
 			},
