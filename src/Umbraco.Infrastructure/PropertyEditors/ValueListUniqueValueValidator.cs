@@ -19,25 +19,43 @@ public class ValueListUniqueValueValidator : IValueValidator
 
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
     {
-        var stringValue = value?.ToString();
-        if (stringValue.IsNullOrWhiteSpace())
-        {
-            yield break;
-        }
-
         string[]? items = null;
-        try
+
+        switch (value)
         {
-            items = _configurationEditorJsonSerializer.Deserialize<string[]>(stringValue);
-        }
-        catch
-        {
-            // swallow and report error below
+            case string stringValue:
+                if (!string.IsNullOrWhiteSpace(stringValue))
+                {
+                    try
+                    {
+                        items = _configurationEditorJsonSerializer.Deserialize<string[]>(stringValue);
+                    }
+                    catch
+                    {
+                        // swallow and report error below
+                    }
+                }
+                break;
+
+            case string[] stringArray:
+                items = stringArray;
+                break;
+
+            case List<string> stringList:
+                items = stringList.ToArray();
+                break;
+
+            case IEnumerable<string> stringEnumerable:
+                items = stringEnumerable.ToArray();
+                break;
+
+            default:
+                break;
         }
 
         if (items is null)
         {
-            yield return new ValidationResult($"The configuration value {stringValue} is not a valid value list configuration", new[] { "items" });
+            yield return new ValidationResult($"The configuration value {value} is not a valid value list configuration", ["items"]);
             yield break;
         }
 
