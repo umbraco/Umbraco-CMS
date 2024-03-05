@@ -7,7 +7,6 @@ export * from './data-type-picker-flow-modal.token.js';
 export * from './data-type-picker-modal.token.js';
 export * from './debug-modal.token.js';
 export * from './dictionary-item-picker-modal.token.js';
-export * from './document-picker-modal.token.js';
 export * from './document-type-picker-modal.token.js';
 export * from './embedded-media-modal.token.js';
 export * from './entity-user-permission-settings-modal.token.js';

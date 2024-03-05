@@ -1,4 +1,4 @@
-import { UmbModalToken } from '../modal/token/modal-token.js';
+import { UmbModalToken } from '../../modal/token/modal-token.js';
 
 export interface UmbSectionPickerModalData {
 	multiple: boolean;

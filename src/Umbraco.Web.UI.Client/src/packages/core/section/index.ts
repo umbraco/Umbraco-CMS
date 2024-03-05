@@ -6,4 +6,4 @@ export * from './section-sidebar-menu-with-entity-actions/index.js';
 export * from './section-default.element.js';
 export * from './section.context.js';
 export * from './input-section/index.js';
-export * from './section-picker-modal.token.js';
+export * from './section-picker/section-picker-modal.token.js';

@@ -1,5 +1,5 @@
 import { UmbInputListBaseElement } from '../../components/input-list-base/input-list-base.js';
-import { UMB_SECTION_PICKER_MODAL } from '../section-picker-modal.token.js';
+import { UMB_SECTION_PICKER_MODAL } from '../section-picker/section-picker-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
