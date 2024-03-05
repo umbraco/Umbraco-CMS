@@ -53,11 +53,12 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selectedIds(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
+	@property({ type: Array })
 	public set selectedIds(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
+	}
+	public get selectedIds(): Array<string> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
