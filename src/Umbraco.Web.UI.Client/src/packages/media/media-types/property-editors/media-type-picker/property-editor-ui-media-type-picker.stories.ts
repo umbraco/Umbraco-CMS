@@ -5,11 +5,11 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-media-type-picker.element.js';
 
 export default {
-	title: 'Property Editor UIs/Document Type Picker',
-	component: 'umb-property-editor-ui-document-type-picker',
-	id: 'umb-property-editor-ui-document-type-picker',
+	title: 'Property Editor UIs/Media Type Picker',
+	component: 'umb-property-editor-ui-media-type-picker',
+	id: 'umb-property-editor-ui-media-type-picker',
 } as Meta;
 
 export const AAAOverview: Story<UmbPropertyEditorUIMediaTypePickerElement> = () =>
-	html` <umb-property-editor-ui-document-type-picker></umb-property-editor-ui-document-type-picker>`;
+	html` <umb-property-editor-ui-media-type-picker></umb-property-editor-ui-media-type-picker>`;
 AAAOverview.storyName = 'Overview';
