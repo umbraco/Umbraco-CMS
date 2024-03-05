@@ -72,9 +72,4 @@ export class UmbBasicState<T> {
 			this._subject.next(data);
 		}
 	}
-
-	/**
-	 * @deprecated - Use `setValue` instead.
-	 */
-	next = this.setValue;
 }
