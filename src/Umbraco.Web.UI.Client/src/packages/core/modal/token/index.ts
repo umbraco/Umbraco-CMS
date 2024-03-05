@@ -20,5 +20,4 @@ export * from './modal-token.js';
 export * from './permissions-modal.token.js';
 export * from './property-editor-ui-picker-modal.token.js';
 export * from './property-settings-modal.token.js';
-export * from './section-picker-modal.token.js';
 export * from './workspace-modal.token.js';
