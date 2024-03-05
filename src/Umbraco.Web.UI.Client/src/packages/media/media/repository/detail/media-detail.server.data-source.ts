@@ -76,7 +76,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 		const media: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,
 			unique: data.id,
-			values: data.values,
+			values: data.values as UmbMediaDetailModel['values'],
 			variants: data.variants.map((variant) => {
 				return {
 					state: null,
@@ -87,7 +87,7 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 					updateDate: variant.updateDate,
 				};
 			}),
-			urls: data.urls,
+			urls: data.urls as UmbMediaDetailModel['urls'],
 			mediaType: {
 				unique: data.mediaType.id,
 				collection: data.mediaType.collection ? { unique: data.mediaType.collection.id } : null,
