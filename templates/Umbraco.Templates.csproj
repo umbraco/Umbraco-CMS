@@ -13,13 +13,41 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
-    <Content Include="UmbracoPackageRcl\**" Exclude="bin;obj" />
-    <Content Include="UmbracoProject\**" Exclude="bin;obj" />
-    <Content Include="..\src\Umbraco.Web.UI.New\Program.cs">
+    <Content Include="..\src\Umbraco.Web.UI\Program.cs">
       <Link>UmbracoProject\Program.cs</Link>
       <PackagePath>UmbracoProject</PackagePath>
     </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blockgrid\area.cshtml">
+      <Link>UmbracoProject\Views\Partials\blockgrid\area.cshtml</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blockgrid\areas.cshtml">
+      <Link>UmbracoProject\Views\Partials\blockgrid\areas.cshtml</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blockgrid\default.cshtml">
+      <Link>UmbracoProject\Views\Partials\blockgrid\default.cshtml</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blockgrid\items.cshtml">
+      <Link>UmbracoProject\Views\Partials\blockgrid\items.cshtml</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\default.cshtml">
+      <Link>UmbracoProject\Views\Partials\blocklist\default.cshtml</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml">
+      <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
+      <PackagePath>UmbracoProject\Views</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\wwwroot\favicon.ico">
+      <Link>UmbracoProject\wwwroot\favicon.ico</Link>
+      <PackagePath>UmbracoProject\wwwroot</PackagePath>
+    </Content>
+    <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
+    <Content Include="UmbracoPackageRcl\**" Exclude="bin;obj" />
+    <Content Include="UmbracoProject\**" Exclude="bin;obj" />
     <Content Include="..\src\Umbraco.Web.UI.New\Views\Partials\blocklist\**">
       <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
@@ -31,14 +59,6 @@
     <Content Include="..\src\Umbraco.Web.UI.New\Views\Partials\blockgrid\**">
       <Link>UmbracoProject\Views\Partials\blockgrid\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\blockgrid</PackagePath>
-    </Content>
-    <Content Include="..\src\Umbraco.Web.UI.New\Views\_ViewImports.cshtml">
-      <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
-      <PackagePath>UmbracoProject\Views</PackagePath>
-    </Content>
-    <Content Include="..\src\Umbraco.Web.UI.New\wwwroot\favicon.ico">
-      <Link>UmbracoProject\wwwroot\favicon.ico</Link>
-      <PackagePath>UmbracoProject\wwwroot</PackagePath>
     </Content>
   </ItemGroup>
 
