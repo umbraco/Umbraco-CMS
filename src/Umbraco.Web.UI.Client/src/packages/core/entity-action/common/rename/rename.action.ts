@@ -5,7 +5,7 @@ import type { MetaEntityActionRenameKind } from '@umbraco-cms/backoffice/extensi
 
 export class UmbRenameEntityAction extends UmbEntityActionBase<MetaEntityActionRenameKind> {
 	async execute() {
-		if (!this.args.unique) throw new Error('Unique is required to rename a folder');
+		if (!this.args.unique) throw new Error('Unique is required to rename an entity');
 
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, UMB_RENAME_MODAL, {

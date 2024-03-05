@@ -1,14 +1,22 @@
 import type { UmbRenameRepository } from '../types.js';
 import type { UmbRenameModalData, UmbRenameModalValue } from './rename-modal.token.js';
-import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 @customElement('umb-rename-modal')
 export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalData, UmbRenameModalValue> {
+	// TODO: make base type for item and detail models
+	#itemRepository?: UmbItemRepository<any>;
 	#renameRepository?: UmbRenameRepository<any>;
+	#init: Promise<unknown>;
+
+	@state()
+	_name = '';
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -17,16 +25,41 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 
 	#observeRepository() {
 		if (!this.data?.renameRepositoryAlias) throw new Error('A rename repository alias is required');
+		if (!this.data?.itemRepositoryAlias) throw new Error('An item repository alias is required');
 
-		new UmbExtensionApiInitializer(
-			this,
-			umbExtensionsRegistry,
-			this.data.renameRepositoryAlias,
-			[this],
-			(permitted, ctrl) => {
-				this.#renameRepository = permitted ? (ctrl.api as UmbRenameRepository<any>) : undefined;
-			},
-		);
+		// TODO: We should properly look into how we can simplify the one time usage of a extension api, as its a bit of overkill to take conditions/overwrites and observation of extensions into play here: [NL]
+		// But since this happens when we execute an action, it does most likely not hurt any users, but it is a bit of a overkill to do this for every action: [NL]
+		this.#init = Promise.all([
+			new UmbExtensionApiInitializer(
+				this,
+				umbExtensionsRegistry,
+				this.data.itemRepositoryAlias,
+				[this],
+				(permitted, ctrl) => {
+					this.#itemRepository = permitted ? (ctrl.api as UmbItemRepository<any>) : undefined;
+				},
+			).asPromise(),
+
+			new UmbExtensionApiInitializer(
+				this,
+				umbExtensionsRegistry,
+				this.data.renameRepositoryAlias,
+				[this],
+				(permitted, ctrl) => {
+					this.#renameRepository = permitted ? (ctrl.api as UmbRenameRepository<any>) : undefined;
+				},
+			).asPromise(),
+		]);
+	}
+
+	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
+		super.firstUpdated(_changedProperties);
+		if (!this.data?.unique) throw new Error('Unique identifier is not available');
+		await this.#init;
+		if (!this.#itemRepository) throw new Error('Item repository is not available');
+
+		const { data } = await this.#itemRepository.requestItems([this.data.unique]);
+		this._name = data?.[0].name ?? '';
 	}
 
 	async #onSubmit(event: SubmitEvent) {
@@ -64,6 +97,7 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 									type="text"
 									id="name"
 									name="name"
+									value=${this._name}
 									placeholder="Enter new name..."
 									required
 									required-message="Name is required"></uui-input>
