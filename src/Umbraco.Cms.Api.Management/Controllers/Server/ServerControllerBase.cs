@@ -7,5 +7,4 @@ namespace Umbraco.Cms.Api.Management.Controllers.Server;
 [ApiExplorerSettings(GroupName = "Server")]
 public abstract class ServerControllerBase : ManagementApiControllerBase
 {
-
 }

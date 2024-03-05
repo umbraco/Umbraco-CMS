@@ -10,5 +10,4 @@ namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 public class RedirectUrlManagementControllerBase : ManagementApiControllerBase
 {
-
 }
