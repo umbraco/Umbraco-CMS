@@ -3,11 +3,7 @@ import type { UmbMemberDetailModel, UmbMemberVariantModel, UmbMemberVariantOptio
 import { UmbMemberPropertyDataContext } from '../property-dataset-context/member-property-dataset-context.js';
 import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbMemberTypeDetailRepository } from '@umbraco-cms/backoffice/member-type';
-import {
-	UMB_VARIANT_WORKSPACE_CONTEXT,
-	UmbEditableWorkspaceContextBase,
-	UmbWorkspaceSplitViewManager,
-} from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 import type {
 	UmbVariantableWorkspaceContextInterface,
 	UmbSaveableWorkspaceContextInterface,
@@ -373,6 +369,10 @@ export class UmbMemberWorkspaceContext
 		const date = this.#get('lastPasswordChangeDate');
 		if (!date) return 'never';
 		return new Date(date).toLocaleString();
+	}
+
+	get memberGroups() {
+		return this.#get('groups') || [];
 	}
 
 	#get<PropertyName extends keyof UmbMemberDetailModel>(propertyName: PropertyName) {
