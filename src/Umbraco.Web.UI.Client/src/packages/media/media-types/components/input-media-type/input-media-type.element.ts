@@ -66,6 +66,9 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selectedIds = splitStringToArray(idsString);
 	}
+	public get value() {
+		return this.selectedIds.join(',');
+	}
 
 	@state()
 	private _items?: Array<UmbMediaTypeItemModel>;
@@ -108,13 +111,13 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 	#renderItems() {
 		if (!this._items) return;
 		return html`
-			<uui-ref-list
-				>${repeat(
+			<uui-ref-list>
+				${repeat(
 					this._items,
 					(item) => item.unique,
 					(item) => this.#renderItem(item),
-				)}</uui-ref-list
-			>
+				)}
+			</uui-ref-list>
 		`;
 	}
 
