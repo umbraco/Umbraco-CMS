@@ -1,10 +1,10 @@
 import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_DOCUMENT_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
 const entityActions: Array<ManifestTypes> = [
 	...createManifests,
