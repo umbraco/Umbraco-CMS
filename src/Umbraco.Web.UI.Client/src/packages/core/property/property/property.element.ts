@@ -179,13 +179,12 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#propertyContext.setEditor(this._element);
 
 			if (this._element) {
-				// TODO: Could this be changed to change event? (or additionally support change?)
+				// TODO: Could this be changed to change event? (or additionally support the change event? [NL])
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(this.#propertyContext.value, (value) => {
 					//this._value = value;// This was not used currently [NL]
-					console.log('got value', value, 'setting value on element...');
 					if (this._element) {
 						this._element.value = value;
 					}
