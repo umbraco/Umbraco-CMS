@@ -31,31 +31,35 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 
 	async #openTemplatingPageFieldModal() {
 		const pageFieldBuilderContext = this.#modalContext?.open(this, UMB_TEMPLATING_PAGE_FIELD_BUILDER_MODAL);
-		await pageFieldBuilderContext?.onSubmit();
+		const result = await pageFieldBuilderContext?.onSubmit().catch(() => undefined);
 
-		const output = pageFieldBuilderContext?.getValue().output;
+		if (result === undefined) return;
 
-		if (output) {
-			this.value = { value: output, type: CodeSnippetType.pageField };
-			this.modalContext?.submit();
-		}
+		const value = pageFieldBuilderContext?.getValue().output;
+
+		if (!value) return;
+
+		this.value = { value, type: CodeSnippetType.pageField };
+		this.modalContext?.submit();
 	}
 
 	async #openPartialViewPickerModal() {
 		const partialViewPickerContext = this.#modalContext?.open(this, UMB_PARTIAL_VIEW_PICKER_MODAL);
-		await partialViewPickerContext?.onSubmit();
+		const result = await partialViewPickerContext?.onSubmit().catch(() => undefined);
 
-		const path = partialViewPickerContext?.getValue().selection[0];
+		if (result === undefined) return;
 
-		if (path) {
-			const regex = /^%2F|%25dot%25cshtml$/g;
-			const prettyPath = path.replace(regex, '').replace(/%2F/g, '/');
-			this.value = {
-				value: prettyPath,
-				type: CodeSnippetType.partialView,
-			};
-			this.modalContext?.submit();
-		}
+		const value = partialViewPickerContext?.getValue().selection[0];
+
+		if (!value) return;
+
+		const regex = /^%2F|%25dot%25cshtml$/g;
+		const prettyPath = value.replace(regex, '').replace(/%2F/g, '/');
+		this.value = {
+			value: prettyPath,
+			type: CodeSnippetType.partialView,
+		};
+		this.modalContext?.submit();
 	}
 
 	async #openDictionaryItemPickerModal() {
@@ -64,14 +68,15 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				pickableFilter: (item) => item.unique !== null,
 			},
 		});
-		await dictionaryItemPickerModal?.onSubmit();
+		const result = await dictionaryItemPickerModal?.onSubmit().catch(() => undefined);
+		if (result === undefined) return;
 
 		const dictionaryItem = dictionaryItemPickerModal?.getValue().selection[0];
 
-		if (dictionaryItem) {
-			this.value = { value: dictionaryItem, type: CodeSnippetType.dictionaryItem };
-			this.modalContext?.submit();
-		}
+		if (!dictionaryItem) return;
+
+		this.value = { value: dictionaryItem, type: CodeSnippetType.dictionaryItem };
+		this.modalContext?.submit();
 	}
 
 	render() {

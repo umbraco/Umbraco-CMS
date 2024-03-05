@@ -109,11 +109,6 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 			});
 			return promise;
 		}
-
-		destroy(): void {
-			super.destroy();
-			(this.localize as any) = undefined;
-		}
 	}
 
 	return UmbElementMixinClass as unknown as HTMLElementConstructor<UmbElement> & T;
