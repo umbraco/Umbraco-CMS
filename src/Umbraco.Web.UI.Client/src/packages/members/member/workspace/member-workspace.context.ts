@@ -125,15 +125,6 @@ export class UmbMemberWorkspaceContext
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 
-		this.structure
-			.ownerContentTypePart((x) => (x ? x.variesByCulture || x.variesBySegment : undefined))
-			.subscribe((x) => {
-				console.log('WHHHAT', x);
-			});
-
-		this.structure.ownerContentType.subscribe((x) => {
-			console.log('ownerContentType', x);
-		});
 		return data || undefined;
 	}
 
@@ -166,7 +157,6 @@ export class UmbMemberWorkspaceContext
 	}
 
 	getContentTypeId() {
-		console.log('getContentTypeId', this.getData()?.memberType.unique);
 		return this.getData()?.memberType.unique;
 	}
 
