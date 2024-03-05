@@ -35,7 +35,7 @@ const jsModuleWithDefaultAndApiExport = {
 	api: UmbExtensionApiTrueTestClass,
 };
 
-describe('Extension-Api: Create Extension Api', () => {
+describe('Create Extension Api Method', () => {
 	let hostElement: UmbTestControllerHostElement;
 
 	beforeEach(async () => {

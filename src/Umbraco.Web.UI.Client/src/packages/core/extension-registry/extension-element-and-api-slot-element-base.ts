@@ -1,5 +1,5 @@
 import { umbExtensionsRegistry } from './registry.js';
-import { html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';

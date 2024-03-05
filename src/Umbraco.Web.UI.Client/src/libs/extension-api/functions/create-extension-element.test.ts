@@ -31,7 +31,7 @@ const jsModuleWithDefaultAndElementExport = {
 	element: UmbExtensionApiTrueTestElement,
 };
 
-describe('Extension-Api: Create Extension Element', () => {
+describe('Create Extension Element Method', () => {
 	it('Returns `undefined` when manifest does not have any correct properties', async () => {
 		const manifest: ManifestElement = {
 			type: 'my-test-type',
