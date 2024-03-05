@@ -13,7 +13,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbPaginationManager, UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -23,6 +23,9 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 {
 	#treeRoot = new UmbObjectState<TreeItemType | undefined>(undefined);
 	treeRoot = this.#treeRoot.asObservable();
+
+	#rootItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
+	rootItems = this.#rootItems.asObservable();
 
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 	public filter?: (item: TreeItemType) => boolean = () => true;
@@ -52,7 +55,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
-		this.requestTreeRoot();
+		this.loadTreeRoot();
 	}
 
 	// TODO: find a generic way to do this
@@ -91,35 +94,27 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		return this.#repository;
 	}
 
-	public async requestTreeRoot() {
+	public async loadTreeRoot() {
 		await this.#init;
 		const { data } = await this.#repository!.requestTreeRoot();
 
 		if (data) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			//@ts-ignore
 			this.#treeRoot.setValue(data);
 		}
 	}
 
-	public async requestRootItems() {
+	public async loadRootItems() {
 		await this.#init;
 
-		const { data, error, asObservable } = await this.#repository!.requestRootTreeItems({
+		const { data } = await this.#repository!.requestRootTreeItems({
 			skip: this.#paging.skip,
 			take: this.#paging.take,
 		});
 
 		if (data) {
+			this.#rootItems.setValue(data.items);
 			this.pagination.setTotalItems(data.total);
 		}
-
-		return { data, error, asObservable };
-	}
-
-	public async rootItems() {
-		await this.#init;
-		return this.#repository!.rootTreeItems();
 	}
 
 	#consumeContexts() {
@@ -139,7 +134,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#paging.skip = target.getSkip();
-		this.requestRootItems();
+		this.loadRootItems();
 	};
 
 	#observeRepository(repositoryAlias?: string) {
@@ -161,11 +156,9 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		// Only handle root request here. Items are handled by the tree item context
 		const treeRoot = this.#treeRoot.getValue();
 		if (treeRoot === undefined) return;
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		if (event.getUnique() !== treeRoot.unique) return;
 		if (event.getEntityType() !== treeRoot.entityType) return;
-		this.requestRootItems();
+		this.loadRootItems();
 	};
 
 	destroy(): void {

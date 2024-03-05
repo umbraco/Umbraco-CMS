@@ -7,7 +7,7 @@ import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/b
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import type { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -32,6 +32,9 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 	#treeItem = new UmbDeepState<TreeItemType | undefined>(undefined);
 	treeItem = this.#treeItem.asObservable();
+
+	#childItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
+	childItems = this.#childItems.asObservable();
 
 	#hasChildren = new UmbBooleanState(false);
 	hasChildren = this.#hasChildren.asObservable();
@@ -129,25 +132,26 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		this.#observeHasChildren();
 	}
 
-	public async requestChildren() {
+	public async loadChildren() {
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 		// TODO: wait for tree context to be ready
 		const repository = this.treeContext?.getRepository();
 		if (!repository) throw new Error('Could not request children, repository is missing');
 
 		this.#isLoading.setValue(true);
-		const { data, error, asObservable } = await repository.requestTreeItemsOf({
+
+		const { data } = await repository.requestTreeItemsOf({
 			parentUnique: this.unique,
 			skip: this.#paging.skip,
 			take: this.#paging.take,
 		});
 
 		if (data) {
+			this.#childItems.setValue(data.items);
 			this.pagination.setTotalItems(data.total);
 		}
 
 		this.#isLoading.setValue(false);
-		return { data, error, asObservable };
 	}
 
 	public toggleContextMenu() {
@@ -285,13 +289,13 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		if (!this.unique) return;
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
-		this.requestChildren();
+		this.loadChildren();
 	};
 
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		this.#paging.skip = target.getSkip();
-		this.requestChildren();
+		this.loadChildren();
 	};
 
 	// TODO: use router context
