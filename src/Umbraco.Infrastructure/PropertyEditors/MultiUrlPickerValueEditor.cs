@@ -151,12 +151,13 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                 var published = true;
                 var trashed = false;
                 var url = dto.Url;
+                IContentBase? content = null;
 
                 if (dto.Udi != null)
                 {
                     if (dto.Udi.EntityType == Constants.UdiEntityType.Document)
                     {
-                        url =  _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, culture);
+                        url = _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, culture);
                         IContent? c = _contentService.GetById(dto.Udi.Guid);
 
                         if (c is not null)
@@ -166,6 +167,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                                 : c.PublishedCultures.Contains(culture);
                             icon = c.ContentType.Icon;
                             trashed = c.Trashed;
+                            content = c;
                         }
                     }
                     else if (dto.Udi.EntityType == Constants.UdiEntityType.Media)
@@ -177,6 +179,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                             published = m.Trashed is false;
                             icon = m.ContentType.Icon;
                             trashed = m.Trashed;
+                            content = m;
                         }
                     }
                 }
@@ -185,6 +188,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                 {
                     Icon = icon,
                     Name = dto.Name,
+                    NodeName = content?.Name,
                     Target = dto.Target,
                     Trashed = trashed,
                     Published = published,
