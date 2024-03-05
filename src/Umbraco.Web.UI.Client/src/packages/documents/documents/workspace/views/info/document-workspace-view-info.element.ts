@@ -141,24 +141,24 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	#renderStateTag() {
 		switch (this._state) {
 			case DocumentVariantStateModel.DRAFT:
-				return html`<uui-tag look="secondary" label=${this.localize.term('content_unpublished')}
-					>${this.localize.term('content_unpublished')}</uui-tag
-				>`;
+				return html`<uui-tag look="secondary" label=${this.localize.term('content_unpublished')}>
+					${this.localize.term('content_unpublished')}
+				</uui-tag>`;
 			case DocumentVariantStateModel.PUBLISHED:
-				return html`<uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}
-					>${this.localize.term('content_published')}</uui-tag
-				>`;
+				return html`<uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}>
+					${this.localize.term('content_published')}
+				</uui-tag>`;
 			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES:
 				return html`<uui-tag
 					color="positive"
 					look="primary"
-					label=${this.localize.term('content_publishedPendingChanges')}
-					>${this.localize.term('content_published')}</uui-tag
-				>`;
+					label=${this.localize.term('content_publishedPendingChanges')}>
+					${this.localize.term('content_published')}
+				</uui-tag>`;
 			default:
-				return html`<uui-tag look="primary" label=${this.localize.term('content_published')}
-					>${this.localize.term('content_published')}</uui-tag
-				>`;
+				return html`<uui-tag look="primary" label=${this.localize.term('content_published')}>
+					${this.localize.term('content_published')}
+				</uui-tag>`;
 		}
 	}
 
@@ -234,7 +234,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								slot="actions"
 								label=${this.localize.term('general_edit')}
 								@click=${this.#openTemplatePicker}></uui-button>
-					  </uui-ref-node>`
+						</uui-ref-node>`
 					: html`<uui-button
 							label=${this.localize.term('general_edit')}
 							@click=${this.#openTemplatePicker}></uui-button>`}
