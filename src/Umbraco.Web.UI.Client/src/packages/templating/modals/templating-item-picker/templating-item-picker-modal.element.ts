@@ -71,16 +71,15 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				pickableFilter: (item) => item.unique !== null,
 			},
 		});
-		await dictionaryItemPickerModal
-			?.onSubmit()
-			.then((value) => {
-				const dictionaryItem = value.selection[0];
-				if (dictionaryItem) {
-					this.value = { value: dictionaryItem, type: CodeSnippetType.dictionaryItem };
-					this.modalContext?.submit();
-				}
-			})
-			.catch(() => undefined);
+		const result = await dictionaryItemPickerModal?.onSubmit().catch(() => undefined);
+		if (result === undefined) return;
+
+		const dictionaryItem = dictionaryItemPickerModal?.getValue().selection[0];
+
+		if (!dictionaryItem) return;
+
+		this.value = { value: dictionaryItem, type: CodeSnippetType.dictionaryItem };
+		this.modalContext?.submit();
 	}
 
 	render() {
