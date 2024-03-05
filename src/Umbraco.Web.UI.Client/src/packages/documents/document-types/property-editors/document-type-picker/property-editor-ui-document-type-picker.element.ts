@@ -52,14 +52,14 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 						.selectedIds=${this._multiPicker
 							? (this._value as Array<string>) ?? []
 							: this._value
-							? [this._value as string]
-							: []}
+								? [this._value as string]
+								: []}
 						.min=${this._limitMin ?? 0}
 						.max=${this._limitMax ?? Infinity}
-						.elementTypesOnly=${this._onlyElementTypes ?? false}
-						>Add</umb-input-document-type
-					>
-			  `
+						.elementTypesOnly=${this._onlyElementTypes ?? false}>
+						<umb-localize key="general_add">Add</umb-localize>
+					</umb-input-document-type>
+				`
 			: '';
 	}
 }
