@@ -324,7 +324,6 @@ export class UmbMediaWorkspaceContext
 
 		if (this.getIsNew()) {
 			if (!this.#parent) throw new Error('Parent is not set');
-			await this.repository.create(this.#currentData.value, this.#parent.unique);
 			const value = this.#currentData.value;
 
 			if ((await this.repository.create(value, this.#parent.unique)).data !== undefined) {
