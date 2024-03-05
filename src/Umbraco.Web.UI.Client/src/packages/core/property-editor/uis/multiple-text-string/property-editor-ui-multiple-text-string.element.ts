@@ -6,17 +6,13 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
 
-interface MultiTextStringValue {
-	value: string;
-}
-
 /**
  * @element umb-property-editor-ui-multiple-text-string
  */
 @customElement('umb-property-editor-ui-multiple-text-string')
 export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Array })
-	value?: Array<MultiTextStringValue>;
+	value?: Array<string>;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -60,13 +56,13 @@ export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement 
 	#onChange(event: UmbChangeEvent) {
 		event.stopPropagation();
 		const target = event.currentTarget as UmbInputMultipleTextStringElement;
-		this.value = target.items.map((item) => ({ value: item }));
+		this.value = target.items;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		return html`<umb-input-multiple-text-string
-			.items="${this.value?.map((item) => item.value) ?? []}"
+			.items="${this.value ?? []}"
 			min="${ifDefined(this._limitMin)}"
 			max="${ifDefined(this._limitMax)}"
 			@change=${this.#onChange}
