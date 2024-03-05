@@ -9,22 +9,8 @@ import {
 
 @customElement('umb-property-editor-ui-media-type-picker')
 export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@state()
-	_value?: Array<string>;
-
 	@property({ type: Array })
-	public set value(value: Array<string> | string | undefined) {
-		if (Array.isArray(value)) {
-			this._value = value;
-		} else if (typeof value === 'string') {
-			this._value = value.split(',');
-		} else {
-			this._value = undefined;
-		}
-	}
-	public get value(): Array<string> | string | undefined {
-		return this._value;
-	}
+	public value?: Array<string> | string;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -50,7 +36,7 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 		return html`
 			<umb-input-media-type
 				@change=${this._onChange}
-				.selectedIds=${this._value ?? []}
+				.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : [this.value]) : []}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}>
 				<umb-localize key="general_add">Add</umb-localize>
