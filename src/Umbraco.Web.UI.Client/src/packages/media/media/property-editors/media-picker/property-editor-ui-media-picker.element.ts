@@ -4,21 +4,15 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-property-editor-ui-media-picker
  */
 @customElement('umb-property-editor-ui-media-picker')
 export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _value: Array<string> = [];
-
 	@property({ type: Array })
-	public get value(): Array<string> {
-		return this._value;
-	}
-	public set value(value: Array<string> | undefined) {
-		this._value = value || [];
-	}
+	public value?: Array<string> | string;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -29,6 +23,9 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 
 		this._limitMin = minMax.min ?? 0;
 		this._limitMax = minMax.max ?? Infinity;
+	}
+	public get config() {
+		return undefined;
 	}
 
 	@state()
@@ -45,7 +42,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		return html`
 			<umb-input-media
 				@change=${this._onChange}
-				.selectedIds=${this._value}
+				.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : splitStringToArray(this.value)) : []}
 				.min=${this._limitMin}
 				.max=${this._limitMax}
 				>Add</umb-input-media

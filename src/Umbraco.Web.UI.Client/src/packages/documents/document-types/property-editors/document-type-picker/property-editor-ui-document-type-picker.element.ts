@@ -22,6 +22,9 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 			this._onlyElementTypes = config.getValueByAlias('onlyPickElementTypes') ?? false;
 		}
 	}
+	public get config() {
+		return undefined;
+	}
 
 	@state()
 	private _limitMin?: number;

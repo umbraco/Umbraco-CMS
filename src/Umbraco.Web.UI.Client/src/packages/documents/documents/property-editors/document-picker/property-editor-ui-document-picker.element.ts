@@ -3,18 +3,12 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _value: Array<string> = [];
-
 	@property({ type: Array })
-	public get value(): Array<string> {
-		return this._value;
-	}
-	public set value(value: Array<string>) {
-		this._value = Array.isArray(value) ? value : value ? [value] : [];
-	}
+	public value?: Array<string> | string;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -22,6 +16,9 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 
 		this._limitMin = (validationLimit?.value as any)?.min;
 		this._limitMax = (validationLimit?.value as any)?.max;
+	}
+	public get config() {
+		return undefined;
 	}
 
 	@state()
@@ -39,7 +36,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		return html`
 			<umb-input-document
 				@change=${this._onChange}
-				.selectedIds=${this._value}
+				.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : splitStringToArray(this.value)) : []}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}
 				>Add</umb-input-document

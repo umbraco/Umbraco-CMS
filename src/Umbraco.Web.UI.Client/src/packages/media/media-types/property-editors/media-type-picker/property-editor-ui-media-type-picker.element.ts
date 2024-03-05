@@ -21,6 +21,9 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 			this._limitMax = validationLimit?.max;
 		}
 	}
+	public get config() {
+		return undefined;
+	}
 
 	@state()
 	private _limitMin?: number;
