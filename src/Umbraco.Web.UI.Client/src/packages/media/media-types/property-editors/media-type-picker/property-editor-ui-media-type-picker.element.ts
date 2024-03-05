@@ -9,14 +9,22 @@ import {
 
 @customElement('umb-property-editor-ui-media-type-picker')
 export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	@state()
+	_value?: Array<string>;
+
 	@property({ type: Array })
+	public set value(value: Array<string> | string | undefined) {
+		if (Array.isArray(value)) {
+			this._value = value;
+		} else if (typeof value === 'string') {
+			this._value = value.split(',');
+		} else {
+			this._value = undefined;
+		}
+	}
 	public get value(): Array<string> | string | undefined {
 		return this._value;
 	}
-	public set value(value: Array<string> | string | undefined) {
-		this._value = value;
-	}
-	private _value?: Array<string> | string;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -24,9 +32,6 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 			const validationLimit = config.getValueByAlias<any>('validationLimit');
 			this._limitMin = validationLimit?.min;
 			this._limitMax = validationLimit?.max;
-
-			// We have the need in Block Editors, to just pick a single ID not as an array. So for that we use the multiPicker config, which can be set to true if you wanted to be able to pick multiple.
-			this._multiPicker = config.getValueByAlias('multiPicker') ?? false;
 		}
 	}
 
@@ -34,30 +39,23 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 	private _limitMin?: number;
 	@state()
 	private _limitMax?: number;
-	@state()
-	private _multiPicker?: boolean;
 
 	private _onChange(event: CustomEvent) {
 		const selectedIds = (event.target as UmbInputMediaTypeElement).selectedIds;
-		this.value = this._multiPicker ? selectedIds : selectedIds[0];
+		this.value = selectedIds;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
+
 	render() {
-		return this._multiPicker !== undefined
-			? html`
-					<umb-input-media-type
-						@change=${this._onChange}
-						.selectedIds=${this._multiPicker
-							? (this._value as Array<string>) ?? []
-							: this._value
-								? [this._value as string]
-								: []}
-						.min=${this._limitMin ?? 0}
-						.max=${this._limitMax ?? Infinity}>
-						<umb-localize key="general_add">Add</umb-localize>
-					</umb-input-media-type>
-				`
-			: '';
+		return html`
+			<umb-input-media-type
+				@change=${this._onChange}
+				.selectedIds=${this._value ?? []}
+				.min=${this._limitMin ?? 0}
+				.max=${this._limitMax ?? Infinity}>
+				<umb-localize key="general_add">Add</umb-localize>
+			</umb-input-media-type>
+		`;
 	}
 }
 
