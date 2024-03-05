@@ -6,7 +6,6 @@ import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -39,7 +38,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 		return html`
 			<umb-input-document
 				@change=${this._onChange}
-				.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : splitStringToArray(this.value)) : []}
+				.value=${this.value ?? ''}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}>
 				<umb-localize key="general_add">Add</umb-localize>
