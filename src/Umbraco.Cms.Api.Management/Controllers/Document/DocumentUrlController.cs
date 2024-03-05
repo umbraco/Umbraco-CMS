@@ -23,7 +23,6 @@ public class DocumentUrlController : DocumentControllerBase
         _documentUrlFactory = documentUrlFactory;
     }
 
-    [HttpGet]
     [MapToApiVersion("1.0")]
     [HttpGet("urls")]
     [ProducesResponseType(typeof(IEnumerable<DocumentUrlInfoResourceSet>), StatusCodes.Status200OK)]

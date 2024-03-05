@@ -22,7 +22,6 @@ public class MediaUrlController : MediaControllerBase
         _mediaUrlFactory = mediaUrlFactory;
     }
 
-    [HttpGet]
     [MapToApiVersion("1.0")]
     [HttpGet("urls")]
     [ProducesResponseType(typeof(IEnumerable<MediaUrlInfoResourceSet>), StatusCodes.Status200OK)]
