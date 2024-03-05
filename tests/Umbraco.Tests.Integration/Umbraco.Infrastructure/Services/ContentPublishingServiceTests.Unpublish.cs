@@ -271,4 +271,56 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
         VerifyIsNotPublished(Subpage.Key);
     }
+
+    [TestCase("en-us")]
+    [TestCase("da-dk")]
+    public async Task Cannot_Unpublish_Incorrect_Culture_Code(string cultureCode)
+    {
+        var (langEn, langDa, contentType) = await SetupVariantTest(false);
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "EN root")
+            .WithCultureName(langDa.IsoCode, "DA root")
+            .Build();
+        content.SetValue("title", "EN title", culture: langEn.IsoCode);
+        content.SetValue("title", "DA title", culture: langDa.IsoCode);
+        ContentService.Save(content);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        VerifyIsPublished(content.Key);
+
+        var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { cultureCode }, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
+        VerifyIsPublished(content.Key);
+
+        content = ContentService.GetById(content.Key)!;
+        Assert.AreEqual(2, content.PublishedCultures.Count());
+    }
+
+    [TestCase("de-DE")]
+    [TestCase("es-ES")]
+    public async Task Cannot_Unpublish_Non_Existing_Culture(string cultureCode)
+    {
+        var (langEn, langDa, contentType) = await SetupVariantTest(false);
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "EN root")
+            .WithCultureName(langDa.IsoCode, "DA root")
+            .Build();
+        content.SetValue("title", "EN title", culture: langEn.IsoCode);
+        content.SetValue("title", "DA title", culture: langDa.IsoCode);
+        ContentService.Save(content);
+        await ContentPublishingService.PublishAsync(content.Key, MakeModel(new HashSet<string>() { langEn.IsoCode, langDa.IsoCode }), Constants.Security.SuperUserKey);
+        VerifyIsPublished(content.Key);
+
+        var result = await ContentPublishingService.UnpublishAsync(content.Key, new HashSet<string>() { cultureCode }, Constants.Security.SuperUserKey);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.InvalidCulture, result.Result);
+        VerifyIsPublished(content.Key);
+
+        content = ContentService.GetById(content.Key)!;
+        Assert.AreEqual(2, content.PublishedCultures.Count());
+    }
 }

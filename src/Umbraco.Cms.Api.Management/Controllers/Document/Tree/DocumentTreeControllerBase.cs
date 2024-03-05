@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Document}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessForContentTree)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessForContentTree)]
 public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemResponseModel>
 {
     private readonly IPublicAccessService _publicAccessService;

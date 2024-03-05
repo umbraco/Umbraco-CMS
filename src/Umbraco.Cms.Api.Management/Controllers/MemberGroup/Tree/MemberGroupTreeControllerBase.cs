@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MemberGroup}")]
 [ApiExplorerSettings(GroupName = "Member Group")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessMemberGroups)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMemberGroups)]
 public class MemberGroupTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
     public MemberGroupTreeControllerBase(IEntityService entityService)

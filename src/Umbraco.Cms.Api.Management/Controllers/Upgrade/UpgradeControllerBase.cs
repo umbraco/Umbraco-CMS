@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Upgrade;
 [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
 [VersionedApiBackOfficeRoute("upgrade")]
 [ApiExplorerSettings(GroupName = "Upgrade")]
-[Authorize(Policy = "New" + AuthorizationPolicies.RequireAdminAccess)]
+[Authorize(Policy = AuthorizationPolicies.RequireAdminAccess)]
 public abstract class UpgradeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UpgradeOperationResult(UpgradeOperationStatus status, InstallationResult? result = null) =>

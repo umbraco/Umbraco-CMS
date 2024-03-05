@@ -7,7 +7,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DynamicRoot;
 
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessSettings)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
 [ApiVersion("1.0")]
 public class GetQueryStepsController : DynamicRootControllerBase
 {

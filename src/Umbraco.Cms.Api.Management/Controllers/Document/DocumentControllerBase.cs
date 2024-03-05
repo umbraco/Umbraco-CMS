@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 [ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Document)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocuments)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class DocumentControllerBase : ContentControllerBase
 {
     protected IActionResult DocumentNotFound()

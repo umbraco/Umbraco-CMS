@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member.Filter;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Filter}/{Constants.UdiEntityType.Member}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Member))]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessForMemberTree)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessForMemberTree)]
 public abstract class MemberFilterControllerBase : ManagementApiControllerBase
 {
     protected IActionResult MemberTypeNotFound()

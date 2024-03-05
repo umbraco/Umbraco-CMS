@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.RelationType}")]
 [ApiExplorerSettings(GroupName = "Relation Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessRelationTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessRelationTypes)]
 public class RelationTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult RelationTypeOperationStatusResult(RelationTypeOperationStatus status) =>

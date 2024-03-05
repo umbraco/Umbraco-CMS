@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Template.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Template}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessTemplates)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
 public class TemplateTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
     public TemplateTreeControllerBase(IEntityService entityService)

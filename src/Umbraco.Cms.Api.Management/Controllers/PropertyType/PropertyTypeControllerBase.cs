@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.PropertyType;
 [ApiController]
 [VersionedApiBackOfficeRoute("property-type")]
 [ApiExplorerSettings(GroupName = "Property Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public abstract class PropertyTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult PropertyTypeOperationStatusResult(PropertyTypeOperationStatus status) =>

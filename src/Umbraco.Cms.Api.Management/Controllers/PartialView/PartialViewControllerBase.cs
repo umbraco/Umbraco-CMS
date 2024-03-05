@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.PartialView;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}")]
 [ApiExplorerSettings(GroupName = "Partial View")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessPartialViews)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessPartialViews)]
 public class PartialViewControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult PartialViewOperationStatusResult(PartialViewOperationStatus status) =>

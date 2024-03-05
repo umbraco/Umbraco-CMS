@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/dictionary")]
 [ApiExplorerSettings(GroupName = "Dictionary")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]
 // NOTE: at the moment dictionary items (renamed to dictionary tree) aren't supported by EntityService, so we have little use of the
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
 public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>

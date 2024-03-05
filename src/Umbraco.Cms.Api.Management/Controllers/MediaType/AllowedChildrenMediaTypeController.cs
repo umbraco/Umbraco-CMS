@@ -15,7 +15,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
 public class AllowedChildrenMediaTypeController : MediaTypeControllerBase
 {
     private readonly IMediaTypeService _mediaTypeService;

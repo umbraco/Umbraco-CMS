@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.User.Filter;
 
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Filter}/user")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessUsers)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
 public abstract class UserFilterControllerBase : UserOrCurrentUserControllerBase
 {
 }

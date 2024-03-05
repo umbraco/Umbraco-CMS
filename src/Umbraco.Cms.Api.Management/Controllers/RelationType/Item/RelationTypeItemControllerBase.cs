@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Item;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/{Constants.UdiEntityType.RelationType}")]
 [ApiExplorerSettings(GroupName = "Relation Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessRelationTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessRelationTypes)]
 public class RelationTypeItemControllerBase : ManagementApiControllerBase
 {
 }

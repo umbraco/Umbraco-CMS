@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.User.Item;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/user")]
 [ApiExplorerSettings(GroupName = "User")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessUsers)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
 public class UserItemControllerBase : ManagementApiControllerBase
 {
 }

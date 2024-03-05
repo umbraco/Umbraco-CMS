@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.MediaType}")]
 [ApiExplorerSettings(GroupName = "Media Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessMediaTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTreeItemResponseModel>
 {
     private readonly IMediaTypeService _mediaTypeService;

@@ -32,7 +32,7 @@ public class UpdateUserGroupsUserController : UserControllerBase
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             UserPermissionResource.WithKeys(requestModel.UserIds),
-            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+            AuthorizationPolicies.UserPermissionByResource);
 
         if (authorizationResult.Succeeded is false)
         {

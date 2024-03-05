@@ -10,7 +10,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DynamicRoot;
 
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessContent)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 [ApiVersion("1.0")]
 public class GetRootsController : DynamicRootControllerBase
 {
