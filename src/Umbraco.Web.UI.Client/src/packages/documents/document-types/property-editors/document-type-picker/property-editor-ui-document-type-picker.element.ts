@@ -7,8 +7,8 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-editor-ui-document-type-picker')
 export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Array })
-	public value?: Array<string> | string;
+	@property()
+	public value?: string;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -37,7 +37,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 
 	private _onChange(event: CustomEvent) {
 		const selectedIds = (event.target as UmbInputDocumentTypeElement).selectedIds;
-		this.value = this._multiPicker ? selectedIds : selectedIds[0];
+		this.value = this._multiPicker ? selectedIds.join(',') : selectedIds[0];
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -47,7 +47,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 			? html`
 					<umb-input-document-type
 						@change=${this._onChange}
-						.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : splitStringToArray(this.value)) : []}
+						.value=${this.value ?? ''}
 						.min=${this._limitMin ?? 0}
 						.max=${this._limitMax ?? Infinity}
 						.elementTypesOnly=${this._onlyElementTypes ?? false}>

@@ -11,8 +11,8 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
  */
 @customElement('umb-property-editor-ui-media-picker')
 export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Array })
-	public value?: Array<string> | string;
+	@property()
+	public value?: string;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -34,7 +34,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	private _limitMax: number = Infinity;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputMediaElement).selectedIds;
+		this.value = (event.target as UmbInputMediaElement).selectedIds.join(',');
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -42,7 +42,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		return html`
 			<umb-input-media
 				@change=${this._onChange}
-				.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : splitStringToArray(this.value)) : []}
+				.value=${this.value ?? ''}
 				.min=${this._limitMin}
 				.max=${this._limitMax}>
 				<umb-localize key="general_add">Add</umb-localize>

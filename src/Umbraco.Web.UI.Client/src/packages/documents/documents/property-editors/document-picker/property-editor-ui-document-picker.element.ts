@@ -7,8 +7,8 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-editor-ui-document-picker')
 export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property({ type: Array })
-	public value?: Array<string> | string;
+	@property()
+	public value?: string;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -27,7 +27,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputDocumentElement).selectedIds;
+		this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
