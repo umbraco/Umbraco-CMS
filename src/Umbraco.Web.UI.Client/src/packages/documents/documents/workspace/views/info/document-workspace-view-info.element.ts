@@ -10,7 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
-import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import type { UmbDocumentVariantModel, UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 import { DocumentVariantStateModel, type DocumentUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	type UmbDocumentTypeDetailModel,
@@ -21,16 +21,13 @@ import { UmbTemplateDetailRepository, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
-	private _nodeName = '';
-
-	@state()
 	private _documentUnique = '';
 
 	@state()
 	private _urls?: Array<DocumentUrlInfoModel>;
 
 	@state()
-	private _createDate = 'Unknown';
+	private _createDate?: string;
 
 	@state()
 	private _state = DocumentVariantStateModel.DRAFT;
@@ -60,6 +57,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	@state()
 	private _editTemplatePath = '';
+
+	@state()
+	private _variants: UmbDocumentVariantModel[] = [];
 
 	#workspaceContext?: UmbDocumentWorkspaceContext;
 
@@ -96,8 +96,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	private _observeContent() {
 		if (!this.#workspaceContext) return;
 
-		this._nodeName = 'TBD, with variants this is not as simple.';
-
 		this.observe(this.#workspaceContext.urls, (urls) => {
 			this._urls = urls;
 		});
@@ -133,9 +131,18 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		/** TODO: Doubt this is the right way to get the create date... */
 		this.observe(this.#workspaceContext.variants, (variants) => {
-			this._createDate = Array.isArray(variants) ? variants[0].createDate || 'Unknown' : 'Unknown';
-			if (variants[0].state) this._state = variants[0].state;
+			this._variants = variants;
+			this.#observeVariants();
 		});
+	}
+
+	#observeVariants() {
+		// Find the oldest variant
+		const oldestVariant = this._variants
+			.filter((v) => !!v.createDate)
+			.reduce((prev, current) => (prev.createDate! < current.createDate! ? prev : current));
+
+		this._createDate = oldestVariant?.createDate ? oldestVariant.createDate : new Date().toISOString();
 	}
 
 	#renderStateTag() {
