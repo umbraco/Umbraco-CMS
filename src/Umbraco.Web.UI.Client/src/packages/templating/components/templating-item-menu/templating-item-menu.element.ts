@@ -6,11 +6,11 @@ import {
 	type UmbTemplatingItemPickerModalValue,
 } from '../../modals/templating-item-picker/templating-item-picker-modal.token.js';
 import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils/index.js';
-import { UmbDictionaryDetailRepository } from '@umbraco-cms/backoffice/dictionary';
+import { UmbDictionaryDetailRepository, UMB_DICTIONARY_PICKER_MODAL } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_DICTIONARY_ITEM_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-templating-insert-menu')
@@ -78,7 +78,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 	}
 
 	async #openDictionaryItemPickerModal() {
-		const dictionaryItemPickerContext = this.#modalContext?.open(this, UMB_DICTIONARY_ITEM_PICKER_MODAL);
+		const dictionaryItemPickerContext = this.#modalContext?.open(this, UMB_DICTIONARY_PICKER_MODAL);
 		await dictionaryItemPickerContext?.onSubmit();
 
 		const item = dictionaryItemPickerContext?.getValue().selection[0];
