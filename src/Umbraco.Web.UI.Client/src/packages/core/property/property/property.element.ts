@@ -101,8 +101,9 @@ export class UmbPropertyElement extends UmbLitElement {
 	@state()
 	private _element?: ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
-	@state()
-	private _value?: unknown;
+	// Not begin used currently [NL]
+	//@state()
+	//private _value?: unknown;
 
 	@state()
 	private _alias?: string;
@@ -183,7 +184,8 @@ export class UmbPropertyElement extends UmbLitElement {
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
 				this.#valueObserver = this.observe(this.#propertyContext.value, (value) => {
-					this._value = value;
+					//this._value = value;// This was not used currently [NL]
+					console.log('got value', value, 'setting value on element...');
 					if (this._element) {
 						this._element.value = value;
 					}
