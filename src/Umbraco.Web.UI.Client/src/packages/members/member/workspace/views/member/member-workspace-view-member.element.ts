@@ -1,13 +1,14 @@
 // import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_MEMBER_WORKSPACE_CONTEXT } from '../../member-workspace.context.js';
 import type { UmbMemberDetailModel } from '../../../types.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import './member-workspace-view-member-info.element.js';
+import type { UmbInputMemberGroupElement } from '@umbraco-cms/backoffice/member-group';
 
 @customElement('umb-member-workspace-view-member')
 export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -37,7 +38,15 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 	#onChange(propertyName: keyof UmbMemberDetailModel, value: UmbMemberDetailModel[keyof UmbMemberDetailModel]) {
 		if (!this._workspaceContext) return;
 
+		console.log('Setting', propertyName, value);
+
 		this._workspaceContext.set(propertyName, value);
+	}
+
+	#onGroupsUpdated(event: CustomEvent) {
+		const uniques = (event.target as UmbInputMemberGroupElement).selectedIds;
+
+		this._workspaceContext?.set('groups', uniques);
 	}
 
 	#onPasswordUpdate = () => {
@@ -147,7 +156,10 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 				${this.#renderPasswordInput()}
 
 				<umb-property-layout label="Member Group">
-					<div slot="editor">MEMBER GROUP PICKER</div>
+					<umb-input-member-group
+						slot="editor"
+						@change=${this.#onGroupsUpdated}
+						.selectedIds=${this._workspaceContext.memberGroups}></umb-input-member-group>
 				</umb-property-layout>
 
 				<umb-property-layout label="Approved">
@@ -160,6 +172,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 				<umb-property-layout label="Locked out">
 					<uui-toggle
+						?disabled=${this._isNew || !this._workspaceContext.isLockedOut}
 						slot="editor"
 						.checked=${this._workspaceContext.isLockedOut}
 						@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
@@ -167,7 +180,12 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 				</umb-property-layout>
 
 				<umb-property-layout label="Two-Factor authentication">
-					<uui-toggle slot="editor"></uui-toggle>
+					<uui-toggle
+						?disabled=${this._isNew || !this._workspaceContext.isTwoFactorEnabled}
+						slot="editor"
+						.checked=${this._workspaceContext.isTwoFactorEnabled}
+						@change=${(e: UUIBooleanInputEvent) => this.#onChange('isTwoFactorEnabled', e.target.checked)}>
+					</uui-toggle>
 				</umb-property-layout>
 			</uui-box>
 		</div>`;
