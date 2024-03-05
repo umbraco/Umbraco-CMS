@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IMediaPresentationFactory
 {
-    Task<MediaResponseModel> CreateResponseModelAsync(IMedia media);
+    MediaResponseModel CreateResponseModel(IMedia media);
 
     MediaItemResponseModel CreateItemResponseModel(IMediaEntitySlim entity);
 

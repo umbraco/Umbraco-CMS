@@ -44,7 +44,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
         _publishedUrlProvider = publishedUrlProvider;
     }
 
-    public async Task<IEnumerable<DocumentUrlInfo>> GetUrlsAsync(IContent content)
+    public async Task<IEnumerable<DocumentUrlInfo>> CreateUrlsAsync(IContent content)
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
@@ -63,5 +63,18 @@ public class DocumentUrlFactory : IDocumentUrlFactory
             .Where(urlInfo => urlInfo.IsUrl)
             .Select(urlInfo => new DocumentUrlInfo { Culture = urlInfo.Culture, Url = urlInfo.Text })
             .ToArray();
+    }
+
+    public async Task<IEnumerable<DocumentUrlInfoResourceSet>> CreateUrlSetsAsync(IEnumerable<IContent> contentItems)
+    {
+        var documentUrlInfoResourceSets = new List<DocumentUrlInfoResourceSet>();
+
+        foreach (IContent content in contentItems)
+        {
+            IEnumerable<DocumentUrlInfo> urls = await CreateUrlsAsync(content);
+            documentUrlInfoResourceSets.Add(new DocumentUrlInfoResourceSet(content.Key, urls));
+        }
+
+        return documentUrlInfoResourceSets;
     }
 }

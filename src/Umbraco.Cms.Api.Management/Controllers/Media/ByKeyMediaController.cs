@@ -52,7 +52,7 @@ public class ByKeyMediaController : MediaControllerBase
             return MediaNotFound();
         }
 
-        MediaResponseModel model = await _mediaPresentationFactory.CreateResponseModelAsync(media);
+        MediaResponseModel model = _mediaPresentationFactory.CreateResponseModel(media);
         return Ok(model);
     }
 }

@@ -18,41 +18,27 @@ internal sealed class MediaPresentationFactory
     : ContentPresentationFactoryBase<IMediaType, IMediaTypeService>, IMediaPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly ContentSettings _contentSettings;
-    private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
-    private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
     private readonly IMediaTypeService _mediaTypeService;
+    private readonly IMediaUrlFactory _mediaUrlFactory;
 
     public MediaPresentationFactory(
         IUmbracoMapper umbracoMapper,
-        IOptions<ContentSettings> contentSettings,
-        MediaUrlGeneratorCollection mediaUrlGenerators,
-        IAbsoluteUrlBuilder absoluteUrlBuilder,
-        IMediaTypeService mediaTypeService)
+        IMediaTypeService mediaTypeService,
+        IMediaUrlFactory mediaUrlFactory)
         : base(mediaTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
-        _contentSettings = contentSettings.Value;
-        _mediaUrlGenerators = mediaUrlGenerators;
-        _absoluteUrlBuilder = absoluteUrlBuilder;
         _mediaTypeService = mediaTypeService;
+        _mediaUrlFactory = mediaUrlFactory;
     }
 
-    public Task<MediaResponseModel> CreateResponseModelAsync(IMedia media)
+    public MediaResponseModel CreateResponseModel(IMedia media)
     {
         MediaResponseModel responseModel = _umbracoMapper.Map<MediaResponseModel>(media)!;
 
-        responseModel.Urls = media
-            .GetUrls(_contentSettings, _mediaUrlGenerators)
-            .WhereNotNull()
-            .Select(mediaUrl => new MediaUrlInfo
-            {
-                Culture = null,
-                Url = _absoluteUrlBuilder.ToAbsoluteUrl(mediaUrl).ToString(),
-            })
-            .ToArray();
+        responseModel.Urls = _mediaUrlFactory.CreateUrls(media);
 
-        return Task.FromResult(responseModel);
+        return responseModel;
     }
 
     public MediaItemResponseModel CreateItemResponseModel(IMediaEntitySlim entity)

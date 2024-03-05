@@ -47,7 +47,7 @@ internal sealed class DocumentPresentationFactory
     {
         DocumentResponseModel responseModel = _umbracoMapper.Map<DocumentResponseModel>(content)!;
 
-        responseModel.Urls = await _documentUrlFactory.GetUrlsAsync(content);
+        responseModel.Urls = await _documentUrlFactory.CreateUrlsAsync(content);
 
         Guid? templateKey = content.TemplateId.HasValue
             ? _fileService.GetTemplate(content.TemplateId.Value)?.Key

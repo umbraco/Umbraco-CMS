@@ -26,11 +26,11 @@ public class DocumentUrlController : DocumentControllerBase
     [HttpGet]
     [MapToApiVersion("1.0")]
     [HttpGet("urls")]
-    [ProducesResponseType(typeof(Dictionary<Guid, DocumentUrlInfo>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<DocumentUrlInfoResourceSet>), StatusCodes.Status200OK)]
     public async Task<ActionResult> GetUrls([FromQuery(Name = "id")] HashSet<Guid> ids)
     {
         IEnumerable<IContent> items = _contentService.GetByIds(ids);
 
-        return Ok(await items.ToDictionaryAsync(content => content.Key, async content => await _documentUrlFactory.GetUrlsAsync(content)));
+        return Ok(await _documentUrlFactory.CreateUrlSetsAsync(items));
     }
 }
