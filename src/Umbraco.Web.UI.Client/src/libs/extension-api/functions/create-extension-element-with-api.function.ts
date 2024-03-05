@@ -45,11 +45,10 @@ export async function createExtensionElementWithApi<
 		apiConstructor = await apiPromise;
 	}
 
-	if (manifest.elementName) {
+	if (!element && manifest.elementName) {
 		element = document.createElement(manifest.elementName) as ElementType;
 	}
-
-	if (fallbackElement) {
+	if (!element && fallbackElement) {
 		element = document.createElement(fallbackElement) as ElementType;
 	}
 
