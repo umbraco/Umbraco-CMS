@@ -27,7 +27,7 @@ const SORTER_CONFIG: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 	itemSelector: '[data-umb-tabs-id]',
 	containerSelector: '#tabs-group',
 	disabledItemSelector: '[inherited]',
-	resolveVerticalDirection: () => {
+	resolvePlacement: () => {
 		return false;
 	},
 };

@@ -6,8 +6,11 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { ManifestWorkspaceAction, MetaWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbWorkspaceActionArgs } from '@umbraco-cms/backoffice/workspace';
 
-function ExtensionApiArgsMethod(manifest: ManifestWorkspaceAction<MetaWorkspaceAction>) {
+function ExtensionApiArgsMethod(
+	manifest: ManifestWorkspaceAction<MetaWorkspaceAction>,
+): [UmbWorkspaceActionArgs<MetaWorkspaceAction>] {
 	return [{ meta: manifest.meta }];
 }
 
