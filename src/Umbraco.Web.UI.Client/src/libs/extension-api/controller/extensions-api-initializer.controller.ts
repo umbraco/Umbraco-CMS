@@ -4,7 +4,12 @@ import {
 	UmbBaseExtensionsInitializer,
 } from './base-extensions-initializer.controller.js';
 import { UmbExtensionApiInitializer } from './extension-api-initializer.controller.js';
-import type { ManifestApi, ManifestBase, UmbExtensionRegistry } from '@umbraco-cms/backoffice/extension-api';
+import type {
+	ManifestApi,
+	ManifestBase,
+	UmbApiConstructorArgumentsMethodType,
+	UmbExtensionRegistry,
+} from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -50,13 +55,13 @@ export class UmbExtensionsApiInitializer<
 	}
 	*/
 
-	#constructorArgs: Array<unknown> | undefined;
+	#constructorArgs: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestTypeAsApi> | undefined;
 
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
-		constructorArguments: Array<unknown> | undefined,
+		constructorArguments: Array<unknown> | UmbApiConstructorArgumentsMethodType<ManifestTypeAsApi> | undefined,
 		filter?: undefined | null | ((manifest: ManifestTypeAsApi) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		controllerAlias?: string,

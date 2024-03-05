@@ -6,13 +6,14 @@ import type {
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserPermissionCondition
 	extends UmbConditionBase<UserPermissionConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(args: UmbConditionControllerArguments<UserPermissionConditionConfig>) {
-		super(args);
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UserPermissionConditionConfig>) {
+		super(host, args);
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(

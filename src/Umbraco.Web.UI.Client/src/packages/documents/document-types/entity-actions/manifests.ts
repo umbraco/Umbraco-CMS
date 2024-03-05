@@ -1,6 +1,6 @@
 import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS, DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
-import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'document-type';

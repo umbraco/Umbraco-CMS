@@ -6,13 +6,17 @@ import type {
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbMediaWorkspaceHasCollectionCondition
 	extends UmbConditionBase<MediaWorkspaceHasCollectionConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(args: UmbConditionControllerArguments<MediaWorkspaceHasCollectionConditionConfig>) {
-		super(args);
+	constructor(
+		host: UmbControllerHost,
+		args: UmbConditionControllerArguments<MediaWorkspaceHasCollectionConditionConfig>,
+	) {
+		super(host, args);
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this.observe(

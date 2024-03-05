@@ -1,4 +1,5 @@
 import { UmbConditionBase } from './condition-base.controller.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -9,8 +10,8 @@ import type {
 export class UmbSwitchCondition extends UmbConditionBase<SwitchConditionConfig> implements UmbExtensionCondition {
 	#timer?: ReturnType<typeof setTimeout>;
 
-	constructor(args: UmbConditionControllerArguments<SwitchConditionConfig>) {
-		super(args);
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<SwitchConditionConfig>) {
+		super(host, args);
 		this.startApprove();
 	}
 

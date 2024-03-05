@@ -7,11 +7,9 @@ import {
 	UMB_DATATYPE_WORKSPACE_MODAL,
 	UMB_DATA_TYPE_ENTITY_TYPE,
 	UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
-} from '@umbraco-cms/backoffice/data-type';
-import {
-	UmbModalRouteRegistrationController,
 	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+} from '@umbraco-cms/backoffice/data-type';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-input-collection-configuration')
