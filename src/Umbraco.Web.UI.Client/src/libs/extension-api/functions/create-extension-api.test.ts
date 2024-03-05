@@ -30,7 +30,7 @@ const jsModuleWithDefaultAndApiExport = {
 	api: UmbExtensionApiTrueTestClass,
 };
 
-describe('Extension-Api: Create Extension Api', () => {
+describe('Create Extension Api Method', () => {
 	it('Returns `undefined` when manifest does not have any correct properties', async () => {
 		const manifest: ManifestApi = {
 			type: 'my-test-type',
