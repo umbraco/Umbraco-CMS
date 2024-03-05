@@ -1,10 +1,9 @@
-import type { UmbClassMixinInterface } from './class.interface.js';
+import type { UmbClassMixinInterface } from './class-mixin.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
 	type UmbControllerHost,
 	UmbControllerHostMixin,
-	type UmbController,
 	type UmbControllerAlias,
 } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -18,84 +17,11 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 type UmbClassMixinConstructor = new (
 	host: UmbControllerHost,
 	controllerAlias?: UmbControllerAlias,
-) => UmbClassMixinDeclaration;
+) => UmbClassMixinInterface;
 
-// TODO: we need the interface from EventTarget to be part of the controller base. As a temp solution the UmbClassMixinDeclaration extends EventTarget.
-declare class UmbClassMixinDeclaration extends EventTarget implements UmbClassMixinInterface {
-	_host: UmbControllerHost;
-
-	/**
-	 * @description Observe a RxJS source of choice.
-	 * @param {Observable<T>} source RxJS source
-	 * @param {method} callback Callback method called when data is changed.
-	 * @return {UmbObserverController} Reference to a Observer Controller instance
-	 * @memberof UmbClassMixin
-	 */
-	observe<T>(
-		source: Observable<T>,
-		callback: (_value: T) => void,
-		controllerAlias?: UmbControllerAlias,
-	): UmbObserverController<T>;
-
-	/**
-	 * @description Provide a context API for this or child elements.
-	 * @param {string} contextAlias
-	 * @param {instance} instance The API instance to be exposed.
-	 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
-	 * @memberof UmbClassMixin
-	 */
-	provideContext<
-		BaseType = unknown,
-		ResultType extends BaseType = BaseType,
-		InstanceType extends ResultType = ResultType,
-	>(
-		alias: string | UmbContextToken<BaseType, ResultType>,
-		instance: InstanceType,
-	): UmbContextProviderController<BaseType, ResultType, InstanceType>;
-
-	/**
-	 * @description Setup a subscription for a context. The callback is called when the context is resolved.
-	 * @param {string} contextAlias
-	 * @param {method} callback Callback method called when context is resolved.
-	 * @return {UmbContextConsumerController} Reference to a Context Consumer Controller instance
-	 * @memberof UmbClassMixin
-	 */
-	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
-		alias: string | UmbContextToken<BaseType, ResultType>,
-		callback: UmbContextCallback<ResultType>,
-	): UmbContextConsumerController<BaseType, ResultType>;
-
-	/**
-	 * @description Retrieve a context. Notice this is a one time retrieving of a context, meaning if you expect this to be up to date with reality you should instead use the consumeContext method.
-	 * @param {string} contextAlias
-	 * @return {Promise<ContextType>} A Promise with the reference to the Context Api Instance
-	 * @memberof UmbClassMixin
-	 */
-	getContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
-		alias: string | UmbContextToken<BaseType, ResultType>,
-	): Promise<ResultType>;
-
-	hasController(controller: UmbController): boolean;
-	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
-	addController(controller: UmbController): void;
-	removeControllerByAlias(controllerAlias: UmbControllerAlias): void;
-	removeController(controller: UmbController): void;
-	getHostElement(): Element;
-
-	get controllerAlias(): UmbControllerAlias;
-	hostConnected(): void;
-	hostDisconnected(): void;
-
-	/**
-	 * @description Destroys the controller and removes it from the host.
-	 * @memberof UmbClassMixin
-	 */
-	destroy(): void;
-}
-
-export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
-	class UmbClassMixinClass extends UmbControllerHostMixin(superClass) implements UmbControllerHost {
-		protected _host: UmbControllerHost;
+export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClass: T) => {
+	class UmbClassMixinClass extends UmbControllerHostMixin(superClass) implements UmbClassMixinInterface {
+		_host: UmbControllerHost;
 		protected _controllerAlias: UmbControllerAlias;
 
 		constructor(host: UmbControllerHost, controllerAlias?: UmbControllerAlias) {
@@ -113,12 +39,12 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			return this._controllerAlias;
 		}
 
-		observe<T>(
+		observe<T, R extends UmbObserverController<T> = UmbObserverController<T>>(
 			source: Observable<T>,
 			callback: (_value: T) => void,
 			controllerAlias?: UmbControllerAlias,
-		): UmbObserverController<T> {
-			return new UmbObserverController<T>(this, source, callback, controllerAlias);
+		): R {
+			return new UmbObserverController<T>(this, source, callback, controllerAlias) as R;
 		}
 
 		provideContext<
@@ -159,5 +85,5 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		}
 	}
 
-	return UmbClassMixinClass as unknown as UmbClassMixinConstructor & UmbClassMixinDeclaration;
+	return UmbClassMixinClass as unknown as UmbClassMixinConstructor & T;
 };
