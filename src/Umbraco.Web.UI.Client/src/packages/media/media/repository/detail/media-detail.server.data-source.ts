@@ -114,7 +114,11 @@ export class UmbMediaServerDataSource implements UmbDetailDataSource<UmbMediaDet
 			parent: parentUnique ? { id: parentUnique } : null,
 			mediaType: { id: model.mediaType.unique },
 			values: model.values,
-			variants: model.variants,
+			variants: model.variants.map((variant) => ({
+				culture: variant.culture || null,
+				segment: variant.segment || null,
+				name: variant.name,
+			})),
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
