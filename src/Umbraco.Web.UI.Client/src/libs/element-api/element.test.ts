@@ -41,17 +41,20 @@ describe('UmbElement', () => {
 			it('has an hasController method', () => {
 				expect(hostElement).to.have.property('getHostElement').that.is.a('function');
 			});
+			it('has an hasController should return it self', () => {
+				expect(hostElement.getHostElement()).to.be.equal(hostElement);
+			});
 			it('has an observe method', () => {
 				expect(hostElement).to.have.property('observe').that.is.a('function');
 			});
 			it('has an provideContext method', () => {
-				expect(hostElement).to.have.property('observe').that.is.a('function');
+				expect(hostElement).to.have.property('provideContext').that.is.a('function');
 			});
 			it('has an consumeContext method', () => {
-				expect(hostElement).to.have.property('observe').that.is.a('function');
+				expect(hostElement).to.have.property('consumeContext').that.is.a('function');
 			});
 			it('has an getContext method', () => {
-				expect(hostElement).to.have.property('observe').that.is.a('function');
+				expect(hostElement).to.have.property('getContext').that.is.a('function');
 			});
 			it('has an localization class instance', () => {
 				expect(hostElement).to.have.property('localize').that.is.a('object');
