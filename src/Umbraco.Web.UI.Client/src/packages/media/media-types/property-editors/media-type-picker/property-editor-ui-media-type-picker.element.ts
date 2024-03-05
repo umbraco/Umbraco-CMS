@@ -6,7 +6,6 @@ import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-editor-ui-media-type-picker')
 export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {

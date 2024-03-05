@@ -2,8 +2,10 @@ import type { UmbInputDocumentTypeElement } from '../../components/input-documen
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-document-type-picker')
 export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -38,7 +40,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 	private _onChange(event: CustomEvent) {
 		const selectedIds = (event.target as UmbInputDocumentTypeElement).selectedIds;
 		this.value = this._multiPicker ? selectedIds.join(',') : selectedIds[0];
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	// TODO: Implement mandatory?
