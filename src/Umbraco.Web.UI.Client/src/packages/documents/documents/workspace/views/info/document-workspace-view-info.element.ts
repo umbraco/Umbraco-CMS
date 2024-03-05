@@ -141,24 +141,24 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	#renderStateTag() {
 		switch (this._state) {
 			case DocumentVariantStateModel.DRAFT:
-				return html`<uui-tag look="secondary" label=${this.localize.term('content_unpublished')}
-					>${this.localize.term('content_unpublished')}</uui-tag
-				>`;
+				return html`<uui-tag look="secondary" label=${this.localize.term('content_unpublished')}>
+					${this.localize.term('content_unpublished')}
+				</uui-tag>`;
 			case DocumentVariantStateModel.PUBLISHED:
-				return html`<uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}
-					>${this.localize.term('content_published')}</uui-tag
-				>`;
+				return html`<uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}>
+					${this.localize.term('content_published')}
+				</uui-tag>`;
 			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES:
 				return html`<uui-tag
 					color="positive"
 					look="primary"
-					label=${this.localize.term('content_publishedPendingChanges')}
-					>${this.localize.term('content_published')}</uui-tag
-				>`;
+					label=${this.localize.term('content_publishedPendingChanges')}>
+					${this.localize.term('content_published')}
+				</uui-tag>`;
 			default:
-				return html`<uui-tag look="primary" label=${this.localize.term('content_published')}
-					>${this.localize.term('content_published')}</uui-tag
-				>`;
+				return html`<uui-tag look="primary" label=${this.localize.term('content_published')}>
+					${this.localize.term('content_published')}
+				</uui-tag>`;
 		}
 	}
 
@@ -218,22 +218,23 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType">Document Type</umb-localize></strong>
 				<uui-ref-node-document-type
+					standalone
 					href=${this._editDocumentTypePath + 'edit/' + this._documentTypeUnique}
 					name=${ifDefined(this._documentTypeName)}>
-					<uui-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></uui-icon>
+					<umb-icon slot="icon" name=${ifDefined(this._documentTypeIcon)}></umb-icon>
 				</uui-ref-node-document-type>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="template_template">Template</umb-localize></strong>
 				${this._templateUnique
 					? html`<uui-ref-node
+							standalone
 							name=${ifDefined(this._templateName)}
 							href=${this._editTemplatePath + 'edit/' + this._templateUnique}>
 							<uui-icon slot="icon" name="icon-newspaper"></uui-icon>
-							<uui-button
-								slot="actions"
-								label=${this.localize.term('general_edit')}
-								@click=${this.#openTemplatePicker}></uui-button>
+							<uui-action-bar slot="actions">
+								<uui-button label=${this.localize.term('general_edit')} @click=${this.#openTemplatePicker}></uui-button>
+							</uui-action-bar>
 					  </uui-ref-node>`
 					: html`<uui-button
 							label=${this.localize.term('general_edit')}
