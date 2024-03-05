@@ -66,6 +66,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 					controllerAlias,
 				) as unknown as SpecificR;
 			} else {
+				callback(undefined as SpecificT);
 				this.removeControllerByAlias(controllerAlias);
 				return undefined as SpecificR;
 			}

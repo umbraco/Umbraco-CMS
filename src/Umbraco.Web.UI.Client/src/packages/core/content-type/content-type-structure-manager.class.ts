@@ -155,19 +155,12 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 					 */
 					this.#contentTypes.appendOne(docType);
 				}
+				// TODO: Do we need to handle the undefined case? [NL]
 			},
 			'observeContentType_' + data.unique,
 		);
 
-		if (ctrl) {
-			this.#contentTypeObservers.push(ctrl);
-		} else {
-			console.error('Could not observe content type: ' + data.unique);
-			// No need to destroy here as this.observe will destroy the controller if it already exists, so here we just need to get rid of it from our list. [NL]
-			this.#contentTypeObservers = this.#contentTypeObservers.filter(
-				(x) => x.controllerAlias === 'observeContentType_' + data.unique,
-			);
-		}
+		this.#contentTypeObservers.push(ctrl);
 	}
 
 	private async _loadContentTypeCompositions(contentType: T) {
