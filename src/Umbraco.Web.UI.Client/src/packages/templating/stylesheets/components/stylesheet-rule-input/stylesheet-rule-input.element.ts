@@ -32,7 +32,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 	}
 
 	#appendRule = async () => {
-		await this.#openRuleSettings(null)
+		this.#openRuleSettings(null)
 			.then((value) => {
 				if (!value.rule) return;
 				this.rules = [...this.rules, value.rule];
@@ -42,7 +42,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 	};
 
 	#editRule = async (rule: UmbStylesheetRule, index: number) => {
-		await this.#openRuleSettings(rule)
+		this.#openRuleSettings(rule)
 			.then((value) => {
 				if (!value.rule) return;
 				this.rules[index] = value.rule;
