@@ -912,11 +912,22 @@ internal class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUser, existingUser);
         }
 
-        var userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToHashSet();
+        IEnumerable<IUserGroup> allUserGroups = _userGroupRepository.GetMany().ToArray();
+        var userGroups = allUserGroups.Where(x => model.UserGroupKeys.Contains(x.Key)).ToHashSet();
 
         if (userGroups.Count != model.UserGroupKeys.Count)
         {
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUserGroup, existingUser);
+        }
+
+        // We're de-admining a user, we need to ensure that this would not leave the admin group empty.
+        if (existingUser.IsAdmin() && model.UserGroupKeys.Contains(Constants.Security.AdminGroupKey) is false)
+        {
+            IUserGroup? adminGroup = allUserGroups.FirstOrDefault(x => x.Key == Constants.Security.AdminGroupKey);
+            if (adminGroup?.UserCount == 1)
+            {
+                return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.AdminUserGroupMustNotBeEmpty, existingUser);
+            }
         }
 
         // We have to resolve the keys to ids to be compatible with the repository, this could be done in the factory,
@@ -1055,7 +1066,7 @@ internal class UserService : RepositoryService, IUserService
             return UserOperationStatus.UserNameIsNotEmail;
         }
 
-        if (!IsEmailValid(model.Email))
+        if (IsEmailValid(model.Email) is false)
         {
             return UserOperationStatus.InvalidEmail;
         }
