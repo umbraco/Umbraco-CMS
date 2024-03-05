@@ -1,19 +1,20 @@
 import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
-import type { UmbDataTypeTreeItemModel } from '../../tree/types.js';
 import { UMB_DATATYPE_WORKSPACE_MODAL } from '../../workspace/data-type-workspace.modal-token.js';
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
+import { UmbDataTypeCollectionRepository } from '../../collection/index.js';
 import { UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL } from './data-type-picker-flow-data-type-picker-modal.token.js';
 import type {
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalValue,
 } from './data-type-picker-flow-modal.token.js';
 import { css, html, repeat, customElement, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
-import { UmbModalBaseElement, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
-import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbModalBaseElement, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;
@@ -29,7 +30,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	@state()
-	private _groupedDataTypes?: GroupedItems<UmbDataTypeTreeItemModel>;
+	private _groupedDataTypes?: GroupedItems<UmbDataTypeItemModel>;
 
 	@state()
 	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUi> = {};
@@ -42,14 +43,15 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	private _createDataTypeModal: UmbModalRouteRegistrationController;
 
-	#treeRepository;
-	#dataTypes: Array<UmbDataTypeTreeItemModel> = [];
+	#collectionRepository;
+	#dataTypes: Array<UmbDataTypeItemModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
 
 	constructor() {
 		super();
-		this.#treeRepository = new UmbDataTypeTreeRepository(this);
+
+		this.#collectionRepository = new UmbDataTypeCollectionRepository(this);
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL)
 			.addAdditionalPath(':uiAlias')
@@ -77,7 +79,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup((params) => {
-				return { data: { entityType: 'data-type', preset: { editorUiAlias: params.uiAlias } } };
+				return { data: { entityType: UMB_DATA_TYPE_ENTITY_TYPE, preset: { editorUiAlias: params.uiAlias } } };
 			})
 			.onSubmit((value) => {
 				this._select(value?.unique);
@@ -97,13 +99,10 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	async #init() {
-		// TODO: Get ALL items, or traverse the structure aka. multiple recursive calls.
 		this.observe(
-			(await this.#treeRepository.requestRootTreeItems({ skip: 0, take: 100 })).asObservable(),
-			(items) => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				this.#dataTypes = items;
+			(await this.#collectionRepository.requestCollection({ skip: 0, take: 100 })).asObservable(),
+			(dataTypes) => {
+				this.#dataTypes = dataTypes;
 				this._performFiltering();
 			},
 			'_repositoryItemsObserver',
@@ -114,12 +113,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			this.#propertyEditorUIs = propertyEditorUIs.filter(
 				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
 			);
-
 			this._performFiltering();
 		});
 	}
 
-	private _handleDataTypeClick(dataType: UmbDataTypeTreeItemModel) {
+	private _handleDataTypeClick(dataType: UmbDataTypeItemModel) {
 		if (dataType.unique) {
 			this._select(dataType.unique);
 			this._submitModal();
@@ -137,8 +135,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 	private _performFiltering() {
 		if (this.#currentFilterQuery) {
-			const filteredDataTypes = this.#dataTypes.filter(
-				(dataType) => dataType.name?.toLowerCase().includes(this.#currentFilterQuery),
+			const filteredDataTypes = this.#dataTypes.filter((dataType) =>
+				dataType.name?.toLowerCase().includes(this.#currentFilterQuery),
 			);
 
 			/* TODO: data type items doesn't have a group property. We will need a reference to the Property Editor UI to get the group.
@@ -158,7 +156,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 						propertyEditorUI.name.toLowerCase().includes(this.#currentFilterQuery) ||
 						propertyEditorUI.alias.toLowerCase().includes(this.#currentFilterQuery)
 					);
-			  });
+				});
 
 		// TODO: groupBy is not known by TS yet
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -266,12 +264,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 									</div>
 								</uui-button>
 							</li>`,
-				  )
+					)
 				: ''}
 		</ul>`;
 	}
 
-	private _renderGroupDataTypes(dataTypes: Array<UmbDataTypeTreeItemModel>) {
+	private _renderGroupDataTypes(dataTypes: Array<UmbDataTypeItemModel>) {
 		return html` <ul id="item-grid">
 			${repeat(
 				dataTypes,
