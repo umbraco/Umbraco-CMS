@@ -27,7 +27,7 @@ export class UmbBlockWorkspaceElement extends UmbLitElement {
 
 	public set manifest(manifest: ManifestWorkspace) {
 		this.#manifest = manifest;
-		createExtensionApi(manifest, [this, { manifest: manifest }]).then((context) => {
+		createExtensionApi(this, manifest, [{ manifest: manifest }]).then((context) => {
 			if (context) {
 				this.#gotWorkspaceContext(context);
 				// TODO: Do we need to recreate when ID changed? Or is that a responsibility of the context it self?

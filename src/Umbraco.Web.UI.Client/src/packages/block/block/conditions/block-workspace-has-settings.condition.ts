@@ -5,13 +5,17 @@ import type {
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbBlockWorkspaceHasSettingsCondition
 	extends UmbConditionBase<BlockWorkspaceHasSettingsConditionConfig>
 	implements UmbExtensionCondition
 {
-	constructor(args: UmbConditionControllerArguments<BlockWorkspaceHasSettingsConditionConfig>) {
-		super(args);
+	constructor(
+		host: UmbControllerHost,
+		args: UmbConditionControllerArguments<BlockWorkspaceHasSettingsConditionConfig>,
+	) {
+		super(host, args);
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			this.observe(

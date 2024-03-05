@@ -20,7 +20,7 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 
 class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 	constructor(
-		host: UmbControllerHostElement,
+		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		alias: string,
 		onPermissionChanged: (isPermitted: boolean) => void,
@@ -40,16 +40,16 @@ class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 
 class UmbTestConditionAlwaysValid extends UmbControllerBase implements UmbExtensionCondition {
 	config: UmbConditionConfigBase;
-	constructor(args: { host: UmbControllerHost; config: UmbConditionConfigBase }) {
-		super(args.host);
+	constructor(host: UmbControllerHost, args: { config: UmbConditionConfigBase }) {
+		super(host);
 		this.config = args.config;
 	}
 	permitted = true;
 }
 class UmbTestConditionAlwaysInvalid extends UmbControllerBase implements UmbExtensionCondition {
 	config: UmbConditionConfigBase;
-	constructor(args: { host: UmbControllerHost; config: UmbConditionConfigBase }) {
-		super(args.host);
+	constructor(host: UmbControllerHost, args: { config: UmbConditionConfigBase }) {
+		super(host);
 		this.config = args.config;
 	}
 	permitted = false;

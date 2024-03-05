@@ -39,7 +39,7 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 		});
 		this.observe(umbExtensionsRegistry.byTypeAndAlias('workspace', UMB_BLOCK_WORKSPACE_ALIAS), (manifest) => {
 			if (manifest) {
-				createExtensionApi(manifest, [this, { manifest: manifest }]).then((context) => {
+				createExtensionApi(this, manifest, [{ manifest: manifest }]).then((context) => {
 					if (context) {
 						this.#workspaceContext = context as typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 						this.#load();
