@@ -160,6 +160,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 
 				<umb-property-layout label="Locked out">
 					<uui-toggle
+						?disabled=${this._isNew || !this._workspaceContext.isLockedOut}
 						slot="editor"
 						.checked=${this._workspaceContext.isLockedOut}
 						@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
@@ -167,7 +168,12 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 				</umb-property-layout>
 
 				<umb-property-layout label="Two-Factor authentication">
-					<uui-toggle slot="editor"></uui-toggle>
+					<uui-toggle
+						?disabled=${this._isNew || !this._workspaceContext.isTwoFactorEnabled}
+						slot="editor"
+						.checked=${this._workspaceContext.isTwoFactorEnabled}
+						@change=${(e: UUIBooleanInputEvent) => this.#onChange('isTwoFactorEnabled', e.target.checked)}>
+					</uui-toggle>
 				</umb-property-layout>
 			</uui-box>
 		</div>`;
