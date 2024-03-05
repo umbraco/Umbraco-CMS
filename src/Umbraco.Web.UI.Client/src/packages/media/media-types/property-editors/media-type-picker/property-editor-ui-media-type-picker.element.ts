@@ -6,6 +6,7 @@ import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-editor-ui-media-type-picker')
 export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
@@ -36,7 +37,7 @@ export class UmbPropertyEditorUIMediaTypePickerElement extends UmbLitElement imp
 		return html`
 			<umb-input-media-type
 				@change=${this._onChange}
-				.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : [this.value]) : []}
+				.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : splitStringToArray(this.value)) : []}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}>
 				<umb-localize key="general_add">Add</umb-localize>

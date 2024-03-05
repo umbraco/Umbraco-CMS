@@ -3,17 +3,12 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-property-editor-ui-document-type-picker')
 export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Array })
-	public get value(): Array<string> | string | undefined {
-		return this._value;
-	}
-	public set value(value: Array<string> | string | undefined) {
-		this._value = value;
-	}
-	private _value?: Array<string> | string;
+	public value?: Array<string> | string;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -49,11 +44,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 			? html`
 					<umb-input-document-type
 						@change=${this._onChange}
-						.selectedIds=${this._multiPicker
-							? (this._value as Array<string>) ?? []
-							: this._value
-								? [this._value as string]
-								: []}
+						.selectedIds=${this.value ? (Array.isArray(this.value) ? this.value : splitStringToArray(this.value)) : []}
 						.min=${this._limitMin ?? 0}
 						.max=${this._limitMax ?? Infinity}
 						.elementTypesOnly=${this._onlyElementTypes ?? false}>
