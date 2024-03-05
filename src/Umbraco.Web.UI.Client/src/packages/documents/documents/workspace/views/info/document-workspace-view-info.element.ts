@@ -21,6 +21,9 @@ import { UmbTemplateDetailRepository, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
+	private _invariantCulture = 'en-US';
+
+	@state()
 	private _documentUnique = '';
 
 	@state()
@@ -28,9 +31,6 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	@state()
 	private _createDate?: string;
-
-	@state()
-	private _state = DocumentVariantStateModel.DRAFT;
 
 	/**Document Type */
 	@state()
@@ -129,11 +129,14 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			'_templateUnique',
 		);
 
-		/** TODO: Doubt this is the right way to get the create date... */
-		this.observe(this.#workspaceContext.variants, (variants) => {
-			this._variants = variants;
-			this.#observeVariants();
-		});
+		this.observe(
+			this.#workspaceContext.variants,
+			(variants) => {
+				this._variants = variants;
+				this.#observeVariants();
+			},
+			'_variants',
+		);
 	}
 
 	#observeVariants() {
@@ -142,11 +145,24 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			.filter((v) => !!v.createDate)
 			.reduce((prev, current) => (prev.createDate! < current.createDate! ? prev : current));
 
-		this._createDate = oldestVariant?.createDate ? oldestVariant.createDate : new Date().toISOString();
+		this._createDate = oldestVariant?.createDate ?? new Date().toISOString();
 	}
 
-	#renderStateTag() {
-		switch (this._state) {
+	#renderVariantStates() {
+		return repeat(
+			this._variants,
+			(variant) => `${variant.culture}_${variant.segment}`,
+			(variant) =>
+				html`<div>
+					<span class="variant-name">${variant.culture ?? this._invariantCulture}</span> ${this.#renderStateTag(
+						variant,
+					)}
+				</div>`,
+		);
+	}
+
+	#renderStateTag(variant: UmbDocumentVariantModel) {
+		switch (variant.state) {
 			case DocumentVariantStateModel.DRAFT:
 				return html`<uui-tag look="secondary" label=${this.localize.term('content_unpublished')}>
 					${this.localize.term('content_unpublished')}
@@ -204,7 +220,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			`;
 		} else {
 			return html`<div class="link-item">
-				<span class="link-language">en-EN</span>
+				<span class="link-language">${this._invariantCulture}</span>
 				<span class="link-content italic"><umb-localize key="content_parentNotPublishedAnomaly"></umb-localize></span>
 			</div>`;
 		}
@@ -214,7 +230,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		return html`
 			<div class="general-item">
 				<strong><umb-localize key="content_publishStatus">Publication Status</umb-localize></strong>
-				<span> ${this.#renderStateTag()} </span>
+				<span> ${this.#renderVariantStates()} </span>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_createDate">Created</umb-localize></strong>
@@ -309,6 +325,11 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 			.general-item:not(:last-child) {
 				margin-bottom: var(--uui-size-space-6);
+			}
+
+			.variant-name {
+				color: var(--uui-color-divider-emphasis);
+				padding-right: var(--uui-size-space-2);
 			}
 
 			// Link section
