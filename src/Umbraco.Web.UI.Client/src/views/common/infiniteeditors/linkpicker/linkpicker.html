@@ -46,6 +46,7 @@
                                 placeholder="{{model.useNodeName && model.target.nodeName ? model.target.nodeName : placeholders_entername}}"
                                 class="umb-property-editor umb-textstring"
                                 ng-model="model.target.name"
+                                ng-change="trackUserInput(model.target.name)"
                                 id="nodeNameLinkPicker"/>
                     </umb-control-group>
 

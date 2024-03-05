@@ -4,6 +4,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -50,7 +51,8 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
         public BlockGridEditorPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
-            IDataTypeService dataTypeService,
+            DataValueReferenceFactoryCollection dataValueReferenceFactories,
+            IDataTypeConfigurationCache dataTypeConfigurationCache,
             ILocalizedTextService textService,
             ILogger<BlockEditorPropertyValueEditor> logger,
             IShortStringHelper shortStringHelper,
@@ -58,7 +60,7 @@ public abstract class BlockGridPropertyEditorBase : DataEditor
             IIOHelper ioHelper,
             IContentTypeService contentTypeService,
             IPropertyValidationService propertyValidationService)
-            : base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
+            : base(attribute, propertyEditors, dataValueReferenceFactories, dataTypeConfigurationCache, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
             BlockEditorValues = new BlockEditorValues(new BlockGridEditorDataConverter(jsonSerializer), contentTypeService, logger);
             Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, contentTypeService));

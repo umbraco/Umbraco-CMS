@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -114,20 +112,30 @@ public class PropertyEditorValueConverterTests
     }
 
     [TestCase("1", 1)]
-    [TestCase("1", 1)]
-    [TestCase("0", 0)]
     [TestCase("0", 0)]
     [TestCase(null, 0)]
-    [TestCase(null, 0)]
-    [TestCase("-1", -1)]
     [TestCase("-1", -1)]
     [TestCase("1.65", 1.65)]
-    [TestCase("1.65", 1.65)]
     [TestCase("-1.65", -1.65)]
-    [TestCase("-1.65", -1.65)]
-    public void CanConvertDecimalAliasPropertyEditor(object value, double expected)
+    public void CanConvertDecimalAliasPropertyEditor(object value, decimal expected)
     {
         var converter = new DecimalValueConverter();
+        var inter = converter.ConvertSourceToIntermediate(null, null, value, false);
+        var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
+
+        Assert.AreEqual(expected, result);
+    }
+
+    [TestCase("100", 100)]
+    [TestCase("0", 0)]
+    [TestCase(null, 0)]
+    [TestCase("-100", -100)]
+    [TestCase("1.65", 2)]
+    [TestCase("-1.65", -2)]
+    [TestCase("something something", 0)]
+    public void CanConvertIntegerAliasPropertyEditor(object value, int expected)
+    {
+        var converter = new IntegerValueConverter();
         var inter = converter.ConvertSourceToIntermediate(null, null, value, false);
         var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
 

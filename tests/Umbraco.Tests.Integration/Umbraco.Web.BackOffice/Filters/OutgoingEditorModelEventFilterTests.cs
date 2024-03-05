@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -34,6 +35,7 @@ public class OutgoingEditorModelEventFilterTests : UmbracoTestServerTestBase
     public void Reset() => ResetNotifications();
 
     [Test]
+    [LongRunning]
     public async Task Content_Item_With_Schedule_Raises_SendingContentNotification()
     {
         IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -68,6 +70,7 @@ public class OutgoingEditorModelEventFilterTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task Publish_Schedule_Is_Mapped_Correctly()
     {
         const string UsIso = "en-US";

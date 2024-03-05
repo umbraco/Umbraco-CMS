@@ -126,7 +126,7 @@ namespace Umbraco.Extensions
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
-        /// 
+        ///
         [Obsolete("Will be removed in Umbraco 13.")]
         public static LoggerConfiguration OutputDefaultTextFile(
             this LoggerConfiguration logConfig,

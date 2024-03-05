@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
 internal abstract class ApiMediaWithCropsBuilderBase<T>
-    where T : IApiMedia
+    where T : IApiMediaWithCrops
 {
     private readonly IApiMediaBuilder _apiMediaBuilder;
     private readonly IPublishedValueFallback _publishedValueFallback;
@@ -23,8 +23,8 @@ internal abstract class ApiMediaWithCropsBuilderBase<T>
     protected abstract T Create(
         IPublishedContent media,
         IApiMedia inner,
-        ImageCropperValue.ImageCropperFocalPoint? focalPoint,
-        IEnumerable<ImageCropperValue.ImageCropperCrop>? crops);
+        ImageFocalPoint? focalPoint,
+        IEnumerable<ImageCrop>? crops);
 
     public T Build(MediaWithCrops media)
     {
@@ -38,7 +38,7 @@ internal abstract class ApiMediaWithCropsBuilderBase<T>
             localCrops = localCrops.Merge(mediaCrops);
         }
 
-        return Create(media.Content, inner, localCrops.FocalPoint, localCrops.Crops);
+        return Create(media.Content, inner, localCrops.GetImageFocalPoint(), localCrops.GetImageCrops());
     }
 
     public T Build(IPublishedContent media)

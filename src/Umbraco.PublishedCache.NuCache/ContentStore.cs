@@ -736,16 +736,22 @@ public class ContentStore
     {
         EnsureLocked();
 
-        IPublishedContentType?[] contentTypes = _contentTypesById
+        IPublishedContentType[] contentTypes = _contentTypesById
             .Where(kvp =>
                 kvp.Value.Value != null &&
                 kvp.Value.Value.PropertyTypes.Any(p => dataTypeIds.Contains(p.DataType.Id)))
             .Select(kvp => kvp.Value.Value)
             .Select(x => getContentType(x!.Id))
-            .Where(x => x != null) // poof, gone, very unlikely and probably an anomaly
+            .WhereNotNull() // poof, gone, very unlikely and probably an anomaly
             .ToArray();
 
-        var contentTypeIdsA = contentTypes.Select(x => x!.Id).ToArray();
+        // all content types that are affected by this data type update must be updated
+        foreach (IPublishedContentType contentType in contentTypes)
+        {
+            SetContentTypeLocked(contentType);
+        }
+
+        var contentTypeIdsA = contentTypes.Select(x => x.Id).ToArray();
         var contentTypeNodes = new Dictionary<int, List<int>>();
         foreach (var id in contentTypeIdsA)
         {
@@ -761,7 +767,7 @@ public class ContentStore
             }
         }
 
-        foreach (IPublishedContentType contentType in contentTypes.WhereNotNull())
+        foreach (IPublishedContentType contentType in contentTypes)
         {
             // again, weird situation
             if (contentTypeNodes.ContainsKey(contentType.Id) == false)

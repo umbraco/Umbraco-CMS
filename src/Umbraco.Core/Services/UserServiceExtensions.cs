@@ -9,6 +9,11 @@ public static class UserServiceExtensions
 {
     public static EntityPermission? GetPermissions(this IUserService userService, IUser? user, string path)
     {
+       return userService.GetAllPermissions(user, path).FirstOrDefault();
+    }
+
+    public static EntityPermissionCollection GetAllPermissions(this IUserService userService, IUser? user, string path)
+    {
         var ids = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
             .Select(x =>
                 int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value)
@@ -23,7 +28,7 @@ public static class UserServiceExtensions
                                                 " could not be parsed into an array of integers or the path was empty");
         }
 
-        return userService.GetPermissions(user, ids[^1]).FirstOrDefault();
+        return userService.GetPermissions(user, ids[^1]);
     }
 
     /// <summary>

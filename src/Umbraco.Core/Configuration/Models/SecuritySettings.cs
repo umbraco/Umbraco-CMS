@@ -17,6 +17,7 @@ public class SecuritySettings
     internal const bool StaticHideDisabledUsersInBackOffice = false;
     internal const bool StaticAllowPasswordReset = true;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
+    internal const bool StaticAllowConcurrentLogins = false;
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
 
     internal const string StaticAllowedUserNameCharacters =
@@ -109,4 +110,10 @@ public class SecuritySettings
     [Obsolete("Use ContentSettings.AllowEditFromInvariant instead")]
     [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
     public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether to allow concurrent logins.
+    /// </summary>
+    [DefaultValue(StaticAllowConcurrentLogins)]
+    public bool AllowConcurrentLogins { get; set; } = StaticAllowConcurrentLogins;
 }

@@ -78,7 +78,6 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
         ModelState.AddModelError("id", $"content with id: {id} was not found");
         NotFoundObjectResult errorResponse = NotFound(ModelState);
 
-
         return errorResponse;
     }
 

@@ -8,6 +8,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_12_0_0;
 
+[Obsolete("This is no longer used and will be removed in V14.")]
 public class UseNvarcharInsteadOfNText : MigrationBase
 {
     public UseNvarcharInsteadOfNText(IMigrationContext context)

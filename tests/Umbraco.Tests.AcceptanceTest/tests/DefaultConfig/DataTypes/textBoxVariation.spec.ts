@@ -8,7 +8,7 @@ test.describe('Vary by culture for TextBox', () => {
         await umbracoApi.report.report(testInfo);
         await umbracoApi.login();
     });
-    
+
     test('create documentType with vary by culture with UI with a textbox property which also has vary by culture', async ({page, umbracoApi, umbracoUi}) => {
         const documentTypeName = 'Test Document';
         const textBoxPropertyName = 'TestBox';
@@ -37,7 +37,7 @@ test.describe('Vary by culture for TextBox', () => {
         await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
         // Assert
-        await expect(page.locator('.umb-notifications__notifications > .alert-success')).toBeVisible();
+        await umbracoUi.isSuccessNotificationVisible();
 
         // Clean
         await umbracoApi.documentTypes.ensureNameNotExists(documentTypeName);
@@ -280,7 +280,7 @@ test.describe('Vary by culture for TextBox', () => {
         await expect(await umbracoApi.content.verifyRenderedContent(daEndpoint, daValue, true)).toBeTruthy();
         await expect(await umbracoApi.content.verifyRenderedContent(enEndpoint, enValue, true)).toBeTruthy();
 
-        // Clean 
+        // Clean
         await umbracoApi.content.deleteAllContent();
         await umbracoApi.documentTypes.ensureNameNotExists(documentName);
         await umbracoApi.languages.ensureCultureNotExists(languageDa);
