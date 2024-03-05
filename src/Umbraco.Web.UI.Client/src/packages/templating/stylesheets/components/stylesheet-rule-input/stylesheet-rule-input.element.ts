@@ -31,19 +31,25 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 		return modalContext?.onSubmit();
 	}
 
-	#appendRule = async () => {
-		const { rule: newRule } = await this.#openRuleSettings(null);
-		if (!newRule) return;
-		this.rules = [...this.rules, newRule];
-		this.dispatchEvent(new UmbChangeEvent());
+	#appendRule = () => {
+		this.#openRuleSettings(null)
+			.then((value) => {
+				if (!value.rule) return;
+				this.rules = [...this.rules, value.rule];
+				this.dispatchEvent(new UmbChangeEvent());
+			})
+			.catch(() => undefined);
 	};
 
-	#editRule = async (rule: UmbStylesheetRule, index: number) => {
-		const { rule: updatedRule } = await this.#openRuleSettings(rule);
-		if (!updatedRule) return;
-		this.rules[index] = updatedRule;
-		this.dispatchEvent(new UmbChangeEvent());
-		this.requestUpdate();
+	#editRule = (rule: UmbStylesheetRule, index: number) => {
+		this.#openRuleSettings(rule)
+			.then((value) => {
+				if (!value.rule) return;
+				this.rules[index] = value.rule;
+				this.dispatchEvent(new UmbChangeEvent());
+				this.requestUpdate();
+			})
+			.catch(() => undefined);
 	};
 
 	#removeRule = (rule: UmbStylesheetRule) => {

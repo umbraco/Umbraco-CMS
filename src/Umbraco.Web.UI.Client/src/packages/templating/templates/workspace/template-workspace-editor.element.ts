@@ -112,11 +112,14 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#openInsertSectionModal() {
 		const sectionModal = this.#modalContext?.open(this, UMB_TEMPLATING_SECTION_PICKER_MODAL);
 
-		sectionModal?.onSubmit().then((insertSectionModalValue) => {
-			if (insertSectionModalValue?.value) {
-				this._codeEditor?.insert(insertSectionModalValue.value);
-			}
-		});
+		sectionModal
+			?.onSubmit()
+			.then((insertSectionModalValue) => {
+				if (insertSectionModalValue?.value) {
+					this._codeEditor?.insert(insertSectionModalValue.value);
+				}
+			})
+			.catch(() => undefined);
 	}
 
 	#resetMasterTemplate() {
@@ -136,20 +139,26 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			},
 		});
 
-		modalContext?.onSubmit().then((value) => {
-			if (!value?.selection) return;
-			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null);
-		});
+		modalContext
+			?.onSubmit()
+			.then((value) => {
+				if (!value?.selection) return;
+				this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null);
+			})
+			.catch(() => undefined);
 	}
 
 	#openQueryBuilder() {
 		const queryBuilderModal = this.#modalContext?.open(this, UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
-		queryBuilderModal?.onSubmit().then((queryBuilderModalValue) => {
-			if (queryBuilderModalValue?.value) {
-				this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
-			}
-		});
+		queryBuilderModal
+			?.onSubmit()
+			.then((queryBuilderModalValue) => {
+				if (queryBuilderModalValue?.value) {
+					this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
+				}
+			})
+			.catch(() => undefined);
 	}
 
 	#renderMasterTemplatePicker() {
