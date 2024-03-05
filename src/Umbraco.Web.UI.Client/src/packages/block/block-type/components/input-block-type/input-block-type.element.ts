@@ -1,15 +1,12 @@
 import type { UmbBlockTypeBaseModel } from '../../types.js';
-import {
-	UMB_DOCUMENT_TYPE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-	umbConfirmModal,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import '../block-type-card/index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<

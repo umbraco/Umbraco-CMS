@@ -1,12 +1,12 @@
 import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
 import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
 import type { UmbDataTypeDetailModel } from '../../types.js';
-import { css, html, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalValue,
-} from '@umbraco-cms/backoffice/modal';
+} from './data-type-picker-flow-data-type-picker-modal.token.js';
+import { css, html, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
@@ -104,7 +104,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 												${dataType.name}
 											</div>
 										</uui-button>
-									</li>`
+								  </li>`
 								: '',
 					)}
 				</ul>`,
