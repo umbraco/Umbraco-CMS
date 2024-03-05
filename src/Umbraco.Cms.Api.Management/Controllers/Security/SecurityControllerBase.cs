@@ -8,7 +8,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("security")]
 [ApiExplorerSettings(GroupName = "Security")]
 [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]

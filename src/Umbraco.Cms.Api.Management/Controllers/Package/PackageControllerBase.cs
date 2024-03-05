@@ -7,7 +7,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("package")]
 [ApiExplorerSettings(GroupName = "Package")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessPackages)]

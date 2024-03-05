@@ -9,7 +9,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.RelationType}")]
 [ApiExplorerSettings(GroupName = "Relation Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessRelationTypes)]

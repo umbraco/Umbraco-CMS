@@ -5,7 +5,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("models-builder")]
 [ApiExplorerSettings(GroupName = "Models Builder")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

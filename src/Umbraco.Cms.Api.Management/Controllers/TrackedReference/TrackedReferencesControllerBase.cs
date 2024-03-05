@@ -5,7 +5,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TrackedReference;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("tracked-reference")]
 [ApiExplorerSettings(GroupName = "Tracked Reference")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessContentOrMedia)]
