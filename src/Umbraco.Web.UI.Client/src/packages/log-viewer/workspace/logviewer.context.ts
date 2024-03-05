@@ -100,7 +100,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 	#polling = new UmbObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
 	polling = this.#polling.asObservable();
 
-	#sortingDirection = new UmbBasicState<DirectionModel>(DirectionModel.ASCENDING);
+	#sortingDirection = new UmbBasicState<DirectionModel>(DirectionModel.DESCENDING);
 	sortingDirection = this.#sortingDirection.asObservable();
 
 	#intervalID: number | null = null;

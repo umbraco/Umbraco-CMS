@@ -2,8 +2,8 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Media Picker 3',
-	alias: 'Umbraco.MediaPicker3',
+	name: 'Media Picker',
+	alias: 'Umbraco.MediaPicker',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
 		settings: {
