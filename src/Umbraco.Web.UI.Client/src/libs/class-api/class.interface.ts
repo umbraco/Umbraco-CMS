@@ -4,7 +4,7 @@ import type {
 	UmbContextProviderController,
 	UmbContextToken,
 } from '../context-api/index.js';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerAlias, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -16,11 +16,22 @@ export interface UmbClassInterface extends UmbControllerHost {
 	 * @return {UmbObserverController} Reference to the created Observer Controller instance.
 	 * @memberof UmbClassMixin
 	 */
-	observe<T, R extends UmbObserverController<T> = UmbObserverController<T>>(
-		source: Observable<T>,
-		callback: ObserverCallback<T>,
-		unique?: string,
-	): R;
+	observe<
+		ObservableType extends Observable<T>,
+		T,
+		SpecificT = ObservableType extends Observable<infer U>
+			? ObservableType extends undefined
+				? U | undefined
+				: U
+			: undefined,
+		R extends UmbObserverController<SpecificT> = UmbObserverController<SpecificT>,
+		SpecificR extends R | undefined = ObservableType extends undefined ? R | undefined : R,
+	>(
+		// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
+		source: ObservableType | undefined,
+		callback: ObserverCallback<SpecificT>,
+		controllerAlias?: UmbControllerAlias,
+	): SpecificR;
 
 	/**
 	 * @description Provide a context API for this or child elements.

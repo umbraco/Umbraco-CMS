@@ -12,7 +12,7 @@ import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
 } from '@umbraco-cms/backoffice/context-api';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { type ObserverCallback, UmbObserverController, simpleHashCode } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbClassMixinConstructor = new (
 	host: UmbControllerHost,
@@ -39,12 +39,36 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 			return this._controllerAlias;
 		}
 
-		observe<T, R extends UmbObserverController<T> = UmbObserverController<T>>(
-			source: Observable<T>,
-			callback: (_value: T) => void,
+		observe<
+			ObservableType extends Observable<T>,
+			T,
+			SpecificT = ObservableType extends Observable<infer U>
+				? ObservableType extends undefined
+					? U | undefined
+					: U
+				: undefined,
+			R extends UmbObserverController<SpecificT> = UmbObserverController<SpecificT>,
+			SpecificR extends R | undefined = ObservableType extends undefined ? R | undefined : R,
+		>(
+			// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
+			source: ObservableType | undefined,
+			callback: ObserverCallback<SpecificT>,
 			controllerAlias?: UmbControllerAlias,
-		): R {
-			return new UmbObserverController<T>(this, source, callback, controllerAlias) as R;
+		): SpecificR {
+			// Fallback to use a hash of the provided method, but only if the alias is undefined.
+			controllerAlias ??= controllerAlias === undefined ? simpleHashCode(callback.toString()) : undefined;
+
+			if (source) {
+				return new UmbObserverController<T>(
+					this,
+					source,
+					callback as unknown as ObserverCallback<T>,
+					controllerAlias,
+				) as unknown as SpecificR;
+			} else {
+				this.removeControllerByAlias(controllerAlias);
+				return undefined as SpecificR;
+			}
 		}
 
 		provideContext<
