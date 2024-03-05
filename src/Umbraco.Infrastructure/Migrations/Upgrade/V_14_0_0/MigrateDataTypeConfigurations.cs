@@ -86,6 +86,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
                 updated |= dataTypeDto.EditorAlias switch
                 {
                     PropertyEditorAliases.Boolean => HandleBoolean(ref configurationData),
+                    PropertyEditorAliases.CheckBoxList => HandleSelectableItems(ref configurationData),
                     PropertyEditorAliases.ColorPicker => HandleColorPicker(ref configurationData),
                     PropertyEditorAliases.ContentPicker => HandleContentPicker(ref configurationData),
                     PropertyEditorAliases.DateTime => HandleDateTime(ref configurationData),
@@ -97,7 +98,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
                     PropertyEditorAliases.MultiNodeTreePicker => HandleMultiNodeTreePicker(ref configurationData, allContentTypes, allMediaTypes, allMemberTypes),
                     PropertyEditorAliases.MultiUrlPicker => HandleMultiUrlPicker(ref configurationData),
                     PropertyEditorAliases.MultipleTextstring => HandleMultipleTextstring(ref configurationData),
-                    PropertyEditorAliases.RadioButtonList => HandleRadioButton(ref configurationData),
+                    PropertyEditorAliases.RadioButtonList => HandleSelectableItems(ref configurationData),
                     PropertyEditorAliases.RichText => HandleRichText(ref configurationData),
                     PropertyEditorAliases.TextBox => HandleTextBoxAndTextArea(ref configurationData),
                     PropertyEditorAliases.TextArea => HandleTextBoxAndTextArea(ref configurationData),
@@ -482,7 +483,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
     }
 
     // translate "selectable items" from old "value list" format to string array
-    private bool HandleRadioButton(ref Dictionary<string, object> configurationData)
+    private bool HandleSelectableItems(ref Dictionary<string, object> configurationData)
         => ReplaceValueListArrayWithStringArray(ref configurationData, "items");
 
 
