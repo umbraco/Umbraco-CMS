@@ -34,9 +34,13 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._propertyStructureHelper.setStructureManager(workspaceContext.structure);
 		});
-		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
-			this._propertyStructure = propertyStructure;
-		});
+		this.observe(
+			this._propertyStructureHelper.propertyStructure,
+			(propertyStructure) => {
+				this._propertyStructure = propertyStructure;
+			},
+			null,
+		);
 	}
 
 	render() {

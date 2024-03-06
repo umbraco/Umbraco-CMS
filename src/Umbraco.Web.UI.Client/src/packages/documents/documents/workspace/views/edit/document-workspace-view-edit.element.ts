@@ -38,10 +38,14 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this._tabsStructureHelper.containers, (tabs) => {
-			this._tabs = tabs;
-			this._createRoutes();
-		});
+		this.observe(
+			this._tabsStructureHelper.containers,
+			(tabs) => {
+				this._tabs = tabs;
+				this._createRoutes();
+			},
+			null,
+		);
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
@@ -121,7 +125,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 											href=${this._routerPath + '/'}
 											>Content</uui-tab
 										>
-								  `
+									`
 								: ''}
 							${repeat(
 								this._tabs,
@@ -133,7 +137,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 									>`;
 								},
 							)}
-					  </uui-tab-group>`
+						</uui-tab-group>`
 					: ''}
 
 				<umb-router-slot

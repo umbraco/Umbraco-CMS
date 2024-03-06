@@ -55,12 +55,20 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._groupStructureHelper.setStructureManager(workspaceContext.structure);
 		});
-		this.observe(this._groupStructureHelper.containers, (groups) => {
-			this._groups = groups;
-		});
-		this.observe(this._groupStructureHelper.hasProperties, (hasProperties) => {
-			this._hasProperties = hasProperties;
-		});
+		this.observe(
+			this._groupStructureHelper.containers,
+			(groups) => {
+				this._groups = groups;
+			},
+			null,
+		);
+		this.observe(
+			this._groupStructureHelper.hasProperties,
+			(hasProperties) => {
+				this._hasProperties = hasProperties;
+			},
+			null,
+		);
 	}
 
 	render() {
@@ -73,7 +81,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 								container-type="Tab"
 								container-name=${this.tabName || ''}></umb-document-workspace-view-edit-properties>
 						</uui-box>
-				  `
+					`
 				: ''}
 			${repeat(
 				this._groups,

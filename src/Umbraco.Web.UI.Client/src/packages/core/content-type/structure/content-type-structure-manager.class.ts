@@ -22,10 +22,11 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init!: Promise<unknown>;
 
-	#contentTypeRepository: UmbDetailRepository<T>;
+	#repository: UmbDetailRepository<T>;
 
 	#ownerContentTypeUnique?: string;
 	#contentTypeObservers = new Array<UmbController>();
+
 	#contentTypes = new UmbArrayState<T>([], (x) => x.unique);
 	readonly contentTypes = this.#contentTypes.asObservable();
 	readonly ownerContentType = this.#contentTypes.asObservablePart((x) =>
@@ -42,7 +43,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	constructor(host: UmbControllerHost, typeRepository: UmbDetailRepository<T>) {
 		super(host);
-		this.#contentTypeRepository = typeRepository;
+		this.#repository = typeRepository;
 
 		this.observe(this.contentTypes, (contentTypes) => {
 			contentTypes.forEach((contentType) => {
@@ -55,7 +56,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	}
 
 	/**
-	 * loadType will load the node type and all inherited and composed types.
+	 * loadType will load the ContentType and all inherited and composed ContentTypes.
 	 * This will give us all the structure for properties and containers.
 	 */
 	public async loadType(unique?: string) {
@@ -63,16 +64,16 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		this.#ownerContentTypeUnique = unique;
 
-		const promiseResult = this._loadType(unique);
-		this.#init = promiseResult;
+		const promise = this._loadType(unique);
+		this.#init = promise;
 		await this.#init;
-		return promiseResult;
+		return promise;
 	}
 
 	public async createScaffold() {
 		this._reset();
 
-		const { data } = await this.#contentTypeRepository.createScaffold();
+		const { data } = await this.#repository.createScaffold();
 		if (!data) return {};
 
 		this.#ownerContentTypeUnique = data.unique;
@@ -84,13 +85,13 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	/**
 	 * Save the owner content type. Notice this is for a Content Type that is already stored on the server.
-	 * @returns
+	 * @returns boolean
 	 */
 	public async save() {
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) return false;
 
-		const { data } = await this.#contentTypeRepository.save(contentType);
+		const { data } = await this.#repository.save(contentType);
 		if (!data) return false;
 
 		// Update state with latest version:
@@ -101,13 +102,13 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	/**
 	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
-	 * @returns
+	 * @returns boolean
 	 */
 	public async create(parentUnique: string | null) {
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) return false;
 
-		const { data } = await this.#contentTypeRepository.create(contentType, parentUnique);
+		const { data } = await this.#repository.create(contentType, parentUnique);
 		if (!data) return false;
 
 		// Update state with latest version:
@@ -117,6 +118,12 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		this._observeContentType(data);
 
 		return true;
+	}
+
+	private async _loadContentTypeCompositions(contentType: T) {
+		contentType.compositions?.forEach((composition) => {
+			this._ensureType(composition.contentType.unique);
+		});
 	}
 
 	private async _ensureType(unique?: string) {
@@ -129,7 +136,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		if (!unique) return {};
 
 		// Lets initiate the content type:
-		const { data } = await this.#contentTypeRepository.requestByUnique(unique);
+		const { data } = await this.#repository.requestByUnique(unique);
 		if (!data) return {};
 
 		await this._observeContentType(data);
@@ -146,7 +153,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		const ctrl = this.observe(
 			// Then lets start observation of the content type:
-			await this.#contentTypeRepository.byUnique(data.unique),
+			await this.#repository.byUnique(data.unique),
 			(docType) => {
 				if (docType) {
 					// TODO: Handle if there was changes made to the owner document type in this context. [NL]
@@ -161,12 +168,6 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		);
 
 		this.#contentTypeObservers.push(ctrl);
-	}
-
-	private async _loadContentTypeCompositions(contentType: T) {
-		contentType.compositions?.forEach((composition) => {
-			this._ensureType(composition.contentType.unique);
-		});
 	}
 
 	/** Public methods for consuming structure: */
