@@ -180,7 +180,6 @@ describe('UmbElementMixin', () => {
 			// The controller is removed from the host, and the new one was NOT added:
 			expect(hostElement.hasController(ctrl)).to.be.false;
 			expect(ctrl2).to.be.undefined;
-			expect(hostElement.hasController(ctrl2)).to.be.false;
 		});
 
 		it('observe is removed when observer is undefined and using the same callback method', () => {
@@ -197,7 +196,6 @@ describe('UmbElementMixin', () => {
 			// The controller is removed from the host, and the new one was NOT added:
 			expect(hostElement.hasController(ctrl)).to.be.false;
 			expect(ctrl2).to.be.undefined;
-			expect(hostElement.hasController(ctrl2)).to.be.false;
 		});
 
 		it('an undefined observer executes the callback method with undefined', () => {
