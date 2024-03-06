@@ -201,7 +201,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	#renderHeader(group: UmbPropertyTypeContainerModel) {
-		const inherited = !this.#groupStructureHelper.isOwnerChildContainer(group.id!);
+		const inherited = !this.#groupStructureHelper.isOwnerChildContainer(group.id);
 
 		if (this._sortModeActive) {
 			return html`<div slot="header">
@@ -213,7 +213,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 					type="number"
 					label=${this.localize.term('sort_sortOrder')}
 					@change=${(e: UUIInputEvent) =>
-						this.#groupStructureHelper.partialUpdateContainer(group.id!, {
+						this.#groupStructureHelper.partialUpdateContainer(group.id, {
 							sortOrder: parseInt(e.target.value as string) || 0,
 						})}
 					.value=${group.sortOrder || 0}
@@ -233,7 +233,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			.value=${group.name}
 			@change=${(e: InputEvent) => {
 				const newName = (e.target as HTMLInputElement).value;
-				this.#groupStructureHelper.updateContainerName(group.id!, group.parent?.id ?? null, newName);
+				this.#groupStructureHelper.updateContainerName(group.id, group.parent?.id ?? null, newName);
 			}}></uui-input>`;
 	}
 

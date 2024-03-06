@@ -190,7 +190,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
 				${repeat(
 					this._propertyStructure,
-					(property) => '' + property.container?.id + property.id + '' + property.sortOrder,
+					(property) => property.id,
 					(property) => {
 						// Note: This piece might be moved into the property component
 						const inheritedFromDocument = this._ownerDocumentTypes?.find((types) =>
@@ -209,7 +209,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 									this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
 								}}
 								@property-delete=${() => {
-									this._propertyStructureHelper.removeProperty(property.id!);
+									this._propertyStructureHelper.removeProperty(property.id);
 								}}>
 							</umb-document-type-workspace-view-edit-property>
 						`;

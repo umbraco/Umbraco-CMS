@@ -178,7 +178,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				?readonly=${this.inherited}
 				label="sort order"
 				@change=${(e: UUIInputEvent) =>
-					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) || 0 } as UmbPropertyTypeModel)}
+					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
 				.value=${this.property.sortOrder ?? 0}></uui-input>
 		`;
 	}
@@ -272,7 +272,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 					<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
 						<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
 					</div>
-			  </uui-input>`
+				</uui-input>`
 			: '';
 	}
 
@@ -283,19 +283,19 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
-						  </uui-tag>`
+							</uui-tag>`
 						: nothing}
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
-						  </uui-tag>`
+							</uui-tag>`
 						: nothing}
 					${this.property.validation.mandatory === true
 						? html`<uui-tag look="default">
 								<span>* ${this.localize.term('general_mandatory')}</span>
-						  </uui-tag>`
+							</uui-tag>`
 						: nothing}
-			  </div>`
+				</div>`
 			: nothing;
 	}
 
