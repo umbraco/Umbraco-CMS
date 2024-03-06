@@ -135,9 +135,9 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
-				this.property.name || this.property.id,
+				this.property.name ?? this.property.id,
 			]}>
-					Are you sure you want to delete the property <strong>${this.property.name || this.property.id}</strong>
+					Are you sure you want to delete the property <strong>${this.property.name ?? this.property.id}</strong>
 				</umb-localize>
 				</div>`,
 			confirmLabel: this.localize.term('actions_delete'),

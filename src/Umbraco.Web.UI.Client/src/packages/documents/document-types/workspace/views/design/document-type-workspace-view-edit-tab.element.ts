@@ -176,7 +176,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 							<umb-document-type-workspace-view-edit-properties
 								container-id=${ifDefined(this.ownerTabId === null ? undefined : this.ownerTabId)}
 								container-type="Tab"
-								container-name=${this.tabName || ''}></umb-document-type-workspace-view-edit-properties>
+								container-name=${this.tabName ?? ''}></umb-document-type-workspace-view-edit-properties>
 						</uui-box>
 					`
 				: ''
@@ -191,7 +191,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 								<umb-document-type-workspace-view-edit-properties
 									container-id=${ifDefined(group.id)}
 									container-type="Group"
-									container-name=${group.name || ''}></umb-document-type-workspace-view-edit-properties>
+									container-name=${group.name ?? ''}></umb-document-type-workspace-view-edit-properties>
 							</uui-box> `,
 					)}
 				</div>
@@ -216,7 +216,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						this.#groupStructureHelper.partialUpdateContainer(group.id, {
 							sortOrder: parseInt(e.target.value as string) || 0,
 						})}
-					.value=${group.sortOrder || 0}
+					.value=${group.sortOrder ?? 0}
 					?disabled=${inherited}></uui-input>
 			</div> `;
 		} else {
