@@ -1,14 +1,17 @@
 import type { UmbImageCropperPropertyEditorValue } from './types.js';
+import type { UmbInputImageCropperFieldElement } from './image-cropper-field.element.js';
 import { html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
-import './image-cropper.element.js';
-import './image-cropper-focus-setter.element.js';
-import './image-cropper-preview.element.js';
-import './image-cropper-field.element.js';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { type TemporaryFileQueueItem, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
+
+import './image-cropper.element.js';
+import './image-cropper-focus-setter.element.js';
+import './image-cropper-preview.element.js';
+import './image-cropper-field.element.js';
 
 @customElement('umb-input-image-cropper')
 export class UmbInputImageCropperElement extends UmbLitElement {
@@ -53,7 +56,8 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 
 		this.file = file;
 		this.fileUnique = unique;
-		this.value.src = unique;
+
+		assignToFrozenObject(this.value, { src: unique });
 
 		this.#manager?.uploadOne(unique, file, 'waiting');
 
@@ -66,7 +70,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	}
 
 	#onRemove = () => {
-		this.value = { ...this.value, src: '' };
+		assignToFrozenObject(this.value, { src: '' });
 		if (!this.fileUnique) return;
 		this.#manager?.removeOne(this.fileUnique);
 		this.fileUnique = undefined;
@@ -91,9 +95,16 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		`;
 	}
 
-	#onChange(e: any) {
-		this.value = e.target.value;
+	#onChange(e: CustomEvent) {
+		const value = (e.target as UmbInputImageCropperFieldElement).value;
 
+		if (!value) {
+			this.value = { src: '', crops: [], focalPoint: { left: 0.5, top: 0.5 } };
+			this.dispatchEvent(new UmbChangeEvent());
+			return;
+		}
+
+		this.value = value;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
