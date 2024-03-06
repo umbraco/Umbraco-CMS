@@ -12,19 +12,24 @@ import {
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import './document-type-workspace-view-edit-properties.element.js';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbDocumentTypeWorkspaceViewEditPropertiesElement> =
+	{
+		getUniqueOfElement: (element) =>
+			element.querySelector('umb-document-type-workspace-view-edit-properties')!.getAttribute('container-id'),
+		getUniqueOfModel: (modelEntry) => modelEntry.id,
+		identifier: 'document-type-container-sorter',
+		itemSelector: '.container-handle',
+		containerSelector: '.container-list',
+	};
 
 @customElement('umb-document-type-workspace-view-edit-tab')
 export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UmbDocumentTypeWorkspaceViewEditPropertiesElement>(
 		this,
 		{
-			getUniqueOfElement: (element) =>
-				element.querySelector('umb-document-type-workspace-view-edit-properties')!.getAttribute('container-id'),
-			getUniqueOfModel: (modelEntry) => modelEntry.id,
-			identifier: 'document-type-container-sorter',
-			itemSelector: '.container-handle',
-			containerSelector: '.container-list',
+			...SORTER_CONFIG,
 			onChange: ({ model }) => {
 				this._groups = model;
 			},
@@ -173,7 +178,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 								container-type="Tab"
 								container-name=${this.tabName || ''}></umb-document-type-workspace-view-edit-properties>
 						</uui-box>
-				  `
+					`
 				: ''
 		}
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>

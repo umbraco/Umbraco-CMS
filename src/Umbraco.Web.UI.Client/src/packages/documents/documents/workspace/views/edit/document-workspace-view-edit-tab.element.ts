@@ -85,7 +85,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 				: ''}
 			${repeat(
 				this._groups,
-				(group) => group.name,
+				(group) => group.id,
 				(group) =>
 					html`<uui-box .headline=${group.name || ''}>
 						<umb-document-workspace-view-edit-properties

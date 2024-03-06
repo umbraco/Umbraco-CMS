@@ -7,27 +7,31 @@ import { css, html, customElement, property, state, repeat, ifDefined } from '@u
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+
+const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbDocumentTypeWorkspacePropertyElement> = {
+	getUniqueOfElement: (element) => {
+		return element.getAttribute('data-umb-property-id');
+	},
+	getUniqueOfModel: (modelEntry) => {
+		return modelEntry.id;
+	},
+	identifier: 'document-type-property-sorter',
+	itemSelector: 'umb-document-type-workspace-view-edit-property',
+	//disabledItemSelector: '[inherited]',
+	//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
+	// This is because we don't want to move local properties into an inherited group container.
+	// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
+	// TODO: Fix bug where a local property turn into an inherited when moved to a new group container.
+	containerSelector: '#property-list',
+};
 
 @customElement('umb-document-type-workspace-view-edit-properties')
 export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
 	#sorter = new UmbSorterController<UmbPropertyTypeModel, UmbDocumentTypeWorkspacePropertyElement>(this, {
-		getUniqueOfElement: (element) => {
-			return element.getAttribute('data-umb-property-id');
-		},
-		getUniqueOfModel: (modelEntry) => {
-			return modelEntry.id;
-		},
-		identifier: 'document-type-property-sorter',
-		itemSelector: 'umb-document-type-workspace-view-edit-property',
-		//disabledItemSelector: '[inherited]',
-		//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
-		// This is because we don't want to move local properties into an inherited group container.
-		// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
-		// TODO: Fix bug where a local property turn into an inherited when moved to a new group container.
-		containerSelector: '#property-list',
+		...SORTER_CONFIG,
 		onChange: ({ model }) => {
 			this._propertyStructure = model;
 		},
@@ -158,8 +162,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addAdditionalPath('new-property')
 			.onSetup(async () => {
-				const documentTypeId = this._ownerDocumentTypes?.find(
-					(types) => types.containers?.find((containers) => containers.id === this.containerId),
+				const documentTypeId = this._ownerDocumentTypes?.find((types) =>
+					types.containers?.find((containers) => containers.id === this.containerId),
 				)?.unique;
 				if (documentTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
@@ -189,8 +193,8 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 					(property) => '' + property.container?.id + property.id + '' + property.sortOrder,
 					(property) => {
 						// Note: This piece might be moved into the property component
-						const inheritedFromDocument = this._ownerDocumentTypes?.find(
-							(types) => types.containers?.find((containers) => containers.id === property.container?.id),
+						const inheritedFromDocument = this._ownerDocumentTypes?.find((types) =>
+							types.containers?.find((containers) => containers.id === property.container?.id),
 						);
 
 						return html`
@@ -220,7 +224,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 						look="placeholder"
 						href=${ifDefined(this._modalRouteNewProperty)}>
 						<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
-				  </uui-button> `
+					</uui-button> `
 				: ''}
 		`;
 	}
