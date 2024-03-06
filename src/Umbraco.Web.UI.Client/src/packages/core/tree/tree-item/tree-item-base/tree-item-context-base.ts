@@ -210,17 +210,29 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			this.#observeHasChildren();
 		});
 
-		this.#actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#actionEventContext?.removeEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
 
-		this.#actionEventContext.addEventListener(
-			UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
-			this.#onReloadRequest as EventListener,
-		);
+			this.#actionEventContext?.removeEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureRequest as unknown as EventListener,
+			);
 
-		this.#actionEventContext.addEventListener(
-			UmbRequestReloadStructureForEntityEvent.TYPE,
-			this.#onReloadStructureRequest as unknown as EventListener,
-		);
+			this.#actionEventContext = instance;
+
+			this.#actionEventContext.addEventListener(
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+
+			this.#actionEventContext.addEventListener(
+				UmbRequestReloadStructureForEntityEvent.TYPE,
+				this.#onReloadStructureRequest as unknown as EventListener,
+			);
+		});
 	}
 
 	getTreeItem() {
