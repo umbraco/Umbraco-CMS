@@ -14,6 +14,8 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ attribute: false })
 	public value: Array<{ key: string; mediaKey: string; mediaTypeAlias: string }> = [];
+	//TODO: Add support for document specific crops. The server side already supports this.
+	//TODO: Add crops and focalpoint to value.
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -37,11 +39,10 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	@state()
 	private _limitMax: number = Infinity;
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.updated(_changedProperties);
-		if (_changedProperties.has('value')) {
-			this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
-		}
+	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.firstUpdated(_changedProperties);
+
+		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
 	}
 
 	private _onChange(event: CustomEvent) {
@@ -56,6 +57,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		});
 
 		this.value = result;
+		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
