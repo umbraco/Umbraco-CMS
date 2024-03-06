@@ -97,8 +97,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 			// @ts-ignore
 			const unique = treeItem?.unique;
 			if (event.detail.unique === unique) {
-				this.loadChildren();
 				event.stopPropagation();
+				this.loadChildren();
 			}
 		});
 	}

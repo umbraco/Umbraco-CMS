@@ -57,6 +57,25 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
+
+		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
+		there might be a better way to do this through a tree item parent context.
+		It does not look like there is a way to have a "dynamic" parent context that will stop when a
+		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
+		const hostElement = this.getHostElement();
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		hostElement.addEventListener('reload-tree-item-parent', (event: CustomEvent) => {
+			const treeRoot = this.#treeRoot.getValue();
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			const unique = treeRoot.unique;
+			if (event.detail.unique === unique) {
+				event.stopPropagation();
+				this.loadRootItems();
+			}
+		});
+
 		this.loadTreeRoot();
 	}
 
