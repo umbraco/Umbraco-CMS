@@ -137,7 +137,7 @@ export class UmbMemberTypeWorkspaceViewEditPropertiesElement extends UmbLitEleme
 				},
 				'_observeIsSorting',
 			);
-			const docTypesObservable = await this._propertyStructureHelper.ownerDocumentTypes();
+			const docTypesObservable = await this._propertyStructureHelper.contentTypes();
 			if (!docTypesObservable) return;
 			this.observe(
 				docTypesObservable,
@@ -160,8 +160,8 @@ export class UmbMemberTypeWorkspaceViewEditPropertiesElement extends UmbLitEleme
 		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addAdditionalPath('new-property')
 			.onSetup(async () => {
-				const memberTypeId = this._ownerMemberTypes?.find(
-					(types) => types.containers?.find((containers) => containers.id === this.containerId),
+				const memberTypeId = this._ownerMemberTypes?.find((types) =>
+					types.containers?.find((containers) => containers.id === this.containerId),
 				)?.unique;
 				if (memberTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
@@ -194,8 +194,8 @@ export class UmbMemberTypeWorkspaceViewEditPropertiesElement extends UmbLitEleme
 					(property) => '' + property.container?.id + property.id + '' + property.sortOrder,
 					(property) => {
 						// Note: This piece might be moved into the property component
-						const inheritedFromMember = this._ownerMemberTypes?.find(
-							(types) => types.containers?.find((containers) => containers.id === property.container?.id),
+						const inheritedFromMember = this._ownerMemberTypes?.find((types) =>
+							types.containers?.find((containers) => containers.id === property.container?.id),
 						);
 
 						return html`
@@ -225,7 +225,7 @@ export class UmbMemberTypeWorkspaceViewEditPropertiesElement extends UmbLitEleme
 						look="placeholder"
 						href=${ifDefined(this._modalRouteNewProperty)}>
 						<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
-				  </uui-button> `
+					</uui-button> `
 				: ''}
 		`;
 	}

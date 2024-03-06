@@ -115,7 +115,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 				'_observeIsSorting',
 			);
 
-			const mediaTypesObservable = await this._propertyStructureHelper.ownerDocumentTypes();
+			const mediaTypesObservable = await this._propertyStructureHelper.contentTypes();
 			if (!mediaTypesObservable) return;
 			this.observe(
 				mediaTypesObservable,
@@ -133,8 +133,8 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addAdditionalPath('new-property')
 			.onSetup(async () => {
-				const mediaTypeId = this._ownerMediaTypes?.find(
-					(types) => types.containers?.find((containers) => containers.id === this.containerId),
+				const mediaTypeId = this._ownerMediaTypes?.find((types) =>
+					types.containers?.find((containers) => containers.id === this.containerId),
 				)?.unique;
 				if (mediaTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
@@ -174,8 +174,8 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 					(property) => property.id ?? '' + property.container?.id ?? '' + property.sortOrder ?? '',
 					(property) => {
 						// Note: This piece might be moved into the property component
-						const inheritedFromMedia = this._ownerMediaTypes?.find(
-							(types) => types.containers?.find((containers) => containers.id === property.container?.id),
+						const inheritedFromMedia = this._ownerMediaTypes?.find((types) =>
+							types.containers?.find((containers) => containers.id === property.container?.id),
 						);
 
 						return html`<umb-media-type-workspace-view-edit-property
@@ -202,7 +202,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 						look="placeholder"
 						href=${ifDefined(this._modalRouteNewProperty)}>
 						<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
-				  </uui-button> `
+					</uui-button> `
 				: ''} `;
 	}
 

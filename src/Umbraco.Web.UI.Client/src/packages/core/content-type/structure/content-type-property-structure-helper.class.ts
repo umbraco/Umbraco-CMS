@@ -26,7 +26,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.#propertyStructure.sortBy((a, b) => ((a as any).sortOrder ?? 0) - ((b as any).sortOrder ?? 0));
 	}
 
-	async ownerDocumentTypes() {
+	async contentTypes() {
 		await this.#init;
 		if (!this.#structure) return;
 		return this.#structure.contentTypes;

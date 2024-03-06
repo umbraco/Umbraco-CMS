@@ -143,8 +143,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				},
 				'_observeIsSorting',
 			);
-			const docTypesObservable = await this._propertyStructureHelper.ownerDocumentTypes();
-			if (!docTypesObservable) return;
+			const docTypesObservable = await this._propertyStructureHelper.contentTypes();
 			this.observe(
 				docTypesObservable,
 				(documents) => {
