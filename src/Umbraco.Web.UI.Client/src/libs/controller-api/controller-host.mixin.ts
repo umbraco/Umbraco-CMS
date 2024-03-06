@@ -121,7 +121,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 					throw new Error(
 						`Controller with controller alias: '${ctrl.controllerAlias?.toString()}' and class name: '${
 							(ctrl as any).constructor.name
-						}', does not remove it self when destroyed. This can cause memory leaks. Please fix this issue.`,
+						}', does not remove it self when destroyed. This can cause memory leaks. Please fix this issue.\r\nThis usually occurs when you have a destroy() method that doesn't call super.destroy().`,
 					);
 				}
 				prev = ctrl;
