@@ -11,6 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { PartialViewResource } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbPartialViewWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbPartialViewDetailModel>
@@ -119,6 +120,14 @@ export class UmbPartialViewWorkspaceContext
 		} else {
 			const { data } = await this.repository.save(this.#data.value);
 			newData = data;
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 
 		if (newData) {

@@ -23,7 +23,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 
 	async firstUpdated() {
 		const mediaUnique = this.data?.parent.unique;
-		const mediaTypeUnique = this.data?.mediaType.unique || null;
+		const mediaTypeUnique = this.data?.mediaType?.unique || null;
 
 		this.#retrieveAllowedMediaTypesOf(mediaTypeUnique);
 
@@ -68,7 +68,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 								data-id=${ifDefined(mediaType.unique)}
 								href="${`section/media/workspace/media/create/parent/${this.data?.parent.entityType}/${
 									this.data?.parent.unique ?? 'null'
-								}}/${mediaType.unique}`}"
+								}/${mediaType.unique}`}"
 								label="${mediaType.name}"
 								@click=${this.#onNavigate}>
 								> ${mediaType.icon ? html`<umb-icon slot="icon" name=${mediaType.icon}></umb-icon>` : nothing}

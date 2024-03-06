@@ -1,4 +1,4 @@
-import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from './reload-tree-item-children-request.event.js';
+import { UmbRequestReloadTreeItemChildrenEvent } from './reload-tree-item-children-request.event.js';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,7 +14,7 @@ export class UmbReloadTreeItemChildrenEntityAction extends UmbEntityActionBase<M
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 
 		eventContext.dispatchEvent(
-			new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+			new UmbRequestReloadTreeItemChildrenEvent({
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 			}),
