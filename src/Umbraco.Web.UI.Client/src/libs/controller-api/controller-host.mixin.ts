@@ -2,13 +2,7 @@ import type { ClassConstructor } from '../extension-api/types/utils.js';
 import type { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
 
-declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost, 'getHostElement'> {
-	hasController(controller: UmbController): boolean;
-	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
-	addController(controller: UmbController): void;
-	removeControllerByAlias(unique: UmbController['controllerAlias']): void;
-	removeController(controller: UmbController): void;
-
+interface UmbControllerHostBaseDeclaration extends Omit<UmbControllerHost, 'getHostElement'> {
 	hostConnected(): void;
 	hostDisconnected(): void;
 	destroy(): void;
@@ -22,10 +16,14 @@ declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost
  * @mixin
  */
 export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T) => {
-	class UmbControllerHostBaseClass extends superClass {
+	class UmbControllerHostBaseClass extends superClass implements UmbControllerHostBaseDeclaration {
 		#controllers: UmbController[] = [];
 
 		#attached = false;
+
+		getHostElement() {
+			return undefined as any;
+		}
 
 		/**
 		 * Tests if a controller is assigned to this element.

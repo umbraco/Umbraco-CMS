@@ -29,6 +29,9 @@ export interface UmbPropertyDatasetContext extends UmbContext {
 
 	// Property methods:
 	propertyVariantId?: (propertyAlias: string) => Promise<Observable<UmbVariantId | undefined>>;
-	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string): Promise<Observable<ReturnType | undefined>>;
+	propertyValueByAlias<ReturnType = unknown>(
+		propertyAlias: string,
+	): Promise<Observable<ReturnType | undefined> | undefined>;
+	// TODO: Append the andCulture method as well..
 	setPropertyValue(propertyAlias: string, value: unknown): void;
 }

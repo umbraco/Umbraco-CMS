@@ -6,7 +6,9 @@ export type ObserverCallbackStack<T> = {
 	complete?: () => void;
 };
 
-export type ObserverCallback<T> = ((_value: T) => void) | ObserverCallbackStack<T>;
+export type ObserverCallback<T> = (_value: T) => void;
+// We do not use the ObserverCallbackStack type, and it was making things more complicated than they need to be so I have taken it out..
+//export type ObserverCallback<T> = ((_value: T) => void) | ObserverCallbackStack<T>;
 
 export class UmbObserver<T> {
 	#source!: Observable<T>;
