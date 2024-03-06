@@ -109,6 +109,8 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 				)}
 				${this.#renderPaging()}
 			`;
+		} else {
+			return nothing;
 		}
 	}
 
