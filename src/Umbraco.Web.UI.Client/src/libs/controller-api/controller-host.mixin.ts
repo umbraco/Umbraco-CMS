@@ -56,7 +56,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 
 			this.#controllers.push(ctrl);
 			if (this.#attached) {
-				// If a controller is created on a already attached element, then it will be added directly. This might not be optimal. As the controller it self has not finished its constructor method jet. therefor i postpone the call:
+				// If a controller is created on a already attached element, then it will be added directly. This might not be optimal. As the controller it self has not finished its constructor method jet. therefor i postpone the call: [NL]
 				Promise.resolve().then(() => {
 					// Extra check to see if we are still attached at this point:
 					if (this.#attached) {
