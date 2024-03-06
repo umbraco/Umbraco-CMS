@@ -144,6 +144,7 @@ internal sealed class MediaEditingService
                 // these are the only result states currently expected from Save
                 OperationResultType.Success => ContentEditingOperationStatus.Success,
                 OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
+                OperationResultType.FailedDuplicateKey => ContentEditingOperationStatus.DuplicateKey,
 
                 // for any other state we'll return "unknown" so we know that we need to amend this
                 _ => ContentEditingOperationStatus.Unknown
