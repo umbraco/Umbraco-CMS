@@ -101,7 +101,10 @@ export class UmbResourceController extends UmbControllerBase {
 							let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
 
 							// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
-							if (error.body?.detail?.includes('ObjectCacheAppCache')) {
+							if (
+								error.body?.detail?.includes('ObjectCacheAppCache') ||
+								error.body?.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
+							) {
 								headline = 'Please restart the server';
 								message =
 									'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
