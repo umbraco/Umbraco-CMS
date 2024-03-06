@@ -12,6 +12,7 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailModel>
@@ -112,6 +113,14 @@ export class UmbStylesheetWorkspaceContext
 		} else {
 			const { data } = await this.repository.save(this.#data.value);
 			newData = data;
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 
 		if (newData) {

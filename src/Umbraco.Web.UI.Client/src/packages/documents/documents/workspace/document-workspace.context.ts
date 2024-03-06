@@ -32,6 +32,7 @@ import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@u
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -458,6 +459,14 @@ export class UmbDocumentWorkspaceContext
 				console.error('Error saving document', error);
 				throw new Error('Error saving document');
 			}
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 
 		return selectedVariants;
