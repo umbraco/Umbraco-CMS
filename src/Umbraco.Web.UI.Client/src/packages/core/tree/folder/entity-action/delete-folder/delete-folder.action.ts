@@ -1,6 +1,8 @@
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { MetaEntityActionFolderKind } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -46,6 +48,14 @@ export class UmbDeleteFolderEntityAction extends UmbEntityActionBase<MetaEntityA
 			});
 
 			await this.#folderRepository?.delete(this.args.unique);
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.args.unique,
+				entityType: this.args.entityType,
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 	}
 }
