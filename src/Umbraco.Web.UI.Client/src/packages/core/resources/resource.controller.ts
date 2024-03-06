@@ -88,6 +88,30 @@ export class UmbResourceController extends UmbControllerBase {
 							},
 						});
 						break;
+					case 500:
+						// Server Error
+						console.group('UmbResourceController');
+						console.error(error);
+						console.groupEnd();
+
+						if (this.#notificationContext) {
+							let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
+
+							// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
+							if (error.body?.detail?.includes('ObjectCacheAppCache')) {
+								message =
+									'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
+							}
+
+							this.#notificationContext.peek('danger', {
+								data: {
+									headline: error.body?.title ?? error.name ?? 'Server Error',
+									message,
+								},
+								...options,
+							});
+						}
+						break;
 					default:
 						// Other errors
 						if (this.#notificationContext) {
