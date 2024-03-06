@@ -47,8 +47,9 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 					? U | undefined
 					: U
 				: undefined,
-			R extends UmbObserverController<SpecificT> = UmbObserverController<SpecificT>,
-			SpecificR = ObservableType extends undefined ? R | undefined : R,
+			SpecificR = ObservableType extends undefined
+				? UmbObserverController<SpecificT> | undefined
+				: UmbObserverController<SpecificT>,
 		>(
 			// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
 			source: ObservableType,
