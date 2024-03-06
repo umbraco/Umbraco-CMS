@@ -56,6 +56,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		this.min = Number(config?.getValueByAlias('minNumber')) || 0;
 		this.max = Number(config?.getValueByAlias('maxNumber')) || 0;
 
+		this.type = config?.getValueByAlias('type') ?? 'content';
 		this.allowedContentTypeIds = config?.getValueByAlias('filter');
 		this.showOpenButton = config?.getValueByAlias('showOpenButton');
 		this.ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
