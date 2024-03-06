@@ -1,8 +1,7 @@
 import { UMB_PROPERTY_DATASET_CONTEXT } from '../property-dataset/index.js';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbArrayState,
 	UmbBasicState,
@@ -10,14 +9,12 @@ import {
 	UmbDeepState,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbPropertyEditorConfigProperty } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
-	private _providerController: UmbContextProviderController;
-
+export class UmbPropertyContext<ValueType = any> extends UmbContextBase<UmbPropertyContext<ValueType>> {
 	#alias = new UmbStringState(undefined);
 	public readonly alias = this.#alias.asObservable();
 	#label = new UmbStringState(undefined);
@@ -29,8 +26,8 @@ export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 	#configValues = new UmbArrayState<UmbPropertyEditorConfigProperty>([], (x) => x.alias);
 	public readonly configValues = this.#configValues.asObservable();
 
-	#configCollection = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
-	public readonly config = this.#configCollection.asObservable();
+	#config = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
+	public readonly config = this.#config.asObservable();
 
 	private _editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
 	public readonly editor = this._editor.asObservable();
@@ -51,7 +48,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
-		super(host);
+		super(host, UMB_PROPERTY_CONTEXT);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (variantContext) => {
 			this.#datasetContext = variantContext;
@@ -63,10 +60,8 @@ export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 			this._observeProperty();
 		});
 
-		this._providerController = new UmbContextProviderController(host, UMB_PROPERTY_CONTEXT, this);
-
 		this.observe(this.configValues, (configValues) => {
-			this.#configCollection.setValue(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
+			this.#config.setValue(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
 		});
 
 		this.observe(this.variantId, () => {
@@ -74,29 +69,25 @@ export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 		});
 	}
 
-	private _observePropertyVariant?: UmbObserverController<UmbVariantId | undefined>;
-	private _observePropertyValue?: UmbObserverController<ValueType | undefined>;
 	private async _observeProperty(): Promise<void> {
 		const alias = this.#alias.getValue();
 		if (!this.#datasetContext || !alias) return;
 
-		const variantIdSubject = (await this.#datasetContext.propertyVariantId?.(alias)) ?? undefined;
-		this._observePropertyVariant?.destroy();
-		if (variantIdSubject) {
-			this._observePropertyVariant = this.observe(variantIdSubject, (variantId) => {
+		this.observe(
+			await this.#datasetContext.propertyVariantId?.(alias),
+			(variantId) => {
 				this.#variantId.setValue(variantId);
-			});
-		}
+			},
+			'observeVariantId',
+		);
 
-		// TODO: Verify if we need to optimize runtime by parsing the propertyVariantID, cause this method retrieves it again:
-		const subject = await this.#datasetContext.propertyValueByAlias<ValueType>(alias);
-
-		this._observePropertyValue?.destroy();
-		if (subject) {
-			this._observePropertyValue = this.observe(subject, (value) => {
+		this.observe(
+			await this.#datasetContext.propertyValueByAlias<ValueType>(alias),
+			(value) => {
 				this.#value.setValue(value);
-			});
-		}
+			},
+			'observeValue',
+		);
 	}
 
 	private _generateVariantDifferenceString() {
@@ -169,8 +160,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbControllerBase {
 		this.#description.destroy();
 		this.#configValues.destroy();
 		this.#value.destroy();
-		this.#configCollection.destroy();
-		this._providerController.destroy(); // This would also be handled by the controller host, but if someone wanted to replace/remove this context without the host being destroyed. Then we have clean up out selfs here.
+		this.#config.destroy();
 		this.#datasetContext = undefined;
 	}
 }

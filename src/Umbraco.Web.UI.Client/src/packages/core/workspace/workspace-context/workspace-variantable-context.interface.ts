@@ -22,7 +22,7 @@ export interface UmbVariantableWorkspaceContextInterface<VariantType extends Umb
 	propertyValueByAlias<ReturnValue = unknown>(
 		alias: string,
 		variantId?: UmbVariantId,
-	): Promise<Observable<ReturnValue | undefined>>;
+	): Promise<Observable<ReturnValue | undefined> | undefined>;
 	getPropertyValue<ReturnValue = unknown>(alias: string, variantId?: UmbVariantId): ReturnValue | undefined;
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId): Promise<void>;
 	//propertyDataByAlias(alias: string, variantId?: UmbVariantId): Observable<ValueModelBaseModel | undefined>;
