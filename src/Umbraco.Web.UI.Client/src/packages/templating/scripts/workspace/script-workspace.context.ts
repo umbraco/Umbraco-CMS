@@ -8,6 +8,7 @@ import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspa
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<UmbScriptDetailModel> {
 	public readonly repository = new UmbScriptDetailRepository(this);
@@ -104,6 +105,14 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 		} else {
 			const { data } = await this.repository.save(this.#data.value);
 			newData = data;
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 
 		if (newData) {

@@ -10,6 +10,7 @@ import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 type EntityType = UmbMemberTypeDetailModel;
 export class UmbMemberTypeWorkspaceContext
@@ -109,6 +110,14 @@ export class UmbMemberTypeWorkspaceContext
 			eventContext.dispatchEvent(event);
 		} else {
 			await this.structure.save();
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 
 		this.setIsNew(false);
