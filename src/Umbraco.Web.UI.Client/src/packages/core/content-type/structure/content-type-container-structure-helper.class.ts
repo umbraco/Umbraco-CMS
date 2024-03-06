@@ -1,10 +1,10 @@
 import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '../types.js';
 import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeModel> {
-	#host: UmbControllerHost;
+export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init;
 	#initResolver?: (value: unknown) => void;
 
@@ -34,7 +34,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	readonly hasProperties = this.#hasProperties.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
+		super(host);
 		this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;
 		});
@@ -101,8 +101,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			// We cannot have root properties currently, therefor we set it to false:
 			this.#hasProperties.setValue(false);
 			this._observeRootContainers();
-			new UmbObserverController(
-				this.#host,
+			this.observe(
 				this.#structure.ownerContainersOf(this._ownerType),
 				(ownerContainers) => {
 					this._ownerContainers = ownerContainers || [];
@@ -110,8 +109,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				'_observeOwnerContainers',
 			);
 		} else if (this._ownerName) {
-			new UmbObserverController(
-				this.#host,
+			this.observe(
 				this.#structure.containersByNameAndType(this._ownerName, this._ownerType),
 				(ownerALikeContainers) => {
 					this.#containers.setValue([]);
@@ -131,8 +129,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		if (!this.#structure) return;
 
 		this._ownerAlikeContainers.forEach((container) => {
-			new UmbObserverController(
-				this.#host,
+			this.observe(
 				this.#structure!.hasPropertyStructuresOf(container.id!),
 				(hasProperties) => {
 					this.#hasProperties.setValue(hasProperties);
@@ -146,8 +143,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		if (!this.#structure || !this._ownerName || !this._childType) return;
 
 		this._ownerAlikeContainers.forEach((container) => {
-			new UmbObserverController(
-				this.#host,
+			this.observe(
 				this.#structure!.containersOfParentKey(container.id, this._childType!),
 				this._insertGroupContainers,
 				'_observeGroupsOf_' + container.id,
@@ -158,8 +154,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	private _observeRootContainers() {
 		if (!this.#structure || !this._isRoot) return;
 
-		new UmbObserverController(
-			this.#host,
+		this.observe(
 			this.#structure.rootContainers(this._childType!),
 			(rootContainers) => {
 				this.#containers.setValue([]);

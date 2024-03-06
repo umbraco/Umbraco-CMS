@@ -1,10 +1,10 @@
 import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeModel } from '../types.js';
 import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel> {
-	#host: UmbControllerHost;
+export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init;
 	#initResolver?: (value: unknown) => void;
 
@@ -18,7 +18,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	readonly propertyStructure = this.#propertyStructure.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
+		super(host);
 		this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;
 		});
@@ -72,8 +72,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		if (this._isRoot === true) {
 			this._observePropertyStructureOf(null);
 		} else if (this._containerName !== undefined) {
-			new UmbObserverController(
-				this.#host,
+			this.observe(
 				this.#structure.containersByNameAndType(this._containerName, this._containerType),
 				(groupContainers) => {
 					groupContainers.forEach((group) => this._observePropertyStructureOf(group.id));
@@ -86,8 +85,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	private _observePropertyStructureOf(groupId?: string | null) {
 		if (!this.#structure || groupId === undefined) return;
 
-		new UmbObserverController(
-			this.#host,
+		this.observe(
 			this.#structure.propertyStructuresOf(groupId),
 			(properties) => {
 				// If this need to be able to remove properties, we need to clean out the ones of this group.id before inserting them:
