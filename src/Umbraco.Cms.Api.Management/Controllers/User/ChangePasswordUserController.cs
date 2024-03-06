@@ -42,7 +42,7 @@ public class ChangePasswordUserController : UserControllerBase
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             UserPermissionResource.WithKeys(id),
-            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+            AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

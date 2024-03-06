@@ -8,10 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("user-group")]
 [ApiExplorerSettings(GroupName = "User Group")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessUsers)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
 public class UserGroupControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserGroupOperationStatusResult(UserGroupOperationStatus status) =>

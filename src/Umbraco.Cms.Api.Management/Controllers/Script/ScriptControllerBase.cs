@@ -9,10 +9,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Script))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessScripts)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]
 public class ScriptControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult ScriptOperationStatusResult(ScriptOperationStatus status) =>

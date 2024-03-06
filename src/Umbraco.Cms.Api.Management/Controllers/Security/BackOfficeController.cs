@@ -2,7 +2,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,17 +13,16 @@ using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
 [ApiVersion("1.0")]
-[ApiController]
 [VersionedApiBackOfficeRoute(Common.Security.Paths.BackOfficeApi.EndpointTemplate)]
 [ApiExplorerSettings(IgnoreApi = true)]
 public class BackOfficeController : SecurityControllerBase

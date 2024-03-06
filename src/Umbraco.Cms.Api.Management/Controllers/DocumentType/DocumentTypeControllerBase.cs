@@ -8,10 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
-[ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentType)]
 [ApiExplorerSettings(GroupName = "Document Type")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
 public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)

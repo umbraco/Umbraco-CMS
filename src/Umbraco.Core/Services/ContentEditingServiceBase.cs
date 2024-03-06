@@ -108,6 +108,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         return Attempt.SucceedWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationResult = validationResult.Result });
     }
 
+    protected async Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase)
+        => await _validationService.ValidateCulturesAsync(contentEditingModelBase);
+
     protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
         ContentEditingModelBase contentEditingModelBase,
         Guid contentTypeKey)

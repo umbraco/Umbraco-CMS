@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Serilog.Events;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -16,7 +14,6 @@ public class LogMessage
     /// <summary>
     ///     The level of the event.
     /// </summary>
-    [JsonConverter(typeof(StringEnumConverter))]
     public LogEventLevel Level { get; set; }
 
     /// <summary>

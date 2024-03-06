@@ -86,6 +86,7 @@ public class MigrateDataTypeConfigurations : MigrationBase
                 updated |= dataTypeDto.EditorAlias switch
                 {
                     PropertyEditorAliases.Boolean => HandleBoolean(ref configurationData),
+                    PropertyEditorAliases.CheckBoxList => HandleCheckBoxList(ref configurationData),
                     PropertyEditorAliases.ColorPicker => HandleColorPicker(ref configurationData),
                     PropertyEditorAliases.ContentPicker => HandleContentPicker(ref configurationData),
                     PropertyEditorAliases.DateTime => HandleDateTime(ref configurationData),
@@ -125,6 +126,10 @@ public class MigrateDataTypeConfigurations : MigrationBase
     // translate "default value" to a proper boolean value
     private bool HandleBoolean(ref Dictionary<string, object> configurationData)
         => ReplaceIntegerStringWithBoolean(ref configurationData, "default");
+
+    // translate "selectable items" from old "value list" format to string array
+    private bool HandleCheckBoxList(ref Dictionary<string, object> configurationData)
+        => ReplaceValueListArrayWithStringArray(ref configurationData, "items");
 
     // translate "allowed colors" configuration from multiple old formats
     private bool HandleColorPicker(ref Dictionary<string, object> configurationData)
