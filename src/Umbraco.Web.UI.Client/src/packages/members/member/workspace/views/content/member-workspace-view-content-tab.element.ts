@@ -38,7 +38,7 @@ export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
 	public set ownerTabId(value: string | null | undefined) {
 		if (value === this._ownerTabId) return;
 		this._ownerTabId = value;
-		this._groupStructureHelper.setOwnerId(value);
+		this._groupStructureHelper.setParentId(value);
 	}
 
 	_groupStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
@@ -73,7 +73,7 @@ export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
 								container-type="Tab"
 								container-name=${this.tabName || ''}></umb-member-workspace-view-content-properties>
 						</uui-box>
-				  `
+					`
 				: ''}
 			${repeat(
 				this._groups,

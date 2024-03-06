@@ -53,7 +53,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	public set ownerTabId(value: string | null | undefined) {
 		if (value === this._ownerTabId) return;
 		this._ownerTabId = value;
-		this.#groupStructureHelper.setOwnerId(value);
+		this.#groupStructureHelper.setParentId(value);
 	}
 
 	/**
@@ -121,7 +121,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 						class="properties"
 						container-type="Group"
 						container-name=${groupName || ''}></umb-block-workspace-view-edit-properties
-			  ></uui-box>`;
+				></uui-box>`;
 	}
 
 	static styles = [

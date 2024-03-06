@@ -65,7 +65,7 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		if (value === this._ownerTabId) return;
 		const oldValue = this._ownerTabId;
 		this._ownerTabId = value;
-		this._groupStructureHelper.setOwnerId(value);
+		this._groupStructureHelper.setParentId(value);
 		this.requestUpdate('ownerTabId', oldValue);
 	}
 
@@ -151,7 +151,7 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 								container-type="Tab"
 								container-name=${this.tabName || ''}></umb-media-type-workspace-view-edit-properties>
 						</uui-box>
-				  `
+					`
 				: ''}
 			<div id="group-list">
 				${repeat(
@@ -184,7 +184,7 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 												? html`<uui-input type="number" label="sort order" .value=${group.sortOrder ?? 0}></uui-input>`
 												: ''}
 										</div>
-								  `
+									`
 								: html`<div slot="header">
 										<div><uui-icon name="icon-merge"></uui-icon><b>${group.name ?? ''}</b> (Inherited)</div>
 										${!this._sortModeActive
@@ -194,7 +194,7 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 													label="sort order"
 													.value=${group.sortOrder ?? 0}></uui-input>`
 											: ''}
-								  </div>`
+									</div>`
 						}
 					</div>
 					<umb-media-type-workspace-view-edit-properties
@@ -210,7 +210,7 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						id="add"
 						look="placeholder"
 						@click=${this.#onAddGroup}>
-				  </uui-button>`
+					</uui-button>`
 				: ''}
 		`;
 	}

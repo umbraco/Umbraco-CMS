@@ -80,7 +80,7 @@ export class UmbMemberTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		if (value === this._ownerTabId) return;
 		const oldValue = this._ownerTabId;
 		this._ownerTabId = value;
-		this._groupStructureHelper.setOwnerId(value);
+		this._groupStructureHelper.setParentId(value);
 		this.requestUpdate('ownerTabId', oldValue);
 	}
 
@@ -180,7 +180,7 @@ export class UmbMemberTypeWorkspaceViewEditTabElement extends UmbLitElement {
 								container-type="Tab"
 								container-name=${this.tabName || ''}></umb-member-type-workspace-view-edit-properties>
 						</uui-box>
-				  `
+					`
 				: ''
 		}
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
