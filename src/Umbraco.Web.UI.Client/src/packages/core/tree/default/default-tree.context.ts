@@ -24,6 +24,8 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 	#treeRoot = new UmbObjectState<TreeItemType | undefined>(undefined);
 	treeRoot = this.#treeRoot.asObservable();
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	#rootItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
 	rootItems = this.#rootItems.asObservable();
 
@@ -99,6 +101,8 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		const { data } = await this.#repository!.requestTreeRoot();
 
 		if (data) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.#treeRoot.setValue(data);
 		}
 	}
