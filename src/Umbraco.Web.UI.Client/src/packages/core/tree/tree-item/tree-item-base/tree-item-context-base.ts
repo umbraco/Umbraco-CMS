@@ -91,7 +91,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		const hostElement = this.getHostElement();
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		hostElement.addEventListener('reload-tree-item-parent', (event: CustomEvent) => {
+		hostElement.addEventListener('temp-reload-tree-item-parent', (event: CustomEvent) => {
 			const treeItem = this.getTreeItem();
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
@@ -323,7 +323,7 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		const parentUnique = treeItem?.parentUnique;
-		const customEvent = new CustomEvent('reload-tree-item-parent', {
+		const customEvent = new CustomEvent('temp-reload-tree-item-parent', {
 			detail: { unique: parentUnique },
 			bubbles: true,
 			composed: true,

@@ -65,7 +65,7 @@ export class UmbDefaultTreeContext<TreeItemType extends UmbTreeItemModelBase>
 		const hostElement = this.getHostElement();
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		hostElement.addEventListener('reload-tree-item-parent', (event: CustomEvent) => {
+		hostElement.addEventListener('temp-reload-tree-item-parent', (event: CustomEvent) => {
 			const treeRoot = this.#treeRoot.getValue();
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
