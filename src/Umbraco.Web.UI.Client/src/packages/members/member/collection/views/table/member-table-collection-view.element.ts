@@ -1,5 +1,5 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbMemberCollectionModel } from '../../types.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import type { UmbTableColumn, UmbTableConfig, UmbTableItem } from '@umbraco-cms/backoffice/components';
