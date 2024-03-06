@@ -33,6 +33,8 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	#treeItem = new UmbDeepState<TreeItemType | undefined>(undefined);
 	treeItem = this.#treeItem.asObservable();
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	#childItems = new UmbArrayState<TreeItemType>([], (x) => x.unique);
 	childItems = this.#childItems.asObservable();
 
@@ -81,6 +83,24 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
+
+		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
+		there might be a better way to do this through a tree item parent context.
+		It does not look like there is a way to have a "dynamic" parent context that will stop when a
+		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
+		const hostElement = this.getHostElement();
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		hostElement.addEventListener('reload-tree-item-parent', (event: CustomEvent) => {
+			const treeItem = this.getTreeItem();
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			const unique = treeItem?.unique;
+			if (event.detail.unique === unique) {
+				this.loadChildren();
+				event.stopPropagation();
+			}
+		});
 	}
 
 	/**
@@ -296,7 +316,21 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 		if (!this.unique) return;
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
-		console.log('reload structure for entity', event);
+
+		/* TODO: revisit. This is a temp solution to notify the parent it needs to reload its children
+		there might be a better way to do this through a tree item parent context.
+		It does not look like there is a way to have a "dynamic" parent context that will stop when a
+		specific parent is reached (a tree item unique that matches the parentUnique of this item) */
+		const treeItem = this.getTreeItem();
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		const parentUnique = treeItem?.parentUnique;
+		const customEvent = new CustomEvent('reload-tree-item-parent', {
+			detail: { unique: parentUnique },
+			bubbles: true,
+			composed: true,
+		});
+		this.getHostElement().dispatchEvent(customEvent);
 	};
 
 	#onPageChange = (event: UmbChangeEvent) => {
