@@ -771,44 +771,7 @@ internal class DatabaseDataCreator
             },
             Constants.DatabaseSchema.Tables.Node,
             "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.MediaPicker,
-            new NodeDto
-            {
-                NodeId = 1048,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = "-1,1048",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.MediaPickerGuid,
-                Text = "Media Picker (legacy)",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
-        ConditionalInsert(
-            Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            Constants.DataTypes.Guids.MultipleMediaPicker,
-            new NodeDto
-            {
-                NodeId = 1049,
-                Trashed = false,
-                ParentId = -1,
-                UserId = -1,
-                Level = 1,
-                Path = "-1,1049",
-                SortOrder = 2,
-                UniqueId = Constants.DataTypes.Guids.MultipleMediaPickerGuid,
-                Text = "Multiple Media Picker (legacy)",
-                NodeObjectType = Constants.ObjectTypes.DataType,
-                CreateDate = DateTime.Now,
-            },
-            Constants.DatabaseSchema.Tables.Node,
-            "id");
+
         ConditionalInsert(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
             Constants.DataTypes.Guids.RelatedLinks,

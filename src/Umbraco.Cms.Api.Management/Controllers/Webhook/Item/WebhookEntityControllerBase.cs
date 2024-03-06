@@ -6,7 +6,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook.Item;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Webhook}")]
 [ApiExplorerSettings(GroupName = "Webhook")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]

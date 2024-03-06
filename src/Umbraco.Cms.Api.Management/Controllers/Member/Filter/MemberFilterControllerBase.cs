@@ -7,7 +7,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.Filter;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Filter}/{Constants.UdiEntityType.Member}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Member))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForMemberTree)]

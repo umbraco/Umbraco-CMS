@@ -6,7 +6,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Item;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Item}/user")]
 [ApiExplorerSettings(GroupName = "User")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]

@@ -7,7 +7,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PropertyType;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("property-type")]
 [ApiExplorerSettings(GroupName = "Property Type")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]

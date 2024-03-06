@@ -8,7 +8,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("user-group")]
 [ApiExplorerSettings(GroupName = "User Group")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]

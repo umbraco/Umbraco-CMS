@@ -8,7 +8,6 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}/folder")]
 [ApiExplorerSettings(GroupName = "Script")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessScripts)]
