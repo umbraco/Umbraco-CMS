@@ -33,6 +33,12 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	}
 
 	public setStructureManager(structure: UmbContentTypePropertyStructureManager<T>) {
+		if (this.#structure === structure) return;
+		if (this.#structure) {
+			throw new Error(
+				'Structure manager is already set, the helpers are not designed to be re-setup with new managers',
+			);
+		}
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
