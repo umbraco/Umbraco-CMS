@@ -5,14 +5,15 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
  * @element umb-property-editor-ui-media-picker
  */
 @customElement('umb-property-editor-ui-media-picker')
 export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	public value: string = '';
+	@property({ attribute: false })
+	public value: Array<{ key: string; mediaKey: string; mediaTypeAlias: string }> = [];
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -39,22 +40,22 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('value')) {
-			if (typeof this.value !== 'string') {
-				//TODO: Temp fix for when the value is an array, this should be fixed elsewhere.
-				this.value = '';
-			}
-			this._items = this.value ? this.value.split(',') : [];
+			this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
 		}
 	}
 
 	private _onChange(event: CustomEvent) {
 		const selectedIds = (event.target as UmbInputMediaElement).selectedIds;
-		//TODO: This is a hack, something changed so now we need to convert the array to a comma separated string to make it work with the server.
-		const toCommaSeparatedString = selectedIds.join(',');
-		// this.value = (event.target as UmbInputMediaElement).selectedIds;
 
-		this.value = toCommaSeparatedString;
-		console.log('property-value-change', this.value);
+		const result = selectedIds.map((mediaKey) => {
+			return {
+				key: UmbId.new(),
+				mediaKey,
+				mediaTypeAlias: 'Image',
+			};
+		});
+
+		this.value = result;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
