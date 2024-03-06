@@ -1,8 +1,13 @@
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '../default/collection-default.context.js';
+import type { MetaEntityBulkAction, ManifestEntityBulkAction } from '../../index.js';
 import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+function apiArgsMethod(manifest: ManifestEntityBulkAction<MetaEntityBulkAction>) {
+	return [{ meta: manifest.meta }] as unknown[];
+}
 
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
@@ -13,7 +18,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	private _selectionLength = 0;
 
 	@state()
-	private _extensionProps = {};
+	private _apiProps = {};
 
 	private _selection: Array<string | null> = [];
 
@@ -53,7 +58,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 			(selection) => {
 				this._selectionLength = selection.length;
 				this._selection = selection;
-				this._extensionProps = { selection: this._selection };
+				this._apiProps = { selection: this._selection };
 			},
 			'umbSelectionObserver',
 		);
@@ -82,13 +87,14 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 					${this._renderSelectionCount()}
 				</div>
 
-				<umb-extension-slot
+				<umb-extension-with-api-slot
 					id="actions"
 					type="entityBulkAction"
 					default-element="umb-entity-bulk-action"
-					.props=${this._extensionProps}
+					.apiProps=${this._apiProps}
+					.apiArgs=${apiArgsMethod}
 					@action-executed=${this.#onActionExecuted}>
-				</umb-extension-slot>
+				</umb-extension-with-api-slot>
 			</div>
 		`;
 	}

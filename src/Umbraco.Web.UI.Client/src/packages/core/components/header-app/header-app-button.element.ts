@@ -1,12 +1,11 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, LitElement, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	ManifestHeaderAppButtonKind,
-	UmbBackofficeManifestKind} from '@umbraco-cms/backoffice/extension-registry';
-import {
-	umbExtensionsRegistry,
+	UmbBackofficeManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: UmbBackofficeManifestKind = {
 	type: 'kind',
@@ -32,7 +31,7 @@ export class UmbHeaderAppButtonElement extends LitElement {
 				label="${ifDefined(this.manifest?.meta.label)}"
 				href="${ifDefined(this.manifest?.meta.href)}"
 				compact>
-				<uui-icon name="${ifDefined(this.manifest?.meta.icon)}"></uui-icon>
+				<umb-icon name="${ifDefined(this.manifest?.meta.icon)}"></umb-icon>
 			</uui-button>
 		`;
 	}

@@ -8,6 +8,10 @@ export class UmbLanguageDetailRepository extends UmbDetailRepositoryBase<UmbLang
 	constructor(host: UmbControllerHost) {
 		super(host, UmbLanguageServerDataSource, UMB_LANGUAGE_DETAIL_STORE_CONTEXT);
 	}
+
+	async create(model: UmbLanguageDetailModel) {
+		return super.create(model, null);
+	}
 }
 
 export default UmbLanguageDetailRepository;

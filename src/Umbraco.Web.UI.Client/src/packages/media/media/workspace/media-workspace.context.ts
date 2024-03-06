@@ -2,8 +2,8 @@ import { UmbMediaTypeDetailRepository } from '../../media-types/repository/detai
 import { UmbMediaPropertyDataContext } from '../property-dataset-context/media-property-dataset-context.js';
 import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
-import type { UmbMediaDetailModel, UmbMediaVariantOptionModel } from '../types.js';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionModel } from '../types.js';
+import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
@@ -12,6 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
+	jsonStringComparison,
 	mergeObservables,
 	partialUpdateFrozenArray,
 	UmbArrayState,
@@ -19,6 +20,9 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
@@ -27,6 +31,8 @@ export class UmbMediaWorkspaceContext
 {
 	//
 	public readonly repository = new UmbMediaDetailRepository(this);
+
+	#parent?: { entityType: string; unique: string | null };
 
 	/**
 	 * The media is the current state/draft version of the media.
@@ -48,25 +54,59 @@ export class UmbMediaWorkspaceContext
 	readonly contentTypeCollection = this.#currentData.asObservablePart((data) => data?.mediaType.collection);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
-	readonly variantOptions = mergeObservables([this.variants, this.languages], ([variants, languages]) => {
-		return languages.map((language) => {
-			return {
-				variant: variants.find((x) => x.culture === language.unique),
-				language,
-				// TODO: When including segments, this should be updated to include the segment as well. [NL]
-				unique: language.unique, // This must be a variantId string!
-			} as UmbMediaVariantOptionModel;
-		});
-	});
+
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbMediaTypeDetailRepository(this));
+	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
+	//#variesByCulture?: boolean;
+	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
+	//#variesBySegment?: boolean;
+	readonly varies = this.structure.ownerContentTypePart((x) =>
+		x ? x.variesByCulture || x.variesBySegment : undefined,
+	);
+	#varies?: boolean;
+
 	readonly splitView = new UmbWorkspaceSplitViewManager();
+
+	readonly variantOptions = mergeObservables(
+		[this.varies, this.variants, this.languages],
+		([varies, variants, languages]) => {
+			// TODO: When including segments, when be aware about the case of segment varying when not culture varying. [NL]
+			if (varies === true) {
+				return languages.map((language) => {
+					return {
+						variant: variants.find((x) => x.culture === language.unique),
+						language,
+						// TODO: When including segments, this object should be updated to include a object for the segment. [NL]
+						// TODO: When including segments, the unique should be updated to include the segment as well. [NL]
+						unique: language.unique, // This must be a variantId string!
+						culture: language.unique,
+						segment: null,
+					} as UmbMediaVariantOptionModel;
+				});
+			} else if (varies === false) {
+				return [
+					{
+						variant: variants.find((x) => x.culture === null),
+						language: languages.find((x) => x.isDefault),
+						culture: null,
+						segment: null,
+						unique: UMB_INVARIANT_CULTURE, // This must be a variantId string!
+					} as UmbMediaVariantOptionModel,
+				];
+			}
+			return [] as Array<UmbMediaVariantOptionModel>;
+		},
+	);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Media');
 
 		this.observe(this.contentTypeUnique, (unique) => this.structure.loadType(unique));
+		this.observe(this.varies, (varies) => (this.#varies = varies));
+
+		this.loadLanguages();
 	}
 
 	resetState() {
@@ -76,6 +116,7 @@ export class UmbMediaWorkspaceContext
 	}
 
 	async loadLanguages() {
+		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
 		const { data } = await this.#languageRepository.requestCollection({});
 		this.#languages.setValue(data?.items ?? []);
 	}
@@ -92,9 +133,10 @@ export class UmbMediaWorkspaceContext
 		return data || undefined;
 	}
 
-	async create(parentUnique: string | null, mediaTypeUnique: string) {
+	async create(parent: { entityType: string; unique: string | null }, mediaTypeUnique: string) {
 		this.resetState();
-		this.#getDataPromise = this.repository.createScaffold(parentUnique, { unique: mediaTypeUnique });
+		this.#parent = parent;
+		this.#getDataPromise = this.repository.createScaffold({ mediaType: { unique: mediaTypeUnique, collection: null } });
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
@@ -120,6 +162,11 @@ export class UmbMediaWorkspaceContext
 		return this.getData()?.mediaType.unique;
 	}
 
+	// TODO: Check if this is used:
+	getVaries() {
+		return this.#varies;
+	}
+
 	variantById(variantId: UmbVariantId) {
 		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x)));
 	}
@@ -139,13 +186,15 @@ export class UmbMediaWorkspaceContext
 	}
 
 	setName(name: string, variantId?: UmbVariantId) {
-		const oldVariants = this.#currentData.getValue()?.variants || [];
-		const variants = partialUpdateFrozenArray(
-			oldVariants,
-			{ name },
-			variantId ? (x) => variantId.compare(x) : () => true,
-		);
-		this.#currentData.update({ variants });
+		// const oldVariants = this.#currentData.getValue()?.variants || [];
+		// const variants = partialUpdateFrozenArray(
+		// 	oldVariants,
+		// 	{ name },
+		// 	variantId ? (x) => variantId.compare(x) : () => true,
+		// );
+		// this.#currentData.update({ variants });
+
+		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
 	async propertyStructureById(propertyId: string) {
@@ -192,6 +241,82 @@ export class UmbMediaWorkspaceContext
 				(x) => x.alias === alias && (variantId ? variantId.compare(x as any) : true),
 			);
 			this.#currentData.update({ values });
+
+			// TODO: We should move this type of logic to the act of saving [NL]
+			this.#updateVariantData(variantId);
+		}
+	}
+
+	/* 	#calculateChangedVariants() {
+		const persisted = this.#persistedData.getValue();
+		const current = this.#currentData.getValue();
+		if (!current) throw new Error('Current data is missing');
+
+		const changedVariants = current?.variants.map((variant) => {
+			const persistedVariant = persisted?.variants.find((x) => UmbVariantId.Create(variant).compare(x));
+			return {
+				culture: variant.culture,
+				segment: variant.segment,
+				equal: persistedVariant ? jsonStringComparison(variant, persistedVariant) : false,
+			};
+		});
+
+		const changedProperties = current?.values.map((value) => {
+			const persistedValues = persisted?.values.find((x) => UmbVariantId.Create(value).compare(x));
+			return {
+				culture: value.culture,
+				segment: value.segment,
+				equal: persistedValues ? jsonStringComparison(value, persistedValues) : false,
+			};
+		});
+
+		// calculate the variantIds of those who either have a change in properties or in variants:
+		return (
+			changedVariants
+				?.concat(changedProperties ?? [])
+				.filter((x) => x.equal === false)
+				.map((x) => new UmbVariantId(x.culture, x.segment)) ?? []
+		);
+	} */
+
+	#updateVariantData(variantId: UmbVariantId, update?: Partial<UmbMediaVariantModel>) {
+		const currentData = this.getData();
+		if (!currentData) throw new Error('Data is missing');
+		if (this.#varies === true) {
+			// If variant Id is invariant, we don't to have the variant appended to our data.
+			if (variantId.isInvariant()) return;
+			const variant = currentData.variants.find((x) => variantId.compare(x));
+			const newVariants = appendToFrozenArray(
+				currentData.variants,
+				{
+					name: '',
+					createDate: null,
+					updateDate: null,
+					...variantId.toObject(),
+					...variant,
+					...update,
+				},
+				(x) => variantId.compare(x),
+			);
+			this.#currentData.update({ variants: newVariants });
+		} else if (this.#varies === false) {
+			// TODO: Beware about segments, in this case we need to also consider segments, if its allowed to vary by segments.
+			const invariantVariantId = UmbVariantId.CreateInvariant();
+			const variant = currentData.variants.find((x) => invariantVariantId.compare(x));
+			// Cause we are invariant, we will just overwrite all variants with this one:
+			const newVariants = [
+				{
+					name: '',
+					createDate: null,
+					updateDate: null,
+					...invariantVariantId.toObject(),
+					...variant,
+					...update,
+				},
+			];
+			this.#currentData.update({ variants: newVariants });
+		} else {
+			throw new Error('Varies by culture is missing');
 		}
 	}
 
@@ -199,13 +324,30 @@ export class UmbMediaWorkspaceContext
 		if (!this.#currentData.value?.unique) throw new Error('Unique is missing');
 
 		if (this.getIsNew()) {
+			if (!this.#parent) throw new Error('Parent is not set');
 			const value = this.#currentData.value;
 
-			if ((await this.repository.create(value)).data !== undefined) {
+			if ((await this.repository.create(value, this.#parent.unique)).data !== undefined) {
 				this.setIsNew(false);
+
+				// TODO: this might not be the right place to alert the tree, but it works for now
+				const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+				const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+					entityType: this.#parent.entityType,
+					unique: this.#parent.unique,
+				});
+				eventContext.dispatchEvent(event);
 			}
 		} else {
 			await this.repository.save(this.#currentData.value);
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 	}
 
@@ -213,7 +355,8 @@ export class UmbMediaWorkspaceContext
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 		await this.#createOrSave();
-		this.saveComplete(data);
+		this.setIsNew(false);
+		this.workspaceComplete(data);
 	}
 
 	async delete() {

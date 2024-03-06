@@ -45,6 +45,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			this._groupsWithBlockTypes = model;
 		},
 		onEnd: () => {
+			// TODO: make one method for updating the blockGroupsDataSetValue:
 			this.#datasetContext?.setPropertyValue(
 				'blockGroups',
 				this._groupsWithBlockTypes.map((group) => ({ key: group.key, name: group.name })),
@@ -143,6 +144,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	// TODO: Implement confirm dialog
 	#deleteGroup(groupKey: string) {
+		// TODO: make one method for updating the blockGroupsDataSetValue:
+		// This one that deletes might require the ability to parse what to send as an argument to the method, then a filtering can occur before.
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
 			this._blockGroups.filter((group) => group.key !== groupKey),
@@ -154,6 +157,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#changeGroupName(e: UUIInputEvent, groupKey: string) {
 		const groupName = e.target.value as string;
+		// TODO: make one method for updating the blockGroupsDataSetValue:
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
 			this._blockGroups.map((group) => (group.key === groupKey ? { ...group, name: groupName } : group)),

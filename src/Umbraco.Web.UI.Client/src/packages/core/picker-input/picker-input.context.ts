@@ -1,11 +1,11 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { type UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
-export class UmbPickerInputContext<ItemType extends { name: string; unique: string }> extends UmbBaseController {
+export class UmbPickerInputContext<ItemType extends { name: string; unique: string }> extends UmbControllerBase {
 	// TODO: We are way too unsecure about the requirements for the Modal Token, as we have certain expectation for the data and value.
 	modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>;
 	repository?: UmbItemRepository<ItemType>;
@@ -68,7 +68,7 @@ export class UmbPickerInputContext<ItemType extends { name: string; unique: stri
 	async openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
 		await this.#itemManager.init;
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const modalContext = modalManager.open(this.modalAlias, {
+		const modalContext = modalManager.open(this, this.modalAlias, {
 			data: {
 				multiple: this._max === 1 ? false : true,
 				...pickerData,

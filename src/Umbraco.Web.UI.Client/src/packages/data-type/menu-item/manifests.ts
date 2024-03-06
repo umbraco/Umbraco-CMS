@@ -9,7 +9,7 @@ const menuItem: ManifestMenuItemTreeKind = {
 	meta: {
 		label: 'Data Types',
 		entityType: 'data-type',
-		treeAlias: 'Umb.Tree.DataTypes',
+		treeAlias: 'Umb.Tree.DataType',
 		menus: ['Umb.Menu.Settings'],
 	},
 };

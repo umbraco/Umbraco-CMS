@@ -1,12 +1,15 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/document-workspace-has-collection.condition.js';
+//import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
+//import { UmbPublishDocumentEntityAction } from '../entity-actions/publish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
 //import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
 //import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
-	ManifestWorkspaceAction,
+	ManifestWorkspaceActions,
+	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -79,9 +82,10 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 	},
 ];
 
-const workspaceActions: Array<ManifestWorkspaceAction> = [
+const workspaceActions: Array<ManifestWorkspaceActions> = [
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		name: 'Save And Publish Document Workspace Action',
 		weight: 70,
@@ -100,6 +104,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 	{
 		type: 'workspaceAction',
+		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Document.Save',
 		name: 'Save Document Workspace Action',
 		weight: 80,
@@ -152,4 +157,46 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	*/
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions];
+const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
+	{
+		type: 'workspaceActionMenuItem',
+		kind: 'default',
+		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
+		name: 'Unpublish',
+		weight: 10,
+		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
+		meta: {
+			label: 'Unpublish',
+			icon: 'icon-globe',
+		},
+	},
+	{
+		type: 'workspaceActionMenuItem',
+		kind: 'default',
+		alias: 'Umb.Document.WorkspaceActionMenuItem.PublishWithDescendants',
+		name: 'Publish with descendants',
+		weight: 20,
+		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
+		meta: {
+			label: 'Publish with descendants (TBD)',
+			icon: 'icon-globe',
+		},
+	},
+	{
+		type: 'workspaceActionMenuItem',
+		kind: 'default',
+		alias: 'Umb.Document.WorkspaceActionMenuItem.SchedulePublishing',
+		name: 'Schedule publishing',
+		weight: 20,
+		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
+		meta: {
+			label: 'Schedule publishing (TBD)',
+			icon: 'icon-globe',
+		},
+	},
+];
+
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...workspaceActionMenuItems];

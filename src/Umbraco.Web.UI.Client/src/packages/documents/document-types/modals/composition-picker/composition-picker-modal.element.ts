@@ -112,7 +112,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 						html`<uui-ref-node-document-type
 							href=${'/section/settings/workspace/document-type/edit/' + item.unique}
 							name=${item.name}>
-							<uui-icon slot="icon" name=${item.icon}></uui-icon>
+							<umb-icon slot="icon" name=${item.icon}></umb-icon>
 						</uui-ref-node-document-type>`,
 				)}
 			</div>`;
@@ -134,7 +134,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 						(folder) => folder.path,
 						(folder) =>
 							html`${this._compatibleCompositions!.length > 1
-								? html`<strong><uui-icon name="icon-folder"></uui-icon>${folder.path}</strong>`
+								? html`<strong><umb-icon name="icon-folder"></umb-icon>${folder.path}</strong>`
 								: nothing}
 							${this.#renderCompositionsItems(folder.compositions)}`,
 					)}
@@ -167,7 +167,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 					@selected=${() => this.#onSelectionAdd(compositions.unique)}
 					@deselected=${() => this.#onSelectionRemove(compositions.unique)}
 					?selected=${this._selection.find((unique) => unique === compositions.unique)}>
-					<uui-icon name=${compositions.icon} slot="icon"></uui-icon>
+					<umb-icon name=${compositions.icon} slot="icon"></umb-icon>
 				</uui-menu-item>`,
 		);
 	}

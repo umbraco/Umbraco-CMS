@@ -1,9 +1,10 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbMediaCreateOptionsModalData {
-	media: {
-		unique: string;
-	} | null;
+	parent: {
+		unique: string | null;
+		entityType: string;
+	};
 	mediaType: {
 		unique: string;
 	} | null;

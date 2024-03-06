@@ -125,7 +125,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 				(propertyEditorUI) =>
 					html` <li class="item" ?selected=${this.value.selection.includes(propertyEditorUI.alias)}>
 						<button type="button" @click="${() => this.#handleClick(propertyEditorUI)}">
-							<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
+							<umb-icon name="${propertyEditorUI.meta.icon}" class="icon"></umb-icon>
 							${propertyEditorUI.meta.label || propertyEditorUI.name}
 						</button>
 					</li>`,

@@ -1,5 +1,6 @@
 import { expect } from '@open-wc/testing';
-import { type UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
+import type { UmbControllerHostElement } from './controller-host-element.interface.js';
+import { UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 import { UmbControllerHostMixin } from './controller-host.mixin.js';
 import type { UmbControllerAlias } from './controller-alias.type.js';
 import type { UmbControllerHost } from './controller-host.interface.js';

@@ -1,15 +1,16 @@
+import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbCreateEntityAction<T extends { copy(): Promise<void> }> extends UmbEntityActionBase<T> {
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
+export class UmbCreateEntityAction extends UmbEntityActionBase<never> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
+		super(host, args);
 	}
 
-	// TODO: can we make this a generic create action
 	async execute() {
-		// TODO: get entity type from repository?
-		const url = `section/settings/workspace/template/create/${this.unique || 'null'}`;
+		const url = `section/settings/workspace/template/create/parent/${this.args.entityType}/${
+			this.args.unique || 'null'
+		}`;
 		// TODO: how do we handle this with a href?
 		history.pushState(null, '', url);
 	}

@@ -3,10 +3,10 @@ import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_ICON_PICKER_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
+
 @customElement('umb-media-type-workspace-editor')
 export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
@@ -21,13 +21,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _icon?: string;
 
-	@state()
-	private _iconColorAlias?: string;
-	// TODO: Color should be using an alias, and look up in some dictionary/key/value) of project-colors.
-
 	#workspaceContext?: UmbMediaTypeWorkspaceContext;
-
-	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
 		super();
@@ -35,10 +29,6 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbMediaTypeWorkspaceContext;
 			this.#observeMediaType();
-		});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
 		});
 	}
 
@@ -61,7 +51,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	// TODO. find a way where we don't have to do this for all workspaces.
+	// TODO: find a way where we don't have to do this for all workspaces.
 	#onNameChange(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
@@ -74,21 +64,21 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 					const expectedOldAlias = generateAlias(oldName ?? '');
 					// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
 					if (expectedOldAlias === oldAlias) {
-						this.#workspaceContext?.updateProperty('alias', generateAlias(newName));
+						this.#workspaceContext?.setAlias(generateAlias(newName));
 					}
 				}
-				this.#workspaceContext?.updateProperty('name', target.value);
+				this.#workspaceContext?.setName(target.value);
 			}
 		}
 	}
 
-	// TODO. find a way where we don't have to do this for all workspaces.
+	// TODO: find a way where we don't have to do this for all workspaces.
 	#onAliasChange(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
 			if (typeof target?.value === 'string') {
-				this.#workspaceContext?.updateProperty('alias', target.value);
+				this.#workspaceContext?.setAlias(target.value);
 			}
 		}
 		event.stopPropagation();
@@ -99,16 +89,22 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	private async _handleIconClick() {
-		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
+		const [alias, color] = this._icon?.replace('color-', '')?.split(' ') ?? [];
+
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_ICON_PICKER_MODAL, {
 			value: {
-				icon: this._icon,
-				color: this._iconColorAlias,
+				icon: alias,
+				color: color,
 			},
 		});
 
-		modalContext?.onSubmit().then((value) => {
-			if (value.icon) this.#workspaceContext?.updateProperty('icon', value.icon);
-			// TODO: save color ALIAS as well
+		modalContext?.onSubmit().then((saved) => {
+			if (saved.icon && saved.color) {
+				this.#workspaceContext?.setIcon(`${saved.icon} color-${saved.color}`);
+			} else if (saved.icon) {
+				this.#workspaceContext?.setIcon(saved.icon);
+			}
 		});
 	}
 
@@ -116,7 +112,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 		return html`<umb-workspace-editor alias="Umb.Workspace.MediaType">
 			<div id="header" slot="header">
 				<uui-button id="icon" @click=${this._handleIconClick} label="icon" compact>
-					<uui-icon name="${ifDefined(this._icon)}" style="color: ${this._iconColorAlias}"></uui-icon>
+					<umb-icon name=${ifDefined(this._icon)}></umb-icon>
 				</uui-button>
 
 				<uui-input id="name" .value=${this._name} @input="${this.#onNameChange}" label="name">

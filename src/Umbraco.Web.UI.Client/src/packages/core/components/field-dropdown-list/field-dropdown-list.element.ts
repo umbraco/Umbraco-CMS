@@ -1,5 +1,5 @@
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { UmbDocumentTypeDetailRepository, UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import {
 	css,
@@ -16,7 +16,6 @@ import type { UUIComboboxEvent, UUIComboboxElement } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbMediaTypeDetailRepository } from '@umbraco-cms/backoffice/media-type';
 import {
-	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 	UMB_MEDIA_TYPE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
 	type UmbModalManagerContext,
@@ -88,7 +87,7 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	async #getDocumentTypeFields() {
 		if (!this.#modalManager) return;
-		const modalContext = this.#modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+		const modalContext = this.#modalManager.open(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: false,
@@ -108,7 +107,7 @@ export class UmbFieldDropdownListElement extends UmbLitElement {
 
 	async #getMediaTypeFields() {
 		if (!this.#modalManager) return;
-		const modalContext = this.#modalManager.open(UMB_MEDIA_TYPE_PICKER_MODAL, {
+		const modalContext = this.#modalManager.open(this, UMB_MEDIA_TYPE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: false,

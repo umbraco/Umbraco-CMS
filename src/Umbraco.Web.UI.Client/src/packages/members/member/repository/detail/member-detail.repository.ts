@@ -19,6 +19,10 @@ export class UmbMemberDetailRepository extends UmbDetailRepositoryBase<UmbMember
 	constructor(host: UmbControllerHost) {
 		super(host, UmbMemberServerDataSource, UMB_MEMBER_DETAIL_STORE_CONTEXT);
 	}
+
+	async create(model: UmbMemberDetailModel) {
+		return super.create(model, null);
+	}
 }
 
 export default UmbMemberDetailRepository;

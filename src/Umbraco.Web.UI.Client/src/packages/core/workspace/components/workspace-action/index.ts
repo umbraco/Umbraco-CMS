@@ -1,3 +1,4 @@
-export * from './workspace-action-base.js';
-export * from './workspace-action.element.js';
 export * from './common/index.js';
+export * from './workspace-action-base.controller.js';
+export type * from './types.js';
+export type * from './workspace-action.interface.js';

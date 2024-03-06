@@ -2,20 +2,29 @@ import { umbPickDocumentVariantModal } from '../modals/pick-document-variant-mod
 import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentVariantState } from '../types.js';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
-import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
+import { type UmbEntityActionArgs, UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<unknown> {
+export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<object> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<object>) {
+		super(host, args);
+	}
+
 	async execute() {
+		if (!this.args.unique) throw new Error('The document unique identifier is missing');
+
 		const languageRepository = new UmbLanguageCollectionRepository(this._host);
 		const { data: languageData } = await languageRepository.requestCollection({});
 
 		const documentRepository = new UmbDocumentDetailRepository(this._host);
-		const { data: documentData } = await documentRepository.requestByUnique(this.unique);
+		const { data: documentData } = await documentRepository.requestByUnique(this.args.unique);
 
 		if (!documentData) throw new Error('The document was not found');
 
 		const allOptions = (languageData?.items ?? []).map((language) => ({
+			culture: language.unique,
+			segment: null,
 			language: language,
 			variant: documentData.variants.find((variant) => variant.culture === language.unique),
 			unique: new UmbVariantId(language.unique, null).toString(),
@@ -35,7 +44,8 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<unknow
 
 		if (selectedVariants.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			await publishingRepository.unpublish(this.unique, selectedVariants);
+			await publishingRepository.unpublish(this.args.unique, selectedVariants);
 		}
 	}
 }
+export default UmbUnpublishDocumentEntityAction;

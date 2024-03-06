@@ -1,4 +1,4 @@
-import type { UmbControllerHostElement } from './controller-host-element.mixin.js';
+import type { UmbControllerHostElement } from './controller-host-element.interface.js';
 import { UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 

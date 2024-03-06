@@ -1,13 +1,25 @@
 import { umbExtensionsRegistry } from '../../index.js';
-import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 
 @customElement('umb-extension-table-action-column-layout')
 export class UmbExtensionTableActionColumnLayoutElement extends UmbLitElement {
 	@property({ attribute: false })
 	value!: ManifestBase;
+
+	#collectionContext?: UmbDefaultCollectionContext<ManifestBase>;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
+			this.#collectionContext = instance;
+		});
+	}
 
 	async #removeExtension() {
 		await umbConfirmModal(this, {
@@ -16,7 +28,10 @@ export class UmbExtensionTableActionColumnLayoutElement extends UmbLitElement {
 			content: html`<p>Are you sure you want to unload the extension <strong>${this.value.alias}</strong>?</p>`,
 			color: 'danger',
 		});
+
 		umbExtensionsRegistry.unregister(this.value.alias);
+
+		this.#collectionContext?.requestCollection();
 	}
 
 	render() {

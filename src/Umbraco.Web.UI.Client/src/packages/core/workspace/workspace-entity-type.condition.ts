@@ -1,24 +1,21 @@
 import { UMB_WORKSPACE_CONTEXT } from './workspace-context/index.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbWorkspaceEntityTypeCondition extends UmbBaseController implements UmbExtensionCondition {
-	config: WorkspaceEntityTypeConditionConfig;
-	permitted = false;
-	#onChange: () => void;
-
-	constructor(args: UmbConditionControllerArguments<WorkspaceEntityTypeConditionConfig>) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+export class UmbWorkspaceEntityTypeCondition
+	extends UmbConditionBase<WorkspaceEntityTypeConditionConfig>
+	implements UmbExtensionCondition
+{
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<WorkspaceEntityTypeConditionConfig>) {
+		super(host, args);
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this.permitted = context.getEntityType().toLowerCase() === this.config.match.toLowerCase();
-			this.#onChange();
 		});
 	}
 }

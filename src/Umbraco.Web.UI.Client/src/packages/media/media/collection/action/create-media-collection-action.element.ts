@@ -78,11 +78,15 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	#getCreateUrl(item: UmbAllowedMediaTypeModel) {
+	#getCreateUrl(mediaType: UmbAllowedMediaTypeModel) {
 		// TODO: [LK] I need help with this. I don't know what the infinity editor URL should be.
+
+		const mediaEntityType = 'media-root'; // TODO: this should be dynamic
 		return this._useInfiniteEditor
-			? `${this._createMediaPath}create/${this._mediaUnique ?? 'null'}/${item.unique}`
-			: `section/media/workspace/media/create/${this._mediaUnique ?? 'null'}/${item.unique}`;
+			? `${this._createMediaPath}create/${this._mediaUnique ?? 'null'}/${mediaType.unique}`
+			: `section/media/workspace/media/create/parent/${mediaEntityType}/${this._mediaUnique ?? 'null'}/${
+					mediaType.unique
+			  }`;
 	}
 
 	render() {
@@ -122,7 +126,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 							this._allowedMediaTypes,
 							(item) => html`
 								<uui-menu-item label=${item.name} href=${this.#getCreateUrl(item)}>
-									<uui-icon slot="icon" name=${item.icon ?? 'icon-picture'}></uui-icon>
+									<umb-icon slot="icon" name=${item.icon ?? 'icon-picture'}></umb-icon>
 								</uui-menu-item>
 							`,
 						)}

@@ -1,6 +1,5 @@
 import { UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UmbPartialViewFolderRepository } from './partial-view-folder.repository.js';
-import { UmbDeleteFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS = 'Umb.Repository.PartialView.Folder';
@@ -17,14 +16,12 @@ export const UMB_DELETE_PARTIAL_VIEW_FOLDER_ENTITY_ACTION_ALIAS = 'Umb.EntityAct
 const entityActions = [
 	{
 		type: 'entityAction',
+		kind: 'folderDelete',
 		alias: UMB_DELETE_PARTIAL_VIEW_FOLDER_ENTITY_ACTION_ALIAS,
 		name: 'Delete Partial View folder Entity Action',
-		api: UmbDeleteFolderEntityAction,
+		forEntityTypes: [UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-trash',
-			label: 'Delete folder...',
-			repositoryAlias: UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
+			folderRepositoryAlias: UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS,
 		},
 	},
 ];

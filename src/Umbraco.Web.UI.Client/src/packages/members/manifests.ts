@@ -4,6 +4,7 @@ import { manifests as memberSectionManifests } from './member-section/manifests.
 import { manifests as memberTypeManifests } from './member-type/manifests.js';
 
 import './member/components/index.js';
+import './member-group/components/index.js';
 
 export const manifests = [
 	...memberGroupManifests,

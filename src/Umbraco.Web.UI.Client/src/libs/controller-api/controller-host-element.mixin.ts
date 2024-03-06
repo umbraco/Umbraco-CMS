@@ -1,19 +1,6 @@
-import type { UmbControllerAlias } from './controller-alias.type.js';
 import { UmbControllerHostMixin } from './controller-host.mixin.js';
-import type { UmbControllerHost } from './controller-host.interface.js';
-import type { UmbController } from './controller.interface.js';
+import type { UmbControllerHostElement } from './controller-host-element.interface.js';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
-
-export declare class UmbControllerHostElement extends HTMLElement implements UmbControllerHost {
-	hasController(controller: UmbController): boolean;
-	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
-	addController(controller: UmbController): void;
-	removeControllerByAlias(alias: UmbControllerAlias): void;
-	removeController(controller: UmbController): void;
-	getHostElement(): Element;
-
-	destroy(): void;
-}
 
 /**
  * This mixin enables a web-component to host controllers.
@@ -23,7 +10,10 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
  * @mixin
  */
 export const UmbControllerHostElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
-	class UmbControllerHostElementClass extends UmbControllerHostMixin(superClass) implements UmbControllerHost {
+	class UmbControllerHostElementClass
+		extends UmbControllerHostMixin<T>(superClass)
+		implements UmbControllerHostElement
+	{
 		getHostElement(): Element {
 			return this;
 		}
@@ -37,6 +27,8 @@ export const UmbControllerHostElementMixin = <T extends HTMLElementConstructor>(
 			super.disconnectedCallback?.();
 			this.hostDisconnected();
 		}
+
+		destroy(): void {}
 	}
 
 	return UmbControllerHostElementClass as unknown as HTMLElementConstructor<UmbControllerHostElement> & T;

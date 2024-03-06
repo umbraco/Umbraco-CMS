@@ -9,6 +9,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Image Crops Configuration',
 		icon: 'icon-autofill',
 		group: 'common',
-		propertyEditorSchemaAlias: 'Umbraco.ImageCropper.Configuration',
 	},
 };

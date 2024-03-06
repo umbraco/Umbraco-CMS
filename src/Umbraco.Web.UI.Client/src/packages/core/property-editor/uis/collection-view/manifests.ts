@@ -23,6 +23,29 @@ const manifest: ManifestPropertyEditorUi = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.LayoutConfiguration',
 				},
 				{
+					alias: 'pageSize',
+					label: 'Page Size',
+					description: 'Number of items per page.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+				},
+				{
+					alias: 'orderBy',
+					label: 'Order By',
+					description: 'The default sort order for the list.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.OrderBy',
+				},
+				{
+					alias: 'orderDirection',
+					label: 'Order Direction',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OrderDirection',
+				},
+				{
+					alias: 'bulkActionPermissions',
+					label: 'Bulk Action Permissions',
+					description: 'The bulk actions that are allowed from the list view.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView.BulkActionPermissions',
+				},
+				{
 					alias: 'icon',
 					label: 'Content app icon',
 					description: 'The icon of the listview content app.',

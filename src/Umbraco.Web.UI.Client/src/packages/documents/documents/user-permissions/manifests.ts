@@ -27,8 +27,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_READ,
 		name: 'Read Document User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Read'],
 			labelKey: 'actions_browse',
 			descriptionKey: 'actionDescriptions_browse',
@@ -38,8 +38,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE_BLUEPRINT,
 		name: 'Create Document Blueprint User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.CreateBlueprint'],
 			labelKey: 'actions_createblueprint',
 			descriptionKey: 'actionDescriptions_createblueprint',
@@ -49,8 +49,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_DELETE,
 		name: 'Delete Document User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Delete'],
 			labelKey: 'actions_delete',
 			descriptionKey: 'actionDescriptions_delete',
@@ -60,8 +60,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_CREATE,
 		name: 'Create Document User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Create'],
 			labelKey: 'actions_create',
 			descriptionKey: 'actionDescriptions_create',
@@ -71,8 +71,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_NOTIFICATIONS,
 		name: 'Document Notifications User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Notifications'],
 			labelKey: 'actions_notify',
 			descriptionKey: 'actionDescriptions_notify',
@@ -82,8 +82,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_PUBLISH,
 		name: 'Publish Document User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Publish'],
 			labelKey: 'actions_publish',
 			descriptionKey: 'actionDescriptions_publish',
@@ -93,8 +93,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_PERMISSIONS,
 		name: 'Document Permissions User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Permissions'],
 			labelKey: 'actions_setPermissions',
 			descriptionKey: 'actionDescriptions_rights',
@@ -104,8 +104,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_UNPUBLISH,
 		name: 'Unpublish Document User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Unpublish'],
 			labelKey: 'actions_unpublish',
 			descriptionKey: 'actionDescriptions_unpublish',
@@ -115,8 +115,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 		name: 'Update Document User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Update'],
 			labelKey: 'actions_update',
 			descriptionKey: 'actionDescriptions_update',
@@ -126,8 +126,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_DUPLICATE,
 		name: 'Duplicate Document User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Duplicate'],
 			labelKey: 'actions_copy',
 			descriptionKey: 'actionDescriptions_copy',
@@ -138,8 +138,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_MOVE,
 		name: 'Move Document User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Move'],
 			labelKey: 'actions_move',
 			descriptionKey: 'actionDescriptions_move',
@@ -150,8 +150,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_SORT,
 		name: 'Sort Document User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Sort'],
 			labelKey: 'actions_sort',
 			descriptionKey: 'actionDescriptions_sort',
@@ -162,8 +162,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_CULTURE_AND_HOSTNAMES,
 		name: 'Document Culture And Hostnames User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.CultureAndHostnames'],
 			labelKey: 'actions_assigndomain',
 			descriptionKey: 'actionDescriptions_assignDomain',
@@ -174,8 +174,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_PUBLIC_ACCESS,
 		name: 'Document Public Access User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.PublicAccess'],
 			labelKey: 'actions_protect',
 			descriptionKey: 'actionDescriptions_protect',
@@ -186,8 +186,8 @@ const permissions: Array<ManifestEntityUserPermission> = [
 		type: 'entityUserPermission',
 		alias: UMB_USER_PERMISSION_DOCUMENT_ROLLBACK,
 		name: 'Document Rollback User Permission',
+		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		meta: {
-			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			verbs: ['Umb.Document.Rollback'],
 			labelKey: 'actions_rollback',
 			descriptionKey: 'actionDescriptions_rollback',

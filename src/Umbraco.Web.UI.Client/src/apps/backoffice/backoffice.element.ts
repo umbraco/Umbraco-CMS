@@ -22,6 +22,7 @@ const CORE_PACKAGES = [
 	import('../../packages/health-check/umbraco-package.js'),
 	import('../../packages/language/umbraco-package.js'),
 	import('../../packages/log-viewer/umbraco-package.js'),
+	import('../../packages/markdown-editor/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
 	import('../../packages/models-builder/umbraco-package.js'),
@@ -36,6 +37,7 @@ const CORE_PACKAGES = [
 	import('../../packages/tiny-mce/umbraco-package.js'),
 	import('../../packages/umbraco-news/umbraco-package.js'),
 	import('../../packages/user/umbraco-package.js'),
+	import('../../packages/webhook/umbraco-package.js'),
 ];
 
 @customElement('umb-backoffice')

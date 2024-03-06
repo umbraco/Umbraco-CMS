@@ -3,26 +3,25 @@ import {
 	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
 } from '../../entity.js';
-import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbCreateDataTypeEntityAction } from './create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.DocumentType.Create',
 		name: 'Create Document Type Entity Action',
 		weight: 1000,
 		api: UmbCreateDataTypeEntityAction,
+		forEntityTypes: [
+			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+		],
 		meta: {
 			icon: 'icon-add',
 			label: 'Create...',
-			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [
-				UMB_DOCUMENT_TYPE_ENTITY_TYPE,
-				UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-				UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-			],
 		},
 	},
 	{

@@ -55,7 +55,6 @@ export class UmbMockEntityFolderManager<MockItemType extends Omit<FolderTreeItem
 		return {
 			name: item.name,
 			id: item.id,
-			parent: item.parent,
 		};
 	};
 }

@@ -1,6 +1,6 @@
-import { getAccumulatedValueOfIndex, getInterpolatedIndexOfPositionInWeightMap } from '@umbraco-cms/backoffice/utils';
 import { closestColumnSpanOption } from '../../utils/index.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { getAccumulatedValueOfIndex, getInterpolatedIndexOfPositionInWeightMap } from '@umbraco-cms/backoffice/utils';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // This might be more generic than Block Grid, but this is where it belongs currently:
@@ -19,7 +19,7 @@ export interface UmbBlockGridScalableContainerContext extends UmbControllerHost 
 	getLayoutContainerElement: () => HTMLElement | undefined;
 }
 
-export class UmbBlockGridScaleManager extends UmbBaseController {
+export class UmbBlockGridScaleManager extends UmbControllerBase {
 	//
 	#runtimeGridColumns: Array<number> = [];
 	#runtimeGridRows: Array<number> = [];

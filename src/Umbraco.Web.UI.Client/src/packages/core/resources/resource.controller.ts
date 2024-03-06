@@ -2,11 +2,11 @@
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export class UmbResourceController extends UmbBaseController {
+export class UmbResourceController extends UmbControllerBase {
 	#promise: Promise<any>;
 
 	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
@@ -32,7 +32,7 @@ export class UmbResourceController extends UmbBaseController {
 	/**
 	 * Base execute function with a try/catch block and return a tuple with the result and the error.
 	 */
-	static async tryExecute<T>(promise: Promise<T>): Promise<DataSourceResponse<T>> {
+	static async tryExecute<T>(promise: Promise<T>): Promise<UmbDataSourceResponse<T>> {
 		try {
 			return { data: await promise };
 		} catch (error) {
@@ -49,7 +49,7 @@ export class UmbResourceController extends UmbBaseController {
 	 * Wrap the {tryExecute} function in a try/catch block and return the result.
 	 * If the executor function throws an error, then show the details in a notification.
 	 */
-	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<DataSourceResponse<T>> {
+	async tryExecuteAndNotify<T>(options?: UmbNotificationOptions): Promise<UmbDataSourceResponse<T>> {
 		const { data, error } = await UmbResourceController.tryExecute<T>(this.#promise);
 
 		if (error) {
@@ -62,6 +62,11 @@ export class UmbResourceController extends UmbBaseController {
 				// Cancelled - do nothing
 				return {};
 			} else {
+				console.group('ApiError caught in UmbResourceController');
+				console.error('Request failed', error.request);
+				console.error('ProblemDetails', error.body);
+				console.error('Error', error);
+
 				// ApiError - body could hold a ProblemDetails from the server
 				if (typeof error.body !== 'undefined' && !!error.body) {
 					try {
@@ -78,7 +83,7 @@ export class UmbResourceController extends UmbBaseController {
 						console.log('Unauthorized');
 
 						// TODO: Do not remove the token here but instead let whatever is listening to the event decide what to do
-						localStorage.removeItem('tokenResponse');
+						localStorage.removeItem('umb:userAuthTokenResponse');
 
 						// TODO: Show a modal dialog to login either by bubbling an event to UmbAppElement or by showing a modal directly
 						this.#notificationContext?.peek('warning', {
@@ -87,6 +92,32 @@ export class UmbResourceController extends UmbBaseController {
 								message: 'Your session has expired. Please refresh the page.',
 							},
 						});
+						break;
+					case 500:
+						// Server Error
+
+						if (this.#notificationContext) {
+							let headline = error.body?.title ?? error.name ?? 'Server Error';
+							let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
+
+							// Special handling for ObjectCacheAppCache corruption errors, which we are investigating
+							if (
+								error.body?.detail?.includes('ObjectCacheAppCache') ||
+								error.body?.detail?.includes('Umbraco.Cms.Infrastructure.Scoping.Scope.DisposeLastScope()')
+							) {
+								headline = 'Please restart the server';
+								message =
+									'The Umbraco object cache is corrupt, but your action may still have been executed. Please restart the server to reset the cache. This is a work in progress.';
+							}
+
+							this.#notificationContext.peek('danger', {
+								data: {
+									headline,
+									message,
+								},
+								...options,
+							});
+						}
 						break;
 					default:
 						// Other errors
@@ -98,12 +129,10 @@ export class UmbResourceController extends UmbBaseController {
 								},
 								...options,
 							});
-						} else {
-							console.group('UmbResourceController');
-							console.error(error);
-							console.groupEnd();
 						}
 				}
+
+				console.groupEnd();
 			}
 		}
 

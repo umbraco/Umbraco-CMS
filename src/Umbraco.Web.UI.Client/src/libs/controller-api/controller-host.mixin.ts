@@ -2,13 +2,7 @@ import type { ClassConstructor } from '../extension-api/types/utils.js';
 import type { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
 
-declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost, 'getHostElement'> {
-	hasController(controller: UmbController): boolean;
-	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
-	addController(controller: UmbController): void;
-	removeControllerByAlias(unique: UmbController['controllerAlias']): void;
-	removeController(controller: UmbController): void;
-
+interface UmbControllerHostBaseDeclaration extends Omit<UmbControllerHost, 'getHostElement'> {
 	hostConnected(): void;
 	hostDisconnected(): void;
 	destroy(): void;
@@ -22,10 +16,14 @@ declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost
  * @mixin
  */
 export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T) => {
-	class UmbControllerHostBaseClass extends superClass {
+	class UmbControllerHostBaseClass extends superClass implements UmbControllerHostBaseDeclaration {
 		#controllers: UmbController[] = [];
 
 		#attached = false;
+
+		getHostElement() {
+			return undefined as any;
+		}
 
 		/**
 		 * Tests if a controller is assigned to this element.
@@ -58,7 +56,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 
 			this.#controllers.push(ctrl);
 			if (this.#attached) {
-				// If a controller is created on a already attached element, then it will be added directly. This might not be optimal. As the controller it self has not finished its constructor method jet. therefor i postpone the call:
+				// If a controller is created on a already attached element, then it will be added directly. This might not be optimal. As the controller it self has not finished its constructor method jet. therefor i postpone the call: [NL]
 				Promise.resolve().then(() => {
 					// Extra check to see if we are still attached at this point:
 					if (this.#attached) {
@@ -123,7 +121,7 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 					throw new Error(
 						`Controller with controller alias: '${ctrl.controllerAlias?.toString()}' and class name: '${
 							(ctrl as any).constructor.name
-						}', does not remove it self when destroyed. This can cause memory leaks. Please fix this issue.`,
+						}', does not remove it self when destroyed. This can cause memory leaks. Please fix this issue.\r\nThis usually occurs when you have a destroy() method that doesn't call super.destroy().`,
 					);
 				}
 				prev = ctrl;

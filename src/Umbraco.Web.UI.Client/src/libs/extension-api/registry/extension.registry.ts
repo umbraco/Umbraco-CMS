@@ -266,10 +266,6 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
-	/**
-	 * @deprecated Use `byAlias` instead.
-	 */
-	getByAlias = this.byAlias.bind(this);
 
 	/**
 	 * Get an observable that provides extensions matching the given type and alias.
@@ -292,10 +288,6 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
-	/**
-	 * @deprecated Use `byTypeAndAlias` instead.
-	 */
-	getByTypeAndAlias = this.byTypeAndAlias.bind(this);
 
 	byTypeAndAliases<Key extends string, T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>>(
 		type: Key,
@@ -312,10 +304,6 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<T>>;
 	}
-	/**
-	 * @deprecated Use `byTypeAndAliases` instead.
-	 */
-	getByTypeAndAliases = this.byTypeAndAliases.bind(this);
 
 	/**
 	 * Get an observable of extensions by type and a given filter method.
@@ -342,6 +330,35 @@ export class UmbExtensionRegistry<
 	}
 
 	/**
+	 * Get an observable of extensions by types and a given filter method.
+	 * This will return the all extensions that matches the types and which filter method returns true.
+	 * The filter method will be called for each extension manifest of the given types, and the first argument to it is the extension manifest.
+	 * @param types {Array<string>} - The types of the extensions to get.
+	 * @param filter {(ext: T): void} - The filter method to use to filter the extensions
+	 * @returns {Observable<Array<T>>} - An observable of the extensions that matches the type and filter method
+	 */
+	byTypesAndFilter<ExtensionTypes extends ManifestBase = ManifestBase>(
+		types: string[],
+		filter: (ext: ExtensionTypes) => boolean,
+	): Observable<Array<ExtensionTypes>> {
+		return combineLatest([
+			this.extensions.pipe(
+				map(
+					(exts) =>
+						exts.filter(
+							(ext) => types.indexOf(ext.type) !== -1 && filter(ext as unknown as ExtensionTypes),
+						) as unknown as Array<ExtensionTypes>,
+				),
+				distinctUntilChanged(extensionArrayMemoization),
+			),
+			this.#kindsOfTypes(types),
+		]).pipe(
+			map(this.#mergeExtensionsWithKinds),
+			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
+		) as Observable<Array<ExtensionTypes>>;
+	}
+
+	/**
 	 * Get an observable that provides extensions matching the given type.
 	 * @param type {string} - The type of the extensions to get.
 	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the type.
@@ -354,14 +371,10 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<T>>;
 	}
-	/**
-	 * @deprecated Use `byType` instead.
-	 */
-	extensionsOfType = this.byType.bind(this);
 
 	/**
 	 * Get an observable that provides extensions matching given types.
-	 * @param type {Array<string>} - The types of the extensions to get.
+	 * @param types {Array<string>} - The types of the extensions to get.
 	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the types.
 	 */
 	byTypes<ExtensionTypes extends ManifestBase = ManifestBase>(types: string[]): Observable<Array<ExtensionTypes>> {
@@ -370,9 +383,4 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<ExtensionTypes>>;
 	}
-
-	/**
-	 * @deprecated Use `byTypes` instead.
-	 */
-	extensionsOfTypes = this.byTypes.bind(this);
 }

@@ -1,6 +1,6 @@
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**
@@ -15,7 +15,7 @@ export class UmbPartialViewDetailStore extends UmbDetailStoreBase<UmbPartialView
 	 * @param {UmbControllerHostInterface} host
 	 * @memberof UmbPartialViewDetailStore
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_PARTIAL_VIEW_DETAIL_STORE_CONTEXT.toString());
 	}
 }

@@ -35,16 +35,15 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	 * @return { CreateDocumentTypeRequestModel }
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbDocumentTypeDetailModel> = {}) {
 		const data: UmbDocumentTypeDetailModel = {
 			entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
 			name: '',
 			alias: '',
 			description: '',
 			icon: 'icon-document',
-			allowedAsRoot: false,
+			allowedAtRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
@@ -60,6 +59,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 				keepLatestVersionPerDayForDays: null,
 			},
 			collection: null,
+			...preset,
 		};
 
 		return { data };
@@ -87,12 +87,11 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 		const DocumentType: UmbDocumentTypeDetailModel = {
 			entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: null, // TODO: map to parent/folder id
 			name: data.name,
 			alias: data.alias,
 			description: data.description || null,
 			icon: data.icon,
-			allowedAsRoot: data.allowedAsRoot,
+			allowedAtRoot: data.allowedAsRoot,
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
@@ -139,18 +138,18 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async create(model: UmbDocumentTypeDetailModel) {
+	async create(model: UmbDocumentTypeDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Media Type is missing');
 		if (!model.unique) throw new Error('Media Type unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDocumentTypeRequestModel = {
-			folder: model.parentUnique ? { id: model.parentUnique } : null,
+			parent: parentUnique ? { id: parentUnique } : null,
 			alias: model.alias,
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -186,6 +185,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			allowedTemplates: model.allowedTemplates,
 			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -217,7 +217,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -252,6 +252,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			allowedTemplates: model.allowedTemplates,
 			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { error } = await tryExecuteAndNotify(

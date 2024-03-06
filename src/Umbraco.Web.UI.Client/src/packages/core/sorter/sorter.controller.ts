@@ -1,5 +1,5 @@
 import { isWithinRect } from '@umbraco-cms/backoffice/utils';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const autoScrollSensitivity = 50;
@@ -57,7 +57,7 @@ function destroyPreventEvent(element: Element) {
 	//element.removeAttribute('draggable');
 }
 
-export type resolveVerticalDirectionArgs<T, ElementType extends HTMLElement> = {
+export type resolvePlacementArgs<T, ElementType extends HTMLElement> = {
 	containerElement: Element;
 	containerRect: DOMRect;
 	item: T;
@@ -134,9 +134,21 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	onRequestMove?: (argument: { item: T }) => boolean;
 	/**
 	 * This callback is executed when an item is hovered within this container.
-	 * The callback should return true if the item should be placed after based on a vertical logic. Other wise false for horizontal. True is default.
+	 * The callback should return true if the item should be placed after the hovered item, or false if it should be placed before the hovered item.
+	 * In this way the callback can control the placement of the item.
+	 * If it returns null the placement will be prevented.
+	 * @example
+	 * This is equivalent to the default behavior:
+	 * ```ts
+	 * resolvePlacement: (argument) => {
+	 * 	if(argument.pointerY > argument.relatedRect.top + argument.relatedRect.height * 0.5) {
+	 * 		return true; // Place after
+	 * 	} else {
+	 * 		return false; // Place before
+	 * 	}
+	 * }
 	 */
-	resolveVerticalDirection?: (argument: resolveVerticalDirectionArgs<T, ElementType>) => boolean | null;
+	resolvePlacement?: (argument: resolvePlacementArgs<T, ElementType>) => boolean | null;
 	/**
 	 * This callback is executed when an item is moved within this container.
 	 */
@@ -164,7 +176,7 @@ export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = 
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
  */
-export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> extends UmbBaseController {
+export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> extends UmbControllerBase {
 	//
 	// The sorter who last indicated that it was okay or not okay to drop here:
 	static lastIndicationSorter?: UmbSorterController<unknown>;
@@ -186,6 +198,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	static activeDragElement?: Element;
 
 	#host;
+	#isConnected = false;
 	#config: INTERNAL_UmbSorterConfig<T, ElementType>;
 	#observer;
 
@@ -239,12 +252,16 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	enable(): void {
 		if (this.#enabled) return;
 		this.#enabled = true;
-		this.#initialize();
+		if (this.#isConnected) {
+			this.#initialize();
+		}
 	}
 	disable(): void {
 		if (!this.#enabled) return;
 		this.#enabled = false;
-		this.#uninitialize();
+		if (this.#isConnected) {
+			this.#uninitialize();
+		}
 	}
 
 	setModel(model: Array<T>): void {
@@ -263,11 +280,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	}
 
 	hostConnected() {
+		this.#isConnected = true;
 		if (this.#enabled) {
 			requestAnimationFrame(this.#initialize);
 		}
 	}
 	hostDisconnected() {
+		this.#isConnected = false;
 		if (this.#enabled) {
 			this.#uninitialize();
 		}
@@ -629,8 +648,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				return;
 			}
 
-			const verticalDirection: boolean | null = this.#config.resolveVerticalDirection
-				? this.#config.resolveVerticalDirection({
+			const verticalDirection: boolean | null = this.#config.resolvePlacement
+				? this.#config.resolvePlacement({
 						containerElement: this.#containerElement,
 						containerRect: currentContainerRect,
 						item: UmbSorterController.activeItem,
@@ -647,7 +666,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				: true;
 
 			if (verticalDirection === null) {
-				// The resolveVerticalDirection has chosen to back out of this move.
+				// The resolvePlacement has chosen to back out of this move.
 				return;
 			}
 
@@ -726,8 +745,9 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			throw new Error('Element was not defined');
 		}
 		const elementUnique = this.#config.getUniqueOfElement(element);
-		if (!elementUnique) {
-			throw new Error('Could not find unique of element');
+		if (elementUnique === undefined) {
+			console.error('Could not find unique of element', element);
+			return undefined;
 		}
 		return this.#model.find((entry: T) => elementUnique === this.#config.getUniqueOfModel(entry));
 	}

@@ -1,4 +1,5 @@
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from './condition-base.controller.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -7,19 +8,15 @@ import type {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 
-export class UmbSectionAliasCondition extends UmbBaseController implements UmbExtensionCondition {
-	config: SectionAliasConditionConfig;
-	permitted = false;
-	#onChange: () => void;
-
-	constructor(args: UmbConditionControllerArguments<SectionAliasConditionConfig>) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+export class UmbSectionAliasCondition
+	extends UmbConditionBase<SectionAliasConditionConfig>
+	implements UmbExtensionCondition
+{
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<SectionAliasConditionConfig>) {
+		super(host, args);
 		this.consumeContext(UMB_SECTION_CONTEXT, (context) => {
 			this.observe(context.alias, (sectionAlias) => {
 				this.permitted = sectionAlias === this.config.match;
-				this.#onChange();
 			});
 		});
 	}

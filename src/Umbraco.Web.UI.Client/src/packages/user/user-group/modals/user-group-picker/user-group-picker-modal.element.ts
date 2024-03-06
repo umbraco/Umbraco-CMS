@@ -71,7 +71,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 								@selected=${(event: UUIMenuItemEvent) => this.#onSelected(event, item)}
 								@deselected=${(event: UUIMenuItemEvent) => this.#onDeselected(event, item)}
 								?selected=${this.#selectionManager.isSelected(item.unique)}>
-								<uui-icon .name=${item.icon || null} slot="icon"></uui-icon>
+								<umb-icon .name=${item.icon || undefined} slot="icon"></umb-icon>
 							</uui-menu-item>
 						`,
 					)}

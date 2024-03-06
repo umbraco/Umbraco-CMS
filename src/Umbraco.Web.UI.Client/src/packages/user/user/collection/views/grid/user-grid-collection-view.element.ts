@@ -22,6 +22,8 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 	#userGroups: Array<UmbUserGroupDetailModel> = [];
 	#collectionContext?: UmbUserCollectionContext;
+
+	// TODO: we need to use the item repository here
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	constructor() {

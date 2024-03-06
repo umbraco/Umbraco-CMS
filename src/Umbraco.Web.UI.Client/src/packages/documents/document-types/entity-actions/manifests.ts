@@ -1,66 +1,44 @@
-import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS, DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
-import {
-	UmbCopyEntityAction,
-	UmbMoveEntityAction,
-	UmbDeleteEntityAction,
-	UmbSortChildrenOfEntityAction,
-} from '@umbraco-cms/backoffice/entity-action';
-import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'document-type';
 
-const entityActions: Array<ManifestEntityAction> = [
+const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'delete',
 		alias: 'Umb.EntityAction.DocumentType.Delete',
 		name: 'Delete Document-Type Entity Action',
-		weight: 900,
-		api: UmbDeleteEntityAction,
+		forEntityTypes: [entityType],
 		meta: {
-			icon: 'icon-trash',
-			label: 'Delete',
-			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [entityType],
+			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+			detailRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 		},
 	},
 	{
 		type: 'entityAction',
+		kind: 'move',
 		alias: 'Umb.EntityAction.DocumentType.Move',
-		name: 'Move Document-Type Entity Action',
-		weight: 700,
-		api: UmbMoveEntityAction,
+		name: 'Move Document Type Entity Action',
+		forEntityTypes: [entityType],
 		meta: {
-			icon: 'icon-enter',
-			label: 'Move',
-			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [entityType],
+			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+			moveRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+			pickerModal: UMB_DOCUMENT_TYPE_PICKER_MODAL,
 		},
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.DocumentType.Copy',
-		name: 'Copy Document-Type Entity Action',
-		weight: 600,
-		api: UmbCopyEntityAction,
+		kind: 'duplicate',
+		alias: 'Umb.EntityAction.DocumentType.Duplicate',
+		name: 'Duplicate Document Type Entity Action',
+		forEntityTypes: [entityType],
 		meta: {
-			icon: 'icon-documents',
-			label: 'Copy',
-			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [entityType],
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.DocumentType.Sort',
-		name: 'Sort Document-Type Entity Action',
-		weight: 500,
-		api: UmbSortChildrenOfEntityAction,
-		meta: {
-			icon: 'icon-navigation-vertical',
-			label: 'Sort',
-			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [entityType],
+			itemRepositoryAlias: DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+			duplicateRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+			pickerModal: UMB_DOCUMENT_TYPE_PICKER_MODAL,
 		},
 	},
 ];

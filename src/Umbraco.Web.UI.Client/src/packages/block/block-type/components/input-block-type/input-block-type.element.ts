@@ -1,15 +1,12 @@
 import type { UmbBlockTypeBaseModel } from '../../types.js';
-import {
-	UMB_DOCUMENT_TYPE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-	umbConfirmModal,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import '../block-type-card/index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_DOCUMENT_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<
@@ -46,7 +43,7 @@ export class UmbInputBlockTypeElement<
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
 		// TODO: Make as mode for the Picker Modal, so the click to select immediately submits the modal(And in that mode we do not want to see a Submit button).
-		const modalContext = modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+		const modalContext = modalManager.open(this, UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				multiple: false,

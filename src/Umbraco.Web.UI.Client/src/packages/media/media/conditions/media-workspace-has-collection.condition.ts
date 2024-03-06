@@ -1,28 +1,28 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbMediaWorkspaceHasCollectionCondition extends UmbBaseController implements UmbExtensionCondition {
-	config: MediaWorkspaceHasCollectionConditionConfig;
-	permitted = false;
-	#onChange: () => void;
-
-	constructor(args: UmbConditionControllerArguments<MediaWorkspaceHasCollectionConditionConfig>) {
-		super(args.host);
-		this.config = args.config;
-		this.#onChange = args.onChange;
+export class UmbMediaWorkspaceHasCollectionCondition
+	extends UmbConditionBase<MediaWorkspaceHasCollectionConditionConfig>
+	implements UmbExtensionCondition
+{
+	constructor(
+		host: UmbControllerHost,
+		args: UmbConditionControllerArguments<MediaWorkspaceHasCollectionConditionConfig>,
+	) {
+		super(host, args);
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
 				context.contentTypeCollection,
 				(collection) => {
 					this.permitted = !!collection?.unique;
-					this.#onChange();
 				},
 				'observeCollection',
 			);

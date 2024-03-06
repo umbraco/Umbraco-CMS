@@ -50,7 +50,7 @@ export class UmbCollectionElement extends UmbLitElement {
 
 	async #createApi() {
 		if (!this.#manifest) throw new Error('No manifest');
-		this.#api = (await createExtensionApi(this.#manifest, [this])) as unknown as UmbCollectionContext;
+		this.#api = (await createExtensionApi(this, this.#manifest)) as unknown as UmbCollectionContext;
 		if (!this.#api) throw new Error('No api');
 		this.#api.setManifest(this.#manifest);
 		this.#setConfig();

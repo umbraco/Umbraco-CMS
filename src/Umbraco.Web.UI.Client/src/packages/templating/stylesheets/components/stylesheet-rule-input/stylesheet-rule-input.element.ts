@@ -3,7 +3,6 @@ import { UMB_STYLESHEET_RULE_SETTINGS_MODAL } from './stylesheet-rule-settings-m
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
@@ -14,47 +13,43 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 	@property({ type: Array, attribute: false })
 	rules: UmbStylesheetRule[] = [];
 
-	#modalManager: UmbModalManagerContext | undefined;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
-			this.#modalManager = modalContext;
-		});
-	}
-
 	protected getFormElement() {
 		return undefined;
 	}
 
-	#openRuleSettings = (rule: UmbStylesheetRule | null = null) => {
-		if (!this.#modalManager) throw new Error('Modal context not found');
+	async #openRuleSettings(rule: UmbStylesheetRule | null = null) {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
 		const value = {
 			rule: rule ? { name: rule.name, selector: rule.selector, styles: rule.styles } : null,
 		};
 
-		const modalContext = this.#modalManager.open(UMB_STYLESHEET_RULE_SETTINGS_MODAL, {
+		const modalContext = modalManager.open(this, UMB_STYLESHEET_RULE_SETTINGS_MODAL, {
 			value,
 		});
 
 		return modalContext?.onSubmit();
+	}
+
+	#appendRule = () => {
+		this.#openRuleSettings(null)
+			.then((value) => {
+				if (!value.rule) return;
+				this.rules = [...this.rules, value.rule];
+				this.dispatchEvent(new UmbChangeEvent());
+			})
+			.catch(() => undefined);
 	};
 
-	#appendRule = async () => {
-		const { rule: newRule } = await this.#openRuleSettings(null);
-		if (!newRule) return;
-		this.rules = [...this.rules, newRule];
-		this.dispatchEvent(new UmbChangeEvent());
-	};
-
-	#editRule = async (rule: UmbStylesheetRule, index: number) => {
-		const { rule: updatedRule } = await this.#openRuleSettings(rule);
-		if (!updatedRule) return;
-		this.rules[index] = updatedRule;
-		this.dispatchEvent(new UmbChangeEvent());
-		this.requestUpdate();
+	#editRule = (rule: UmbStylesheetRule, index: number) => {
+		this.#openRuleSettings(rule)
+			.then((value) => {
+				if (!value.rule) return;
+				this.rules[index] = value.rule;
+				this.dispatchEvent(new UmbChangeEvent());
+				this.requestUpdate();
+			})
+			.catch(() => undefined);
 	};
 
 	#removeRule = (rule: UmbStylesheetRule) => {
@@ -78,7 +73,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 					`,
 				)}
 			</uui-ref-list>
-			<uui-button label="Add rule" look="placeholder" @click=${() => this.#appendRule()}>Add</uui-button>
+			<uui-button label="Add rule" look="placeholder" @click=${this.#appendRule}>Add</uui-button>
 		`;
 	}
 

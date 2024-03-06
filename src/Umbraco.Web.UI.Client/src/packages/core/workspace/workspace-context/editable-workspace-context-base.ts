@@ -46,13 +46,12 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 		this.#isNew.setValue(isNew);
 	}
 
-	protected saveComplete(data: WorkspaceDataModelType) {
+	protected workspaceComplete(data: WorkspaceDataModelType | undefined) {
 		if (this.modalContext) {
-			this.modalContext?.setValue(data);
+			if (data) {
+				this.modalContext?.setValue(data);
+			}
 			this.modalContext?.submit();
-		} else {
-			// No need to have UI changing to "not new" if we are in a modal.
-			this.setIsNew(false);
 		}
 	}
 

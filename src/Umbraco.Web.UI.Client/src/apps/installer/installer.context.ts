@@ -18,7 +18,7 @@ export class UmbInstallerContext {
 	private _data = new UmbObjectState<InstallRequestModel>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
 		database: { id: '', providerName: '', useIntegratedAuthentication: false, trustServerCertificate: false },
-		telemetryLevel: TelemetryLevelModel.BASIC,
+		telemetryLevel: TelemetryLevelModel.DETAILED,
 	});
 	public readonly data = this._data.asObservable();
 

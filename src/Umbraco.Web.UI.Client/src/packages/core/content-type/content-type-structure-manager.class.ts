@@ -14,11 +14,12 @@ import {
 	partialUpdateFrozenArray,
 	appendToFrozenArray,
 	filterFrozenArray,
+	createObservablePart,
 } from '@umbraco-cms/backoffice/observable-api';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeModel> extends UmbBaseController {
+export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init!: Promise<unknown>;
 
 	#contentTypeRepository: UmbDetailRepository<T>;
@@ -27,6 +28,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	#contentTypeObservers = new Array<UmbController>();
 	#contentTypes = new UmbArrayState<T>([], (x) => x.unique);
 	readonly contentTypes = this.#contentTypes.asObservable();
+	readonly ownerContentType = this.#contentTypes.asObservablePart((x) =>
+		x.find((y) => y.unique === this.#ownerContentTypeUnique),
+	);
 	private readonly _contentTypeContainers = this.#contentTypes.asObservablePart((x) =>
 		x.flatMap((x) => x.containers ?? []),
 	);
@@ -65,12 +69,10 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		return promiseResult;
 	}
 
-	public async createScaffold(parentUnique: string | null) {
+	public async createScaffold() {
 		this._reset();
 
-		if (parentUnique === undefined) return {};
-
-		const { data } = await this.#contentTypeRepository.createScaffold(parentUnique);
+		const { data } = await this.#contentTypeRepository.createScaffold();
 		if (!data) return {};
 
 		this.#ownerContentTypeUnique = data.unique;
@@ -101,11 +103,11 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
 	 * @returns
 	 */
-	public async create() {
+	public async create(parentUnique: string | null) {
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) return false;
 
-		const { data } = await this.#contentTypeRepository.create(contentType);
+		const { data } = await this.#contentTypeRepository.create(contentType, parentUnique);
 		if (!data) return false;
 
 		// Update state with latest version:
@@ -126,6 +128,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	private async _loadType(unique?: string) {
 		if (!unique) return {};
 
+		// Lets initiate the content type:
 		const { data } = await this.#contentTypeRepository.requestByUnique(unique);
 		if (!data) return {};
 
@@ -136,24 +139,28 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	private async _observeContentType(data: T) {
 		if (!data.unique) return;
 
-		// Load inherited and composed types:
-		this._loadContentTypeCompositions(data);
+		// Notice we do not store the content type in the store here, cause it will happen shortly after when the observations gets its first initial callback. [NL]
 
-		this.#contentTypeObservers.push(
-			this.observe(
-				await this.#contentTypeRepository.byUnique(data.unique),
-				(docType) => {
-					if (docType) {
-						// TODO: Handle if there was changes made to the owner document type in this context.
-						/*
-						possible easy solutions could be to notify user wether they want to update(Discard the changes to accept the new ones).
-					 	*/
-						this.#contentTypes.appendOne(docType);
-					}
-				},
-				'observeContentType_' + data.unique,
-			),
+		// Load inherited and composed types:
+		//this._loadContentTypeCompositions(data);// Should not be necessary as this will be done when appended to the contentTypes state. [NL]
+
+		const ctrl = this.observe(
+			// Then lets start observation of the content type:
+			await this.#contentTypeRepository.byUnique(data.unique),
+			(docType) => {
+				if (docType) {
+					// TODO: Handle if there was changes made to the owner document type in this context. [NL]
+					/*
+					possible easy solutions could be to notify user wether they want to update(Discard the changes to accept the new ones). [NL]
+					 */
+					this.#contentTypes.appendOne(docType);
+				}
+				// TODO: Do we need to handle the undefined case? [NL]
+			},
+			'observeContentType_' + data.unique,
 		);
+
+		this.#contentTypeObservers.push(ctrl);
 	}
 
 	private async _loadContentTypeCompositions(contentType: T) {
@@ -164,8 +171,8 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	/** Public methods for consuming structure: */
 
-	ownerContentType() {
-		return this.#contentTypes.asObservablePart((x) => x.find((y) => y.unique === this.#ownerContentTypeUnique));
+	ownerContentTypePart<R>(mappingFunction: MappingFunction<T | undefined, R>) {
+		return createObservablePart(this.ownerContentType, mappingFunction);
 	}
 
 	getOwnerContentType() {
@@ -487,7 +494,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		});
 	}
 
-	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should not be merged.
+	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should not be merged. [NL]
 	containersByNameAndType(name: string, containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);

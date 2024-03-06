@@ -31,20 +31,19 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 
 	/**
 	 * Creates a new Media Type scaffold
-	 * @param {(string | null)} parentUnique
+	 * @param {Partial<UmbMediaTypeDetailModel>} [preset]
 	 * @return { CreateMediaTypeRequestModel }
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(preset: Partial<UmbMediaTypeDetailModel> = {}) {
 		const data: UmbMediaTypeDetailModel = {
 			entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 			unique: UmbId.new(),
-			parentUnique,
 			name: '',
 			alias: '',
 			description: '',
 			icon: '',
-			allowedAsRoot: false,
+			allowedAtRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
@@ -53,6 +52,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			allowedContentTypes: [],
 			compositions: [],
 			collection: null,
+			...preset,
 		};
 
 		return { data };
@@ -77,12 +77,11 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		const mediaType: UmbMediaTypeDetailModel = {
 			entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: null, // TODO: map to parent/folder id
 			name: data.name,
 			alias: data.alias,
 			description: data.description || null,
 			icon: data.icon,
-			allowedAsRoot: data.allowedAsRoot,
+			allowedAtRoot: data.allowedAsRoot,
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
@@ -126,7 +125,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	 * @return {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
-	async create(model: UmbMediaTypeDetailModel) {
+	async create(model: UmbMediaTypeDetailModel, parentUnique: string | null = null) {
 		if (!model) throw new Error('Media Type is missing');
 		if (!model.unique) throw new Error('Media Type unique is missing');
 
@@ -136,7 +135,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -169,7 +168,8 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 				};
 			}),
 			id: model.unique,
-			folder: model.parentUnique ? { id: model.parentUnique } : null,
+			parent: parentUnique ? { id: parentUnique } : null,
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -201,7 +201,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			name: model.name,
 			description: model.description,
 			icon: model.icon,
-			allowedAsRoot: model.allowedAsRoot,
+			allowedAsRoot: model.allowedAtRoot,
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
@@ -233,6 +233,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 					compositionType: composition.compositionType,
 				};
 			}),
+			collection: model.collection?.unique ? { id: model.collection?.unique } : null,
 		};
 
 		const { error } = await tryExecuteAndNotify(

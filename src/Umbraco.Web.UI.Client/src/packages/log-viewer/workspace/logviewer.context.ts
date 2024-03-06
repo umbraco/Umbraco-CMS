@@ -9,8 +9,8 @@ import type {
 	SavedLogSearchPresenationBaseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel, LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { query } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
@@ -27,7 +27,7 @@ export interface LogViewerDateRange {
 }
 
 // TODO: Revisit usage of workspace for this case...
-export class UmbLogViewerWorkspaceContext extends UmbBaseController implements UmbWorkspaceContextInterface {
+export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements UmbWorkspaceContextInterface {
 	public readonly workspaceAlias: string = 'Umb.Workspace.LogViewer';
 	#repository: UmbLogViewerRepository;
 
@@ -100,14 +100,14 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 	#polling = new UmbObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
 	polling = this.#polling.asObservable();
 
-	#sortingDirection = new UmbBasicState<DirectionModel>(DirectionModel.ASCENDING);
+	#sortingDirection = new UmbBasicState<DirectionModel>(DirectionModel.DESCENDING);
 	sortingDirection = this.#sortingDirection.asObservable();
 
 	#intervalID: number | null = null;
 
 	currentPage = 1;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.

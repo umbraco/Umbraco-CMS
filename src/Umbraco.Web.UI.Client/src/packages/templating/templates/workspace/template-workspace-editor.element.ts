@@ -8,12 +8,15 @@ import { toCamelCase } from '@umbraco-cms/backoffice/utils';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_MODAL_MANAGER_CONTEXT, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-template-workspace-editor')
 export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
+	#modalContext?: UmbModalManagerContext;
+
 	@state()
 	private _name?: string | null = '';
 
@@ -37,13 +40,14 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	#masterTemplateUnique: string | null = null;
 
+	// TODO: Revisit this code, to not use RxJS directly:
 	private inputQuery$ = new Subject<string>();
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this._modalContext = instance;
+			this.#modalContext = instance;
 		});
 
 		this.consumeContext(UMB_TEMPLATE_WORKSPACE_CONTEXT, (workspaceContext) => {
@@ -105,16 +109,17 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		this._codeEditor?.insert(value);
 	}
 
-	private _modalContext?: UmbModalManagerContext;
-
 	#openInsertSectionModal() {
-		const sectionModal = this._modalContext?.open(UMB_TEMPLATING_SECTION_PICKER_MODAL);
+		const sectionModal = this.#modalContext?.open(this, UMB_TEMPLATING_SECTION_PICKER_MODAL);
 
-		sectionModal?.onSubmit().then((insertSectionModalValue) => {
-			if (insertSectionModalValue?.value) {
-				this._codeEditor?.insert(insertSectionModalValue.value);
-			}
-		});
+		sectionModal
+			?.onSubmit()
+			.then((insertSectionModalValue) => {
+				if (insertSectionModalValue?.value) {
+					this._codeEditor?.insert(insertSectionModalValue.value);
+				}
+			})
+			.catch(() => undefined);
 	}
 
 	#resetMasterTemplate() {
@@ -122,7 +127,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#openMasterTemplatePicker() {
-		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
+		const modalContext = this.#modalContext?.open(this, UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				pickableFilter: (item) => {
@@ -134,20 +139,26 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 			},
 		});
 
-		modalContext?.onSubmit().then((value) => {
-			if (!value?.selection) return;
-			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null);
-		});
+		modalContext
+			?.onSubmit()
+			.then((value) => {
+				if (!value?.selection) return;
+				this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null);
+			})
+			.catch(() => undefined);
 	}
 
 	#openQueryBuilder() {
-		const queryBuilderModal = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
+		const queryBuilderModal = this.#modalContext?.open(this, UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
-		queryBuilderModal?.onSubmit().then((queryBuilderModalValue) => {
-			if (queryBuilderModalValue?.value) {
-				this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
-			}
-		});
+		queryBuilderModal
+			?.onSubmit()
+			.then((queryBuilderModalValue) => {
+				if (queryBuilderModalValue?.value) {
+					this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
+				}
+			})
+			.catch(() => undefined);
 	}
 
 	#renderMasterTemplatePicker() {

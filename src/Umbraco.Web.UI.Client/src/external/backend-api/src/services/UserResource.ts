@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ChangePasswordCurrentUserRequestModel } from '../models/ChangePasswordCurrentUserRequestModel';
 import type { ChangePasswordUserRequestModel } from '../models/ChangePasswordUserRequestModel';
 import type { CreateInitialPasswordUserRequestModel } from '../models/CreateInitialPasswordUserRequestModel';
 import type { CreateUserRequestModel } from '../models/CreateUserRequestModel';
-import type { CreateUserResponseModel } from '../models/CreateUserResponseModel';
 import type { CurrentUserResponseModel } from '../models/CurrentUserResponseModel';
 import type { CurrenUserConfigurationResponseModel } from '../models/CurrenUserConfigurationResponseModel';
 import type { DeleteUsersRequestModel } from '../models/DeleteUsersRequestModel';
@@ -18,6 +18,7 @@ import type { LinkedLoginsRequestModel } from '../models/LinkedLoginsRequestMode
 import type { NoopSetupTwoFactorModel } from '../models/NoopSetupTwoFactorModel';
 import type { PagedUserResponseModel } from '../models/PagedUserResponseModel';
 import type { ResendInviteUserRequestModel } from '../models/ResendInviteUserRequestModel';
+import type { ResetPasswordUserResponseModel } from '../models/ResetPasswordUserResponseModel';
 import type { SetAvatarRequestModel } from '../models/SetAvatarRequestModel';
 import type { UnlockUsersRequestModel } from '../models/UnlockUsersRequestModel';
 import type { UpdateUserGroupsOnUserRequestModel } from '../models/UpdateUserGroupsOnUserRequestModel';
@@ -100,40 +101,43 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Created
      * @throws ApiError
      */
     public static postUser({
         requestBody,
     }: {
         requestBody?: (CreateUserRequestModel | InviteUserRequestModel),
-    }): CancelablePromise<CreateUserResponseModel> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteUser({
         requestBody,
     }: {
         requestBody?: DeleteUsersRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -162,6 +166,7 @@ export class UserResource {
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -190,29 +195,32 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteUserById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static putUserById({
@@ -221,7 +229,7 @@ export class UserResource {
     }: {
         id: string,
         requestBody?: UpdateUserRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/user/{id}',
@@ -230,8 +238,12 @@ export class UserResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
             },
         });
     }
@@ -260,7 +272,7 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteUserById2FaByProviderName({
@@ -269,7 +281,7 @@ export class UserResource {
     }: {
         id: string,
         providerName: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user/{id}/2fa/{providerName}',
@@ -277,6 +289,36 @@ export class UserResource {
                 'id': id,
                 'providerName': providerName,
             },
+            responseHeader: 'Umb-Notifications',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns string Success
+     * @throws ApiError
+     */
+    public static postUserByIdChangePassword({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: (ChangePasswordUserRequestModel | ChangePasswordCurrentUserRequestModel),
+    }): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user/{id}/change-password',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -290,26 +332,53 @@ export class UserResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static postUserByIdResetPassword({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<ResetPasswordUserResponseModel> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user/{id}/reset-password',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns string Success
+     * @throws ApiError
+     */
     public static deleteUserAvatarById({
         id,
     }: {
         id: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user/avatar/{id}',
             path: {
                 'id': id,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserAvatarById({
@@ -318,7 +387,7 @@ export class UserResource {
     }: {
         id: string,
         requestBody?: SetAvatarRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/avatar/{id}',
@@ -327,35 +396,12 @@ export class UserResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static postUserChangePasswordById({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: ChangePasswordUserRequestModel,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/umbraco/management/api/v1/user/change-password/{id}',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -404,7 +450,7 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static deleteUserCurrent2FaByProviderName({
@@ -413,7 +459,7 @@ export class UserResource {
     }: {
         providerName: string,
         code?: string,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user/current/2fa/{providerName}',
@@ -423,6 +469,7 @@ export class UserResource {
             query: {
                 'code': code,
             },
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -482,20 +529,22 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserCurrentAvatar({
         requestBody,
     }: {
         requestBody?: SetAvatarRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/current/avatar',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
             },
@@ -503,20 +552,22 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserCurrentChangePassword({
         requestBody,
     }: {
-        requestBody?: ChangePasswordUserRequestModel,
-    }): CancelablePromise<any> {
+        requestBody?: ChangePasswordCurrentUserRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/current/change-password',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
             },
         });
@@ -558,7 +609,7 @@ export class UserResource {
         id,
     }: {
         id?: Array<string>,
-    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
+    }): CancelablePromise<UserPermissionsResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/current/permissions',
@@ -588,6 +639,7 @@ export class UserResource {
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -600,7 +652,7 @@ export class UserResource {
         id,
     }: {
         id?: Array<string>,
-    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
+    }): CancelablePromise<UserPermissionsResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/current/permissions/media',
@@ -609,50 +661,55 @@ export class UserResource {
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserDisable({
         requestBody,
     }: {
         requestBody?: DisableUserRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/disable',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserEnable({
         requestBody,
     }: {
         requestBody?: EnableUserRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/enable',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
             },
         });
     }
@@ -673,26 +730,30 @@ export class UserResource {
             mediaType: 'application/json',
             responseHeader: 'Umb-Generated-Resource',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserInviteCreatePassword({
         requestBody,
     }: {
         requestBody?: CreateInitialPasswordUserRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/invite/create-password',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
@@ -700,41 +761,22 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserInviteResend({
         requestBody,
     }: {
         requestBody?: ResendInviteUserRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/invite/resend',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static postUserInviteVerify({
-        requestBody,
-    }: {
-        requestBody?: (VerifyInviteUserRequestModel | CreateInitialPasswordUserRequestModel),
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/umbraco/management/api/v1/user/invite/verify',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
@@ -742,19 +784,43 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
+     * @throws ApiError
+     */
+    public static postUserInviteVerify({
+        requestBody,
+    }: {
+        requestBody?: (VerifyInviteUserRequestModel | CreateInitialPasswordUserRequestModel),
+    }): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user/invite/verify',
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserSetUserGroups({
         requestBody,
     }: {
         requestBody?: UpdateUserGroupsOnUserRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/set-user-groups',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
                 403: `The authenticated user do not have access to this resource`,
@@ -763,19 +829,20 @@ export class UserResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Success
      * @throws ApiError
      */
     public static postUserUnlock({
         requestBody,
     }: {
         requestBody?: UnlockUsersRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user/unlock',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Notifications',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

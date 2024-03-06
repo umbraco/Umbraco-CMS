@@ -1,9 +1,9 @@
 import { UmbEntityActionEvent, type UmbEntityActionEventArgs } from '@umbraco-cms/backoffice/entity-action';
 
-export class UmbReloadTreeItemChildrenRequestEntityActionEvent extends UmbEntityActionEvent {
-	static readonly TYPE = 'reload-tree-item-children-request';
+export class UmbRequestReloadTreeItemChildrenEvent extends UmbEntityActionEvent {
+	static readonly TYPE = 'request-reload-tree-item-children';
 
 	constructor(args: UmbEntityActionEventArgs) {
-		super(UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE, args);
+		super(UmbRequestReloadTreeItemChildrenEvent.TYPE, args);
 	}
 }

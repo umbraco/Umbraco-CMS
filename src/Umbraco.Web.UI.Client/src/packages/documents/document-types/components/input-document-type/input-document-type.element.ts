@@ -72,11 +72,12 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selectedIds(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
+	@property({ type: Array })
 	public set selectedIds(ids: Array<string> | undefined) {
 		this.#pickerContext.setSelection(ids ?? []);
+	}
+	public get selectedIds(): Array<string> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
@@ -165,9 +166,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 				id="add-button"
 				look="placeholder"
 				@click=${this.#openPicker}
-				label="${this.localize.term('general_choose')}"
-				>${this.localize.term('general_choose')}</uui-button
-			>
+				label="${this.localize.term('general_choose')}"></uui-button>
 		`;
 	}
 
@@ -196,7 +195,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 
 	#renderIcon(item: UmbDocumentTypeItemModel) {
 		if (!item.icon) return;
-		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
+		return html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`;
 	}
 
 	static styles = [

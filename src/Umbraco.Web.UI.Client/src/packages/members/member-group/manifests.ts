@@ -3,6 +3,7 @@ import { manifests as entityActionManifests } from './entity-actions/manifests.j
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as sectionViewManifests } from './section-view/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
+import { manifests as memberGroupPickerModalManifests } from './components/member-group-picker-modal/manifests.js';
 
 export const manifests = [
 	...repositoryManifests,
@@ -10,4 +11,5 @@ export const manifests = [
 	...workspaceManifests,
 	...sectionViewManifests,
 	...collectionManifests,
+	...memberGroupPickerModalManifests,
 ];

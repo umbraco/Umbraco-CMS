@@ -1,30 +1,20 @@
-import type { UmbDictionaryExportRepository } from '../../repository/index.js';
+import { UmbDictionaryExportRepository } from '../../repository/index.js';
 import { UMB_EXPORT_DICTIONARY_MODAL } from './export-dictionary-modal.token.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryExportRepository> {
-	#modalContext?: UmbModalManagerContext;
-
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
-		super(host, repositoryAlias, unique, entityType);
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
-			this.#modalContext = instance;
-		});
-	}
-
+export class UmbExportDictionaryEntityAction extends UmbEntityActionBase<object> {
 	async execute() {
-		if (!this.#modalContext) return;
+		if (!this.args.unique) throw new Error('Unique is not available');
 
-		const modalContext = this.#modalContext?.open(UMB_EXPORT_DICTIONARY_MODAL, { data: { unique: this.unique } });
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const modalContext = modalManager.open(this, UMB_EXPORT_DICTIONARY_MODAL, { data: { unique: this.args.unique } });
 
 		const { includeChildren } = await modalContext.onSubmit();
 
 		// Export the file
-		const result = await this.repository?.requestExport(this.unique, includeChildren);
+		const repository = new UmbDictionaryExportRepository(this);
+		const result = await repository.requestExport(this.args.unique, includeChildren);
 		const blobContent = await result?.data;
 
 		if (!blobContent) return;
@@ -34,7 +24,7 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 
 		// Download
 		a.href = url;
-		a.download = `${this.unique}.udt`;
+		a.download = `${this.args.unique}.udt`;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -43,3 +33,5 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 		window.URL.revokeObjectURL(url);
 	}
 }
+
+export default UmbExportDictionaryEntityAction;

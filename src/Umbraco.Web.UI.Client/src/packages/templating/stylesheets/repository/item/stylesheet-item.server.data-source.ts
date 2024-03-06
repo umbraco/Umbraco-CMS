@@ -37,7 +37,7 @@ export class UmbStylesheetItemServerDataSource implements UmbItemDataSource<UmbS
 		const paths = uniques
 			.map((unique) => {
 				const serverPath = this.#serverFilePathUniqueSerializer.toServerPath(unique);
-				return serverPath ? encodeURI(serverPath) : null;
+				return serverPath ? serverPath : null;
 			})
 			.filter((x) => x !== null) as string[];
 

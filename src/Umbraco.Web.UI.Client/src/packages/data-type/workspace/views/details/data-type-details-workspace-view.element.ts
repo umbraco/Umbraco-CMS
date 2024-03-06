@@ -55,12 +55,13 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 	async #openPropertyEditorUIPicker() {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const value = await modalManager
-			.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
+			.open(this, UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
 				value: {
 					selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
 				},
 			})
-			.onSubmit();
+			.onSubmit()
+			.catch(() => undefined);
 
 		this._workspaceContext?.setPropertyEditorUiAlias(value?.selection[0]);
 	}
@@ -84,13 +85,13 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 								property-editor-schema-alias=${this._propertyEditorSchemaAlias}
 								standalone>
 								${this._propertyEditorUiIcon
-									? html` <uui-icon name="${this._propertyEditorUiIcon}" slot="icon"></uui-icon> `
+									? html` <umb-icon name="${this._propertyEditorUiIcon}" slot="icon"></umb-icon> `
 									: ''}
 								<uui-action-bar slot="actions">
 									<uui-button label="Change" @click=${this.#openPropertyEditorUIPicker}></uui-button>
 								</uui-action-bar>
 							</umb-ref-property-editor-ui>
-					  `
+						`
 					: html`
 							<uui-button
 								slot="editor"
@@ -98,7 +99,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 								look="placeholder"
 								color="default"
 								@click=${this.#openPropertyEditorUIPicker}></uui-button>
-					  `}
+						`}
 			</umb-property-layout>
 		`;
 	}

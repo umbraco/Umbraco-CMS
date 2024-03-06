@@ -6,16 +6,21 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	public readonly repository = new UmbStylesheetDetailRepository(this);
+
+	#parent?: { entityType: string; unique: string | null };
 
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -26,7 +31,7 @@ export class UmbStylesheetWorkspaceContext
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_STYLESHEET_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
 	}
@@ -77,9 +82,10 @@ export class UmbStylesheetWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null) {
+	async create(parent: { entityType: string; unique: string | null }) {
 		this.resetState();
-		const { data } = await this.repository.createScaffold(parentUnique);
+		this.#parent = parent;
+		const { data } = await this.repository.createScaffold();
 
 		if (data) {
 			this.setIsNew(true);
@@ -93,16 +99,34 @@ export class UmbStylesheetWorkspaceContext
 		let newData = undefined;
 
 		if (this.getIsNew()) {
-			const { data } = await this.repository.create(this.#data.value);
+			if (!this.#parent) throw new Error('Parent is not set');
+			const { data } = await this.repository.create(this.#data.value, this.#parent.unique);
 			newData = data;
+
+			// TODO: this might not be the right place to alert the tree, but it works for now
+			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
+				entityType: this.#parent.entityType,
+				unique: this.#parent.unique,
+			});
+			eventContext.dispatchEvent(event);
 		} else {
 			const { data } = await this.repository.save(this.#data.value);
 			newData = data;
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 
 		if (newData) {
 			this.#data.setValue(newData);
-			this.saveComplete(newData);
+			this.setIsNew(false);
+			this.workspaceComplete(newData);
 		}
 	}
 
