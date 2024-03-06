@@ -6,7 +6,7 @@ import { type UmbObserverController, UmbStringState } from '@umbraco-cms/backoff
 @customElement('test-my-umb-element')
 class UmbTestUmbElement extends UmbElementMixin(HTMLElement) {}
 
-describe('UmbElement', () => {
+describe('UmbElementMixin', () => {
 	let hostElement: UmbTestUmbElement;
 
 	beforeEach(() => {
@@ -196,6 +196,17 @@ describe('UmbElement', () => {
 			// The controller is removed from the host, and the new one was NOT added:
 			expect(hostElement.hasController(ctrl)).to.be.false;
 			expect(ctrl2).to.be.undefined;
+		});
+
+		it('an undefined observer executes the callback method with undefined', () => {
+			let callbackWasCalled = false;
+			const ctrl = hostElement.observe(undefined, (value) => {
+				expect(value).to.be.undefined;
+				callbackWasCalled = true;
+			});
+			expect(callbackWasCalled).to.be.true;
+			expect(ctrl).to.be.undefined;
+			expect(hostElement.hasController(ctrl)).to.be.false;
 		});
 	});
 	describe('Observe types', () => {
