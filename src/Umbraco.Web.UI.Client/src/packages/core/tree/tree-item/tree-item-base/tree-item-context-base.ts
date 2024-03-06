@@ -305,8 +305,6 @@ export abstract class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemMod
 	}
 
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
-		// Only handle children request here. Root request is handled by the tree context
-		if (!this.unique) return;
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
 		this.loadChildren();
