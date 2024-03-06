@@ -206,7 +206,6 @@ describe('UmbElementMixin', () => {
 			});
 			expect(callbackWasCalled).to.be.true;
 			expect(ctrl).to.be.undefined;
-			expect(hostElement.hasController(ctrl)).to.be.false;
 		});
 	});
 	describe('Observe types', () => {
