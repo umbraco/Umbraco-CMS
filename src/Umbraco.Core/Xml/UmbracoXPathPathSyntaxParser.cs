@@ -112,12 +112,6 @@ public class UmbracoXPathPathSyntaxParser
                     "$site",
                     string.Format(rootXpath, closestPublishedAncestorId) + "/ancestor-or-self::*[@level = 1]");
             });
-
-            vars.Add("$current", q =>
-            {
-                var closestPublishedAncestorId = getClosestPublishedAncestor(getPath(parentId.Value));
-                return q.Replace("$current", string.Format(rootXpath, closestPublishedAncestorId));
-            });
         }
         else if (nodeContextId.HasValue)
         {
@@ -140,10 +134,14 @@ public class UmbracoXPathPathSyntaxParser
                     "$site",
                     string.Format(rootXpath, closestPublishedAncestorId) + "/ancestor-or-self::*[@level = 1]");
             });
+        }
 
+        if (nodeContextId.HasValue || parentId.HasValue)
+        {
+            var currentId = nodeContextId.HasValue && nodeContextId.Value != default ? nodeContextId.Value : parentId.GetValueOrDefault();
             vars.Add("$current", q =>
             {
-                var closestPublishedAncestorId = getClosestPublishedAncestor(getPath(nodeContextId.Value));
+                var closestPublishedAncestorId = getClosestPublishedAncestor(getPath(currentId));
                 return q.Replace("$current", string.Format(rootXpath, closestPublishedAncestorId));
             });
         }
