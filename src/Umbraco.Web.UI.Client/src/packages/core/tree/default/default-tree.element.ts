@@ -99,15 +99,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	}
 
 	#renderRootItems() {
-		if (this._rootItems?.length === 0) return nothing;
-		return html`
-			${repeat(
-				this._rootItems,
-				(item, index) => item.name + '___' + index,
-				(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
-			)}
-			${this.#renderPaging()}
-		`;
+		// only shot the root items directly if the tree root is hidden
+		if (this.hideTreeRoot === true) {
+			return html`
+				${repeat(
+					this._rootItems,
+					(item, index) => item.name + '___' + index,
+					(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
+				)}
+				${this.#renderPaging()}
+			`;
+		}
 	}
 
 	#onLoadMoreClick = (event: any) => {
