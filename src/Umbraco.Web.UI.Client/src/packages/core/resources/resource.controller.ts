@@ -62,6 +62,11 @@ export class UmbResourceController extends UmbControllerBase {
 				// Cancelled - do nothing
 				return {};
 			} else {
+				console.group('UmbResourceController');
+				console.error('Request failed', error.request);
+				console.error('ProblemDetails', error.body);
+				console.error('Error', error);
+
 				// ApiError - body could hold a ProblemDetails from the server
 				if (typeof error.body !== 'undefined' && !!error.body) {
 					try {
@@ -90,9 +95,6 @@ export class UmbResourceController extends UmbControllerBase {
 						break;
 					case 500:
 						// Server Error
-						console.group('UmbResourceController');
-						console.error(error);
-						console.groupEnd();
 
 						if (this.#notificationContext) {
 							let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
@@ -122,12 +124,10 @@ export class UmbResourceController extends UmbControllerBase {
 								},
 								...options,
 							});
-						} else {
-							console.group('UmbResourceController');
-							console.error(error);
-							console.groupEnd();
 						}
 				}
+
+				console.groupEnd();
 			}
 		}
 
