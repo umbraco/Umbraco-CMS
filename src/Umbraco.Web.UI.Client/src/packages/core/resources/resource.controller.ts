@@ -62,7 +62,7 @@ export class UmbResourceController extends UmbControllerBase {
 				// Cancelled - do nothing
 				return {};
 			} else {
-				console.group('UmbResourceController');
+				console.group('ApiError caught in UmbResourceController');
 				console.error('Request failed', error.request);
 				console.error('ProblemDetails', error.body);
 				console.error('Error', error);
