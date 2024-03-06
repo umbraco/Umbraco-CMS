@@ -42,6 +42,13 @@ export const UmbControllerHostMixin = <T extends ClassConstructor>(superClass: T
 		}
 
 		/**
+		 * Retrieve all controllers of this element.
+		 */
+		getAllControllers(): UmbController[] {
+			return this.#controllers;
+		}
+
+		/**
 		 * Append a controller to this element.
 		 * @param {UmbController} ctrl
 		 */
