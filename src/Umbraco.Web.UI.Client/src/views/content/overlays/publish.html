@@ -3,13 +3,24 @@
   <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
     <umb-load-indicator></umb-load-indicator>
   </div>
-
+  
   <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.missingMandatoryVariants.length === 0">
 
     <div class="mb3">
       <p>
         <localize key="content_variantsToPublish">Which variants would you like to publish?</localize>
       </p>
+    </div>
+
+    <div class="umb-list-item" ng-if="vm.availableVariants.length > 1">
+      <umb-checkbox
+                    model="vm.publishAll"
+                    name="publishAllVariantsSelector"
+                    on-change="vm.changePublishAllSelection()"
+                    disabled="vm.availableVariants.length == 0">
+      <span class="umb-variant-selector-entry__title">
+        <localize key="content_selectAllVariants">Select all variants</localize>
+      </span>
     </div>
 
     <div class="umb-list-item"

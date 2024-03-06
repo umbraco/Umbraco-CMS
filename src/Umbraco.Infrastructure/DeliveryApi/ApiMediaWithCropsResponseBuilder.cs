@@ -1,22 +1,21 @@
 ﻿using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Cms.Infrastructure.DeliveryApi;
 
-internal sealed class ApiMediaWithCropsResponseBuilder : ApiMediaWithCropsBuilderBase<ApiMediaWithCropsResponse>, IApiMediaWithCropsResponseBuilder
+internal sealed class ApiMediaWithCropsResponseBuilder : ApiMediaWithCropsBuilderBase<IApiMediaWithCropsResponse>, IApiMediaWithCropsResponseBuilder
 {
     public ApiMediaWithCropsResponseBuilder(IApiMediaBuilder apiMediaBuilder, IPublishedValueFallback publishedValueFallback)
         : base(apiMediaBuilder, publishedValueFallback)
     {
     }
 
-    protected override ApiMediaWithCropsResponse Create(
+    protected override IApiMediaWithCropsResponse Create(
         IPublishedContent media,
         IApiMedia inner,
-        ImageCropperValue.ImageCropperFocalPoint? focalPoint,
-        IEnumerable<ImageCropperValue.ImageCropperCrop>? crops)
+        ImageFocalPoint? focalPoint,
+        IEnumerable<ImageCrop>? crops)
     {
         var path = $"/{string.Join("/", PathSegments(media).Reverse())}/";
         return new ApiMediaWithCropsResponse(inner, focalPoint, crops, path, media.CreateDate, media.UpdateDate);

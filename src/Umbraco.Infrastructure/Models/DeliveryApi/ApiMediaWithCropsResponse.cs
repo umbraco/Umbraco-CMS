@@ -1,13 +1,11 @@
-﻿using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+﻿namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
-namespace Umbraco.Cms.Core.Models.DeliveryApi;
-
-public sealed class ApiMediaWithCropsResponse : ApiMediaWithCrops
+internal sealed class ApiMediaWithCropsResponse : ApiMediaWithCrops, IApiMediaWithCropsResponse
 {
     public ApiMediaWithCropsResponse(
         IApiMedia inner,
-        ImageCropperValue.ImageCropperFocalPoint? focalPoint,
-        IEnumerable<ImageCropperValue.ImageCropperCrop>? crops,
+        ImageFocalPoint? focalPoint,
+        IEnumerable<ImageCrop>? crops,
         string path,
         DateTime createDate,
         DateTime updateDate)

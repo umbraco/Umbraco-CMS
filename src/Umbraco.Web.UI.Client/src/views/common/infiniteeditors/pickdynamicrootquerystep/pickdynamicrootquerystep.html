@@ -1,0 +1,58 @@
+<div ng-controller="Umbraco.Editors.PickDynamicRootQueryStep as vm">
+
+    <umb-editor-view>
+
+        <umb-editor-header
+            name="model.title"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <umb-box>
+                <umb-box-content>
+                    <div class="umb-insert-code-boxes">
+                        <button type="button" class="btn-reset umb-insert-code-box" ng-click="vm.choose('NearestAncestorOrSelf')">
+                            <h2 class="umb-insert-code-box__title"><localize key="dynamicRoot_queryStepNearestAncestorOrSelfTitle">Nearest Ancestor Or Self</localize></h2>
+                            <p class="umb-insert-code-box__description"><localize key="dynamicRoot_queryStepNearestAncestorOrSelfDesc">Query the nearest ancestor or self that fits with one of the configured types</localize></p>
+                        </button>
+                        <button type="button" class="btn-reset umb-insert-code-box" ng-click="vm.choose('FurthestAncestorOrSelf')">
+                            <h2 class="umb-insert-code-box__title"><localize key="dynamicRoot_queryStepFurthestAncestorOrSelfTitle">Furthest Ancestor Or Self</localize></h2>
+                            <p class="umb-insert-code-box__description"><localize key="dynamicRoot_queryStepFurthestAncestorOrSelfDesc">Query the Furthest ancestor or self that fits with one of the configured types</localize></p>
+                        </button>
+                        <button type="button" class="btn-reset umb-insert-code-box" ng-click="vm.choose('NearestDescendantOrSelf')">
+                            <h2 class="umb-insert-code-box__title"><localize key="dynamicRoot_queryStepNearestDescendantOrSelfTitle">Nearest Descendant Or Self</localize></h2>
+                            <p class="umb-insert-code-box__description"><localize key="dynamicRoot_queryStepNearestDescendantOrSelfDesc">Query the nearest descendant or self that fits with one of the configured types</localize></p>
+                        </button>
+                        <button type="button" class="btn-reset umb-insert-code-box" ng-click="vm.choose('FurthestDescendantOrSelf')">
+                            <h2 class="umb-insert-code-box__title"><localize key="dynamicRoot_queryStepFurthestDescendantOrSelfTitle">Furthest Descendant Or Self</localize></h2>
+                            <p class="umb-insert-code-box__description"><localize key="dynamicRoot_queryStepFurthestDescendantOrSelfDesc">Query the Furthest descendant or self that fits with one of the configured types</localize></p>
+                        </button>
+                        <button type="button" class="btn-reset umb-insert-code-box" ng-click="vm.chooseCustom()">
+                            <h2 class="umb-insert-code-box__title"><localize key="dynamicRoot_queryStepCustomTitle">Custom</localize></h2>
+                            <p class="umb-insert-code-box__description"><localize key="dynamicRoot_queryStepCustomDesc">Query via a custom Query Step</localize></p>
+                        </button>
+                    </div>
+                </umb-box-content>
+            </umb-box>
+
+        </umb-editor-container>
+
+        <umb-editor-footer>
+            <umb-editor-footer-content-right>
+                <umb-button
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    shortcut="esc"
+                    action="vm.close()">
+                </umb-button>
+            </umb-editor-footer-content-right>
+        </umb-editor-footer>
+
+    </umb-editor-view>
+
+</div>

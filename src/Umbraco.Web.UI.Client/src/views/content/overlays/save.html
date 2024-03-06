@@ -13,6 +13,17 @@
 
         <div class="umb-list umb-list--condensed">
 
+            <div class="umb-list-item" ng-if="vm.availableVariants.length > 1">
+                <umb-checkbox
+                              model="vm.saveAll"
+                              name="saveAllVariantsSelector"
+                              on-change="vm.changeSaveAllSelection()"
+                              disabled="vm.availableVariants.length == 0">
+                <span class="umb-variant-selector-entry__title">
+                  <localize key="content_selectAllVariants">Select all variants</localize>
+                </span>
+              </div>
+
             <div class="umb-list-item"
                  ng-repeat="variant in vm.availableVariants track by variant.compositeId">
                 <ng-form name="saveVariantSelectorForm">

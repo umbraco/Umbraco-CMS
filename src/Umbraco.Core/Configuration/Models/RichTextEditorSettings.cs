@@ -82,6 +82,10 @@ public class RichTextEditorSettings
         {
             Alias = "umbmediapicker", Name = "Image", Mode = RichTextEditorCommandMode.Insert,
         },
+        new RichTextEditorCommand
+        {
+            Alias = "umbblockpicker", Name = "Block", Mode = RichTextEditorCommandMode.All,
+        },
         new RichTextEditorCommand { Alias = "umbmacro", Name = "Macro", Mode = RichTextEditorCommandMode.All },
         new RichTextEditorCommand { Alias = "table", Name = "Table", Mode = RichTextEditorCommandMode.Insert },
         new RichTextEditorCommand
@@ -141,6 +145,11 @@ public class RichTextEditorSettings
     /// </summary>
     [DefaultValue(StaticInvalidElements)]
     public string InvalidElements { get; set; } = StaticInvalidElements;
+
+    /// <summary>
+    ///     Cloud API Key for TinyMCE. This is required to use TinyMCE premium plugins.
+    /// </summary>
+    public string? CloudApiKey { get; set; }
 
     public class RichTextEditorCommand
     {

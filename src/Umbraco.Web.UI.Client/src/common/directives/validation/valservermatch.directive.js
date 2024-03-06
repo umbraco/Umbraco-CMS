@@ -13,7 +13,7 @@
 function valServerMatch(serverValidationManager) {
 
     return {
-        require: ['form', '^^umbProperty', '?^^umbVariantContent'],
+        require: ['form', '?^^umbProperty', '?^^umbVariantContent'],
         restrict: "A",
         scope: {
             valServerMatch: "="
@@ -22,17 +22,19 @@ function valServerMatch(serverValidationManager) {
 
             var formCtrl = ctrls[0];
             var umbPropCtrl = ctrls[1];
-            if (!umbPropCtrl) {
+            // You can skip the requirement of ^^umbProperty, by parsing the culture and segment as part of valServerMatch object.
+            if (!umbPropCtrl && scope.valServerMatch.culture === undefined) {
+              console.log("val server blocked.", scope.valServerMatch)
                 //we cannot proceed, this validator will be disabled
                 return;
             }
 
-            // optional reference to the varaint-content-controller, needed to avoid validation when the field is invariant on non-default languages.
+            // optional reference to the variant-content-controller, needed to avoid validation when the field is invariant on non-default languages.
             var umbVariantCtrl = ctrls[2];
 
-            var currentProperty = umbPropCtrl.property;
-            var currentCulture = currentProperty.culture;
-            var currentSegment = currentProperty.segment;
+            var currentProperty = umbPropCtrl ? umbPropCtrl.property : undefined;
+            var currentCulture = umbPropCtrl ? currentProperty.culture : scope.valServerMatch.culture;
+            var currentSegment = umbPropCtrl ? currentProperty.segment : scope.valServerMatch.segment;
 
             if (umbVariantCtrl) {
                 //if we are inside of an umbVariantContent directive
@@ -84,9 +86,13 @@ function valServerMatch(serverValidationManager) {
 
             if (Utilities.isObject(scope.valServerMatch)) {
                 var allowedKeys = ["contains", "prefix", "suffix"];
-                Object.keys(scope.valServerMatch).forEach(matchType => {
+                const objectKeys = Object.keys(scope.valServerMatch);
+                if(objectKeys.find(x => allowedKeys.x)) {
+                  throw "valServerMatch dictionary keys must be one of " + allowedKeys.join();
+                }
+                objectKeys.forEach(matchType => {
                     if (allowedKeys.indexOf(matchType) === -1) {
-                        throw "valServerMatch dictionary keys must be one of " + allowedKeys.join();
+                      return;
                     }
 
                     var matchVal = scope.valServerMatch[matchType];

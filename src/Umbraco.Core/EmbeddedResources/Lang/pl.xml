@@ -683,13 +683,13 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="renewSession">Wznów sesję teraz, aby zapisać swoją pracę</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Szczęśliwej super niedzieli</key>
-    <key alias="greeting1">Szczęśliwego maniakalnego poniedziałku </key>
-    <key alias="greeting2">Szczęśliwego świetnego wtorku</key>
-    <key alias="greeting3">Szczęśliwej niesamowitej środy</key>
-    <key alias="greeting4">Szczęśliwego wyjątkowego czwartku</key>
-    <key alias="greeting5">Szczęśliwego odjechanego piątku</key>
-    <key alias="greeting6">Szczęśliwej cudownej soboty</key>
+    <key alias="greeting0">Witaj</key>
+    <key alias="greeting1">Witaj</key>
+    <key alias="greeting2">Witaj</key>
+    <key alias="greeting3">Witaj</key>
+    <key alias="greeting4">Witaj</key>
+    <key alias="greeting5">Witaj</key>
+    <key alias="greeting6">Witaj</key>
     <key alias="instruction">Zaloguj się poniżej</key>
     <key alias="signInWith">Zaloguj się z</key>
     <key alias="timeout">Sesja wygasła</key>
