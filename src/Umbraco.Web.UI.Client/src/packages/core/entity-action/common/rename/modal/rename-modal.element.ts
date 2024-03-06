@@ -13,7 +13,7 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 	// TODO: make base type for item and detail models
 	#itemRepository?: UmbItemRepository<any>;
 	#renameRepository?: UmbRenameRepository<any>;
-	#init: Promise<unknown>;
+	#init?: Promise<unknown>;
 
 	@state()
 	_name = '';
