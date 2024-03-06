@@ -1,7 +1,7 @@
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbMemberDetailModel, UmbMemberValueModel } from '../../types.js';
 import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
 import type { UmbMemberCollectionFilterModel } from '../types.js';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import type { MemberResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberResource } from '@umbraco-cms/backoffice/external/backend-api';
