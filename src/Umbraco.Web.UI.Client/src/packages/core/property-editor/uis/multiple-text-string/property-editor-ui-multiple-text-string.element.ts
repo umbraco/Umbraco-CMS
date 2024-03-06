@@ -12,7 +12,7 @@ import type { UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/
 @customElement('umb-property-editor-ui-multiple-text-string')
 export class UmbPropertyEditorUIMultipleTextStringElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Array })
-	public value: Array<string> = [];
+	value?: Array<string>;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {

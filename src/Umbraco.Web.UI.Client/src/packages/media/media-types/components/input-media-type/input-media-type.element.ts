@@ -53,17 +53,21 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selectedIds(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
+	@property({ type: Array })
 	public set selectedIds(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
+	}
+	public get selectedIds(): Array<string> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selectedIds = splitStringToArray(idsString);
+	}
+	public get value() {
+		return this.selectedIds.join(',');
 	}
 
 	@state()
@@ -107,13 +111,13 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 	#renderItems() {
 		if (!this._items) return;
 		return html`
-			<uui-ref-list
-				>${repeat(
+			<uui-ref-list>
+				${repeat(
 					this._items,
 					(item) => item.unique,
 					(item) => this.#renderItem(item),
-				)}</uui-ref-list
-			>
+				)}
+			</uui-ref-list>
 		`;
 	}
 

@@ -5,6 +5,7 @@ import type { ManifestModal, ManifestTypes } from '@umbraco-cms/backoffice/exten
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.Media.Create',
 		name: 'Create Media Entity Action',
 		weight: 1000,

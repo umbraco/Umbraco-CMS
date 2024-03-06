@@ -60,6 +60,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 
 			// TODO: investigate if we can make an observe decorator
 			this.observe(this.#treeItemContext.treeItem, (value) => (this._item = value));
+			this.observe(this.#treeItemContext.childItems, (value) => (this._childItems = value));
 			this.observe(this.#treeItemContext.hasChildren, (value) => (this._hasChildren = value));
 			this.observe(this.#treeItemContext.isLoading, (value) => (this._isLoading = value));
 			this.observe(this.#treeItemContext.isSelectableContext, (value) => (this._isSelectableContext = value));
@@ -89,21 +90,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 
 	// TODO: do we want to catch and emit a backoffice event here?
 	private _onShowChildren() {
-		if (this._childItems && this._childItems.length > 0) return;
-		this.#observeChildren();
-	}
-
-	async #observeChildren() {
-		if (!this.#treeItemContext?.requestChildren) return;
-
-		const { asObservable } = await this.#treeItemContext.requestChildren();
-		if (!asObservable) return;
-
-		this.observe(asObservable(), (childItems) => {
-			const oldValue = this._childItems;
-			this._childItems = childItems;
-			this.requestUpdate('_childItems', oldValue);
-		});
+		this.#treeItemContext?.loadChildren();
 	}
 
 	#onLoadMoreClick = (event: any) => {
@@ -176,7 +163,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 					.entityType=${this.#treeItemContext.entityType}
 					.unique=${this.#treeItemContext.unique}
 					.label=${this._item.name}>
-			  </umb-entity-actions-bundle>`
+				</umb-entity-actions-bundle>`
 			: '';
 	}
 
@@ -187,7 +174,7 @@ export abstract class UmbTreeItemElementBase<TreeItemModelType extends UmbTreeIt
 						this._childItems,
 						(item, index) => item.name + '___' + index,
 						(item) => html`<umb-tree-item .entityType=${item.entityType} .props=${{ item }}></umb-tree-item>`,
-				  )
+					)
 				: ''}
 		`;
 	}

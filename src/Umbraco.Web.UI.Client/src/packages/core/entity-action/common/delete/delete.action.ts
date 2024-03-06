@@ -6,6 +6,8 @@ import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionDeleteKind> {
 	// TODO: make base type for item and detail models
@@ -58,5 +60,14 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 		});
 
 		await this.#detailRepository!.delete(this.args.unique);
+
+		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(event);
 	}
 }
+export default UmbDeleteEntityAction;

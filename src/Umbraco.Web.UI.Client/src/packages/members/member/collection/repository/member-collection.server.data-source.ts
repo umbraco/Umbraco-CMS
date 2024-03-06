@@ -1,10 +1,12 @@
-import type { UmbMemberCollectionFilterModel, UmbMemberCollectionModel } from '../types.js';
-import type { UmbMemberDetailModel } from '../../types.js';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbMemberDetailModel, UmbMemberValueModel } from '../../types.js';
 import { UMB_MEMBER_ENTITY_TYPE } from '../../entity.js';
+import type { UmbMemberCollectionFilterModel } from '../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
+import type { MemberResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MemberResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A data source that fetches the member collection data from the server.
@@ -31,28 +33,40 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 	 * @memberof UmbMemberCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbMemberCollectionFilterModel) {
-		//const { data, error } = await tryExecuteAndNotify(this.#host, MemberResource.getCollectionMember(filter));
+		const { data, error } = await tryExecuteAndNotify(this.#host, MemberResource.getFilterMember(filter));
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
-			fetch('/umbraco/management/api/v1/collection/member'),
-		);
-
-		if (data) {
-			const json = await data.json();
-			const items = json.items.map((item: any) => {
-				const model: UmbMemberCollectionModel = {
-					unique: item.id,
-					entityType: UMB_MEMBER_ENTITY_TYPE,
-					variants: item.variants,
-				};
-
-				return model;
-			});
-
-			return { data: { items, total: json.total } };
+		if (error) {
+			return { error };
 		}
 
-		return { error };
+		if (!data) {
+			return { data: { items: [], total: 0 } };
+		}
+
+		const { items, total } = data;
+
+		const mappedItems: Array<UmbMemberDetailModel> = items.map((item: MemberResponseModel) => {
+			const memberDetail: UmbMemberDetailModel = {
+				entityType: UMB_MEMBER_ENTITY_TYPE,
+				email: item.email,
+				variants: item.variants as UmbVariantModel[],
+				unique: item.id,
+				lastLoginDate: item.lastLoginDate || null,
+				lastLockoutDate: item.lastLockoutDate || null,
+				lastPasswordChangeDate: item.lastPasswordChangeDate || null,
+				failedPasswordAttempts: item.failedPasswordAttempts,
+				isApproved: item.isApproved,
+				isLockedOut: item.isLockedOut,
+				groups: item.groups,
+				isTwoFactorEnabled: item.isTwoFactorEnabled,
+				memberType: { unique: item.memberType.id },
+				username: item.username,
+				values: item.values as UmbMemberValueModel[],
+			};
+
+			return memberDetail;
+		});
+
+		return { data: { items: mappedItems, total } };
 	}
 }

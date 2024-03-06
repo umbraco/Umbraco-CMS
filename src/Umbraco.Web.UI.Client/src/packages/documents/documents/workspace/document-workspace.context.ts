@@ -29,9 +29,10 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -230,7 +231,10 @@ export class UmbDocumentWorkspaceContext
 		return this.structure.propertyStructureById(propertyId);
 	}
 
-	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
+	async propertyValueByAlias<PropertyValueType = unknown>(
+		propertyAlias: string,
+		variantId?: UmbVariantId,
+	): Promise<Observable<PropertyValueType | undefined> | undefined> {
 		return this.#currentData.asObservablePart(
 			(data) =>
 				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
@@ -254,20 +258,16 @@ export class UmbDocumentWorkspaceContext
 		}
 		return undefined;
 	}
-	async setPropertyValue<UmbDocumentValueModel = unknown>(
-		alias: string,
-		value: UmbDocumentValueModel,
-		variantId?: UmbVariantId,
-	) {
+	async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
 		variantId ??= UmbVariantId.CreateInvariant();
 
-		const entry = { ...variantId.toObject(), alias, value };
+		const entry = { ...variantId.toObject(), alias, value } as UmbDocumentValueModel<ValueType>;
 		const currentData = this.getData();
 		if (currentData) {
 			const values = appendToFrozenArray(
-				currentData.values || [],
+				currentData.values ?? [],
 				entry,
-				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
+				(x) => x.alias === alias && variantId!.compare(x),
 			);
 			this.#currentData.update({ values });
 
@@ -458,6 +458,14 @@ export class UmbDocumentWorkspaceContext
 				console.error('Error saving document', error);
 				throw new Error('Error saving document');
 			}
+
+			const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+			const event = new UmbRequestReloadStructureForEntityEvent({
+				unique: this.getUnique()!,
+				entityType: this.getEntityType(),
+			});
+
+			actionEventContext.dispatchEvent(event);
 		}
 
 		return selectedVariants;

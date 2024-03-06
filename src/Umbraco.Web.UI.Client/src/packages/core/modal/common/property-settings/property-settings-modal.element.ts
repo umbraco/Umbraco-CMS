@@ -65,7 +65,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 			this.observe(instance.variesByCulture, (variesByCulture) => (this._documentVariesByCulture = variesByCulture));
 			this.observe(instance.variesBySegment, (variesBySegment) => (this._documentVariesBySegment = variesBySegment));
-		}).skipOrigin();
+		}).skipHost();
 
 		this._originalPropertyData = this.value;
 		this.#isNew = this.value.alias === '';
@@ -357,7 +357,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 							name="pattern-message"
 							@change=${this.#onValidationMessageChange}
 							.value=${this.value.validation?.regExMessage ?? ''}></uui-textarea>
-				  `
+					`
 				: nothing} `;
 	}
 

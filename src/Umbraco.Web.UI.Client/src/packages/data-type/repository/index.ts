@@ -1,4 +1,4 @@
-export { UmbCopyDataTypeRepository, COPY_DATA_TYPE_REPOSITORY_ALIAS } from './copy/index.js';
+export { UmbDuplicateDataTypeRepository, UMB_DUPLICATE_DATA_TYPE_REPOSITORY_ALIAS } from './duplicate/index.js';
 export {
 	UmbDataTypeDetailRepository,
 	UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,

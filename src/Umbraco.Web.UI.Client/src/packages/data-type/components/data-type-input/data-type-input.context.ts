@@ -1,8 +1,8 @@
 import { UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
 import type { UmbDataTypeItemModel } from '../../repository/item/types.js';
+import { UMB_DATA_TYPE_PICKER_MODAL } from '../../modals/index.js';
 import { UmbPickerInputContext } from '@umbraco-cms/backoffice/picker-input';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_DATA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 
 export class UmbDataTypePickerContext extends UmbPickerInputContext<UmbDataTypeItemModel> {
 	constructor(host: UmbControllerHost) {

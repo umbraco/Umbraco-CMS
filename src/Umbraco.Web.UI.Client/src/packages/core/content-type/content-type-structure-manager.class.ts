@@ -144,22 +144,23 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		// Load inherited and composed types:
 		//this._loadContentTypeCompositions(data);// Should not be necessary as this will be done when appended to the contentTypes state. [NL]
 
-		this.#contentTypeObservers.push(
-			this.observe(
-				// Then lets start observation of the content type:
-				await this.#contentTypeRepository.byUnique(data.unique),
-				(docType) => {
-					if (docType) {
-						// TODO: Handle if there was changes made to the owner document type in this context.
-						/*
-						possible easy solutions could be to notify user wether they want to update(Discard the changes to accept the new ones).
-					 	*/
-						this.#contentTypes.appendOne(docType);
-					}
-				},
-				'observeContentType_' + data.unique,
-			),
+		const ctrl = this.observe(
+			// Then lets start observation of the content type:
+			await this.#contentTypeRepository.byUnique(data.unique),
+			(docType) => {
+				if (docType) {
+					// TODO: Handle if there was changes made to the owner document type in this context. [NL]
+					/*
+					possible easy solutions could be to notify user wether they want to update(Discard the changes to accept the new ones). [NL]
+					 */
+					this.#contentTypes.appendOne(docType);
+				}
+				// TODO: Do we need to handle the undefined case? [NL]
+			},
+			'observeContentType_' + data.unique,
 		);
+
+		this.#contentTypeObservers.push(ctrl);
 	}
 
 	private async _loadContentTypeCompositions(contentType: T) {
@@ -493,7 +494,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		});
 	}
 
-	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should not be merged.
+	// In future this might need to take parentName(parentId lookup) into account as well? otherwise containers that share same name and type will always be merged, but their position might be different and they should not be merged. [NL]
 	containersByNameAndType(name: string, containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);

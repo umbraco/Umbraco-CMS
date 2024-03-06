@@ -81,7 +81,9 @@ export class UmbSelectionManager<ValueType extends string | null = string | null
 		/* If multiple is set to false, and the current selection is more than one,
 		then we need to set the selection to the first item. */
 		if (value === false && this.getSelection().length > 1) {
-			this.setSelection([this.getSelection()[0]]);
+			const first = this.getSelection()[0];
+			this.clearSelection();
+			this.select(first);
 		}
 	}
 

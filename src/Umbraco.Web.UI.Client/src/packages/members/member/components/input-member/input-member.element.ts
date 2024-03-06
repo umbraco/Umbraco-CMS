@@ -1,3 +1,5 @@
+import type { UmbMemberItemModel } from '../../repository/index.js';
+import { UmbMemberPickerContext } from './input-member.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -35,13 +37,10 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	 */
 	@property({ type: Number })
 	public get min(): number {
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		//return this.#pickerContext.min;
-		return 0;
+		return this.#pickerContext.min;
 	}
 	public set min(value: number) {
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		//this.#pickerContext.min = value;
+		this.#pickerContext.min = value;
 	}
 
 	/**
@@ -61,13 +60,10 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	 */
 	@property({ type: Number })
 	public get max(): number {
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		//return this.#pickerContext.max;
-		return Infinity;
+		return this.#pickerContext.max;
 	}
 	public set max(value: number) {
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		//this.#pickerContext.max = value;
+		this.#pickerContext.max = value;
 	}
 
 	/**
@@ -80,13 +76,10 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public get selectedIds(): Array<string> {
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		//return this.#pickerContext.getSelection();
-		return [];
+		return this.#pickerContext.getSelection();
 	}
 	public set selectedIds(ids: Array<string>) {
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		//this.#pickerContext.setSelection(ids);
+		this.#pickerContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
 
@@ -102,14 +95,16 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		this.selectedIds = splitStringToArray(idsString);
 	}
 
+	@property({ type: Object, attribute: false })
+	public filter: (member: UmbMemberItemModel) => boolean = () => true;
+
 	@state()
 	private _editMemberPath = '';
 
 	@state()
-	private _items?: Array<MemberItemResponseModel>;
+	private _items?: Array<UmbMemberItemModel>;
 
-	// TODO: Create the `UmbMemberPickerContext` [LK]
-	//#pickerContext = new UmbMemberPickerContext(this);
+	#pickerContext = new UmbMemberPickerContext(this);
 
 	constructor() {
 		super();
@@ -122,61 +117,51 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 			.observeRouteBuilder((routeBuilder) => {
 				this._editMemberPath = routeBuilder({});
 			});
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		// this.addValidator(
-		// 	'rangeUnderflow',
-		// 	() => this.minMessage,
-		// 	() => !!this.min && this.#pickerContext.getSelection().length < this.min,
-		// );
 
-		// this.addValidator(
-		// 	'rangeOverflow',
-		// 	() => this.maxMessage,
-		// 	() => !!this.max && this.#pickerContext.getSelection().length > this.max,
-		// );
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => {
+			this._items = selectedItems;
+		});
+	}
 
-		// this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		// this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		this.addValidator(
+			'rangeUnderflow',
+			() => this.minMessage,
+			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
+		);
+
+		this.addValidator(
+			'rangeOverflow',
+			() => this.maxMessage,
+			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
+		);
 	}
 
 	protected _openPicker() {
-		console.log('member.openPicker');
-		// this.#pickerContext.openPicker({
-		// 	hideTreeRoot: true,
-		// });
+		this.#pickerContext.openPicker({
+			hideTreeRoot: true,
+		});
 	}
 
-	protected _requestRemoveItem(item: MemberItemResponseModel) {
-		console.log('member.requestRemoveItem', item);
-		//this.#pickerContext.requestRemoveItem(item.id!);
+	protected _requestRemoveItem(item: UmbMemberItemModel) {
+		this.#pickerContext.requestRemoveItem(item.unique!);
 	}
 
 	protected getFormElement() {
 		return undefined;
 	}
 
-	#pickableFilter: (item: MemberItemResponseModel) => boolean = (item) => {
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		console.log('member.pickableFilter', item);
-		// 	if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-		// 		return this.allowedContentTypeIds.includes(item.contentTypeId);
-		// 	}
-		return true;
-	};
-
 	#openPicker() {
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		console.log('member.openPicker');
-		// this.#pickerContext.openPicker({
-		// 	hideTreeRoot: true,
-		//	pickableFilter: this.#pickableFilter,
-		// });
+		this.#pickerContext.openPicker({
+			filter: this.filter,
+		});
 	}
 
 	#requestRemoveItem(item: MemberItemResponseModel) {
-		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
-		console.log('member.requestRemoveItem', item);
-		//this.#pickerContext.requestRemoveItem(item.id!);
+		this.#pickerContext.requestRemoveItem(item.id!);
 	}
 
 	render() {
@@ -188,7 +173,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		return html`<uui-ref-list>
 			${repeat(
 				this._items,
-				(item) => item.id,
+				(item) => item.unique,
 				(item) => this.#renderItem(item),
 			)}
 		</uui-ref-list>`;
@@ -203,12 +188,12 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
-	#renderItem(item: MemberItemResponseModel) {
-		if (!item.id) return;
+	#renderItem(item: UmbMemberItemModel) {
+		if (!item.unique) return;
 		// TODO: get the correct variant name
 		const name = item.variants[0].name;
 		return html`
-			<uui-ref-node name=${ifDefined(item.variants[0].name)} detail=${ifDefined(item.id)}>
+			<uui-ref-node name=${ifDefined(item.variants[0].name)} detail=${ifDefined(item.unique)}>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderOpenButton(item)}
@@ -222,23 +207,23 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	#renderOpenButton(item: MemberItemResponseModel) {
+	#renderOpenButton(item: UmbMemberItemModel) {
 		if (!this.showOpenButton) return;
 		// TODO: get the correct variant name
 		const name = item.variants[0].name;
 		return html`
 			<uui-button
 				compact
-				href="${this._editMemberPath}edit/${item.id}"
+				href="${this._editMemberPath}edit/${item.unique}"
 				label=${this.localize.term('general_edit') + ` ${name}`}>
 				<uui-icon name="icon-edit"></uui-icon>
 			</uui-button>
 		`;
 	}
-	#renderIsTrashed(item: MemberItemResponseModel) {
+	#renderIsTrashed(item: UmbMemberItemModel) {
 		// TODO: Uncomment, once the Management API model support deleted members. [LK]
-		//if (!item.isTrashed) return;
-		//return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
+		// if (!item.isTrashed) return;
+		// return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
 	static styles = [

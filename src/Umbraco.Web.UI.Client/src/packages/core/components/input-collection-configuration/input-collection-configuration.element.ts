@@ -3,11 +3,13 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { UMB_DATATYPE_WORKSPACE_MODAL, UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/data-type';
 import {
-	UmbModalRouteRegistrationController,
+	UMB_DATATYPE_WORKSPACE_MODAL,
+	UMB_DATA_TYPE_ENTITY_TYPE,
+	UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
 	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+} from '@umbraco-cms/backoffice/data-type';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import type { UmbDataTypeItemModel } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-input-collection-configuration')
@@ -72,7 +74,7 @@ export class UmbInputCollectionConfigurationElement extends FormControlMixin(Umb
 		this.#createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup((params) => {
-				return { data: { entityType: 'data-type', preset: { editorUiAlias: params.uiAlias } } };
+				return { data: { entityType: UMB_DATA_TYPE_ENTITY_TYPE, preset: { editorUiAlias: params.uiAlias } } };
 			})
 			.onSubmit((value) => {
 				this.#setValue(value?.unique ?? this.defaultValue ?? '');
@@ -92,7 +94,10 @@ export class UmbInputCollectionConfigurationElement extends FormControlMixin(Umb
 	}
 
 	#createDataType() {
-		this.#createDataTypeModal.open({ uiAlias: this.#propertyEditorUiAlias }, 'create/null');
+		this.#createDataTypeModal.open(
+			{ uiAlias: this.#propertyEditorUiAlias },
+			`create/parent/${UMB_DATA_TYPE_ENTITY_TYPE}/null`,
+		);
 	}
 
 	render() {

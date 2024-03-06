@@ -1,5 +1,5 @@
 import { umbExtensionsRegistry } from './registry.js';
-import { html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -60,7 +60,14 @@ export abstract class UmbExtensionElementAndApiSlotElementBase<
 		this.requestUpdate('_element');
 	};
 
-	render() {
-		return html`${this._element}`;
+	protected render() {
+		return this._element;
+	}
+
+	/**
+	 * Disable the Shadow DOM for this element. This is needed because this is a wrapper element and should not stop the event propagation.
+	 */
+	protected createRenderRoot() {
+		return this;
 	}
 }

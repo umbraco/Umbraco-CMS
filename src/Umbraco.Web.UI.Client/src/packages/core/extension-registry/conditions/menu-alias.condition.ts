@@ -1,5 +1,6 @@
 import { UMB_MENU_CONTEXT } from '../../menu/menu.context.js';
 import { UmbConditionBase } from './condition-base.controller.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
@@ -12,8 +13,8 @@ export type MenuAliasConditionConfig = UmbConditionConfigBase & {
 };
 
 export class UmbMenuAliasCondition extends UmbConditionBase<MenuAliasConditionConfig> implements UmbExtensionCondition {
-	constructor(args: UmbConditionControllerArguments<MenuAliasConditionConfig>) {
-		super(args);
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<MenuAliasConditionConfig>) {
+		super(host, args);
 
 		this.consumeContext(UMB_MENU_CONTEXT, (context) => {
 			this.observe(context.alias, (MenuAlias) => {

@@ -1,7 +1,7 @@
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
-import { UMB_COPY_DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/copy/manifests.js';
+import { UMB_DATA_TYPE_PICKER_MODAL } from '../../modals/data-type-picker-modal.token.js';
+import { UMB_DUPLICATE_DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/duplicate/manifests.js';
 import { UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS } from '../../repository/index.js';
-import { UMB_DATA_TYPE_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -12,9 +12,9 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Duplicate Data Type Entity Action',
 		forEntityTypes: [UMB_DATA_TYPE_ENTITY_TYPE],
 		meta: {
-			duplicateRepositoryAlias: UMB_COPY_DATA_TYPE_REPOSITORY_ALIAS,
+			duplicateRepositoryAlias: UMB_DUPLICATE_DATA_TYPE_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DATA_TYPE_ITEM_REPOSITORY_ALIAS,
-			pickerModalAlias: UMB_DATA_TYPE_PICKER_MODAL.toString(),
+			pickerModal: UMB_DATA_TYPE_PICKER_MODAL,
 		},
 	},
 ];

@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "14.0.0--beta001",
+	"version": "14.0.0-beta001",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -44,6 +44,7 @@
 		"./lit-element": "./dist-cms/packages/core/lit-element/index.js",
 		"./localization": "./dist-cms/packages/core/localization/index.js",
 		"./log-viewer": "./dist-cms/packages/log-viewer/index.js",
+		"./markdown-editor": "./dist-cms/packages/markdown-editor/index.js",
 		"./media-type": "./dist-cms/packages/media/media-types/index.js",
 		"./media": "./dist-cms/packages/media/media/index.js",
 		"./member-group": "./dist-cms/packages/members/member-group/index.js",

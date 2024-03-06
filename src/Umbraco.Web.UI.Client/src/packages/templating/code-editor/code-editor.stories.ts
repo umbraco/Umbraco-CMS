@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbCodeEditorElement } from './code-editor.element.js';
-import type { CodeEditorLanguage} from './code-editor.model.js';
+import type { CodeEditorLanguage } from './code-editor.model.js';
 import { CodeEditorTheme } from './code-editor.model.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
@@ -133,18 +133,18 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 		}
 
 		setName(value: string) {
-			this.#data.next({ ...this.#data.value, name: value });
+			this.#data.setValue({ ...this.#data.value, name: value });
 		}
 
 		setContent(value: string) {
-			this.#data.next({ ...this.#data.value, content: value });
+			this.#data.setValue({ ...this.#data.value, content: value });
 		}
 
 		async load(entityId: string) {
 			const { data } = await this.repository.requestByKey(entityId);
 			if (data) {
 				this.setIsNew(false);
-				this.#data.next(data);
+				this.#data.setValue(data);
 			}
 		}
 
@@ -152,7 +152,7 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 			const { data } = await this.repository.createScaffold(parentId);
 			if (!data) return;
 			this.setIsNew(true);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}`,
 	json: `{

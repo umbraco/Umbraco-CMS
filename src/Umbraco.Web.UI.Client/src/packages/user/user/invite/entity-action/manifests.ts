@@ -6,6 +6,7 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	{
 		type: 'entityAction',
+		kind: 'default',
 		alias: 'Umb.EntityAction.User.ResendInvite',
 		name: 'Resend Invite User Entity Action',
 		weight: 500,

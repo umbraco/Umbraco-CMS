@@ -6,8 +6,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBasicState, type UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UUIModalCloseEvent,
 	type UUIDialogElement,
@@ -39,7 +38,7 @@ export class UmbModalElement extends UmbLitElement {
 
 	public element?: UUIModalDialogElement | UUIModalSidebarElement;
 
-	#innerElement = new BehaviorSubject<HTMLElement | undefined>(undefined);
+	#innerElement = new UmbBasicState<HTMLElement | undefined>(undefined);
 
 	#modalExtensionObserver?: UmbObserverController<ManifestModal | undefined>;
 	#modalRouterElement: UmbRouterSlotElement = document.createElement('umb-router-slot');
@@ -153,14 +152,14 @@ export class UmbModalElement extends UmbLitElement {
 
 	#appendInnerElement(element: HTMLElement) {
 		this.#modalRouterElement.appendChild(element);
-		this.#innerElement.next(element);
+		this.#innerElement.setValue(element);
 	}
 
 	#removeInnerElement() {
 		const innerElement = this.#innerElement.getValue();
 		if (innerElement) {
 			this.#modalRouterElement.removeChild(innerElement);
-			this.#innerElement.next(undefined);
+			this.#innerElement.setValue(undefined);
 		}
 	}
 
@@ -178,7 +177,7 @@ export class UmbModalElement extends UmbLitElement {
 	};
 
 	destroy() {
-		this.#innerElement.complete();
+		this.#innerElement.destroy();
 		this.#modalExtensionObserver?.destroy();
 		this.#modalExtensionObserver = undefined;
 		if (this.#modalContext) {

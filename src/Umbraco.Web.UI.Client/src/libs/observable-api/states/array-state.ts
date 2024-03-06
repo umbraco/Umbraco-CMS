@@ -57,11 +57,6 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	}
 
 	/**
-	 * @deprecated - Use `setValue` instead.
-	 */
-	next = this.setValue;
-
-	/**
 	 * @method remove
 	 * @param {unknown[]} uniques - The unique values to remove.
 	 * @return {UmbArrayState<T>} Reference to it self.

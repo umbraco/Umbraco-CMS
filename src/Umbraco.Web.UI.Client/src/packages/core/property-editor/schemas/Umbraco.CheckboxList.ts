@@ -3,8 +3,8 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
 	name: 'Checkbox List',
-	alias: 'Umbraco.CheckboxList',
+	alias: 'Umbraco.CheckBoxList',
 	meta: {
-		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.CheckboxList',
+		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.CheckBoxList',
 	},
 };

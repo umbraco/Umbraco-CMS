@@ -266,10 +266,6 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
-	/**
-	 * @deprecated Use `byAlias` instead.
-	 */
-	getByAlias = this.byAlias.bind(this);
 
 	/**
 	 * Get an observable that provides extensions matching the given type and alias.
@@ -292,10 +288,6 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
-	/**
-	 * @deprecated Use `byTypeAndAlias` instead.
-	 */
-	getByTypeAndAlias = this.byTypeAndAlias.bind(this);
 
 	byTypeAndAliases<Key extends string, T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>>(
 		type: Key,
@@ -312,10 +304,6 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<T>>;
 	}
-	/**
-	 * @deprecated Use `byTypeAndAliases` instead.
-	 */
-	getByTypeAndAliases = this.byTypeAndAliases.bind(this);
 
 	/**
 	 * Get an observable of extensions by type and a given filter method.
@@ -383,10 +371,6 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<T>>;
 	}
-	/**
-	 * @deprecated Use `byType` instead.
-	 */
-	extensionsOfType = this.byType.bind(this);
 
 	/**
 	 * Get an observable that provides extensions matching given types.
@@ -399,9 +383,4 @@ export class UmbExtensionRegistry<
 			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<ExtensionTypes>>;
 	}
-
-	/**
-	 * @deprecated Use `byTypes` instead.
-	 */
-	extensionsOfTypes = this.byTypes.bind(this);
 }
