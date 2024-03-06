@@ -4,7 +4,7 @@ import type {
 	UmbPropertyTypeContainerModel,
 	UmbPropertyTypeModel,
 	UmbPropertyTypeScaffoldModel,
-} from './types.js';
+} from '../types.js';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
