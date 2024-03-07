@@ -127,9 +127,18 @@ public class NuCacheContentService : RepositoryService, INuCacheContentService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
         {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            scope.ReadLock(Constants.Locks.MediaTree);
-            scope.ReadLock(Constants.Locks.MemberTree);
+            if (contentTypeIds is not null && contentTypeIds.Any())
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+            }
+            if (mediaTypeIds is not null && mediaTypeIds.Any())
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+            }
+            if (memberTypeIds is not null && memberTypeIds.Any())
+            {
+                scope.ReadLock(Constants.Locks.MemberTree);
+            }
 
             _repository.Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds);
 
