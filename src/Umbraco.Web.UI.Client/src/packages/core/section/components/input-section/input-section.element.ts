@@ -1,4 +1,4 @@
-import type { UmbSectionItemModel } from '../repository/index.js';
+import type { UmbSectionItemModel } from '../../repository/index.js';
 import { UmbSectionPickerContext } from './input-section.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
