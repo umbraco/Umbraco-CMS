@@ -5,6 +5,8 @@ import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffi
 
 export interface UmbContentTypeWorkspaceContext<ContentTypeType extends UmbContentTypeModel = UmbContentTypeModel>
 	extends UmbSaveableWorkspaceContextInterface {
+	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT: true;
+
 	readonly name: Observable<string | undefined>;
 	readonly alias: Observable<string | undefined>;
 	readonly description: Observable<string | undefined>;

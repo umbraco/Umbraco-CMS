@@ -20,6 +20,7 @@ export class UmbDocumentTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbContentTypeWorkspaceContext<EntityType>
 {
+	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
 	//
 	readonly repository = new UmbDocumentTypeDetailRepository(this);
 	// Data/Draft is located in structure manager
