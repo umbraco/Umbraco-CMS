@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -77,6 +78,7 @@ namespace Umbraco.Cms
             public bool IsColdBootRequired(int lastId)
             {
                 using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+                scope.ReadLock(Constants.Locks.CacheInstructions);
                 if (lastId <= 0)
                 {
                     var count = _cacheInstructionRepository.CountAll();
@@ -103,6 +105,7 @@ namespace Umbraco.Cms
             public bool IsInstructionCountOverLimit(int lastId, int limit, out int count)
             {
                 using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+                scope.ReadLock(Constants.Locks.CacheInstructions);
                 // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
                 // row so we will sum these numbers to get the actual count.
                 count = _cacheInstructionRepository.CountPendingInstructions(lastId);
@@ -113,6 +116,7 @@ namespace Umbraco.Cms
             public int GetMaxInstructionId()
             {
                 using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+                scope.ReadLock(Constants.Locks.CacheInstructions);
                 return _cacheInstructionRepository.GetMaxId();
             }
 
@@ -123,6 +127,7 @@ namespace Umbraco.Cms
 
                 using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
+                    scope.WriteLock(Constants.Locks.CacheInstructions);
                     _cacheInstructionRepository.Add(entity);
                     scope.Complete();
                 }
@@ -134,6 +139,7 @@ namespace Umbraco.Cms
                 // Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount.
                 using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
+                    scope.WriteLock(Constants.Locks.CacheInstructions);
                     foreach (IEnumerable<RefreshInstruction> instructionsBatch in instructions.InGroupsOf(
                                  _globalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount))
                     {
@@ -157,6 +163,7 @@ namespace Umbraco.Cms
                 using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                 using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
+                    scope.ReadLock(Constants.Locks.CacheInstructions);
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
                     // Check for pruning throttling.
@@ -251,6 +258,7 @@ namespace Umbraco.Cms
                     List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions);
 
                     // Process as per-normal.
+
                     var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
 
                     // If they couldn't be all processed (i.e. we're shutting down) then exit.

@@ -1015,6 +1015,8 @@ internal class DatabaseDataCreator
             new LockDto { Id = Constants.Locks.Languages, Name = "Languages" });
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
             new LockDto { Id = Constants.Locks.ScheduledPublishing, Name = "ScheduledPublishing" });
+        _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
+            new LockDto { Id = Constants.Locks.CacheInstructions, Name = "CacheInstructions" });
 
         _database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false,
             new LockDto { Id = Constants.Locks.MainDom, Name = "MainDom" });

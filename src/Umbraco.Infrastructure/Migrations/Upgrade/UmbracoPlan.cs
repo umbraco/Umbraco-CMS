@@ -7,6 +7,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_5_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_7_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_9_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
@@ -307,5 +308,8 @@ public class UmbracoPlan : MigrationPlan
 
         // to 10.7.0
         To<MigrateTagsFromNVarcharToNText>("{EF93F398-1385-4F07-808A-D3C518984442}");
+
+        // to 10.9.0
+        To<AddCacheInstructionLock>("{75AB5D21-4464-40F5-A9D1-3E8CE0D89E38}");
     }
 }

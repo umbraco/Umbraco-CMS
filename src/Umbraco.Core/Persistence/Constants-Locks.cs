@@ -70,5 +70,10 @@ public static partial class Constants
         ///     ScheduledPublishing job.
         /// </summary>
         public const int ScheduledPublishing = -341;
+
+        /// <summary>
+        ///     CacheInstructions service.
+        /// </summary>
+        public const int CacheInstructions = -342;
     }
 }

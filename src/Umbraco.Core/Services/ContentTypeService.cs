@@ -29,7 +29,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     // beware! order is important to avoid deadlocks
     protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
 
-    protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
+    protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes, Constants.Locks.CacheInstructions};
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
 
