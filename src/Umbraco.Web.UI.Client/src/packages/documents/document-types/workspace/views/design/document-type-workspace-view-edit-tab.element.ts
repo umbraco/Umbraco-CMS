@@ -83,6 +83,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		if (value === this._ownerTabId) return;
 		const oldValue = this._ownerTabId;
 		this._ownerTabId = value;
+		console.log('tab owner id', value);
 		this.#groupStructureHelper.setParentId(value);
 		this.requestUpdate('ownerTabId', oldValue);
 	}
@@ -127,6 +128,9 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.#groupStructureHelper.setParentType('Tab');
+
+		// TODO: Use a structured/? workspace context token...
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			this.#groupStructureHelper.setStructureManager((context as UmbDocumentTypeWorkspaceContext).structure);
 			this.observe(
@@ -168,7 +172,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						look="placeholder"></uui-button>`
 				: ''
 		}
-
+		<b>${this.ownerTabId}</b>
 		${
 			!this._noTabName
 				? html`
@@ -182,12 +186,13 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				: ''
 		}
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
+					<pre>${JSON.stringify(this._groups)}</pre>
 					${repeat(
 						this._groups,
 						(group) => group.id,
 						(group) =>
 							html`<uui-box class="container-handle">
-								${this.#renderHeader(group)}
+								${this.#renderContainerHeader(group)}
 								<umb-document-type-workspace-view-edit-properties
 									container-id=${ifDefined(group.id)}
 									container-type="Group"
@@ -200,7 +205,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		`;
 	}
 
-	#renderHeader(group: UmbPropertyTypeContainerModel) {
+	#renderContainerHeader(group: UmbPropertyTypeContainerModel) {
 		const inherited = !this.#groupStructureHelper.isOwnerChildContainer(group.id);
 
 		if (this._sortModeActive) {
@@ -222,6 +227,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		} else {
 			return html`<div slot="header">
 				${inherited ? html`<uui-icon name="icon-merge"></uui-icon>` : this.#renderInputGroupName(group)}
+				(${group.parent?.id}/${group.id})
 			</div> `;
 		}
 	}

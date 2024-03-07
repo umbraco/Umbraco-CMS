@@ -485,9 +485,11 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		);
 	}
 
+	/*
 	isOwnerContainer(containerId: string) {
 		return this.getOwnerContentType()?.containers?.filter((x) => x.id === containerId);
 	}
+	*/
 
 	containersOfParentKey(parentId: string, containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {

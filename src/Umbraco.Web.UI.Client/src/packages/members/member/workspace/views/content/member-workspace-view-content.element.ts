@@ -79,7 +79,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 						(component as UmbMemberWorkspaceViewContentTabElement).tabName = tabName;
 						// TODO: Consider if we can link these more simple, and not parse this on.
 						(component as UmbMemberWorkspaceViewContentTabElement).ownerTabId =
-							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
+							this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});
@@ -121,7 +121,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 											href=${this._routerPath + '/'}
 											>Content</uui-tab
 										>
-								  `
+									`
 								: ''}
 							${repeat(
 								this._tabs,
@@ -133,7 +133,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 									>`;
 								},
 							)}
-					  </uui-tab-group>`
+						</uui-tab-group>`
 					: ''}
 
 				<umb-router-slot

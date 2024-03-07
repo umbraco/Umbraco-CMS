@@ -84,7 +84,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 						// TODO: Consider if we can link these more simple, and not parse this on.
 						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
 						(component as UmbDocumentWorkspaceViewEditTabElement).ownerTabId =
-							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
+							this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});

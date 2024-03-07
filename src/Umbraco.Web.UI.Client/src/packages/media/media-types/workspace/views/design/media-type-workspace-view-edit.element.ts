@@ -152,7 +152,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 					setup: (component) => {
 						(component as UmbMediaTypeWorkspaceViewEditTabElement).tabName = tabName;
 						(component as UmbMediaTypeWorkspaceViewEditTabElement).ownerTabId =
-							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
+							this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});
@@ -205,7 +205,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 	#remove(tabId?: string) {
 		if (!tabId) return;
 		this._workspaceContext?.structure.removeContainer(null, tabId);
-		this._tabsStructureHelper?.isOwnerContainer(tabId)
+		this._tabsStructureHelper?.isOwnerChildContainer(tabId)
 			? window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'))
 			: '';
 	}
@@ -338,7 +338,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 	renderTab(tab: PropertyTypeContainerModelBaseModel) {
 		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 		const tabActive = path === this._activePath;
-		const tabInherited = !this._tabsStructureHelper.isOwnerContainer(tab.id!);
+		const tabInherited = !this._tabsStructureHelper.isOwnerChildContainer(tab.id!);
 
 		return html`<uui-tab
 			label=${tab.name ?? 'unnamed'}

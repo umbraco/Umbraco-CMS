@@ -78,11 +78,8 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 					setup: (component) => {
 						(component as UmbMediaWorkspaceViewEditTabElement).tabName = tabName;
 						// TODO: Consider if we can link these more simple, and not parse this on.
-						(component as UmbMediaWorkspaceViewEditTabElement).ownerTabId = this._tabsStructureHelper.isOwnerContainer(
-							tab.id!,
-						)
-							? tab.id
-							: undefined;
+						(component as UmbMediaWorkspaceViewEditTabElement).ownerTabId =
+							this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});
@@ -124,7 +121,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 											href=${this._routerPath + '/'}
 											>Content</uui-tab
 										>
-								  `
+									`
 								: ''}
 							${repeat(
 								this._tabs,
@@ -136,7 +133,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 									>`;
 								},
 							)}
-					  </uui-tab-group>`
+						</uui-tab-group>`
 					: ''}
 
 				<umb-router-slot

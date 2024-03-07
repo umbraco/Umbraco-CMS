@@ -10,7 +10,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 	#structure?: UmbContentTypePropertyStructureManager<T>;
 
-	private _parentType?: UmbPropertyContainerTypes = 'Tab';
+	private _parentType?: UmbPropertyContainerTypes;
 	private _childType?: UmbPropertyContainerTypes = 'Group';
 	private _isRoot = false;
 	/**
@@ -22,9 +22,9 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 	// Containers defined in data might be more than actual containers to display as we merge them by name.
 	// Direct containers are the containers defining the total of this container(Multiple containers with the same name and type)
-	private _parentAlikeContainers: UmbPropertyTypeContainerModel[] = [];
+	private _parentMatchingContainers: UmbPropertyTypeContainerModel[] = [];
 	// Owner containers are containers owned by the owner Content Type (The specific one up for editing)
-	private _ownerContainers: UmbPropertyTypeContainerModel[] = [];
+	private _parentOwnerContainers: UmbPropertyTypeContainerModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
 	#containers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
@@ -43,18 +43,24 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	public setStructureManager(structure: UmbContentTypePropertyStructureManager<T>) {
+		if (this.#structure === structure) return;
+		if (this.#structure) {
+			throw new Error(
+				'Structure manager is already set, the helpers are not designed to be re-setup with new managers',
+			);
+		}
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
 		this._observeParentAlikeContainers();
 	}
 
-	public setType(value?: UmbPropertyContainerTypes) {
+	public setParentType(value?: UmbPropertyContainerTypes) {
 		if (this._parentType === value) return;
 		this._parentType = value;
 		this._observeParentAlikeContainers();
 	}
-	public getType() {
+	public getParentType() {
 		return this._parentType;
 	}
 
@@ -94,41 +100,52 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	private _observeParentAlikeContainers() {
-		if (!this.#structure || !this._parentType) return;
+		if (!this.#structure || (!this._isRoot && !this._parentType)) return;
 
 		if (this._isRoot) {
 			this.#containers.setValue([]);
-			// We cannot have root properties currently, therefor we set it to false:
+			//this._observeChildProperties(); // We cannot have root properties currently, therefor we instead just set it to false:
 			this.#hasProperties.setValue(false);
 			this._observeRootContainers();
-			this.observe(
+			/*this.observe(
 				this.#structure.ownerContainersOf(this._parentType),
-				(ownerContainers) => {
-					this._ownerContainers = ownerContainers || [];
+				(containers) => {
+					this._parentContainers = containers ?? [];
+					console.log('root parent containers', this._parentContainers);
+					if (this._parentContainers.length !== 1) {
+						console.log(
+							'!!! We did not just get one parentContainer, I would have expected this, so I have to re-evaluate my understanding.  !!!',
+						);
+					}
+					this._parentAlikeContainers = [];
 				},
 				'_observeOwnerContainers',
-			);
-		} else if (this._parentName) {
+			);*/
+		} else if (this._parentName && this._parentType) {
 			this.observe(
 				this.#structure.containersByNameAndType(this._parentName, this._parentType),
-				(ownerALikeContainers) => {
+				(parentContainers) => {
 					this.#containers.setValue([]);
-					this._ownerContainers = ownerALikeContainers.filter((x) => x.id === this._parentId) || [];
-					this._parentAlikeContainers = ownerALikeContainers || [];
-					if (this._parentAlikeContainers.length > 0) {
-						this._observeChildContainerProperties();
+					this._parentOwnerContainers = parentContainers.filter((x) => x.id === this._parentId) || [];
+					this._parentMatchingContainers = parentContainers ?? [];
+					console.log('owner containers', this._parentOwnerContainers);
+					console.log('matching containers', this._parentMatchingContainers);
+					if (this._parentMatchingContainers.length > 0) {
+						this._observeChildProperties();
 						this._observeChildContainers();
 					}
 				},
 				'_observeOwnerContainers',
 			);
+		} else {
+			throw new Error('Container Structure Helper is not properly configured, missing required properties!!!!!!!!!');
 		}
 	}
 
-	private _observeChildContainerProperties() {
+	private _observeChildProperties() {
 		if (!this.#structure) return;
 
-		this._parentAlikeContainers.forEach((container) => {
+		this._parentMatchingContainers.forEach((container) => {
 			this.observe(
 				this.#structure!.hasPropertyStructuresOf(container.id!),
 				(hasProperties) => {
@@ -142,10 +159,10 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	private _observeChildContainers() {
 		if (!this.#structure || !this._parentName || !this._childType) return;
 
-		this._parentAlikeContainers.forEach((container) => {
+		this._parentMatchingContainers.forEach((container) => {
 			this.observe(
 				this.#structure!.containersOfParentKey(container.id, this._childType!),
-				this._insertGroupContainers,
+				this._insertChildContainers,
 				'_observeGroupsOf_' + container.id,
 			);
 		});
@@ -158,14 +175,14 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			this.#structure.rootContainers(this._childType!),
 			(rootContainers) => {
 				this.#containers.setValue([]);
-				this._insertGroupContainers(rootContainers);
+				this._insertChildContainers(rootContainers);
 			},
 			'_observeRootContainers',
 		);
 	}
 
-	private _insertGroupContainers = (groupContainers: UmbPropertyTypeContainerModel[]) => {
-		groupContainers.forEach((group) => {
+	private _insertChildContainers = (childContainers: UmbPropertyTypeContainerModel[]) => {
+		childContainers.forEach((group) => {
 			if (group.name !== null && group.name !== undefined) {
 				if (!this.#containers.getValue().find((x) => x.name === group.name)) {
 					this.#containers.appendOne(group);
@@ -177,17 +194,21 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	/**
 	 * Returns true if the container is an owner container.
 	 */
+	/*
 	isOwnerContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;
 
-		return this._ownerContainers.find((x) => x.id === containerId) !== undefined;
+		return this._parentOwnerContainers.find((x) => x.id === containerId) !== undefined;
 	}
+	*/
 
 	/**
 	 * Returns true if the container is an owner container.
 	 */
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;
+
+		console.log('isOwnerChildContainer', containerId, this._parentId, this._parentOwnerContainers);
 
 		return (
 			this.#containers

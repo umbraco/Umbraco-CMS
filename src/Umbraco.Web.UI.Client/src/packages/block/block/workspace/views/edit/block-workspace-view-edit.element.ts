@@ -98,11 +98,8 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 						(component as UmbBlockWorkspaceViewEditTabElement).tabName = tabName;
 						// TODO: Consider if we can link these more simple, and not parse this on.
 						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
-						(component as UmbBlockWorkspaceViewEditTabElement).ownerTabId = this.#tabsStructureHelper.isOwnerContainer(
-							tab.id!,
-						)
-							? tab.id
-							: undefined;
+						(component as UmbBlockWorkspaceViewEditTabElement).ownerTabId =
+							this.#tabsStructureHelper.isOwnerChildContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});
@@ -144,7 +141,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 											href=${this._routerPath + '/'}
 											>Content</uui-tab
 										>
-								  `
+									`
 								: ''}
 							${repeat(
 								this._tabs,
@@ -156,7 +153,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 									>`;
 								},
 							)}
-					  </uui-tab-group>`
+						</uui-tab-group>`
 					: ''}
 
 				<umb-router-slot

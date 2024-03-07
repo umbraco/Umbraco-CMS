@@ -98,7 +98,7 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 										@click=${() => this.#setTabName(null, null)}
 										>Content</uui-tab
 									>
-							  `
+								`
 							: ''}
 						${repeat(
 							this._tabs,
@@ -112,18 +112,18 @@ export class UmbBlockWorkspaceViewEditContentNoRouterElement extends UmbLitEleme
 								>`;
 							},
 						)}
-				  </uui-tab-group>`
+					</uui-tab-group>`
 				: ''}
 			${this._activeTabId !== undefined
 				? html`<umb-block-workspace-view-edit-tab
 						.managerName=${'content'}
 						.hideSingleGroup=${true}
-						.ownerTabId=${this._activeTabId && this.#tabsStructureHelper.isOwnerContainer(this._activeTabId)
+						.ownerTabId=${this._activeTabId && this.#tabsStructureHelper.isOwnerChildContainer(this._activeTabId)
 							? this._activeTabId
 							: null}
 						.noTabName=${this._hasRootGroups && this._activeTabName === null}
 						.tabName=${this._activeTabName ?? undefined}>
-				  </umb-block-workspace-view-edit-tab>`
+					</umb-block-workspace-view-edit-tab>`
 				: ''}
 		`;
 	}
