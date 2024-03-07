@@ -109,6 +109,8 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this._groupStructureHelper.setParentType('Tab');
+
 		this.sorter = new UmbSorterController(this, this.config);
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {

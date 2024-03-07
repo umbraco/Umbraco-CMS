@@ -52,6 +52,8 @@ export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this._groupStructureHelper.setParentType('Tab');
+
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._groupStructureHelper.setStructureManager(workspaceContext.structure);
 		});

@@ -100,7 +100,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	private _observeParentAlikeContainers() {
-		if (!this.#structure || (!this._isRoot && !this._parentType)) return;
+		if (!this.#structure) return;
 
 		if (this._isRoot) {
 			this.#containers.setValue([]);
@@ -119,7 +119,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 					}
 					this._parentAlikeContainers = [];
 				},
-				'_observeOwnerContainers',
+				'_observeParentContainers',
 			);*/
 		} else if (this._parentName && this._parentType) {
 			this.observe(
@@ -128,17 +128,13 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 					this.#containers.setValue([]);
 					this._parentOwnerContainers = parentContainers.filter((x) => x.id === this._parentId) || [];
 					this._parentMatchingContainers = parentContainers ?? [];
-					console.log('owner containers', this._parentOwnerContainers);
-					console.log('matching containers', this._parentMatchingContainers);
 					if (this._parentMatchingContainers.length > 0) {
 						this._observeChildProperties();
 						this._observeChildContainers();
 					}
 				},
-				'_observeOwnerContainers',
+				'_observeParentContainers',
 			);
-		} else {
-			throw new Error('Container Structure Helper is not properly configured, missing required properties!!!!!!!!!');
 		}
 	}
 
@@ -151,7 +147,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				(hasProperties) => {
 					this.#hasProperties.setValue(hasProperties);
 				},
-				'_observeOwnerHasProperties_' + container.id,
+				'_observeParentHasProperties_' + container.id,
 			);
 		});
 	}
@@ -207,8 +203,6 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	 */
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;
-
-		console.log('isOwnerChildContainer', containerId, this._parentId, this._parentOwnerContainers);
 
 		return (
 			this.#containers

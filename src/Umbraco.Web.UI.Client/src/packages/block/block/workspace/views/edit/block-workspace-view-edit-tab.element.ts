@@ -72,6 +72,8 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this.#groupStructureHelper.setParentType('Tab');
+
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#blockWorkspace = workspaceContext;
 			this.#setStructureManager();

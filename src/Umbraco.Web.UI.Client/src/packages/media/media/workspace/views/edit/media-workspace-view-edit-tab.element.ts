@@ -52,6 +52,8 @@ export class UmbMediaWorkspaceViewEditTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		this._groupStructureHelper.setParentType('Tab');
+
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this._groupStructureHelper.setStructureManager(workspaceContext.structure);
 		});
