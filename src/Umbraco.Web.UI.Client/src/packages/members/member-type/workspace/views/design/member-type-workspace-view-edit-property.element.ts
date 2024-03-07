@@ -121,14 +121,14 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	_partialUpdate(partialObject: UmbPropertyTypeModel) {
-		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
+		this.dispatchEvent(new CustomEvent('umb:partial-property-update', { detail: partialObject }));
 	}
 
 	_singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
 		const partialObject = {} as any;
 		partialObject[propertyName] = value;
 
-		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
+		this.dispatchEvent(new CustomEvent('umb:partial-property-update', { detail: partialObject }));
 	}
 
 	@state()
@@ -283,7 +283,7 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 					<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
 						<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
 					</div>
-			  </uui-input>`
+				</uui-input>`
 			: '';
 	}
 
@@ -294,19 +294,19 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
-						  </uui-tag>`
+							</uui-tag>`
 						: nothing}
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
-						  </uui-tag>`
+							</uui-tag>`
 						: nothing}
 					${this.property.validation.mandatory === true
 						? html`<uui-tag look="default">
 								<span>* ${this.localize.term('general_mandatory')}</span>
-						  </uui-tag>`
+							</uui-tag>`
 						: nothing}
-			  </div>`
+				</div>`
 			: nothing;
 	}
 

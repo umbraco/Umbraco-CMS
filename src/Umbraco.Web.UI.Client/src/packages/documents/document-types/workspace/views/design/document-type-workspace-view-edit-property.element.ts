@@ -20,7 +20,12 @@ import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbrac
  */
 @customElement('umb-document-type-workspace-view-edit-property')
 export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
-	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
+	//
+	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+
+	#settingsModal;
+	#workspaceModal;
+
 	/**
 	 * Property, the data object for the property.
 	 * @type {UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined}
@@ -34,10 +39,12 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	public set property(value: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined) {
 		const oldValue = this._property;
 		this._property = value;
-		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
+		this.#settingsModal.setUniquePathValue('propertyId', value?.id?.toString());
+		this.#workspaceModal.setUniquePathValue('propertyId', value?.id?.toString());
 		this.setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
+	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
 
 	/**
 	 * Inherited, Determines if the property is part of the main document type thats being edited.
@@ -52,21 +59,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true, attribute: 'sort-mode-active' })
 	public sortModeActive = false;
 
-	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
-
-	#modalRegistration;
-
-	@state()
-	protected _modalRoute?: string;
-
-	@state()
-	protected _editDocumentTypePath?: string;
-
-	@property()
-	public get modalRoute() {
-		return this._modalRoute;
-	}
-
 	@property({ type: String, attribute: 'owner-document-type-id' })
 	public ownerDocumentTypeId?: string;
 
@@ -74,16 +66,20 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	public ownerDocumentTypeName?: string;
 
 	@state()
+	protected _modalRoute?: string;
+
+	@state()
+	protected _editDocumentTypePath?: string;
+
+	@state()
 	private _dataTypeName?: string;
 
-	async setDataType(dataTypeId: string | undefined) {
-		if (!dataTypeId) return;
-		this.#dataTypeDetailRepository.requestByUnique(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
-	}
+	@state()
+	private _aliasLocked = true;
 
 	constructor() {
 		super();
-		this.#modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
 				const documentTypeId = this.ownerDocumentTypeId;
@@ -99,7 +95,8 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				this._modalRoute = routeBuilder(null);
 			});
 
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addUniquePaths(['propertyId'])
 			.addAdditionalPath('document-type')
 			.onSetup(() => {
 				return { data: { entityType: 'document-type', preset: {} } };
@@ -110,21 +107,23 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	}
 
 	_partialUpdate(partialObject: UmbPropertyTypeModel) {
-		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
+		this.dispatchEvent(new CustomEvent('umb:partial-property-update', { detail: partialObject }));
 	}
 
 	_singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
 		const partialObject = {} as any;
 		partialObject[propertyName] = value;
 
-		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
+		this.dispatchEvent(new CustomEvent('umb:partial-property-update', { detail: partialObject }));
 	}
-
-	@state()
-	private _aliasLocked = true;
 
 	#onToggleAliasLock() {
 		this._aliasLocked = !this._aliasLocked;
+	}
+
+	async setDataType(dataTypeId: string | undefined) {
+		if (!dataTypeId) return;
+		this.#dataTypeDetailRepository.requestByUnique(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
 	}
 
 	async #requestRemove(e: Event) {
@@ -166,21 +165,38 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			}
 		}
 	}
-	renderSortableProperty() {
+
+	render() {
+		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
+		return this.inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
+	}
+
+	renderInheritedProperty() {
 		if (!this.property) return;
-		return html`
-			<div class="sortable">
-				<uui-icon name="${this.inherited ? 'icon-merge' : 'icon-navigation'}"></uui-icon>
-				${this.property.name} <span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
-			</div>
-			<uui-input
-				type="number"
-				?readonly=${this.inherited}
-				label="sort order"
-				@change=${(e: UUIInputEvent) =>
-					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
-				.value=${this.property.sortOrder ?? 0}></uui-input>
-		`;
+
+		if (this.sortModeActive) {
+			return this.renderSortableProperty();
+		} else {
+			return html`
+				<div id="header">
+					<b>${this.property.name}</b>
+					<i>${this.property.alias}</i>
+					<p>${this.property.description}</p>
+				</div>
+				<div id="editor">
+					${this.renderPropertyTags()}
+					<uui-tag look="default" class="inherited">
+						<uui-icon name="icon-merge"></uui-icon>
+						<span
+							>${this.localize.term('contentTypeEditor_inheritedFrom')}
+							<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
+								${this.ownerDocumentTypeName ?? '??'}
+							</a>
+						</span>
+					</uui-tag>
+				</div>
+			`;
+		}
 	}
 
 	renderEditableProperty() {
@@ -227,32 +243,21 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		}
 	}
 
-	renderInheritedProperty() {
+	renderSortableProperty() {
 		if (!this.property) return;
-
-		if (this.sortModeActive) {
-			return this.renderSortableProperty();
-		} else {
-			return html`
-				<div id="header">
-					<b>${this.property.name}</b>
-					<i>${this.property.alias}</i>
-					<p>${this.property.description}</p>
-				</div>
-				<div id="editor">
-					${this.renderPropertyTags()}
-					<uui-tag look="default" class="inherited">
-						<uui-icon name="icon-merge"></uui-icon>
-						<span
-							>${this.localize.term('contentTypeEditor_inheritedFrom')}
-							<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
-								${this.ownerDocumentTypeName ?? '??'}
-							</a>
-						</span>
-					</uui-tag>
-				</div>
-			`;
-		}
+		return html`
+			<div class="sortable">
+				<uui-icon name="${this.inherited ? 'icon-merge' : 'icon-navigation'}"></uui-icon>
+				${this.property.name} <span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
+			</div>
+			<uui-input
+				type="number"
+				?readonly=${this.inherited}
+				label="sort order"
+				@change=${(e: UUIInputEvent) =>
+					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
+				.value=${this.property.sortOrder ?? 0}></uui-input>
+		`;
 	}
 
 	renderPropertyAlias() {
@@ -297,11 +302,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 						: nothing}
 				</div>`
 			: nothing;
-	}
-
-	render() {
-		// TODO: Only show alias on label if user has access to DocumentType within settings:
-		return this.inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
 	}
 
 	static styles = [

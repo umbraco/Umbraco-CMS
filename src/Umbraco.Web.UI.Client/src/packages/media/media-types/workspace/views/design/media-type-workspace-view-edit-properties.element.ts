@@ -185,7 +185,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 							?inherited=${property.container?.id !== this.containerId}
 							?sort-mode-active=${this._sortModeActive}
 							.property=${property}
-							@partial-property-update=${(event: CustomEvent) => {
+							@umb:partial-property-update=${(event: CustomEvent) => {
 								this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
 							}}
 							@property-delete=${() => {
