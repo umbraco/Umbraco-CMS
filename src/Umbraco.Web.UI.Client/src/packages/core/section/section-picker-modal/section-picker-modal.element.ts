@@ -13,7 +13,16 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _sections: Array<ManifestSection> = [];
 
+	@state()
+	private _selectable = false;
+
 	#selectionManager = new UmbSelectionManager(this);
+
+	constructor() {
+		super();
+
+		this.observe(this.#selectionManager.selectable, (selectable) => (this._selectable = selectable));
+	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -21,6 +30,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
 		this.#selectionManager.setSelection(this.data?.selection ?? []);
+		this.#selectionManager.setSelectable(true);
 
 		this.observe(
 			umbExtensionsRegistry.byType('section'),
@@ -42,7 +52,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 						(item) => html`
 							<uui-menu-item
 								label=${item.meta.label}
-								selectable
+								?selectable=${this._selectable}
 								?selected=${this.#selectionManager.isSelected(item.alias)}
 								@selected=${() => this.#selectionManager.select(item.alias)}
 								@deselected=${() => this.#selectionManager.deselect(item.alias)}></uui-menu-item>
