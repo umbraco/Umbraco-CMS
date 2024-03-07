@@ -57,7 +57,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		this.file = file;
 		this.fileUnique = unique;
 
-		assignToFrozenObject(this.value, { src: unique });
+		this.value = assignToFrozenObject(this.value, { src: unique });
 
 		this.#manager?.uploadOne(unique, file, 'waiting');
 
@@ -70,7 +70,7 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	}
 
 	#onRemove = () => {
-		assignToFrozenObject(this.value, { src: '' });
+		this.value = assignToFrozenObject(this.value, { src: '' });
 		if (!this.fileUnique) return;
 		this.#manager?.removeOne(this.fileUnique);
 		this.fileUnique = undefined;
