@@ -3,6 +3,7 @@ import { html, customElement, property, nothing } from '@umbraco-cms/backoffice/
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../../components/input-image-cropper/input-image-cropper.element.js';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-image-cropper
@@ -29,21 +30,20 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 		}
 	}
 
-	// #crops = [];
+	@property({ attribute: false })
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		const crops = config?.getValueByAlias<UmbImageCropperPropertyEditorValue['crops']>('crops') ?? [];
 
-	// @property({ attribute: false })
-	// public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-	// 	this.#crops = config?.getValueByAlias('crops') ?? [];
-
-	// 	if (!this.value) {
-	// 		//TODO: How should we combine the crops from the value with the configuration?
-	// 		this.value = {
-	// 			crops: this.#crops,
-	// 			focalPoint: { left: 0.5, top: 0.5 },
-	// 			src: 'https://picsum.photos/seed/picsum/1920/1080',
-	// 		};
-	// 	}
-	// }
+		if (!this.value) {
+			this.value = {
+				src: '',
+				crops: crops,
+				focalPoint: { left: 0.5, top: 0.5 },
+			};
+		} else {
+			this.value.crops = crops;
+		}
+	}
 
 	#onChange(e: Event) {
 		this.value = (e.target as any).value;
