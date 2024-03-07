@@ -119,11 +119,11 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return await this.#structure.createPropertyScaffold(ownerId, sortOrder);
 	}
 
-	async addProperty(ownerId?: string, sortOrder?: number) {
+	async addProperty(containerId?: string, sortOrder?: number) {
 		await this.#init;
 		if (!this.#structure) return;
 
-		return await this.#structure.createProperty(null, ownerId, sortOrder);
+		return await this.#structure.createProperty(null, containerId, sortOrder);
 	}
 
 	async insertProperty(property: UmbPropertyTypeModel, sortOrder = 0) {

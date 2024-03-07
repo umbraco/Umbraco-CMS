@@ -170,18 +170,12 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 				return { data: { documentTypeId }, value: propertyData };
 			})
 			.onSubmit((value) => {
-				this.#addProperty(value as UmbPropertyTypeModel);
+				// TODO: The model requires a data-type to be set, we cheat currently. But this should be re-though when we implement validation(As we most likely will have to com up with partial models for the runtime model.) [NL]
+				this._propertyStructureHelper.insertProperty(value as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteNewProperty = routeBuilder(null);
 			});
-	}
-
-	async #addProperty(propertyData: UmbPropertyTypeModel) {
-		const propertyPlaceholder = await this._propertyStructureHelper.addProperty(this._containerId);
-		if (!propertyPlaceholder) return;
-
-		this._propertyStructureHelper.partialUpdateProperty(propertyPlaceholder.id, propertyData);
 	}
 
 	render() {
