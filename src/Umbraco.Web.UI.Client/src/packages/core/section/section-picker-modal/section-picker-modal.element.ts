@@ -1,4 +1,5 @@
 import type { UmbSectionPickerModalData, UmbSectionPickerModalValue } from './section-picker-modal.token.js';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
@@ -20,17 +21,14 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 
 	constructor() {
 		super();
-
+		this.#selectionManager.setSelectable(true);
 		this.observe(this.#selectionManager.selectable, (selectable) => (this._selectable = selectable));
 	}
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
-		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
-		this.#selectionManager.setSelection(this.data?.selection ?? []);
-		this.#selectionManager.setSelectable(true);
+		this.#selectionManager.setSelection(this.value?.selection ?? []);
 
 		this.observe(
 			umbExtensionsRegistry.byType('section'),
