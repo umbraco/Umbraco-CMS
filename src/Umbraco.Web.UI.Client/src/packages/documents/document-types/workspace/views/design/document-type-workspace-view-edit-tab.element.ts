@@ -191,6 +191,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						(group) => group.id,
 						(group) =>
 							html`<uui-box class="container-handle">
+								<!-- Implement a group element for this -->
 								${this.#renderContainerHeader(group)}
 								<umb-document-type-workspace-view-edit-properties
 									container-id=${ifDefined(group.id)}
