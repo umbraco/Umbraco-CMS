@@ -93,6 +93,7 @@ public class TestDatabase : IUmbracoDatabase
     public bool IsUmbracoInstalled() => true;
 
     public DatabaseSchemaResult ValidateSchema() => throw new NotImplementedException();
+    public int ExecuteNonQuery(DbCommand command) => throw new NotImplementedException();
 
     public DbParameter CreateParameter() => throw new NotImplementedException();
 
