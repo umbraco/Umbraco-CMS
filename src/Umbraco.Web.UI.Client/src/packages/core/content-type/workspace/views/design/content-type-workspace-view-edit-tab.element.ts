@@ -170,7 +170,6 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						look="placeholder"></uui-button>`
 				: ''
 		}
-		<b>${this.ownerTabId}</b>
 		${
 			!this._noTabName
 				? html`
@@ -184,7 +183,6 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				: ''
 		}
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
-					<pre>${JSON.stringify(this._groups)}</pre>
 					${repeat(
 						this._groups,
 						(group) => group.id,
@@ -226,7 +224,6 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		} else {
 			return html`<div slot="header">
 				${inherited ? html`<uui-icon name="icon-merge"></uui-icon>` : this.#renderInputGroupName(group)}
-				(${group.parent?.id}/${group.id})
 			</div> `;
 		}
 	}
