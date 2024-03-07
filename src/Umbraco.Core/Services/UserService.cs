@@ -909,6 +909,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (performingUser is null)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUser, existingUser);
         }
 
@@ -917,6 +918,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (userGroups.Count != model.UserGroupKeys.Count)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUserGroup, existingUser);
         }
 
@@ -926,6 +928,7 @@ internal class UserService : RepositoryService, IUserService
             IUserGroup? adminGroup = allUserGroups.FirstOrDefault(x => x.Key == Constants.Security.AdminGroupKey);
             if (adminGroup?.UserCount == 1)
             {
+                scope.Complete();
                 return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.AdminUserGroupMustNotBeEmpty, existingUser);
             }
         }
@@ -936,6 +939,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (startContentIds is null || startContentIds.Length != model.ContentStartNodeKeys.Count)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ContentStartNodeNotFound, existingUser);
         }
 
@@ -943,6 +947,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (startMediaIds is null || startMediaIds.Length != model.MediaStartNodeKeys.Count)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
         }
 
@@ -955,12 +960,14 @@ internal class UserService : RepositoryService, IUserService
 
         if (isAuthorized.Success is false)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Unauthorized, existingUser);
         }
 
         UserOperationStatus validationStatus = ValidateUserUpdateModel(existingUser, model);
         if (validationStatus is not UserOperationStatus.Success)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(validationStatus, existingUser);
         }
 

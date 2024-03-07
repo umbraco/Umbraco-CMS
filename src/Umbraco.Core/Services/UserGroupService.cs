@@ -200,6 +200,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
                 IUserGroup? adminGroup = await GetAsync(Constants.Security.AdminGroupKey);
                 if (adminGroup is not null && adminGroup.UserCount <= usersToDeAdmin.Length)
                 {
+                    scope.Complete();
                     return UserGroupOperationStatus.AdminGroupCannotBeEmpty;
                 }
             }
