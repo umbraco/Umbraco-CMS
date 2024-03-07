@@ -1,9 +1,7 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
-import type { UmbContentTypeWorkspaceViewEditPropertiesElement } from './content-type-workspace-view-edit-properties.element.js';
-import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-workspace-view-edit-group.element.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbContentTypeContainerStructureHelper,
 	type UmbContentTypeModel,
@@ -11,65 +9,61 @@ import {
 } from '@umbraco-cms/backoffice/content-type';
 
 import './content-type-workspace-view-edit-properties.element.js';
+import './content-type-workspace-view-edit-group.element.js';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
-const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditPropertiesElement> =
-	{
-		getUniqueOfElement: (element) =>
-			element.querySelector('umb-content-type-workspace-view-edit-properties')!.getAttribute('container-id'),
-		getUniqueOfModel: (modelEntry) => modelEntry.id,
-		identifier: 'document-type-container-sorter',
-		itemSelector: '.container-handle',
-		containerSelector: '.container-list',
-	};
+const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditGroupElement> = {
+	getUniqueOfElement: (element) => element.group?.id,
+	getUniqueOfModel: (modelEntry) => modelEntry.id,
+	identifier: 'document-type-container-sorter',
+	itemSelector: '.container-handle',
+	containerSelector: '.container-list',
+};
 
 @customElement('umb-content-type-workspace-view-edit-tab')
 export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
-	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditPropertiesElement>(
-		this,
-		{
-			...SORTER_CONFIG,
-			onChange: ({ model }) => {
-				this._groups = model;
-			},
-			onEnd: ({ item }) => {
-				/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
-				 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
-				 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
-				 */
-				const model = this._groups;
-				const newIndex = model.findIndex((entry) => entry.id === item.id);
-
-				// Doesn't exist in model
-				if (newIndex === -1) return;
-
-				// First in list
-				if (newIndex === 0 && model.length > 1) {
-					this.#groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
-					return;
-				}
-
-				// Not first in list
-				if (newIndex > 0 && model.length > 1) {
-					const prevItemSortOrder = model[newIndex - 1].sortOrder;
-
-					let weight = 1;
-					this.#groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
-
-					// Check for overlaps
-					model.some((entry, index) => {
-						if (index <= newIndex) return;
-						if (entry.sortOrder === prevItemSortOrder + weight) {
-							weight++;
-							this.#groupStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
-						}
-						// Break the loop
-						return true;
-					});
-				}
-			},
+	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditGroupElement>(this, {
+		...SORTER_CONFIG,
+		onChange: ({ model }) => {
+			this._groups = model;
 		},
-	);
+		onEnd: ({ item }) => {
+			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
+			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
+			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
+			 */
+			const model = this._groups;
+			const newIndex = model.findIndex((entry) => entry.id === item.id);
+
+			// Doesn't exist in model
+			if (newIndex === -1) return;
+
+			// First in list
+			if (newIndex === 0 && model.length > 1) {
+				this.#groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
+				return;
+			}
+
+			// Not first in list
+			if (newIndex > 0 && model.length > 1) {
+				const prevItemSortOrder = model[newIndex - 1].sortOrder;
+
+				let weight = 1;
+				this.#groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
+
+				// Check for overlaps
+				model.some((entry, index) => {
+					if (index <= newIndex) return;
+					if (entry.sortOrder === prevItemSortOrder + weight) {
+						weight++;
+						this.#groupStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
+					}
+					// Break the loop
+					return true;
+				});
+			}
+		},
+	});
 
 	private _ownerTabId?: string | null;
 
@@ -187,56 +181,17 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						this._groups,
 						(group) => group.id,
 						(group) =>
-							html`<uui-box class="container-handle">
-								<!-- Implement a group element for this -->
-								${this.#renderContainerHeader(group)}
-								<umb-content-type-workspace-view-edit-properties
-									container-id=${ifDefined(group.id)}
-									container-type="Group"
-									container-name=${group.name ?? ''}></umb-content-type-workspace-view-edit-properties>
-							</uui-box> `,
+							html`<umb-content-type-workspace-view-edit-group
+								class="container-handle"
+								?sort-mode-active=${this._sortModeActive}
+								.group=${group}
+								.groupStructureHelper=${this.#groupStructureHelper}>
+							</umb-content-type-workspace-view-edit-group> `,
 					)}
 				</div>
 				${this.#renderAddGroupButton()}
 			</div>
 		`;
-	}
-
-	#renderContainerHeader(group: UmbPropertyTypeContainerModel) {
-		const inherited = !this.#groupStructureHelper.isOwnerChildContainer(group.id);
-
-		if (this._sortModeActive) {
-			return html`<div slot="header">
-				<div>
-					<uui-icon name=${inherited ? 'icon-merge' : 'icon-navigation'}></uui-icon>
-					${this.#renderInputGroupName(group)}
-				</div>
-				<uui-input
-					type="number"
-					label=${this.localize.term('sort_sortOrder')}
-					@change=${(e: UUIInputEvent) =>
-						this.#groupStructureHelper.partialUpdateContainer(group.id, {
-							sortOrder: parseInt(e.target.value as string) || 0,
-						})}
-					.value=${group.sortOrder ?? 0}
-					?disabled=${inherited}></uui-input>
-			</div> `;
-		} else {
-			return html`<div slot="header">
-				${inherited ? html`<uui-icon name="icon-merge"></uui-icon>` : this.#renderInputGroupName(group)}
-			</div> `;
-		}
-	}
-
-	#renderInputGroupName(group: UmbPropertyTypeContainerModel) {
-		return html`<uui-input
-			label=${this.localize.term('contentTypeEditor_group')}
-			placeholder=${this.localize.term('placeholders_entername')}
-			.value=${group.name}
-			@change=${(e: InputEvent) => {
-				const newName = (e.target as HTMLInputElement).value;
-				this.#groupStructureHelper.updateContainerName(group.id, group.parent?.id ?? null, newName);
-			}}></uui-input>`;
 	}
 
 	#renderAddGroupButton() {
@@ -251,7 +206,6 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UmbTextStyles,
 		css`
 			[drag-placeholder] {
 				opacity: 0.5;
@@ -269,34 +223,8 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				margin-top: var(--uui-size-layout-1);
 			}
 
-			uui-box {
+			umb-content-type-workspace-view-edit-group {
 				margin-bottom: var(--uui-size-layout-1);
-			}
-
-			[data-umb-group-id] {
-				display: block;
-				position: relative;
-			}
-
-			div[slot='header'] {
-				flex: 1;
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-			}
-
-			div[slot='header'] > div {
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-3);
-			}
-
-			uui-input[type='number'] {
-				max-width: 75px;
-			}
-
-			[sort-mode-active] div[slot='header'] {
-				cursor: grab;
 			}
 
 			.container-list {
