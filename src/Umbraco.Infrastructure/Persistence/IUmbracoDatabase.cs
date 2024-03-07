@@ -36,5 +36,5 @@ public interface IUmbracoDatabase : IDatabase
     DatabaseSchemaResult ValidateSchema();
 
     /// <returns>The number of rows affected.</returns>
-    int ExecuteNonQuery(DbCommand command);
+    int ExecuteNonQuery(DbCommand command) => command.ExecuteNonQuery();
 }
