@@ -19,6 +19,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Missing User Group")
                 .WithDetail("The specified user group was not found.")
                 .Build()),
+            UserOperationStatus.AdminUserGroupMustNotBeEmpty => BadRequest(problemDetailsBuilder
+                .WithTitle("Admin User Group Must Not Be Empty")
+                .WithDetail("The admin user group must not be empty.")
+                .Build()),
             UserOperationStatus.NoUserGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("No User Group Specified")
                 .WithDetail("A user group must be specified to create a user")
