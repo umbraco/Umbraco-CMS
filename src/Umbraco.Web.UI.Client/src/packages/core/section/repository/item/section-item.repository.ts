@@ -4,7 +4,7 @@ import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbItemRepository<UmbSectionItemModel> {
 	constructor(host: UmbControllerHost) {
@@ -20,14 +20,14 @@ export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbIt
 	async requestItems(uniques: Array<string>) {
 		if (!uniques) throw new Error('Uniques are missing');
 
-		const sectionManifests = umbExtensionsRegistry.getAllExtensions().filter((x) => x.type === 'section');
+		const sectionManifests = umbExtensionsRegistry
+			.getAllExtensions()
+			.filter((manifest) => manifest.type === 'section')
+			.filter((manifest) => uniques.includes(manifest.alias));
+
 		const sectionItems: Array<UmbSectionItemModel> = sectionManifests.map((manifest) => itemMapper(manifest));
 
-		const sectionItemsObservable = umbExtensionsRegistry
-			.byType('section')
-			.pipe(map((manifests) => manifests.map((manifest) => itemMapper(manifest))));
-
-		return { data: sectionItems, asObservable: () => sectionItemsObservable };
+		return { data: sectionItems, asObservable: () => sectionItemsByUniquesObservable(uniques) };
 	}
 
 	/**
@@ -37,13 +37,16 @@ export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbIt
 	 * @memberof UmbItemRepositoryBase
 	 */
 	async items(uniques: Array<string>) {
-		return umbExtensionsRegistry
-			.getAllExtensions()
-			.filter((x) => x.type === 'section')
-			.map((manifest) => itemMapper(manifest))
-			.filter((x) => uniques.includes(x.unique));
+		return sectionItemsByUniquesObservable(uniques);
 	}
 }
+
+const sectionItemsObservable = createObservablePart(umbExtensionsRegistry.byType('section'), (manifests) =>
+	manifests.map((manifest) => itemMapper(manifest)),
+);
+
+const sectionItemsByUniquesObservable = (uniques: Array<string>) =>
+	createObservablePart(sectionItemsObservable, (items) => items.filter((x) => uniques.includes(x.unique)));
 
 const itemMapper = (manifest: ManifestSection): UmbSectionItemModel => {
 	return {
