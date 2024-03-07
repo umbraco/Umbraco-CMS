@@ -4,7 +4,7 @@ const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.CompositionPicker',
-		name: 'Block Catalogue Modal',
+		name: 'ContentType Composition Picker Modal',
 		js: () => import('./composition-picker/composition-picker-modal.element.js'),
 	},
 ];

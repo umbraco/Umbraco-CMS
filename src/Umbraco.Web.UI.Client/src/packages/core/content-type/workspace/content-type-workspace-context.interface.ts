@@ -1,0 +1,29 @@
+import type { UmbContentTypeCompositionModel, UmbContentTypeModel, UmbContentTypeSortModel } from '../types.js';
+import type { UmbContentTypePropertyStructureManager } from '../structure/index.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+
+export interface UmbContentTypeWorkspaceContext<ContentTypeType extends UmbContentTypeModel = UmbContentTypeModel>
+	extends UmbSaveableWorkspaceContextInterface {
+	readonly name: Observable<string | undefined>;
+	readonly alias: Observable<string | undefined>;
+	readonly description: Observable<string | undefined>;
+	readonly icon: Observable<string | undefined>;
+
+	readonly allowedAtRoot: Observable<boolean | undefined>;
+	readonly variesByCulture: Observable<boolean | undefined>;
+	readonly variesBySegment: Observable<boolean | undefined>;
+	readonly isElement: Observable<boolean | undefined>;
+	readonly allowedContentTypes: Observable<UmbContentTypeSortModel[] | undefined>;
+	readonly compositions: Observable<UmbContentTypeCompositionModel[] | undefined>;
+
+	readonly structure: UmbContentTypePropertyStructureManager<ContentTypeType>;
+	readonly isSorting: Observable<boolean>;
+
+	getIsSorting(): boolean;
+	setIsSorting(isSorting: boolean): void;
+
+	setAlias(alias: string): void;
+
+	setCompositions(compositions: Array<UmbContentTypeCompositionModel>): void;
+}

@@ -1,17 +1,19 @@
-import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import './document-type-workspace-view-edit-property.element.js';
-import type { UmbDocumentTypeDetailModel } from '../../../types.js';
-import type { UmbDocumentTypeWorkspacePropertyElement } from './document-type-workspace-view-edit-property.element.js';
+import './content-type-workspace-view-edit-property.element.js';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
+import type { UmbContentTypeWorkspacePropertyElement } from './content-type-workspace-view-edit-property.element.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbContentTypeModel,
+	UmbPropertyContainerTypes,
+	UmbPropertyTypeModel,
+} from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
-const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbDocumentTypeWorkspacePropertyElement> = {
+const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeWorkspacePropertyElement> = {
 	getUniqueOfElement: (element) => {
 		return element.getAttribute('data-umb-property-id');
 	},
@@ -19,7 +21,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbDocumentTypeWorksp
 		return modelEntry.id;
 	},
 	identifier: 'document-type-property-sorter',
-	itemSelector: 'umb-document-type-workspace-view-edit-property',
+	itemSelector: 'umb-content-type-workspace-view-edit-property',
 	//disabledItemSelector: '[inherited]',
 	//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
 	// This is because we don't want to move local properties into an inherited group container.
@@ -28,9 +30,9 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbDocumentTypeWorksp
 	containerSelector: '#property-list',
 };
 
-@customElement('umb-document-type-workspace-view-edit-properties')
-export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	#sorter = new UmbSorterController<UmbPropertyTypeModel, UmbDocumentTypeWorkspacePropertyElement>(this, {
+@customElement('umb-content-type-workspace-view-edit-properties')
+export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
+	#sorter = new UmbSorterController<UmbPropertyTypeModel, UmbContentTypeWorkspacePropertyElement>(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
 			this._propertyStructure = model;
@@ -108,13 +110,13 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbDocumentTypeDetailModel>(this);
+	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
 	_propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	@state()
-	_ownerDocumentTypes?: UmbDocumentTypeDetailModel[];
+	_ownerDocumentTypes?: UmbContentTypeModel[];
 
 	@state()
 	protected _modalRouteNewProperty?: string;
@@ -127,12 +129,10 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 
 		this.#sorter.disable();
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, async (workspaceContext) => {
-			this._propertyStructureHelper.setStructureManager(
-				(workspaceContext as UmbDocumentTypeWorkspaceContext).structure,
-			);
+		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
+			this._propertyStructureHelper.setStructureManager(workspaceContext.structure);
 			this.observe(
-				(workspaceContext as UmbDocumentTypeWorkspaceContext).isSorting,
+				workspaceContext.isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {
@@ -197,7 +197,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 						);
 
 						return html`
-							<umb-document-type-workspace-view-edit-property
+							<umb-content-type-workspace-view-edit-property
 								data-umb-property-id=${property.id}
 								owner-document-type-id=${ifDefined(inheritedFromDocument?.unique)}
 								owner-document-type-name=${ifDefined(inheritedFromDocument?.name)}
@@ -210,7 +210,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 								@property-delete=${() => {
 									this._propertyStructureHelper.removeProperty(property.id);
 								}}>
-							</umb-document-type-workspace-view-edit-property>
+							</umb-content-type-workspace-view-edit-property>
 						`;
 					},
 				)}
@@ -235,7 +235,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				width: 100%;
 			}
 
-			#property-list[sort-mode-active]:not(:has(umb-document-type-workspace-view-edit-property)) {
+			#property-list[sort-mode-active]:not(:has(umb-content-type-workspace-view-edit-property)) {
 				/* Some height so that the sorter can target the area if the group is empty*/
 				min-height: var(--uui-size-layout-1);
 			}
@@ -243,10 +243,10 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 	];
 }
 
-export default UmbDocumentTypeWorkspaceViewEditPropertiesElement;
+export default UmbContentTypeWorkspaceViewEditPropertiesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-workspace-view-edit-properties': UmbDocumentTypeWorkspaceViewEditPropertiesElement;
+		'umb-content-type-workspace-view-edit-properties': UmbContentTypeWorkspaceViewEditPropertiesElement;
 	}
 }

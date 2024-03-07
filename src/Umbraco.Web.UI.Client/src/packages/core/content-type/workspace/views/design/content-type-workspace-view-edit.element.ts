@@ -1,17 +1,18 @@
-import { UMB_COMPOSITION_PICKER_MODAL, type UmbCompositionPickerModalData } from '../../../modals/index.js';
-import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import type { UmbDocumentTypeDetailModel } from '../../../types.js';
-import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
+import type { UmbContentTypeWorkspaceViewEditTabElement } from './content-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import {
+	UMB_COMPOSITION_PICKER_MODAL,
+	UmbContentTypeContainerStructureHelper,
+	type UmbContentTypeModel,
+} from '@umbraco-cms/backoffice/content-type';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	CompositionTypeModel,
 	type PropertyTypeContainerModelBaseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
@@ -19,8 +20,8 @@ import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoff
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
-@customElement('umb-document-type-workspace-view-edit')
-export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@customElement('umb-content-type-workspace-view-edit')
+export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#sorter = new UmbSorterController<PropertyTypeContainerModelBaseModel, UUITabElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
 		getUniqueOfModel: (tab) => tab.id,
@@ -93,12 +94,12 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	@state()
 	private _buttonDisabled: boolean = false;
 
-	private _workspaceContext?: UmbDocumentTypeWorkspaceContext;
+	private _workspaceContext?: (typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT)['TYPE'];
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbDocumentTypeDetailModel>(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
-	private _compositionConfiguration?: UmbCompositionPickerModalData;
+	private _compositionConfiguration?: (typeof UMB_COMPOSITION_PICKER_MODAL)['DATA'];
 
 	constructor() {
 		super();
@@ -117,11 +118,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 		// _hasRootProperties can be gotten via _tabsStructureHelper.hasProperties. But we do not support root properties currently.
 
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._workspaceContext = workspaceContext as UmbDocumentTypeWorkspaceContext;
-			this._tabsStructureHelper.setStructureManager((workspaceContext as UmbDocumentTypeWorkspaceContext).structure);
+		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (workspaceContext) => {
+			this._workspaceContext = workspaceContext;
+			this._tabsStructureHelper.setStructureManager(workspaceContext.structure);
 			this.observe(
-				this._workspaceContext.isSorting,
+				workspaceContext.isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {
@@ -133,10 +134,10 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				'_observeIsSorting',
 			);
 
-			const unique = this._workspaceContext.getUnique();
+			const unique = workspaceContext.getUnique();
 
 			//TODO Figure out the correct data that needs to be sent to the compositions modal. Do we really have to send isElement, currentPropertyAliases - isn't unique enough?
-			this.observe(this._workspaceContext.structure.contentTypes, (contentTypes) => {
+			this.observe(workspaceContext.structure.contentTypes, (contentTypes) => {
 				this._compositionConfiguration = {
 					unique: unique ?? '',
 					selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
@@ -175,10 +176,10 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 				const tabName = tab.name ?? '';
 				routes.push({
 					path: `tab/${encodeFolderName(tabName).toString()}`,
-					component: () => import('./document-type-workspace-view-edit-tab.element.js'),
+					component: () => import('./content-type-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
-						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName;
-						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId =
+						(component as UmbContentTypeWorkspaceViewEditTabElement).tabName = tabName;
+						(component as UmbContentTypeWorkspaceViewEditTabElement).ownerTabId =
 							//tab.parent ? tab.parent.id === null
 							this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ? tab.id : undefined;
 					},
@@ -188,10 +189,10 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 		routes.push({
 			path: 'root',
-			component: () => import('./document-type-workspace-view-edit-tab.element.js'),
+			component: () => import('./content-type-workspace-view-edit-tab.element.js'),
 			setup: (component) => {
-				(component as UmbDocumentTypeWorkspaceViewEditTabElement).noTabName = true;
-				(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId = null;
+				(component as UmbContentTypeWorkspaceViewEditTabElement).noTabName = true;
+				(component as UmbContentTypeWorkspaceViewEditTabElement).ownerTabId = null;
 			},
 		});
 
@@ -553,10 +554,10 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	];
 }
 
-export default UmbDocumentTypeWorkspaceViewEditElement;
+export default UmbContentTypeWorkspaceViewEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-workspace-view-edit': UmbDocumentTypeWorkspaceViewEditElement;
+		'umb-content-type-workspace-view-edit': UmbContentTypeWorkspaceViewEditElement;
 	}
 }

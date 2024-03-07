@@ -1,13 +1,13 @@
-import { UmbDocumentTypeCompositionRepository } from '../../repository/index.js';
 import type {
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue,
 } from './composition-picker-modal.token.js';
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import type {
-	UmbDocumentTypeCompositionCompatibleModel,
-	UmbDocumentTypeCompositionReferenceModel,
+import {
+	UmbDocumentTypeCompositionRepository,
+	type UmbDocumentTypeCompositionCompatibleModel,
+	type UmbDocumentTypeCompositionReferenceModel,
 } from '@umbraco-cms/backoffice/document-type';
 
 interface CompatibleCompositions {
@@ -20,6 +20,7 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue
 > {
+	// TODO: Loosen this from begin specific to Document Types:
 	#compositionRepository = new UmbDocumentTypeCompositionRepository(this);
 	#unique?: string;
 

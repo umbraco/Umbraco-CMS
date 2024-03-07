@@ -68,7 +68,7 @@ export class UmbMemberTypeWorkspaceContext
 	protected resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
-		this.#isSorting.setValue(undefined);
+		this.#isSorting.setValue(false);
 	}
 
 	async load(unique: string) {

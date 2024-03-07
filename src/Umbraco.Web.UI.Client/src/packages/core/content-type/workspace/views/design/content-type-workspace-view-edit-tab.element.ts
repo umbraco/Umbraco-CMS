@@ -1,32 +1,31 @@
-import type { UmbDocumentTypeDetailModel } from '../../../types.js';
-import type { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import type { UmbDocumentTypeWorkspaceViewEditPropertiesElement } from './document-type-workspace-view-edit-properties.element.js';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
+import type { UmbContentTypeWorkspaceViewEditPropertiesElement } from './content-type-workspace-view-edit-properties.element.js';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbContentTypeContainerStructureHelper,
+	type UmbContentTypeModel,
 	type UmbPropertyTypeContainerModel,
 } from '@umbraco-cms/backoffice/content-type';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
-import './document-type-workspace-view-edit-properties.element.js';
+import './content-type-workspace-view-edit-properties.element.js';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
-const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbDocumentTypeWorkspaceViewEditPropertiesElement> =
+const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditPropertiesElement> =
 	{
 		getUniqueOfElement: (element) =>
-			element.querySelector('umb-document-type-workspace-view-edit-properties')!.getAttribute('container-id'),
+			element.querySelector('umb-content-type-workspace-view-edit-properties')!.getAttribute('container-id'),
 		getUniqueOfModel: (modelEntry) => modelEntry.id,
 		identifier: 'document-type-container-sorter',
 		itemSelector: '.container-handle',
 		containerSelector: '.container-list',
 	};
 
-@customElement('umb-document-type-workspace-view-edit-tab')
-export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
-	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UmbDocumentTypeWorkspaceViewEditPropertiesElement>(
+@customElement('umb-content-type-workspace-view-edit-tab')
+export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
+	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditPropertiesElement>(
 		this,
 		{
 			...SORTER_CONFIG,
@@ -122,7 +121,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	@state()
 	_sortModeActive?: boolean;
 
-	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbDocumentTypeDetailModel>(this);
+	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	constructor() {
 		super();
@@ -130,10 +129,10 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		this.#groupStructureHelper.setParentType('Tab');
 
 		// TODO: Use a structured/? workspace context token...
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
-			this.#groupStructureHelper.setStructureManager((context as UmbDocumentTypeWorkspaceContext).structure);
+		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
+			this.#groupStructureHelper.setStructureManager(context.structure);
 			this.observe(
-				(context as UmbDocumentTypeWorkspaceContext).isSorting,
+				context.isSorting,
 				(isSorting) => {
 					this._sortModeActive = isSorting;
 					if (isSorting) {
@@ -176,10 +175,10 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			!this._noTabName
 				? html`
 						<uui-box>
-							<umb-document-type-workspace-view-edit-properties
+							<umb-content-type-workspace-view-edit-properties
 								container-id=${ifDefined(this.ownerTabId === null ? undefined : this.ownerTabId)}
 								container-type="Tab"
-								container-name=${this.tabName ?? ''}></umb-document-type-workspace-view-edit-properties>
+								container-name=${this.tabName ?? ''}></umb-content-type-workspace-view-edit-properties>
 						</uui-box>
 					`
 				: ''
@@ -193,10 +192,10 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 							html`<uui-box class="container-handle">
 								<!-- Implement a group element for this -->
 								${this.#renderContainerHeader(group)}
-								<umb-document-type-workspace-view-edit-properties
+								<umb-content-type-workspace-view-edit-properties
 									container-id=${ifDefined(group.id)}
 									container-type="Group"
-									container-name=${group.name ?? ''}></umb-document-type-workspace-view-edit-properties>
+									container-name=${group.name ?? ''}></umb-content-type-workspace-view-edit-properties>
 							</uui-box> `,
 					)}
 				</div>
@@ -316,10 +315,10 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentTypeWorkspaceViewEditTabElement;
+export default UmbContentTypeWorkspaceViewEditTabElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-workspace-view-edit-tab': UmbDocumentTypeWorkspaceViewEditTabElement;
+		'umb-content-type-workspace-view-edit-tab': UmbContentTypeWorkspaceViewEditTabElement;
 	}
 }

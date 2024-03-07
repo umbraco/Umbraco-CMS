@@ -14,12 +14,12 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 
 /**
- *  @element umb-document-type-workspace-view-edit-property
+ *  @element umb-content-type-workspace-view-edit-property
  *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
  */
-@customElement('umb-document-type-workspace-view-edit-property')
-export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
+@customElement('umb-content-type-workspace-view-edit-property')
+export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 	//
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
@@ -47,8 +47,8 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
 
 	/**
-	 * Inherited, Determines if the property is part of the main document type thats being edited.
-	 * If true, then the property is inherited from another document type, not a part of the main document type.
+	 * Inherited, Determines if the property is part of the main content type thats being edited.
+	 * If true, then the property is inherited from another content type, not a part of the main content type.
 	 * @type {boolean}
 	 * @attr
 	 * @default undefined
@@ -470,6 +470,6 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-workspace-view-edit-property': UmbDocumentTypeWorkspacePropertyElement;
+		'umb-content-type-workspace-view-edit-property': UmbContentTypeWorkspacePropertyElement;
 	}
 }

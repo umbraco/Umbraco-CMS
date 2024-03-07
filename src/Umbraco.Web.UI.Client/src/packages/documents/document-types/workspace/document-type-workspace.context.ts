@@ -4,10 +4,13 @@ import type { UmbDocumentTypeDetailModel } from '../types.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbContentTypeCompositionModel,
+	UmbContentTypeSortModel,
+	UmbContentTypeWorkspaceContext,
+} from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
@@ -15,7 +18,7 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbContentTypeWorkspaceContext<EntityType>
 {
 	//
 	readonly repository = new UmbDocumentTypeDetailRepository(this);
@@ -25,7 +28,7 @@ export class UmbDocumentTypeWorkspaceContext
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
-	readonly data;
+	//readonly data;
 	readonly name;
 	readonly alias;
 	readonly description;
@@ -46,14 +49,14 @@ export class UmbDocumentTypeWorkspaceContext
 
 	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
-	#isSorting = new UmbBooleanState(undefined);
+	#isSorting = new UmbBooleanState(false);
 	isSorting = this.#isSorting.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DocumentType');
 
 		// General for content types:
-		this.data = this.structure.ownerContentType;
+		//this.data = this.structure.ownerContentType;
 		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
@@ -75,7 +78,7 @@ export class UmbDocumentTypeWorkspaceContext
 	protected resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
-		this.#isSorting.setValue(undefined);
+		this.#isSorting.setValue(false);
 	}
 
 	getIsSorting() {
