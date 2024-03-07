@@ -22,8 +22,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.#init = new Promise((resolve) => {
 			this.#initResolver = resolve;
 		});
-		// TODO: Remove as any when sortOrder is implemented:
-		this.#propertyStructure.sortBy((a, b) => ((a as any).sortOrder ?? 0) - ((b as any).sortOrder ?? 0));
+		this.#propertyStructure.sortBy((a, b) => a.sortOrder - b.sortOrder);
 	}
 
 	async contentTypes() {
