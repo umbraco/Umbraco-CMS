@@ -23,7 +23,7 @@ export class UmbSectionItemRepository extends UmbRepositoryBase implements UmbIt
 		const sectionManifests = umbExtensionsRegistry
 			.getAllExtensions()
 			.filter((manifest) => manifest.type === 'section')
-			.filter((manifest) => uniques.includes(manifest.alias));
+			.filter((manifest) => uniques.includes(manifest.alias)) as Array<ManifestSection>;
 
 		const sectionItems: Array<UmbSectionItemModel> = sectionManifests.map((manifest) => itemMapper(manifest));
 
