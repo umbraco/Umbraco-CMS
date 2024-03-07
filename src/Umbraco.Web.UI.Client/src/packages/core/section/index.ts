@@ -7,3 +7,4 @@ export * from './section-default.element.js';
 export * from './section.context.js';
 export * from './input-section/index.js';
 export * from './section-picker-modal/section-picker-modal.token.js';
+export * from './components/index.js';

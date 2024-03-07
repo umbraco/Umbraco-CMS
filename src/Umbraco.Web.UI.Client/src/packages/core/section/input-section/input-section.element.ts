@@ -107,18 +107,13 @@ export class UmbInputSectionElement extends FormControlMixin(UmbLitElement) {
 
 	private _renderItem(item: UmbSectionItemModel) {
 		if (!item.unique) return;
-		return html`${item.unique}
-			<!--
-			<uui-ref-node-data-type name=${item.name}>
-				<uui-action-bar slot="actions">
-					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.unique)}
-						label="Remove Data Type ${item.name}"
-						>Remove</uui-button
-					>
-				</uui-action-bar>
-			</uui-ref-node-data-type>
-	-->`;
+		return html` <umb-ref-section .item=${item}>
+			<uui-action-bar slot="actions">
+				<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.unique)} label="Remove ${item.name}"
+					>Remove</uui-button
+				>
+			</uui-action-bar>
+		</umb-ref-section>`;
 	}
 
 	static styles = [
