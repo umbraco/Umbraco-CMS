@@ -28,6 +28,11 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			this._groups = model;
 		},
 		onEnd: ({ item }) => {
+			if (this._ownerTabId === undefined) {
+				throw new Error('OwnerTabId is not set, we have not made a local duplicated of this container.');
+				return;
+			}
+			console.log('_ownerTabId', this._ownerTabId);
 			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
@@ -38,29 +43,30 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			// Doesn't exist in model
 			if (newIndex === -1) return;
 
-			// First in list
-			if (newIndex === 0 && model.length > 1) {
-				this.#groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: model[1].sortOrder - 1 });
-				return;
-			}
+			// As origin we set prev sort order to -1, so if no other then our item will become 0
+			let prevSortOrder = -1;
 
 			// Not first in list
-			if (newIndex > 0 && model.length > 1) {
-				const prevItemSortOrder = model[newIndex - 1].sortOrder;
+			if (newIndex > 0 && model.length > 0) {
+				prevSortOrder = model[newIndex - 1].sortOrder;
+			}
 
-				let weight = 1;
-				this.#groupStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
+			// increase the prevSortOrder and use it for the moved item,
+			this.#groupStructureHelper.partialUpdateContainer(item.id, {
+				sortOrder: ++prevSortOrder,
+			});
 
-				// Check for overlaps
-				model.some((entry, index) => {
-					if (index <= newIndex) return;
-					if (entry.sortOrder === prevItemSortOrder + weight) {
-						weight++;
-						this.#groupStructureHelper.partialUpdateContainer(entry.id, { sortOrder: prevItemSortOrder + weight });
-					}
-					// Break the loop
-					return true;
+			// Adjust everyone right after, meaning until there is a gap between the sortOrders:
+			let i = newIndex + 1;
+			let entry: UmbPropertyTypeContainerModel | undefined;
+			// As long as there is an item with the index & the sortOrder is less or equal to the prevSortOrder, we will update the sortOrder:
+			while ((entry = model[i]) !== undefined && entry.sortOrder <= prevSortOrder) {
+				// Increase the prevSortOrder and use it for the item:
+				this.#groupStructureHelper.partialUpdateContainer(entry.id, {
+					sortOrder: ++prevSortOrder,
 				});
+
+				i++;
 			}
 		},
 	});
