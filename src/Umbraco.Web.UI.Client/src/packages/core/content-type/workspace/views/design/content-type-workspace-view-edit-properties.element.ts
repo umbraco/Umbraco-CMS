@@ -41,6 +41,10 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			this._propertyStructure = model;
 		},
 		onEnd: ({ item }) => {
+			if (this._containerId === undefined) {
+				throw new Error('ContainerId is not set, we have not duplicated this container.');
+				return;
+			}
 			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
@@ -51,35 +55,30 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			// Doesn't exist in model
 			if (newIndex === -1) return;
 
-			// First in list
-			if (newIndex === 0 && model.length > 1) {
-				this._propertyStructureHelper.partialUpdateProperty(item.id, {
-					sortOrder: model[1].sortOrder - 1,
-					container: this._containerId ? { id: this._containerId } : null,
-				});
-				return;
-			}
+			// As origin we set prev sort order to -1, so if no other then our item will become 0
+			let prevSortOrder = -1;
 
 			// Not first in list
-			if (newIndex > 0 && model.length > 1) {
-				const prevItemSortOrder = model[newIndex - 1].sortOrder;
+			if (newIndex > 0 && model.length > 0) {
+				prevSortOrder = model[newIndex - 1].sortOrder;
+			}
 
-				let weight = 1;
-				this._propertyStructureHelper.partialUpdateProperty(item.id, {
-					sortOrder: prevItemSortOrder + weight,
-					container: this._containerId ? { id: this._containerId } : null,
+			// increase the prevSortOrder and use it for the moved item,
+			this._propertyStructureHelper.partialUpdateProperty(item.id, {
+				sortOrder: ++prevSortOrder,
+			});
+
+			// Adjust everyone right after, meaning until there is a gap between the sortOrders:
+			let i = newIndex + 1;
+			let entry: UmbPropertyTypeModel | undefined;
+			// As long as there is an item with the index & the sortOrder is less or equal to the prevSortOrder, we will update the sortOrder:
+			while ((entry = model[i]) !== undefined && entry.sortOrder <= prevSortOrder) {
+				// Increase the prevSortOrder and use it for the item:
+				this._propertyStructureHelper.partialUpdateProperty(entry.id, {
+					sortOrder: ++prevSortOrder,
 				});
 
-				// Check for overlaps
-				model.some((entry, index) => {
-					if (index <= newIndex) return;
-					if (entry.sortOrder === prevItemSortOrder + weight) {
-						weight++;
-						this._propertyStructureHelper.partialUpdateProperty(entry.id, { sortOrder: prevItemSortOrder + weight });
-					}
-					// Break the loop
-					return true;
-				});
+				i++;
 			}
 		},
 	});
