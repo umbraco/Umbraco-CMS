@@ -5,7 +5,7 @@ const sectionAlias = 'Umb.Section.Media';
 
 const section: ManifestSection = {
 	type: 'section',
-	alias: 'Umb.Section.Media',
+	alias: sectionAlias,
 	name: 'Media Section',
 	weight: 500,
 	meta: {
