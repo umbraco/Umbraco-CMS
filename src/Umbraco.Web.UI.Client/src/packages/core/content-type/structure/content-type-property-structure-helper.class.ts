@@ -129,11 +129,14 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return await this.#structure.createProperty(null, containerId, sortOrder);
 	}
 
-	async insertProperty(property: UmbPropertyTypeModel) {
+	async insertProperty(property: UmbPropertyTypeModel, sortOrder?: number) {
 		await this.#init;
 		if (!this.#structure) return false;
 
 		const newProperty = { ...property };
+		if (sortOrder) {
+			newProperty.sortOrder = sortOrder;
+		}
 
 		// TODO: Remove as any when server model has gotten sortOrder:
 		await this.#structure.insertProperty(null, newProperty);

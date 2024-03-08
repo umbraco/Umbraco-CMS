@@ -21,12 +21,6 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.PropertySettings',
-		name: 'Property Settings Modal',
-		js: () => import('./property-settings/property-settings-modal.element.js'),
-	},
-	{
-		type: 'modal',
 		alias: 'Umb.Modal.CodeEditor',
 		name: 'Code Editor Modal',
 		js: () => import('./code-editor/code-editor-modal.element.js'),

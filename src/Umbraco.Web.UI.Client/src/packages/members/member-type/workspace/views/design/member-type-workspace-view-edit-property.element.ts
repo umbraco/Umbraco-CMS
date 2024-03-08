@@ -2,11 +2,8 @@ import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import {
-	UMB_CONFIRM_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_PROPERTY_SETTINGS_MODAL,
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
 	umbConfirmModal,
@@ -14,7 +11,11 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
+import {
+	UMB_PROPERTY_SETTINGS_MODAL,
+	type UmbPropertyTypeModel,
+	type UmbPropertyTypeScaffoldModel,
+} from '@umbraco-cms/backoffice/content-type';
 
 /**
  *  @element umb-member-type-workspace-view-edit-property

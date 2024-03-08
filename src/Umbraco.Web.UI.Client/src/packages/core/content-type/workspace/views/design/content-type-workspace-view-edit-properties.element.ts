@@ -9,14 +9,12 @@ import type {
 	UmbPropertyContainerTypes,
 	UmbPropertyTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
-import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import {
+	UmbContentTypePropertyStructureHelper,
 	UMB_PROPERTY_SETTINGS_MODAL,
-	UmbModalRouteBuilder,
-	UmbModalRouteRegistrationController,
-} from '@umbraco-cms/backoffice/modal';
-import { Params } from '@umbraco-cms/backoffice/router';
+} from '@umbraco-cms/backoffice/content-type';
+import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeWorkspacePropertyElement> = {
 	getUniqueOfElement: (element) => {

@@ -6,10 +6,13 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
-import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import {
+	UmbContentTypePropertyStructureHelper,
+	UMB_PROPERTY_SETTINGS_MODAL,
+} from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-member-type-workspace-view-edit-properties')
 export class UmbMemberTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
