@@ -65,7 +65,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	}
 
 	getUniques(): Array<string> {
-		return this.#uniques.value;
+		return this.#uniques.getValue();
 	}
 
 	setUniques(uniques: string[]): void {
@@ -73,7 +73,7 @@ export class UmbRepositoryItemsManager<ItemType extends { unique: string }> exte
 	}
 
 	getItems(): Array<ItemType> {
-		return this.#items.value;
+		return this.#items.getValue();
 	}
 
 	async #requestItems(): Promise<void> {
