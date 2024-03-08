@@ -5,14 +5,15 @@ import type {
 	UmbConditionControllerArguments,
 	UmbExtensionCondition,
 } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbSectionUserPermissionCondition extends UmbControllerBase implements UmbExtensionCondition {
 	config: UmbSectionUserPermissionConditionConfig;
 	permitted = false;
 	#onChange: () => void;
 
-	constructor(args: UmbConditionControllerArguments<UmbSectionUserPermissionConditionConfig>) {
-		super(args.host);
+	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<UmbSectionUserPermissionConditionConfig>) {
+		super(host);
 		this.config = args.config;
 		this.#onChange = args.onChange;
 
