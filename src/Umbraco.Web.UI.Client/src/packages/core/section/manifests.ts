@@ -8,7 +8,6 @@ export const manifests: Array<ManifestTypes> = [
 		alias: 'Umb.Modal.SectionPicker',
 		name: 'Section Picker Modal',
 		element: () => import('./section-picker-modal/section-picker-modal.element.js'),
-		js: () => import('./section-picker-modal/section-picker-modal.element.js'),
 	},
 	{
 		type: 'condition',
