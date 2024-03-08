@@ -283,7 +283,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		this.#contentTypes.updateOne(contentTypeUnique, { containers });
 	}
 
-	createPropertyScaffold(containerId: string | null = null, sortOrder?: number) {
+	createPropertyScaffold(containerId: string | null = null) {
 		const property: UmbPropertyTypeScaffoldModel = {
 			id: UmbId.new(),
 			container: containerId ? { id: containerId } : null,
@@ -301,7 +301,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 			appearance: {
 				labelOnTop: false,
 			},
-			sortOrder: sortOrder ?? 0,
+			sortOrder: 0,
 		};
 
 		return property;
@@ -311,7 +311,8 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
 
-		const property = this.createPropertyScaffold(containerId, sortOrder);
+		const property = this.createPropertyScaffold(containerId);
+		property.sortOrder = sortOrder ?? 0;
 
 		const properties: Array<UmbPropertyTypeScaffoldModel | UmbPropertyTypeModel> = [
 			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.properties ?? []),

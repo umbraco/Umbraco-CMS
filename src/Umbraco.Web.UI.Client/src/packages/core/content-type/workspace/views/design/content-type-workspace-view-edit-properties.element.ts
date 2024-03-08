@@ -11,7 +11,12 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_PROPERTY_SETTINGS_MODAL,
+	UmbModalRouteBuilder,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
+import { Params } from '@umbraco-cms/backoffice/router';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeWorkspacePropertyElement> = {
 	getUniqueOfElement: (element) => {
@@ -119,7 +124,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 	_ownerDocumentTypes?: UmbContentTypeModel[];
 
 	@state()
-	protected _modalRouteNewProperty?: string;
+	protected _modalRouteBuilderNewProperty?: UmbModalRouteBuilder;
 
 	@state()
 	_sortModeActive?: boolean;
@@ -159,14 +164,22 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 
 		// Note: Route for adding a new property
 		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
-			.addAdditionalPath('new-property')
-			.onSetup(async () => {
+			.addAdditionalPath('add-property/:sortOrder')
+			.onSetup(async (params) => {
 				const documentTypeId = this._ownerDocumentTypes?.find((types) =>
 					types.containers?.find((containers) => containers.id === this.containerId),
 				)?.unique;
 				if (documentTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
+				if (params.sortOrder !== undefined) {
+					let sortOrderInt = parseInt(params.sortOrder, 10);
+					if (sortOrderInt === -1) {
+						// Find the highest sortOrder and add 1 to it:
+						sortOrderInt = Math.max(...this._propertyStructure.map((x) => x.sortOrder), -1);
+					}
+					propertyData.sortOrder = sortOrderInt + 1;
+				}
 				return { data: { documentTypeId }, value: propertyData };
 			})
 			.onSubmit((value) => {
@@ -174,7 +187,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 				this._propertyStructureHelper.insertProperty(value as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this._modalRouteNewProperty = routeBuilder(null);
+				this._modalRouteBuilderNewProperty = routeBuilder;
 			});
 	}
 
@@ -215,7 +228,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 						label=${this.localize.term('contentTypeEditor_addProperty')}
 						id="add"
 						look="placeholder"
-						href=${ifDefined(this._modalRouteNewProperty)}>
+						href=${ifDefined(this._modalRouteBuilderNewProperty?.({ sortOrder: -1 }))}>
 						<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
 					</uui-button> `
 				: ''}

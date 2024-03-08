@@ -112,13 +112,16 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
 	/** Manipulate methods: */
 
-	async createPropertyScaffold(ownerId?: string, sortOrder?: number) {
+	async createPropertyScaffold(ownerId?: string) {
 		await this.#init;
 		if (!this.#structure) return;
 
-		return await this.#structure.createPropertyScaffold(ownerId, sortOrder);
+		return await this.#structure.createPropertyScaffold(ownerId);
 	}
-
+	/*
+		Only used by legacy implementation:
+		@deprecated
+	*/
 	async addProperty(containerId?: string, sortOrder?: number) {
 		await this.#init;
 		if (!this.#structure) return;
@@ -126,11 +129,11 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return await this.#structure.createProperty(null, containerId, sortOrder);
 	}
 
-	async insertProperty(property: UmbPropertyTypeModel, sortOrder = 0) {
+	async insertProperty(property: UmbPropertyTypeModel) {
 		await this.#init;
 		if (!this.#structure) return false;
 
-		const newProperty = { ...property, sortOrder };
+		const newProperty = { ...property };
 
 		// TODO: Remove as any when server model has gotten sortOrder:
 		await this.#structure.insertProperty(null, newProperty);
