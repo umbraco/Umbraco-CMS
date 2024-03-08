@@ -387,11 +387,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 
 		// If we have a currentItem and the element matches, we should set the currentElement to this element.
-		const elUnique = this.#config.getUniqueOfElement(element);
-		const modelUnique = this.#config.getUniqueOfModel(UmbSorterController.activeItem);
-		if (UmbSorterController.activeItem && elUnique === modelUnique && elUnique !== undefined) {
-			if (UmbSorterController.activeElement !== element) {
-				this.#setCurrentElement(element);
+		if (UmbSorterController.activeItem) {
+			const elUnique = this.#config.getUniqueOfElement(element);
+			const modelUnique = this.#config.getUniqueOfModel(UmbSorterController.activeItem);
+			if (elUnique === modelUnique && elUnique !== undefined) {
+				if (UmbSorterController.activeElement !== element) {
+					this.#setCurrentElement(element);
+				}
 			}
 		}
 	}
