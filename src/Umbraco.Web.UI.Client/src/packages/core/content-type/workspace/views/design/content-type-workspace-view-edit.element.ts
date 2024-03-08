@@ -212,6 +212,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	}
 
 	async #requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
+		// TODO: Localize this:
 		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
@@ -235,20 +236,23 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	#remove(tabId?: string) {
 		if (!tabId) return;
 		this._workspaceContext?.structure.removeContainer(null, tabId);
+		// TODO: We should only navigate away if it was the last tab and if it was the active one...
 		this._tabsStructureHelper?.isOwnerChildContainer(tabId)
 			? window.history.replaceState(null, '', this._routerPath + (this._routes[0]?.path ?? '/root'))
 			: '';
 	}
 	async #addTab() {
-		if (
-			(this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement) &&
-			(this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement).value === ''
-		) {
+		const inputEl = this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement;
+		if (inputEl?.value === '') {
 			this.#focusInput();
 			return;
 		}
 
-		const tab = await this._workspaceContext?.structure.createContainer(null, null, 'Tab');
+		if (!this._tabs) return;
+
+		const len = this._tabs.length;
+		const sortOrder = len === 0 ? 0 : this._tabs[len - 1].sortOrder + 1;
+		const tab = await this._workspaceContext?.structure.createContainer(null, null, 'Tab', sortOrder);
 		if (tab) {
 			const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
 			window.history.replaceState(null, '', path);
@@ -267,6 +271,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 		let newName = (event.target as HTMLInputElement).value;
 
 		if (newName === '') {
+			// TODO: Localize this:
 			newName = 'Unnamed';
 			(event.target as HTMLInputElement).value = 'Unnamed';
 		}
@@ -330,6 +335,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	}
 
 	renderAddButton() {
+		// TODO: Localize this:
 		if (this._sortModeActive) return;
 		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
 			<uui-icon name="icon-add"></uui-icon>
@@ -401,6 +407,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	}
 
 	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, tabInherited: boolean) {
+		// TODO: Localize this:
 		if (this._sortModeActive) {
 			return html`<div class="no-edit">
 				${tabInherited

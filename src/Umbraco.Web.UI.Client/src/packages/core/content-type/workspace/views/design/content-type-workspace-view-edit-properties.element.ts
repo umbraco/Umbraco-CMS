@@ -94,6 +94,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 		if (value === this._containerId) return;
 		const oldValue = this._containerId;
 		this._containerId = value;
+		this.#addPropertyModal.setUniquePathValue('container-id', value);
 		this.requestUpdate('containerId', oldValue);
 	}
 
@@ -112,6 +113,8 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 	public set containerType(value: UmbPropertyContainerTypes | undefined) {
 		this._propertyStructureHelper.setContainerType(value);
 	}
+
+	#addPropertyModal: UmbModalRouteRegistrationController;
 
 	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
@@ -161,7 +164,8 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 		});
 
 		// Note: Route for adding a new property
-		new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+		this.#addPropertyModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+			.addUniquePaths(['container-id'])
 			.addAdditionalPath('add-property/:sortOrder')
 			.onSetup(async (params) => {
 				const documentTypeId = this._ownerDocumentTypes?.find((types) =>

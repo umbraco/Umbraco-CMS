@@ -159,7 +159,8 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		// Idea, maybe we can gather the sortOrder from the last group rendered and add 1 to it?
 		const len = this._groups.length;
 		const sortOrder = len === 0 ? 0 : this._groups[len - 1].sortOrder + 1;
-		this.#groupStructureHelper.addContainer(this._ownerTabId, sortOrder);
+		const container = this.#groupStructureHelper.addContainer(this._ownerTabId, sortOrder);
+		console.log('container', container);
 	};
 
 	render() {
@@ -188,13 +189,18 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 					${repeat(
 						this._groups,
 						(group) => group.id,
-						(group) =>
-							html`<umb-content-type-workspace-view-edit-group
+						(group) => html`
+							<b>${group.id} - ${group.name}</b>
+							<umb-content-type-workspace-view-edit-group
 								class="container-handle"
 								?sort-mode-active=${this._sortModeActive}
 								.group=${group}
-								.groupStructureHelper=${this.#groupStructureHelper}>
-							</umb-content-type-workspace-view-edit-group> `,
+								.groupStructureHelper=${this.#groupStructureHelper}
+								@umb:partial-group-update=${(event: CustomEvent) => {
+									this.#groupStructureHelper.partialUpdateContainer(group.id, event.detail);
+								}}>
+							</umb-content-type-workspace-view-edit-group>
+						`,
 					)}
 				</div>
 				${this.#renderAddGroupButton()}
