@@ -31,6 +31,19 @@ export class UmbRouteContext extends UmbControllerBase {
 		});
 	}
 
+	public navigateLevelUp() {
+		const path = this.getLevelUpPath();
+		if (path) {
+			window.history.pushState({}, '', path);
+		}
+	}
+	public getLevelUpPath() {
+		if (this.#routerBasePath) {
+			return this.#routerBasePath.endsWith('/') ? this.#routerBasePath : this.#routerBasePath + '/';
+		}
+		return;
+	}
+
 	public registerModal(registration: UmbModalRouteRegistration) {
 		this.#modalRegistrations.push(registration);
 		this.#createNewUrlBuilder(registration);
