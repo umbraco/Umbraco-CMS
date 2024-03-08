@@ -61,7 +61,7 @@ internal sealed class ContentPublishingService : IContentPublishingService
             }
 
             var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode);
-            if (cultures.Any(x => x == "*") || cultures.All(x=> validCultures.Contains(x, StringComparer.InvariantCultureIgnoreCase) is false))
+            if (cultures.Any(x => x == "*") || cultures.All(x=> validCultures.Contains(x) is false))
             {
                 scope.Complete();
                 return Attempt.FailWithStatus(ContentPublishingOperationStatus.InvalidCulture, new ContentPublishingResult());
@@ -197,24 +197,123 @@ internal sealed class ContentPublishingService : IContentPublishingService
             : Attempt.FailWithStatus(ContentPublishingOperationStatus.FailedBranch, branchResult);
     }
 
-    /// <inheritdoc />
-    public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, string? culture, Guid userKey)
+
+    /// <inheritdoc/>
+    public async Task<Attempt<ContentPublishingOperationStatus>> UnpublishAsync(Guid key, ISet<string>? cultures, Guid userKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         IContent? content = _contentService.GetById(key);
         if (content is null)
         {
+            scope.Complete();
             return Attempt.Fail(ContentPublishingOperationStatus.ContentNotFound);
         }
 
         var userId = await _userIdKeyResolver.GetAsync(userKey);
-        PublishResult result = _contentService.Unpublish(content, culture ?? "*", userId);
+
+        Attempt<ContentPublishingOperationStatus> attempt;
+        if (cultures is null)
+        {
+            attempt = await UnpublishInvariantAsync(
+                content,
+                userId);
+
+            scope.Complete();
+            return attempt;
+        }
+
+        if (cultures.Any() is false)
+        {
+            scope.Complete();
+            return Attempt<ContentPublishingOperationStatus>.Fail(ContentPublishingOperationStatus.CultureMissing);
+        }
+
+        if (cultures.Contains("*"))
+        {
+            attempt = await UnpublishAllCulturesAsync(
+                content,
+                userId);
+        }
+        else
+        {
+            attempt = await UnpublishMultipleCultures(
+                content,
+                cultures,
+                userId);
+        }
+        scope.Complete();
+
+        return attempt;
+    }
+
+    private Task<Attempt<ContentPublishingOperationStatus>> UnpublishAllCulturesAsync(IContent content, int userId)
+    {
+        if (content.ContentType.VariesByCulture() is false)
+        {
+            return Task.FromResult(Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant));
+        }
+
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        PublishResult result = _contentService.Unpublish(content, "*", userId);
         scope.Complete();
 
         ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
-        return contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
+        return Task.FromResult(contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
             ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
-            : Attempt.Fail(ToContentPublishingOperationStatus(result));
+            : Attempt.Fail(ToContentPublishingOperationStatus(result)));
+    }
+
+    private async Task<Attempt<ContentPublishingOperationStatus>> UnpublishMultipleCultures(IContent content, ISet<string> cultures, int userId)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        if (content.ContentType.VariesByCulture() is false)
+        {
+            scope.Complete();
+            return Attempt.Fail(ContentPublishingOperationStatus.CannotPublishVariantWhenNotVariant);
+        }
+
+        var validCultures = (await _languageService.GetAllAsync()).Select(x => x.IsoCode).ToArray();
+
+        foreach (var culture in cultures)
+        {
+            if (validCultures.Contains(culture) is false)
+            {
+                scope.Complete();
+                return Attempt.Fail(ContentPublishingOperationStatus.InvalidCulture);
+            }
+
+            PublishResult result = _contentService.Unpublish(content, culture, userId);
+
+            ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
+
+            if (contentPublishingOperationStatus is not ContentPublishingOperationStatus.Success)
+            {
+                return Attempt.Fail(ToContentPublishingOperationStatus(result));
+            }
+        }
+
+        scope.Complete();
+        return Attempt.Succeed(ContentPublishingOperationStatus.Success);
+    }
+
+
+    private Task<Attempt<ContentPublishingOperationStatus>> UnpublishInvariantAsync(IContent content, int userId)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+
+        if (content.ContentType.VariesByCulture())
+        {
+            return Task.FromResult(Attempt.Fail(ContentPublishingOperationStatus.CannotPublishInvariantWhenVariant));
+        }
+
+        PublishResult result = _contentService.Unpublish(content, null, userId);
+        scope.Complete();
+
+        ContentPublishingOperationStatus contentPublishingOperationStatus = ToContentPublishingOperationStatus(result);
+        return Task.FromResult(contentPublishingOperationStatus is ContentPublishingOperationStatus.Success
+            ? Attempt.Succeed(ToContentPublishingOperationStatus(result))
+            : Attempt.Fail(ToContentPublishingOperationStatus(result)));
     }
 
     private static ContentPublishingOperationStatus ToContentPublishingOperationStatus(PublishResult publishResult)

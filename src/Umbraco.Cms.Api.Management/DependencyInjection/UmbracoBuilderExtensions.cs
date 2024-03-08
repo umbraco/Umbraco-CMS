@@ -37,6 +37,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddDocumentTypes()
                 .AddMedia()
                 .AddMediaTypes()
+                .AddMemberGroups()
                 .AddMember()
                 .AddMemberTypes()
                 .AddLanguages()

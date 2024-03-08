@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
-using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -30,12 +29,14 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         target.IsElement = source.IsElement;
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
-
-        target.Compositions = source.ContentTypeComposition.Select(contentTypeComposition => new MemberTypeComposition
-        {
-            MemberType = new ReferenceByIdModel(contentTypeComposition.Key),
-            CompositionType = CalculateCompositionType(source, contentTypeComposition)
-        }).ToArray();
+        target.Compositions = MapNestedCompositions(
+            source.ContentTypeComposition,
+            source.ParentId,
+            (referenceByIdModel, compositionType) => new MemberTypeComposition
+            {
+                MemberType = referenceByIdModel,
+                CompositionType = compositionType,
+            });
     }
 
     // Umbraco.Code.MapAll -Collection

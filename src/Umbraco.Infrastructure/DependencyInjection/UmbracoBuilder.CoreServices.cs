@@ -105,8 +105,7 @@ public static partial class UmbracoBuilderExtensions
             .AddRepositories()
             .AddServices()
             .AddCoreMappingProfiles()
-            .AddFileSystems()
-            .AddWebAssets();
+            .AddFileSystems();
 
         // register persistence mappers - required by database factory so needs to be done here
         // means the only place the collection can be modified is in a runtime - afterwards it
@@ -168,7 +167,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BlockGridPropertyValueConstructorCache>();
         builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
 
-        // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
+        // both SimpleTinyMceValueConverter (in Core) and RteBlockRenderingValueConverter (in Infrastructure) will be
         // discovered when CoreBootManager configures the converters. We will remove the basic one defined
         // in core so that the more enhanced version is active.
         builder.PropertyValueConverters()
@@ -390,8 +389,6 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<RelationTypeSavedNotification, RelationTypeSavedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<DomainDeletedNotification, DomainDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<DomainSavedNotification, DomainSavedDistributedCacheNotificationHandler>()
-            .AddNotificationHandler<MacroSavedNotification, MacroSavedDistributedCacheNotificationHandler>()
-            .AddNotificationHandler<MacroDeletedNotification, MacroDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>()
             .AddNotificationHandler<ContentTypeChangedNotification, ContentTypeChangedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MediaTypeChangedNotification, MediaTypeChangedDistributedCacheNotificationHandler>()

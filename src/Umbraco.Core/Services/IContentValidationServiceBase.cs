@@ -7,4 +7,6 @@ internal interface IContentValidationServiceBase<in TContentType>
     where TContentType : IContentTypeComposition
 {
     Task<ContentValidationResult> ValidatePropertiesAsync(ContentEditingModelBase contentEditingModelBase, TContentType contentType);
+
+    Task<bool> ValidateCulturesAsync(ContentEditingModelBase contentEditingModelBase);
 }

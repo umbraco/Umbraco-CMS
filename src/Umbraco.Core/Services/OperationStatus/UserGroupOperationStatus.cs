@@ -22,5 +22,7 @@ public enum UserGroupOperationStatus
     UnauthorizedMissingContentStartNodeAccess,
     UnauthorizedMissingMediaStartNodeAccess,
     UnauthorizedMissingUserGroupAccess,
-    UnauthorizedMissingUsersSectionAccess
+    UnauthorizedMissingUsersSectionAccess,
+    AdminGroupCannotBeEmpty,
+    UserNotInGroup,
 }

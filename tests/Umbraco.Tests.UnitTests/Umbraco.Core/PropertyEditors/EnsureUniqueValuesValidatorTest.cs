@@ -16,7 +16,7 @@ public class EnsureUniqueValuesValidatorTest
         => new SystemTextConfigurationEditorJsonSerializer();
 
     [Test]
-    public void Expects_Array_Of_ValueListItems_Not_Single_String()
+    public void Expects_Array_Of_String_Not_Single_String()
     {
         var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
         var result = validator.Validate(
@@ -27,7 +27,7 @@ public class EnsureUniqueValuesValidatorTest
     }
 
     [Test]
-    public void Expects_Array_Of_ValueListItems_Not_Array_Of_String()
+    public void Expects_Array_Of_String()
     {
         var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
         var result =
@@ -35,7 +35,7 @@ public class EnsureUniqueValuesValidatorTest
                 new JsonArray("hello", "world"),
                 null,
                 null);
-        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(0, result.Count());
     }
 
     [Test]
@@ -44,9 +44,7 @@ public class EnsureUniqueValuesValidatorTest
         var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
         var result =
             validator.Validate(
-                new JsonArray(
-                    JsonNode.Parse("""{"value": "hello"}"""),
-                    JsonNode.Parse("""{"value": "world"}""")),
+                new JsonArray("one", "two", "three"),
                 null,
                 null);
         Assert.AreEqual(0, result.Count());
@@ -58,9 +56,7 @@ public class EnsureUniqueValuesValidatorTest
         var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
         var result =
             validator.Validate(
-                new JsonArray(
-                    JsonNode.Parse("""{"value": "hello"}"""),
-                    JsonNode.Parse("""{"value": "hello"}""")),
+                new JsonArray("one", "one"),
                 null,
                 null);
         Assert.AreEqual(1, result.Count());
@@ -72,13 +68,60 @@ public class EnsureUniqueValuesValidatorTest
         var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
         var result =
             validator.Validate(
-                new JsonArray(
-                    JsonNode.Parse("""{"value": "hello"}"""),
-                    JsonNode.Parse("""{"value": "hello"}"""),
-                    JsonNode.Parse("""{"value": "world"}"""),
-                    JsonNode.Parse("""{"value": "world"}""")),
+                new JsonArray("one", "two", "three", "one", "two"),
                 null,
                 null);
         Assert.AreEqual(2, result.Count());
+    }
+
+    [Test]
+    public void Handles_Null()
+    {
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
+        var result =
+            validator.Validate(
+                null,
+                null,
+                null);
+        Assert.AreEqual(0, result.Count());
+    }
+
+    [Test]
+    public void Handles_IEnumerable_Of_String()
+    {
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
+        IEnumerable<string> value = new[] { "one", "two", "three" };
+        var result =
+            validator.Validate(
+                value,
+                null,
+                null);
+        Assert.AreEqual(0, result.Count());
+    }
+
+    [Test]
+    public void Handles_Array_Of_String()
+    {
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
+        string[] value = { "one", "two", "three" };
+        var result =
+            validator.Validate(
+                value,
+                null,
+                null);
+        Assert.AreEqual(0, result.Count());
+    }
+
+    [Test]
+    public void Handles_List_Of_String()
+    {
+        var validator = new ValueListUniqueValueValidator(ConfigurationEditorJsonSerializer());
+        var value = new List<string> { "one", "two", "three" };
+        var result =
+            validator.Validate(
+                value,
+                null,
+                null);
+        Assert.AreEqual(0, result.Count());
     }
 }

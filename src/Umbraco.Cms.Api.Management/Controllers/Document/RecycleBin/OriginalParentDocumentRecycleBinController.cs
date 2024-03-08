@@ -9,6 +9,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Querying.RecycleBin;
 using Umbraco.Cms.Web.Common.Authorization;

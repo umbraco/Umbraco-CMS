@@ -1,6 +1,7 @@
 using System.Data;
 using System.Globalization;
-using System.Xml.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -11,15 +12,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
-using static Umbraco.Cms.Core.Constants.SqlTemplates;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -207,7 +207,6 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
         return usages;
     }
-
 
     #region Overrides of RepositoryBase<int,DataTypeDefinition>
 

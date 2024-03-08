@@ -2,16 +2,25 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Security.Authorization.User;
+using Umbraco.Cms.Api.Management.Controllers.UserGroup;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.User;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+// This controller is a bit of a weird case, for all intents and purposes this should be a UserGroupController
+// It uses the UserGroupService to manipulate the members of a user group, however, from the frontend perspective it is a user(s) operation
+// In order to not have to re-implement all the UserGroupOperationStatusResults this controller inherits from UserGroupControllerBase
+// But manually specifies its route and APIExplorerSettings to be under users.
 [ApiVersion("1.0")]
-public class UpdateUserGroupsUserController : UserControllerBase
+[VersionedApiBackOfficeRoute("user")]
+[ApiExplorerSettings(GroupName = "User")]
+public class UpdateUserGroupsUserController : UserGroupControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IUserGroupService _userGroupService;
@@ -30,14 +39,15 @@ public class UpdateUserGroupsUserController : UserControllerBase
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             UserPermissionResource.WithKeys(requestModel.UserIds),
-            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+            AuthorizationPolicies.UserPermissionByResource);
 
-        if (!authorizationResult.Succeeded)
+        if (authorizationResult.Succeeded is false)
         {
             return Forbidden();
         }
 
-        await _userGroupService.UpdateUserGroupsOnUsers(requestModel.UserGroupIds, requestModel.UserIds);
-        return Ok();
+        UserGroupOperationStatus status = await _userGroupService.UpdateUserGroupsOnUsersAsync(requestModel.UserGroupIds, requestModel.UserIds);
+
+        return UserGroupOperationStatusResult(status);
     }
 }

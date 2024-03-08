@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -43,7 +44,7 @@ public class GetCurrentUserController : CurrentUserControllerBase
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             UserPermissionResource.WithKeys(currentUserKey),
-            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+            AuthorizationPolicies.UserPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

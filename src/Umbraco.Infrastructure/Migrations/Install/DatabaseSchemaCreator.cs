@@ -40,8 +40,6 @@ public class DatabaseSchemaCreator
         typeof(LanguageTextDto),
         typeof(DomainDto),
         typeof(LogDto),
-        typeof(MacroDto),
-        typeof(MacroPropertyDto),
         typeof(MemberPropertyTypeDto),
         typeof(MemberDto),
         typeof(Member2MemberGroupDto),

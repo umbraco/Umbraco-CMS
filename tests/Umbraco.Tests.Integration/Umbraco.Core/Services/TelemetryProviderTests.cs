@@ -1,21 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -47,8 +39,6 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
 
     private UserTelemetryProvider UserTelemetryProvider => GetRequiredService<UserTelemetryProvider>();
 
-    private MacroTelemetryProvider MacroTelemetryProvider => GetRequiredService<MacroTelemetryProvider>();
-
     private MediaTelemetryProvider MediaTelemetryProvider => GetRequiredService<MediaTelemetryProvider>();
 
     private PropertyEditorTelemetryProvider PropertyEditorTelemetryProvider =>
@@ -76,7 +66,6 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
         builder.Services.AddTransient<ContentTelemetryProvider>();
         builder.Services.AddTransient<LanguagesTelemetryProvider>();
         builder.Services.AddTransient<UserTelemetryProvider>();
-        builder.Services.AddTransient<MacroTelemetryProvider>();
         builder.Services.AddTransient<MediaTelemetryProvider>();
         builder.Services.AddTransient<PropertyEditorTelemetryProvider>();
         base.CustomTestSetup(builder);
@@ -157,15 +146,6 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
 
         // Assert
         Assert.AreEqual(3, result.First().Data);
-    }
-
-    [Test]
-    public void MacroTelemetry_Can_Get_Macros()
-    {
-        BuildMacros();
-        var result = MacroTelemetryProvider.GetInformation()
-            .FirstOrDefault(x => x.Name == Constants.Telemetry.MacroCount);
-        Assert.AreEqual(3, result.Data);
     }
 
     [Test]
@@ -341,20 +321,6 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
         for (var i = 0; i < count; i++)
         {
             yield return BuildUserGroup(i.ToString());
-        }
-    }
-
-    private void BuildMacros()
-    {
-        var scopeProvider = ScopeProvider;
-        using (var scope = scopeProvider.CreateScope())
-        {
-            var repository = new MacroRepository((IScopeAccessor)scopeProvider, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
-
-            repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml"));
-            repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml"));
-            repository.Save(new Macro(ShortStringHelper, "test3", "Tet3", "~/views/macropartials/test3.cshtml"));
-            scope.Complete();
         }
     }
 

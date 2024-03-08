@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tour;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("tour")]
 [ApiExplorerSettings(GroupName = "Tour")]
 public class TourControllerBase : ManagementApiControllerBase
