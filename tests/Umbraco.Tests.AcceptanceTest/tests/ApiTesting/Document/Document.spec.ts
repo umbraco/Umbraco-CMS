@@ -3,6 +3,7 @@ import {expect} from "@playwright/test";
 
 test.describe('Documents tests', () => {
   let documentTypeId = '';
+  let documentId = '';
   const documentName = 'TestDocument';
   const documentTypeName = 'TestDocumentType';
 
@@ -21,8 +22,34 @@ test.describe('Documents tests', () => {
     await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
 
     // Assert
-    await expect(umbracoApi.document.doesNameExist(documentName)).toBeTruthy();
+    expect(await umbracoApi.document.doesNameExist(documentName)).toBeTruthy();
   });
 
+  test('can delete a document', async ({umbracoApi}) => {
+    // Arrange
+    documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+    expect(umbracoApi.document.doesExist(documentId)).toBeTruthy();
 
+    // Act
+    await umbracoApi.document.delete(documentId);
+
+    // Assert
+    expect(await umbracoApi.document.doesNameExist(documentName)).toBeFalsy();
+  });
+
+  test('can update a document', async ({umbracoApi}) => {
+    // Arrange
+    const wrongName = 'WrongDocument';
+    documentId = await umbracoApi.document.createDefaultDocument(wrongName, documentTypeId);
+    expect(await umbracoApi.document.doesNameExist(wrongName)).toBeTruthy();
+    let documentData = await umbracoApi.document.get(documentId);
+    documentData.variants[0].name = documentName;
+
+    // Act
+    await umbracoApi.document.update(documentData.id, documentData);
+
+    // Assert
+    const updatedDocumentData = await umbracoApi.document.get(documentId);
+    expect(updatedDocumentData.variants[0].name).toEqual(documentName);
+  });
 });
