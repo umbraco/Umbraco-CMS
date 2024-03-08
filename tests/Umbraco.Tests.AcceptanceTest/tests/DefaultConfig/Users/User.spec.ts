@@ -1,5 +1,8 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
+import crypto from "crypto";
+import * as fs from "fs";
+import * as path from "path";
 
 test.describe('User tests', () => {
   const nameOfTheUser = 'TestUser';
@@ -288,6 +291,52 @@ test.describe('User tests', () => {
     expect(userData.state).toBe('Inactive');
   });
 
+  test('can add an avatar to a user', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
+    const userGroup = await umbracoApi.userGroup.getByName('Writers');
+    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+
+    // Create a temporary file
+    const temporaryFileId = crypto.randomUUID();
+
+    const fileName = 'Umbraco.png';
+    const mimeType = 'image/png';
+    const filePath = './fixtures/mediaLibrary/Umbraco.png';
+    console.log(await umbracoApi.temporaryFile.create(temporaryFileId, fileName, mimeType, filePath));
+
+    // Act
+
+    let skippity = fs.readFileSync(filePath);
+    console.log(skippity);
+
+    await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+    await page.getByText(nameOfTheUser, {exact: true}).click();
+    await page.pause();
+    await page.getByLabel('Change photo').click();
+
+    await page.locator('#AvatarFileField').setInputFiles({
+      name: fileName,
+      mimeType: mimeType,
+      buffer: fs.readFileSync(filePath)
+    })
+
+    // await umbracoApi.user.addAvatar(userId, temporaryFileId);
+
+    await page.pause();
+
+
+    // Assert
+    // Checks if the avatar was updated successfully.
+  });
+
+  test('can update an avatar for a user', async ({page, umbracoApi, umbracoUi}) => {
+
+  });
+
+  test('can remove an avatar from a user', async ({page, umbracoApi, umbracoUi}) => {
+
+  });
+
   test('can see if the inactive label is removed from the test user', async ({page, umbracoApi, umbracoUi}) => {
     const currentUser = await umbracoApi.user.getCurrentUser();
 
@@ -308,11 +357,14 @@ test.describe('User tests', () => {
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
-    await page.pause();
     await expect(page.locator('uui-card-user')).toHaveCount(2);
     await page.getByLabel('Search the users section').fill('TestUser');
-    await page.waitForTimeout(500);
+
+    // Assert
+    // Wait for filtering to be done
+    await page.waitForTimeout(200);
     await expect(page.locator('uui-card-user')).toHaveCount(1);
+    await expect(page.locator('uui-card-user')).toContainText(nameOfTheUser);
   });
 
   test('can filter by status', async ({page, umbracoApi, umbracoUi}) => {
@@ -323,6 +375,15 @@ test.describe('User tests', () => {
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await expect(page.locator('uui-card-user')).toHaveCount(2);
+    await page.locator('uui-button').filter({ hasText: 'Status: All' }).getByLabel('status').click({force: true});
+    await page.locator('label').filter({hasText: 'Inactive'}).click();
+
+    // Assert
+    // Wait for filtering to be done
+    await page.waitForTimeout(200);
+    await expect(page.locator('uui-card-user')).toHaveCount(1);
+    await expect(page.locator('uui-card-user')).toContainText(nameOfTheUser);
+    await expect(page.locator('uui-card-user')).toContainText('Inactive');
   });
 
   test('can filter by user groups', async ({page, umbracoApi, umbracoUi}) => {
@@ -335,8 +396,15 @@ test.describe('User tests', () => {
 
     await expect(page.locator('uui-card-user')).toHaveCount(2);
 
-    await expect(page.locator('uui-card-user')).toHaveCount(1);
+    await page.pause();
+    await page.locator('uui-button').filter({ hasText: 'Groups: All' }).getByLabel('groups').click({force: true});
+    await page.locator('label').filter({hasText: 'Writers'}).click();
 
+    // Assert
+    // Wait for filtering to be done
+    await page.waitForTimeout(200);
+    await expect(page.locator('uui-card-user')).toHaveCount(1);
+    await expect(page.locator('uui-card-user')).toContainText('Writers');
   });
 
 
@@ -351,4 +419,4 @@ test.describe('User tests', () => {
   });
 
 
-  });
+});
