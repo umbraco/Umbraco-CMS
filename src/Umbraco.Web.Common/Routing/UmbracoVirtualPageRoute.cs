@@ -22,7 +22,6 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     private readonly LinkParser _linkParser;
     private readonly UriUtility _uriUtility;
     private readonly IPublishedRouter _publishedRouter;
-    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
     /// <summary>
     /// Constructor.
@@ -35,14 +34,12 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         EndpointDataSource endpointDataSource,
         LinkParser linkParser,
         UriUtility uriUtility,
-        IPublishedRouter publishedRouter,
-        IUmbracoContextAccessor umbracoContextAccessor)
+        IPublishedRouter publishedRouter)
     {
         _endpointDataSource = endpointDataSource;
         _linkParser = linkParser;
         _uriUtility = uriUtility;
         _publishedRouter = publishedRouter;
-        _umbracoContextAccessor = umbracoContextAccessor;
     }
 
     /// <summary>
@@ -160,12 +157,8 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
         IPublishedRequestBuilder requestBuilder = await _publishedRouter.CreateRequestAsync(cleanedUrl);
         requestBuilder.SetPublishedContent(publishedContent);
 
-        if (_publishedRouter is PublishedRouter publishedRouter)
-        {
-            publishedRouter.FindDomain(requestBuilder);
-        }
-
-        return requestBuilder.Build();
+        // Ensure the culture and domain is set correctly for the published request
+        return await _publishedRouter.RouteRequestAsync(requestBuilder, new RouteRequestOptions(Core.Routing.RouteDirection.Inbound));
     }
 
     /// <summary>
@@ -179,7 +172,10 @@ public class UmbracoVirtualPageRoute : IUmbracoVirtualPageRoute
     {
         IPublishedRequest publishedRequest = await CreatePublishedRequest(httpContext, publishedContent);
 
-        if (_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
+        IUmbracoContextAccessor umbracoContextAccessor = httpContext.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
+
+        // Ensure the published request is set to the UmbracoContext
+        if (umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
             umbracoContext.PublishedRequest = publishedRequest;
         }
