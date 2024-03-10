@@ -1,13 +1,9 @@
 import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from '@playwright/test';
-import crypto from "crypto";
-import * as fs from "fs";
-import * as path from "path";
 
 test.describe('User tests', () => {
   const nameOfTheUser = 'TestUser';
   const userEmail = 'TestUser@EmailTest.test';
-  const userPassword = 'TestPassword';
   const defaultUserGroupName = 'Writers';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
@@ -19,23 +15,23 @@ test.describe('User tests', () => {
     await umbracoApi.user.ensureNameNotExists(nameOfTheUser);
   });
 
-  test('can create a user', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a user', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await umbracoUi.user.clickCreateButton();
-    await page.getByLabel('name').fill(nameOfTheUser);
-    await page.getByLabel('email').fill(userEmail);
-    await page.getByLabel('open', {exact: true}).click();
-    await page.getByRole('button', {name: defaultUserGroupName}).click();
-    await page.getByLabel('Submit').click();
-    await page.getByLabel('Create user').click();
+    await umbracoUi.user.enterNameOfTheUser(nameOfTheUser);
+    await umbracoUi.user.enterUserEmail(userEmail);
+    await umbracoUi.user.clickOpenUserGroupsButton();
+    await umbracoUi.user.clickButtonWithName(defaultUserGroupName);
+    await umbracoUi.user.clickSubmitButton();
+    await umbracoUi.user.clickCreateUserButton();
 
     // Assert
     await umbracoUi.user.isSuccessNotificationVisible();
     expect(await umbracoApi.user.doesNameExist(nameOfTheUser)).toBeTruthy();
   });
 
-  test('can rename a user', async ({page, umbracoApi, umbracoUi}) => {
+  test('can rename a user', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongName = 'WrongName';
     await umbracoApi.user.ensureNameNotExists(wrongName);
@@ -44,8 +40,8 @@ test.describe('User tests', () => {
 
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
-    await page.getByText(wrongName, {exact: true}).click();
-    await page.locator('#name').locator('#input').first().fill(nameOfTheUser);
+    await umbracoUi.user.clickTextButtonWithName(wrongName);
+    await umbracoUi.user.updateNameOfUser(nameOfTheUser);
     await umbracoUi.user.clickSaveButton();
 
     // Assert
@@ -235,6 +231,7 @@ test.describe('User tests', () => {
 
   test('can change password for a user', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
+    const userPassword = 'TestPassword';
     const userGroup = await umbracoApi.userGroup.getByName('Writers');
     const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
 
@@ -294,50 +291,42 @@ test.describe('User tests', () => {
   test('can add an avatar to a user', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const userGroup = await umbracoApi.userGroup.getByName('Writers');
-    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
-
-    // Create a temporary file
-    const temporaryFileId = crypto.randomUUID();
-
-    const fileName = 'Umbraco.png';
-    const mimeType = 'image/png';
+    await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
     const filePath = './fixtures/mediaLibrary/Umbraco.png';
-    console.log(await umbracoApi.temporaryFile.create(temporaryFileId, fileName, mimeType, filePath));
 
     // Act
-
-    let skippity = fs.readFileSync(filePath);
-    console.log(skippity);
-
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await page.getByText(nameOfTheUser, {exact: true}).click();
-    await page.pause();
+    const fileChooserPromise = page.waitForEvent('filechooser');
     await page.getByLabel('Change photo').click();
-
-    await page.locator('#AvatarFileField').setInputFiles({
-      name: fileName,
-      mimeType: mimeType,
-      buffer: fs.readFileSync(filePath)
-    })
-
-    // await umbracoApi.user.addAvatar(userId, temporaryFileId);
-
-    await page.pause();
-
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(filePath);
 
     // Assert
-    // Checks if the avatar was updated successfully.
-  });
-
-  test('can update an avatar for a user', async ({page, umbracoApi, umbracoUi}) => {
-
+    await umbracoUi.user.isSuccessNotificationVisible();
+    const userData = await umbracoApi.user.getByName(nameOfTheUser);
+    expect(userData.avatarUrls).not.toHaveLength(0);
   });
 
   test('can remove an avatar from a user', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
+    const userGroup = await umbracoApi.userGroup.getByName('Writers');
+    const userId = await umbracoApi.user.createDefaultUser(nameOfTheUser, userEmail, userGroup.id);
+    await umbracoApi.user.addDefaultAvatarImageToUser(userId);
 
+    // Act
+    await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+    await page.getByText(nameOfTheUser, {exact: true}).click();
+    await page.getByLabel('Remove photo').click();
+
+    // Assert
+    await umbracoUi.user.isSuccessNotificationVisible();
+    const userData = await umbracoApi.user.getByName(nameOfTheUser);
+    expect(userData.avatarUrls).toHaveLength(0);
   });
 
   test('can see if the inactive label is removed from the test user', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
     const currentUser = await umbracoApi.user.getCurrentUser();
 
     // Act
@@ -375,7 +364,7 @@ test.describe('User tests', () => {
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
     await expect(page.locator('uui-card-user')).toHaveCount(2);
-    await page.locator('uui-button').filter({ hasText: 'Status: All' }).getByLabel('status').click({force: true});
+    await page.locator('uui-button').filter({hasText: 'Status: All'}).getByLabel('status').click({force: true});
     await page.locator('label').filter({hasText: 'Inactive'}).click();
 
     // Assert
@@ -396,8 +385,7 @@ test.describe('User tests', () => {
 
     await expect(page.locator('uui-card-user')).toHaveCount(2);
 
-    await page.pause();
-    await page.locator('uui-button').filter({ hasText: 'Groups: All' }).getByLabel('groups').click({force: true});
+    await page.locator('uui-button').filter({hasText: 'Groups: All'}).getByLabel('groups').click({force: true});
     await page.locator('label').filter({hasText: 'Writers'}).click();
 
     // Assert
@@ -407,16 +395,14 @@ test.describe('User tests', () => {
     await expect(page.locator('uui-card-user')).toContainText('Writers');
   });
 
-
   test('can change from grid to table view', async ({page, umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.user.goToSection(ConstantHelper.sections.users);
+    await page.locator('umb-collection-view-bundle').getByLabel('status').click({force: true});
+    await page.getByRole('link', {name: 'Table'}).click({force: true});
+
+    // Assert
+    await expect(page.locator('umb-user-table-collection-view')).toBeVisible();
+    expect(page.url()).toEqual(umbracoApi.baseUrl + '/umbraco/section/user-management/view/users/collection/table');
   });
-
-  test('can change from table to grid view', async ({page, umbracoApi, umbracoUi}) => {
-    // Act
-    await umbracoUi.user.goToSection(ConstantHelper.sections.users);
-  });
-
-
 });
