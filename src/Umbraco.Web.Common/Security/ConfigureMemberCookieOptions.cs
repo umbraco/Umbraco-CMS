@@ -66,10 +66,11 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
                     .OfType<ControllerActionDescriptor>()
                     .FirstOrDefault();
 
-                if (!controllerDescriptor?.ControllerTypeInfo.IsSubclassOf(typeof(UmbracoApiController)) ?? false)
-                {
-                    new CookieAuthenticationEvents().OnRedirectToAccessDenied(ctx);
-                }
+                // FIXME: Look into if this is needed anymore
+                // if (!controllerDescriptor?.ControllerTypeInfo.IsSubclassOf(typeof(UmbracoApi)) ?? false)
+                // {
+                //     new CookieAuthenticationEvents().OnRedirectToAccessDenied(ctx);
+                // }
 
                 return Task.CompletedTask;
             },
