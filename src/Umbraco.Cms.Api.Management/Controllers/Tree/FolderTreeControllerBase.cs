@@ -3,7 +3,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Extensions;
 
