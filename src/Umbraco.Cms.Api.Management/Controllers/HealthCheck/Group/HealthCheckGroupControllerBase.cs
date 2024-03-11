@@ -7,7 +7,6 @@ using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.HealthChecks.RoutePath.HealthCheck}-group")]
 [ApiExplorerSettings(GroupName = "Health Check")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]

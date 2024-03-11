@@ -64,6 +64,10 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid culture")
                 .WithDetail("One or more of the supplied culture codes did not match the configured languages.")
                 .Build()),
+            ContentEditingOperationStatus.DuplicateKey => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid Id")
+                .WithDetail("The supplied id is already in use.")
+                .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
                 problemDetailsBuilder

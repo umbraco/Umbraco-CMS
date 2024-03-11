@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
-[ApiController]
 [ApiExplorerSettings(GroupName = "User")]
 public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerBase
 {
@@ -19,6 +18,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
             UserOperationStatus.MissingUserGroup => NotFound(problemDetailsBuilder
                 .WithTitle("Missing User Group")
                 .WithDetail("The specified user group was not found.")
+                .Build()),
+            UserOperationStatus.AdminUserGroupMustNotBeEmpty => BadRequest(problemDetailsBuilder
+                .WithTitle("Admin User Group Must Not Be Empty")
+                .WithDetail("The admin user group must not be empty.")
                 .Build()),
             UserOperationStatus.NoUserGroup => BadRequest(problemDetailsBuilder
                 .WithTitle("No User Group Specified")
