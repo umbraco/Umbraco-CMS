@@ -103,10 +103,13 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	*/
 
 	_singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
+		if (!this._groupStructureHelper || !this.group) return;
+
 		const partialObject = {} as any;
 		partialObject[propertyName] = value;
 
-		this.dispatchEvent(new CustomEvent('umb:partial-group-update', { detail: partialObject }));
+		//this.dispatchEvent(new CustomEvent('umb:partial-group-update', { detail: partialObject }));
+		this._groupStructureHelper.partialUpdateContainer(this.group.id, partialObject);
 	}
 
 	render() {

@@ -195,10 +195,7 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 								class="container-handle"
 								?sort-mode-active=${this._sortModeActive}
 								.group=${group}
-								.groupStructureHelper=${this.#groupStructureHelper}
-								@umb:partial-group-update=${(event: CustomEvent) => {
-									this.#groupStructureHelper.partialUpdateContainer(group.id, event.detail);
-								}}>
+								.groupStructureHelper=${this.#groupStructureHelper}>
 							</umb-content-type-workspace-view-edit-group>
 						`,
 					)}
