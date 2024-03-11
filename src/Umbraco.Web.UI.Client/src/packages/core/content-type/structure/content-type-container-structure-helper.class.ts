@@ -4,6 +4,10 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
+/**
+ * This class is a helper class for managing the structure of containers in a content type.
+ * This requires a structure manager {@link UmbContentTypePropertyStructureManager} to manage the structure.
+ */
 export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init;
 	#initResolver?: (value: unknown) => void;

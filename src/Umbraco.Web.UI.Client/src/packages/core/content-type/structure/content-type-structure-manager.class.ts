@@ -19,6 +19,13 @@ import {
 import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
+/**
+ * Manages a structure of a Content Type and its properties and containers.
+ * This loads and merges the structures of the Content Type and its inherited and composed Content Types.
+ * To help manage the data, there is two helper classes:
+ * - {@link UmbContentTypePropertyStructureHelper} for managing the structure of properties, optional of another container or root.
+ * - {@link UmbContentTypeContainerStructureHelper} for managing the structure of containers, optional of another container or root.
+ */
 export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init!: Promise<unknown>;
 
