@@ -29,6 +29,11 @@ describe('createRoutePathBuilder', () => {
 		expect(buildPath({ param1: 'value1' })).to.eq('/test/value1/path/value1/');
 	});
 
+	it('should not consider parameters that are not in the params object', () => {
+		const buildPath = createRoutePathBuilder('test/:param1/path/:param2');
+		expect(buildPath({ param1: 'value1' })).to.eq('/test/value1/path/:param2/');
+	});
+
 	it('should support complex objects as parameters with a custom toString method', () => {
 		const buildPath = createRoutePathBuilder('test/:param1/path/:param2');
 		const obj = {
