@@ -255,12 +255,18 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		await this.#init;
 		if (!this.#structure || !containerId || !partialUpdate) return;
 
+		// TODO Check if this is a owner container, if not make a clone and append the change to it.
+
 		return await this.#structure.updateContainer(null, containerId, partialUpdate);
 	}
 
-	async updateContainerName(containerId: string, containerParentId: string | null, name: string) {
+	// TODO: This is only used by legacy implementations:
+	// @deprecated
+	async _legacy_updateContainerName(containerId: string, containerParentId: string | null, name: string) {
 		await this.#init;
 		if (!this.#structure) return;
+
+		// TODO Check if this is a owner container, if not make a clone and append the change to it.
 
 		const newName =
 			this.#structure.makeContainerNameUniqueForOwnerContentType(name, this._childType, containerParentId) ?? name;
