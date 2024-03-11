@@ -55,6 +55,10 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this._observeParentAlikeContainers();
 	}
 
+	public getStructureManager() {
+		return this.#structure;
+	}
+
 	public setParentType(value?: UmbPropertyContainerTypes) {
 		if (this._parentType === value) return;
 		this._parentType = value;

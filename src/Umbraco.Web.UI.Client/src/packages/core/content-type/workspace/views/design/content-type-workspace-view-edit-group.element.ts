@@ -64,15 +64,35 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	sortModeActive = false;
 
 	@state()
-	_inherited?: boolean;
+	_hasOwnerContainer?: boolean;
 
-	constructor() {
-		super();
-	}
+	@state()
+	_inherited?: boolean;
 
 	#checkInherited() {
 		if (this.groupStructureHelper && this.group) {
-			this._inherited = !this.groupStructureHelper.isOwnerChildContainer(this.group.id);
+			console.log('checkInherited!!!!');
+			// TODO: Check for any inherited containers?
+			if (this.group.name) {
+				this.observe(
+					this.groupStructureHelper.getStructureManager()!.containersByNameAndType(this.group.name, 'Group'),
+					(containers) => {
+						const amountOfContainers = containers.length;
+
+						const isAOwnerContainer = this.groupStructureHelper!.isOwnerChildContainer(this.group!.id);
+
+						const pureOwnerContainer = isAOwnerContainer && amountOfContainers === 1;
+
+						this._hasOwnerContainer = isAOwnerContainer;
+						this._inherited = !pureOwnerContainer;
+						console.log('this._inherited', this._inherited, 'this._hasOwnerContainer', this._hasOwnerContainer);
+					},
+					'observeGroupContainers',
+				);
+			} else {
+				// We use name match to determine inheritance, but a no name should not be inherited.
+				this._inherited = false;
+			}
 		}
 	}
 
@@ -115,11 +135,14 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					label=${this.localize.term('sort_sortOrder')}
 					@change=${(e: UUIInputEvent) => this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) || 0)}
 					.value=${this.group!.sortOrder ?? 0}
-					?disabled=${this._inherited}></uui-input>
+					?disabled=${!this._hasOwnerContainer}></uui-input>
 			</div> `;
 		} else {
 			return html`<div slot="header">
-				${this._inherited ? html`<uui-icon name="icon-merge"></uui-icon>` : this.#renderInputGroupName()}
+				<div>
+					<uui-icon name=${this._inherited ? 'icon-merge' : 'icon-navigation'}></uui-icon>
+					${this.#renderInputGroupName()}
+				</div>
 			</div> `;
 		}
 	}
@@ -129,6 +152,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			label=${this.localize.term('contentTypeEditor_group')}
 			placeholder=${this.localize.term('placeholders_entername')}
 			.value=${this.group!.name}
+			?disabled=${!this._hasOwnerContainer}
 			@change=${(e: InputEvent) => {
 				const newName = (e.target as HTMLInputElement).value;
 				this._singleValueUpdate('name', newName);
