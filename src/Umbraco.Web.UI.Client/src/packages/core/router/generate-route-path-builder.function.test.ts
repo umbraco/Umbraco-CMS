@@ -8,8 +8,10 @@ describe('createRoutePathBuilder', () => {
 	});
 
 	it('should return a function that builds a route path with parameters', () => {
-		const buildPath = createRoutePathBuilder('test/:param1/path/:param2');
-		expect(buildPath({ param1: 'value1', param2: 'value2' })).to.eq('/test/value1/path/value2/');
+		const buildPath = createRoutePathBuilder(':param0/test/:param1/path/:param2');
+		expect(buildPath({ param0: 'value0', param1: 'value1', param2: 'value2' })).to.eq(
+			'/value0/test/value1/path/value2/',
+		);
 	});
 
 	it('should convert number parameters to strings', () => {
