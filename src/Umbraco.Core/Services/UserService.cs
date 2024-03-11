@@ -909,14 +909,28 @@ internal class UserService : RepositoryService, IUserService
 
         if (performingUser is null)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUser, existingUser);
         }
 
-        var userGroups = _userGroupRepository.GetMany().Where(x=>model.UserGroupKeys.Contains(x.Key)).ToHashSet();
+        IEnumerable<IUserGroup> allUserGroups = _userGroupRepository.GetMany().ToArray();
+        var userGroups = allUserGroups.Where(x => model.UserGroupKeys.Contains(x.Key)).ToHashSet();
 
         if (userGroups.Count != model.UserGroupKeys.Count)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MissingUserGroup, existingUser);
+        }
+
+        // We're de-admining a user, we need to ensure that this would not leave the admin group empty.
+        if (existingUser.IsAdmin() && model.UserGroupKeys.Contains(Constants.Security.AdminGroupKey) is false)
+        {
+            IUserGroup? adminGroup = allUserGroups.FirstOrDefault(x => x.Key == Constants.Security.AdminGroupKey);
+            if (adminGroup?.UserCount == 1)
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.AdminUserGroupMustNotBeEmpty, existingUser);
+            }
         }
 
         // We have to resolve the keys to ids to be compatible with the repository, this could be done in the factory,
@@ -925,6 +939,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (startContentIds is null || startContentIds.Length != model.ContentStartNodeKeys.Count)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ContentStartNodeNotFound, existingUser);
         }
 
@@ -932,6 +947,7 @@ internal class UserService : RepositoryService, IUserService
 
         if (startMediaIds is null || startMediaIds.Length != model.MediaStartNodeKeys.Count)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
         }
 
@@ -944,12 +960,14 @@ internal class UserService : RepositoryService, IUserService
 
         if (isAuthorized.Success is false)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Unauthorized, existingUser);
         }
 
         UserOperationStatus validationStatus = ValidateUserUpdateModel(existingUser, model);
         if (validationStatus is not UserOperationStatus.Success)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(validationStatus, existingUser);
         }
 
@@ -1055,7 +1073,7 @@ internal class UserService : RepositoryService, IUserService
             return UserOperationStatus.UserNameIsNotEmail;
         }
 
-        if (!IsEmailValid(model.Email))
+        if (IsEmailValid(model.Email) is false)
         {
             return UserOperationStatus.InvalidEmail;
         }

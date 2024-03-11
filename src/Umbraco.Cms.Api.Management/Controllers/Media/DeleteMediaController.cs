@@ -38,7 +38,7 @@ public class DeleteMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             MediaPermissionResource.RecycleBin(),
             AuthorizationPolicies.MediaPermissionByResource);

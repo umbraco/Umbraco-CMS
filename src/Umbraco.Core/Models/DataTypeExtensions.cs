@@ -12,8 +12,6 @@ public static class DataTypeExtensions
     {
         Constants.DataTypes.Guids.ContentPickerGuid,
         Constants.DataTypes.Guids.MemberPickerGuid,
-        Constants.DataTypes.Guids.MediaPickerGuid,
-        Constants.DataTypes.Guids.MultipleMediaPickerGuid,
         Constants.DataTypes.Guids.RelatedLinksGuid,
         Constants.DataTypes.Guids.MemberGuid,
         Constants.DataTypes.Guids.ImageCropperGuid,

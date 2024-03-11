@@ -2,12 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
-using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
@@ -45,7 +40,7 @@ public class RemoveUsersFromUserGroupController : UserGroupControllerBase
             UserGroupPermissionResource.WithKeys(id),
             AuthorizationPolicies.UserBelongsToUserGroupInRequest);
 
-        if (!authorizationResult.Succeeded)
+        if (authorizationResult.Succeeded is false)
         {
             return Forbidden();
         }

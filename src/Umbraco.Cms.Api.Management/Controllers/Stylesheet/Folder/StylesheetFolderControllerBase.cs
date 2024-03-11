@@ -8,10 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Stylesheet}/folder")]
 [ApiExplorerSettings(GroupName = "Stylesheet")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessStylesheets)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]
 public class StylesheetFolderControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult OperationStatusResult(StylesheetFolderOperationStatus status) =>

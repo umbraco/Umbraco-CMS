@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Api.Management.Controllers.StaticFile.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/static-file")]
 [ApiExplorerSettings(GroupName = "Static File")]
 public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
