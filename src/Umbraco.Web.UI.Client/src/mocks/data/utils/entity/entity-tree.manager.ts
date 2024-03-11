@@ -50,7 +50,7 @@ export class UmbMockEntityTreeManager<T extends Omit<EntityTreeItemResponseModel
 		const movedItems = items.map((item) => {
 			return {
 				...item,
-				parentId: destinationId,
+				parent: destinationId ? { id: destinationId } : null,
 			};
 		});
 
