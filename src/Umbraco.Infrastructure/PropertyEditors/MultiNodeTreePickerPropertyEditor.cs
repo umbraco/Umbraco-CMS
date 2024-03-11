@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -33,6 +34,8 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
 
     public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
+        private readonly IJsonSerializer _jsonSerializer;
+
         public MultiNodeTreePickerPropertyValueEditor(
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
@@ -40,6 +43,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             DataEditorAttribute attribute)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
+            _jsonSerializer = jsonSerializer;
         }
 
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -58,19 +62,19 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
 
 
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
-            => editorValue.Value is IEnumerable<string> stringValues
-                ? string.Join(",", ParseGuidsToConfiguredUdis(stringValues, editorValue.DataTypeConfiguration))
+            => editorValue.Value is JsonArray jsonArray
+                ? EntityReferencesToUdis(_jsonSerializer.Deserialize<IEnumerable<EditorEntityReference>>(jsonArray.ToJsonString()) ?? Enumerable.Empty<EditorEntityReference>())
                 : null;
 
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment);
             return value is string stringValue
-            ? ParseConfiguredUdisToGuids(stringValue.Split(Constants.CharArrays.Comma)).ToArray()
+            ? UdisToEntityReferences(stringValue.Split(Constants.CharArrays.Comma)).ToArray()
             : null;
         }
 
-        private IEnumerable<string> ParseConfiguredUdisToGuids(IEnumerable<string> stringUdis)
+        private IEnumerable<EditorEntityReference> UdisToEntityReferences(IEnumerable<string> stringUdis)
         {
             foreach (var stringUdi in stringUdis)
             {
@@ -79,28 +83,18 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
                     yield break;
                 }
 
-                yield return guidUdi.Guid.ToString();
+                yield return new EditorEntityReference() { Type = guidUdi.EntityType, Unique = guidUdi.Guid };
             }
         }
 
-        private IEnumerable<string> ParseGuidsToConfiguredUdis(IEnumerable<string> stringKeys, object? configuration)
+        private string EntityReferencesToUdis(IEnumerable<EditorEntityReference> nodeReferences)
+            => string.Join(",", nodeReferences.Select(entityReference => Udi.Create(entityReference.Type, entityReference.Unique).ToString()));
+
+        public class EditorEntityReference
         {
-            var configuredEntityType = (configuration as MultiNodePickerConfiguration)?.TreeSource?.ObjectType;
+            public required string Type { get; set; }
 
-            if (configuredEntityType is not null && configuredEntityType.Equals(Constants.Trees.Content, StringComparison.InvariantCultureIgnoreCase))
-            {
-                configuredEntityType = Constants.UdiEntityType.Document;
-            }
-
-            foreach (var stringKey in stringKeys)
-            {
-                if (Guid.TryParse(stringKey, out Guid guidValue) is false)
-                {
-                    yield break;
-                }
-
-                yield return Udi.Create(configuredEntityType, guidValue).ToString();
-            }
+            public Guid Unique { get; set; }
         }
     }
 }
