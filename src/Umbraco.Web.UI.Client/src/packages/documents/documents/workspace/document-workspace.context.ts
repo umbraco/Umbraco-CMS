@@ -14,11 +14,11 @@ import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.ac
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbEditableWorkspaceContextBase,
-	UmbWorkspaceSplitViewManager,
-	type UmbVariantableWorkspaceContextInterface,
-	type UmbPublishableWorkspaceContextInterface,
+import { UmbEditableWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbWorkspaceCollectionContextInterface,
+	UmbVariantableWorkspaceContextInterface,
+	UmbPublishableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -33,11 +33,15 @@ import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/externa
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>, UmbPublishableWorkspaceContextInterface
+	implements
+		UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>,
+		UmbPublishableWorkspaceContextInterface,
+		UmbWorkspaceCollectionContextInterface<UmbDocumentTypeDetailModel>
 {
 	//
 	public readonly repository = new UmbDocumentDetailRepository(this);
@@ -64,6 +68,7 @@ export class UmbDocumentWorkspaceContext
 
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
+
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
 
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
@@ -161,6 +166,10 @@ export class UmbDocumentWorkspaceContext
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(data);
 		return data;
+	}
+
+	getCollectionAlias() {
+		return 'Umb.Collection.Document';
 	}
 
 	getData() {
