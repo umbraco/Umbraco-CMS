@@ -1,5 +1,5 @@
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
@@ -73,6 +73,12 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
 				.variantLanguageOptions=${this.data?.options ?? []}></umb-document-variant-language-picker>
+
+			${when(
+				this.data?.allowScheduledPublish,
+				() => html`This is a scheduled publish`,
+				() => nothing,
+			)}
 
 			<p>${this.localize.term('content_variantsWillBeSaved')}</p>
 
