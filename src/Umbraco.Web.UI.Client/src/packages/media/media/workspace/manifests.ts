@@ -1,4 +1,3 @@
-import { UMB_MEDIA_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/media-workspace-has-collection.condition.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -31,7 +30,11 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: UMB_MEDIA_WORKSPACE_HAS_COLLECTION_CONDITION,
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+			{
+				alias: 'Umb.Condition.WorkspaceHasCollection',
 			},
 		],
 	},
