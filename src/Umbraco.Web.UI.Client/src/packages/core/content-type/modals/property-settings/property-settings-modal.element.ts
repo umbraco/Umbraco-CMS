@@ -2,12 +2,12 @@ import {
 	UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
 	UmbPropertyTypeWorkspaceContext,
 } from './property-settings-modal.context.js';
+import type { UmbPropertySettingsModalData, UmbPropertySettingsModalValue } from './property-settings-modal.token.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertySettingsModalValue, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 // TODO: Could base take a token to get its types?.

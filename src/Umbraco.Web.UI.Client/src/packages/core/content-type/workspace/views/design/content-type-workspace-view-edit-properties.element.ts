@@ -94,7 +94,6 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 		if (value === this._containerId) return;
 		const oldValue = this._containerId;
 		this._containerId = value;
-		this.#addPropertyModal.setUniquePathValue('container-id', value);
 		this.requestUpdate('containerId', oldValue);
 	}
 
@@ -104,6 +103,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 	}
 	public set containerName(value: string | undefined) {
 		this._propertyStructureHelper.setContainerName(value);
+		this.#addPropertyModal.setUniquePathValue('container-name', value);
 	}
 
 	@property({ type: String, attribute: 'container-type', reflect: false })
@@ -112,6 +112,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 	}
 	public set containerType(value: UmbPropertyContainerTypes | undefined) {
 		this._propertyStructureHelper.setContainerType(value);
+		this.#addPropertyModal.setUniquePathValue('container-type', value);
 	}
 
 	#addPropertyModal: UmbModalRouteRegistrationController;
@@ -122,7 +123,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 	_propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	@state()
-	_ownerDocumentTypes?: UmbContentTypeModel[];
+	_ownerDocumentType?: UmbContentTypeModel;
 
 	@state()
 	protected _modalRouteBuilderNewProperty?: UmbModalRouteBuilder;
@@ -137,6 +138,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this._propertyStructureHelper.setStructureManager(workspaceContext.structure);
+
 			this.observe(
 				workspaceContext.isSorting,
 				(isSorting) => {
@@ -149,13 +151,13 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 				},
 				'_observeIsSorting',
 			);
-			const docTypesObservable = await this._propertyStructureHelper.contentTypes();
+			const docTypeObservable = workspaceContext.structure.ownerContentType;
 			this.observe(
-				docTypesObservable,
-				(documents) => {
-					this._ownerDocumentTypes = documents;
+				docTypeObservable,
+				(document) => {
+					this._ownerDocumentType = document;
 				},
-				'observeOwnerDocumentTypes',
+				'observeOwnerDocumentType',
 			);
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
@@ -165,14 +167,18 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 
 		// Note: Route for adding a new property
 		this.#addPropertyModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
-			.addUniquePaths(['container-id'])
+			.addUniquePaths(['container-type', 'container-name'])
 			.addAdditionalPath('add-property/:sortOrder')
 			.onSetup(async (params) => {
+				if (!this._ownerDocumentType) return false;
+				/*
 				const documentTypeId = this._ownerDocumentTypes?.find((types) =>
 					types.containers?.find((containers) => containers.id === this.containerId),
 				)?.unique;
 				if (documentTypeId === undefined) return false;
-				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
+				*/
+
+				const propertyData = await this._propertyStructureHelper.createPropertyScaffold();
 				if (propertyData === undefined) return false;
 				if (params.sortOrder !== undefined) {
 					let sortOrderInt = parseInt(params.sortOrder, 10);
@@ -182,11 +188,45 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 					}
 					propertyData.sortOrder = sortOrderInt + 1;
 				}
-				return { data: { documentTypeId }, value: propertyData };
+				return { data: { documentTypeId: this._ownerDocumentType.unique }, value: propertyData };
 			})
-			.onSubmit((value) => {
+			.onSubmit(async (value) => {
+				if (!this._ownerDocumentType) return false;
+				// I would like to create the missing container at this point:
+
+				// TODO: Missing params in this case. but maybe its not a problem since I do know the containerType and containerName?
+				let containerId: string | undefined;
+				containerId = this._ownerDocumentType.containers.find(
+					(containers) => containers.type === this.containerType && containers.name === this.containerName,
+				)?.id;
+				if (!containerId) {
+					// We did not have this container in the owner document:
+					// TODO: Find the existing container to clone from:
+
+					// TODO: Missing method to recursively create containers for a documentType: [NL]
+					// TODO: Such method should take an existing container id as 'inspiration'.
+					const containerData = await this._propertyStructureHelper
+						.getStructureManager()
+						?.createContainer(this._ownerDocumentType.unique, parentID!!, params.containerType, sortOrder);
+					//TODO: inherit the name
+
+					containerId = containerData?.id;
+				}
+				if (!containerId) {
+					throw new Error('Could not get or create a container to insert property into');
+					return false;
+				}
+
+				// Unless we are at root?
+				if (value.container) {
+					value.container.id = containerId;
+				} else {
+					value.container = { id: containerId };
+				}
+
 				// TODO: The model requires a data-type to be set, we cheat currently. But this should be re-though when we implement validation(As we most likely will have to com up with partial models for the runtime model.) [NL]
 				this._propertyStructureHelper.insertProperty(value as UmbPropertyTypeModel);
+				return true;
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteBuilderNewProperty = routeBuilder;

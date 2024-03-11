@@ -28,11 +28,11 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			this._groups = model;
 		},
 		onEnd: ({ item }) => {
-			if (this._ownerTabId === undefined) {
+			if (this._inherited === undefined) {
 				throw new Error('OwnerTabId is not set, we have not made a local duplicated of this container.');
 				return;
 			}
-			console.log('_ownerTabId', this._ownerTabId);
+			console.log('_ownerTabId', this._inherited);
 			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
@@ -71,17 +71,19 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		},
 	});
 
-	private _ownerTabId?: string | null;
+	private _containerId?: string | null;
+	private _inherited?: boolean;
 
-	// TODO: get rid of this:
 	@property({ type: String })
-	public get ownerTabId(): string | null | undefined {
-		return this._ownerTabId;
+	public get containerId(): string | null | undefined {
+		return this._containerId;
 	}
-	public set ownerTabId(value: string | null | undefined) {
-		if (value === this._ownerTabId) return;
-		const oldValue = this._ownerTabId;
-		this._ownerTabId = value;
+	public set containerId(value: string | null | undefined) {
+		if (value === this._inherited) return;
+		const oldValue = this._inherited;
+		this._containerId = value;
+		// TODO: Needs ways to check if the container is inherited or not, that works for root containers, maybe null === not inherited is okay:
+		this._inherited = value === null ? false : !this.#groupStructureHelper.isOwnerChildContainer(value);
 		this.#groupStructureHelper.setParentId(value);
 		this.requestUpdate('ownerTabId', oldValue);
 	}
@@ -159,7 +161,11 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		// Idea, maybe we can gather the sortOrder from the last group rendered and add 1 to it?
 		const len = this._groups.length;
 		const sortOrder = len === 0 ? 0 : this._groups[len - 1].sortOrder + 1;
-		const container = this.#groupStructureHelper.addContainer(this._ownerTabId, sortOrder);
+		if (this._inherited) {
+			//TODO: recursively create containers for this docType.
+			// Then container ID should update to the new container ID.
+		}
+		const container = this.#groupStructureHelper.addContainer(this._containerId, sortOrder);
 		console.log('container', container);
 	};
 
@@ -178,7 +184,7 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				? html`
 						<uui-box>
 							<umb-content-type-workspace-view-edit-properties
-								container-id=${ifDefined(this.ownerTabId === null ? undefined : this.ownerTabId)}
+								container-id=${ifDefined(this.containerId === null ? undefined : this.containerId)}
 								container-type="Tab"
 								container-name=${this.tabName ?? ''}></umb-content-type-workspace-view-edit-properties>
 						</uui-box>

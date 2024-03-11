@@ -48,6 +48,10 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this._observeGroupContainers();
 	}
 
+	public getStructureManager() {
+		return this.#structure;
+	}
+
 	public setContainerType(value?: UmbPropertyContainerTypes) {
 		if (this._containerType === value) return;
 		this._containerType = value;
