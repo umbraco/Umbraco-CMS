@@ -15,7 +15,7 @@ public class SimpleTinyMceValueConverter : PropertyValueConverterBase
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IHtmlEncodedString);
 
-    // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink} nor executes macros
+    // PropertyCacheLevel.Content is ok here because that converter does not parse {locallink}
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 

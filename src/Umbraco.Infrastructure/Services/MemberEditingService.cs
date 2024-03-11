@@ -43,8 +43,13 @@ internal sealed class MemberEditingService : IMemberEditingService
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MemberCreateModel createModel)
         => await _memberContentEditingService.ValidateAsync(createModel, createModel.ContentTypeKey);
 
-    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMember member, MemberUpdateModel updateModel)
-        => await _memberContentEditingService.ValidateAsync(updateModel, member.ContentType.Key);
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MemberUpdateModel updateModel)
+    {
+        IMember? member = _memberService.GetById(key);
+        return member is not null
+            ? await _memberContentEditingService.ValidateAsync(updateModel, member.ContentType.Key)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, new ContentValidationResult());
+    }
 
     public async Task<Attempt<MemberCreateResult, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user)
     {
@@ -98,9 +103,16 @@ internal sealed class MemberEditingService : IMemberEditingService
             : Attempt.FailWithStatus(status, new MemberCreateResult { Content = member });
     }
 
-    public async Task<Attempt<MemberUpdateResult, MemberEditingStatus>> UpdateAsync(IMember member, MemberUpdateModel updateModel, IUser user)
+    public async Task<Attempt<MemberUpdateResult, MemberEditingStatus>> UpdateAsync(Guid key, MemberUpdateModel updateModel, IUser user)
     {
         var status = new MemberEditingStatus();
+
+        IMember? member = _memberService.GetByKey(key);
+        if (member is null)
+        {
+            status.ContentEditingOperationStatus = ContentEditingOperationStatus.NotFound;
+            return Attempt.FailWithStatus(new MemberEditingStatus(), new MemberUpdateResult());
+        }
 
         MemberIdentityUser? identityMember = await _memberManager.FindByIdAsync(member.Id.ToString());
         if (identityMember is null)

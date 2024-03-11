@@ -36,7 +36,6 @@ public class UmbracoMvcConfigureOptions : IConfigureOptions<MvcOptions>
         options.ModelBinderProviders.Insert(0, new ContentModelBinderProvider());
         options.ModelValidatorProviders.Insert(0, new BypassRenderingModelValidatorProvider());
         options.ModelMetadataDetailsProviders.Add(new BypassRenderingModelValidationMetadataProvider());
-        options.Filters.Insert(0, new EnsurePartialViewMacroViewContextFilterAttribute());
 
         // these MVC options may be applied more than once; let's make sure we only add these conventions once.
         if (options.Conventions.Any(convention => convention is UmbracoBackofficeToken) is false)

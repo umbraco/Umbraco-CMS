@@ -26,13 +26,14 @@ public class AllLanguageController : LanguageControllerBase
     [ProducesResponseType(typeof(PagedViewModel<LanguageResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<LanguageResponseModel>>> All(int skip = 0, int take = 100)
     {
-        ILanguage[] allLanguages = (await _languageService.GetAllAsync()).ToArray();
+        IEnumerable<ILanguage> result = await _languageService.GetAllAsync();
+        ILanguage[] allLanguages = result.ToArray();
         var viewModel = new PagedViewModel<LanguageResponseModel>
         {
             Total = allLanguages.Length,
             Items = _umbracoMapper.MapEnumerable<ILanguage, LanguageResponseModel>(allLanguages.Skip(skip).Take(take))
         };
 
-        return await Task.FromResult(Ok(viewModel));
+        return Ok(viewModel);
     }
 }

@@ -140,7 +140,9 @@ public class BackOfficeUserStore :
             StartContentIds = user.StartContentIds ?? new int[] { },
             StartMediaIds = user.StartMediaIds ?? new int[] { },
             IsLockedOut = user.IsLockedOut,
+            Key = user.Key,
         };
+
 
         // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
         var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
@@ -325,6 +327,7 @@ public class BackOfficeUserStore :
 
             throw;
         }
+
     }
 
     /// <inheritdoc />

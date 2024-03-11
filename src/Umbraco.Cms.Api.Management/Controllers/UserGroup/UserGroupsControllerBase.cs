@@ -8,10 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
-[ApiController]
 [VersionedApiBackOfficeRoute("user-group")]
 [ApiExplorerSettings(GroupName = "User Group")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessUsers)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
 public class UserGroupControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserGroupOperationStatusResult(UserGroupOperationStatus status) =>
@@ -50,6 +49,10 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Media start node key not found")
                 .WithDetail("The assigned media start node does not exists.")
                 .Build()),
+            UserGroupOperationStatus.DocumentPermissionKeyNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("A document permission key not found")
+                .WithDetail("A assigned document permission not exists.")
+                .Build()),
             UserGroupOperationStatus.LanguageNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Language not found")
                 .WithDetail("The specified language cannot be found.")
@@ -66,6 +69,13 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Missing user group name.")
                 .WithDetail("The user group name is required, and cannot be an empty string.")
                 .Build()),
+            UserGroupOperationStatus.AdminGroupCannotBeEmpty => BadRequest(problemDetailsBuilder
+                .WithTitle("Admin group cannot be empty")
+                .WithDetail("The admin group cannot be empty.")
+                .Build()),
+            UserGroupOperationStatus.UserNotInGroup => BadRequest(problemDetailsBuilder
+                .WithTitle("User not in group")
+                .WithDetail("The user is not in the group.")),
             UserGroupOperationStatus.UnauthorizedMissingAllowedSectionAccess => Unauthorized(problemDetailsBuilder
                 .WithTitle("Unauthorized section access")
                 .WithDetail("The performing user does not have access to all sections specified as allowed for this user group.")

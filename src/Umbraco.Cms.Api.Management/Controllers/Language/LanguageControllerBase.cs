@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Language;
 
-[ApiController]
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Language)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Language))]
 public abstract class LanguageControllerBase : ManagementApiControllerBase

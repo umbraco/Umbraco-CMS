@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;

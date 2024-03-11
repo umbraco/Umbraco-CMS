@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -60,6 +59,14 @@ public class ContentControllerBase : ManagementApiControllerBase
             ContentEditingOperationStatus.SortingInvalid => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid sorting options")
                 .WithDetail("The supplied sorting operations were invalid. Additional details can be found in the log.")
+                .Build()),
+            ContentEditingOperationStatus.InvalidCulture => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid culture")
+                .WithDetail("One or more of the supplied culture codes did not match the configured languages.")
+                .Build()),
+            ContentEditingOperationStatus.DuplicateKey => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid Id")
+                .WithDetail("The supplied id is already in use.")
                 .Build()),
             ContentEditingOperationStatus.Unknown => StatusCode(
                 StatusCodes.Status500InternalServerError,
