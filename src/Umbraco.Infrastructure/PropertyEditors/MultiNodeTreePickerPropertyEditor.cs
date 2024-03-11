@@ -86,7 +86,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
             {
                 if (UdiParser.TryParse(stringUdi, out GuidUdi? guidUdi) is false)
                 {
-                    yield break;
+                    continue;
                 }
 
                 yield return new EditorEntityReference() { Type = guidUdi.EntityType, Unique = guidUdi.Guid };
@@ -100,7 +100,7 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
         {
             public required string Type { get; set; }
 
-            public Guid Unique { get; set; }
+            public required Guid Unique { get; set; }
         }
     }
 }
