@@ -2,6 +2,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.UI", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{C55CA725-9F4E-4618-9435-6B8AE05DA14D}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
 	ProjectSection(SolutionItems) = preProject
 		tests\.editorconfig = tests\.editorconfig
@@ -147,8 +149,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSharp", "src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj", "{C280181E-597B-4AA5-82E7-D7017E928749}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{05878304-40EB-4F84-B40B-91BDB70DE094}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.UI", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{C55CA725-9F4E-4618-9435-6B8AE05DA14D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Api.Common", "src\Umbraco.Cms.Api.Common\Umbraco.Cms.Api.Common.csproj", "{D48B5D6B-82FF-4235-986C-CDE646F41DEC}"
 EndProject
