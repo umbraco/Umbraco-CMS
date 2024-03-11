@@ -268,6 +268,13 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		const frozenContainers =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers ?? [];
 
+		const ownerContainer = frozenContainers.find((x) => x.id === containerId);
+		if (!ownerContainer) {
+			console.error(
+				'We do not have this container on the requested id, we should clone the container and append the change to it. [NL]',
+			);
+		}
+
 		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === containerId);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
