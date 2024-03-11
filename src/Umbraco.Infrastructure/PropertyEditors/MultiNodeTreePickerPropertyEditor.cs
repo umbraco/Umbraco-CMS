@@ -32,6 +32,12 @@ public class MultiNodeTreePickerPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<MultiNodeTreePickerPropertyValueEditor>(Attribute!);
 
+    /// <remarks>
+    /// At first glance, the fromEditor and toEditor methods might seem strange.
+    /// This is because we wanted to stop the leaking of UDI's to the frontend while not having to do database migrations
+    /// so we opted to, for now, translate the udi string in the database into a structured format unique to the client
+    /// This way, for now, no migration is needed and no changes outside of the editor logic needs to be touched to stop the leaking.
+    /// </remarks>
     public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IJsonSerializer _jsonSerializer;
