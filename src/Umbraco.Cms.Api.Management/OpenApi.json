@@ -32241,14 +32241,10 @@
           "hasChildren",
           "id",
           "isTrashed",
-          "noAccess",
-          "type"
+          "noAccess"
         ],
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -39634,14 +39630,10 @@
       },
       "TreeItemPresentationModel": {
         "required": [
-          "hasChildren",
-          "type"
+          "hasChildren"
         ],
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           }

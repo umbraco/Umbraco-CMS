@@ -36,7 +36,6 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
             {
                 Name = dictionaryItem.ItemKey,
                 Id = dictionaryItem.Key,
-                Type = Constants.UdiEntityType.DictionaryItem,
                 HasChildren = hasChildren,
                 Parent = parentKey.HasValue
                     ? new ReferenceByIdModel
