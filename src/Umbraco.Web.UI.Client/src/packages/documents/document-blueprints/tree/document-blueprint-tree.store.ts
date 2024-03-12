@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT } from '../repository/index.js';
+import { UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT } from '../repository/detail/index.js';
 import type { UmbDocumentBlueprintDetailModel } from '../types.js';
 import type { UmbDocumentBlueprintTreeItemModel } from './types.js';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
@@ -29,9 +29,7 @@ export class UmbDocumentBlueprintTreeStore extends UmbUniqueTreeStore {
 	}
 
 	#updateTreeItemMapper = (item: UmbDocumentBlueprintDetailModel) => {
-		return {
-			name: item.name,
-		};
+		return { ...item, name: item.variants.map((variant) => variant.name)[0] };
 	};
 }
 

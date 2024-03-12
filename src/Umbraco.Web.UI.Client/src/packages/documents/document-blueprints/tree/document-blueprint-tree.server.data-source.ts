@@ -50,8 +50,8 @@ const mapper = (item: DocumentBlueprintTreeItemResponseModel): UmbDocumentBluepr
 		unique: item.id,
 		parentUnique: item.parent?.id || null,
 		name: item.name,
-		entityType: item.isFolder ? UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE : UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
-		isFolder: item.isFolder,
+		entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
+		isFolder: false,
 		hasChildren: item.hasChildren,
 	};
 };
