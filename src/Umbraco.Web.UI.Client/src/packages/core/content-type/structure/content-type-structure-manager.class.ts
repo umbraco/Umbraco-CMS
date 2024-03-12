@@ -251,9 +251,11 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 			clonedContainer.parent = { id: parentContainer.id };
 		}
 		// Spread containers, so we can append to it, and then update the specific content-type with the new set of containers: [NL]
-		const containers = [
-			...(this.#contentTypes.getValue().find((x) => x.unique === toContentTypeUnique)?.containers ?? []),
-		];
+		// Correction the spread is removed now, cause we do a filter: [NL]
+		// And then we remove the existing one, to have the more local one replacing it. [NL]
+		const containers = (
+			this.#contentTypes.getValue().find((x) => x.unique === toContentTypeUnique)?.containers ?? []
+		).filter((x) => x.name !== clonedContainer.name && x.type === clonedContainer.type);
 		containers.push(clonedContainer);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
