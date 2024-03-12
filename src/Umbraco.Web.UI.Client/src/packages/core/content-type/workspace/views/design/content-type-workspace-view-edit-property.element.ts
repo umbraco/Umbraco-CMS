@@ -125,12 +125,10 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 
 	async #checkInherited() {
 		if (this._propertyStructureHelper && this._property) {
-			console.log('checkInherited');
 			// We can first match with something if we have a name [NL]
 			this.observe(
 				await this._propertyStructureHelper!.isOwnerProperty(this._property.id),
 				(isOwned) => {
-					console.log('inherited', isOwned);
 					this.inherited = !isOwned;
 				},
 				'observeIsOwnerProperty',
