@@ -287,17 +287,25 @@ export class UmbMemberWorkspaceContext
 	}
 
 	async save() {
-		const data = this.getData();
-		if (!data) throw new Error('No data to save');
+		if (!this.#currentData.value) throw new Error('Data is missing');
+		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
+
+		let newData = undefined;
 
 		if (this.getIsNew()) {
-			await this.repository.create(data);
+			const { data } = await this.repository.create(this.#currentData.value);
+			newData = data;
 		} else {
-			await this.repository.save(data);
+			const { data } = await this.repository.save(this.#currentData.value);
+			newData = data;
 		}
 
-		this.setIsNew(false);
-		this.workspaceComplete(data);
+		if (newData) {
+			this.#persistedData.setValue(newData);
+			this.#currentData.setValue(newData);
+			this.setIsNew(false);
+			this.workspaceComplete(newData);
+		}
 	}
 
 	async delete() {
