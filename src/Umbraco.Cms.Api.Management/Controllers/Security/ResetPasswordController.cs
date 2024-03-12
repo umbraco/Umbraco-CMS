@@ -21,7 +21,6 @@ public class ResetPasswordController : SecurityControllerBase
 
     [HttpPost("forgot-password")]
     [MapToApiVersion("1.0")]
-    [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [UserPasswordEnsureMinimumResponseTime]
