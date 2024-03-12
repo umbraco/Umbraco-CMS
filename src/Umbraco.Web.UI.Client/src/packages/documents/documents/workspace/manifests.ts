@@ -180,6 +180,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		meta: {
 			label: 'Schedule publishing',
 			icon: 'icon-globe',
+			allowScheduledPublish: true,
 		},
 	},
 ];

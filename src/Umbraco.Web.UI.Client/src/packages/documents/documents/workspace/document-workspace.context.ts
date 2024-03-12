@@ -460,6 +460,44 @@ export class UmbDocumentWorkspaceContext
 		return selectedVariants;
 	}
 
+	async #handleSaveAndPublish(allowScheduledPublish?: boolean) {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		let variantIds: Array<UmbVariantId> = [];
+
+		const { options, selected } = await this.#determineVariantOptions();
+
+		// If there is only one variant, we don't need to open the modal.
+		if (options.length === 0) {
+			throw new Error('No variants are available');
+		} else if (options.length === 1) {
+			// If only one option we will skip ahead and save the document with the only variant available:
+			variantIds.push(UmbVariantId.Create(options[0]));
+		} else {
+			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
+			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+			const result = await modalManagerContext
+				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+					data: {
+						options,
+						allowScheduledPublish: allowScheduledPublish ?? false,
+					},
+					value: { selection: selected },
+				})
+				.onSubmit()
+				.catch(() => undefined);
+
+			if (!result?.selection.length || !unique) return;
+
+			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		}
+
+		const variants = await this.#performSaveOrCreate(variantIds);
+		await this.publishingRepository.publish(unique, variants);
+		this.workspaceComplete(this.#currentData.getValue());
+	}
+
 	async save() {
 		const { options, selected } = await this.#determineVariantOptions();
 
@@ -505,44 +543,11 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async saveAndPublish(): Promise<void> {
-		const unique = this.getUnique();
-		if (!unique) throw new Error('Unique is missing');
-
-		let variantIds: Array<UmbVariantId> = [];
-
-		const { options, selected } = await this.#determineVariantOptions();
-
-		// If there is only one variant, we don't need to open the modal.
-		if (options.length === 0) {
-			throw new Error('No variants are available');
-		} else if (options.length === 1) {
-			// If only one option we will skip ahead and save the document with the only variant available:
-			variantIds.push(UmbVariantId.Create(options[0]));
-		} else {
-			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
-			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-			const result = await modalManagerContext
-				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
-					data: {
-						options,
-					},
-					value: { selection: selected },
-				})
-				.onSubmit()
-				.catch(() => undefined);
-
-			if (!result?.selection.length || !unique) return;
-
-			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
-		}
-
-		const variants = await this.#performSaveOrCreate(variantIds);
-		await this.publishingRepository.publish(unique, variants);
-		this.workspaceComplete(this.#currentData.getValue());
+		return this.#handleSaveAndPublish();
 	}
 
 	saveAndSchedule() {
-		throw new Error('Method not implemented.');
+		return this.#handleSaveAndPublish(true);
 	}
 
 	public async unpublish() {
