@@ -364,7 +364,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The Sql statement.</param>
-        /// <param name="fields">Expressions specifying the fields.</param>
+        /// <param name="fields">Expressions speci fying the fields.</param>
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> AndBy<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object?>>[] fields)
         {
@@ -372,6 +372,17 @@ namespace Umbraco.Extensions
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
                 : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
+            return sql.Append(", " + string.Join(", ", columns));
+
+        }
+
+        public static Sql<ISqlContext> AndBy<TDto>(this Sql<ISqlContext> sql, string tableAlias,
+            params Expression<Func<TDto, object?>>[] fields)
+        {
+            ISqlSyntaxProvider sqlSyntax = sql.SqlContext.SqlSyntax;
+            var columns = fields.Length == 0
+                ? sql.GetColumns<TDto>(withAlias: false)
+                : fields.Select(x => sqlSyntax.GetFieldName(x, tableAlias)).ToArray();
             return sql.Append(", " + string.Join(", ", columns));
         }
 
