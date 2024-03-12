@@ -105,9 +105,11 @@ test.describe('Data Types Folder tests', () => {
     // Arrange
     let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
+    await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
     await umbracoApi.dataType.create(dataTypeName, editorAlias, [], dataTypeFolderId);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
-    
+    await umbracoUi.reloadPage();
+      
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.deleteDataTypeFolder(dataTypeFolderName);
@@ -119,6 +121,9 @@ test.describe('Data Types Folder tests', () => {
     const dataTypeChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
     expect(dataTypeChildren[0].name).toBe(dataTypeName); 
     expect(dataTypeChildren[0].isFolder).toBeFalsy(); 
+
+    // Clean
+    await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
   });
 
   test.skip('can move a data type to a data type folder', async ({}) => {
