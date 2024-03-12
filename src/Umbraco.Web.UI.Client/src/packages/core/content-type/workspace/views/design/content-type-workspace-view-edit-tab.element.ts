@@ -191,7 +191,6 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						this._groups,
 						(group) => group.id,
 						(group) => html`
-							<b>${group.id} - ${group.name}</b>
 							<umb-content-type-workspace-view-edit-group
 								class="container-handle"
 								?sort-mode-active=${this._sortModeActive}
