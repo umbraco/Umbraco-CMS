@@ -8,7 +8,7 @@ import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-log-viewer-saved-searches-overview')
 export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
-	#itemsPerPage = 15;
+	#itemsPerPage = 999;
 	#currentPage = 1;
 
 	@state()

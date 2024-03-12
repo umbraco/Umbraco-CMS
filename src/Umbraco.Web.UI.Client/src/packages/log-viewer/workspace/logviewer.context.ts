@@ -168,7 +168,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		return this.#dateRange.getValue();
 	}
 
-	async getSavedSearches({ skip = 0, take = 15 }: { skip?: number; take?: number } = {}) {
+	async getSavedSearches({ skip = 0, take = 999 }: { skip?: number; take?: number } = {}) {
 		const { data } = await this.#repository.getSavedSearches({ skip, take });
 		if (data) {
 			this.#savedSearches.setValue(data);
