@@ -4,6 +4,8 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
+type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
+
 /**
  * This class is a helper class for managing the structure of containers in a content type.
  * This requires a structure manager {@link UmbContentTypePropertyStructureManager} to manage the structure.
@@ -101,7 +103,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.observe(
 			this.#structure.propertyStructuresOf(groupId),
 			(properties) => {
-				// If this need to be able to remove properties, we need to clean out the ones of this group.id before inserting them:
+				// If property was removed, we want to make sure that we clean out the ones of this group.id before inserting them again:
 				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.container?.id !== groupId);
 
 				properties?.forEach((property) => {
@@ -115,6 +117,13 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 			},
 			'_observePropertyStructureOfGroup' + groupId,
 		);
+	}
+
+	async isOwnerProperty(propertyId: UmbPropertyTypeId) {
+		await this.#init;
+		if (!this.#structure) return;
+
+		return this.#structure.ownerContentTypePart((x) => x?.properties.some((y) => y.id === propertyId));
 	}
 
 	// TODO: consider moving this to another class, to separate 'viewer' from 'manipulator':
@@ -151,7 +160,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return true;
 	}
 
-	async removeProperty(propertyId: string) {
+	async removeProperty(propertyId: UmbPropertyTypeId) {
 		await this.#init;
 		if (!this.#structure) return false;
 

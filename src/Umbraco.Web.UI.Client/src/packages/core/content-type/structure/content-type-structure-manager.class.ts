@@ -433,7 +433,8 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 			if (!container) {
 				throw new Error('Container for inserting property could not be found or created');
 			}
-			property.container.id = container.id;
+			// Unfreeze object, while settings container.id
+			property = { ...property, container: { id: container.id } };
 		}
 
 		const frozenProperties =

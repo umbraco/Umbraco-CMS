@@ -209,13 +209,8 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 										owner-document-type-name=${ifDefined(this._ownerDocumentType!.name)}
 										?inherited=${property.container?.id !== this.containerId}
 										?sort-mode-active=${this._sortModeActive}
-										.property=${property}
-										@umb:partial-property-update=${(event: CustomEvent) => {
-											this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
-										}}
-										@property-delete=${() => {
-											this._propertyStructureHelper.removeProperty(property.id);
-										}}>
+										.propertyStructureHelper=${this._propertyStructureHelper}
+										.property=${property}>
 									</umb-content-type-workspace-view-edit-property>
 								`;
 							},

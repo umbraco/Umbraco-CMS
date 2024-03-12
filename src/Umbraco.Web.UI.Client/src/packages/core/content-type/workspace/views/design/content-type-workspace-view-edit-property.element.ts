@@ -12,6 +12,8 @@ import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UMB_PROPERTY_SETTINGS_MODAL,
+	type UmbContentTypeModel,
+	type UmbContentTypePropertyStructureHelper,
 	type UmbPropertyTypeModel,
 	type UmbPropertyTypeScaffoldModel,
 } from '@umbraco-cms/backoffice/content-type';
@@ -29,6 +31,17 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 	#settingsModal;
 	#workspaceModal;
 
+	@property({ attribute: false })
+	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
+		if (value === this._propertyStructureHelper) return;
+		this._propertyStructureHelper = value;
+		this.#checkInherited();
+	}
+	public get propertyStructureHelper(): UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined {
+		return this._propertyStructureHelper;
+	}
+	private _propertyStructureHelper?: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined;
+
 	/**
 	 * Property, the data object for the property.
 	 * @type {UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined}
@@ -42,8 +55,9 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 	public set property(value: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined) {
 		const oldValue = this._property;
 		this._property = value;
+		this.#checkInherited();
 		this.#settingsModal.setUniquePathValue('propertyId', value?.id?.toString());
-		this.#workspaceModal.setUniquePathValue('propertyId', value?.id?.toString());
+		//this.#workspaceModal.setUniquePathValue('propertyId', value?.id?.toString());
 		this.setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
@@ -99,7 +113,7 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 			});
 
 		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addUniquePaths(['propertyId'])
+			//.addUniquePaths(['propertyId'])
 			.addAdditionalPath('document-type')
 			.onSetup(() => {
 				return { data: { entityType: 'document-type', preset: {} } };
@@ -109,15 +123,34 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 			});
 	}
 
-	_partialUpdate(partialObject: UmbPropertyTypeModel) {
-		this.dispatchEvent(new CustomEvent('umb:partial-property-update', { detail: partialObject }));
+	async #checkInherited() {
+		if (this._propertyStructureHelper && this._property) {
+			console.log('checkInherited');
+			// We can first match with something if we have a name [NL]
+			this.observe(
+				await this._propertyStructureHelper!.isOwnerProperty(this._property.id),
+				(isOwned) => {
+					console.log('inherited', isOwned);
+					this.inherited = !isOwned;
+				},
+				'observeIsOwnerProperty',
+			);
+		}
 	}
 
-	_singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
-		const partialObject = {} as any;
-		partialObject[propertyName] = value;
+	_partialUpdate(partialObject: UmbPropertyTypeModel) {
+		if (!this._property || !this._propertyStructureHelper) return;
+		this._propertyStructureHelper.partialUpdateProperty(this._property.id, partialObject);
+	}
 
-		this.dispatchEvent(new CustomEvent('umb:partial-property-update', { detail: partialObject }));
+	_singleValueUpdate<PropertyNameType extends keyof UmbPropertyTypeModel>(
+		propertyName: PropertyNameType,
+		value: UmbPropertyTypeModel[PropertyNameType],
+	) {
+		if (!this._property || !this._propertyStructureHelper) return;
+		const partialObject: Partial<UmbPropertyTypeModel> = {};
+		partialObject[propertyName] = value === null ? undefined : value;
+		this._propertyStructureHelper.partialUpdateProperty(this._property.id, partialObject);
 	}
 
 	#onToggleAliasLock() {
@@ -132,21 +165,22 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 	async #requestRemove(e: Event) {
 		e.preventDefault();
 		e.stopImmediatePropagation();
-		if (!this.property || !this.property.id) return;
+		if (!this._property || !this._property.id) return;
 
+		// TODO: Do proper localization here: [NL]
 		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
-				this.property.name ?? this.property.id,
+				this._property.name ?? this._property.id,
 			]}>
-					Are you sure you want to delete the property <strong>${this.property.name ?? this.property.id}</strong>
+					Are you sure you want to delete the property <strong>${this._property.name ?? this._property.id}</strong>
 				</umb-localize>
 				</div>`,
 			confirmLabel: this.localize.term('actions_delete'),
 			color: 'danger',
 		});
 
-		this.dispatchEvent(new CustomEvent('property-delete'));
+		this._propertyStructureHelper?.removeProperty(this._property.id);
 	}
 
 	#onNameChange(event: UUIInputEvent) {

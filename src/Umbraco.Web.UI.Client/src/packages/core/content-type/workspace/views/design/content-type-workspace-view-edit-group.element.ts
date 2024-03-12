@@ -11,7 +11,7 @@ import './content-type-workspace-view-edit-properties.element.js';
 
 @customElement('umb-content-type-workspace-view-edit-group')
 export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
-	private _ownerGroupId?: string | null;
+	//private _ownerGroupId?: string | null;
 
 	/*
 	@property({ type: String })
