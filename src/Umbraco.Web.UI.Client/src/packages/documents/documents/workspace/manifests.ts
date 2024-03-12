@@ -139,22 +139,6 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			},
 		],
 	},
-	{
-		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.Document.SaveAndSchedule',
-		name: 'Save And Schedule Document Workspace Action',
-		weight: 100,
-		api: UmbSaveAndScheduleDocumentWorkspaceAction,
-		meta: {
-			label: 'Save And Schedule',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
 	*/
 ];
 
