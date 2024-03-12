@@ -61,7 +61,7 @@ for (const listViewType of listViewTypes) {
       const expectedIncludePropertiesValues = {
         alias: "contentTypeAlias",
         header: "Document Type",
-        isSystem: true,
+        isSystem: 1,
       };
 
       // Act
@@ -76,7 +76,7 @@ for (const listViewType of listViewTypes) {
 
     test(`can remove Column Displayed`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
-      const columnName = 'Last edited';
+      const columnName = 'updateDate';
       const expectedIncludePropertiesValues = {
         alias: "updateDate",
         header: "Last edited",
