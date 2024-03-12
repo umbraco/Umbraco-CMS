@@ -52,11 +52,9 @@ public class FilterMemberFilterController : MemberFilterControllerBase
             memberTypeAlias = memberType.Alias;
         }
 
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
         IEnumerable<IMember> members = await Task.FromResult(_memberService.GetAll(
-            pageNumber,
-            pageSize,
+            skip,
+            take,
             out var totalRecords,
             orderBy,
             orderDirection,
