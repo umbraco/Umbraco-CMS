@@ -544,7 +544,7 @@ export class UmbDocumentWorkspaceContext
 			.onSubmit()
 			.catch(() => undefined);
 
-		if (!result?.selection.length || unique) return;
+		if (!result?.selection.length || !unique) return;
 
 		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		const variants = await this.#performSaveOrCreate(variantIds);
