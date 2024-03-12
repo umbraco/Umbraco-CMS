@@ -40,7 +40,6 @@ export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>, UmbPublishableWorkspaceContextInterface
 {
-	//
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
@@ -540,6 +539,10 @@ export class UmbDocumentWorkspaceContext
 		const variants = await this.#performSaveOrCreate(variantIds);
 		await this.publishingRepository.publish(unique, variants);
 		this.workspaceComplete(this.#currentData.getValue());
+	}
+
+	saveAndSchedule() {
+		throw new Error('Method not implemented.');
 	}
 
 	public async unpublish() {
