@@ -5,7 +5,7 @@ const dataTypeName = 'Approved Color';
 test.describe(`${dataTypeName} tests`, () => {
   let dataTypeDefaultData = null;
   let dataTypeData = null;  
-  const colorValue = '#ffffff';
+  const colorValue = 'ffffff';
   const colorLabel = 'TestColor';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
@@ -71,8 +71,7 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
 
-  // TODO: remove .skip when the frontend is able to display the added color. Currently the added colors are not displayed after reloading page
-  test.skip('can remove color', async ({umbracoApi, umbracoUi}) => {  
+  test('can remove color', async ({umbracoApi, umbracoUi}) => {  
     // Arrange
     const removedDataTypeValues = [
       {
