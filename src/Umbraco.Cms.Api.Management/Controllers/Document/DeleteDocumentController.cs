@@ -39,7 +39,7 @@ public class DeleteDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             ContentPermissionResource.WithKeys(ActionDelete.ActionLetter, id),
             AuthorizationPolicies.ContentPermissionByResource);

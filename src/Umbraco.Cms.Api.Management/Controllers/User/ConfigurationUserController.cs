@@ -9,7 +9,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.RequireAdminAccess)]
+[Authorize(Policy = AuthorizationPolicies.RequireAdminAccess)]
 public class ConfigurationUserController : UserControllerBase
 {
     private readonly IUserPresentationFactory _userPresentationFactory;
