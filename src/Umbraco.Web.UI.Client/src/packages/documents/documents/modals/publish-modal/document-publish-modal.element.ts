@@ -1,3 +1,4 @@
+import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
 import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
@@ -19,35 +20,49 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	@state()
 	_selection: Array<string> = [];
 
+	@state()
+	_options: Array<UmbDocumentVariantOptionModel> = [];
+
 	constructor() {
 		super();
 		this.observe(this.#selectionManager.selection, (selection) => {
 			this._selection = selection;
 		});
+	}
 
+	firstUpdated() {
 		this.#configureSelectionManager();
 	}
 
 	async #configureSelectionManager() {
+		this.#selectionManager.setMultiple(true);
+		this.#selectionManager.setSelectable(true);
+
+		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
+		this._options =
+			this.data?.options.filter(
+				(option) => option.variant && option.variant.state !== UmbDocumentVariantState.NOT_CREATED,
+			) ?? [];
+
 		let selected = this.value?.selection ?? [];
 
 		// Filter selection based on options:
-		selected = selected.filter((s) => this.data?.options.some((o) => o.unique === s));
+		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
 
+		// If no selections were provided, select the app language by default:
 		if (selected.length === 0) {
 			const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
 			const appCulture = context.getAppCulture();
 			// If the app language is one of the options, select it by default:
-			if (appCulture && this.data?.options.some((o) => o.language.unique === appCulture)) {
+			if (appCulture && this._options.some((o) => o.language.unique === appCulture)) {
 				selected = appendToFrozenArray(selected, new UmbVariantId(appCulture, null).toString());
 			}
 		}
 
-		this.#selectionManager.setMultiple(true);
-		this.#selectionManager.setSelectable(true);
 		this.#selectionManager.setSelection(selected);
 
-		this.data?.options.forEach((variant) => {
+		// Additionally select mandatory languages:
+		this._options.forEach((variant) => {
 			if (variant.language?.isMandatory) {
 				this.#selectionManager.select(variant.unique);
 			}
@@ -72,7 +87,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 			</p>
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
-				.variantLanguageOptions=${this.data?.options ?? []}></umb-document-variant-language-picker>
+				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
 
 			${when(
 				this.data?.allowScheduledPublish,

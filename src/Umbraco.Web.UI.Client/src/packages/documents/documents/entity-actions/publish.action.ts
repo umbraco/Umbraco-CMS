@@ -1,10 +1,12 @@
+import { UMB_DOCUMENT_PUBLISH_MODAL } from '../modals/publish-modal/index.js';
 import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
-import { UmbDocumentVariantState } from '../types.js';
+import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<object> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<object>) {
@@ -30,7 +32,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<object> 
 			return;
 		}
 
-		const allOptions = (languageData?.items ?? []).map((language) => ({
+		const options: Array<UmbDocumentVariantOptionModel> = (languageData?.items ?? []).map((language) => ({
 			culture: language.unique,
 			segment: null,
 			language: language,
@@ -38,22 +40,25 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<object> 
 			unique: new UmbVariantId(language.unique, null).toString(),
 		}));
 
-		// TODO: Maybe move this to modal [NL]
-		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
-		const options = allOptions.filter(
-			(option) =>
-				option.variant &&
-				(option.variant.state === UmbDocumentVariantState.DRAFT ||
-					option.variant.state === UmbDocumentVariantState.PUBLISHED ||
-					option.variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES),
-		);
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const result = await modalManagerContext
+			.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+				data: {
+					options,
+				},
+				// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
+				value: { selection: [] },
+			})
+			.onSubmit()
+			.catch(() => undefined);
 
-		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
-		const selectedVariants = await umbPickDocumentVariantModal(this, { type: 'publish', options });
+		if (!result?.selection.length) return;
 
-		if (selectedVariants.length) {
+		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+
+		if (variantIds.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			await publishingRepository.publish(this.args.unique, selectedVariants);
+			await publishingRepository.publish(this.args.unique, variantIds);
 		}
 	}
 }
