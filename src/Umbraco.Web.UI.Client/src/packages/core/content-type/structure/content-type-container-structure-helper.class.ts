@@ -93,6 +93,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	public setIsRoot(value: boolean) {
 		if (this._isRoot === value) return;
 		this._isRoot = value;
+		this._parentId = null;
 		this._observeParentAlikeContainers();
 	}
 	public getIsRoot() {
@@ -108,7 +109,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	private _observeParentAlikeContainers() {
-		if (!this.#structure || !this._parentType) return;
+		if (!this.#structure) return;
 
 		if (this._isRoot) {
 			this.#containers.setValue([]);
@@ -129,7 +130,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				},
 				'_observeParentContainers',
 			);*/
-		} else if (this._parentName) {
+		} else if (this._parentName && this._parentType) {
+			this.#containers.setValue([]);
 			this.observe(
 				this.#structure.containersByNameAndType(this._parentName, this._parentType),
 				(parentContainers) => {
@@ -166,7 +168,9 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this._parentMatchingContainers.forEach((container) => {
 			this.observe(
 				this.#structure!.containersOfParentKey(container.id, this._childType!),
-				this._insertChildContainers,
+				(containers) => {
+					this.#containers.append(this._insertChildContainers(containers));
+				},
 				'_observeGroupsOf_' + container.id,
 			);
 		});
@@ -178,23 +182,25 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.observe(
 			this.#structure.rootContainers(this._childType),
 			(rootContainers) => {
-				this.#containers.setValue([]);
-				this._insertChildContainers(rootContainers);
+				this.#containers.setValue(this._insertChildContainers(rootContainers));
 				this._parentOwnerContainers = this.#structure!.getOwnerContainers(this._childType!, this._parentId!) ?? [];
 			},
 			'_observeRootContainers',
 		);
 	}
 
-	private _insertChildContainers = (childContainers: UmbPropertyTypeContainerModel[]) => {
-		childContainers.forEach((group) => {
+	private _insertChildContainers(
+		childContainers: UmbPropertyTypeContainerModel[],
+	): Array<UmbPropertyTypeContainerModel> {
+		return childContainers.flatMap((group, i, value) => {
 			if (group.name !== null && group.name !== undefined) {
-				if (!this.#containers.getValue().find((x) => x.name === group.name)) {
-					this.#containers.appendOne(group);
+				if (value.find((x) => x.name === group.name)) {
+					return group;
 				}
 			}
+			return [];
 		});
-	};
+	}
 
 	/**
 	 * Returns true if the container is an owner container.

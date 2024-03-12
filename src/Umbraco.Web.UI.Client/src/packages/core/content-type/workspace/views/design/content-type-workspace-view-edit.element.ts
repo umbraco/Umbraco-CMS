@@ -1,6 +1,6 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
 import type { UmbContentTypeWorkspaceViewEditTabElement } from './content-type-workspace-view-edit-tab.element.js';
-import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement, UUIInputEvent, UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_COMPOSITION_PICKER_MODAL,
@@ -92,12 +92,10 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	@state()
 	private _activePath = '';
 
+	private _activeTabId?: string;
+
 	@state()
 	private _sortModeActive?: boolean;
-
-	// TODO: investigate if we really want this:
-	@state()
-	private _buttonDisabled: boolean = false;
 
 	constructor() {
 		super();
@@ -154,16 +152,24 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	}
 
 	private _createRoutes() {
+		// TODO: How about storing a set of elements based on tab ids? to prevent re-initializing the element when renaming..[NL]
 		if (!this._workspaceContext || !this._tabs || this._hasRootGroups === undefined) return;
 		const routes: UmbRoute[] = [];
+
+		// We gather the activeTab name to check for rename, this is a bit hacky way to redirect the user without noticing to the new name [NL]
+		let activeTabName: string | undefined = undefined;
 
 		if (this._tabs.length > 0) {
 			this._tabs?.forEach((tab) => {
 				const tabName = tab.name ?? '';
+				if (tab.id === this._activeTabId) {
+					activeTabName = tabName;
+				}
 				routes.push({
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./content-type-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
+						// Or just cache the current view here, and use it if the same is begin requested?. [NL]
 						(component as UmbContentTypeWorkspaceViewEditTabElement).tabName = tabName;
 						(component as UmbContentTypeWorkspaceViewEditTabElement).containerId = tab.id;
 					},
@@ -184,15 +190,33 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 			routes.push({
 				path: '',
 				redirectTo: 'root',
+				guards: [() => !this._activeTabId],
 			});
-		} else if (routes.length !== 0) {
+		} else if (this._tabs.length !== 0) {
 			routes.push({
 				path: '',
 				redirectTo: routes[0]?.path,
 			});
+			// TODO: Look at this case.
 		}
 
+		// If we have an active tab name, then we might have a active tab name re-name, then we will redirect to the new name if it has been changed: [NL]
+		if (activeTabName) {
+			if (this._activePath && this._routerPath) {
+				const oldPath = this._activePath.split(this._routerPath)[1];
+				const newPath = '/tab/' + encodeFolderName(activeTabName);
+				if (oldPath !== newPath) {
+					// Lets cheat a bit and update the activePath already, in this way our input does not loose focus [NL]
+					this._activePath = this._routerPath + newPath;
+					// Update the current URL, so we are still on this specific tab:
+					window.history.replaceState(null, '', this._activePath);
+				}
+			}
+		}
+
+		//if (jsonStringComparison(this._routes, routes) === false) {
 		this._routes = routes;
+		//}
 	}
 
 	async #requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
@@ -226,13 +250,13 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 			: '';
 	}
 	async #addTab() {
-		/*
+		// If there is already a Tab with no name, then focus it instead of adding a new one:
+		// TODO: Optimize this so it looks at the data instead of the DOM [NL]
 		const inputEl = this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement;
 		if (inputEl?.value === '') {
 			this.#focusInput();
 			return;
 		}
-		*/
 
 		if (!this._tabs) return;
 
@@ -240,7 +264,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 		const sortOrder = len === 0 ? 0 : this._tabs[len - 1].sortOrder + 1;
 		const tab = await this._workspaceContext?.structure.createContainer(null, null, 'Tab', sortOrder);
 		if (tab) {
-			const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
+			const path = this._routerPath + (tab.name ? '/tab/' + encodeFolderName(tab.name) : '/tab');
 			window.history.replaceState(null, '', path);
 			this.#focusInput();
 		}
@@ -253,14 +277,8 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	}
 
 	async #tabNameChanged(event: InputEvent, tab: PropertyTypeContainerModelBaseModel) {
-		if (this._buttonDisabled) this._buttonDisabled = !this._buttonDisabled;
+		this._activeTabId = tab.id;
 		let newName = (event.target as HTMLInputElement).value;
-
-		if (newName === '') {
-			// TODO: Localize this:
-			newName = 'Unnamed';
-			(event.target as HTMLInputElement).value = 'Unnamed';
-		}
 
 		const changedName = this._workspaceContext?.structure.makeContainerNameUniqueForOwnerContentType(
 			newName,
@@ -277,9 +295,10 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 		this._tabsStructureHelper.partialUpdateContainer(tab.id!, {
 			name: newName,
 		});
+	}
 
-		// Update the current URL, so we are still on this specific tab:
-		window.history.replaceState(null, '', this._routerPath + '/tab/' + encodeFolderName(newName));
+	async #tabNameBlur() {
+		this._activeTabId = undefined;
 	}
 
 	async #openCompositionModal() {
@@ -397,7 +416,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	}
 
 	renderTab(tab: PropertyTypeContainerModelBaseModel) {
-		const path = this._routerPath + '/tab/' + encodeFolderName(tab.name || '');
+		const path = this._routerPath + (tab.name ? '/tab/' + encodeFolderName(tab.name) : '/tab');
 		const tabActive = path === this._activePath;
 		const tabInherited = !this._tabsStructureHelper.isOwnerChildContainer(tab.id!);
 
@@ -436,9 +455,8 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 					value="${tab.name!}"
 					auto-width
 					@change=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@blur=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
-					@input=${() => (this._buttonDisabled = true)}
-					@focus=${(e: UUIInputEvent) => (e.target.value ? nothing : (this._buttonDisabled = true))}>
+					@input=${(e: InputEvent) => this.#tabNameChanged(e, tab)}
+					@blur=${(e: InputEvent) => this.#tabNameBlur()}>
 					${this.renderDeleteFor(tab)}
 				</uui-input>
 			</div>`;
@@ -462,7 +480,6 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 			label=${this.localize.term('actions_remove')}
 			class="trash"
 			slot="append"
-			?disabled=${this._buttonDisabled}
 			@click=${() => this.#requestRemoveTab(tab)}
 			compact>
 			<uui-icon name="icon-trash"></uui-icon>
