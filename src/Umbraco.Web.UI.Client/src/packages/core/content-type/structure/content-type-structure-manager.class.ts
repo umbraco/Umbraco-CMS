@@ -191,6 +191,10 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		this.#contentTypes.updateOne(this.#ownerContentTypeUnique, entry);
 	}
 
+	getContentTypes() {
+		return this.#contentTypes.getValue();
+	}
+
 	// TODO: We could move the actions to another class?
 
 	/**

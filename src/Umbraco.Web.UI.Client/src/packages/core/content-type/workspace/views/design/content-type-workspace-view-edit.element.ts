@@ -71,6 +71,10 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 		},
 	});
 
+	private _workspaceContext?: (typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT)['TYPE'];
+
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
+
 	//private _hasRootProperties = false;
 
 	@state()
@@ -91,15 +95,9 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	@state()
 	private _sortModeActive?: boolean;
 
+	// TODO: investigate if we really want this:
 	@state()
 	private _buttonDisabled: boolean = false;
-
-	private _workspaceContext?: (typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT)['TYPE'];
-
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
-
-	@state()
-	private _compositionConfiguration?: (typeof UMB_COMPOSITION_PICKER_MODAL)['DATA'];
 
 	constructor() {
 		super();
@@ -133,18 +131,6 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 				},
 				'_observeIsSorting',
 			);
-
-			const unique = workspaceContext.getUnique();
-
-			//TODO Figure out the correct data that needs to be sent to the compositions modal. Do we really have to send isElement, currentPropertyAliases - isn't unique enough?
-			this.observe(workspaceContext.structure.contentTypes, (contentTypes) => {
-				this._compositionConfiguration = {
-					unique: unique ?? '',
-					selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
-					isElement: contentTypes.find((contentType) => contentType.unique === unique)?.isElement ?? false,
-					currentPropertyAliases: [],
-				};
-			});
 
 			this._observeRootGroups();
 		});
@@ -297,9 +283,29 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	}
 
 	async #openCompositionModal() {
+		if (!this._workspaceContext) return;
+
+		const unique = this._workspaceContext.getUnique();
+		if (!unique) {
+			throw new Error('Content Type unique is undefined');
+		}
+		const contentTypes = this._workspaceContext.structure.getContentTypes();
+		const ownerContentType = this._workspaceContext.structure.getOwnerContentType();
+		if (!ownerContentType) {
+			throw new Error('Owner Content Type not found');
+		}
+
+		const compositionConfiguration = {
+			unique: unique,
+			// Here we use the loaded content types to declare what we already inherit. That puts a pressure on cleaning up, but thats a good thing. [NL]
+			selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
+			isElement: ownerContentType.isElement,
+			currentPropertyAliases: [],
+		};
+
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManagerContext.open(this, UMB_COMPOSITION_PICKER_MODAL, {
-			data: this._compositionConfiguration,
+			data: compositionConfiguration,
 		});
 		await modalContext?.onSubmit();
 
@@ -316,9 +322,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="container-list" class="flex">
-						${this._routerPath ? this.renderTabsNavigation() : ''} ${this.renderAddButton()}
-					</div>
+					<div id="container-list" class="flex">${this.renderTabsNavigation()} ${this.renderAddButton()}</div>
 					${this.renderActions()}
 				</div>
 				<umb-router-slot
