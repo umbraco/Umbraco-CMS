@@ -7,7 +7,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
-import '../variant-picker/document-variant-language-picker.element.js';
+import '../shared/document-variant-language-picker.element.js';
 
 @customElement('umb-document-variant-picker-modal')
 export class UmbDocumentPublishModalElement extends UmbModalBaseElement<

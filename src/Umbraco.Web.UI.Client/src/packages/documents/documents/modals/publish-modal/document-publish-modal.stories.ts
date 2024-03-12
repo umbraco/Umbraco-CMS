@@ -8,7 +8,6 @@ import type { UmbDocumentPublishModalElement } from './document-publish-modal.el
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 const modalData: UmbDocumentPublishModalData = {
-	type: 'save',
 	options: [
 		{
 			unique: 'en-us',
