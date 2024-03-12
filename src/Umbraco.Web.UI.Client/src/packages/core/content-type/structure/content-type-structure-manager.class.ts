@@ -590,7 +590,6 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	}
 
 	getOwnerContainers(containerType: UmbPropertyContainerTypes, parentId: string | null) {
-		console.log('containers of owner:', this.getOwnerContentType()?.containers);
 		return this.getOwnerContentType()?.containers?.filter((x) =>
 			parentId ? x.parent?.id === parentId : x.parent === null && x.type === containerType,
 		);

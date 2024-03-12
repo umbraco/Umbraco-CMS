@@ -168,7 +168,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	}
 
 	private _createRoutes() {
-		if (!this._workspaceContext || !this._tabs) return;
+		if (!this._workspaceContext || !this._tabs || this._hasRootGroups === undefined) return;
 		const routes: UmbRoute[] = [];
 
 		if (this._tabs.length > 0) {
@@ -240,11 +240,13 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 			: '';
 	}
 	async #addTab() {
+		/*
 		const inputEl = this.shadowRoot?.querySelector('uui-tab[active] uui-input') as UUIInputElement;
 		if (inputEl?.value === '') {
 			this.#focusInput();
 			return;
 		}
+		*/
 
 		if (!this._tabs) return;
 
