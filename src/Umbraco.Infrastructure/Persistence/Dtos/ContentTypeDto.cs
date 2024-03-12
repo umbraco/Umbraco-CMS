@@ -39,9 +39,9 @@ internal class ContentTypeDto
     [Length(1500)]
     public string? Description { get; set; }
 
-    [Column("isContainer")]
-    [Constraint(Default = "0")]
-    public bool IsContainer { get; set; }
+    [Column("listView")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    public Guid? ListView { get; set; }
 
     [Column("isElement")]
     [Constraint(Default = "0")]

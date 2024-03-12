@@ -441,7 +441,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         empty. If the content type is invariant, then culture can be either '*' or null or empty.
     ///     </para>
     /// </remarks>
-    PublishResult Unpublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
+    PublishResult Unpublish(IContent content, string? culture = "*", int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets a value indicating whether a document is path-publishable.
@@ -484,7 +484,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///     Assigns a permission to a document.
     /// </summary>
     /// <remarks>Adds the permission to existing permissions.</remarks>
-    void SetPermission(IContent entity, char permission, IEnumerable<int> groupIds);
+    void SetPermission(IContent entity, string permission, IEnumerable<int> groupIds);
 
     #endregion
 

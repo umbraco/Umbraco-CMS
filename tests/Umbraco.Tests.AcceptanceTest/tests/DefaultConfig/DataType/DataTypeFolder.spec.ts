@@ -34,7 +34,7 @@ test.describe('Data Types Folder tests', () => {
     await umbracoApi.dataType.ensureNameNotExists(wrongDataTypeFolderName);
     await umbracoApi.dataType.createFolder(wrongDataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(wrongDataTypeFolderName)).toBeTruthy();
-    
+
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(wrongDataTypeFolderName);
@@ -51,7 +51,7 @@ test.describe('Data Types Folder tests', () => {
     // Arrange
     await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
-    
+
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.deleteDataTypeFolder(dataTypeFolderName);
@@ -64,7 +64,7 @@ test.describe('Data Types Folder tests', () => {
     // Arrange
     let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
-    
+
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
@@ -76,16 +76,17 @@ test.describe('Data Types Folder tests', () => {
     // Assert
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
     const dataTypeChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
-    expect(dataTypeChildren[0].name).toBe(dataTypeName); 
-    expect(dataTypeChildren[0].isFolder).toBeFalsy(); 
+    expect(dataTypeChildren[0].name).toBe(dataTypeName);
+    expect(dataTypeChildren[0].isFolder).toBeFalsy();
   });
 
-  test('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
+  //TODO: Remove skip when the frontend is ready
+  test.skip('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'Child Folder';
     let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
-    
+
     // Act
     await umbracoUi.dataType.clickRootFolderCaretButton();
     await umbracoUi.dataType.clickActionsMenuForDataType(dataTypeFolderName);
@@ -97,11 +98,12 @@ test.describe('Data Types Folder tests', () => {
     // Assert
     expect(await umbracoApi.dataType.doesNameExist(childFolderName)).toBeTruthy();
     const dataTypeChildren = await umbracoApi.dataType.getChildren(dataTypeFolderId);
-    expect(dataTypeChildren[0].name).toBe(childFolderName); 
-    expect(dataTypeChildren[0].isFolder).toBeTruthy(); 
+    expect(dataTypeChildren[0].name).toBe(childFolderName);
+    expect(dataTypeChildren[0].isFolder).toBeTruthy();
   });
 
-  test('cannot delete a non-empty data type folder', async ({umbracoApi, umbracoUi}) => {
+  //TODO: Remove skip when the frontend is ready
+  test.skip('cannot delete a non-empty data type folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();

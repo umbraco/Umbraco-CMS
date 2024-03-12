@@ -30,16 +30,21 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.VariesByCulture = source.VariesByCulture();
         target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
+
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
         target.AllowedMediaTypes = source.AllowedContentTypes?.Select(ct =>
                 new MediaTypeSort { MediaType = new ReferenceByIdModel(ct.Key), SortOrder = ct.SortOrder })
             .ToArray() ?? Enumerable.Empty<MediaTypeSort>();
-        target.Compositions = source.ContentTypeComposition.Select(contentTypeComposition => new MediaTypeComposition
-        {
-            MediaType = new ReferenceByIdModel(contentTypeComposition.Key),
-            CompositionType = CalculateCompositionType(source, contentTypeComposition)
-        }).ToArray();
+        target.Compositions = MapNestedCompositions(
+            source.ContentTypeComposition,
+            source.ParentId,
+            (referenceByIdModel, compositionType) => new MediaTypeComposition
+            {
+                MediaType = referenceByIdModel,
+                CompositionType = compositionType,
+            });
     }
 
     // Umbraco.Code.MapAll
@@ -47,7 +52,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
     // Umbraco.Code.MapAll
@@ -55,7 +60,7 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
+        target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
     }
 
     // Umbraco.Code.MapAll

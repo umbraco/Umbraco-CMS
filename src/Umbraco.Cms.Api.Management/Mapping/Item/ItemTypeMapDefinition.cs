@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
+using Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
@@ -10,10 +10,12 @@ using Umbraco.Cms.Api.Management.ViewModels.RelationType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Template.Item;
 using Umbraco.Cms.Api.Management.ViewModels.User.Item;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup.Item;
+using Umbraco.Cms.Api.Management.ViewModels.Webhook.Item;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Item;
 
@@ -32,6 +34,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         mapper.Define<IRelationType, RelationTypeItemResponseModel>((_, _) => new RelationTypeItemResponseModel(), Map);
         mapper.Define<IUser, UserItemResponseModel>((_, _) => new UserItemResponseModel(), Map);
         mapper.Define<IUserGroup, UserGroupItemResponseModel>((_, _) => new UserGroupItemResponseModel(), Map);
+        mapper.Define<IWebhook, WebhookItemResponseModel>((_, _) => new WebhookItemResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -47,6 +50,7 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
         target.EditorUiAlias = source.EditorUiAlias;
+        target.IsDeletable = source.IsDeletableDataType();
     }
 
     // Umbraco.Code.MapAll
@@ -116,5 +120,15 @@ public class ItemTypeMapDefinition : IMapDefinition
         target.Id = source.Key;
         target.Name = source.Name ?? source.Alias;
         target.Icon = source.Icon;
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(IWebhook source, WebhookItemResponseModel target, MapperContext context)
+    {
+        target.Name = string.Empty; //source.Name;
+        target.Url = source.Url;
+        target.Enabled = source.Enabled;
+        target.Events = string.Join(",", source.Events);
+        target.Types = string.Join(",", source.ContentTypeKeys);
     }
 }

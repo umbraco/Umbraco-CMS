@@ -40,11 +40,7 @@ public class UpdateRelationTypeController : RelationTypeControllerBase
 
         if (persistedRelationType is null)
         {
-            ProblemDetails problemDetails = new ProblemDetailsBuilder()
-                .WithTitle("Could not find relation type")
-                .WithDetail($"Relation type with id {id} could not be found")
-                .Build();
-            return NotFound(problemDetails);
+            return RelationTypeNotFound();
         }
 
         _relationTypePresentationFactory.MapUpdateModelToRelationType(updateRelationTypeSavingViewModel, persistedRelationType);

@@ -32,7 +32,7 @@ public class MoveDictionaryController : DictionaryControllerBase
         IDictionaryItem? source = await _dictionaryItemService.GetAsync(id);
         if (source == null)
         {
-            return DictionaryNotFound();
+            return DictionaryItemNotFound();
         }
 
         Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = await _dictionaryItemService.MoveAsync(

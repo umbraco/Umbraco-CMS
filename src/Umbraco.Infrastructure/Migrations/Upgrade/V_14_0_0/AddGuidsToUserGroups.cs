@@ -45,6 +45,9 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserGroupDto>(columns, NewColumnName);
 
+        var nodeDtoTrashedIndex = $"IX_umbracoUserGroup_userGroupKey";
+        CreateIndex<UserGroupDto>(nodeDtoTrashedIndex);
+
         // We want specific keys for the default user groups, so we need to fetch the user groups again to set their keys.
         List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>();
 

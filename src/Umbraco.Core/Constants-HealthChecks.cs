@@ -26,8 +26,6 @@ public static partial class Constants
 
             public static class Configuration
             {
-                public const string MacroErrorsCheck = "https://umbra.co/healthchecks-macro-errors";
-
                 public const string TrySkipIisCustomErrorsCheck =
                     "https://umbra.co/healthchecks-skip-iis-custom-errors";
 

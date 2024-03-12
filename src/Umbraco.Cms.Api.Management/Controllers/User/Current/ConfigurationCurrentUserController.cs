@@ -9,7 +9,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
 [ApiVersion("1.0")]
-[Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
+[Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 public class ConfigurationCurrentUserController : CurrentUserControllerBase
 {
     private readonly IUserPresentationFactory _userPresentationFactory;

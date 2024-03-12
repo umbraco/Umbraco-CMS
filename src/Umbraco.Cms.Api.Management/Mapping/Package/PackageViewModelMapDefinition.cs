@@ -17,7 +17,7 @@ public class PackageViewModelMapDefinition : IMapDefinition
             (_, _) => new PackageMigrationStatusResponseModel { PackageName = string.Empty }, Map);
     }
 
-    // Umbraco.Code.MapAll -Id -PackageId -PackagePath -Macros
+    // Umbraco.Code.MapAll -Id -PackageId -PackagePath
     private static void Map(PackageModelBase source, PackageDefinition target, MapperContext context)
     {
         target.Name = source.Name;

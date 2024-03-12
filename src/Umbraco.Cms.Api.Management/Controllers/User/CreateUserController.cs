@@ -35,8 +35,9 @@ public class CreateUserController : UserControllerBase
 
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(CreateUserResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateUserRequestModel model)
     {
         UserCreateModel createModel = await _presentationFactory.CreateCreationModelAsync(model);
@@ -44,7 +45,7 @@ public class CreateUserController : UserControllerBase
         Attempt<UserCreationResult, UserOperationStatus> result = await _userService.CreateAsync(CurrentUserKey(_backOfficeSecurityAccessor), createModel, true);
 
         return result.Success
-            ? Ok(_mapper.Map<CreateUserResponseModel>(result.Result))
+            ? CreatedAtId<ByKeyUserController>(controller => nameof(controller.ByKey), result.Result.CreatedUser!.Key)
             : UserOperationStatusResult(result.Status, result.Result);
     }
 }
