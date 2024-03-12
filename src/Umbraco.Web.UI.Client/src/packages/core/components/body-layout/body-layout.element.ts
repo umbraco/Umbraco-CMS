@@ -15,6 +15,7 @@ import {
 /**
  * @element umb-body-layout
  * @description Layout element to arrange elements in a body layout. A general layout for most views.
+ * @slot - Slot for main content
  * @slot icon - Slot for icon
  * @slot name - Slot for name
  * @slot footer - Slot for footer element
