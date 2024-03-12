@@ -21,14 +21,12 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can add option', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const optionName = 'Test option';
-    const expectedDataTypeValues = [{
-      "alias": "items",
-      "value": [
-        {
-          "value": optionName
-        }
-      ]
-    }];
+    const expectedDataTypeValues = [
+      {
+        alias: "items",
+        value: [optionName],
+      },
+    ];
     // Remove all existing options
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     dataTypeData.values = [];
@@ -48,14 +46,12 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can remove option', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const removedOptionName = 'Removed Option';
-    const removedOptionValues = [{
-      "alias": "items",
-      "value": [
-        {
-          "value": removedOptionName
-        }
-      ]
-    }];
+    const removedOptionValues = [
+      {
+        alias: "items",
+        value: [removedOptionName],
+      },
+    ];
     // Remove all existing options and add an option to remove
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
     dataTypeData.values = removedOptionValues;
