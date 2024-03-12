@@ -5,7 +5,7 @@ import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { type TemporaryFileQueueItem, UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
+import { UmbTemporaryFileManager } from '@umbraco-cms/backoffice/temporary-file';
 import { assignToFrozenObject } from '@umbraco-cms/backoffice/observable-api';
 
 import './image-cropper.element.js';
@@ -25,6 +25,9 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 		focalPoint: { left: 0.5, top: 0.5 },
 	};
 
+	@property({ attribute: false })
+	crops: UmbImageCropperPropertyEditorValue['crops'] = [];
+
 	@state()
 	file?: File;
 
@@ -36,18 +39,11 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#manager = new UmbTemporaryFileManager(this);
-
-		// this.observe(this.#manager.isReady, (value) => (this.error = !value));
-		this.observe(this.#manager.queue, this.#onQueueUpdate);
 	}
 
-	#onQueueUpdate = (value: TemporaryFileQueueItem[]) => {
-		if (value.length) {
-			// this.file = value[0].file;
-			// this.fileUnique = value[0].unique;
-			// this.value.src = value[0].unique;
-		}
-	};
+	protected firstUpdated(): void {
+		this.#mergeCrops();
+	}
 
 	#onUpload(e: UUIFileDropzoneEvent) {
 		const file = e.detail.files[0];
@@ -78,6 +74,24 @@ export class UmbInputImageCropperElement extends UmbLitElement {
 
 		this.dispatchEvent(new UmbChangeEvent());
 	};
+
+	#mergeCrops() {
+		// Replace crops from the value with the crops from the config while keeping the coordinates from the value if they exist.
+		const filteredCrops = this.crops.map((crop) => {
+			const cropFromValue = this.value.crops.find((valueCrop) => valueCrop.alias === crop.alias);
+			const result = {
+				...crop,
+				coordinates: cropFromValue?.coordinates ?? undefined,
+			};
+
+			return result;
+		});
+
+		this.value = {
+			...this.value,
+			crops: filteredCrops,
+		};
+	}
 
 	render() {
 		if (this.value.src || this.file) {
