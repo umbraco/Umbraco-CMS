@@ -1,10 +1,11 @@
-import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
+import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-input-tree')
@@ -98,7 +99,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		switch (this._type) {
 			case 'content':
-				return this.#renderContentPicker();
+				return this.#renderDocumentPicker();
 			case 'media':
 				return this.#renderMediaPicker();
 			case 'member':
@@ -108,7 +109,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	#renderContentPicker() {
+	#renderDocumentPicker() {
 		return html`<umb-input-document
 			.selectedIds=${this.#selectedIds}
 			.startNodeId=${this.startNodeId}
@@ -121,6 +122,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderMediaPicker() {
+		// TODO: [LK] Review the data structure of this input editor.
 		return html`<umb-input-media
 			.selectedIds=${this.#selectedIds}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
