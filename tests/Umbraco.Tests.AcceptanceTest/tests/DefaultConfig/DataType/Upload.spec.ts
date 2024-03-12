@@ -25,11 +25,7 @@ for (const uploadType of uploadTypes) {
       const expectedDataTypeValues = [
         {
           alias: "fileExtensions",
-          value: [
-            {
-              "value": fileExtensionValue
-            },
-          ],
+          value: [fileExtensionValue],
         },
       ];
       // Remove all existing accepted file extensions
@@ -54,11 +50,7 @@ for (const uploadType of uploadTypes) {
       const removedFileExtensionsValues = [
         {
           alias: "fileExtensions",
-          value: [
-            {
-              "value": removedFileExtensionValue
-            },
-          ],
+          value: [removedFileExtensionValue],
         },
       ];
       // Remove all existing accepted file extensions and add an file extension to remove
