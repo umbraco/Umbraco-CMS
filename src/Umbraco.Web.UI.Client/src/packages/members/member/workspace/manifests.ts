@@ -45,7 +45,7 @@ export const workspaceViews: Array<ManifestWorkspaceView> = [
 		alias: 'Umb.WorkspaceView.Member.Content',
 		name: 'Member Workspace Content View',
 		js: () => import('./views/content/member-workspace-view-content.element.js'),
-		weight: 300,
+		weight: 100,
 		meta: {
 			label: 'Content',
 			pathname: 'content',
