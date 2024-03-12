@@ -18,17 +18,7 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager<string>(this);
 
 	@state()
-	_selection: Array<string> = [];
-
-	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
-
-	constructor() {
-		super();
-		this.observe(this.#selectionManager.selection, (selection) => {
-			this._selection = selection;
-		});
-	}
 
 	firstUpdated() {
 		this.#configureSelectionManager();
