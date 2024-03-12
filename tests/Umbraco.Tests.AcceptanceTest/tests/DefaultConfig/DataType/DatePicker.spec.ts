@@ -36,6 +36,10 @@ for (const datePickerType of datePickerTypes) {
             ]
           : [
               {
+                alias: "format",
+                value: "YYYY-MM-DD HH:mm:ss",
+              },
+              {
                 alias: "offsetTime",
                 value: true,
               },
@@ -53,21 +57,18 @@ for (const datePickerType of datePickerTypes) {
     test(`can update date format`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const dateFormatValue =
-        datePickerType === 'Date Picker' ? 'DD-MM-YYYY' : 'DD-MM-YYYY hh:mm:ss';
-      const expectedDataTypeValues = [
-        {
-          alias: "format",
-          value: dateFormatValue,
-        },
-      ];
-
+        datePickerType === "Date Picker" ? "DD-MM-YYYY" : "DD-MM-YYYY hh:mm:ss";
+      const expectedDataTypeValues = {
+        alias: "format",
+        value: dateFormatValue,
+      };
       // Act
       await umbracoUi.dataType.enterDateFormatValue(dateFormatValue);
       await umbracoUi.dataType.clickSaveButton();
 
       // Assert
       dataTypeData = await umbracoApi.dataType.getByName(datePickerType);
-      expect(dataTypeData.values).toEqual(expectedDataTypeValues);
+      expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
   });
 }
