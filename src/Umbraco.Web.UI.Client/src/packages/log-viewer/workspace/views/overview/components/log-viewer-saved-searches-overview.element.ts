@@ -6,7 +6,6 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
-//TODO: implement the saved searches pagination when the API total bug is fixed
 @customElement('umb-log-viewer-saved-searches-overview')
 export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 	#itemsPerPage = 15;
