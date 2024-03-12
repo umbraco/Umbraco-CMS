@@ -171,12 +171,6 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			.addAdditionalPath('add-property/:sortOrder')
 			.onSetup(async (params) => {
 				if (!this._ownerDocumentType) return false;
-				/*
-				const documentTypeId = this._ownerDocumentTypes?.find((types) =>
-					types.containers?.find((containers) => containers.id === this.containerId),
-				)?.unique;
-				if (documentTypeId === undefined) return false;
-				*/
 
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold();
 				if (propertyData === undefined) return false;
@@ -192,38 +186,6 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			})
 			.onSubmit(async (value) => {
 				if (!this._ownerDocumentType) return false;
-				// I would like to create the missing container at this point:
-
-				// TODO: Missing params in this case. but maybe its not a problem since I do know the containerType and containerName?
-				let containerId: string | undefined;
-				containerId = this._ownerDocumentType.containers.find(
-					(containers) => containers.type === this.containerType && containers.name === this.containerName,
-				)?.id;
-				if (!containerId) {
-					// We did not have this container in the owner document:
-					// TODO: Find the existing container to clone from:
-
-					// TODO: Missing method to recursively create containers for a documentType: [NL]
-					// TODO: Such method should take an existing container id as 'inspiration'.
-					const containerData = await this._propertyStructureHelper
-						.getStructureManager()
-						?.createContainer(this._ownerDocumentType.unique, parentID!!, params.containerType, sortOrder);
-					//TODO: inherit the name
-
-					containerId = containerData?.id;
-				}
-				if (!containerId) {
-					throw new Error('Could not get or create a container to insert property into');
-					return false;
-				}
-
-				// Unless we are at root?
-				if (value.container) {
-					value.container.id = containerId;
-				} else {
-					value.container = { id: containerId };
-				}
-
 				// TODO: The model requires a data-type to be set, we cheat currently. But this should be re-though when we implement validation(As we most likely will have to com up with partial models for the runtime model.) [NL]
 				this._propertyStructureHelper.insertProperty(value as UmbPropertyTypeModel);
 				return true;
@@ -234,47 +196,44 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 	}
 
 	render() {
-		return html`
-			<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
-				${repeat(
-					this._propertyStructure,
-					(property) => property.id,
-					(property) => {
-						// Note: This piece might be moved into the property component
-						const inheritedFromDocument = this._ownerDocumentTypes?.find((types) =>
-							types.containers?.find((containers) => containers.id === property.container?.id),
-						);
+		return this._ownerDocumentType
+			? html`
+					<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
+						${repeat(
+							this._propertyStructure,
+							(property) => property.id,
+							(property) => {
+								return html`
+									<umb-content-type-workspace-view-edit-property
+										data-umb-property-id=${property.id}
+										owner-document-type-id=${ifDefined(this._ownerDocumentType!.unique)}
+										owner-document-type-name=${ifDefined(this._ownerDocumentType!.name)}
+										?inherited=${property.container?.id !== this.containerId}
+										?sort-mode-active=${this._sortModeActive}
+										.property=${property}
+										@umb:partial-property-update=${(event: CustomEvent) => {
+											this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
+										}}
+										@property-delete=${() => {
+											this._propertyStructureHelper.removeProperty(property.id);
+										}}>
+									</umb-content-type-workspace-view-edit-property>
+								`;
+							},
+						)}
+					</div>
 
-						return html`
-							<umb-content-type-workspace-view-edit-property
-								data-umb-property-id=${property.id}
-								owner-document-type-id=${ifDefined(inheritedFromDocument?.unique)}
-								owner-document-type-name=${ifDefined(inheritedFromDocument?.name)}
-								?inherited=${property.container?.id !== this.containerId}
-								?sort-mode-active=${this._sortModeActive}
-								.property=${property}
-								@umb:partial-property-update=${(event: CustomEvent) => {
-									this._propertyStructureHelper.partialUpdateProperty(property.id, event.detail);
-								}}
-								@property-delete=${() => {
-									this._propertyStructureHelper.removeProperty(property.id);
-								}}>
-							</umb-content-type-workspace-view-edit-property>
-						`;
-					},
-				)}
-			</div>
-
-			${!this._sortModeActive
-				? html`<uui-button
-						label=${this.localize.term('contentTypeEditor_addProperty')}
-						id="add"
-						look="placeholder"
-						href=${ifDefined(this._modalRouteBuilderNewProperty?.({ sortOrder: -1 }))}>
-						<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
-					</uui-button> `
-				: ''}
-		`;
+					${!this._sortModeActive
+						? html`<uui-button
+								label=${this.localize.term('contentTypeEditor_addProperty')}
+								id="add"
+								look="placeholder"
+								href=${ifDefined(this._modalRouteBuilderNewProperty?.({ sortOrder: -1 }))}>
+								<umb-localize key="contentTypeEditor_addProperty">Add property</umb-localize>
+							</uui-button> `
+						: ''}
+				`
+			: '';
 	}
 
 	static styles = [

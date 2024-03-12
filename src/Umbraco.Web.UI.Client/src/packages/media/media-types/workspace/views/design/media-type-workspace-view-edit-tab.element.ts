@@ -173,12 +173,14 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 													placeholder="Enter a group name"
 													value=${group.name ?? ''}
 													@change=${(e: InputEvent) => {
-														const newName = (e.target as HTMLInputElement).value;
+														throw new Error('Not implemented');
+														/*const newName = (e.target as HTMLInputElement).value;
 														this._groupStructureHelper.updateContainerName(
 															group.id!,
 															group.parent?.id ?? null,
 															newName,
 														);
+														*/
 													}}>
 												</uui-input>
 											</div>

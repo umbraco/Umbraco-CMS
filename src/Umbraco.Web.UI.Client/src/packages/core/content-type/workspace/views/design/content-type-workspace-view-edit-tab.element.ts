@@ -130,7 +130,6 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 		this.#groupStructureHelper.setParentType('Tab');
 
-		// TODO: Use a structured/? workspace context token...
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#groupStructureHelper.setStructureManager(context.structure);
 			this.observe(
@@ -161,10 +160,6 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		// Idea, maybe we can gather the sortOrder from the last group rendered and add 1 to it?
 		const len = this._groups.length;
 		const sortOrder = len === 0 ? 0 : this._groups[len - 1].sortOrder + 1;
-		if (this._inherited) {
-			//TODO: recursively create containers for this docType.
-			// Then container ID should update to the new container ID.
-		}
 		const container = this.#groupStructureHelper.addContainer(this._containerId, sortOrder);
 		console.log('container', container);
 	};

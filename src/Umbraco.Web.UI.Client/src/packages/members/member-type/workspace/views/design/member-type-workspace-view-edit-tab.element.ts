@@ -236,8 +236,11 @@ export class UmbMemberTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			placeholder=${this.localize.term('placeholders_entername')}
 			.value=${group.name}
 			@change=${(e: InputEvent) => {
+				throw new Error('Not implemented');
+				/*
 				const newName = (e.target as HTMLInputElement).value;
 				this._groupStructureHelper.updateContainerName(group.id!, group.parent?.id ?? null, newName);
+				*/
 			}}></uui-input>`;
 	}
 

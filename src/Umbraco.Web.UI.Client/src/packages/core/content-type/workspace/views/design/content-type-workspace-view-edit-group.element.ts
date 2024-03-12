@@ -92,6 +92,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			} else {
 				// We use name match to determine inheritance, but a no name should not be inherited.
 				this._inherited = false;
+				this.removeControllerByAlias('observeGroupContainers');
 			}
 		}
 	}
