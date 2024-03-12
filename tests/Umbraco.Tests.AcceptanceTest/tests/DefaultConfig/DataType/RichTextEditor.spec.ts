@@ -9,7 +9,6 @@ test.describe(`${dataTypeName} tests`, () => {
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoUi.goToBackOffice();
     await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-    await umbracoUi.dataType.goToDataType(dataTypeName);
     dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
   });
 
@@ -25,6 +24,7 @@ test.describe(`${dataTypeName} tests`, () => {
       alias: "ignoreUserStartNodes",
       value: true,
     };
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
     await umbracoUi.dataType.clickIgnoreUserStartNodesCamelSlider();
@@ -37,11 +37,19 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test('can enable all toolbar options', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const toolbarValues: string[] = ['undo', 'redo', 'cut', 'copy'];
-    const expectedDataTypeValues = {
-      "alias": "toolbar",
-      "value": toolbarValues
-    };
+    const toolbarValues: string[] = ["undo", "redo", "cut", "copy"];
+    const expectedDataTypeValues = [
+      {
+        alias: "toolbar",
+        value: toolbarValues,
+      },
+    ];
+
+    // Remove all existing values
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    dataTypeData.values = [];
+    await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
     await umbracoUi.dataType.pickTheToolbarOptionByValue(toolbarValues);
@@ -49,7 +57,7 @@ test.describe(`${dataTypeName} tests`, () => {
 
     // Assert
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+    expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
 
   test('can add stylesheet', async ({umbracoApi, umbracoUi}) => {
@@ -57,13 +65,14 @@ test.describe(`${dataTypeName} tests`, () => {
     const stylesheetName = 'StylesheetForDataType.css';
     await umbracoApi.stylesheet.ensureNameNotExists(stylesheetName);
     const stylesheetPath = await umbracoApi.stylesheet.create(stylesheetName, 'content');
-    await umbracoUi.reloadPage();
 
     const expectedDataTypeValues = {
       alias: "stylesheets",
       value: [stylesheetPath],
     };
 
+    await umbracoUi.dataType.goToDataType(dataTypeName);
+    
     // Act
     await umbracoUi.dataType.addStylesheet(stylesheetName);
     await umbracoUi.dataType.clickSaveButton();
@@ -85,6 +94,7 @@ test.describe(`${dataTypeName} tests`, () => {
       alias: "dimensions",
       value: [width, height],
     };
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
     await umbracoUi.dataType.enterDimensionsValue(width.toString(), height.toString());
@@ -103,6 +113,7 @@ test.describe(`${dataTypeName} tests`, () => {
       alias: "maxImageSize",
       value: maxImageSize,
     };
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
     await umbracoUi.dataType.enterMaximumSizeForImages(maxImageSize.toString());
@@ -120,6 +131,7 @@ test.describe(`${dataTypeName} tests`, () => {
       alias: "overlaySize",
       value: overlaySizeValue,
     };
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
     await umbracoUi.dataType.chooseOverlaySizeByValue(overlaySizeValue);
@@ -136,6 +148,7 @@ test.describe(`${dataTypeName} tests`, () => {
       alias: "hideLabel",
       value: true,
     };
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
     await umbracoUi.dataType.clickHideLabelSlider();
