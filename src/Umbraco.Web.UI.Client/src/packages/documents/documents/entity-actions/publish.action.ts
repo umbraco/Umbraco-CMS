@@ -1,4 +1,3 @@
-import { umbPickDocumentVariantModal } from '../modals/pick-document-variant-modal.controller.js';
 import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentVariantState } from '../types.js';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
