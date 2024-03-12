@@ -11,11 +11,10 @@ import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 /**
  * @element umb-property-editor-ui-tree-picker
  */
-
 @customElement('umb-property-editor-ui-tree-picker')
 export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value = '';
+	@property({ type: Array })
+	value: UmbInputTreeElement['items'] = [];
 
 	@state()
 	type: UmbTreePickerSource['type'] = 'content';
@@ -82,13 +81,14 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	}
 
 	#onChange(e: CustomEvent) {
-		this.value = (e.target as UmbInputTreeElement).value as string;
+		const input = e.target as UmbInputTreeElement;
+		this.value = input.items;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		return html`<umb-input-tree
-			.value=${this.value}
+			.items=${this.value}
 			.type=${this.type}
 			.startNodeId=${this.startNodeId ?? ''}
 			.min=${this.min}

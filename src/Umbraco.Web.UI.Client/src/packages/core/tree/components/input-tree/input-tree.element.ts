@@ -50,32 +50,40 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Boolean })
 	ignoreUserStartNodes?: boolean;
 
-	@property()
-	public set value(newValue: string) {
-		super.value = newValue;
-		if (newValue) {
-			this.selectedIds = newValue.split(',');
-		} else {
-			this.selectedIds = [];
-		}
+	#entityTypeLookup = { content: 'document', media: 'media', member: 'member' };
+
+	@property({ type: Array })
+	public set items(items: Array<UmbReferenceByUniqueAndType>) {
+		this.#selectedIds = items?.map((item) => item.unique) ?? [];
+		this.value = items?.map((item) => item.unique).join(',');
 	}
-	public get value(): string {
-		return super.value as string;
+	public get items(): Array<UmbReferenceByUniqueAndType> {
+		return this.#selectedIds.map((id) => ({ type: this.#entityTypeLookup[this._type], unique: id }));
 	}
 
-	selectedIds: Array<string> = [];
+	#selectedIds: Array<string> = [];
 
 	#onChange(event: CustomEvent) {
 		switch (this._type) {
 			case 'content':
-				this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
+				{
+					const input = event.target as UmbInputDocumentElement;
+					this.#selectedIds = input.selectedIds;
+					this.value = input.selectedIds.join(',');
+				}
 				break;
-			case 'media':
-				this.value = (event.target as UmbInputMediaElement).selectedIds.join(',');
+			case 'media': {
+				const input = event.target as UmbInputMediaElement;
+				this.#selectedIds = input.selectedIds;
+				this.value = input.selectedIds.join(',');
 				break;
-			case 'member':
-				this.value = (event.target as UmbInputMemberElement).selectedIds.join(',');
+			}
+			case 'member': {
+				const input = event.target as UmbInputMemberElement;
+				this.#selectedIds = input.selectedIds;
+				this.value = input.selectedIds.join(',');
 				break;
+			}
 			default:
 				break;
 		}
@@ -102,7 +110,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 
 	#renderContentPicker() {
 		return html`<umb-input-document
-			.selectedIds=${this.selectedIds}
+			.selectedIds=${this.#selectedIds}
 			.startNodeId=${this.startNodeId}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
@@ -114,7 +122,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 
 	#renderMediaPicker() {
 		return html`<umb-input-media
-			.selectedIds=${this.selectedIds}
+			.selectedIds=${this.#selectedIds}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}
@@ -125,7 +133,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 
 	#renderMemberPicker() {
 		return html`<umb-input-member
-			.selectedIds=${this.selectedIds}
+			.selectedIds=${this.#selectedIds}
 			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}
