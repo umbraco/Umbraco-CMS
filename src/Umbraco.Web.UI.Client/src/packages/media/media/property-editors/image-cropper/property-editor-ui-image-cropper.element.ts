@@ -1,9 +1,12 @@
 import type { UmbImageCropperPropertyEditorValue } from '../../components/index.js';
-import { html, customElement, property, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, nothing, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import '../../components/input-image-cropper/input-image-cropper.element.js';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-image-cropper
@@ -16,6 +19,9 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 		crops: [],
 		focalPoint: { left: 0.5, top: 0.5 },
 	};
+
+	@state()
+	crops: UmbImageCropperPropertyEditorValue['crops'] = [];
 
 	updated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.updated(changedProperties);
@@ -32,22 +38,28 @@ export class UmbPropertyEditorUIImageCropperElement extends UmbLitElement implem
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const crops = config?.getValueByAlias<UmbImageCropperPropertyEditorValue['crops']>('crops') ?? [];
+		this.crops = config?.getValueByAlias<UmbImageCropperPropertyEditorValue['crops']>('crops') ?? [];
 
-		if (!this.value) {
-			this.value = {
-				src: '',
-				crops: crops,
-				focalPoint: { left: 0.5, top: 0.5 },
+		// Replace crops from the value with the crops from the config while keeping the coordinates from the value if they exist.
+		const filteredCrops = this.crops.map((crop) => {
+			const cropFromValue = this.value.crops.find((valueCrop) => valueCrop.alias === crop.alias);
+			const result = {
+				...crop,
+				coordinates: cropFromValue?.coordinates ?? undefined,
 			};
-		} else {
-			this.value.crops = crops;
-		}
+
+			return result;
+		});
+
+		this.value = {
+			...this.value,
+			crops: filteredCrops,
+		};
 	}
 
 	#onChange(e: Event) {
 		this.value = (e.target as any).value;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
