@@ -74,14 +74,15 @@ test.describe(`${dataTypeName} tests`, () => {
 
   test('can add image crop', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const cropData = ['Test Alias', 100, 50];
+    const cropData = ['Test Label', 'Test Alias', 100, 50];
     const expectedDataTypeValues = {
       "alias": "crops",
       "value": [
         {
-          "alias": cropData[0],
-          "width": cropData[1],
-          "height": cropData[2]
+          "label": cropData[0],
+          "alias": cropData[1],
+          "width": cropData[2],
+          "height": cropData[3]
         }
       ]
     };
@@ -90,7 +91,8 @@ test.describe(`${dataTypeName} tests`, () => {
     await umbracoUi.dataType.enterCropValues(
       cropData[0].toString(),
       cropData[1].toString(),
-      cropData[2].toString()
+      cropData[2].toString(),
+      cropData[3].toString()
     );
     await umbracoUi.dataType.clickAddCropButton();
     await umbracoUi.dataType.clickSaveButton();
