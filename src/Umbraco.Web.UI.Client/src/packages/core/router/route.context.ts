@@ -149,7 +149,6 @@ export class UmbRouteContext extends UmbControllerBase {
 				: this.#routerActiveLocalPath + '/'
 			: '';
 		const localPath = routeBasePath + routeActiveLocalPath + modalRegistration.generateModalPath();
-
 		const urlBuilder = createRoutePathBuilder(localPath);
 
 		modalRegistration._internal_setRouteBuilder(urlBuilder);
