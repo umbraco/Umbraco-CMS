@@ -67,7 +67,7 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 	};
 
 	#savedSearches = new UmbObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
-	savedSearches = this.#savedSearches.asObservablePart((data) => data?.items);
+	savedSearches = this.#savedSearches.asObservablePart((data) => data);
 
 	#logCount = new UmbObjectState<LogLevelCountsReponseModel | null>(null);
 	logCount = this.#logCount.asObservable();
@@ -168,8 +168,8 @@ export class UmbLogViewerWorkspaceContext extends UmbControllerBase implements U
 		return this.#dateRange.getValue();
 	}
 
-	async getSavedSearches() {
-		const { data } = await this.#repository.getSavedSearches({ skip: 0, take: 100 });
+	async getSavedSearches({ skip = 0, take = 999 }: { skip?: number; take?: number } = {}) {
+		const { data } = await this.#repository.getSavedSearches({ skip, take });
 		if (data) {
 			this.#savedSearches.setValue(data);
 		} else {
