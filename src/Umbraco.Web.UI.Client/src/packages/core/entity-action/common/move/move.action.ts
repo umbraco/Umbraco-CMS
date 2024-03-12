@@ -5,6 +5,8 @@ import type { UmbItemRepository, UmbMoveRepository } from '@umbraco-cms/backoffi
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry, type MetaEntityActionMoveKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 
 export class UmbMoveEntityAction extends UmbEntityActionBase<any> {
 	// TODO: make base type for item and detail models
@@ -47,8 +49,19 @@ export class UmbMoveEntityAction extends UmbEntityActionBase<any> {
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const modalContext = modalManager.open(this, this.args.meta.pickerModal) as any; // TODO: make generic picker interface with selection
 		const value = await modalContext.onSubmit();
-		if (!value) return;
-		await this.#moveRepository!.move(this.args.unique, value.selection[0]);
+		const destinationUnique = value.selection[0];
+		if (!destinationUnique) return;
+		await this.#moveRepository!.move(this.args.unique, destinationUnique);
+
+		// TODO: we can't reload the destination entity as we don't know the type
+		// we will have to add this when a selection is refactored to include both type and unique
+		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		const event = new UmbRequestReloadStructureForEntityEvent({
+			unique: this.args.unique,
+			entityType: this.args.entityType,
+		});
+
+		actionEventContext.dispatchEvent(event);
 	}
 }
 
