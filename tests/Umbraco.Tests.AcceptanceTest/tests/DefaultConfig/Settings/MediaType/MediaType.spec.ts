@@ -8,18 +8,16 @@ test.describe('Media Type tests', () => {
   const tabName = 'TestTab';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
-    await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName)
+    await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName);
     await umbracoUi.goToBackOffice();
     await umbracoUi.mediaType.goToSection(ConstantHelper.sections.settings);
   });
 
   test.afterEach(async ({umbracoApi}) => {
-    await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName)
+    await umbracoApi.mediaType.ensureNameNotExists(mediaTypeName);
   });
 
   test.describe('Design Tab', () => {
-
-    // Design
     // Name and alias is removed when saving
     test.skip('can create an empty media type', async ({page, umbracoApi, umbracoUi}) => {
       // Act
@@ -34,7 +32,7 @@ test.describe('Media Type tests', () => {
       expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
     });
 
-    test('can create a media type with a single property', async ({page, umbracoApi, umbracoUi}) => {
+    test('can create a media type with a single property', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
@@ -42,7 +40,7 @@ test.describe('Media Type tests', () => {
       await umbracoUi.mediaType.goToMediaType(mediaTypeName);
       await umbracoUi.mediaType.clickAddGroupButton();
       await umbracoUi.mediaType.addPropertyEditor(dataTypeName);
-      await umbracoUi.mediaType.enterMediaTypeGroupName(groupName);
+      await umbracoUi.mediaType.enterGroupName(groupName);
       await umbracoUi.mediaType.clickSaveButton();
 
       // Assert
@@ -54,7 +52,7 @@ test.describe('Media Type tests', () => {
       expect(mediaTypeData.properties[0].dataType.id).toBe(dataType.id);
     });
 
-    test('can rename a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test('can rename a media type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const wrongName = 'NotAMediaTypeName';
       await umbracoApi.mediaType.ensureNameNotExists(wrongName);
@@ -70,7 +68,7 @@ test.describe('Media Type tests', () => {
       expect(await umbracoApi.mediaType.doesNameExist(mediaTypeName)).toBeTruthy();
     });
 
-    test('can update alias for a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test('can update alias for a media type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const updatedAlias = 'TestMediaAlias';
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
@@ -78,10 +76,12 @@ test.describe('Media Type tests', () => {
       // Act
       await umbracoUi.mediaType.goToMediaType(mediaTypeName);
       // Unlocks the alias field
-      await page.locator('#name #alias-lock').click();
+      // await page.locator('#name #alias-lock').click();
+      await umbracoUi.mediaType.enterAliasName(updatedAlias);
       // Updates the alias
-      await page.locator('#name').getByLabel('alias').clear();
-      await page.locator('#name').getByLabel('alias').fill(updatedAlias);
+      // await umbracoUi.mediaType.enterAliasName(updatedAlias);
+      // await page.locator('#name').getByLabel('alias').clear();
+      // await page.locator('#name').getByLabel('alias').fill(updatedAlias);
       await umbracoUi.mediaType.clickSaveButton();
 
       // Assert
@@ -90,7 +90,7 @@ test.describe('Media Type tests', () => {
       expect(mediaTypeData.alias).toBe(updatedAlias);
     });
 
-    test('can update a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test('can update a property in a media type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       const newDataTypeName = 'Media Picker';
@@ -109,7 +109,7 @@ test.describe('Media Type tests', () => {
       expect(mediaTypeData.properties[0].dataType.id).toBe(dataType.id);
     });
 
-    test('can update group name in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test('can update group name in a media type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       const updatedGroupName = 'UpdatedGroupName';
@@ -117,7 +117,7 @@ test.describe('Media Type tests', () => {
 
       // Act
       await umbracoUi.mediaType.goToMediaType(mediaTypeName);
-      await umbracoUi.mediaType.enterMediaTypeGroupName(updatedGroupName);
+      await umbracoUi.mediaType.enterGroupName(updatedGroupName);
       await umbracoUi.mediaType.clickSaveButton();
 
       // Assert
@@ -126,7 +126,7 @@ test.describe('Media Type tests', () => {
       expect(mediaTypeData.containers[0].name).toBe(updatedGroupName);
     });
 
-    test('can delete a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test('can delete a media type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
@@ -196,7 +196,7 @@ test.describe('Media Type tests', () => {
       expect(mediaTypeData.properties[0].validation.mandatory).toBeTruthy();
     });
 
-    test('can set up validation for a property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test('can set up validation for a property in a media type', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       const regex = '^[a-zA-Z0-9]*$';
@@ -219,7 +219,7 @@ test.describe('Media Type tests', () => {
       expect(mediaTypeData.properties[0].validation.regExMessage).toBe(regexMessage);
     });
 
-    test('can set appearance as label on top for property in a media type', async ({page, umbracoApi, umbracoUi}) => {
+    test('can set appearance as label on top for property in a media type', async ({umbracoApi, umbracoUi}) => {
       const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
       await umbracoApi.mediaType.createMediaTypeWithPropertyEditor(mediaTypeName, dataTypeName, dataTypeData.id);
 
@@ -355,14 +355,14 @@ test.describe('Media Type tests', () => {
   });
 
   test.describe('Structure Tab', () => {
-    test('can create a media type with allow as root enabled', async ({page, umbracoApi, umbracoUi}) => {
+    test('can create a media type with allow as root enabled', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       await umbracoApi.mediaType.createDefaultMediaType(mediaTypeName);
 
       // Act
       await umbracoUi.mediaType.goToMediaType(mediaTypeName);
       await umbracoUi.mediaType.clickStructureTab();
-      await umbracoUi.mediaType.clickAllowAtRootButton();
+      await umbracoUi.mediaType.clickAllowAsRootButton();
       await umbracoUi.mediaType.clickSaveButton();
 
       // Assert

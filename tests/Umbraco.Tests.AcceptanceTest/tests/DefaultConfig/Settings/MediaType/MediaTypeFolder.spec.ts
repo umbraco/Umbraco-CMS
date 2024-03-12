@@ -55,8 +55,6 @@ test.describe('Media Type Folder tests', () => {
     await umbracoUi.mediaType.enterFolderName(mediaTypeFolderName);
     await umbracoUi.mediaType.clickUpdateFolderButton();
 
-    // await page.ge etByLabel('Update Folder').click();
-
     // Assert
     await umbracoUi.mediaType.isSuccessNotificationVisible();
     const folder = await umbracoApi.mediaType.getByName(mediaTypeFolderName);
@@ -74,8 +72,6 @@ test.describe('Media Type Folder tests', () => {
     // Act
     await umbracoUi.mediaType.clickRootFolderCaretButton();
     await umbracoUi.mediaType.clickActionsMenuForName(mediaTypeFolderName);
-
-    await page.pause();
 
     await umbracoUi.mediaType.createFolder(childFolderName);
 
