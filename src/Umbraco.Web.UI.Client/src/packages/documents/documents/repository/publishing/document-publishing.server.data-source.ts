@@ -1,6 +1,7 @@
 import type {
 	CultureAndScheduleRequestModel,
 	PublishDocumentRequestModel,
+	ScheduleRequestModel,
 	UnpublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentResource } from '@umbraco-cms/backoffice/external/backend-api';
@@ -33,7 +34,7 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async publish(unique: string, variantIds: Array<UmbVariantId>) {
+	async publish(unique: string, variantIds: Array<UmbVariantId>, schedule?: ScheduleRequestModel) {
 		if (!unique) throw new Error('Id is missing');
 
 		const publishSchedules: CultureAndScheduleRequestModel[] = variantIds.map<CultureAndScheduleRequestModel>(
@@ -41,7 +42,7 @@ export class UmbDocumentPublishingServerDataSource {
 				return {
 					culture: variant.isCultureInvariant() ? null : variant.toCultureString(),
 					// TODO: NO, this does not belong as part of the UmbVariantID, we need another way to parse that around:
-					//schedule: variant.schedule,
+					schedule,
 				};
 			},
 		);

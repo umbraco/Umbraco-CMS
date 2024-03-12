@@ -3,6 +3,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	#init!: Promise<unknown>;
@@ -28,12 +29,12 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 	 * @return {*}
 	 * @memberof UmbDocumentPublishingRepository
 	 */
-	async publish(unique: string, variantIds: Array<UmbVariantId>) {
+	async publish(unique: string, variantIds: Array<UmbVariantId>, schedule?: ScheduleRequestModel) {
 		if (!unique) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
 		await this.#init;
 
-		const { error } = await this.#publishingDataSource.publish(unique, variantIds);
+		const { error } = await this.#publishingDataSource.publish(unique, variantIds, schedule);
 
 		if (!error) {
 			const notification = { data: { message: `Document published` } };

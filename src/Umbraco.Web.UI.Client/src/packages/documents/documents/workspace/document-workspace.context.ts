@@ -34,6 +34,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -465,6 +466,7 @@ export class UmbDocumentWorkspaceContext
 		if (!unique) throw new Error('Unique is missing');
 
 		let variantIds: Array<UmbVariantId> = [];
+		let schedule: ScheduleRequestModel | undefined = undefined;
 
 		const { options, selected } = await this.#determineVariantOptions();
 
@@ -491,10 +493,11 @@ export class UmbDocumentWorkspaceContext
 			if (!result?.selection.length || !unique) return;
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+			schedule = result.schedule;
 		}
 
 		const variants = await this.#performSaveOrCreate(variantIds);
-		await this.publishingRepository.publish(unique, variants);
+		await this.publishingRepository.publish(unique, variants, schedule);
 		this.workspaceComplete(this.#currentData.getValue());
 	}
 
