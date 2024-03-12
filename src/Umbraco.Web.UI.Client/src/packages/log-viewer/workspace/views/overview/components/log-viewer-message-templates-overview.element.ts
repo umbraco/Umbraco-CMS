@@ -39,7 +39,6 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	}
 
 	#getMessageTemplates() {
-		//const take = this._messageTemplates?.length ?? 0;
 		const skip = this.#currentPage * this.#itemsPerPage - this.#itemsPerPage;
 		this.#logViewerContext?.getMessageTemplates(skip, this.#itemsPerPage);
 	}
