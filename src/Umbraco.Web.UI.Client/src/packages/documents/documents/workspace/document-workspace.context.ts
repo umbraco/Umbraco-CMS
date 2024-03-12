@@ -464,41 +464,32 @@ export class UmbDocumentWorkspaceContext
 	async save() {
 		const { options, selected } = await this.#determineVariantOptions();
 
+		let variantIds: Array<UmbVariantId> = [];
+
 		// If there is only one variant, we don't need to open the modal.
 		if (options.length === 0) {
 			throw new Error('No variants are available');
 		} else if (options.length === 1) {
 			// If only one option we will skip ahead and save the document with the only variant available:
-			const firstVariant = UmbVariantId.Create(options[0]);
-			await this.#performSaveOrCreate([firstVariant]);
+			variantIds.push(UmbVariantId.Create(options[0]));
+		} else {
+			// If there are multiple variants, we will open the modal to let the user pick which variants to save.
+			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+			const result = await modalManagerContext
+				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+					data: {
+						options,
+					},
+					value: { selection: selected },
+				})
+				.onSubmit()
+				.catch(() => undefined);
 
-			const data = this.getData();
-			if (!data) throw new Error('Data is missing');
+			if (!result?.selection.length) return;
 
-			this.#persistedData.setValue(data);
-			this.#currentData.setValue(data);
-
-			this.workspaceComplete(data);
-
-			this.workspaceComplete(this.#currentData.getValue());
-			return;
+			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		// If there are multiple variants, we will open the modal to let the user pick which variants to save.
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const result = await modalManagerContext
-			.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
-				data: {
-					options,
-				},
-				value: { selection: selected },
-			})
-			.onSubmit()
-			.catch(() => undefined);
-
-		if (!result?.selection.length) return;
-
-		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		await this.#performSaveOrCreate(variantIds);
 
 		const data = this.getData();
@@ -518,6 +509,8 @@ export class UmbDocumentWorkspaceContext
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
+		let variantIds: Array<UmbVariantId> = [];
+
 		const { options, selected } = await this.#determineVariantOptions();
 
 		// If there is only one variant, we don't need to open the modal.
@@ -525,28 +518,25 @@ export class UmbDocumentWorkspaceContext
 			throw new Error('No variants are available');
 		} else if (options.length === 1) {
 			// If only one option we will skip ahead and save the document with the only variant available:
-			const firstVariant = UmbVariantId.Create(options[0]);
-			const variants = await this.#performSaveOrCreate([firstVariant]);
-			await this.publishingRepository.publish(unique, variants);
-			this.workspaceComplete(this.#currentData.getValue());
-			return;
+			variantIds.push(UmbVariantId.Create(options[0]));
+		} else {
+			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
+			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+			const result = await modalManagerContext
+				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+					data: {
+						options,
+					},
+					value: { selection: selected },
+				})
+				.onSubmit()
+				.catch(() => undefined);
+
+			if (!result?.selection.length || !unique) return;
+
+			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
 
-		// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-		const result = await modalManagerContext
-			.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
-				data: {
-					options,
-				},
-				value: { selection: selected },
-			})
-			.onSubmit()
-			.catch(() => undefined);
-
-		if (!result?.selection.length || !unique) return;
-
-		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		const variants = await this.#performSaveOrCreate(variantIds);
 		await this.publishingRepository.publish(unique, variants);
 		this.workspaceComplete(this.#currentData.getValue());
