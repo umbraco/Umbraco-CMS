@@ -62,7 +62,7 @@
   <!-- Generate JSON package schema on build (and before copying to project) -->
   <Target Name="GenerateUmbracoPackageSchema" BeforeTargets="Build;CopyUmbracoJsonSchemaFiles" Condition="!Exists('$(_UmbracoCmsPackageSchemaReference)')">
     <Message Text="Generating $(_UmbracoCmsPackageSchemaReference) because it doesn't exist" Importance="high" />
-    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.New.Client" Command="npm run generate:jsonschema -- --out &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsPackageSchemaReference)&quot; tsconfig.json UmbracoPackage" />
+    <Exec WorkingDirectory="$(MsBuildThisFileDirectory)..\Umbraco.Web.UI.Client" Command="npm run generate:jsonschema -- --out &quot;$(MSBuildThisFileDirectory)$(_UmbracoCmsPackageSchemaReference)&quot; tsconfig.json UmbracoPackage" />
   </Target>
 
   <!-- Remove generated JSON package schema on clean -->
