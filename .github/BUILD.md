@@ -15,7 +15,7 @@ If the answer is yes, please read on. Otherwise, make sure to head on over [to t
 
 ## Getting Started:
 To run umbraco, we first need to initialize the client git submodule:
-* Execute `git submodule init` and then `git submodule update` to get the files into Umbraco.Web.UI.New.Client project
+* Execute `git submodule init` and then `git submodule update` to get the files into Umbraco.Web.UI.Client project
 * If you are going to work on the Backoffice, you can either go to the Umbraco.Web.UI.Client folder and check out a new branch or set it up in your IDE, which will allow you to commit to each repository simultaneously:
   * **Rider**: Preferences -> Version Control -> Directory Mappings -> Click the '+' sign
 
