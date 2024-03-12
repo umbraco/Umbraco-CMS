@@ -121,7 +121,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 						<umb-content-type-workspace-view-edit-properties
 							container-id=${this.group!.id}
 							container-type="Group"
-							container-name=${this.group!.name ?? ''}></umb-content-type-workspace-view-edit-properties>
+							container-name=${this.group?.name ?? ''}></umb-content-type-workspace-view-edit-properties>
 					</uui-box>
 				`
 			: '';
