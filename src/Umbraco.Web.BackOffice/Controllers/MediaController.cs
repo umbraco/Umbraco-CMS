@@ -183,7 +183,8 @@ public class MediaController : ContentControllerBase
             return NotFound();
         }
 
-        IMedia emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        IMedia emptyContent = _mediaService.CreateMedia("", parentId, contentType.Alias,
+            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
         MediaItemDisplay? mapped = _umbracoMapper.Map<MediaItemDisplay>(emptyContent);
 
         if (mapped is not null)
@@ -203,7 +204,8 @@ public class MediaController : ContentControllerBase
     {
         var apps = new List<ContentApp>
         {
-            ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "media", Constants.DataTypes.DefaultMediaListView)
+            ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "media",
+                Constants.DataTypes.DefaultMediaListView)
         };
         apps[0].Active = true;
         var display = new MediaItemDisplay
@@ -302,7 +304,8 @@ public class MediaController : ContentControllerBase
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildFolders(int id, int pageNumber = 1, int pageSize = 1000)
+    public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildFolders(int id, int pageNumber = 1,
+        int pageSize = 1000)
     {
         // Suggested convention for folder mediatypes - we can make this more or less complicated as long as we document it...
         // if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
@@ -410,7 +413,8 @@ public class MediaController : ContentControllerBase
 
         var moveResult = toMove is null
             ? false
-            : _mediaService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+            : _mediaService.Move(toMove, move.ParentId,
+                _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         if (sourceParentId == destinationParentId)
         {
@@ -489,7 +493,8 @@ public class MediaController : ContentControllerBase
         }
 
         // save the item
-        Attempt<OperationResult?> saveStatus = _mediaService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        Attempt<OperationResult?> saveStatus = _mediaService.Save(contentItem.PersistedContent,
+            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         // return the updated model
         MediaItemDisplay? display = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
@@ -565,7 +570,8 @@ public class MediaController : ContentControllerBase
         // Authorize...
         var requirement = new MediaPermissionsResourceRequirement();
         var resource = new MediaPermissionsResource(sorted.ParentId);
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, resource, requirement);
+        AuthorizationResult authorizationResult =
+            await _authorizationService.AuthorizeAsync(User, resource, requirement);
         if (!authorizationResult.Succeeded)
         {
             return Forbid();
@@ -779,16 +785,16 @@ public class MediaController : ContentControllerBase
                 continue;
             }
 
-                using var stream = new MemoryStream();
-                await formFile.CopyToAsync(stream);
-                if (_fileStreamSecurityValidator != null && _fileStreamSecurityValidator.IsConsideredSafe(stream) == false)
-                {
-                    tempFiles.Notifications.Add(new BackOfficeNotification(
-                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
-                        _localizedTextService.Localize("media", "fileSecurityValidationFailure"),
-                        NotificationStyle.Warning));
-                    continue;
-                }
+            using var stream = new MemoryStream();
+            await formFile.CopyToAsync(stream);
+            if (_fileStreamSecurityValidator != null && _fileStreamSecurityValidator.IsConsideredSafe(stream) == false)
+            {
+                tempFiles.Notifications.Add(new BackOfficeNotification(
+                    _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                    _localizedTextService.Localize("media", "fileSecurityValidationFailure"),
+                    NotificationStyle.Warning));
+                continue;
+            }
 
             if (string.IsNullOrEmpty(mediaTypeAlias))
             {
@@ -823,9 +829,11 @@ public class MediaController : ContentControllerBase
                         }
 
                         if (allowedContentTypes.Any(x => x.Alias == mediaTypeItem.Alias) == false)
-                            {
-                                continue;
-                            }mediaTypeAlias = mediaTypeItem.Alias;
+                        {
+                            continue;
+                        }
+
+                        mediaTypeAlias = mediaTypeItem.Alias;
                         break;
                     }
 
@@ -834,20 +842,20 @@ public class MediaController : ContentControllerBase
                         _imageUrlGenerator.IsSupportedImageFormat(ext))
                     {
                         if (allowedContentTypes.Any(mt => mt.Alias == Constants.Conventions.MediaTypes.Image))
-                            {
-                                mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
-                            }
-                            else
-                            {
-                                IMediaType? customType = allowedContentTypes.FirstOrDefault(mt =>
-                                    mt.CompositionPropertyTypes.Any(pt =>
-                                        pt.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper));
+                        {
+                            mediaTypeAlias = Constants.Conventions.MediaTypes.Image;
+                        }
+                        else
+                        {
+                            IMediaType? customType = allowedContentTypes.FirstOrDefault(mt =>
+                                mt.CompositionPropertyTypes.Any(pt =>
+                                    pt.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper));
 
-                                if (customType is not null)
-                                {
-                                    mediaTypeAlias = customType.Alias;
-                                }
+                            if (customType is not null)
+                            {
+                                mediaTypeAlias = customType.Alias;
                             }
+                        }
                     }
                 }
                 else
@@ -870,8 +878,8 @@ public class MediaController : ContentControllerBase
             IMedia createdMediaItem = _mediaService.CreateMedia(mediaItemName, parentId.Value, mediaTypeAlias,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
-                createdMediaItem.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper,
-                    _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
+            createdMediaItem.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper,
+                _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
 
             Attempt<OperationResult?> saveResult = _mediaService.Save(createdMediaItem,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
@@ -954,7 +962,6 @@ public class MediaController : ContentControllerBase
     /// <returns></returns>
     private async Task<ActionResult<int?>?> GetParentIdAsIntAsync(string? parentId, bool validatePermissions)
     {
-
         // test for udi
         if (UdiParser.TryParse(parentId, out GuidUdi? parentUdi))
         {
@@ -1032,7 +1039,8 @@ public class MediaController : ContentControllerBase
             if (toMove.ContentType.AllowedAsRoot == false && mediaTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
             {
                 var notificationModel = new SimpleNotificationModel();
-                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedAtRoot"), string.Empty);
+                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedAtRoot"),
+                    string.Empty);
                 return ValidationProblem(notificationModel);
             }
         }
@@ -1060,7 +1068,8 @@ public class MediaController : ContentControllerBase
                     .IndexOf($",{toMove.Id},", StringComparison.Ordinal) > -1)
             {
                 var notificationModel = new SimpleNotificationModel();
-                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"), string.Empty);
+                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"),
+                    string.Empty);
                 return ValidationProblem(notificationModel);
             }
         }
@@ -1192,7 +1201,7 @@ public class MediaController : ContentControllerBase
         var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize)
         {
             Items = children
-            .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull()
+                .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull()
         };
 
         return pagedResult;
@@ -1253,7 +1262,8 @@ public class MediaController : ContentControllerBase
             IEntitySlim? entity = _entityService.Get(guidUdi.Guid);
             if (entity != null)
             {
-                return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+                return GetChildren(entity.Id, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField,
+                    filter);
             }
         }
 
