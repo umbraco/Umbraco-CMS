@@ -201,10 +201,14 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	 */
 	async ensureContainerOf(
 		containerId: string,
-		contentTypeUnique?: string,
+		contentTypeUnique: string,
 	): Promise<UmbPropertyTypeContainerModel | undefined> {
 		await this.#init;
-		const containers = this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers;
+		const contentType = this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique);
+		if (!contentType) {
+			throw new Error('Could not find the Content Type to ensure containers for');
+		}
+		const containers = contentType?.containers;
 		const container = containers?.find((x) => x.id === containerId);
 		if (!container) {
 			return this.cloneContainerTo(containerId, contentTypeUnique);
@@ -253,7 +257,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		// TODO: fix TS partial complaint [NL]
 		this.#contentTypes.updateOne(toContentTypeUnique, { containers });
 
-		return container;
+		return clonedContainer;
 	}
 
 	async createContainer(
