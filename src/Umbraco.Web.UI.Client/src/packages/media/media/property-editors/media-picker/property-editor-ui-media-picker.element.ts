@@ -1,8 +1,11 @@
 import type { UmbInputMediaElement } from '../../components/input-media/input-media.element.js';
 import '../../components/input-media/input-media.element.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbMediaPickerPropertyValue } from './index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
+} from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -13,9 +16,15 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 @customElement('umb-property-editor-ui-media-picker')
 export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ attribute: false })
-	public value: Array<{ key: string; mediaKey: string; mediaTypeAlias: string }> = [];
+	public set value(value: Array<UmbMediaPickerPropertyValue>) {
+		this.#value = value;
+		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
+	}
 	//TODO: Add support for document specific crops. The server side already supports this.
-	//TODO: Add crops and focalpoint to value.
+
+	public get value() {
+		return this.#value;
+	}
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -39,32 +48,30 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	@state()
 	private _limitMax: number = Infinity;
 
-	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
+	#value: Array<UmbMediaPickerPropertyValue> = [];
 
-		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
-	}
-
-	private _onChange(event: CustomEvent) {
+	#onChange(event: CustomEvent) {
 		const selectedIds = (event.target as UmbInputMediaElement).selectedIds;
 
 		const result = selectedIds.map((mediaKey) => {
 			return {
 				key: UmbId.new(),
 				mediaKey,
-				mediaTypeAlias: 'Image',
+				mediaTypeAlias: '',
+				focalPoint: null,
+				crops: [],
 			};
 		});
 
 		this.value = result;
 		this._items = this.value ? this.value.map((x) => x.mediaKey) : [];
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		return html`
 			<umb-input-media
-				@change=${this._onChange}
+				@change=${this.#onChange}
 				.selectedIds=${this._items}
 				.min=${this._limitMin}
 				.max=${this._limitMax}>
