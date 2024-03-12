@@ -179,7 +179,7 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				? html`
 						<uui-box>
 							<umb-content-type-workspace-view-edit-properties
-								container-id=${ifDefined(this.containerId === null ? undefined : this.containerId)}
+								container-id=${this.containerId!}
 								container-type="Tab"
 								container-name=${this.tabName ?? ''}></umb-content-type-workspace-view-edit-properties>
 						</uui-box>

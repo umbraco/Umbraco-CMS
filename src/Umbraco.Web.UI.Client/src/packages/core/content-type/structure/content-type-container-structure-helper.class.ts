@@ -173,14 +173,14 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	private _observeRootContainers() {
-		if (!this.#structure || !this._isRoot || !this._parentType) return;
+		if (!this.#structure || !this._isRoot || !this._childType || this._parentId === undefined) return;
 
 		this.observe(
-			this.#structure.rootContainers(this._childType!),
+			this.#structure.rootContainers(this._childType),
 			(rootContainers) => {
 				this.#containers.setValue([]);
 				this._insertChildContainers(rootContainers);
-				this._parentOwnerContainers = this.#structure!.getOwnerContainers(this._parentType!) ?? [];
+				this._parentOwnerContainers = this.#structure!.getOwnerContainers(this._childType!, this._parentId!) ?? [];
 			},
 			'_observeRootContainers',
 		);
@@ -212,21 +212,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	 */
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;
-
-		if (this._isRoot) {
-			return false;
-		} else {
-			return this._parentOwnerContainers.some((x) => x.id === containerId);
-		}
-		return false;
-		/*
-		return (
-			this.#containers
-				.getValue()
-				.find((x) => (x.id === containerId && this._parentId ? x.parent?.id === this._parentId : x.parent === null)) !==
-			undefined
-		);
-		*/
+		return this._parentOwnerContainers.some((x) => x.id === containerId);
 	}
 
 	/** Manipulate methods: */

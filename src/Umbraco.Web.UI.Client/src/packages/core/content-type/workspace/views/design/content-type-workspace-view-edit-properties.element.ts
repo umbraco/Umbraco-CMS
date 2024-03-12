@@ -84,13 +84,13 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 		},
 	});
 
-	private _containerId: string | undefined;
+	private _containerId: string | null | undefined;
 
 	@property({ type: String, attribute: 'container-id', reflect: false })
-	public get containerId(): string | undefined {
+	public get containerId(): string | null | undefined {
 		return this._containerId;
 	}
-	public set containerId(value: string | undefined) {
+	public set containerId(value: string | null | undefined) {
 		if (value === this._containerId) return;
 		const oldValue = this._containerId;
 		this._containerId = value;

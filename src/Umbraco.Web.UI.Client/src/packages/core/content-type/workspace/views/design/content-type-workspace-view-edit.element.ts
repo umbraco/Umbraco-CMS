@@ -179,9 +179,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 					component: () => import('./content-type-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbContentTypeWorkspaceViewEditTabElement).tabName = tabName;
-						(component as UmbContentTypeWorkspaceViewEditTabElement).containerId =
-							//tab.parent ? tab.parent.id === null
-							this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ? tab.id : undefined;
+						(component as UmbContentTypeWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
 			});

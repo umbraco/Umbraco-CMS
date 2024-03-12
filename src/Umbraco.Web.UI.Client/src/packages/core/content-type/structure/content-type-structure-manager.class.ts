@@ -315,7 +315,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		containerType: UmbPropertyContainerTypes = 'Tab',
 		parentId: string | null = null,
 	) {
-		const ownerRootContainers = this.getOwnerContainers(containerType); //getRootContainers() can't differentiates between compositions and locals
+		const ownerRootContainers = this.getOwnerContainers(containerType, parentId); //getRootContainers() can't differentiates between compositions and locals
 
 		let changedName = newName;
 		if (ownerRootContainers) {
@@ -584,7 +584,8 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		return this.ownerContentTypeObservablePart((x) => x.containers?.filter((x) => x.type === containerType) ?? []);
 	}
 
-	getOwnerContainers(containerType: UmbPropertyContainerTypes, parentId: string | null = null) {
+	getOwnerContainers(containerType: UmbPropertyContainerTypes, parentId: string | null) {
+		console.log('containers of owner:', this.getOwnerContentType()?.containers);
 		return this.getOwnerContentType()?.containers?.filter((x) =>
 			parentId ? x.parent?.id === parentId : x.parent === null && x.type === containerType,
 		);

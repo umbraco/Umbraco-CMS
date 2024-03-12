@@ -71,9 +71,9 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 	#checkInherited() {
 		if (this.groupStructureHelper && this.group) {
-			console.log('checkInherited!!!!');
-			// TODO: Check for any inherited containers?
+			// Check is this container matches with any other group. If so it is inherited aka. merged with others. [NL]
 			if (this.group.name) {
+				// We can first match with something if we have a name [NL]
 				this.observe(
 					this.groupStructureHelper.getStructureManager()!.containersByNameAndType(this.group.name, 'Group'),
 					(containers) => {
@@ -85,13 +85,13 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 						this._hasOwnerContainer = isAOwnerContainer;
 						this._inherited = !pureOwnerContainer;
-						console.log('this._inherited', this._inherited, 'this._hasOwnerContainer', this._hasOwnerContainer);
 					},
 					'observeGroupContainers',
 				);
 			} else {
-				// We use name match to determine inheritance, but a no name should not be inherited.
+				// We use name match to determine inheritance, so no name cannot inherit.
 				this._inherited = false;
+				this._hasOwnerContainer = true;
 				this.removeControllerByAlias('observeGroupContainers');
 			}
 		}
