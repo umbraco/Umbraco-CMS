@@ -94,6 +94,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     public PagedModel<IMember> FilterAsync(
         Guid? memberTypeId = null,
         string? memberGroupName = null,
+        bool? isApproved = null,
         string orderBy = "username",
         Direction orderDirection = Direction.Ascending,
         string? filter = null,
