@@ -34,7 +34,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext

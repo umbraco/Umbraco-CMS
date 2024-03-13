@@ -178,9 +178,8 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		api: UmbDocumentSaveAndScheduleWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Schedule publishing',
+			label: 'Schedule...',
 			icon: 'icon-globe',
-			allowScheduledPublish: true,
 		},
 	},
 ];
