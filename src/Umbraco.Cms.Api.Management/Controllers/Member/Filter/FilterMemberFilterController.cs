@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.Filter;
@@ -39,7 +40,16 @@ public class FilterMemberFilterController : MemberFilterControllerBase
         int skip = 0,
         int take = 100)
     {
-        PagedModel<IMember> members = _memberService.FilterAsync(memberTypeId, memberGroupName, isApproved, isLockedOut, orderBy, orderDirection, filter, skip, take);
+        var memberFilter = new MemberFilter()
+        {
+            MemberTypeId = memberTypeId,
+            MemberGroupName = memberGroupName,
+            IsApproved = isApproved,
+            IsLockedOut = isLockedOut,
+            Filter = filter,
+        };
+
+        PagedModel<IMember> members = _memberService.FilterAsync(memberFilter, orderBy, orderDirection, skip, take);
 
         var pageViewModel = new PagedViewModel<MemberResponseModel>
         {

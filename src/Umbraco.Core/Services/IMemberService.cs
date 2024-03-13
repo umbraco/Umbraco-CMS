@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services;
@@ -92,13 +93,9 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
         string filter);
 
     public PagedModel<IMember> FilterAsync(
-        Guid? memberTypeId = null,
-        string? memberGroupName = null,
-        bool? isApproved = null,
-        bool? isLockedOut = null,
+        MemberFilter memberFilter,
         string orderBy = "username",
         Direction orderDirection = Direction.Ascending,
-        string? filter = null,
         int skip = 0,
         int take = 100);
 

@@ -100,45 +100,41 @@ namespace Umbraco.Cms.Core.Services
         #region Create
 
         public PagedModel<IMember> FilterAsync(
-            Guid? memberTypeId = null,
-            string? memberGroupName = null,
-            bool? isApproved = null,
-            bool? isLockedOut = null,
+            MemberFilter memberFilter,
             string orderBy = "username",
             Direction orderDirection = Direction.Ascending,
-            string? filter = null,
             int skip = 0,
             int take = 100)
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTypes);
             IMemberType? memberType = null;
-            if (memberTypeId is not null)
+            if (memberFilter.MemberTypeId is not null)
             {
-                memberType = _memberTypeRepository.Get(memberTypeId.Value);
+                memberType = _memberTypeRepository.Get(memberFilter.MemberTypeId.Value);
             }
 
             PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
             scope.ReadLock(Constants.Locks.MemberTree);
             IQuery<IMember>? query1 = memberType?.Alias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberType.Alias);
-            int.TryParse(filter, out int filterAsIntId);
-            Guid.TryParse(filter, out Guid filterAsGuid);
+            int.TryParse(memberFilter.Filter, out int filterAsIntId);
+            Guid.TryParse(memberFilter.Filter, out Guid filterAsGuid);
 
             IEnumerable<IMember> members;
             long totalRecords;
-            if (memberGroupName.IsNullOrWhiteSpace() is false)
+            if (memberFilter.MemberGroupName.IsNullOrWhiteSpace() is false)
             {
-                members = _memberRepository.FindMembersInRole(memberGroupName, string.Empty);
-                if (filter is not null)
+                members = _memberRepository.FindMembersInRole(memberFilter.MemberGroupName, string.Empty);
+                if (memberFilter.Filter is not null)
                 {
                     members = members.Where(x =>
-                            (x.Name != null && x.Name.Contains(filter)) ||
-                            x.Username.Contains(filter) ||
-                            x.Email.Contains(filter) ||
+                            (x.Name != null && x.Name.Contains(memberFilter.Filter)) ||
+                            x.Username.Contains(memberFilter.Filter) ||
+                            x.Email.Contains(memberFilter.Filter) ||
                             x.Id == filterAsIntId ||
                             x.Key == filterAsGuid ||
-                            (isApproved is not null && x.IsApproved == isApproved) ||
-                            (isLockedOut is not null && x.IsLockedOut == isLockedOut))
+                            (memberFilter.IsApproved is not null && x.IsApproved == memberFilter.IsApproved) ||
+                            (memberFilter.IsLockedOut is not null && x.IsLockedOut == memberFilter.IsLockedOut))
                         .ToArray();
                 }
 
@@ -147,18 +143,18 @@ namespace Umbraco.Cms.Core.Services
             }
             else
             {
-                IQuery<IMember> query2 = isApproved is null ? Query<IMember>() : Query<IMember>().Where(x => x.IsApproved == isApproved);
-                if (isLockedOut is not null)
+                IQuery<IMember> query2 = memberFilter.IsApproved is null ? Query<IMember>() : Query<IMember>().Where(x => x.IsApproved == memberFilter.IsApproved);
+                if (memberFilter.IsLockedOut is not null)
                 {
-                    query2 = query2.Where(x => x.IsLockedOut == isLockedOut);
+                    query2 = query2.Where(x => x.IsLockedOut == memberFilter.IsLockedOut);
                 }
 
-                query2 = filter == null
+                query2 = memberFilter.Filter == null
                     ? query2
                     : query2.Where(x =>
-                        (x.Name != null && x.Name.Contains(filter)) ||
-                        x.Username.Contains(filter) ||
-                        x.Email.Contains(filter) ||
+                        (x.Name != null && x.Name.Contains(memberFilter.Filter)) ||
+                        x.Username.Contains(memberFilter.Filter) ||
+                        x.Email.Contains(memberFilter.Filter) ||
                         x.Id == filterAsIntId ||
                         x.Key == filterAsGuid);
                 members = _memberRepository.GetPage(query1, pageNumber, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: true));
