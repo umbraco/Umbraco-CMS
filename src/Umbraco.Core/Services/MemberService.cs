@@ -103,6 +103,7 @@ namespace Umbraco.Cms.Core.Services
             Guid? memberTypeId = null,
             string? memberGroupName = null,
             bool? isApproved = null,
+            bool? isLockedOut = null,
             string orderBy = "username",
             Direction orderDirection = Direction.Ascending,
             string? filter = null,
@@ -130,7 +131,15 @@ namespace Umbraco.Cms.Core.Services
                 members = _memberRepository.FindMembersInRole(memberGroupName, string.Empty);
                 if (filter is not null)
                 {
-                    members = members.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key == filterAsGuid || (isApproved is not null && x.IsApproved == isApproved)).ToArray();
+                    members = members.Where(x =>
+                            (x.Name != null && x.Name.Contains(filter)) ||
+                            x.Username.Contains(filter) ||
+                            x.Email.Contains(filter) ||
+                            x.Id == filterAsIntId ||
+                            x.Key == filterAsGuid ||
+                            (isApproved is not null && x.IsApproved == isApproved) ||
+                            (isLockedOut is not null && x.IsLockedOut == isLockedOut))
+                        .ToArray();
                 }
 
                 totalRecords = members.Count();
@@ -139,7 +148,19 @@ namespace Umbraco.Cms.Core.Services
             else
             {
                 IQuery<IMember> query2 = isApproved is null ? Query<IMember>() : Query<IMember>().Where(x => x.IsApproved == isApproved);
-                query2 = filter == null ? query2 : query2.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key == filterAsGuid);
+                if (isLockedOut is not null)
+                {
+                    query2 = query2.Where(x => x.IsLockedOut == isLockedOut);
+                }
+
+                query2 = filter == null
+                    ? query2
+                    : query2.Where(x =>
+                        (x.Name != null && x.Name.Contains(filter)) ||
+                        x.Username.Contains(filter) ||
+                        x.Email.Contains(filter) ||
+                        x.Id == filterAsIntId ||
+                        x.Key == filterAsGuid);
                 members = _memberRepository.GetPage(query1, pageNumber, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: true));
             }
 

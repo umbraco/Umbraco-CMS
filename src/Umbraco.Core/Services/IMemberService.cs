@@ -95,6 +95,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
         Guid? memberTypeId = null,
         string? memberGroupName = null,
         bool? isApproved = null,
+        bool? isLockedOut = null,
         string orderBy = "username",
         Direction orderDirection = Direction.Ascending,
         string? filter = null,

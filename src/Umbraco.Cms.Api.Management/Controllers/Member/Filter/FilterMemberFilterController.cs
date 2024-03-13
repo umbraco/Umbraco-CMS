@@ -32,13 +32,14 @@ public class FilterMemberFilterController : MemberFilterControllerBase
         Guid? memberTypeId = null,
         string? memberGroupName = null,
         bool? isApproved = null,
+        bool? isLockedOut = null,
         string orderBy = "username",
         Direction orderDirection = Direction.Ascending,
         string? filter = null,
         int skip = 0,
         int take = 100)
     {
-        PagedModel<IMember> members = _memberService.FilterAsync(memberTypeId, memberGroupName, isApproved, orderBy, orderDirection, filter, skip, take);
+        PagedModel<IMember> members = _memberService.FilterAsync(memberTypeId, memberGroupName, isApproved, isLockedOut, orderBy, orderDirection, filter, skip, take);
 
         var pageViewModel = new PagedViewModel<MemberResponseModel>
         {
