@@ -118,18 +118,18 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 					<uui-icon slot="icon" name="icon-globe"></uui-icon>
 					${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
 				</uui-menu-item>
-				${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option.unique))}
+				${when(this.#isSelected(option.unique), () => this.#renderPublishDateInput(option))}
 			`,
 		);
 	}
 
-	#renderPublishDateInput(unique: string) {
+	#renderPublishDateInput(option: UmbDocumentVariantOptionModel) {
 		return html`<div class="publish-date">
 			<umb-input-date
-				@change=${(e: Event) => this.#onFromDateChange(e, unique)}
+				@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
 				label=${this.localize.term('general_publishDate')}></umb-input-date>
 			<umb-input-date
-				@change=${(e: Event) => this.#onToDateChange(e, unique)}
+				@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
 				label=${this.localize.term('general_publishDate')}></umb-input-date>
 		</div>`;
 	}
