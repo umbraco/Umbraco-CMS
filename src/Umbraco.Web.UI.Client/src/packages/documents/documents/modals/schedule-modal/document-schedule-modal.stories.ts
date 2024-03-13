@@ -30,6 +30,28 @@ const modalData: UmbDocumentScheduleModalData = {
 				fallbackIsoCode: null,
 			},
 		},
+		{
+			unique: 'da-dk',
+			culture: 'da-dk',
+			segment: null,
+			variant: {
+				name: 'Danish variant name',
+				culture: 'da-dk',
+				state: UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES,
+				createDate: '2021-08-25T14:00:00Z',
+				publishDate: null,
+				updateDate: null,
+				segment: null,
+			},
+			language: {
+				entityType: 'language',
+				name: 'Danish',
+				unique: 'da-dk',
+				isDefault: true,
+				isMandatory: false,
+				fallbackIsoCode: null,
+			},
+		},
 	],
 };
 
@@ -45,7 +67,7 @@ const meta: Meta<UmbDocumentScheduleModalElement> = {
 		data: modalData,
 		value: modalValue,
 	},
-	decorators: [(Story) => html`<div style="width: 500px; border: 1px solid #000;">${Story()}</div>`],
+	decorators: [(Story) => html`<div style="border: 1px solid #000;">${Story()}</div>`],
 	parameters: {
 		layout: 'centered',
 		docs: {
@@ -94,3 +116,11 @@ export default meta;
 type Story = StoryObj<UmbDocumentScheduleModalElement>;
 
 export const Overview: Story = {};
+
+export const WithoutVariants: Story = {
+	args: {
+		data: {
+			options: modalData.options.slice(0, 1),
+		},
+	},
+};
