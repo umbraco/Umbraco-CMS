@@ -47,6 +47,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		[],
 		(x) => x.id,
 	);
+	containerById(id: string) {
+		return this.#containers.asObservablePart((x) => x.find((y) => y.id === id));
+	}
 
 	constructor(host: UmbControllerHost, typeRepository: UmbDetailRepository<T>) {
 		super(host);
@@ -633,6 +636,30 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	containersByNameAndType(name: string, containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.name === name && x.type === containerType);
+		});
+	}
+
+	containersByNameAndTypeAndParent(
+		name: string,
+		containerType: UmbPropertyContainerTypes,
+		parentName: string | null,
+		parentType?: UmbPropertyContainerTypes,
+	) {
+		return this.#containers.asObservablePart((data) => {
+			return data.filter(
+				(x) =>
+					// Match name and type:
+					x.name === name &&
+					x.type === containerType &&
+					// If we look for a parent name, then we need to match that as well:
+					(parentName
+						? // And we have a parent on this container, then we need to match the parent name and type as well
+							x.parent
+							? data.some((y) => x.parent!.id === y.id && y.name === parentName && y.type === parentType)
+							: false
+						: // if we do not have a parent then its not a match
+							x.parent === null), // it parentName === null then we expect the container parent to be null.
+			);
 		});
 	}
 

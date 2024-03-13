@@ -122,6 +122,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		} else if (this._parentName && this._parentType) {
 			this.#containers.setValue([]);
 			this.observe(
+				// This only works because we just have two levels, meaning this is the upper level and we want it to merge, so it okay this does not take parent parent into account: [NL]
 				this.#structure.containersByNameAndType(this._parentName, this._parentType),
 				(parentContainers) => {
 					this._ownerContainers = [];

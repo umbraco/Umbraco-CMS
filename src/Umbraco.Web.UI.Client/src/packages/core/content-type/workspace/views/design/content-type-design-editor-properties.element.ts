@@ -5,11 +5,7 @@ import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-ed
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type {
-	UmbContentTypeModel,
-	UmbPropertyContainerTypes,
-	UmbPropertyTypeModel,
-} from '@umbraco-cms/backoffice/content-type';
+import type { UmbContentTypeModel, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbContentTypePropertyStructureHelper,
 	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
@@ -98,24 +94,9 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		if (value === this._containerId) return;
 		const oldValue = this._containerId;
 		this._containerId = value;
+		this.#propertyStructureHelper.setContainerId(value);
 		this.#addPropertyModal.setUniquePathValue('container-id', value === null ? 'root' : value);
 		this.requestUpdate('containerId', oldValue);
-	}
-
-	@property({ type: String, attribute: 'container-name', reflect: false })
-	public get containerName(): string | undefined {
-		return this.#propertyStructureHelper.getContainerName();
-	}
-	public set containerName(value: string | undefined) {
-		this.#propertyStructureHelper.setContainerName(value);
-	}
-
-	@property({ type: String, attribute: 'container-type', reflect: false })
-	public get containerType(): UmbPropertyContainerTypes | undefined {
-		return this.#propertyStructureHelper.getContainerType();
-	}
-	public set containerType(value: UmbPropertyContainerTypes | undefined) {
-		this.#propertyStructureHelper.setContainerType(value);
 	}
 
 	#addPropertyModal: UmbModalRouteRegistrationController;

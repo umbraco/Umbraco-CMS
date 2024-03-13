@@ -11,33 +11,6 @@ import './content-type-design-editor-properties.element.js';
 
 @customElement('umb-content-type-design-editor-group')
 export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
-	//private _ownerGroupId?: string | null;
-
-	/*
-	@property({ type: String })
-	public get ownerGroupId(): string | null | undefined {
-		return this._ownerGroupId;
-	}
-	public set ownerGroupId(value: string | null | undefined) {
-		if (value === this._ownerGroupId) return;
-		const oldValue = this._ownerGroupId;
-		this._ownerGroupId = value;
-		this.requestUpdate('ownerGroupId', oldValue);
-	}
-	private _groupName?: string | undefined;
-
-	@property({ type: String })
-	public get groupName(): string | undefined {
-		return this._groupName;
-	}
-	public set groupName(value: string | undefined) {
-		if (value === this._groupName) return;
-		const oldValue = this._groupName;
-		this._groupName = value;
-		this.requestUpdate('groupName', oldValue);
-	}
-	*/
-
 	@property({ attribute: false })
 	public set group(value: UmbPropertyTypeContainerModel | undefined) {
 		if (value === this._group) return;
@@ -84,6 +57,8 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			if (this.group.name) {
 				// We can first match with something if we have a name [NL]
 				this.observe(
+					// TODO: Missing something about parent name and type here as well, or maybe this one can use the groupStructureHelper for this case:
+					// TODO: When the groupStructureHelper holds the full list of containers, then we can use that to look up all child containers by name and type.[NL]
 					this.groupStructureHelper.getStructureManager()!.containersByNameAndType(this.group.name, 'Group'),
 					(containers) => {
 						const amountOfContainers = containers.length;
@@ -108,19 +83,12 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		}
 	}
 
-	/*
-	_partialUpdate(partialObject: Partial<UmbPropertyTypeContainerModel>) {
-		this.dispatchEvent(new CustomEvent('umb:partial-group-update', { detail: partialObject }));
-	}
-	*/
-
 	_singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
 		if (!this._groupStructureHelper || !this.group) return;
 
 		const partialObject = {} as any;
 		partialObject[propertyName] = value;
 
-		//this.dispatchEvent(new CustomEvent('umb:partial-group-update', { detail: partialObject }));
 		this._groupStructureHelper.partialUpdateContainer(this.group.id, partialObject);
 	}
 
@@ -142,9 +110,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					<uui-box>
 						${this.#renderContainerHeader()}
 						<umb-content-type-design-editor-properties
-							container-id=${this._groupId}
-							container-type="Group"
-							container-name=${this._groupName}></umb-content-type-design-editor-properties>
+							container-id=${this._groupId}></umb-content-type-design-editor-properties>
 					</uui-box>
 				`
 			: '';

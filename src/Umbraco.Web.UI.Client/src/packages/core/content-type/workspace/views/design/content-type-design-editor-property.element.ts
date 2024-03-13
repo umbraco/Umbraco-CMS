@@ -90,6 +90,8 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		// TODO: consider if this can be registered more globally/contextually. [NL]
 		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {

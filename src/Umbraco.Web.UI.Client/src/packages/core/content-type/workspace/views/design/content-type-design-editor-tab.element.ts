@@ -179,9 +179,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				? html`
 						<uui-box>
 							<umb-content-type-design-editor-properties
-								container-id=${this.containerId!}
-								container-type="Tab"
-								container-name=${this.tabName ?? ''}></umb-content-type-design-editor-properties>
+								container-id=${this.containerId!}></umb-content-type-design-editor-properties>
 						</uui-box>
 					`
 				: ''

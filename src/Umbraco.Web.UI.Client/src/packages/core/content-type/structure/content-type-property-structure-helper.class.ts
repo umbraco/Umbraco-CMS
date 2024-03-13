@@ -21,9 +21,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 	#structure?: UmbContentTypePropertyStructureManager<T>;
 
-	private _containerType?: UmbPropertyContainerTypes;
-	private _isRoot?: boolean;
-	private _containerName?: string;
+	private _containerId?: string | null;
 
 	#propertyStructure = new UmbArrayState<UmbPropertyTypeModel>([], (x) => x.id);
 	readonly propertyStructure = this.#propertyStructure.asObservable();
@@ -52,70 +50,102 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
-		this._observeGroupContainers();
+		this._observeContainers();
 	}
 
 	public getStructureManager() {
 		return this.#structure;
 	}
 
-	public setContainerType(value?: UmbPropertyContainerTypes) {
-		if (this._containerType === value) return;
-		this._containerType = value;
-		this._observeGroupContainers();
+	public setContainerId(value?: string | null) {
+		if (this._containerId === value) return;
+		this._containerId = value;
+		this._observeContainers();
 	}
-	public getContainerType() {
-		return this._containerType;
-	}
-
-	public setContainerName(value?: string) {
-		if (this._containerName === value) return;
-		this._containerName = value;
-		this._observeGroupContainers();
-	}
-	public getContainerName() {
-		return this._containerName;
+	public getContainerId() {
+		return this._containerId;
 	}
 
-	public setIsRoot(value: boolean) {
-		if (this._isRoot === value) return;
-		this._isRoot = value;
-		this._observeGroupContainers();
-	}
-	public getIsRoot() {
-		return this._isRoot;
-	}
+	private _containerName?: string;
+	private _containerType?: UmbPropertyContainerTypes;
+	private _parentName?: string | null;
+	private _parentType?: UmbPropertyContainerTypes;
 
-	#groupContainers?: Array<UmbPropertyTypeContainerModel>;
-	private _observeGroupContainers() {
-		if (!this.#structure || !this._containerType) return;
+	#containers?: Array<UmbPropertyTypeContainerModel>;
+	private _observeContainers() {
+		if (!this.#structure || !this._containerId) return;
 
-		if (this._isRoot === true) {
+		if (this._containerId === null) {
 			this._observePropertyStructureOf(null);
-		} else if (this._containerName !== undefined) {
+			this.removeControllerByAlias('_observeContainers');
+		} else {
 			this.observe(
-				this.#structure.containersByNameAndType(this._containerName, this._containerType),
-				(groupContainers) => {
-					console.log('group observe', this._containerName);
-					if (this.#groupContainers) {
-						// We want to remove properties of groups that does not exist anymore: [NL]
-						const goneGroupContainers = this.#groupContainers.filter(
-							(x) => !groupContainers.some((y) => y.id === x.id),
-						);
-						console.log('groupContainers', groupContainers);
-						console.log('goneGroupContainers', goneGroupContainers);
-						const _propertyStructure = this.#propertyStructure
-							.getValue()
-							.filter((x) => !goneGroupContainers.some((y) => y.id === x.container?.id));
-						this.#propertyStructure.setValue(_propertyStructure);
+				this.#structure.containerById(this._containerId),
+				(container) => {
+					if (container) {
+						this._containerName = container.name ?? '';
+						this._containerType = container.type;
+						if (container.parent) {
+							// We have a parent for our main container, so lets observe that one as well:
+							this.observe(
+								this.#structure!.containerById(container.parent.id),
+								(parent) => {
+									if (parent) {
+										this._parentName = parent.name ?? '';
+										this._parentType = parent.type;
+										this.#observeSimilarContainers();
+									} else {
+										this.removeControllerByAlias('_observeContainers');
+										this._parentName = undefined;
+										this._parentType = undefined;
+										this.#propertyStructure.setValue([]);
+										throw new Error('Main parent container does not exist');
+									}
+								},
+								'_observeMainParentContainer',
+							);
+						} else {
+							this._parentName = null; //In this way we want to look for one without a parent. [NL]
+							this._parentType = undefined;
+							this.removeControllerByAlias('_observeMainParentContainer');
+							this.#observeSimilarContainers();
+						}
+					} else {
+						this._containerName = undefined;
+						this._containerType = undefined;
+						this.removeControllerByAlias('_observeContainers');
+						throw new Error('Main container does not exist');
 					}
-
-					groupContainers.forEach((group) => this._observePropertyStructureOf(group.id));
-					this.#groupContainers = groupContainers;
 				},
-				'_observeGroupContainers',
+				'_observeMainContainer',
 			);
 		}
+	}
+
+	#observeSimilarContainers() {
+		if (!this._containerName || !this._containerType || !this._parentName) return;
+		this.observe(
+			this.#structure!.containersByNameAndTypeAndParent(
+				this._containerName,
+				this._containerType,
+				this._parentName,
+				this._parentType,
+			),
+			(groupContainers) => {
+				if (this.#containers) {
+					// We want to remove properties of groups that does not exist anymore: [NL]
+					const goneGroupContainers = this.#containers.filter((x) => !groupContainers.some((y) => y.id === x.id));
+					const _propertyStructure = this.#propertyStructure
+						.getValue()
+						.filter((x) => !goneGroupContainers.some((y) => y.id === x.container?.id));
+					this.#propertyStructure.setValue(_propertyStructure);
+				}
+
+				groupContainers.forEach((group) => this._observePropertyStructureOf(group.id));
+				this.#containers = groupContainers;
+			},
+			'_observeContainers',
+		);
 	}
 
 	private _observePropertyStructureOf(groupId?: string | null) {
