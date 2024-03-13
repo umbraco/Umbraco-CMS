@@ -1,8 +1,11 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-document-variant-language-picker')
 export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
@@ -16,8 +19,18 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		this.#selectionManager = value;
 		this.observe(
 			this.selectionManager.selection,
-			(selection) => {
+			async (selection) => {
 				this._selection = selection;
+
+				// If no selections were provided, select the app language by default:
+				if (!this._selection.length) {
+					const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+					const appCulture = context.getAppCulture();
+					// If the app language is one of the options, select it by default:
+					if (appCulture && this.variantLanguageOptions.some((o) => o.language.unique === appCulture)) {
+						this._selection = appendToFrozenArray(this._selection, new UmbVariantId(appCulture, null).toString());
+					}
+				}
 			},
 			'_selectionManager',
 		);

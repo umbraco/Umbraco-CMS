@@ -1,12 +1,9 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
 import type { UmbDocumentScheduleModalData, UmbDocumentScheduleModalValue } from './document-schedule-modal.token.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
+import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { ScheduleRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 import '../shared/document-variant-language-picker.element.js';
@@ -40,16 +37,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 		// Filter selection based on options:
 		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
-
-		// If no selections were provided, select the app language by default:
-		if (selected.length === 0) {
-			const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
-			const appCulture = context.getAppCulture();
-			// If the app language is one of the options, select it by default:
-			if (appCulture && this._options.some((o) => o.language.unique === appCulture)) {
-				selected = appendToFrozenArray(selected, new UmbVariantId(appCulture, null).toString());
-			}
-		}
 
 		this.#selectionManager.setSelection(selected);
 
