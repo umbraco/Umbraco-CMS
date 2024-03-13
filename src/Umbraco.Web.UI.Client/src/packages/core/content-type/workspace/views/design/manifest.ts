@@ -3,11 +3,11 @@ import type { UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extensio
 export const contentTypeDesignEditorManifest: UmbBackofficeManifestKind = {
 	type: 'kind',
 	alias: 'Umb.Kind.WorkspaceView.ContentTypeDesignEditor',
-	matchKind: 'contentTypeDesign',
+	matchKind: 'contentTypeDesignEditor',
 	matchType: 'workspaceView',
 	manifest: {
 		type: 'workspaceView',
-		kind: 'contentTypeDesign',
+		kind: 'contentTypeDesignEditor',
 		element: () => import('./content-type-workspace-view-edit.element.js'),
 		weight: 1000,
 		meta: {

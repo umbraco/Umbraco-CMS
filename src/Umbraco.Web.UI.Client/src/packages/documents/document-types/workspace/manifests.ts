@@ -20,7 +20,7 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceViews> = [
 	{
 		type: 'workspaceView',
-		kind: 'contentTypeDesign',
+		kind: 'contentTypeDesignEditor',
 		alias: 'Umb.WorkspaceView.DocumentType.Design',
 		name: 'Document Type Workspace Design View',
 		meta: {
