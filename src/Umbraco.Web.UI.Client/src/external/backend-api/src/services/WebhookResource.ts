@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateWebhookRequestModel } from '../models/CreateWebhookRequestModel';
+import type { PagedWebhookResponseModel } from '../models/PagedWebhookResponseModel';
 import type { UpdateWebhookRequestModel } from '../models/UpdateWebhookRequestModel';
 import type { WebhookItemResponseModel } from '../models/WebhookItemResponseModel';
 import type { WebhookResponseModel } from '../models/WebhookResponseModel';
@@ -12,6 +13,30 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class WebhookResource {
+
+    /**
+     * @returns PagedWebhookResponseModel Success
+     * @throws ApiError
+     */
+    public static getWebhook({
+        skip,
+        take = 100,
+    }: {
+        skip?: number,
+        take?: number,
+    }): CancelablePromise<PagedWebhookResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/webhook',
+            query: {
+                'skip': skip,
+                'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
 
     /**
      * @returns string Created

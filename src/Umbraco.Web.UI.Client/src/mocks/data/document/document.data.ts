@@ -5,9 +5,7 @@ import type {
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockDocumentTypeModelHack = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
-
-export interface UmbMockDocumentModel extends Omit<UmbMockDocumentTypeModelHack, 'type'> {}
+export type UmbMockDocumentModel = DocumentResponseModel & DocumentTreeItemResponseModel & DocumentItemResponseModel;
 
 export const data: Array<UmbMockDocumentModel> = [
 	{

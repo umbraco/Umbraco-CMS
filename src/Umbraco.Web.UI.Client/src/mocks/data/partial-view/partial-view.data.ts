@@ -5,11 +5,9 @@ import type {
 	PartialViewSnippetResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockPartialViewModelHack = PartialViewResponseModel &
+export type UmbMockPartialViewModel = PartialViewResponseModel &
 	FileSystemTreeItemPresentationModel &
 	PartialViewItemResponseModel;
-
-export interface UmbMockPartialViewModel extends Omit<UmbMockPartialViewModelHack, 'type' | 'icon'> {}
 
 export const data: Array<UmbMockPartialViewModel> = [
 	{
