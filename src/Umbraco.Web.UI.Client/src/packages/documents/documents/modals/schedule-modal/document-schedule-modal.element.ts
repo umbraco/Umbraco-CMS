@@ -126,16 +126,22 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 	#renderPublishDateInput(option: UmbDocumentVariantOptionModel) {
 		return html`<div class="publish-date">
 			<uui-form-layout-item>
-				<uui-label><umb-localize key="content_releaseDate">Publish at</umb-localize></uui-label>
-				<umb-input-date
-					@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
-					label=${this.localize.term('general_publishDate')}></umb-input-date>
+				<uui-label slot="label"><umb-localize key="content_releaseDate">Publish at</umb-localize></uui-label>
+				<div>
+					<umb-input-date
+						type="datetime-local"
+						@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
+						label=${this.localize.term('general_publishDate')}></umb-input-date>
+				</div>
 			</uui-form-layout-item>
 			<uui-form-layout-item>
-				<uui-label><umb-localize key="content_unpublishDate">Unpublish at</umb-localize></uui-label>
-				<umb-input-date
-					@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
-					label=${this.localize.term('general_publishDate')}></umb-input-date>
+				<uui-label slot="label"><umb-localize key="content_unpublishDate">Unpublish at</umb-localize></uui-label>
+				<div>
+					<umb-input-date
+						type="datetime-local"
+						@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
+						label=${this.localize.term('general_publishDate')}></umb-input-date>
+				</div>
 			</uui-form-layout-item>
 		</div>`;
 	}
@@ -165,7 +171,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		css`
 			:host {
 				display: block;
-				width: 400px;
+				min-width: 600px;
 				max-width: 90vw;
 			}
 
