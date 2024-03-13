@@ -79,11 +79,13 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					(containers) => {
 						const amountOfContainers = containers.length;
 
-						const isAOwnerContainer = this.groupStructureHelper!.isOwnerChildContainer(this.group!.id);
+						const hasAOwnerContainer = containers.some((con) =>
+							this.groupStructureHelper!.isOwnerChildContainer(con.id),
+						);
 
-						const pureOwnerContainer = isAOwnerContainer && amountOfContainers === 1;
+						const pureOwnerContainer = hasAOwnerContainer && amountOfContainers === 1;
 
-						this._hasOwnerContainer = isAOwnerContainer;
+						this._hasOwnerContainer = hasAOwnerContainer;
 						this._inherited = !pureOwnerContainer;
 					},
 					'observeGroupContainers',
@@ -140,36 +142,26 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	}
 
 	#renderContainerHeader() {
-		if (this.sortModeActive) {
-			return html`<div slot="header">
-				<div>
-					<uui-icon name=${this._inherited ? 'icon-merge' : 'icon-navigation'}></uui-icon>
-					${this.#renderInputGroupName()}
-				</div>
+		return html`<div slot="header">
+			<div>
+				<uui-icon name=${this._inherited ? 'icon-merge' : 'icon-navigation'}></uui-icon>
 				<uui-input
-					type="number"
-					label=${this.localize.term('sort_sortOrder')}
-					@change=${(e: UUIInputEvent) => this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) || 0)}
-					.value=${this.group!.sortOrder ?? 0}
-					?disabled=${!this._hasOwnerContainer}></uui-input>
-			</div> `;
-		} else {
-			return html`<div slot="header">
-				<div>
-					<uui-icon name=${this._inherited ? 'icon-merge' : 'icon-navigation'}></uui-icon>
-					${this.#renderInputGroupName()}
-				</div>
-			</div> `;
-		}
-	}
-
-	#renderInputGroupName() {
-		return html`<uui-input
-			label=${this.localize.term('contentTypeEditor_group')}
-			placeholder=${this.localize.term('placeholders_entername')}
-			.value=${this.group!.name}
-			?disabled=${!this._hasOwnerContainer}
-			@change=${this.#renameGroup}></uui-input>`;
+					label=${this.localize.term('contentTypeEditor_group')}
+					placeholder=${this.localize.term('placeholders_entername')}
+					.value=${this.group!.name}
+					?disabled=${!this._hasOwnerContainer}
+					@change=${this.#renameGroup}></uui-input>
+			</div>
+			${this.sortModeActive
+				? html` <uui-input
+						type="number"
+						label=${this.localize.term('sort_sortOrder')}
+						@change=${(e: UUIInputEvent) =>
+							this._singleValueUpdate('sortOrder', parseInt(e.target.value as string) || 0)}
+						.value=${this.group!.sortOrder ?? 0}
+						?disabled=${!this._hasOwnerContainer}></uui-input>`
+				: ''}
+		</div> `;
 	}
 
 	static styles = [

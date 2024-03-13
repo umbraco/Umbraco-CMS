@@ -20,6 +20,7 @@ import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import './content-type-design-editor-tab.element.js';
 
 @customElement('umb-content-type-design-editor')
 export class UmbContentTypeDesignEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -154,6 +155,28 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		);
 	}
 
+	#routeElementCache = new Map<string, UmbContentTypeDesignEditorTabElement>();
+
+	#getCacheOrImportTabElement(tabName: string) {
+		const found = this.#routeElementCache.get(tabName);
+		if (found) {
+			return found;
+		}
+
+		const element = document.createElement(
+			'umb-content-type-design-editor-tab',
+		) as UmbContentTypeDesignEditorTabElement;
+		this.#routeElementCache.set(tabName, element);
+		return element;
+	}
+	#updateCachedTabElement(tabName: string, containerId: string | null) {
+		const found = this.#routeElementCache.get(tabName);
+		if (found) {
+			found.tabName = tabName;
+			found.containerId = containerId;
+		}
+	}
+
 	private _createRoutes() {
 		// TODO: How about storing a set of elements based on tab ids? to prevent re-initializing the element when renaming..[NL]
 		if (!this.#workspaceContext || !this._tabs || this._hasRootGroups === undefined) return;
@@ -168,9 +191,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				if (tab.id === this._activeTabId) {
 					activeTabName = tabName;
 				}
+				this.#updateCachedTabElement(tabName, tab.id);
 				routes.push({
 					path: `tab/${encodeFolderName(tabName).toString()}`,
-					component: () => import('./content-type-design-editor-tab.element.js'),
+					component: () => this.#getCacheOrImportTabElement(tabName),
 					setup: (component) => {
 						// Or just cache the current view here, and use it if the same is begin requested?. [NL]
 						(component as UmbContentTypeDesignEditorTabElement).tabName = tabName;
@@ -182,7 +206,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		routes.push({
 			path: 'root',
-			component: () => import('./content-type-design-editor-tab.element.js'),
+			component: () =>
+				document.createElement('umb-content-type-design-editor-tab') as UmbContentTypeDesignEditorTabElement,
 			setup: (component) => {
 				(component as UmbContentTypeDesignEditorTabElement).noTabName = true;
 				(component as UmbContentTypeDesignEditorTabElement).containerId = null;

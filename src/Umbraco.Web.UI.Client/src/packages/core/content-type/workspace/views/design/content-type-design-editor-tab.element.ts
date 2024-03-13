@@ -29,10 +29,10 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 			this._groups = model;
 		},
 		onEnd: ({ item }) => {
-			if (this._inherited === undefined) {
+			/*if (this._inherited === undefined) {
 				throw new Error('OwnerTabId is not set, we have not made a local duplicated of this container.');
 				return;
-			}
+			}*/
 			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
@@ -72,20 +72,20 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	});
 
 	private _containerId?: string | null;
-	private _inherited?: boolean;
+	//private _inherited?: boolean;
 
 	@property({ type: String })
 	public get containerId(): string | null | undefined {
 		return this._containerId;
 	}
 	public set containerId(value: string | null | undefined) {
-		if (value === this._inherited) return;
-		const oldValue = this._inherited;
+		const oldValue = this._containerId;
+		if (value === this._containerId) return;
 		this._containerId = value;
 		// TODO: Needs ways to check if the container is inherited or not, that works for root containers, maybe null === not inherited is okay:
-		this._inherited = value === null ? false : !this.#groupStructureHelper.isOwnerChildContainer(value);
+		//this._inherited = value === null ? false : !this.#groupStructureHelper.isOwnerChildContainer(value);
 		this.#groupStructureHelper.setParentId(value);
-		this.requestUpdate('ownerTabId', oldValue);
+		this.requestUpdate('containerId', oldValue);
 	}
 
 	private _tabName?: string | undefined;

@@ -163,6 +163,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	private _observeChildContainers() {
 		if (!this.#structure || !this._parentName || !this._childType || !this._parentId) return;
 
+		// TODO: Containers still appears as inherited when they are cloned to local [NL]..... THIS IS WHAT I NEED TO DO NEXT!!!!!!
+
 		this.observe(
 			this.#structure.ownerContainersOf(this._childType, this._parentId),
 			(containers) => {

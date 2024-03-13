@@ -253,9 +253,10 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		// Spread containers, so we can append to it, and then update the specific content-type with the new set of containers: [NL]
 		// Correction the spread is removed now, cause we do a filter: [NL]
 		// And then we remove the existing one, to have the more local one replacing it. [NL]
-		const containers = (
-			this.#contentTypes.getValue().find((x) => x.unique === toContentTypeUnique)?.containers ?? []
-		).filter((x) => x.name !== clonedContainer.name && x.type === clonedContainer.type);
+		const containers = [
+			...(this.#contentTypes.getValue().find((x) => x.unique === toContentTypeUnique)?.containers ?? []),
+		];
+		//.filter((x) => x.name !== clonedContainer.name && x.type === clonedContainer.type);
 		containers.push(clonedContainer);
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -345,6 +346,18 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	) {
 		await this.#init;
 		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeUnique!;
+
+		/*
+		// If we have a container, we need to ensure it exists, and then update the container with the new parent id.
+		if (containerId) {
+			const container = await this.ensureContainerOf(containerId, contentTypeUnique);
+			if (!container) {
+				throw new Error('Container for inserting property could not be found or created');
+			}
+			// Correct containerId to the local one: [NL]
+			containerId = container.id;
+		}
+		*/
 
 		const frozenContainers =
 			this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers ?? [];
