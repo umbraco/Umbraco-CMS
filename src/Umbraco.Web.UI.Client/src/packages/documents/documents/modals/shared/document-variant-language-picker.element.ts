@@ -41,18 +41,18 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 					@deselected=${() => this.selectionManager.deselect(option.unique)}
 					?selected=${this._selection.includes(option.unique)}>
 					<uui-icon slot="icon" name="icon-globe"></uui-icon>
-					${this.#renderLabel(option)}
+					${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
 				</uui-menu-item>
 			`,
 		);
 	}
 
-	#renderLabel(option: UmbDocumentVariantOptionModel) {
+	static renderLabel(option: UmbDocumentVariantOptionModel) {
 		return html`<div class="label" slot="label">
 			<strong>
 				${option.variant?.segment ? option.variant.segment + ' - ' : ''}${option.variant?.name ?? option.language.name}
 			</strong>
-			<div class="label-status">${this.#renderVariantStatus(option)}</div>
+			<div class="label-status">${UmbDocumentVariantLanguagePickerElement.renderVariantStatus(option)}</div>
 			${option.language.isMandatory && option.variant?.state !== UmbDocumentVariantState.PUBLISHED
 				? html`<div class="label-status">
 						<umb-localize key="languages_mandatoryLanguage">Mandatory language</umb-localize>
@@ -61,17 +61,17 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 		</div>`;
 	}
 
-	#renderVariantStatus(option: UmbDocumentVariantOptionModel) {
+	static renderVariantStatus(option: UmbDocumentVariantOptionModel) {
 		switch (option.variant?.state) {
 			case UmbDocumentVariantState.PUBLISHED:
-				return this.localize.term('content_published');
+				return html`<umb-localize key="content_published">Published</umb-localize>`;
 			case UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES:
-				return this.localize.term('content_publishedPendingChanges');
+				return html`<umb-localize key="content_publishedPendingChanges">Published with pending changes</umb-localize>`;
 			case UmbDocumentVariantState.DRAFT:
-				return this.localize.term('content_unpublished');
+				return html`<umb-localize key="content_unpublished">Draft</umb-localize>`;
 			case UmbDocumentVariantState.NOT_CREATED:
 			default:
-				return this.localize.term('content_notCreated');
+				return html`<umb-localize key="content_notCreated">Not created</umb-localize>`;
 		}
 	}
 
