@@ -1,4 +1,3 @@
-import '../../../../core/components/body-layout/body-layout.element.js';
 import './document-publish-modal.element.js';
 
 import type { Meta, StoryObj } from '@storybook/web-components';
@@ -100,39 +99,56 @@ import { UMB_DOCUMENT_PUBLISH_MODAL, UmbDocumentVariantState } from '@umbraco-cm
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
-	modalManager.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+	const result = modalManager.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
 		data: {
 			options: [
 				{
-					name: 'English',
+					unique: 'en-us',
 					culture: 'en-us',
-					state: UmbDocumentVariantState.PUBLISHED,
-					createDate: '2021-08-25T14:00:00Z',
-					publishDate: '2021-08-25T14:00:00Z',
-					updateDate: null,
 					segment: null,
+					variant: {
+						name: 'English variant name',
+						culture: 'en-us',
+						state: UmbDocumentVariantState.PUBLISHED,
+						createDate: '2021-08-25T14:00:00Z',
+						publishDate: null,
+						updateDate: null,
+						segment: null,
+					},
+					language: {
+						entityType: 'language',
+						name: 'English',
+						unique: 'en-us',
+						isDefault: true,
+						isMandatory: true,
+						fallbackIsoCode: null,
+					},
 				},
 				{
-					name: 'English',
-					culture: 'en-us',
-					state: UmbDocumentVariantState.PUBLISHED,
-					createDate: '2021-08-25T14:00:00Z',
-					publishDate: '2021-08-25T14:00:00Z',
-					updateDate: null,
-					segment: 'GTM',
-				},
-				{
-					name: 'Danish',
+					unique: 'da-dk',
 					culture: 'da-dk',
-					state: UmbDocumentVariantState.NOT_CREATED,
-					createDate: null,
-					publishDate: null,
-					updateDate: null,
 					segment: null,
+					variant: {
+						name: 'Danish variant name',
+						culture: 'da-dk',
+						state: UmbDocumentVariantState.NOT_CREATED,
+						createDate: null,
+						publishDate: null,
+						updateDate: null,
+						segment: null,
+					},
+					language: {
+						entityType: 'language',
+						name: 'Danish',
+						unique: 'da-dk',
+						isDefault: false,
+						isMandatory: false,
+						fallbackIsoCode: null,
+					},
 				},
 			],
 		}
-	}
+	}).onSubmit().catch(() => undefined);
 });
 				`,
 			},
