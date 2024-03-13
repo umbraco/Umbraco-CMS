@@ -2,11 +2,7 @@ import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UMB_WORKSPACE_MODAL,
-	UmbModalRouteRegistrationController,
-	umbConfirmModal,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -29,7 +25,6 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
 	#settingsModal;
-	#workspaceModal;
 
 	@property({ attribute: false })
 	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
@@ -57,7 +52,6 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 		this._property = value;
 		this.#checkInherited();
 		this.#settingsModal.setUniquePathValue('propertyId', value?.id?.toString());
-		//this.#workspaceModal.setUniquePathValue('propertyId', value?.id?.toString());
 		this.setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
@@ -76,17 +70,17 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true, attribute: 'sort-mode-active' })
 	public sortModeActive = false;
 
-	@property({ type: String, attribute: 'owner-document-type-id' })
-	public ownerDocumentTypeId?: string;
+	@property({ type: String, attribute: 'owner-content-type-id' })
+	public ownerContentTypeId?: string;
 
-	@property({ type: String, attribute: 'owner-document-type-name' })
-	public ownerDocumentTypeName?: string;
+	@property({ type: String, attribute: 'owner-content-type-name' })
+	public ownerContentTypeName?: string;
+
+	@property({ type: String, attribute: 'edit-content-type-path' })
+	public editContentTypePath?: string;
 
 	@state()
 	protected _modalRoute?: string;
-
-	@state()
-	protected _editDocumentTypePath?: string;
 
 	@state()
 	private _dataTypeName?: string;
@@ -99,27 +93,17 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
-				const documentTypeId = this.ownerDocumentTypeId;
-				if (documentTypeId === undefined) return false;
+				const id = this.ownerContentTypeId;
+				if (id === undefined) return false;
 				const propertyData = this.property;
 				if (propertyData === undefined) return false;
-				return { data: { documentTypeId }, value: propertyData };
+				return { data: { contentTypeId: id }, value: propertyData };
 			})
 			.onSubmit((result) => {
 				this._partialUpdate(result as UmbPropertyTypeModel);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder(null);
-			});
-
-		this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			//.addUniquePaths(['propertyId'])
-			.addAdditionalPath('document-type')
-			.onSetup(() => {
-				return { data: { entityType: 'document-type', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editDocumentTypePath = routeBuilder({});
 			});
 	}
 
@@ -224,8 +208,8 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 						<uui-icon name="icon-merge"></uui-icon>
 						<span
 							>${this.localize.term('contentTypeEditor_inheritedFrom')}
-							<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
-								${this.ownerDocumentTypeName ?? '??'}
+							<a href=${this.editContentTypePath + 'edit/' + this.ownerContentTypeId}>
+								${this.ownerContentTypeName ?? '??'}
 							</a>
 						</span>
 					</uui-tag>

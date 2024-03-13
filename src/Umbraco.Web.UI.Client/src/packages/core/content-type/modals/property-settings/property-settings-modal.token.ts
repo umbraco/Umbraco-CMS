@@ -2,7 +2,7 @@ import { UmbModalToken } from '../../../modal/token/modal-token.js';
 import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 
 export type UmbPropertySettingsModalData = {
-	documentTypeId: string;
+	contentTypeId: string;
 };
 export type UmbPropertySettingsModalValue = UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel;
 

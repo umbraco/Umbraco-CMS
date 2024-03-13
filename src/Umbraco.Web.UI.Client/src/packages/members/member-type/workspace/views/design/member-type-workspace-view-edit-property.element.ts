@@ -95,7 +95,7 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 				if (memberTypeId === undefined) return false;
 				const propertyData = this.property;
 				if (propertyData === undefined) return false;
-				return { data: { documentTypeId: memberTypeId }, value: propertyData };
+				return { data: { contentTypeId: memberTypeId }, value: propertyData };
 			})
 			.onSubmit((result) => {
 				if (!result.dataType) {

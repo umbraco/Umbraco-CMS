@@ -14,7 +14,11 @@ import {
 	UMB_PROPERTY_SETTINGS_MODAL,
 } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { type UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import {
+	type UmbModalRouteBuilder,
+	UmbModalRouteRegistrationController,
+	UMB_WORKSPACE_MODAL,
+} from '@umbraco-cms/backoffice/modal';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeWorkspacePropertyElement> = {
 	getUniqueOfElement: (element) => {
@@ -23,7 +27,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeWorkspa
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.id;
 	},
-	identifier: 'document-type-property-sorter',
+	identifier: 'content-type-property-sorter',
 	itemSelector: 'umb-content-type-workspace-view-edit-property',
 	//disabledItemSelector: '[inherited]',
 	//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
@@ -115,20 +119,24 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 	}
 
 	#addPropertyModal: UmbModalRouteRegistrationController;
+	#workspaceModal?: UmbModalRouteRegistrationController;
 
 	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
-	_propertyStructure: Array<UmbPropertyTypeModel> = [];
+	private _propertyStructure: Array<UmbPropertyTypeModel> = [];
 
 	@state()
-	_ownerDocumentType?: UmbContentTypeModel;
+	private _ownerContentType?: UmbContentTypeModel;
 
 	@state()
-	protected _modalRouteBuilderNewProperty?: UmbModalRouteBuilder;
+	private _modalRouteBuilderNewProperty?: UmbModalRouteBuilder;
 
 	@state()
-	_sortModeActive?: boolean;
+	private _editContentTypePath?: string;
+
+	@state()
+	private _sortModeActive?: boolean;
 
 	constructor() {
 		super();
@@ -137,6 +145,18 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this._propertyStructureHelper.setStructureManager(workspaceContext.structure);
+
+			const entityType = workspaceContext.getEntityType();
+
+			this.#workspaceModal?.destroy();
+			this.#workspaceModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+				.addAdditionalPath(entityType)
+				.onSetup(async () => {
+					return { data: { entityType: entityType, preset: {} } };
+				})
+				.observeRouteBuilder((routeBuilder) => {
+					this._editContentTypePath = routeBuilder({});
+				});
 
 			this.observe(
 				workspaceContext.isSorting,
@@ -153,10 +173,10 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			const docTypeObservable = workspaceContext.structure.ownerContentType;
 			this.observe(
 				docTypeObservable,
-				(document) => {
-					this._ownerDocumentType = document;
+				(contentType) => {
+					this._ownerContentType = contentType;
 				},
-				'observeOwnerDocumentType',
+				'observeOwnerContentType',
 			);
 		});
 		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
@@ -169,7 +189,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			.addUniquePaths(['container-id'])
 			.addAdditionalPath('add-property/:sortOrder')
 			.onSetup(async (params) => {
-				if (!this._ownerDocumentType || !this._containerId) return false;
+				if (!this._ownerContentType || !this._containerId) return false;
 
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
@@ -181,10 +201,10 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 					}
 					propertyData.sortOrder = sortOrderInt + 1;
 				}
-				return { data: { documentTypeId: this._ownerDocumentType.unique }, value: propertyData };
+				return { data: { contentTypeId: this._ownerContentType.unique }, value: propertyData };
 			})
 			.onSubmit(async (value) => {
-				if (!this._ownerDocumentType) return false;
+				if (!this._ownerContentType) return false;
 				// TODO: The model requires a data-type to be set, we cheat currently. But this should be re-though when we implement validation(As we most likely will have to com up with partial models for the runtime model.) [NL]
 				this._propertyStructureHelper.insertProperty(value as UmbPropertyTypeModel);
 				return true;
@@ -195,7 +215,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 	}
 
 	render() {
-		return this._ownerDocumentType
+		return this._ownerContentType
 			? html`
 					<div id="property-list" ?sort-mode-active=${this._sortModeActive}>
 						${repeat(
@@ -205,8 +225,9 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 								return html`
 									<umb-content-type-workspace-view-edit-property
 										data-umb-property-id=${property.id}
-										owner-document-type-id=${ifDefined(this._ownerDocumentType!.unique)}
-										owner-document-type-name=${ifDefined(this._ownerDocumentType!.name)}
+										owner-content-type-id=${ifDefined(this._ownerContentType!.unique)}
+										owner-content-type-name=${ifDefined(this._ownerContentType!.name)}
+										.editContentTypePath=${this._editContentTypePath}
 										?inherited=${property.container?.id !== this.containerId}
 										?sort-mode-active=${this._sortModeActive}
 										.propertyStructureHelper=${this._propertyStructureHelper}

@@ -25,7 +25,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	#sorter = new UmbSorterController<PropertyTypeContainerModelBaseModel, UUITabElement>(this, {
 		getUniqueOfElement: (element) => element.getAttribute('data-umb-tabs-id'),
 		getUniqueOfModel: (tab) => tab.id,
-		identifier: 'document-type-tabs-sorter',
+		identifier: 'content-type-tabs-sorter',
 		itemSelector: 'uui-tab',
 		containerSelector: 'uui-tab-group',
 		disabledItemSelector: '#root-tab',
@@ -285,7 +285,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 			tab.id,
 		);
 
-		// Check if it collides with another tab name of this same document-type, if so adjust name:
+		// Check if it collides with another tab name of this same content-type, if so adjust name:
 		if (changedName) {
 			newName = changedName;
 			(event.target as HTMLInputElement).value = newName;

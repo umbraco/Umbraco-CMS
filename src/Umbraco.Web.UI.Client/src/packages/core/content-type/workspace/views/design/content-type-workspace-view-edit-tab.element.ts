@@ -15,7 +15,7 @@ import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffi
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditGroupElement> = {
 	getUniqueOfElement: (element) => element.group?.id,
 	getUniqueOfModel: (modelEntry) => modelEntry.id,
-	identifier: 'document-type-container-sorter',
+	identifier: 'content-type-container-sorter',
 	itemSelector: '.container-handle',
 	containerSelector: '.container-list',
 };

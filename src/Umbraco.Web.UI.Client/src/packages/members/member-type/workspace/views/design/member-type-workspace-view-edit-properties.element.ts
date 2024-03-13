@@ -169,7 +169,7 @@ export class UmbMemberTypeWorkspaceViewEditPropertiesElement extends UmbLitEleme
 				if (memberTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
-				return { data: { documentTypeId: memberTypeId }, value: propertyData };
+				return { data: { contentTypeId: memberTypeId }, value: propertyData };
 			})
 			.onSubmit((value) => {
 				if (!value.dataType) {

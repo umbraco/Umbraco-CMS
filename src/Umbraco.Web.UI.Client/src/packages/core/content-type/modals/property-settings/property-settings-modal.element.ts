@@ -3,13 +3,13 @@ import {
 	UmbPropertyTypeWorkspaceContext,
 } from './property-settings-modal.context.js';
 import type { UmbPropertySettingsModalData, UmbPropertySettingsModalValue } from './property-settings-modal.token.js';
-import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
+import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 // TODO: Could base take a token to get its types?.
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
@@ -52,19 +52,19 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	#context = new UmbPropertyTypeWorkspaceContext(this);
 
 	@state()
-	private _documentVariesByCulture?: boolean;
+	private _contentTypeVariesByCulture?: boolean;
 
 	@state()
-	private _documentVariesBySegment?: boolean;
+	private _contentTypeVariesBySegment?: boolean;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			if (!this.data?.documentTypeId) return;
+		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
+			if (!this.data?.contentTypeId) return;
 
-			this.observe(instance.variesByCulture, (variesByCulture) => (this._documentVariesByCulture = variesByCulture));
-			this.observe(instance.variesBySegment, (variesBySegment) => (this._documentVariesBySegment = variesBySegment));
+			this.observe(instance.variesByCulture, (variesByCulture) => (this._contentTypeVariesByCulture = variesByCulture));
+			this.observe(instance.variesBySegment, (variesBySegment) => (this._contentTypeVariesBySegment = variesBySegment));
 		}).skipHost();
 
 		this._originalPropertyData = this.value;
@@ -362,10 +362,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderVariationControls() {
-		return this._documentVariesByCulture || this._documentVariesBySegment
+		return this._contentTypeVariesByCulture || this._contentTypeVariesBySegment
 			? html` <div class="container">
 						<b>Variation</b>
-						${this._documentVariesByCulture ? this.#renderVaryByCulture() : ''}
+						${this._contentTypeVariesByCulture ? this.#renderVaryByCulture() : ''}
 					</div>
 					<hr />`
 			: '';
