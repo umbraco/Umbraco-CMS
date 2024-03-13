@@ -3,6 +3,7 @@ import { UmbDocumentPropertyDataContext } from '../property-dataset-context/docu
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type {
+	UmbDocumentVariantPublishModel,
 	UmbDocumentDetailModel,
 	UmbDocumentValueModel,
 	UmbDocumentVariantModel,
@@ -494,7 +495,10 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		const variants = await this.#performSaveOrCreate(variantIds);
-		await this.publishingRepository.publish(unique, variants);
+		await this.publishingRepository.publish(
+			unique,
+			variants.map((variantId) => ({ variantId })),
+		);
 		this.workspaceComplete(this.#currentData.getValue());
 	}
 
@@ -563,13 +567,18 @@ export class UmbDocumentWorkspaceContext
 
 		if (!result?.selection.length) return;
 
-		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x.unique)) ?? [];
+		// Map to the correct format for the API (UmbDocumentVariantPublishModel)
+		const variants =
+			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
+				variantId: UmbVariantId.FromString(x.unique),
+				schedule: x.schedule,
+			})) ?? [];
 
-		if (!variantIds.length) return;
+		if (!variants.length) return;
 
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
-		await this.publishingRepository.publish(unique, variantIds);
+		await this.publishingRepository.publish(unique, variants);
 
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');

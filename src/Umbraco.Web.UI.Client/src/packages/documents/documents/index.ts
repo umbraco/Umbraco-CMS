@@ -15,4 +15,4 @@ export * from './tree/index.js';
 export { UMB_CONTENT_MENU_ALIAS } from './menu.manifests.js';
 export { UMB_DOCUMENT_COLLECTION_ALIAS } from './collection/index.js';
 
-export type { UmbDocumentVariantModel } from './types.js';
+export type * from './types.js';

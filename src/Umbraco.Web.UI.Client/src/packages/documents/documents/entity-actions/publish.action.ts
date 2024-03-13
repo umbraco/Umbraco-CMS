@@ -28,7 +28,7 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<unknown>
 		if (documentData.variants.length === 1) {
 			const variantId = UmbVariantId.Create(documentData.variants[0]);
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			await publishingRepository.publish(this.args.unique, [variantId]);
+			await publishingRepository.publish(this.args.unique, [{ variantId }]);
 			return;
 		}
 
@@ -67,7 +67,10 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<unknown>
 
 		if (variantIds.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			await publishingRepository.publish(this.args.unique, variantIds);
+			await publishingRepository.publish(
+				this.args.unique,
+				variantIds.map((variantId) => ({ variantId })),
+			);
 		}
 	}
 }
