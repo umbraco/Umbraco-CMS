@@ -422,7 +422,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		const path = this._routerPath + (tab.name ? '/tab/' + encodeFolderName(tab.name) : '/tab');
 		const tabActive = path === this._activePath;
 		const ownedTab = this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ?? false;
-		console.log('ownedTab', ownedTab);
 
 		return html`<uui-tab
 			label=${tab.name ?? 'unnamed'}
