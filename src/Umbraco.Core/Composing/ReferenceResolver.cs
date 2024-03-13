@@ -63,10 +63,22 @@ internal class ReferenceResolver
         {
             foreach (var dll in Directory.EnumerateFiles(dir ?? string.Empty, "*.dll"))
             {
+                var fileName = Path.GetFileNameWithoutExtension(dll);
+
+                if (SkipAssemblyWithFileName(fileName))
+                {
+                    continue;
+                }
+
                 AssemblyName? assemblyName = null;
                 try
                 {
                     assemblyName = AssemblyName.GetAssemblyName(dll);
+
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Loaded assembly {dll} for type scanning", dll);
+                    }
                 }
                 catch (BadImageFormatException e)
                 {
@@ -116,6 +128,52 @@ internal class ReferenceResolver
         }
 
         return applicationParts;
+    }
+
+    private static bool SkipAssemblyWithFileName(string? fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            return true;
+        }
+
+        if (fileName.EndsWith(".Views"))
+        {
+            return true;
+        }
+
+        // don't include if this is excluded
+        if (TypeFinder.KnownAssemblyExclusionFilter.Any(FileNameMatchesExclusionFilter))
+        {
+            return true;
+        }
+
+        // don't include this item if it's Umbraco Core
+        if (Constants.Composing.UmbracoCoreAssemblyNames.Any(fileName.StartsWith))
+        {
+            return true;
+        }
+
+        // Otherwise assembly may be loaded
+        return false;
+
+        bool FileNameMatchesExclusionFilter(string exclusion)
+        {
+            if (fileName.StartsWith(exclusion, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return true;
+            }
+
+            // Exclusion filters like "System," are meant to be an exact match on System.dll,
+            // so for the file name match we need to trim the comma and then match the exact file name (case insensitive).
+            if (fileName.Equals(exclusion.TrimEnd(','), StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // Not excluded
+            return false;
+        }
     }
 
     protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
