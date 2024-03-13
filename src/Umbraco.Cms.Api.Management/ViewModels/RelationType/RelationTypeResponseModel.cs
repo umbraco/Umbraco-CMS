@@ -11,7 +11,7 @@ public class RelationTypeResponseModel : RelationTypeBaseModel
     [Required]
     public string Path { get; set; } = string.Empty;
 
-    public bool IsSystemRelationType { get; set; }
+    public bool IsDeletable { get; set; }
 
     /// <summary>
     ///     Gets or sets the Parent's object type name.
