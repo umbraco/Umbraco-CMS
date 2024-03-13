@@ -204,14 +204,13 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	 */
 	#filterNonOwnerContainers(containers: Array<UmbPropertyTypeContainerModel>) {
 		return this._ownerContainers.length > 0
-			? containers.filter((anyCon) =>
-					this._ownerContainers.some(
-						(ownerCon) =>
-							// We would like to keep the owner container in the anyCons, so do not filter that
-							ownerCon.id === anyCon.id ||
-							// Then if this is not the owner container but matches by name & type, then we do not want it.
-							!(ownerCon.id !== anyCon.id && ownerCon.name === anyCon.name && ownerCon.type === anyCon.type),
-					),
+			? containers.filter(
+					(anyCon) =>
+						!this._ownerContainers.some(
+							(ownerCon) =>
+								// Then if this is not the owner container but matches one by name & type, then we do not want it.
+								ownerCon.id !== anyCon.id && ownerCon.name === anyCon.name && ownerCon.type === anyCon.type,
+						),
 				)
 			: containers;
 	}
@@ -222,8 +221,17 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.observe(
 			this.#structure.rootContainers(this._childType),
 			(rootContainers) => {
-				this.#containers.setValue(rootContainers);
+				// Here (When getting root containers) we get containers from all ContentTypes. It also means we need to do an extra filtering to ensure we only get one of each containers. [NL]
+
+				// For that we get the owner containers first (We do not need to observe as this observation will be triggered if one of the owner containers change) [NL]
 				this._ownerContainers = this.#structure!.getOwnerContainers(this._childType!, this._parentId!) ?? [];
+
+				// Then we filter out the duplicate containers based on type and name:
+				rootContainers = rootContainers.filter(
+					(x, i, cons) => i === cons.findIndex((y) => y.name === x.name && y.type === x.type),
+				);
+
+				this.#containers.setValue(this.#filterNonOwnerContainers(rootContainers));
 			},
 			'_observeRootContainers',
 		);

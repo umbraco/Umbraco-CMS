@@ -122,7 +122,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this._tabsStructureHelper.containers, (tabs) => {
-			console.log('tabs', tabs);
 			this._tabs = tabs;
 			this.#sorter.setModel(tabs);
 			this._createRoutes();
@@ -215,6 +214,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					this._activePath = this._routerPath + newPath;
 					// Update the current URL, so we are still on this specific tab:
 					window.history.replaceState(null, '', this._activePath);
+					// TODO: We have some flickering when renaming, this could potentially be fixed if we cache the view and re-use it if the same is requested [NL]
+					// Or maybe its just about we just send the updated tabName to the view, and let it handle the update itself [NL]
 				}
 			}
 		}
