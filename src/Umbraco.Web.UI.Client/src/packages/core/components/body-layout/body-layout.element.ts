@@ -212,6 +212,11 @@ export class UmbBodyLayoutElement extends LitElement {
 				overflow-y: auto;
 				padding: var(--uui-size-layout-1);
 			}
+
+			#main > slot::slotted(*:first-child) {
+				padding-top: 0;
+				margin-top: 0;
+			}
 		`,
 	];
 }
