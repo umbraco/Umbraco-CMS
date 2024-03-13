@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
+using DataType = Umbraco.Cms.Core.Models.DataType;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -29,6 +31,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IIOHelper _ioHelper;
         private readonly IDataTypeContainerService _dataTypeContainerService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
+        private readonly Lazy<IIdKeyMap> _idKeyMap;
 
         public DataTypeService(
             ICoreScopeProvider provider,
@@ -38,7 +41,8 @@ namespace Umbraco.Cms.Core.Services.Implement
             IDataValueEditorFactory dataValueEditorFactory,
             IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            Lazy<IIdKeyMap> idKeyMap)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
@@ -46,6 +50,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
             _ioHelper = ioHelper;
+            _idKeyMap = idKeyMap;
 
             // resolve dependencies for obsolete methods through the static service provider, so they don't pollute the constructor signature
             _dataTypeContainerService = StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>();
@@ -241,6 +246,35 @@ namespace Umbraco.Cms.Core.Services.Implement
             IDataType[] dataTypes = _dataTypeRepository.Get(Query<IDataType>().Where(x => keys.Contains(x.Key))).ToArray();
             ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
             return Task.FromResult<IEnumerable<IDataType>>(dataTypes);
+        }
+
+        /// <inheritdoc />
+        public Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100)
+        {
+            IEnumerable<IDataType> query = GetAll();
+
+            if (name is not null)
+            {
+                query = query.Where(datatype => datatype.Name?.InvariantContains(name) ?? false);
+            }
+
+            if (editorUiAlias != null)
+            {
+                query = query.Where(datatype => datatype.EditorUiAlias?.InvariantContains(editorUiAlias) ?? false);
+            }
+
+            if (editorAlias != null)
+            {
+                query = query.Where(datatype => datatype.EditorAlias.InvariantContains(editorAlias));
+            }
+
+            IDataType[] result = query.ToArray();
+
+            return Task.FromResult(new PagedModel<IDataType>
+            {
+                Total = result.Length,
+                Items = result.Skip(skip).Take(take),
+            });
         }
 
         /// <summary>
@@ -590,6 +624,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return Attempt.FailWithStatus(DataTypeOperationStatus.NotFound, dataType);
             }
 
+            if (dataType.IsDeletableDataType() is false)
+            {
+                scope.Complete();
+                return Attempt.FailWithStatus<IDataType?, DataTypeOperationStatus>(DataTypeOperationStatus.NonDeletable, dataType);
+            }
+
             var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, eventMessages);
             if (await scope.Notifications.PublishCancelableAsync(deletingDataTypeNotification))
             {
@@ -737,11 +777,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         private IDataType? GetDataTypeFromRepository(Guid id)
+        => _idKeyMap.Value.GetIdForKey(id, UmbracoObjectTypes.DataType) switch
         {
-            IQuery<IDataType> query = Query<IDataType>().Where(x => x.Key == id);
-            IDataType? dataType = _dataTypeRepository.Get(query).FirstOrDefault();
-            return dataType;
-        }
+            { Success: false } => null,
+            { Result: var intId } => _dataTypeRepository.Get(intId),
+        };
 
         private void Audit(AuditType type, int userId, int objectId)
             => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));

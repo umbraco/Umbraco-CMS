@@ -24,7 +24,7 @@ public class UpdateDocumentController : UpdateDocumentControllerBase
         IContentEditingService contentEditingService,
         IDocumentEditingPresentationFactory documentEditingPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : base(authorizationService, contentEditingService)
+        : base(authorizationService)
     {
         _contentEditingService = contentEditingService;
         _documentEditingPresentationFactory = documentEditingPresentationFactory;
@@ -37,11 +37,11 @@ public class UpdateDocumentController : UpdateDocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateDocumentRequestModel requestModel)
-        => await HandleRequest(id, requestModel, async content =>
+        => await HandleRequest(id, requestModel, async () =>
         {
             ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
             Attempt<ContentUpdateResult, ContentEditingOperationStatus> result =
-                await _contentEditingService.UpdateAsync(content, model, CurrentUserKey(_backOfficeSecurityAccessor));
+                await _contentEditingService.UpdateAsync(id, model, CurrentUserKey(_backOfficeSecurityAccessor));
 
             return result.Success
                 ? Ok()

@@ -118,7 +118,7 @@ public class ContentTypeBuilderTests
         Assert.AreEqual(testIcon, contentType.Icon);
         Assert.AreEqual(testThumbnail, contentType.Thumbnail);
         Assert.AreEqual(testTrashed, contentType.Trashed);
-        Assert.IsFalse(contentType.IsContainer);
+        Assert.IsNull(contentType.ListView);
         Assert.AreEqual(2, contentType.PropertyTypes.Count());
 
         var propertyTypeIds = contentType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();

@@ -1510,8 +1510,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         var sql = new Sql(
             $@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
-WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer",
-            new { ids, isContainer = true });
+WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.listView IS NULL", new { ids});
         return Database.ExecuteScalar<int>(sql) > 0;
     }
 
@@ -1534,8 +1533,8 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
         var list = new List<string>
         {
             "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
-            "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
+            "DELETE FROM umbracoUserGroup2Permission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
+            "DELETE FROM umbracoUserGroup2GranularPermission WHERE userGroupKey IN (SELECT [umbracoUserGroup].[Key] FROM umbracoUserGroup WHERE Id = @id)",
             "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
             "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @id",
             "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @id",

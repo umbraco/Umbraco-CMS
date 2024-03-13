@@ -33,7 +33,6 @@ public class MapperCollectionBuilder : SetCollectionBuilderBase<MapperCollection
         Add<DomainMapper>();
         Add<KeyValueMapper>();
         Add<LanguageMapper>();
-        Add<MacroMapper>();
         Add<MediaMapper>();
         Add<MediaTypeMapper>();
         Add<MemberGroupMapper>();

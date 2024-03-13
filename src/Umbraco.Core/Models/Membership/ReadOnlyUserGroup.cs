@@ -1,3 +1,5 @@
+using Umbraco.Cms.Core.Models.Membership.Permissions;
+
 namespace Umbraco.Cms.Core.Models.Membership;
 
 public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
@@ -12,8 +14,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         string? alias,
         IEnumerable<int> allowedLanguages,
         IEnumerable<string> allowedSections,
-        IEnumerable<string>? permissions,
-        ISet<string> permissionNames,
+        ISet<string> permissions,
+        ISet<IGranularPermission> granularPermissions,
         bool hasAccessToAllLanguages)
     {
         Name = name ?? string.Empty;
@@ -23,13 +25,13 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         Alias = alias ?? string.Empty;
         AllowedLanguages = allowedLanguages.ToArray();
         AllowedSections = allowedSections.ToArray();
-        Permissions = permissions?.ToArray();
 
         // Zero is invalid and will be treated as Null
         StartContentId = startContentId == 0 ? null : startContentId;
         StartMediaId = startMediaId == 0 ? null : startMediaId;
         HasAccessToAllLanguages = hasAccessToAllLanguages;
-        PermissionNames = permissionNames;
+        Permissions = permissions;
+        GranularPermissions = granularPermissions;
     }
 
     public int Id { get; }
@@ -63,17 +65,12 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
 
     public bool HasAccessToAllLanguages { get; set; }
 
-    /// <summary>
-    ///     The set of default permissions
-    /// </summary>
-    /// <remarks>
-    ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
-    ///     flexible permissions structure in the future.
-    /// </remarks>
-    public IEnumerable<string>? Permissions { get; set; }
-
     public IEnumerable<int> AllowedLanguages { get; private set; }
-    public ISet<string> PermissionNames { get; private set; }
+
+    public ISet<string> Permissions { get; private set; }
+
+    public ISet<IGranularPermission> GranularPermissions { get; private set; }
+
     public IEnumerable<string> AllowedSections { get; private set; }
 
     public static bool operator ==(ReadOnlyUserGroup left, ReadOnlyUserGroup right) => Equals(left, right);

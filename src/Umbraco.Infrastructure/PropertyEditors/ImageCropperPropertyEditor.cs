@@ -3,14 +3,14 @@
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -34,6 +34,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     private readonly ILogger<ImageCropperPropertyEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
     private ContentSettings _contentSettings;
+    private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ImageCropperPropertyEditor" /> class.
@@ -45,7 +46,8 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         IOptionsMonitor<ContentSettings> contentSettings,
         IIOHelper ioHelper,
         UploadAutoFillProperties uploadAutoFillProperties,
-        IContentService contentService)
+        IContentService contentService,
+        IJsonSerializer jsonSerializer)
         : base(dataValueEditorFactory)
     {
         _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
@@ -54,6 +56,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         _autoFillProperties =
             uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
         _contentService = contentService;
+        _jsonSerializer = jsonSerializer;
         _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
 
         contentSettings.OnChange(x => _contentSettings = x);
@@ -65,7 +68,7 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)
     {
         if (propertyEditorAlias == Alias &&
-            GetFileSrcFromPropertyValue(value, out _, false) is var mediaPathValue &&
+            GetFileSrcFromPropertyValue(value, false) is var mediaPathValue &&
             !string.IsNullOrWhiteSpace(mediaPathValue))
         {
             mediaPath = mediaPathValue;
@@ -92,16 +95,18 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
             foreach (IPropertyValue propertyValue in property.Values)
             {
                 var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
-                var src = GetFileSrcFromPropertyValue(propVal, out JObject? jo);
-                if (src == null)
+                var sourcePath = GetFileSrcFromPropertyValue(propVal, relative: true);
+                if (sourcePath.IsNullOrWhiteSpace())
                 {
                     continue;
                 }
 
-                var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(src);
                 var copyPath = _mediaFileManager.CopyFile(notification.Copy, property.PropertyType, sourcePath);
-                jo!["src"] = _mediaFileManager.FileSystem.GetUrl(copyPath);
-                notification.Copy.SetValue(property.Alias, jo.ToString(Formatting.None), propertyValue.Culture,
+                ImageCropperValue? newValue = (propVal is string stringValue && stringValue.DetectIsJson()
+                    ? _jsonSerializer.Deserialize<ImageCropperValue>(stringValue)
+                    : null) ?? new ImageCropperValue();
+                newValue.Src = _mediaFileManager.FileSystem.GetUrl(copyPath);
+                notification.Copy.SetValue(property.Alias,  _jsonSerializer.Serialize(newValue), propertyValue.Culture,
                     propertyValue.Segment);
                 isUpdated = true;
             }
@@ -153,35 +158,6 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
                                                               Constants.PropertyEditors.Aliases.ImageCropper;
 
     /// <summary>
-    ///     Parses the property value into a json object.
-    /// </summary>
-    /// <param name="value">The property value.</param>
-    /// <param name="writeLog">A value indicating whether to log the error.</param>
-    /// <returns>The json object corresponding to the property value.</returns>
-    /// <remarks>In case of an error, optionally logs the error and returns null.</remarks>
-    private JObject? GetJObject(string value, bool writeLog)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return null;
-        }
-
-        try
-        {
-            return JsonConvert.DeserializeObject<JObject>(value);
-        }
-        catch (Exception ex)
-        {
-            if (writeLog)
-            {
-                _logger.LogError(ex, "Could not parse image cropper value '{Json}'", value);
-            }
-
-            return null;
-        }
-    }
-
-    /// <summary>
     ///     The paths to all image cropper property files contained within a collection of content entities
     /// </summary>
     /// <param name="entities"></param>
@@ -202,14 +178,14 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         foreach (IPropertyValue propertyValue in prop.Values)
         {
             // check if the published value contains data and return it
-            var src = GetFileSrcFromPropertyValue(propertyValue.PublishedValue, out JObject? _);
+            var src = GetFileSrcFromPropertyValue(propertyValue.PublishedValue);
             if (src != null)
             {
                 yield return _mediaFileManager.FileSystem.GetRelativePath(src);
             }
 
             // check if the edited value contains data and return it
-            src = GetFileSrcFromPropertyValue(propertyValue.EditedValue, out JObject? _);
+            src = GetFileSrcFromPropertyValue(propertyValue.EditedValue);
             if (src != null)
             {
                 yield return _mediaFileManager.FileSystem.GetRelativePath(src);
@@ -224,32 +200,38 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
     /// <param name="deserializedValue">The deserialized <see cref="JObject" /> value</param>
     /// <param name="relative">Should the path returned be the application relative path</param>
     /// <returns></returns>
-    private string? GetFileSrcFromPropertyValue(object? propVal, out JObject? deserializedValue, bool relative = true)
+    private string? GetFileSrcFromPropertyValue(object? propVal, bool relative = true)
     {
-        deserializedValue = null;
-        if (propVal == null || !(propVal is string str))
+        if (propVal is not string stringValue)
         {
             return null;
         }
 
-        if (!str.DetectIsJson())
+        string? source = null;
+
+        if (!stringValue.DetectIsJson())
         {
             // Assume the value is a plain string with the file path
-            deserializedValue = new JObject { { "src", str } };
+            source = stringValue;
         }
         else
         {
-            deserializedValue = GetJObject(str, true);
+            try
+            {
+                source = _jsonSerializer.Deserialize<LightWeightImageCropperValue>(stringValue)?.Src;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Could not parse image cropper value '{Json}'", stringValue);
+            }
         }
 
-        if (deserializedValue?["src"] == null)
+        if (source.IsNullOrWhiteSpace())
         {
             return null;
         }
 
-        var src = deserializedValue["src"]!.Value<string>();
-
-        return relative ? _mediaFileManager.FileSystem.GetRelativePath(src!) : src;
+        return relative ? _mediaFileManager.FileSystem.GetRelativePath(source) : source;
     }
 
     private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
@@ -275,44 +257,42 @@ public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
 
             foreach (IPropertyValue pvalue in property.Values)
             {
-                var svalue = property.GetValue(pvalue.Culture, pvalue.Segment) as string;
-                if (string.IsNullOrWhiteSpace(svalue))
+                var value = property.GetValue(pvalue.Culture, pvalue.Segment);
+                var source = GetFileSrcFromPropertyValue(property.GetValue(pvalue.Culture, pvalue.Segment));
+                if (source.IsNullOrWhiteSpace())
                 {
                     _autoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
                 }
                 else
                 {
-                    JObject? jo = GetJObject(svalue, false);
-                    string? src;
-                    if (jo == null)
+                    if (value is string stringValue && stringValue.DetectIsJson() is false)
                     {
                         // so we have a non-empty string value that cannot be parsed into a json object
                         // see http://issues.umbraco.org/issue/U4-4756
                         // it can happen when an image is uploaded via the folder browser, in which case
                         // the property value will be the file source eg '/media/23454/hello.jpg' and we
                         // are fixing that anomaly here - does not make any sense at all but... bah...
-                        src = svalue;
-
                         property.SetValue(
-                            JsonConvert.SerializeObject(new { src = svalue }, Formatting.None),
+                            _jsonSerializer.Serialize(new LightWeightImageCropperValue { Src = stringValue }),
                             pvalue.Culture, pvalue.Segment);
                     }
-                    else
-                    {
-                        src = jo["src"]?.Value<string>();
-                    }
 
-                    if (src == null)
+                    if (source is null)
                     {
                         _autoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
                     }
                     else
                     {
-                        _autoFillProperties.Populate(model, autoFillConfig,
-                            _mediaFileManager.FileSystem.GetRelativePath(src), pvalue.Culture, pvalue.Segment);
+                        _autoFillProperties.Populate(model, autoFillConfig, source, pvalue.Culture, pvalue.Segment);
                     }
                 }
             }
         }
+    }
+
+    // for efficient value deserialization, we don't want to deserialize more than we need to (we don't need crops, focal point etc.)
+    private class LightWeightImageCropperValue
+    {
+        public string? Src { get; set; } = string.Empty;
     }
 }

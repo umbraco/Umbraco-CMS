@@ -355,7 +355,8 @@ test.describe('Created packages tests', () => {
   });
 
   // Currently you are not able to download a package
-  test('can download a package', async ({umbracoApi, umbracoUi}) => {
+  //TODO: Remove skip when the frontend is ready
+  test.skip('can download a package', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const packageId = await umbracoApi.package.createEmptyPackage(packageName);
     await umbracoUi.reloadPage();

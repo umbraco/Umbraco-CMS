@@ -35,6 +35,41 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
     ///     Gets a list of paged <see cref="IMember" /> objects
     /// </summary>
     /// <remarks>An <see cref="IMember" /> can be of type <see cref="IMember" /> </remarks>
+    /// <param name="skip">Amount to skip.</param>
+    /// <param name="take">Amount to take.</param>
+    /// <param name="totalRecords">Total number of records found (out)</param>
+    /// <param name="orderBy">Field to order by</param>
+    /// <param name="orderDirection">Direction to order by</param>
+    /// <param name="memberTypeAlias"></param>
+    /// <param name="filter">Search text filter</param>
+    /// <returns>
+    ///     <see cref="IEnumerable{T}" />
+    /// </returns>
+    IEnumerable<IMember> GetAll(
+        int skip,
+        int take,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
+        string? memberTypeAlias = null,
+        string filter = "")
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        return GetAll(
+            pageNumber,
+            pageSize,
+            out totalRecords,
+            orderBy,
+            orderDirection,
+            memberTypeAlias,
+            filter);
+    }
+
+    /// <summary>
+    ///     Gets a list of paged <see cref="IMember" /> objects
+    /// </summary>
+    /// <remarks>An <see cref="IMember" /> can be of type <see cref="IMember" /> </remarks>
     /// <param name="pageIndex">Current page index</param>
     /// <param name="pageSize">Size of the page</param>
     /// <param name="totalRecords">Total number of records found (out)</param>

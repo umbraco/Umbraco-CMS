@@ -1,5 +1,4 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
-using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -16,7 +15,7 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         mapper.Define<ISimpleContentType, MemberTypeReferenceResponseModel>((_, _) => new MemberTypeReferenceResponseModel(), Map);
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Collection
     private void Map(IMemberType source, MemberTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -30,26 +29,27 @@ public class MemberTypeMapDefinition : ContentTypeMapDefinition<IMemberType, Mem
         target.IsElement = source.IsElement;
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
-        target.Compositions = source.ContentTypeComposition.Select(contentTypeComposition => new MemberTypeComposition
-        {
-            MemberType = new ReferenceByIdModel(contentTypeComposition.Key),
-            CompositionType = CalculateCompositionType(source, contentTypeComposition)
-        }).ToArray();
+        target.Compositions = MapNestedCompositions(
+            source.ContentTypeComposition,
+            source.ParentId,
+            (referenceByIdModel, compositionType) => new MemberTypeComposition
+            {
+                MemberType = referenceByIdModel,
+                CompositionType = compositionType,
+            });
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Collection
     private void Map(IMemberType source, MemberTypeReferenceResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
     }
 
-    // Umbraco.Code.MapAll
+    // Umbraco.Code.MapAll -Collection
     private void Map(ISimpleContentType source, MemberTypeReferenceResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
         target.Icon = source.Icon ?? string.Empty;
-        target.HasListView = source.IsContainer;
     }
 }

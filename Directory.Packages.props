@@ -12,13 +12,13 @@
   </ItemGroup>
   <!-- Microsoft packages -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="8.0.1" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.1" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.1" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
@@ -55,7 +55,6 @@
     <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
     <PackageVersion Include="MiniProfiler.Shared" Version="4.3.8" />
     <PackageVersion Include="ncrontab" Version="3.3.3" />
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="NPoco" Version="5.7.1" />
     <PackageVersion Include="NPoco.SqlServer" Version="5.7.1" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="4.10.1" />
@@ -75,8 +74,6 @@
     <PackageVersion Include="Serilog.Sinks.Map" Version="1.0.2" />
     <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.2" />
     <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.1.0" />
-    <PackageVersion Include="Smidge.InMemory" Version="4.3.0" />
-    <PackageVersion Include="Smidge.Nuglify" Version="4.3.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
   <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->

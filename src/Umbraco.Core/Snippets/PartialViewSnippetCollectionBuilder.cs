@@ -18,15 +18,6 @@ public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilder
     {
         var embeddedSnippets = new List<PartialViewSnippet>(base.CreateItems(factory));
 
-        // Ignore these
-        var filterNames = new List<string>
-        {
-            "Gallery",
-            "ListChildPagesFromChangeableSource",
-            "ListChildPagesOrderedByProperty",
-            "ListImagesFromMediaFolder"
-        };
-
         var snippetProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
         IEnumerable<IFileInfo> embeddedFiles = snippetProvider.GetDirectoryContents(string.Empty)
             .Where(x => !x.IsDirectory && x.Name.EndsWith(".cshtml"));
@@ -35,11 +26,6 @@ public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilder
         foreach (IFileInfo file in embeddedFiles)
         {
             var id = Path.GetFileNameWithoutExtension(file.Name);
-            if (filterNames.Contains(id))
-            {
-                continue;
-            }
-
             var name = id.SplitPascalCasing(shortStringHelper).ToFirstUpperInvariant();
             using var stream = new StreamReader(file.CreateReadStream());
             var content = CleanUpSnippetContent(stream.ReadToEnd().Trim());

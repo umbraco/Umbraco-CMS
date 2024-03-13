@@ -18,13 +18,13 @@ public class UserResponseModel : UserPresentationBase
 
     public int FailedLoginAttempts { get; set; }
 
-    public DateTime CreateDate { get; set; }
+    public DateTimeOffset CreateDate { get; set; }
 
-    public DateTime UpdateDate { get; set; }
+    public DateTimeOffset UpdateDate { get; set; }
 
-    public DateTime? LastLoginDate { get; set; }
+    public DateTimeOffset? LastLoginDate { get; set; }
 
-    public DateTime? LastLockoutDate { get; set; }
+    public DateTimeOffset? LastLockoutDate { get; set; }
 
-    public DateTime? LastPasswordChangeDate { get; set; }
+    public DateTimeOffset? LastPasswordChangeDate { get; set; }
 }

@@ -75,6 +75,7 @@ public static partial class Constants
             public const string RecycleBin = "recycle-bin";
             public const string Item = "item";
             public const string Collection = "collection";
+            public const string Filter = "filter";
         }
 
         public static class AttributeRouting

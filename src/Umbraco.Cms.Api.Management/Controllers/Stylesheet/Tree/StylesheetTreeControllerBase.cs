@@ -8,10 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Tree;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.Tree}/{Constants.UdiEntityType.Stylesheet}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Stylesheet))]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessStylesheets)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]
 public class StylesheetTreeControllerBase : FileSystemTreeControllerBase
 {
     public StylesheetTreeControllerBase(FileSystems fileSystems)

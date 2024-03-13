@@ -2,7 +2,6 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Hosting;
@@ -16,11 +15,10 @@ public class UmbracoBackOfficePathGenerator : IBackOfficePathGenerator
     public UmbracoBackOfficePathGenerator(
         IHostingEnvironment hostingEnvironment,
         IUmbracoVersion umbracoVersion,
-        IRuntimeMinifier runtimeMinifier,
         IOptions<GlobalSettings> globalSettings)
     {
         BackOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment);
-        BackOfficeCacheBustHash = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion, runtimeMinifier);
+        BackOfficeCacheBustHash = UrlHelperExtensions.GetCacheBustHash(hostingEnvironment, umbracoVersion);
     }
 
     /// <inheritdoc />
