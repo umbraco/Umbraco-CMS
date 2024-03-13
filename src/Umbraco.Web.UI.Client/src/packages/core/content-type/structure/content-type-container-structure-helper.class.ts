@@ -140,10 +140,20 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				(parentContainers) => {
 					this.#containers.setValue([]);
 					//this._parentOwnerContainers = parentContainers.filter((x) => x.id === this._parentId) || [];
+					// Stop observing a the previous _parentMatchingContainers...
+					this._parentMatchingContainers.forEach((container) => {
+						this.removeControllerByAlias('_observeParentHasProperties_' + container.id);
+						this.removeControllerByAlias('_observeGroupsOf_' + container.id);
+					});
 					this._parentMatchingContainers = parentContainers ?? [];
 					if (this._parentMatchingContainers.length > 0) {
 						this._observeChildProperties();
 						this._observeChildContainers();
+					} else {
+						// Do some reset:
+						this.#hasProperties.setValue(false);
+						this._ownerContainers = [];
+						this.removeControllerByAlias('_observeOwnerContainers');
 					}
 				},
 				'_observeParentContainers',
@@ -175,51 +185,50 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			this.#structure.ownerContainersOf(this._childType, this._parentId),
 			(containers) => {
 				this._ownerContainers = containers ?? [];
-				//console.log('this._ownerContainers', this._ownerContainers);
+				this.#containers.setValue(this.#filterNonOwnerContainers(this.#containers.getValue()));
 			},
 			'_observeOwnerContainers',
 		);
 
-		this._parentMatchingContainers.forEach((container) => {
+		this._parentMatchingContainers.forEach((parentCon) => {
 			this.observe(
-				this.#structure!.containersOfParentKey(container.id, this._childType!),
+				this.#structure!.containersOfParentKey(parentCon.id, this._childType!),
 				(containers) => {
-					// TODO: This stinks, we need to finder a smarter way to do merging on the way. Think about the case when a container is appended but matches a container already in the list.
+					// First we will filter out non-owner containers:
 					const old = this.#containers.getValue();
-
-					//const appends = this._insertChildContainers(containers);
-					// Make sure entries are unique on name and type:
+					// Then filter out the containers that are in the new list, either based on id or a match on name & type.
+					// Matching on name & type will result in the latest being the one we include, notice will only counts for non-owner containers.
 					const oldFiltered = old.filter(
 						(x) => !containers.some((y) => y.id === x.id || (y.name === x.name && y.type === x.type)),
 					);
 
 					const newFiltered = oldFiltered.concat(containers);
-					/*
-					// Filter the newFiltered so it becomes unique name and type:
-					newFiltered.forEach((x, i, value) => !value.some((y) => y.name === x.name && y.type === x.type));
-*/
-					this.#containers.setValue(this._filterContainers(newFiltered));
-					//console.log('new set of containers:', this.#containers.getValue(), this._parentId);
-					//debugger;
-					// TODO: make sure we filter away any inherited containers:
+
+					// Filter out non owners again:
+					this.#containers.setValue(this.#filterNonOwnerContainers(newFiltered));
 				},
-				'_observeGroupsOf_' + container.id,
+				'_observeGroupsOf_' + parentCon.id,
 			);
 		});
 	}
 
-	private _filterContainers(old: Array<UmbPropertyTypeContainerModel>) {
-		return old.filter(
-			(anyCon) =>
-				!this._ownerContainers.some(
-					(ownerCon) =>
-						// We would like to keep the owner container in the anyCons, so do not filter that
-						ownerCon.id !== anyCon.id ||
-						(ownerCon.name === anyCon.name &&
-							ownerCon.type === anyCon.type &&
-							ownerCon.parent?.id === anyCon.parent?.id),
-				),
-		);
+	/**
+	 * This filters our local containers, so we only have one pr. type and name.
+	 * This method is used to ensure we prioritize a Owner Container over the inherited containers.
+	 * This method does not ensure that there is only one of each
+	 */
+	#filterNonOwnerContainers(containers: Array<UmbPropertyTypeContainerModel>) {
+		return this._ownerContainers.length > 0
+			? containers.filter((anyCon) =>
+					this._ownerContainers.some(
+						(ownerCon) =>
+							// We would like to keep the owner container in the anyCons, so do not filter that
+							ownerCon.id === anyCon.id ||
+							// Then if this is not the owner container but matches by name & type, then we do not want it.
+							!(ownerCon.id !== anyCon.id && ownerCon.name === anyCon.name && ownerCon.type === anyCon.type),
+					),
+				)
+			: containers;
 	}
 
 	private _observeRootContainers() {

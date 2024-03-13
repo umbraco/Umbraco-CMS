@@ -113,6 +113,18 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		this._groupStructureHelper.partialUpdateContainer(this.group.id, partialObject);
 	}
 
+	#renameGroup(e: InputEvent) {
+		if (!this.groupStructureHelper || !this._group) return;
+		let newName = (e.target as HTMLInputElement).value;
+		const changedName = this.groupStructureHelper
+			.getStructureManager()!
+			.makeContainerNameUniqueForOwnerContentType(newName, 'Group', this._group.parent?.id ?? null);
+		if (changedName) {
+			newName = changedName;
+		}
+		this._singleValueUpdate('name', newName);
+	}
+
 	render() {
 		return this._inherited !== undefined
 			? html`
@@ -157,10 +169,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			placeholder=${this.localize.term('placeholders_entername')}
 			.value=${this.group!.name}
 			?disabled=${!this._hasOwnerContainer}
-			@change=${(e: InputEvent) => {
-				const newName = (e.target as HTMLInputElement).value;
-				this._singleValueUpdate('name', newName);
-			}}></uui-input>`;
+			@change=${this.#renameGroup}></uui-input>`;
 	}
 
 	static styles = [
