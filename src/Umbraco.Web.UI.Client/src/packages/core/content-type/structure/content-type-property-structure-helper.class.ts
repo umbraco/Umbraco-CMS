@@ -1,4 +1,9 @@
-import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeModel } from '../types.js';
+import type {
+	UmbContentTypeModel,
+	UmbPropertyContainerTypes,
+	UmbPropertyTypeContainerModel,
+	UmbPropertyTypeModel,
+} from '../types.js';
 import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -81,6 +86,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return this._isRoot;
 	}
 
+	#groupContainers?: Array<UmbPropertyTypeContainerModel>;
 	private _observeGroupContainers() {
 		if (!this.#structure || !this._containerType) return;
 
@@ -90,7 +96,22 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 			this.observe(
 				this.#structure.containersByNameAndType(this._containerName, this._containerType),
 				(groupContainers) => {
+					console.log('group observe', this._containerName);
+					if (this.#groupContainers) {
+						// We want to remove properties of groups that does not exist anymore: [NL]
+						const goneGroupContainers = this.#groupContainers.filter(
+							(x) => !groupContainers.some((y) => y.id === x.id),
+						);
+						console.log('groupContainers', groupContainers);
+						console.log('goneGroupContainers', goneGroupContainers);
+						const _propertyStructure = this.#propertyStructure
+							.getValue()
+							.filter((x) => !goneGroupContainers.some((y) => y.id === x.container?.id));
+						this.#propertyStructure.setValue(_propertyStructure);
+					}
+
 					groupContainers.forEach((group) => this._observePropertyStructureOf(group.id));
+					this.#groupContainers = groupContainers;
 				},
 				'_observeGroupContainers',
 			);
@@ -103,9 +124,12 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.observe(
 			this.#structure.propertyStructuresOf(groupId),
 			(properties) => {
-				// If property was removed, we want to make sure that we clean out the ones of this group.id before inserting them again:
-				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.container?.id !== groupId);
+				// Lets remove the properties that does not exists any longer:
+				const _propertyStructure = this.#propertyStructure
+					.getValue()
+					.filter((x) => !(x.container?.id === groupId && !properties.some((y) => y.id === x.id)));
 
+				// Lets append the properties that does not exists already:
 				properties?.forEach((property) => {
 					if (!_propertyStructure.find((x) => x.alias === property.alias)) {
 						_propertyStructure.push(property);

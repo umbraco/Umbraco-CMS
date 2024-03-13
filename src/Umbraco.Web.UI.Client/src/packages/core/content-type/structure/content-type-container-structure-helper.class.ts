@@ -124,6 +124,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			this.observe(
 				this.#structure.containersByNameAndType(this._parentName, this._parentType),
 				(parentContainers) => {
+					this._ownerContainers = [];
 					this.#containers.setValue([]);
 					// Stop observing a the previous _parentMatchingContainers...
 					this._parentMatchingContainers.forEach((container) => {
@@ -137,7 +138,6 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 					} else {
 						// Do some reset:
 						this.#hasProperties.setValue(false);
-						this._ownerContainers = [];
 						this.removeControllerByAlias('_observeOwnerContainers');
 					}
 				},
@@ -163,8 +163,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	private _observeChildContainers() {
 		if (!this.#structure || !this._parentName || !this._childType || !this._parentId) return;
 
-		// TODO: Containers still appears as inherited when they are cloned to local [NL]..... THIS IS WHAT I NEED TO DO NEXT!!!!!!
-
+		// TODO: If a owner container is removed, Or suddenly matches name-wise with a inherited container, then we now miss the inherited container,maybe [NL]
 		this.observe(
 			this.#structure.ownerContainersOf(this._childType, this._parentId),
 			(containers) => {
@@ -176,7 +175,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 		this._parentMatchingContainers.forEach((parentCon) => {
 			this.observe(
-				this.#structure!.containersOfParentKey(parentCon.id, this._childType!),
+				this.#structure!.containersOfParentId(parentCon.id, this._childType!),
 				(containers) => {
 					// First we will filter out non-owner containers:
 					const old = this.#containers.getValue();

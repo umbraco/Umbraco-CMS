@@ -147,6 +147,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		});
 		this.observe(this.#groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
+			console.log('tab got groups', groups);
 			this.#sorter.setModel(this._groups);
 		});
 		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {
@@ -164,6 +165,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	render() {
 		return html`
+		<b>${this.containerId} — ${this.tabName}</b>
 		${
 			this._sortModeActive
 				? html`<uui-button
@@ -187,8 +189,9 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
 					${repeat(
 						this._groups,
-						(group) => group.id + '_' + group.name,
+						(group) => group.id + '_' + group.name + '_' + group.parent?.id ?? '',
 						(group) => html`
+							<b>${group.id}</b>
 							<umb-content-type-design-editor-group
 								class="container-handle"
 								?sort-mode-active=${this._sortModeActive}

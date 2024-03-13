@@ -124,6 +124,9 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this._tabsStructureHelper.containers, (tabs) => {
 			this._tabs = tabs;
+			this._tabs.forEach((tab) => {
+				this.#updateCachedTabElementId(tab.name ?? '', tab.id);
+			});
 			this.#sorter.setModel(tabs);
 			this._createRoutes();
 		});
@@ -169,11 +172,21 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this.#routeElementCache.set(tabName, element);
 		return element;
 	}
-	#updateCachedTabElement(tabName: string, containerId: string | null) {
+
+	#updateCachedTabElementId(tabName: string, containerId: string | null) {
 		const found = this.#routeElementCache.get(tabName);
 		if (found) {
-			found.tabName = tabName;
 			found.containerId = containerId;
+		}
+	}
+
+	#updateCachedTabElementName(tabName: string, newTabName: string) {
+		// change key for map entry:
+		const found = this.#routeElementCache.get(tabName);
+		if (found) {
+			found.tabName = newTabName;
+			this.#routeElementCache.set(newTabName, found);
+			this.#routeElementCache.delete(tabName);
 		}
 	}
 
@@ -191,7 +204,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				if (tab.id === this._activeTabId) {
 					activeTabName = tabName;
 				}
-				this.#updateCachedTabElement(tabName, tab.id);
 				routes.push({
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => this.#getCacheOrImportTabElement(tabName),
@@ -320,6 +332,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			newName = changedName;
 			(event.target as HTMLInputElement).value = newName;
 		}
+
+		this.#updateCachedTabElementName(tab.name ?? '', newName);
 
 		this._tabsStructureHelper.partialUpdateContainer(tab.id!, {
 			name: newName,

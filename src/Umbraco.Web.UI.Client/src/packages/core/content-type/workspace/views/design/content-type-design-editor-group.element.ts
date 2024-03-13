@@ -41,7 +41,10 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	@property({ attribute: false })
 	public set group(value: UmbPropertyTypeContainerModel | undefined) {
 		if (value === this._group) return;
+		console.log('Groupå got new group', value);
 		this._group = value;
+		this._groupId = value?.id;
+		this._groupName = value?.name ?? '';
 		this.#checkInherited();
 	}
 	public get group(): UmbPropertyTypeContainerModel | undefined {
@@ -62,6 +65,12 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 	@property({ type: Boolean, attribute: 'sort-mode-active', reflect: true })
 	sortModeActive = false;
+
+	@state()
+	_groupId?: string;
+
+	@state()
+	_groupName?: string;
 
 	@state()
 	_hasOwnerContainer?: boolean;
@@ -128,14 +137,14 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._inherited !== undefined
+		return this._inherited !== undefined && this._groupId && this._groupName
 			? html`
 					<uui-box>
 						${this.#renderContainerHeader()}
 						<umb-content-type-design-editor-properties
-							container-id=${this.group!.id}
+							container-id=${this._groupId}
 							container-type="Group"
-							container-name=${this.group?.name ?? ''}></umb-content-type-design-editor-properties>
+							container-name=${this._groupName}></umb-content-type-design-editor-properties>
 					</uui-box>
 				`
 			: '';

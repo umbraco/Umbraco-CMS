@@ -623,7 +623,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		return this.getOwnerContentType()?.containers?.filter((x) => x.id === containerId);
 	}
 
-	containersOfParentKey(parentId: string, containerType: UmbPropertyContainerTypes) {
+	containersOfParentId(parentId: string, containerType: UmbPropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
 			return data.filter((x) => x.parent?.id === parentId && x.type === containerType);
 		});
