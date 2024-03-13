@@ -56,7 +56,7 @@ const modalData: UmbDocumentScheduleModalData = {
 };
 
 const modalValue: UmbDocumentScheduleModalValue = {
-	selection: ['en-us'],
+	selection: [{ unique: 'en-us', schedule: null }],
 };
 
 const meta: Meta<UmbDocumentScheduleModalElement> = {
@@ -103,7 +103,10 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 					},
 				},
 			],
-		}
+		},
+		value: {
+			selection: [{ unique: 'en-us', schedule: null }],
+		},
 	}).onSubmit().catch(() => undefined);
 });
 				`,
