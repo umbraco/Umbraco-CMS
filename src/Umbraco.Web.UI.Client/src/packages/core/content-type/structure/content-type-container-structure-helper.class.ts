@@ -163,9 +163,6 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	private _observeChildContainers() {
 		if (!this.#structure || !this._parentName || !this._childType || !this._parentId) return;
 
-		//console.log('Get owner child containers', this._childType, this._parentId);
-		// TODO: We need to observe instead:
-		//this._ownerContainers = this.#structure.getOwnerContainers(this._childType, this._parentId) ?? [];
 		this.observe(
 			this.#structure.ownerContainersOf(this._childType, this._parentId),
 			(containers) => {
