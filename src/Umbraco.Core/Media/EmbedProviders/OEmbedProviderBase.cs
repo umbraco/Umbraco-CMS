@@ -60,7 +60,7 @@ public abstract class OEmbedProviderBase : IEmbedProvider
 
         using (var request = new HttpRequestMessage(HttpMethod.Get, url))
         {
-            HttpResponseMessage response = _httpClient.SendAsync(request).GetAwaiter().GetResult();
+            using HttpResponseMessage response = _httpClient.SendAsync(request).GetAwaiter().GetResult();
             return response.Content.ReadAsStringAsync().Result;
         }
     }
