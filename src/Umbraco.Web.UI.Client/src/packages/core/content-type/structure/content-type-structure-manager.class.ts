@@ -591,13 +591,19 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		});
 	}
 
-	ownerContainersOf(containerType: UmbPropertyContainerTypes) {
-		return this.ownerContentTypeObservablePart((x) => x.containers?.filter((x) => x.type === containerType) ?? []);
+	ownerContainersOf(containerType: UmbPropertyContainerTypes, parentId: string | null) {
+		return this.ownerContentTypeObservablePart(
+			(x) =>
+				x.containers?.filter(
+					(x) => (parentId ? x.parent?.id === parentId : x.parent === null) && x.type === containerType,
+				) ?? [],
+		);
 	}
 
 	getOwnerContainers(containerType: UmbPropertyContainerTypes, parentId: string | null) {
-		return this.getOwnerContentType()?.containers?.filter((x) =>
-			parentId ? x.parent?.id === parentId : x.parent === null && x.type === containerType,
+		console.log(this.getOwnerContentType()?.containers);
+		return this.getOwnerContentType()?.containers?.filter(
+			(x) => (parentId ? x.parent?.id === parentId : x.parent === null) && x.type === containerType,
 		);
 	}
 

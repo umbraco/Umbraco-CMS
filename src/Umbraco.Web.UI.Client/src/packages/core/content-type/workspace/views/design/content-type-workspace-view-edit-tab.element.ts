@@ -1,7 +1,7 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
 import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-workspace-view-edit-group.element.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbContentTypeContainerStructureHelper,
 	type UmbContentTypeModel,
@@ -32,7 +32,6 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				throw new Error('OwnerTabId is not set, we have not made a local duplicated of this container.');
 				return;
 			}
-			console.log('_ownerTabId', this._inherited);
 			/** Explanation: If the item is the first in list, we compare it to the item behind it to set a sortOrder.
 			 * If it's not the first in list, we will compare to the item in before it, and check the following item to see if it caused overlapping sortOrder, then update
 			 * the overlap if true, which may cause another overlap, so we loop through them till no more overlaps...
@@ -161,7 +160,6 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		const len = this._groups.length;
 		const sortOrder = len === 0 ? 0 : this._groups[len - 1].sortOrder + 1;
 		const container = this.#groupStructureHelper.addContainer(this._containerId, sortOrder);
-		console.log('container', container);
 	};
 
 	render() {

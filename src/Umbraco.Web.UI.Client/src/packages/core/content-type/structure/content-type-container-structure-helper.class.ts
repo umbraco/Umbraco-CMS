@@ -114,6 +114,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		if (!this.#structure) return;
 
 		if (this._isRoot) {
+			this.removeControllerByAlias('_observeOwnerContainers');
 			this.#containers.setValue([]);
 			//this._observeChildProperties(); // We cannot have root properties currently, therefor we instead just set it to false:
 			this.#hasProperties.setValue(false);
@@ -165,13 +166,19 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 
 	private _observeChildContainers() {
-		if (!this.#structure || !this._parentName || !this._childType) return;
+		if (!this.#structure || !this._parentName || !this._childType || !this._parentId) return;
 
-		if (this._parentId) {
-			this._ownerContainers = this.#structure.getOwnerContainers(this._childType, this._parentId) ?? [];
-		} else {
-			this._ownerContainers = [];
-		}
+		//console.log('Get owner child containers', this._childType, this._parentId);
+		// TODO: We need to observe instead:
+		//this._ownerContainers = this.#structure.getOwnerContainers(this._childType, this._parentId) ?? [];
+		this.observe(
+			this.#structure.ownerContainersOf(this._childType, this._parentId),
+			(containers) => {
+				this._ownerContainers = containers ?? [];
+				//console.log('this._ownerContainers', this._ownerContainers);
+			},
+			'_observeOwnerContainers',
+		);
 
 		this._parentMatchingContainers.forEach((container) => {
 			this.observe(
@@ -179,25 +186,40 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				(containers) => {
 					// TODO: This stinks, we need to finder a smarter way to do merging on the way. Think about the case when a container is appended but matches a container already in the list.
 					const old = this.#containers.getValue();
-					const appends = this._insertChildContainers(containers);
+
+					//const appends = this._insertChildContainers(containers);
 					// Make sure entries are unique on name and type:
 					const oldFiltered = old.filter(
-						(x) =>
-							!appends.some(
-								(y) =>
-									y.name === x.name && y.type === x.type && this._ownerContainers.some((oc) => oc.id === y.parent?.id),
-							),
+						(x) => !containers.some((y) => y.id === x.id || (y.name === x.name && y.type === x.type)),
 					);
-					const newFiltered = oldFiltered.concat(appends);
+
+					const newFiltered = oldFiltered.concat(containers);
+					/*
 					// Filter the newFiltered so it becomes unique name and type:
 					newFiltered.forEach((x, i, value) => !value.some((y) => y.name === x.name && y.type === x.type));
-
-					this.#containers.setValue(newFiltered);
+*/
+					this.#containers.setValue(this._filterContainers(newFiltered));
+					//console.log('new set of containers:', this.#containers.getValue(), this._parentId);
+					//debugger;
 					// TODO: make sure we filter away any inherited containers:
 				},
 				'_observeGroupsOf_' + container.id,
 			);
 		});
+	}
+
+	private _filterContainers(old: Array<UmbPropertyTypeContainerModel>) {
+		return old.filter(
+			(anyCon) =>
+				!this._ownerContainers.some(
+					(ownerCon) =>
+						// We would like to keep the owner container in the anyCons, so do not filter that
+						ownerCon.id !== anyCon.id ||
+						(ownerCon.name === anyCon.name &&
+							ownerCon.type === anyCon.type &&
+							ownerCon.parent?.id === anyCon.parent?.id),
+				),
+		);
 	}
 
 	private _observeRootContainers() {
@@ -206,13 +228,13 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.observe(
 			this.#structure.rootContainers(this._childType),
 			(rootContainers) => {
-				this.#containers.setValue(this._insertChildContainers(rootContainers));
+				this.#containers.setValue(rootContainers);
 				this._ownerContainers = this.#structure!.getOwnerContainers(this._childType!, this._parentId!) ?? [];
 			},
 			'_observeRootContainers',
 		);
 	}
-
+	/*
 	private _insertChildContainers(
 		childContainers: UmbPropertyTypeContainerModel[],
 	): Array<UmbPropertyTypeContainerModel> {
@@ -225,7 +247,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			}
 			return [];
 		});
-	}
+	}*/
 
 	/**
 	 * Returns true if the container is an owner container.
@@ -243,6 +265,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	 */
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;
+		console.log('isOwnerChildContainer: ', this._parentId, this._ownerContainers, containerId);
 		return this._ownerContainers.some((x) => x.id === containerId);
 	}
 

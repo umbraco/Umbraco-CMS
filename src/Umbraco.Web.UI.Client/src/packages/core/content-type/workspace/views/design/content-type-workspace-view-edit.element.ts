@@ -134,6 +134,10 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 		});
 	}
 
+	#toggleSortMode() {
+		this._workspaceContext?.setIsSorting(!this._sortModeActive);
+	}
+
 	private _observeRootGroups() {
 		if (!this._workspaceContext) return;
 
@@ -145,10 +149,6 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 			},
 			'_observeGroups',
 		);
-	}
-
-	#changeMode() {
-		this._workspaceContext?.setIsSorting(!this._sortModeActive);
 	}
 
 	private _createRoutes() {
@@ -202,8 +202,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 		}
 
 		// If we have an active tab name, then we might have a active tab name re-name, then we will redirect to the new name if it has been changed: [NL]
-		// TODOD: this._activeTabId could be left out.
-		if (this._activeTabId && activeTabName) {
+		if (activeTabName) {
 			if (this._activePath && this._routerPath) {
 				const oldPath = this._activePath.split(this._routerPath)[1];
 				const newPath = '/tab/' + encodeFolderName(activeTabName);
@@ -216,9 +215,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 			}
 		}
 
-		//if (jsonStringComparison(this._routes, routes) === false) {
 		this._routes = routes;
-		//}
 	}
 
 	async #requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
@@ -382,7 +379,7 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 				<uui-icon name="icon-merge"></uui-icon>
 				${this.localize.term('contentTypeEditor_compositions')}
 			</uui-button>
-			<uui-button look="outline" label=${sortButtonText} compact @click=${this.#changeMode}>
+			<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
 				<uui-icon name="icon-navigation"></uui-icon>
 				${sortButtonText}
 			</uui-button>
@@ -420,34 +417,35 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 	renderTab(tab: PropertyTypeContainerModelBaseModel) {
 		const path = this._routerPath + (tab.name ? '/tab/' + encodeFolderName(tab.name) : '/tab');
 		const tabActive = path === this._activePath;
-		const tabInherited = !this._tabsStructureHelper.isOwnerChildContainer(tab.id!);
+		const ownedTab = this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ?? false;
+		console.log('ownedTab', ownedTab);
 
 		return html`<uui-tab
 			label=${tab.name ?? 'unnamed'}
 			.active=${tabActive}
 			href=${path}
 			data-umb-tabs-id=${ifDefined(tab.id)}>
-			${this.renderTabInner(tab, tabActive, tabInherited)}
+			${this.renderTabInner(tab, tabActive, ownedTab)}
 		</uui-tab>`;
 	}
 
-	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, tabInherited: boolean) {
+	renderTabInner(tab: PropertyTypeContainerModelBaseModel, tabActive: boolean, ownedTab: boolean) {
 		// TODO: Localize this:
 		if (this._sortModeActive) {
 			return html`<div class="no-edit">
-				${tabInherited
-					? html`<uui-icon class="external" name="icon-merge"></uui-icon>${tab.name!}`
-					: html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
+				${ownedTab
+					? html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
 							<uui-input
 								label="sort order"
 								type="number"
 								value=${ifDefined(tab.sortOrder)}
 								style="width:50px"
-								@change=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`}
+								@change=${(e: UUIInputEvent) => this.#changeOrderNumber(tab, e)}></uui-input>`
+					: html`<uui-icon class="external" name="icon-merge"></uui-icon>${tab.name!}`}
 			</div>`;
 		}
 
-		if (tabActive && !tabInherited) {
+		if (tabActive && ownedTab) {
 			return html`<div class="tab">
 				<uui-input
 					id="input"
@@ -464,10 +462,10 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 			</div>`;
 		}
 
-		if (tabInherited) {
-			return html`<div class="no-edit"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
-		} else {
+		if (ownedTab) {
 			return html`<div class="no-edit">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
+		} else {
+			return html`<div class="no-edit"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
 		}
 	}
 
