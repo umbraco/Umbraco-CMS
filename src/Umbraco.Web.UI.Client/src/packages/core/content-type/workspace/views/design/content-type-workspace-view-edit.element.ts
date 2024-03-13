@@ -190,18 +190,20 @@ export class UmbContentTypeWorkspaceViewEditElement extends UmbLitElement implem
 			routes.push({
 				path: '',
 				redirectTo: 'root',
-				guards: [() => !this._activeTabId],
+				guards: [() => this._activeTabId === undefined],
 			});
-		} else if (this._tabs.length !== 0) {
+		} else if (routes.length !== 0) {
 			routes.push({
 				path: '',
 				redirectTo: routes[0]?.path,
+				guards: [() => this._activeTabId === undefined],
 			});
 			// TODO: Look at this case.
 		}
 
 		// If we have an active tab name, then we might have a active tab name re-name, then we will redirect to the new name if it has been changed: [NL]
-		if (activeTabName) {
+		// TODOD: this._activeTabId could be left out.
+		if (this._activeTabId && activeTabName) {
 			if (this._activePath && this._routerPath) {
 				const oldPath = this._activePath.split(this._routerPath)[1];
 				const newPath = '/tab/' + encodeFolderName(activeTabName);
