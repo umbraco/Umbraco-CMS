@@ -495,11 +495,19 @@ export class UmbDocumentWorkspaceContext
 		}
 
 		const variants = await this.#performSaveOrCreate(variantIds);
+
 		await this.publishingRepository.publish(
 			unique,
 			variants.map((variantId) => ({ variantId })),
 		);
-		this.workspaceComplete(this.#currentData.getValue());
+
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+
+		this.#persistedData.setValue(data);
+		this.#currentData.setValue(data);
+
+		this.workspaceComplete(data);
 	}
 
 	async save() {
