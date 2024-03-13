@@ -1,15 +1,15 @@
 import { UmbModalToken } from '../../../modal/token/modal-token.js';
 import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
 
-export type UmbPropertySettingsModalData = {
+export type UmbPropertyTypeSettingsModalData = {
 	contentTypeId: string;
 };
-export type UmbPropertySettingsModalValue = UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel;
+export type UmbPropertyTypeSettingsModalValue = UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel;
 
-export const UMB_PROPERTY_SETTINGS_MODAL = new UmbModalToken<
-	UmbPropertySettingsModalData,
-	UmbPropertySettingsModalValue
->('Umb.Modal.PropertySettings', {
+export const UMB_PROPERTY_TYPE_SETTINGS_MODAL = new UmbModalToken<
+	UmbPropertyTypeSettingsModalData,
+	UmbPropertyTypeSettingsModalValue
+>('Umb.Modal.PropertyTypeSettings', {
 	modal: {
 		type: 'sidebar',
 		size: 'small',

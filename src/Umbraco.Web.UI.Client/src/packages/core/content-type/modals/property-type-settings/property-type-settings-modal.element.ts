@@ -1,8 +1,11 @@
 import {
 	UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
 	UmbPropertyTypeWorkspaceContext,
-} from './property-settings-modal.context.js';
-import type { UmbPropertySettingsModalData, UmbPropertySettingsModalValue } from './property-settings-modal.token.js';
+} from './property-type-settings-modal.context.js';
+import type {
+	UmbPropertyTypeSettingsModalData,
+	UmbPropertyTypeSettingsModalValue,
+} from './property-type-settings-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -10,14 +13,14 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
-// TODO: Could base take a token to get its types?.
-@customElement('umb-property-settings-modal')
-export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
-	UmbPropertySettingsModalData,
-	UmbPropertySettingsModalValue
+// TODO: Could base take a token to get its types? [NL]
+@customElement('umb-property-type-settings-modal')
+export class UmbPropertyTypeSettingsModalElement extends UmbModalBaseElement<
+	UmbPropertyTypeSettingsModalData,
+	UmbPropertyTypeSettingsModalValue
 > {
-	//TODO: Should these options come from the server?
-	// TODO: Or should they come from a extension point?
+	//TODO: Should these options come from the server? [NL]
+	// TODO: Or should they come from a extension point? [NL]
 	@state() private _customValidationOptions: Array<Option> = [
 		{
 			name: 'No validation',
@@ -44,7 +47,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	@state() private _aliasLocked = true;
 
-	protected _originalPropertyData!: UmbPropertySettingsModalValue;
+	protected _originalPropertyData!: UmbPropertyTypeSettingsModalValue;
 
 	/** Indicates if the currently edited property is a new property or an existing */
 	#isNew = false;
@@ -92,7 +95,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.firstUpdated(_changedProperties);
 
-		// TODO: Make a general way to put focus on a input in a modal. (also make sure it only happens if its the top-most-modal.)
+		// TODO: Make a general way to put focus on a input in a modal. (also make sure it only happens if its the top-most-modal.) [NL]
 		requestAnimationFrame(() => {
 			(this.shadowRoot!.querySelector('#name-input') as HTMLElement).focus();
 		});
@@ -116,7 +119,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this.updateValue({ name: event.target.value.toString() });
 		if (this._aliasLocked) {
 			const expectedOldAlias = generateAlias(oldName ?? '');
-			// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
+			// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.) [NL]
 			if (expectedOldAlias === oldAlias) {
 				this.updateValue({ alias: generateAlias(this.value.name ?? '') });
 			}
@@ -215,9 +218,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	// TODO: This would conceptually be a Property Type Workspace, should be changed at one point in the future.
-	// For now this is hacky made available by giving the element an fixed alias.
-	// This would allow for workspace views and workspace actions.
+	// TODO: This would conceptually be a Property Type Workspace, should be changed at one point in the future. [NL]
+	// For now this is hacky made available by giving the element an fixed alias. [NL]
+	// This would allow for workspace views and workspace actions. [NL]
 	render() {
 		return html`
 			<uui-form>
@@ -510,10 +513,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	];
 }
 
-export default UmbPropertySettingsModalElement;
+export default UmbPropertyTypeSettingsModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-settings-modal': UmbPropertySettingsModalElement;
+		'umb-property-type-settings-modal': UmbPropertyTypeSettingsModalElement;
 	}
 }

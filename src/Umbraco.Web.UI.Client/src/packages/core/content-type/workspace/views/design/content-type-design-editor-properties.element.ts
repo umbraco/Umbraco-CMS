@@ -12,7 +12,7 @@ import type {
 } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbContentTypePropertyStructureHelper,
-	UMB_PROPERTY_SETTINGS_MODAL,
+	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
 } from '@umbraco-cms/backoffice/content-type';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import {
@@ -189,7 +189,7 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 		});
 
 		// Note: Route for adding a new property
-		this.#addPropertyModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+		this.#addPropertyModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
 			.addUniquePaths(['container-id'])
 			.addAdditionalPath('add-property/:sortOrder')
 			.onSetup(async (params) => {

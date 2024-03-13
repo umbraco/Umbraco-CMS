@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
-	UMB_PROPERTY_SETTINGS_MODAL,
+	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
 	type UmbContentTypeModel,
 	type UmbContentTypePropertyStructureHelper,
 	type UmbPropertyTypeModel,
@@ -90,7 +90,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
+		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
 			.addUniquePaths(['propertyId'])
 			.onSetup(() => {
 				const id = this.ownerContentTypeId;

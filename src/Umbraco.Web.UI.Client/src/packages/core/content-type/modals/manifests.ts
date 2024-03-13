@@ -9,9 +9,9 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.PropertySettings',
-		name: 'Property Settings Modal',
-		js: () => import('.//property-settings/property-settings-modal.element.js'),
+		alias: 'Umb.Modal.PropertyTypeSettings',
+		name: 'Property Type Settings Modal',
+		js: () => import('./property-type-settings/property-type-settings-modal.element.js'),
 	},
 ];
 
