@@ -556,21 +556,20 @@ export class UmbDocumentWorkspaceContext
 				data: {
 					options,
 				},
-				value: { selection: selected },
+				value: { selection: selected.map((unique) => ({ unique, schedule: {} })) },
 			})
 			.onSubmit()
 			.catch(() => undefined);
 
-		if (!result?.selection.length || !result?.schedule) return;
+		if (!result?.selection.length) return;
 
-		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
-		const schedule = result?.schedule;
+		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x.unique)) ?? [];
 
-		if (!variantIds.length || !schedule) return;
+		if (!variantIds.length) return;
 
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
-		await this.publishingRepository.publish(unique, variantIds, schedule);
+		await this.publishingRepository.publish(unique, variantIds);
 
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
