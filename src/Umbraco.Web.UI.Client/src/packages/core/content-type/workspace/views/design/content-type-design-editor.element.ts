@@ -122,6 +122,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(this._tabsStructureHelper.containers, (tabs) => {
+			console.log('tabs', tabs);
 			this._tabs = tabs;
 			this.#sorter.setModel(tabs);
 			this._createRoutes();

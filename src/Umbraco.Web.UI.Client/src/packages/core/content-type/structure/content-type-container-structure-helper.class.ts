@@ -119,27 +119,12 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			//this._observeChildProperties(); // We cannot have root properties currently, therefor we instead just set it to false:
 			this.#hasProperties.setValue(false);
 			this._observeRootContainers();
-			/*this.observe(
-				this.#structure.ownerContainersOf(this._parentType),
-				(containers) => {
-					this._parentContainers = containers ?? [];
-					console.log('root parent containers', this._parentContainers);
-					if (this._parentContainers.length !== 1) {
-						console.log(
-							'!!! We did not just get one parentContainer, I would have expected this, so I have to re-evaluate my understanding.  !!!',
-						);
-					}
-					this._parentAlikeContainers = [];
-				},
-				'_observeParentContainers',
-			);*/
 		} else if (this._parentName && this._parentType) {
 			this.#containers.setValue([]);
 			this.observe(
 				this.#structure.containersByNameAndType(this._parentName, this._parentType),
 				(parentContainers) => {
 					this.#containers.setValue([]);
-					//this._parentOwnerContainers = parentContainers.filter((x) => x.id === this._parentId) || [];
 					// Stop observing a the previous _parentMatchingContainers...
 					this._parentMatchingContainers.forEach((container) => {
 						this.removeControllerByAlias('_observeParentHasProperties_' + container.id);
@@ -243,38 +228,12 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			'_observeRootContainers',
 		);
 	}
-	/*
-	private _insertChildContainers(
-		childContainers: UmbPropertyTypeContainerModel[],
-	): Array<UmbPropertyTypeContainerModel> {
-		// TODO: This place needs to be more intelligent about the existing containers. Now it only takes care of it self. [NL]
-		return childContainers.flatMap((group, i, value) => {
-			if (group.name !== null && group.name !== undefined) {
-				if (value.find((x) => x.name === group.name)) {
-					return group;
-				}
-			}
-			return [];
-		});
-	}*/
-
-	/**
-	 * Returns true if the container is an owner container.
-	 */
-	/*
-	isOwnerContainer(containerId?: string) {
-		if (!this.#structure || !containerId) return;
-
-		return this._parentOwnerContainers.find((x) => x.id === containerId) !== undefined;
-	}
-	*/
 
 	/**
 	 * Returns true if the container is an owner container.
 	 */
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;
-		console.log('isOwnerChildContainer: ', this._parentId, this._ownerContainers, containerId);
 		return this._ownerContainers.some((x) => x.id === containerId);
 	}
 
