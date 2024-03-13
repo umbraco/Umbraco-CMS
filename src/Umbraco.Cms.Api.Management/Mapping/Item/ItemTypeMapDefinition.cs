@@ -3,7 +3,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Dictionary.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Language.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType.Item;
-using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType.Item;
 using Umbraco.Cms.Api.Management.ViewModels.RelationType.Item;
@@ -105,6 +104,7 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Id = source.Key;
         target.Name = source.Name ?? string.Empty;
+        target.IsDeletable = source.IsDeletableRelationType();
     }
 
     // Umbraco.Code.MapAll
