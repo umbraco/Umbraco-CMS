@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -44,7 +43,7 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
         return dto == null ? null : Map(dto);
     }
 
-    public  async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url)
+    public async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url)
     {
         Sql<ISqlContext> sql = GetMostRecentSql(url);
         List<RedirectUrlDto> dtos = await Database.FetchAsync<RedirectUrlDto>(sql);
@@ -71,7 +70,7 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
         Sql<ISqlContext> sql = GetMostRecentUrlSql(url, culture);
 
         List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
-        RedirectUrlDto? dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
+        RedirectUrlDto? dto = dtos.FirstOrDefault(f => culture.InvariantEquals(f.Culture));
 
         if (dto == null)
         {
@@ -102,7 +101,7 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
         Sql<ISqlContext> sql = GetMostRecentUrlSql(url, culture);
 
         List<RedirectUrlDto> dtos = await Database.FetchAsync<RedirectUrlDto>(sql);
-        RedirectUrlDto? dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
+        RedirectUrlDto? dto = dtos.FirstOrDefault(f => culture.InvariantEquals(f.Culture));
 
         if (dto == null)
         {
@@ -159,7 +158,7 @@ internal class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>,
         return rules;
     }
 
-    protected override int PerformCount(IQuery<IRedirectUrl> query) =>
+    protected override int PerformCount(IQuery<IRedirectUrl>? query) =>
         throw new NotSupportedException("This repository does not support this method.");
 
     protected override bool PerformExists(Guid id) => PerformGet(id) != null;

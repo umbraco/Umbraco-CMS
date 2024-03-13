@@ -9,47 +9,47 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 
-[ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Stylesheet}")]
 [ApiExplorerSettings(GroupName = "Stylesheet")]
-[Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessStylesheets)]
-public class StylesheetControllerBase : ManagementApiControllerBase
+[Authorize(Policy = AuthorizationPolicies.TreeAccessStylesheets)]
+public class StylesheetControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult StylesheetOperationStatusResult(StylesheetOperationStatus status) =>
-        status switch
+        OperationStatusResult(status, problemDetailsBuilder => status switch
         {
-            StylesheetOperationStatus.Success => Ok(),
-            StylesheetOperationStatus.AlreadyExists => BadRequest(new ProblemDetailsBuilder()
+            StylesheetOperationStatus.AlreadyExists => BadRequest(problemDetailsBuilder
                 .WithTitle("Stylesheet already exists")
                 .WithDetail("A stylesheet with the same path already exists")
                 .Build()),
-            StylesheetOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
+            StylesheetOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A stylesheet notification handler prevented the stylesheet operation.")
                 .Build()),
-            StylesheetOperationStatus.InvalidFileExtension => BadRequest(new ProblemDetailsBuilder()
+            StylesheetOperationStatus.InvalidFileExtension => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid file extension")
                 .WithDetail("The file extension is not valid for a stylesheet.")
                 .Build()),
-            StylesheetOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
+            StylesheetOperationStatus.ParentNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("Parent not found")
                 .WithDetail("The parent folder was not found.")
                 .Build()),
-            StylesheetOperationStatus.PathTooLong => BadRequest(new ProblemDetailsBuilder()
+            StylesheetOperationStatus.PathTooLong => BadRequest(problemDetailsBuilder
                 .WithTitle("Path too long")
                 .WithDetail("The file path is too long.")
                 .Build()),
-            StylesheetOperationStatus.NotFound => StylesheetNotFound(),
-            StylesheetOperationStatus.InvalidName => BadRequest(new ProblemDetailsBuilder()
+            StylesheetOperationStatus.NotFound => StylesheetNotFound(problemDetailsBuilder),
+            StylesheetOperationStatus.InvalidName => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid name")
                 .WithDetail("The stylesheet name is invalid.")
                 .Build()),
-            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown stylesheet operation status.")
                 .Build()),
-        };
+        });
 
-    protected IActionResult StylesheetNotFound() => NotFound(new ProblemDetailsBuilder()
+    protected IActionResult StylesheetNotFound() => OperationStatusResult(StylesheetOperationStatus.NotFound, StylesheetNotFound);
+
+    protected IActionResult StylesheetNotFound(ProblemDetailsBuilder problemDetailsBuilder) => NotFound(problemDetailsBuilder
         .WithTitle("Stylesheet not found")
         .WithDetail("The stylesheet was not found.")
         .Build());

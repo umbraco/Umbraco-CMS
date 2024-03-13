@@ -32,6 +32,7 @@ public class ContentService : RepositoryService, IContentService
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly ICultureImpactFactory _cultureImpactFactory;
+    private readonly IUserIdKeyResolver _userIdKeyResolver;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -48,7 +49,8 @@ public class ContentService : RepositoryService, IContentService
     ILanguageRepository languageRepository,
     Lazy<IPropertyValidationService> propertyValidationService,
     IShortStringHelper shortStringHelper,
-    ICultureImpactFactory cultureImpactFactory)
+    ICultureImpactFactory cultureImpactFactory,
+    IUserIdKeyResolver userIdKeyResolver)
     : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -60,10 +62,11 @@ public class ContentService : RepositoryService, IContentService
         _propertyValidationService = propertyValidationService;
         _shortStringHelper = shortStringHelper;
         _cultureImpactFactory = cultureImpactFactory;
+        _userIdKeyResolver = userIdKeyResolver;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
-    [Obsolete("Use constructor that takes ICultureImpactService as a parameter, scheduled for removal in V12")]
+    [Obsolete("Use constructor that takes IUserIdKeyResolver as a parameter, scheduled for removal in V15")]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -75,7 +78,8 @@ public class ContentService : RepositoryService, IContentService
         IDocumentBlueprintRepository documentBlueprintRepository,
         ILanguageRepository languageRepository,
         Lazy<IPropertyValidationService> propertyValidationService,
-        IShortStringHelper shortStringHelper)
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory)
         : this(
             provider,
             loggerFactory,
@@ -88,7 +92,8 @@ public class ContentService : RepositoryService, IContentService
             languageRepository,
             propertyValidationService,
             shortStringHelper,
-            StaticServiceProvider.Instance.GetRequiredService<ICultureImpactFactory>())
+            cultureImpactFactory,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
     {
     }
 
@@ -207,7 +212,7 @@ public class ContentService : RepositoryService, IContentService
 
     /// <summary>
     ///     Used to bulk update the permissions set for a content item. This will replace all permissions
-    ///     assigned to an entity with a list of user id & permission pairs.
+    ///     assigned to an entity with a list of user id &amp; permission pairs.
     /// </summary>
     /// <param name="permissionSet"></param>
     public void SetPermissions(EntityPermissionSet permissionSet)
@@ -226,7 +231,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="entity"></param>
     /// <param name="permission"></param>
     /// <param name="groupIds"></param>
-    public void SetPermission(IContent entity, char permission, IEnumerable<int> groupIds)
+    public void SetPermission(IContent entity, string permission, IEnumerable<int> groupIds)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -372,7 +377,7 @@ public class ContentService : RepositoryService, IContentService
     public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         // TODO: what about culture?
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -395,6 +400,8 @@ public class ContentService : RepositoryService, IContentService
 
             Save(content, userId);
 
+            scope.Complete();
+
             return content;
         }
     }
@@ -416,7 +423,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(parent));
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -431,6 +438,7 @@ public class ContentService : RepositoryService, IContentService
 
             Save(content, userId);
 
+            scope.Complete();
             return content;
         }
     }
@@ -508,10 +516,11 @@ public class ContentService : RepositoryService, IContentService
     /// <inheritdoc />
     public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
             _documentRepository.PersistContentSchedule(content, contentSchedule);
+            scope.Complete();
         }
     }
 
@@ -1098,7 +1107,7 @@ public class ContentService : RepositoryService, IContentService
                 new ContentTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
 
             string contentIds = string.Join(", ", contentsA.Select(x => x.Id));
-            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items ({contentIds})");
+            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentIds.Length})");
 
             scope.Complete();
         }
@@ -1106,10 +1115,41 @@ public class ContentService : RepositoryService, IContentService
         return OperationResult.Succeed(eventMessages);
     }
 
-    /// <inheritdoc />
+    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
     public PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
+        => Publish(content, new[] { culture }, userId);
+
+    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(Publish)} instead. Will be removed in V16")]
+    public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
+        => Publish(content, cultures, userId);
+
+    public PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
     {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
+        if (content == null)
+        {
+            throw new ArgumentNullException(nameof(content));
+        }
+
+        if (cultures is null)
+        {
+            throw new ArgumentNullException(nameof(cultures));
+        }
+
+        if (cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
+        {
+            throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
+        }
+
+        // we need to guard against unsaved changes before proceeding; the content will be saved, but we're not firing any saved notifications
+        if (HasUnsavedChanges(content))
+        {
+            return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, EventMessagesFactory.Get(), content);
+        }
+
+        if (content.Name != null && content.Name.Length > 255)
+        {
+            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+        }
 
         PublishedState publishedState = content.PublishedState;
         if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -1122,71 +1162,22 @@ public class ContentService : RepositoryService, IContentService
         // cannot accept a specific culture for invariant content type (but '*' is ok)
         if (content.ContentType.VariesByCulture())
         {
-            if (culture.IsNullOrWhiteSpace())
+            if (cultures.Length > 1 && cultures.Contains("*"))
             {
-                throw new NotSupportedException("Invariant culture is not supported by variant content types.");
+                throw new ArgumentException("Cannot combine wildcard and specific cultures when publishing variant content types.", nameof(cultures));
             }
         }
         else
         {
-            if (!culture.IsNullOrWhiteSpace() && culture != "*")
+            if (cultures.Length == 0)
             {
-                throw new NotSupportedException(
-                    $"Culture \"{culture}\" is not supported by invariant content types.");
-            }
-        }
-
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            var allLangs = _languageRepository.GetMany().ToList();
-
-            // Change state to publishing
-            content.PublishedState = PublishedState.Publishing;
-            var savingNotification = new ContentSavingNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+                cultures = new[] { "*" };
             }
 
-            // if culture is specific, first publish the invariant values, then publish the culture itself.
-            // if culture is '*', then publish them all (including variants)
-
-            // this will create the correct culture impact even if culture is * or null
-            var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
-
-            // publish the culture(s)
-            // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-            content.PublishCulture(impact);
-
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
-            scope.Complete();
-            return result;
-        }
-    }
-
-    /// <inheritdoc />
-    public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId)
-    {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
-        if (cultures == null)
-        {
-            throw new ArgumentNullException(nameof(cultures));
-        }
-
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+            if (cultures[0] != "*" || cultures.Length > 1)
+            {
+                throw new ArgumentException($"Only wildcard culture is supported when publishing invariant content types.", nameof(cultures));
+            }
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -1197,37 +1188,18 @@ public class ContentService : RepositoryService, IContentService
 
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
-            var savingNotification = new ContentSavingNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-            }
-
-            var varies = content.ContentType.VariesByCulture();
-
-            if (cultures.Length == 0 && !varies)
-            {
-                // No cultures specified and doesn't vary, so publish it, else nothing to publish
-                return SaveAndPublish(content, userId: userId);
-            }
-
-            if (cultures.Any(x => x == null || x == "*"))
-            {
-                throw new InvalidOperationException(
-                    "Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
-            }
-
-            IEnumerable<CultureImpact> impacts =
-                    cultures.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
+            // this will create the correct culture impact even if culture is * or null
+            IEnumerable<CultureImpact?> impacts =
+                cultures.Select(culture => _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content));
 
             // publish the culture(s)
             // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
-            foreach (CultureImpact impact in impacts)
+            foreach (CultureImpact? impact in impacts)
             {
                 content.PublishCulture(impact);
             }
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
             scope.Complete();
             return result;
         }
@@ -1282,21 +1254,15 @@ public class ContentService : RepositoryService, IContentService
 
             var allLangs = _languageRepository.GetMany().ToList();
 
-            var savingNotification = new ContentSavingNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-            }
-
             // all cultures = unpublish whole
             if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
             {
-                // It's important to understand that when the document varies by culture but the "*" is used,
-                // we are just unpublishing the whole document but leaving all of the culture's as-is. This is expected
-                // because we don't want to actually unpublish every culture and then the document, we just want everything
-                // to be non-routable so that when it's re-published all variants were as they were.
+                // Unpublish the culture, this will change the document state to Publishing! ... which is expected because this will
+                // essentially be re-publishing the document with the requested culture removed
+                // We are however unpublishing all cultures, so we will set this to unpublishing.
+                content.UnpublishCulture(culture);
                 content.PublishedState = PublishedState.Unpublishing;
-                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
                 scope.Complete();
                 return result;
             }
@@ -1310,7 +1276,7 @@ public class ContentService : RepositoryService, IContentService
                 var removed = content.UnpublishCulture(culture);
 
                 // Save and publish any changes
-                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+                PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
 
                 scope.Complete();
 
@@ -1328,7 +1294,7 @@ public class ContentService : RepositoryService, IContentService
     }
 
     /// <summary>
-    ///     Saves a document and publishes/unpublishes any pending publishing changes made to the document.
+    ///     Publishes/unpublishes any pending publishing changes made to the document.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -1361,15 +1327,9 @@ public class ContentService : RepositoryService, IContentService
 
             scope.WriteLock(Constants.Locks.ContentTree);
 
-            var savingNotification = new ContentSavingNotification(content, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-            }
-
             var allLangs = _languageRepository.GetMany().ToList();
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, out _);
             scope.Complete();
             return result;
         }
@@ -1381,7 +1341,6 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="scope"></param>
     /// <param name="content"></param>
     /// <param name="allLangs"></param>
-    /// <param name="notificationState"></param>
     /// <param name="userId"></param>
     /// <param name="branchOne"></param>
     /// <param name="branchRoot"></param>
@@ -1400,8 +1359,8 @@ public class ContentService : RepositoryService, IContentService
         IContent content,
         EventMessages eventMessages,
         IReadOnlyCollection<ILanguage> allLangs,
-        IDictionary<string, object?>? notificationState,
-        int userId = Constants.Security.SuperUserId,
+        int userId,
+        out IDictionary<string, object?>? initialNotificationState,
         bool branchOne = false,
         bool branchRoot = false)
     {
@@ -1463,6 +1422,7 @@ public class ContentService : RepositoryService, IContentService
             _documentRepository.Save(c);
         }
 
+        initialNotificationState = null;
         if (publishing)
         {
             // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
@@ -1480,7 +1440,7 @@ public class ContentService : RepositoryService, IContentService
                 culturesUnpublishing,
                 eventMessages,
                 allLangs,
-                notificationState);
+                out initialNotificationState);
             if (publishResult.Success)
             {
                 // note: StrategyPublish flips the PublishedState to Publishing!
@@ -1543,7 +1503,7 @@ public class ContentService : RepositoryService, IContentService
                 // handling events, business rules, etc
                 // note: StrategyUnpublish flips the PublishedState to Unpublishing!
                 // note: This unpublishes the entire document (not different variants)
-                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, notificationState);
+                unpublishResult = StrategyCanUnpublish(scope, content, eventMessages, out initialNotificationState);
                 if (unpublishResult.Success)
                 {
                     unpublishResult = StrategyUnpublish(content, eventMessages);
@@ -1556,6 +1516,7 @@ public class ContentService : RepositoryService, IContentService
                     // PublishState to anything other than Publishing or Unpublishing - which is precisely
                     // what we want to do here - throws
                     content.Published = content.Published;
+                    return unpublishResult;
                 }
             }
             else
@@ -1570,10 +1531,6 @@ public class ContentService : RepositoryService, IContentService
         // Persist the document
         SaveDocument(content);
 
-        // raise the Saved event, always
-        scope.Notifications.Publish(
-            new ContentSavedNotification(content, eventMessages).WithState(notificationState));
-
         // we have tried to unpublish - won't happen in a branch
         if (unpublishing)
         {
@@ -1582,7 +1539,7 @@ public class ContentService : RepositoryService, IContentService
             {
                 // events and audit
                 scope.Notifications.Publish(
-                    new ContentUnpublishedNotification(content, eventMessages).WithState(notificationState));
+                    new ContentUnpublishedNotification(content, eventMessages).WithState(initialNotificationState));
                 scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshBranch, eventMessages));
 
                 if (culturesUnpublishing != null)
@@ -1644,7 +1601,7 @@ public class ContentService : RepositoryService, IContentService
                     scope.Notifications.Publish(
                         new ContentTreeChangeNotification(content, changeType, eventMessages));
                     scope.Notifications.Publish(
-                        new ContentPublishedNotification(content, eventMessages).WithState(notificationState));
+                        new ContentPublishedNotification(content, eventMessages).WithState(initialNotificationState));
                 }
 
                 // it was not published and now is... descendants that were 'published' (but
@@ -1654,7 +1611,7 @@ public class ContentService : RepositoryService, IContentService
                 {
                     IContent[] descendants = GetPublishedDescendantsLocked(content).ToArray();
                     scope.Notifications.Publish(
-                        new ContentPublishedNotification(descendants, eventMessages).WithState(notificationState));
+                        new ContentPublishedNotification(descendants, eventMessages).WithState(initialNotificationState));
                 }
 
                 switch (publishResult.Result)
@@ -1754,13 +1711,6 @@ public class ContentService : RepositoryService, IContentService
                         continue; // shouldn't happen but no point in processing this document if there's nothing there
                     }
 
-                    var savingNotification = new ContentSavingNotification(d, evtMsgs);
-                    if (scope.Notifications.PublishCancelable(savingNotification))
-                    {
-                        results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
-                        continue;
-                    }
-
                     foreach (var c in pendingCultures)
                     {
                         // Clear this schedule for this culture
@@ -1771,7 +1721,7 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     _documentRepository.PersistContentSchedule(d, contentSchedule);
-                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                    PublishResult result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId, out _);
                     if (result.Success == false)
                     {
                         _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1826,13 +1776,6 @@ public class ContentService : RepositoryService, IContentService
                         continue; // shouldn't happen but no point in processing this document if there's nothing there
                     }
 
-                    var savingNotification = new ContentSavingNotification(d, evtMsgs);
-                    if (scope.Notifications.PublishCancelable(savingNotification))
-                    {
-                        results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
-                        continue;
-                    }
-
                     var publishing = true;
                     foreach (var culture in pendingCultures)
                     {
@@ -1877,7 +1820,7 @@ public class ContentService : RepositoryService, IContentService
                     else
                     {
                         _documentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId, out _);
                     }
 
                     if (result.Success == false)
@@ -1901,7 +1844,7 @@ public class ContentService : RepositoryService, IContentService
                     else
                     {
                         _documentRepository.PersistContentSchedule(d, contentSchedule);
-                        result = SaveAndPublish(d, userId: d.WriterId);
+                        result = Publish(d, d.AvailableCultures.ToArray(), userId: d.WriterId);
                     }
 
                     if (result.Success == false)
@@ -1920,10 +1863,8 @@ public class ContentService : RepositoryService, IContentService
     }
 
     // utility 'PublishCultures' func used by SaveAndPublishBranch
-    private bool SaveAndPublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IReadOnlyCollection<ILanguage> allLangs)
+    private bool PublishBranch_PublishCultures(IContent content, HashSet<string> culturesToPublish, IReadOnlyCollection<ILanguage> allLangs)
     {
-        // TODO: Th is does not support being able to return invalid property details to bubble up to the UI
-
         // variant content type - publish specified cultures
         // invariant content type - publish only the invariant culture
         if (content.ContentType.VariesByCulture())
@@ -1941,7 +1882,7 @@ public class ContentService : RepositoryService, IContentService
     }
 
     // utility 'ShouldPublish' func used by SaveAndPublishBranch
-    private HashSet<string>? SaveAndPublishBranch_ShouldPublish(ref HashSet<string>? cultures, string c, bool published, bool edited, bool isRoot, bool force)
+    private HashSet<string>? PublishBranch_ShouldPublish(ref HashSet<string>? cultures, string c, bool published, bool edited, bool isRoot, bool force)
     {
         // if published, republish
         if (published)
@@ -1974,7 +1915,7 @@ public class ContentService : RepositoryService, IContentService
         return cultures;
     }
 
-    /// <inheritdoc />
+    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
     public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId)
     {
         // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
@@ -1994,13 +1935,13 @@ public class ContentService : RepositoryService, IContentService
             // invariant content type
             if (!c.ContentType.VariesByCulture())
             {
-                return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
+                return PublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
             }
 
             // variant content type, specific culture
             if (culture != "*")
             {
-                return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, force);
+                return PublishBranch_ShouldPublish(ref culturesToPublish, culture, c.IsCulturePublished(culture), c.IsCultureEdited(culture), isRoot, force);
             }
 
             // variant content type, all cultures
@@ -2010,7 +1951,7 @@ public class ContentService : RepositoryService, IContentService
                 // others will have to 'republish this culture'
                 foreach (var x in c.AvailableCultures)
                 {
-                    SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
+                    PublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
                 }
 
                 return culturesToPublish;
@@ -2022,15 +1963,24 @@ public class ContentService : RepositoryService, IContentService
                 : null; // null means 'nothing to do'
         }
 
-        return SaveAndPublishBranch(content, force, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
+        return PublishBranch(content, force, ShouldPublish, PublishBranch_PublishCultures, userId);
     }
 
-    /// <inheritdoc />
+    [Obsolete($"This method no longer saves content, only publishes it. Please use {nameof(PublishBranch)} instead. Will be removed in V16")]
     public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId)
+        => PublishBranch(content, force, cultures, userId);
+
+    /// <inheritdoc />
+    public IEnumerable<PublishResult> PublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId)
     {
         // note: EditedValue and PublishedValue are objects here, so it is important to .Equals()
         // and not to == them, else we would be comparing references, and that is a bad thing
         cultures = cultures ?? Array.Empty<string>();
+
+        if (content.ContentType.VariesByCulture() is false && cultures.Length == 0)
+        {
+            cultures = new[] { "*" };
+        }
 
         // determines cultures to be published
         // can be: null (content is not impacted), an empty set (content is impacted but already published), or cultures
@@ -2042,7 +1992,7 @@ public class ContentService : RepositoryService, IContentService
             // invariant content type
             if (!c.ContentType.VariesByCulture())
             {
-                return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
+                return PublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
             }
 
             // variant content type, specific cultures
@@ -2052,7 +2002,7 @@ public class ContentService : RepositoryService, IContentService
                 // others will have to 'republish this culture'
                 foreach (var x in cultures)
                 {
-                    SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
+                    PublishBranch_ShouldPublish(ref culturesToPublish, x, c.IsCulturePublished(x), c.IsCultureEdited(x), isRoot, force);
                 }
 
                 return culturesToPublish;
@@ -2064,10 +2014,10 @@ public class ContentService : RepositoryService, IContentService
                 : null; // null means 'nothing to do'
         }
 
-        return SaveAndPublishBranch(content, force, ShouldPublish, SaveAndPublishBranch_PublishCultures, userId);
+        return PublishBranch(content, force, ShouldPublish, PublishBranch_PublishCultures, userId);
     }
 
-    internal IEnumerable<PublishResult> SaveAndPublishBranch(
+    internal IEnumerable<PublishResult> PublishBranch(
         IContent document,
         bool force,
         Func<IContent, HashSet<string>?> shouldPublish,
@@ -2088,6 +2038,7 @@ public class ContentService : RepositoryService, IContentService
         var results = new List<PublishResult>();
         var publishedDocuments = new List<IContent>();
 
+        IDictionary<string, object?>? initialNotificationState = null;
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -2106,7 +2057,7 @@ public class ContentService : RepositoryService, IContentService
             }
 
             // deal with the branch root - if it fails, abort
-            PublishResult? result = SaveAndPublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs);
+            PublishResult? result = PublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out initialNotificationState);
             if (result != null)
             {
                 results.Add(result);
@@ -2141,7 +2092,7 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     // no need to check path here, parent has to be published here
-                    result = SaveAndPublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs);
+                    result = PublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
                     if (result != null)
                     {
                         results.Add(result);
@@ -2165,7 +2116,7 @@ public class ContentService : RepositoryService, IContentService
             // (SaveAndPublishBranchOne does *not* do it)
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true).WithState(initialNotificationState));
 
             scope.Complete();
         }
@@ -2176,7 +2127,7 @@ public class ContentService : RepositoryService, IContentService
     // shouldPublish: a function determining whether the document has changes that need to be published
     //  note - 'force' is handled by 'editing'
     // publishValues: a function publishing values (using the appropriate PublishCulture calls)
-    private PublishResult? SaveAndPublishBranchItem(
+    private PublishResult? PublishBranchItem(
         ICoreScope scope,
         IContent document,
         Func<IContent, HashSet<string>?> shouldPublish,
@@ -2186,9 +2137,18 @@ public class ContentService : RepositoryService, IContentService
         ICollection<IContent> publishedDocuments,
         EventMessages evtMsgs,
         int userId,
-        IReadOnlyCollection<ILanguage> allLangs)
+        IReadOnlyCollection<ILanguage> allLangs,
+        out IDictionary<string, object?>? initialNotificationState)
     {
         HashSet<string>? culturesToPublish = shouldPublish(document);
+
+        initialNotificationState = null;
+
+        // we need to guard against unsaved changes before proceeding; the document will be saved, but we're not firing any saved notifications
+        if (HasUnsavedChanges(document))
+        {
+            return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, document);
+        }
 
         // null = do not include
         if (culturesToPublish == null)
@@ -2202,12 +2162,6 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document);
         }
 
-        var savingNotification = new ContentSavingNotification(document, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
-        }
-
         // publish & check if values are valid
         if (!publishCultures(document, culturesToPublish, allLangs))
         {
@@ -2215,7 +2169,7 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
         }
 
-        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
+        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, userId, out initialNotificationState, true, isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);
@@ -2570,6 +2524,9 @@ public class ContentService : RepositoryService, IContentService
         content.WriterId = userId;
         _documentRepository.Save(content);
     }
+
+    public async Task<OperationResult> EmptyRecycleBinAsync(Guid userId)
+        => EmptyRecycleBin(await _userIdKeyResolver.GetAsync(userId));
 
     /// <summary>
     ///     Empties the Recycle Bin by deleting all <see cref="IContent" /> that resides in the bin
@@ -2960,9 +2917,11 @@ public class ContentService : RepositoryService, IContentService
         return OperationResult.Succeed(eventMessages);
     }
 
+    private bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
+
     public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
@@ -2974,6 +2933,8 @@ public class ContentService : RepositoryService, IContentService
                 var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
                 scope.Notifications.Publish(new ContentTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
             }
+
+            scope.Complete();
 
             return report;
         }
@@ -3048,7 +3009,6 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="evtMsgs"></param>
     /// <param name="culturesPublishing"></param>
     /// <param name="allLangs"></param>
-    /// <param name="notificationState"></param>
     /// <returns></returns>
     private PublishResult StrategyCanPublish(
         ICoreScope scope,
@@ -3058,11 +3018,14 @@ public class ContentService : RepositoryService, IContentService
         IReadOnlyCollection<string>? culturesUnpublishing,
         EventMessages evtMsgs,
         IReadOnlyCollection<ILanguage> allLangs,
-        IDictionary<string, object?>? notificationState)
+        out IDictionary<string, object?>? initialNotificationState)
     {
         // raise Publishing notification
-        if (scope.Notifications.PublishCancelable(
-                new ContentPublishingNotification(content, evtMsgs).WithState(notificationState)))
+        var notification = new ContentPublishingNotification(content, evtMsgs);
+        var notificationResult = scope.Notifications.PublishCancelable(notification);
+        initialNotificationState = notification.State;
+
+        if (notificationResult)
         {
             _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
@@ -3301,10 +3264,18 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="content"></param>
     /// <param name="evtMsgs"></param>
     /// <returns></returns>
-    private PublishResult StrategyCanUnpublish(ICoreScope scope, IContent content, EventMessages evtMsgs, IDictionary<string, object?>? notificationState)
+    private PublishResult StrategyCanUnpublish(
+        ICoreScope scope,
+        IContent content,
+        EventMessages evtMsgs,
+        out IDictionary<string, object?>? initialNotificationState)
     {
         // raise Unpublishing notification
-        if (scope.Notifications.PublishCancelable(new ContentUnpublishingNotification(content, evtMsgs).WithState(notificationState)))
+        var notification = new ContentUnpublishingNotification(content, evtMsgs);
+        var notificationResult = scope.Notifications.PublishCancelable(notification);
+        initialNotificationState = notification.State;
+
+        if (notificationResult)
         {
             _logger.LogInformation(
                 "Document {ContentName} (id={ContentId}) cannot be unpublished: unpublishing was cancelled.", content.Name, content.Id);
@@ -3570,6 +3541,7 @@ public class ContentService : RepositoryService, IContentService
             Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
             scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
             scope.Complete();
         }
@@ -3584,6 +3556,7 @@ public class ContentService : RepositoryService, IContentService
             scope.WriteLock(Constants.Locks.ContentTree);
             _documentBlueprintRepository.Delete(content);
             scope.Notifications.Publish(new ContentDeletedBlueprintNotification(content, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.Remove, evtMsgs));
             scope.Complete();
         }
     }
@@ -3684,6 +3657,7 @@ public class ContentService : RepositoryService, IContentService
                 }
 
                 scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprints, evtMsgs));
+                scope.Notifications.Publish(new ContentTreeChangeNotification(blueprints, TreeChangeTypes.Remove, evtMsgs));
                 scope.Complete();
             }
         }

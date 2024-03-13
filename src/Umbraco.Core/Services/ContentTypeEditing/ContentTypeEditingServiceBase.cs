@@ -33,8 +33,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         _shortStringHelper = shortStringHelper;
     }
 
-    protected abstract Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement);
-
     protected abstract TContentType CreateContentType(IShortStringHelper shortStringHelper, int parentId);
 
     protected abstract bool SupportsPublishing { get; }
@@ -42,6 +40,29 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     protected abstract UmbracoObjectTypes ContentTypeObjectType { get; }
 
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
+
+    protected async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> FindAvailableCompositionsAsync(
+        Guid? key,
+        IEnumerable<Guid> currentCompositeKeys,
+        IEnumerable<string> currentPropertyAliases,
+        bool isElement = false)
+    {
+        TContentType? contentType = key.HasValue ? await _concreteContentTypeService.GetAsync(key.Value) : null;
+        IContentTypeComposition[] allContentTypes = _concreteContentTypeService.GetAll().ToArray();
+
+        var currentCompositionAliases = currentCompositeKeys.Any()
+            ? allContentTypes.Where(ct => currentCompositeKeys.Contains(ct.Key)).Select(ct => ct.Alias).ToArray()
+            : Array.Empty<string>();
+
+        ContentTypeAvailableCompositionsResults availableCompositions = _contentTypeService.GetAvailableCompositeContentTypes(
+            contentType,
+            allContentTypes,
+            currentCompositionAliases,
+            currentPropertyAliases.ToArray(),
+            isElement);
+
+        return availableCompositions.Results;
+    }
 
     protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> ValidateAndMapForCreationAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? containerKey)
     {
@@ -287,7 +308,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
 
         // verify that all compositions keys are allowed
-        Guid[] allowedCompositionKeys = GetAvailableCompositionKeys(contentType, allContentTypeCompositions, model.IsElement);
+        Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(contentType, allContentTypeCompositions, isElement: model.IsElement)
+            .Results
+            .Where(x => x.Allowed)
+            .Select(x => x.Composition.Key)
+            .ToArray();
+
         if (allowedCompositionKeys.ContainsAll(compositionKeys) is false)
         {
             return ContentTypeOperationStatus.InvalidComposition;
@@ -401,6 +427,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         contentType.Name = model.Name;
         contentType.AllowedAsRoot = model.AllowedAsRoot;
         contentType.IsElement = model.IsElement;
+        contentType.ListView = model.ListView;
         contentType.SetVariesBy(ContentVariation.Culture, model.VariesByCulture);
         contentType.SetVariesBy(ContentVariation.Segment, model.VariesBySegment);
 

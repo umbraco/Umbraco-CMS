@@ -10,18 +10,25 @@ public class PropertyValidationService : IPropertyValidationService
 {
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyEditorCollection _propertyEditors;
-    private readonly ILocalizedTextService _textService;
     private readonly IValueEditorCache _valueEditorCache;
 
+    [Obsolete($"Use the constructor that does not accept {nameof(ILocalizedTextService)}. Will be removed in V15.")]
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
         ILocalizedTextService textService,
         IValueEditorCache valueEditorCache)
+        : this(propertyEditors, dataTypeService, valueEditorCache)
+    {
+    }
+
+    public PropertyValidationService(
+        PropertyEditorCollection propertyEditors,
+        IDataTypeService dataTypeService,
+        IValueEditorCache valueEditorCache)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
-        _textService = textService;
         _valueEditorCache = valueEditorCache;
     }
 
@@ -63,11 +70,8 @@ public class PropertyValidationService : IPropertyValidationService
     {
         // Retrieve default messages used for required and regex validatation.  We'll replace these
         // if set with custom ones if they've been provided for a given property.
-        var requiredDefaultMessages = new[]
-        {
-            _textService.Localize("validation", "invalidNull"), _textService.Localize("validation", "invalidEmpty"),
-        };
-        var formatDefaultMessages = new[] { _textService.Localize("validation", "invalidPattern") };
+        var requiredDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.Missing };
+        var formatDefaultMessages = new[] { Constants.Validation.ErrorMessages.Properties.PatternMismatch };
 
         IDataValueEditor valueEditor = _valueEditorCache.GetValueEditor(editor, dataType);
         foreach (ValidationResult validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp))
@@ -179,14 +183,20 @@ public class PropertyValidationService : IPropertyValidationService
         }
 
         // else validate vvalues (but don't revalidate pvalue)
-        var pvalues = property.Values.Where(x =>
+        var vvalues = property.Values.Where(x =>
                 x != pvalue && // don't revalidate pvalue
                 property.PropertyType.SupportsVariation(x.Culture, x.Segment, true) && // the value variation is ok
                     (culture == "*" || x.Culture.InvariantEquals(culture)) && // the culture matches
                     (segment == "*" || x.Segment.InvariantEquals(segment))) // the segment matches
             .ToList();
 
-        return pvalues.Count == 0 || pvalues.All(x => IsValidPropertyValue(property, x.EditedValue));
+        // if we do not have any vvalues at this point, validate null (no variant values present)
+        if (vvalues.Any() is false)
+        {
+            return IsValidPropertyValue(property, null);
+        }
+
+        return vvalues.All(x => IsValidPropertyValue(property, x.EditedValue));
     }
 
     /// <summary>

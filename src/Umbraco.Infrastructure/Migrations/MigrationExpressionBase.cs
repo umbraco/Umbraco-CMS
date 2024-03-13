@@ -33,7 +33,7 @@ public abstract class MigrationExpressionBase : IMigrationExpression
     public List<IMigrationExpression> Expressions => _expressions ??= new List<IMigrationExpression>();
 
     /// <summary>
-    /// This might be useful in the future if we add it to the interface, but for now it's used to hack the DeleteAppTables & DeleteForeignKeyExpression
+    /// This might be useful in the future if we add it to the interface, but for now it's used to hack the DeleteAppTables &amp; DeleteForeignKeyExpression
     /// to ensure they are not executed twice.
     /// </summary>
     internal string? Name { get; set; }

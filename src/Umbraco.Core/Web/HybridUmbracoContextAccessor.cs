@@ -17,7 +17,7 @@ public class HybridUmbracoContextAccessor : HybridAccessorBase<IUmbracoContext>,
     }
 
     /// <summary>
-    ///     Tries to get the <see cref="UmbracoContext" /> object.
+    ///     Tries to get the <see cref="IUmbracoContext" /> object.
     /// </summary>
     public bool TryGetUmbracoContext([MaybeNullWhen(false)] out IUmbracoContext umbracoContext)
     {
@@ -27,12 +27,12 @@ public class HybridUmbracoContextAccessor : HybridAccessorBase<IUmbracoContext>,
     }
 
     /// <summary>
-    ///     Clears the current <see cref="UmbracoContext" /> object.
+    ///     Clears the current <see cref="IUmbracoContext" /> object.
     /// </summary>
     public void Clear() => Value = null;
 
     /// <summary>
-    ///     Sets the <see cref="UmbracoContext" /> object.
+    ///     Sets the <see cref="IUmbracoContext" /> object.
     /// </summary>
     /// <param name="umbracoContext"></param>
     public void Set(IUmbracoContext umbracoContext) => Value = umbracoContext;

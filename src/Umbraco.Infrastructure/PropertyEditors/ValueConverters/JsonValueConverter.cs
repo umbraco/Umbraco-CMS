@@ -1,10 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 ///     Since this is a default (umbraco) converter it will be ignored if another converter found conflicts with this one.
 /// </remarks>
 [DefaultPropertyValueConverter]
-public class JsonValueConverter : PropertyValueConverterBase
+public class JsonValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly ILogger<JsonValueConverter> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
@@ -44,8 +45,9 @@ public class JsonValueConverter : PropertyValueConverterBase
         && editor.GetValueEditor().ValueType.InvariantEquals(ValueTypes.Json)
         && _excludedPropertyEditors.Contains(propertyType.EditorAlias) == false;
 
+    // We return a JsonDocument here because it's readonly and faster than JsonNode.
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-        => typeof(JToken);
+        => typeof(JsonDocument);
 
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
@@ -63,8 +65,7 @@ public class JsonValueConverter : PropertyValueConverterBase
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject(sourceString);
-                return obj;
+                return JsonDocument.Parse(sourceString);
             }
             catch (Exception ex)
             {
@@ -76,5 +77,14 @@ public class JsonValueConverter : PropertyValueConverterBase
         return sourceString;
     }
 
-    // TODO: Now to convert that to XPath!
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
+        => GetPropertyCacheLevel(propertyType);
+
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
+        => typeof(JsonNode);
+
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
+        => inter is not JsonDocument jsonDocument
+            ? null
+            : JsonNode.Parse(jsonDocument.RootElement.ToString());
 }

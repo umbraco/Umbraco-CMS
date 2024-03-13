@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
@@ -28,10 +29,8 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
-    private IMacroService MacroService => GetRequiredService<IMacroService>();
-
     [HideFromTypeFinder]
-    [DataEditor("7e062c13-7c41-4ad9-b389-41d88aeef87c", "Editor1", "editor1")]
+    [DataEditor("7e062c13-7c41-4ad9-b389-41d88aeef87c")]
     public class Editor1 : DataEditor
     {
         public Editor1(IDataValueEditorFactory dataValueEditorFactory)
@@ -41,7 +40,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [HideFromTypeFinder]
-    [DataEditor("d15e1281-e456-4b24-aa86-1dda3e4299d5", "Editor2", "editor2")]
+    [DataEditor("d15e1281-e456-4b24-aa86-1dda3e4299d5")]
     public class Editor2 : DataEditor
     {
         public Editor2(IDataValueEditorFactory dataValueEditorFactory)
@@ -87,6 +86,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_uBlogsy_ContentTypes_And_Verify_Structure()
     {
         // Arrange
@@ -134,6 +134,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Inherited_ContentTypes_And_Verify_PropertyTypes_UniqueIds()
     {
         // Arrange
@@ -160,6 +161,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Inherited_ContentTypes_And_Verify_PropertyGroups_And_PropertyTypes()
     {
         // Arrange
@@ -199,6 +201,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Template_Package_Xml()
     {
         // Arrange
@@ -268,6 +271,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_StandardMvc_ContentTypes_Package_Xml()
     {
         // Arrange
@@ -306,6 +310,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_StandardMvc_ContentTypes_And_Templates_Xml()
     {
         // Arrange
@@ -332,6 +337,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Fanoe_Starterkit_ContentTypes_And_Templates_Xml()
     {
         // Arrange
@@ -387,6 +393,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_Import_Media_Package_Xml()
     {
         // Arrange
@@ -513,6 +520,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    [LongRunning]
     public void Can_ReImport_Single_DocType()
     {
         // Arrange
@@ -685,53 +693,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Can_Import_Macros()
-    {
-        // Arrange
-        var strXml = ImportResources.uBlogsy_Package;
-        var xml = XElement.Parse(strXml);
-        var macrosElement = xml.Descendants("Macros").First();
-
-        // Act
-        var macros = PackageDataInstallation.ImportMacros(
-            macrosElement.Elements("macro"),
-            -1).ToList();
-
-        // Assert
-        Assert.That(macros.Any(), Is.True);
-
-        var allMacros = MacroService.GetAll().ToList();
-        foreach (var macro in macros)
-        {
-            Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
-        }
-    }
-
-    [Test]
-    public void Can_Import_Macros_With_Properties()
-    {
-        // Arrange
-        var strXml = ImportResources.XsltSearch_Package;
-        var xml = XElement.Parse(strXml);
-        var macrosElement = xml.Descendants("Macros").First();
-
-        // Act
-        var macros = PackageDataInstallation.ImportMacros(
-            macrosElement.Elements("macro"),
-            -1).ToList();
-
-        // Assert
-        Assert.That(macros.Any(), Is.True);
-        Assert.That(macros.First().Properties.Values.Any(), Is.True);
-
-        var allMacros = MacroService.GetAll().ToList();
-        foreach (var macro in macros)
-        {
-            Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
-        }
-    }
-
-    [Test]
+    [LongRunning]
     public void Can_Import_Package_With_Compositions()
     {
         // Arrange

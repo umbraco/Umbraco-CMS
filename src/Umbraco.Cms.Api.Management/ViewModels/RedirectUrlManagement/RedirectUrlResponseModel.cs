@@ -8,9 +8,9 @@ public class RedirectUrlResponseModel
 
     public required string DestinationUrl { get; set; }
 
-    public DateTime Created { get; set; }
+    public DateTimeOffset Created { get; set; }
 
-    public Guid ContentId { get; set; }
+    public required ReferenceByIdModel Document { get; set; }
 
     public string? Culture { get; set; }
 }

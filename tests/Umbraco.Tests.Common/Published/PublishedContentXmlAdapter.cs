@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -44,7 +45,7 @@ public static class PublishedContentXmlAdapter
     {
         // use the label data type for all data for these tests except in the case
         // where a property is named 'content', in which case use the RTE.
-        var serializer = new ConfigurationEditorJsonSerializer();
+        var serializer = new SystemTextConfigurationEditorJsonSerializer();
         var labelDataType =
             new DataType(new VoidEditor("Label", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 3 };
         var rteDataType = new DataType(new VoidEditor("RTE", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 4 };

@@ -17,6 +17,7 @@ public class SecuritySettings
     internal const bool StaticHideDisabledUsersInBackOffice = false;
     internal const bool StaticAllowPasswordReset = true;
     internal const bool StaticAllowEditInvariantFromNonDefault = false;
+    internal const bool StaticAllowConcurrentLogins = false;
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
 
     internal const string StaticAllowedUserNameCharacters =
@@ -24,6 +25,7 @@ public class SecuritySettings
 
     internal const int StaticMemberDefaultLockoutTimeInMinutes = 30 * 24 * 60;
     internal const int StaticUserDefaultLockoutTimeInMinutes = 30 * 24 * 60;
+    internal const string StaticAuthorizeCallbackPathName = "/umbraco";
 
     /// <summary>
     ///     Gets or sets a value indicating whether to keep the user logged in.
@@ -109,4 +111,21 @@ public class SecuritySettings
     [Obsolete("Use ContentSettings.AllowEditFromInvariant instead")]
     [DefaultValue(StaticAllowEditInvariantFromNonDefault)]
     public bool AllowEditInvariantFromNonDefault { get; set; } = StaticAllowEditInvariantFromNonDefault;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether to allow concurrent logins.
+    /// </summary>
+    [DefaultValue(StaticAllowConcurrentLogins)]
+    public bool AllowConcurrentLogins { get; set; } = StaticAllowConcurrentLogins;
+
+    /// <summary>
+    ///     Gets or sets a value of the back-office host URI. Use this when running the back-office client and the Management API on different hosts. Leave empty when running both on the same host.
+    /// </summary>
+    public Uri? BackOfficeHost { get; set; }
+
+    /// <summary>
+    ///     The path to use for authorization callback. Will be appended to the BackOfficeHost.
+    /// </summary>
+    [DefaultValue(StaticAuthorizeCallbackPathName)]
+    public string AuthorizeCallbackPathName { get; set; } = StaticAuthorizeCallbackPathName;
 }

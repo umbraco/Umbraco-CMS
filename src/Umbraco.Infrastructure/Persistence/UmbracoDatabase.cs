@@ -390,7 +390,7 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     public new T ExecuteScalar<T>(string sql, params object[] args)
         => ExecuteScalar<T>(new Sql(sql, args));
 
-    /// <inheritdoc cref="Database.ExecuteScalar{T}(sql)" />
+    /// <inheritdoc cref="Database.ExecuteScalar{T}(Sql)" />
     public new T ExecuteScalar<T>(Sql sql)
         => ExecuteScalar<T>(sql.SQL, CommandType.Text, sql.Arguments);
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.Services.Paging;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -31,12 +31,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
-        {
-            return BadRequest(error);
-        }
-
-        IEntitySlim[] rootEntities = GetPagedRootEntities(pageNumber, pageSize, out var totalItems);
+        IEntitySlim[] rootEntities = GetPagedRootEntities(skip, take, out var totalItems);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(null, rootEntities);
 
@@ -46,12 +41,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentId, int skip, int take)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
-        {
-            return BadRequest(error);
-        }
-
-        IEntitySlim[] children = GetPagedChildEntities(parentId, pageNumber, pageSize, out var totalItems);
+        IEntitySlim[] children = GetPagedChildEntities(parentId, skip, take, out var totalItems);
 
         TItem[] treeItemViewModels = MapTreeItemViewModels(parentId, children);
 
@@ -73,38 +63,26 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         return await Task.FromResult(Ok(treeItemViewModels));
     }
 
-    protected virtual IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
+    protected virtual IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
         => EntityService
             .GetPagedChildren(
-                Constants.System.Root,
+                Constants.System.RootKey,
                 ItemObjectType,
-                pageNumber,
-                pageSize,
+                skip,
+                take,
                 out totalItems,
                 ordering: ItemOrdering)
             .ToArray();
 
-    protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
-    {
-        // EntityService is only able to get paged children by parent ID, so we must first map parent id to parent ID
-        Attempt<int> parentId = EntityService.GetId(parentKey, ItemObjectType);
-        if (parentId.Success == false)
-        {
-            // not much else we can do here but return nothing
-            totalItems = 0;
-            return Array.Empty<IEntitySlim>();
-        }
-
-        IEntitySlim[] children = EntityService.GetPagedChildren(
-                parentId.Result,
+    protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems) =>
+        EntityService.GetPagedChildren(
+                parentKey,
                 ItemObjectType,
-                pageNumber,
-                pageSize,
+                skip,
+                take,
                 out totalItems,
                 ordering: ItemOrdering)
             .ToArray();
-        return children;
-    }
 
     protected virtual IEntitySlim[] GetEntities(Guid[] ids) => EntityService.GetAll(ItemObjectType, ids).ToArray();
 
@@ -115,12 +93,15 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     {
         var viewModel = new TItem
         {
-            Name = entity.Name!,
             Id = entity.Key,
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
-            IsContainer = entity.IsContainer,
-            ParentId = parentKey
+            Parent = parentKey.HasValue
+                ? new ReferenceByIdModel
+                {
+                    Id = parentKey.Value
+                }
+                : null
         };
 
         return viewModel;

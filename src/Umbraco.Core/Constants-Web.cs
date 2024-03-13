@@ -44,6 +44,11 @@ public static partial class Constants
         /// </summary>
         public const string TwoFactorRememberBrowserCookie = "TwoFactorRememberBrowser";
 
+        /// <summary>
+        ///     The token used to replace the cache buster hash in web assets.
+        /// </summary>
+        public const string CacheBusterToken = "%CACHE_BUSTER%";
+
         public static class Mvc
         {
             public const string InstallArea = "UmbracoInstall";
@@ -54,6 +59,7 @@ public static partial class Constants
             public const string BackOfficeArea = "UmbracoBackOffice"; // Used for area routes of non-api controllers
             public const string BackOfficeApiArea = "UmbracoApi"; // Same name as v8 so all routing remains the same
             public const string BackOfficeTreeArea = "UmbracoTrees"; // Same name as v8 so all routing remains the same
+            public const string BackOfficeLoginArea = "UmbracoLogin"; // Used for area routes of non-api controllers for login
         }
 
         public static class Routing
@@ -67,6 +73,9 @@ public static partial class Constants
         {
             public const string Tree = "tree";
             public const string RecycleBin = "recycle-bin";
+            public const string Item = "item";
+            public const string Collection = "collection";
+            public const string Filter = "filter";
         }
 
         public static class AttributeRouting

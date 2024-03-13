@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.User;
+﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -10,8 +11,8 @@ public class UsersViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<PasswordChangedModel, ChangePasswordUserResponseModel>((_, _) => new ChangePasswordUserResponseModel(), Map);
-        mapper.Define<UserCreationResult, CreateUserResponseModel>((_, _) => new CreateUserResponseModel(), Map);
+        mapper.Define<PasswordChangedModel, ResetPasswordUserResponseModel>((_, _) => new ResetPasswordUserResponseModel(), Map);
+        mapper.Define<UserCreationResult, CreateUserResponseModel>((_, _) => new CreateUserResponseModel { User = new() }, Map);
         mapper.Define<IIdentityUserLogin, LinkedLoginViewModel>((_, _) => new LinkedLoginViewModel { ProviderKey = string.Empty, ProviderName = string.Empty }, Map);
     }
 
@@ -25,12 +26,15 @@ public class UsersViewModelsMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(UserCreationResult source, CreateUserResponseModel target, MapperContext context)
     {
-        target.UserId = source.CreatedUser?.Key ?? Guid.Empty;
+        Guid userId = source.CreatedUser?.Key
+                      ?? throw new ArgumentException("Cannot map a user creation response without a created user", nameof(source));
+
+        target.User = new ReferenceByIdModel(userId);
         target.InitialPassword = source.InitialPassword;
     }
 
     // Umbraco.Code.MapAll
-    private void Map(PasswordChangedModel source, ChangePasswordUserResponseModel target, MapperContext context)
+    private void Map(PasswordChangedModel source, ResetPasswordUserResponseModel target, MapperContext context)
     {
         target.ResetPassword = source.ResetPassword;
     }

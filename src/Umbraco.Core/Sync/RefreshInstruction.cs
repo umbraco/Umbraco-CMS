@@ -62,6 +62,9 @@ public class RefreshInstruction
     /// <summary>
     ///     A private constructor to create a new instance
     /// </summary>
+    /// <param name="refresher"></param>
+    /// <param name="refreshType"></param>
+    /// <param name="json"></param>
     /// <param name="idCount">
     ///     When the refresh method is <see cref="RefreshMethodType.RefreshByIds" /> we know how many Ids are being refreshed
     ///     so we know the instruction

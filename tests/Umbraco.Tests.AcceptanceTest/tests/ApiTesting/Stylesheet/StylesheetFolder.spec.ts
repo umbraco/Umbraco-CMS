@@ -2,89 +2,87 @@ import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Stylesheet Folder tests', () => {
-  let stylesheetFolderPath = "";
   const stylesheetFolderName = 'StylesheetFolder';
 
-  test.beforeEach(async ({page, umbracoApi}) => {
-    await umbracoApi.stylesheet.ensureNameNotExistsAtRoot(stylesheetFolderName);
+  test.beforeEach(async ({umbracoApi}) => {
+    await umbracoApi.stylesheet.ensureNameNotExists(stylesheetFolderName);
   });
 
-  test.afterEach(async ({page, umbracoApi}) => {
-    await umbracoApi.stylesheet.deleteFolder(stylesheetFolderPath);
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.stylesheet.ensureNameNotExists(stylesheetFolderName);
   });
 
-  test('can create a stylesheet folder', async ({page, umbracoApi, umbracoUi}) => {
-    stylesheetFolderPath = await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
+  test('can create a stylesheet folder', async ({umbracoApi}) => {
+    // Act
+    await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
 
     // Assert
-    await expect(await umbracoApi.stylesheet.folderExists(stylesheetFolderPath)).toBeTruthy();
+    expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeTruthy();
   });
 
-  test('can delete a stylesheet folder', async ({page, umbracoApi, umbracoUi}) => {
-    stylesheetFolderPath = await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
+  test('can delete a stylesheet folder', async ({umbracoApi}) => {
+    // Arrange
+    await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
+    expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeTruthy();
 
-    await expect(await umbracoApi.stylesheet.folderExists(stylesheetFolderPath)).toBeTruthy();
-
-    await umbracoApi.stylesheet.deleteFolder(stylesheetFolderPath);
+    // Act
+    await umbracoApi.stylesheet.deleteFolder(stylesheetFolderName);
 
     // Assert
-    await expect(await umbracoApi.stylesheet.exists(stylesheetFolderPath)).toBeFalsy();
+    expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetFolderName)).toBeFalsy();
   });
 
-  test('can add a stylesheet folder in another folder', async ({page, umbracoApi, umbracoUi}) => {
+  test('can add a stylesheet folder in another folder', async ({umbracoApi}) => {
+    // Arrange
     const childFolderName = 'childFolder';
-    stylesheetFolderPath = await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
+    await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
 
-    await umbracoApi.stylesheet.createFolder(childFolderName, stylesheetFolderPath);
-
-    const children = await umbracoApi.stylesheet.getFolderChildren(stylesheetFolderPath);
+    // Act
+    await umbracoApi.stylesheet.createFolder(childFolderName, stylesheetFolderName);
 
     // Assert
-    await expect(children.items[0].name).toEqual(childFolderName);
+    const children = await umbracoApi.stylesheet.getChildren(stylesheetFolderName);
+    expect(children[0].name).toEqual(childFolderName);
   });
 
-  test('can add a stylesheet folder in a folder that is in another folder', async ({page, umbracoApi, umbracoUi}) => {
+  test('can add a stylesheet folder in a folder in another folder', async ({umbracoApi}) => {
+    // Arrange
     const childFolderName = 'childFolder';
     const childOfChildFolderName = 'childOfChildFolder';
-
+    const childFolderPath = stylesheetFolderName + '/' + childFolderName;
     // Creates parent folder
-    stylesheetFolderPath = await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
-
+    await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
     // Creates child folder in parent folder
-    const childOfParentPath = await umbracoApi.stylesheet.createFolder(childFolderName, stylesheetFolderPath);
+    await umbracoApi.stylesheet.createFolder(childFolderName, stylesheetFolderName);
 
-    const childOfParent = await umbracoApi.stylesheet.getFolderChildren(stylesheetFolderPath);
-
+    // Act
     // Creates childOfChild folder in child folder
-    await umbracoApi.stylesheet.createFolder(childOfChildFolderName, childOfParentPath);
-
-    const childOfChild = await umbracoApi.stylesheet.getFolderChildren(childOfParentPath);
+    await umbracoApi.stylesheet.createFolder(childOfChildFolderName, childFolderPath);
 
     // Assert
     // Checks if the stylesheet folder are in the correct folders
-    await expect(childOfParent.items[0].name).toEqual(childFolderName);
-    await expect(childOfChild.items[0].name).toEqual(childOfChildFolderName);
+    const childOfParent = await umbracoApi.stylesheet.getChildren(stylesheetFolderName);
+    const childOfChild = await umbracoApi.stylesheet.getChildren(childFolderPath);
+    expect(childOfParent[0].name).toEqual(childFolderName);
+    expect(childOfChild[0].name).toEqual(childOfChildFolderName);
   });
 
-  test('can delete a stylesheet folder from another folder', async ({page, umbracoApi, umbracoUi}) => {
+  test('can delete a stylesheet folder from another folder', async ({umbracoApi}) => {
+    // Arrange
     const childFolderName = 'childFolder';
-
-    stylesheetFolderPath = await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
-
-    const childPath = await umbracoApi.stylesheet.createFolder(childFolderName, stylesheetFolderPath);
-
-    const child = await umbracoApi.stylesheet.getFolderChildren(stylesheetFolderPath);
-
+    const stylesheetParentFolderPath = await umbracoApi.stylesheet.createFolder(stylesheetFolderName);
+    const stylesheetChildFolderPath = await umbracoApi.stylesheet.createFolder(childFolderName, stylesheetFolderName);
     // Checks if a child exists in the parent folder with the name
-    await expect(child.items[0].name).toEqual(childFolderName);
+    const child = await umbracoApi.stylesheet.getChildren(stylesheetParentFolderPath);
+    expect(child[0].name).toEqual(childFolderName);
+    expect(child[0].isFolder).toBe(true);
+    expect(await umbracoApi.stylesheet.doesFolderExist(stylesheetChildFolderPath)).toBeTruthy();
 
-    await umbracoApi.stylesheet.folderExists(childPath);
-
-    await umbracoApi.stylesheet.deleteFolder(childPath);
-
-    const noChild = await umbracoApi.stylesheet.getFolderChildren(stylesheetFolderPath);
+    // Act
+    await umbracoApi.stylesheet.deleteFolder(stylesheetChildFolderPath);
 
     // Assert
-    await expect(noChild.items[0]).toEqual(undefined);
+    const noChild = await umbracoApi.stylesheet.getChildren(stylesheetParentFolderPath);
+    expect(noChild[0]).toBe(undefined);
   });
 });

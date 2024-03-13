@@ -3,4 +3,4 @@
 public class DisableUserRequestModel
 {
     public HashSet<Guid> UserIds { get; set; } = new();
- }
+}

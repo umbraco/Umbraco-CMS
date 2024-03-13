@@ -11,11 +11,6 @@ WebApplication app = builder.Build();
 
 await app.BootUmbracoAsync();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-
 #if (UseHttpsRedirect)
 app.UseHttpsRedirection();
 #endif
@@ -28,7 +23,6 @@ app.UseUmbraco()
     })
     .WithEndpoints(u =>
     {
-        u.UseInstallerEndpoints();
         u.UseBackOfficeEndpoints();
         u.UseWebsiteEndpoints();
     });

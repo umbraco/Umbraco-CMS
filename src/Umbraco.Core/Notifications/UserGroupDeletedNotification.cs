@@ -12,4 +12,9 @@ public sealed class UserGroupDeletedNotification : DeletedNotification<IUserGrou
         : base(target, messages)
     {
     }
+
+    public UserGroupDeletedNotification(IEnumerable<IUserGroup> target, EventMessages messages)
+        : base(target, messages)
+    {
+    }
 }

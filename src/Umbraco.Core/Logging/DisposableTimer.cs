@@ -113,7 +113,7 @@ public class DisposableTimer : DisposableObjectSlim
     /// <summary>
     ///     Disposes resources.
     /// </summary>
-    /// <remarks>Overrides abstract class <see cref="DisposableObject" /> which handles required locking.</remarks>
+    /// <remarks>Overrides abstract class <see cref="DisposableObjectSlim" /> which handles required locking.</remarks>
     protected override void DisposeResources()
     {
         Stopwatch.Stop();

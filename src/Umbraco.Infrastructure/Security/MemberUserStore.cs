@@ -96,7 +96,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new ArgumentNullException(nameof(user));
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // create member
             IMember memberEntity = _memberService.CreateMember(
@@ -106,6 +106,23 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 user.MemberTypeAlias.IsNullOrWhiteSpace()
                     ? Constants.Security.DefaultMemberTypeAlias
                     : user.MemberTypeAlias!);
+
+            if (user.Key != Guid.Empty)
+            {
+                // at the time of writing, the memberEntity identity is not set until the member is saved. as we rely on
+                // that behavior when setting an explicit key, we need to know immediately if it changes. integration tests
+                // will detect this change of behavior.
+                if (memberEntity.HasIdentity)
+                {
+                    return Task.FromResult(IdentityResult.Failed(new IdentityError
+                    {
+                        Code = GenericIdentityErrorCode,
+                        Description = "Cannot assign a new key to a member that already has identity."
+                    }));
+                }
+
+                memberEntity.Key = user.Key;
+            }
 
             UpdateMemberProperties(memberEntity, user, out bool _);
 
@@ -150,6 +167,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                         x.Value)));
             }
 
+            scope.Complete();
             return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)
@@ -179,7 +197,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             IMember? found = _memberService.GetById(asInt);
             if (found != null)
@@ -220,6 +238,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 }
             }
 
+            scope.Complete();
             return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)

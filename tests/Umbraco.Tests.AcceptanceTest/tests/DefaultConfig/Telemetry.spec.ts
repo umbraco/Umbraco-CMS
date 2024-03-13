@@ -1,32 +1,38 @@
-import {test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Telemetry tests', () => {
 
-  test.beforeEach(async ({page, umbracoApi}, testInfo) => {
+  test.beforeEach(async ({umbracoApi, umbracoUi}) => {
     await umbracoApi.telemetry.setLevel("Basic");
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.telemetryData.goToSection(ConstantHelper.sections.settings);
   });
 
-  test.afterEach(async ({page, umbracoApi}, testInfo) => {
+  test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.telemetry.setLevel("Basic");
   });
 
   test('can change telemetry level', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
     const expectedLevel = "Minimal";
+    const levelValue = "1";
+    await umbracoUi.telemetryData.clickTelemetryDataTab();
+    await umbracoUi.telemetryData.changeTelemetryDataLevelValue(levelValue);
 
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-
-    // Selects minimal as the telemetry level
-    await page.getByRole('tab', { name: 'Settings' }).click();
-    await page.getByRole('tab', {name: 'Telemetry Data'}).click();
-    await page.locator('[name="telemetryLevel"] >> input[id=input]').fill('1');
-    await page.getByRole('button', { name: 'Save telemetry settings' }).click();
+    // We wait until we are sure that the Telemetry level has been saved before we continue.
+    await Promise.all([
+      page.waitForResponse(resp => resp.url().includes(umbracoApi.baseUrl + '/umbraco/management/api/v1/telemetry/level') && resp.status() === 200),
+    await umbracoUi.telemetryData.clickSaveButton()
+    ]);
 
     // Assert
     // UI
-    await page.reload();
-    await expect(await page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue('1');
+    await umbracoUi.reloadPage();
+    await expect(page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue(levelValue, {timeout: 20000});
+    // await umbracoUi.telemetryData.doesTelemetryDataLevelHaveValue(levelValue);
+
     // API
-    await expect(await umbracoApi.telemetry.checkLevel(expectedLevel)).toBeTruthy();
+    expect(await umbracoApi.telemetry.getLevel() == expectedLevel).toBeTruthy();
   });
 });

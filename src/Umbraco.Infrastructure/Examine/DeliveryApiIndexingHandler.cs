@@ -1,6 +1,8 @@
 ﻿using Examine;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
@@ -17,6 +19,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
     private readonly IExamineManager _examineManager;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ILogger<DeliveryApiIndexingHandler> _logger;
+    private DeliveryApiSettings _deliveryApiSettings;
     private readonly Lazy<bool> _enabled;
 
     // these dependencies are for the deferred handling (we don't want those handlers registered in the DI)
@@ -31,6 +34,7 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         IExamineManager examineManager,
         ICoreScopeProvider scopeProvider,
         ILogger<DeliveryApiIndexingHandler> logger,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
         IContentService contentService,
         IPublicAccessService publicAccessService,
         IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
@@ -47,6 +51,8 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         _deliveryApiContentIndexHelper = deliveryApiContentIndexHelper;
         _backgroundTaskQueue = backgroundTaskQueue;
         _enabled = new Lazy<bool>(IsEnabled);
+        _deliveryApiSettings = deliveryApiSettings.CurrentValue;
+        deliveryApiSettings.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     /// <inheritdoc />
@@ -83,6 +89,10 @@ internal sealed class DeliveryApiIndexingHandler : IDeliveryApiIndexingHandler
         var deferred = new DeliveryApiContentIndexHandlePublicAccessChanges(
             _publicAccessService,
             this,
+            _contentService,
+            _deliveryApiContentIndexValueSetBuilder,
+            _deliveryApiContentIndexHelper,
+            _deliveryApiSettings,
             _backgroundTaskQueue);
         Execute(deferred);
     }

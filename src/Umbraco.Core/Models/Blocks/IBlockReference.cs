@@ -44,7 +44,8 @@ public interface IBlockReference<TSettings> : IBlockReference
 /// <summary>
 ///     Represents a data item reference with content and settings for a Block editor implementation.
 /// </summary>
-/// <typeparam name="TSettings">The type of the content.</typeparam>
+/// <typeparam name="TContent">The type of the content.</typeparam>
+/// <typeparam name="TSettings">The type of the settings.</typeparam>
 public interface IBlockReference<TContent, TSettings> : IBlockReference<TSettings>
 {
     /// <summary>

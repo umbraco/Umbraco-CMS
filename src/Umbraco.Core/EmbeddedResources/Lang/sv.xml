@@ -67,6 +67,12 @@
     <key alias="setLanguageHelp"><![CDATA[Sätt kulturen för noder under aktuell nod,<br /> eller ärv kulturen från föregående noder. Appliceras även<br />
      på befintlig nod.]]></key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media raderat</key>
+    <key alias="move">Media flyttat</key>
+    <key alias="copy">Media kopierat</key>
+    <key alias="save">Media sparat</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visar för</key>
     <key alias="delete">Innehållet raderat</key>
@@ -103,6 +109,12 @@
     <key alias="blockHasChanges">Du har gjort ändringar i detta innehåll. Är du säker på att du vill ta bort dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Ignorera skapandet</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Är du säker på att du vill avbryta skapandet?]]></key>
+    <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> måste vara närvarande åtminstone <strong>%2%</strong> time(s).]]></key>
+    <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> måste maximalt finnas <strong>%3%</strong> time(s).]]></key>
+  </area>
+  <area alias="validation">
+    <key alias="entriesShort"><![CDATA[Minsta %0% poster, kräver <strong>%1%</strong> mer.]]></key>
+    <key alias="entriesExceed"><![CDATA[Max %0% poster, <strong>%1%</strong> för många.]]></key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
@@ -211,7 +223,7 @@
     <key alias="publishedPendingChanges">Publicerad (osparade ändringar)</key>
     <key alias="listViewNoContent">Inga undernoder har lagts till</key>
     <key alias="noChanges">Inga ändringar har gjorts</key>
-    <key alias="notCreated">Ej skapad</key>    
+    <key alias="notCreated">Ej skapad</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="yesDelete">Ja, ta bort</key>
@@ -239,6 +251,60 @@
     <key alias="settingsWelcome">Välkommen</key>
     <key alias="memberIntro">Komma igång</key>
     <key alias="formsInstall">Installera Umbraco Forms</key>
+  </area>
+  <area alias="visuallyHiddenTexts">
+    <key alias="goBack">Backa</key>
+    <key alias="activeListLayout">Aktiv layout:</key>
+    <key alias="jumpTo">Hoppa till</key>
+    <key alias="group">grupp</key>
+    <key alias="passed">godkänd</key>
+    <key alias="warning">varning</key>
+    <key alias="failed">underkänd</key>
+    <key alias="suggestion">förslag</key>
+    <key alias="checkPassed">Godkänd</key>
+    <key alias="checkFailed">Underkänd</key>
+    <key alias="openBackofficeSearch">Öppna sökfunktion (backoffice)</key>
+    <key alias="openCloseBackofficeHelp">Öppna/stäng hjälpfunktion</key>
+    <key alias="openCloseBackofficeProfileOptions">Öppna/stäng personliga inställningar</key>
+    <key alias="assignDomainDescription">Redigera språk och värdnamn för %0%</key>
+    <key alias="createDescription">Skapa en ny nod under %0%</key>
+    <key alias="protectDescription">Ändra behörigheter för %0%</key>
+    <key alias="rightsDescription">Redigera behörigheter för %0%</key>
+    <key alias="sortDescription">Ändra sortering av %0%</key>
+    <key alias="createblueprintDescription">Skapa innehållsmall baserad på %0%</key>
+    <key alias="openContextMenu">Öppna kontextmeny för </key>
+    <key alias="currentLanguage">Aktuellt språk</key>
+    <key alias="switchLanguage">Byt språk till</key>
+    <key alias="createNewFolder">Skapa ny mapp</key>
+    <key alias="newPartialView">Del av vy</key>
+    <key alias="newPartialViewMacro">Del av vy (makro)</key>
+    <key alias="newMember">Medlem</key>
+    <key alias="newDataType">Datatyp</key>
+    <key alias="redirectDashboardSearchLabel">Sök bland omdirigeringar</key>
+    <key alias="userGroupSearchLabel">Sök bland användargrupper</key>
+    <key alias="userSearchLabel">Sök bland användare</key>
+    <key alias="createItem">Skapa post</key>
+    <key alias="create">Skapa</key>
+    <key alias="edit">Redigera</key>
+    <key alias="name">Namn</key>
+    <key alias="addNewRow">Lägg till ny rad</key>
+    <key alias="tabExpand">Visa fler alternativ</key>
+    <key alias="searchOverlayTitle">Sök i Umbraco backoffice</key>
+    <key alias="searchOverlayDescription">Sök efter innehåll, media etc i hela Umbraco.</key>
+    <key alias="searchInputDescription">När det finns automatförslag, använd pil upp eller ner, eller använd tabbtangenten. Använd enter för att välja.
+    </key>
+    <key alias="path">Sökväg:</key>
+    <key alias="foundIn">Hittad i</key>
+    <key alias="hasTranslation">Har översättning</key>
+    <key alias="noTranslation">Saknar översättning</key>
+    <key alias="dictionaryListCaption">Post i ordlista</key>
+    <key alias="contextMenuDescription">Välj ett av alternativen för att redigera noden.</key>
+    <key alias="contextDialogDescription">Utför %0% på noden %1%</key>
+    <key alias="addImageCaption">Lägg till bildtext</key>
+    <key alias="searchContentTree">Sök i innehållsträdet</key>
+    <key alias="maxAmount">Maximalt värde</key>
+    <key alias="expandChildItems">Visa underliggande noder för</key>
+    <key alias="openContextNode">Öppna kontext för</key>
   </area>
   <area alias="prompt">
     <key alias="stay">Stanna</key>
@@ -570,13 +636,13 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
-    <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy manic Monday</key>
-    <key alias="greeting2">Happy tremendous Tuesday</key>
-    <key alias="greeting3">Happy wonderful Wednesday</key>
-    <key alias="greeting4">Happy thunderous Thursday</key>
-    <key alias="greeting5">Happy friendly Friday</key>
-    <key alias="greeting6">Happy shiny Saturday</key>
+    <key alias="greeting0">Välkommen</key>
+    <key alias="greeting1">Välkommen</key>
+    <key alias="greeting2">Välkommen</key>
+    <key alias="greeting3">Välkommen</key>
+    <key alias="greeting4">Välkommen</key>
+    <key alias="greeting5">Välkommen</key>
+    <key alias="greeting6">Välkommen</key>
     <key alias="instruction">Logga in nedan</key>
     <key alias="signInWith">Logga in med</key>
     <key alias="timeout">Sessionen har nått sin maxgräns</key>

@@ -17,7 +17,7 @@ public class VoidEditor : DataEditor
     ///     Initializes a new instance of the <see cref="VoidEditor" /> class.
     /// </summary>
     /// <param name="aliasSuffix">An optional alias suffix.</param>
-    /// <param name="loggerFactory">A logger factory.</param>
+    /// <param name="dataValueEditorFactory">A data value editor factory.</param>
     /// <remarks>
     ///     The default alias of the editor is "Umbraco.Void". When a suffix is provided,
     ///     it is appended to the alias. Eg if the suffix is "Foo" the alias is "Umbraco.Void.Foo".
@@ -39,7 +39,7 @@ public class VoidEditor : DataEditor
     /// <summary>
     ///     Initializes a new instance of the <see cref="VoidEditor" /> class.
     /// </summary>
-    /// <param name="loggerFactory">A logger factory.</param>
+    /// <param name="dataValueEditorFactory">A data value editor factory.</param>
     /// <remarks>The alias of the editor is "Umbraco.Void".</remarks>
     public VoidEditor(
         IDataValueEditorFactory dataValueEditorFactory)

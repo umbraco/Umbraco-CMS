@@ -1,6 +1,9 @@
 using Examine;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
@@ -24,9 +27,26 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
 
     [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
     protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values)
-        => AddPropertyValue(property, culture, segment, values, Enumerable.Empty<string>());
+        => AddPropertyValue(
+            property,
+            culture,
+            segment,
+            values,
+            Enumerable.Empty<string>(),
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>().GetAll().ToDictionary(x=>x.Key));
 
-    protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values, IEnumerable<string> availableCultures)
+    [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
+    protected void AddPropertyValue(IProperty property, string? culture, string? segment,
+        IDictionary<string, IEnumerable<object?>>? values, IEnumerable<string> availableCultures)
+        => AddPropertyValue(
+            property,
+            culture,
+            segment,
+            values,
+            Enumerable.Empty<string>(),
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>().GetAll().ToDictionary(x=>x.Key));
+
+    protected void AddPropertyValue(IProperty property, string? culture, string? segment, IDictionary<string, IEnumerable<object?>>? values, IEnumerable<string> availableCultures, IDictionary<Guid, IContentType> contentTypeDictionary)
     {
         IDataEditor? editor = _propertyEditors[property.PropertyType.PropertyEditorAlias];
         if (editor == null)
@@ -35,7 +55,7 @@ public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
         }
 
         IEnumerable<KeyValuePair<string, IEnumerable<object?>>> indexVals =
-            editor.PropertyIndexValueFactory.GetIndexValues(property, culture, segment, PublishedValuesOnly, availableCultures);
+            editor.PropertyIndexValueFactory.GetIndexValues(property, culture, segment, PublishedValuesOnly, availableCultures, contentTypeDictionary);
         foreach (KeyValuePair<string, IEnumerable<object?>> keyVal in indexVals)
         {
             if (keyVal.Key.IsNullOrWhiteSpace())

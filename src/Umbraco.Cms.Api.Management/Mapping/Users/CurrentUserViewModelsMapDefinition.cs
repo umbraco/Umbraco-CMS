@@ -7,22 +7,12 @@ namespace Umbraco.Cms.Api.Management.Mapping.Users;
 public class CurrentUserViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
-    {
-        mapper.Define<UserData, UserDataViewModel>((_, _) => new UserDataViewModel {Data = string.Empty, Name = string.Empty }, Map);
-        mapper.Define<NodePermissions, UserPermissionViewModel>((_, _) => new UserPermissionViewModel(), Map);
-    }
+        => mapper.Define<NodePermissions, UserPermissionViewModel>((_, _) => new UserPermissionViewModel(), Map);
 
     // Umbraco.Code.MapAll
     private void Map(NodePermissions source, UserPermissionViewModel target, MapperContext context)
     {
         target.NodeKey = source.NodeKey;
         target.Permissions = source.Permissions;
-    }
-
-    // Umbraco.Code.MapAll
-    private void Map(UserData source, UserDataViewModel target, MapperContext context)
-    {
-        target.Name = source.Name;
-        target.Data = source.Data;
     }
 }

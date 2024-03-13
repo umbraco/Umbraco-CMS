@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Filters;
@@ -33,6 +34,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Security
         }
 
         [Test]
+        [LongRunning]
         public async Task Secure_SurfaceController_Should_Return_Redirect_WhenNotLoggedIn()
         {
             _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(false);
@@ -47,6 +49,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Security
         }
 
         [Test]
+        [LongRunning]
         public async Task Secure_SurfaceController_Should_Return_Redirect_WhenNotAuthorized()
         {
             _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(true);
@@ -65,8 +68,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Security
             Assert.AreEqual(cookieAuthenticationOptions.Value.AccessDeniedPath.ToString(), response.Headers.Location?.AbsolutePath);
         }
 
-
         [Test]
+        [LongRunning]
         public async Task Secure_ApiController_Should_Return_Unauthorized_WhenNotLoggedIn()
         {
             _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(false);
@@ -78,12 +81,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Security
         }
 
         [Test]
+        [LongRunning]
         public async Task Secure_ApiController_Should_Return_Forbidden_WhenNotAuthorized()
         {
             _memberManagerMock.Setup(x => x.IsLoggedIn()).Returns(true);
             _memberManagerMock.Setup(x => x.IsMemberAuthorizedAsync(
                      It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<IEnumerable<string>>(),
+                     It.IsAny<IEnumerable<string>>(),
                      It.IsAny<IEnumerable<int>>()))
                 .ReturnsAsync(false);
 

@@ -2,13 +2,13 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.User;
 
-public class UserResponseModel : UserPresentationBase, INamedEntityPresentationModel
+public class UserResponseModel : UserPresentationBase
 {
     public Guid Id { get; set; }
 
     public string? LanguageIsoCode { get; set; }
 
-    public ISet<Guid> ContentStartNodeIds { get; set; } = new HashSet<Guid>();
+    public ISet<Guid> DocumentStartNodeIds { get; set; } = new HashSet<Guid>();
 
     public ISet<Guid> MediaStartNodeIds { get; set; } = new HashSet<Guid>();
 
@@ -18,13 +18,13 @@ public class UserResponseModel : UserPresentationBase, INamedEntityPresentationM
 
     public int FailedLoginAttempts { get; set; }
 
-    public DateTime CreateDate { get; set; }
+    public DateTimeOffset CreateDate { get; set; }
 
-    public DateTime UpdateDate { get; set; }
+    public DateTimeOffset UpdateDate { get; set; }
 
-    public DateTime? LastLoginDate { get; set; }
+    public DateTimeOffset? LastLoginDate { get; set; }
 
-    public DateTime? LastLockoutDate { get; set; }
+    public DateTimeOffset? LastLockoutDate { get; set; }
 
-    public DateTime? LastPasswordChangeDate { get; set; }
+    public DateTimeOffset? LastPasswordChangeDate { get; set; }
 }

@@ -1,8 +1,11 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 
 public class DictionaryItemModelBase
 {
-    public string Name { get; set; } = null!;
+    [Required]
+    public string Name { get; set; } = string.Empty;
 
-    public IEnumerable<DictionaryItemTranslationModel> Translations { get; set; } = Array.Empty<DictionaryItemTranslationModel>();
+    public IEnumerable<DictionaryItemTranslationModel> Translations { get; set; } = Enumerable.Empty<DictionaryItemTranslationModel>();
 }

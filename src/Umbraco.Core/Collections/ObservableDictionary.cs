@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
 namespace Umbraco.Cms.Core.Collections;
@@ -84,7 +84,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
     }
 
     /// <summary>
-    ///     Clears all <see cref="CollectionChanged" /> event handlers
+    ///     Clears all <see cref="INotifyCollectionChanged.CollectionChanged" /> event handlers
     /// </summary>
     public void ClearCollectionChangedEvents() => _changed = null;
 

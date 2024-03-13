@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Cms.Web.Common.FileProviders;
 
-public class WebRootFileProviderFactory : ILegacyPackageManifestFileProviderFactory, IGridEditorsConfigFileProviderFactory
+public class WebRootFileProviderFactory : IGridEditorsConfigFileProviderFactory
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
 
@@ -18,7 +18,7 @@ public class WebRootFileProviderFactory : ILegacyPackageManifestFileProviderFact
     }
 
     /// <summary>
-    ///     Creates a new <see cref="IFileProvider" /> instance, pointing at <see cref="WebRootPath"/>.
+    ///     Creates a new <see cref="IFileProvider" /> instance, pointing at <see cref="IWebHostEnvironment.WebRootPath"/>.
     /// </summary>
     /// <returns>
     ///     The newly created <see cref="IFileProvider" /> instance.

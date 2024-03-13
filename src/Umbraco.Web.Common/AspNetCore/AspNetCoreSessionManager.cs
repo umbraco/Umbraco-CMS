@@ -27,7 +27,7 @@ internal class AspNetCoreSessionManager : ISessionIdResolver, ISessionManager
     /// <summary>
     ///     If session isn't enabled this will throw an exception so we check
     /// </summary>
-    private bool IsSessionsAvailable => !(_httpContextAccessor.HttpContext?.Features.Get<ISessionFeature>() is null);
+    private bool IsSessionsAvailable => !(_httpContextAccessor.HttpContext?.Features.Get<ISessionFeature>()?.Session is null);
 
     public string? GetSessionValue(string key)
     {

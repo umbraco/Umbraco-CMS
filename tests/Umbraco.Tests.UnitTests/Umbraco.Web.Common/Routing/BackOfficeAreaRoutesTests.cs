@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Controllers.Security;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
@@ -47,11 +47,11 @@ public class BackOfficeAreaRoutesTests
 
         Assert.AreEqual(1, endpoints.DataSources.Count);
         var route = endpoints.DataSources.First();
-        Assert.AreEqual(4, route.Endpoints.Count);
+        Assert.AreEqual(3, route.Endpoints.Count);
 
         AssertMinimalBackOfficeRoutes(route);
 
-        var endpoint4 = (RouteEndpoint)route.Endpoints[3];
+        var endpoint4 = (RouteEndpoint)route.Endpoints[2];
         var apiControllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
         Assert.AreEqual(
             $"umbraco/backoffice/api/{apiControllerName.ToLowerInvariant()}/{{action}}/{{id?}}",
@@ -65,26 +65,8 @@ public class BackOfficeAreaRoutesTests
     {
         var endpoint1 = (RouteEndpoint)route.Endpoints[0];
         Assert.AreEqual("umbraco/{action}/{id?}", endpoint1.RoutePattern.RawText);
-        Assert.AreEqual(Constants.Web.Mvc.BackOfficeArea, endpoint1.RoutePattern.Defaults[AreaToken]);
-        Assert.AreEqual("Default", endpoint1.RoutePattern.Defaults[ActionToken]);
-        Assert.AreEqual(
-            ControllerExtensions.GetControllerName<BackOfficeController>(),
-            endpoint1.RoutePattern.Defaults[ControllerToken]);
-        Assert.AreEqual(
-            endpoint1.RoutePattern.Defaults[AreaToken],
-            typeof(BackOfficeController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
-
-        var endpoint2 = (RouteEndpoint)route.Endpoints[1];
-        var controllerName = ControllerExtensions.GetControllerName<AuthenticationController>();
-        Assert.AreEqual(
-            $"umbraco/backoffice/{Constants.Web.Mvc.BackOfficeApiArea.ToLowerInvariant()}/{controllerName.ToLowerInvariant()}/{{action}}/{{id?}}",
-            endpoint2.RoutePattern.RawText);
-        Assert.AreEqual(Constants.Web.Mvc.BackOfficeApiArea, endpoint2.RoutePattern.Defaults[AreaToken]);
-        Assert.IsFalse(endpoint2.RoutePattern.Defaults.ContainsKey(ActionToken));
-        Assert.AreEqual(controllerName, endpoint2.RoutePattern.Defaults[ControllerToken]);
-        Assert.AreEqual(
-            endpoint1.RoutePattern.Defaults[AreaToken],
-            typeof(BackOfficeController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
+        Assert.AreEqual("Index", endpoint1.RoutePattern.Defaults[ActionToken]);
+        Assert.AreEqual(ControllerExtensions.GetControllerName<BackOfficeDefaultController>(), endpoint1.RoutePattern.Defaults[ControllerToken]);
     }
 
     private BackOfficeAreaRoutes GetBackOfficeAreaRoutes(RuntimeLevel level)

@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
 
 public class RelationTypeResponseModel : RelationTypeBaseModel
 {
@@ -6,6 +8,7 @@ public class RelationTypeResponseModel : RelationTypeBaseModel
 
     public string? Alias { get; set; }
 
+    [Required]
     public string Path { get; set; } = string.Empty;
 
     public bool IsSystemRelationType { get; set; }

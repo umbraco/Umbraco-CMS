@@ -8,7 +8,7 @@
     <key alias="assigndomain">Kultura i imena hostova</key>
     <key alias="auditTrail">Audit zapis</key>
     <key alias="browse">Pregledaj čvor</key>
-    <key alias="changeDocType">Promijeni Tip Dokumenta</key>
+    <key alias="changeDocType">Promijeni Vrstu Dokumenta</key>
     <key alias="copy">Kopiraj</key>
     <key alias="create">Kreiraj</key>
     <key alias="export">Izvezi</key>
@@ -19,8 +19,8 @@
     <key alias="editSettings">Uredi postavke</key>
     <key alias="emptyrecyclebin">Isprazni koš za smeće</key>
     <key alias="enable">Omogući</key>
-    <key alias="exportDocumentType">Izvezi Tip Dokumenta</key>
-    <key alias="importdocumenttype">Uvezi Tip Dokumenta</key>
+    <key alias="exportDocumentType">Izvezi Vrstu Dokumenta</key>
+    <key alias="importdocumenttype">Uvezi Vrstu Dokumenta</key>
     <key alias="importPackage">Uvezi Paket</key>
     <key alias="liveEdit">Uređivanje na stranici</key>
     <key alias="logout">Izlaz</key>
@@ -66,7 +66,7 @@
     <key alias="assignDomain">Dopustite pristup za dodjelu kulture i imena hostova</key>
     <key alias="auditTrail">Dopustite pristup za pregled dnevnika povijesti čvora</key>
     <key alias="browse">Dopustite pristup za pregled čvora</key>
-    <key alias="changeDocType">Dopustite pristup za promjenu Tipa Dokumenta za čvor</key>
+    <key alias="changeDocType">Dopustite pristup za promjenu Vrste Dokumenta za čvor</key>
     <key alias="copy">Dopustite pristup za kopiranje čvora</key>
     <key alias="create">Dopustite pristup za kreiranje čvora</key>
     <key alias="delete">Dopustite pristup za brisanje čvora</key>
@@ -158,6 +158,12 @@
     <key alias="morePublishingOptions">Više opcija za objavljivanje</key>
     <key alias="submitChanges">Pošalji</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Mediji je obrisan</key>
+    <key alias="move">Mediji premješten</key>
+    <key alias="copy">Mediji kopiran</key>
+    <key alias="save">Mediji spremljen</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Pregled za</key>
     <key alias="delete">Sadržaj je obrisan</key>
@@ -209,7 +215,7 @@
     <key alias="updatedBy" version="7.0">Ažurirao</key>
     <key alias="createDate">Kreirano</key>
     <key alias="createDateDesc" version="7.0">Datum i vrijeme kreiranja ovog dokumenta</key>
-    <key alias="documentType">Tip dokumenta</key>
+    <key alias="documentType">Vrsta dokumenta</key>
     <key alias="editing">Uređivanje</key>
     <key alias="expireDate">Ukloni na</key>
     <key alias="itemChanged">Ova stavka je promijenjena nakon objavljivanja</key>
@@ -219,11 +225,11 @@
     <key alias="listViewNoItems" version="7.1.5">Nema stavki za prikaz na listi.</key>
     <key alias="listViewNoContent">Nije dodan sadržaj</key>
     <key alias="listViewNoMembers">Nijedan član nije dodan</key>
-    <key alias="mediatype">Tip medija</key>
+    <key alias="mediatype">Vrsta medija</key>
     <key alias="mediaLinks">Link do medijske stavke</key>
     <key alias="membergroup">Grupa članova</key>
     <key alias="memberrole">Uloga</key>
-    <key alias="membertype">Tip člana</key>
+    <key alias="membertype">Vrsta člana</key>
     <key alias="noChanges">Nisu napravljene nikakve promjene</key>
     <key alias="noDate">Nije odabran datum</key>
     <key alias="nodeName">Naslov stranice</key>
@@ -242,7 +248,7 @@
     <key alias="publishDescendantsHelp">
       <![CDATA[Objavi <strong>%0%</strong> i sve stavke sadržaja ispod i time čineći njihov sadržaj javno dostupnim.]]></key>
     <key alias="publishDescendantsWithVariantsHelp">
-      <![CDATA[Objavi varijante i varijante istog tipa ispod i na taj način učinite njihov sadržaj javno dostupnim.]]></key>
+      <![CDATA[Objavi varijante i varijante iste vrste ispod i na taj način učinite njihov sadržaj javno dostupnim.]]></key>
     <key alias="releaseDate">Objavi na</key>
     <key alias="unpublishDate">Poništi objavu na</key>
     <key alias="removeDate">Obriši datum</key>
@@ -255,7 +261,7 @@
     <key alias="titleOptional">Naslov (opcionalno)</key>
     <key alias="altTextOptional">Alternativni tekst (opcionalno)</key>
     <key alias="captionTextOptional">Natpis (opcionalno)</key>
-    <key alias="type">Tip</key>
+    <key alias="type">Vrsta</key>
     <key alias="unpublish">Poništi objavu</key>
     <key alias="unpublished">Neobjavljeno</key>
     <key alias="notCreated">Nije kreirano</key>
@@ -277,17 +283,17 @@
       Sadržaj.
     </key>
     <key alias="nestedContentDeleteAllItems">Jeste li sigurni da želite obrisati sve stavke?</key>
-    <key alias="nestedContentNoContentTypes">Za ovo svojstvo nisu konfigurirani tipovi sadržaja.</key>
-    <key alias="nestedContentAddElementType">Dodajte tip elementa</key>
-    <key alias="nestedContentSelectElementTypeModalTitle">Odaberi tip elementa</key>
+    <key alias="nestedContentNoContentTypes">Za ovo svojstvo nisu konfigurirane vrste sadržaja.</key>
+    <key alias="nestedContentAddElementType">Dodajte vrstu elementa</key>
+    <key alias="nestedContentSelectElementTypeModalTitle">Odaberite vrstu elementa</key>
     <key alias="nestedContentGroupHelpText">Odaberite grupu čija svojstva trebaju biti prikazana. Ako je ostavljeno prazno,
-       koristit će se prva grupa na tipu elementa.
+       koristit će se prva grupa na vrsti elementa.
     </key>
     <key alias="nestedContentTemplateHelpTextPart1">Unesite angular izraz za procjenu svake stavke za njeno
        ime. Koristi
     </key>
     <key alias="nestedContentTemplateHelpTextPart2">za prikaz indeksa stavke</key>
-    <key alias="nestedContentNoGroups">Odabrani tip elementa ne sadrži nijednu podržanu grupu (ovaj uređivač ne podržava kartice, promijenite ih u grupe ili koristite uređivač liste blokova).</key>
+    <key alias="nestedContentNoGroups">Odabrana vrsta elementa ne sadrži nijednu podržanu grupu (ovaj uređivač ne podržava kartice, promijenite ih u grupe ili koristite uređivač liste blokova).</key>
     <key alias="addTextBox">Dodajte još jedan okvir za tekst</key>
     <key alias="removeTextBox">Uklonite ovaj okvir za tekst</key>
     <key alias="contentRoot">Korijen Sadržaja</key>
@@ -330,7 +336,7 @@
   <area alias="media">
     <key alias="clickToUpload">Kliknite za prijenos</key>
     <key alias="orClickHereToUpload">ili kliknite ovdje kako bi odaberali datoteke</key>
-    <key alias="disallowedFileType">Nije moguće učitati ovu datoteku, jer nema odobreni tip datoteke</key>
+    <key alias="disallowedFileType">Nije moguće učitati ovu datoteku, jer nema odobrenu vrstu datoteke</key>
     <key alias="disallowedMediaType">Nije moguće učitati ovu datoteku, format medija sa nastavkom '%0%' nije dozvoljen</key>
     <key alias="invalidFileName">Nije moguće učitati ovu datoteku, jer nema važeći naziv datoteke</key>
     <key alias="maxFileSize">Maksimalna veličina datoteke je</key>
@@ -346,16 +352,16 @@
     <key alias="2fa">Dvostruka provjera autentičnosti</key>
   </area>
   <area alias="contentType">
-    <key alias="copyFailed">Kopiranje tipa sadržaja nije uspjelo</key>
-    <key alias="moveFailed">Premještanje tipa sadržaja nije uspjelo</key>
+    <key alias="copyFailed">Kopiranje vrste sadržaja nije uspjelo</key>
+    <key alias="moveFailed">Premještanje vrste sadržaja nije uspjelo</key>
   </area>
   <area alias="mediaType">
-    <key alias="copyFailed">Kopiranje tipa medija nije uspjelo</key>
-    <key alias="moveFailed">Premještanje tipa medija nije uspjelo</key>
+    <key alias="copyFailed">Kopiranje vrste medija nije uspjelo</key>
+    <key alias="moveFailed">Premještanje vrste medija nije uspjelo</key>
     <key alias="autoPickMediaType">Automatski odabir</key>
   </area>
   <area alias="memberType">
-    <key alias="copyFailed">Kopiranje tipa člana nije uspjelo</key>
+    <key alias="copyFailed">Kopiranje vrste člana nije uspjelo</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Gdje želite kreirati novi %0%</key>
@@ -364,30 +370,30 @@
     <key alias="enterFolderName">Unesite naziv mape</key>
     <key alias="updateData">Odaberite vrstu i naslov</key>
     <key alias="noDocumentTypes" version="7.0">
-      <![CDATA[Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Dozvole</strong>.]]></key>
+      <![CDATA[Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Dozvole</strong>.]]></key>
     <key alias="noDocumentTypesAtRoot">
-      <![CDATA[Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih kreirati u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>.]]></key>
+      <![CDATA[Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih kreirati u <strong>Vrste Dokumenata</strong> unutar sekcije <strong>Postavke</strong>.]]></key>
     <key alias="noDocumentTypesWithNoSettingsAccess">Odabrana stranica u stablu sadržaja ne dozvoljava kreiranje nijedne stranice ispod.
     </key>
-    <key alias="noDocumentTypesEditPermissions">Uredi dozvole za ovaj tip dokumenta</key>
-    <key alias="noDocumentTypesCreateNew">Kreiraj novi tip dokumenta</key>
+    <key alias="noDocumentTypesEditPermissions">Uredi dozvole za ovu vrstu dokumenta</key>
+    <key alias="noDocumentTypesCreateNew">Kreiraj novu vrstu dokumenta</key>
     <key alias="noDocumentTypesAllowedAtRoot">
-      <![CDATA[Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Dozvole</strong>.]]></key>
+      <![CDATA[Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Dozvole</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0">
-      <![CDATA[Nema dozvoljenih tipova medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Media Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Dozvole</strong>.]]></key>
+      <![CDATA[Nema dozvoljenih vrsta medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Vrste Medija</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Dozvole</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">Odabrani medij u stablu ne dopušta bilo koji drugi medij
        kreiran ispod njega.
     </key>
-    <key alias="noMediaTypesEditPermissions">Uredi dozvole za ovaj tip medija</key>
-    <key alias="documentTypeWithoutTemplate">Tip dokumenta bez predloška</key>
-    <key alias="documentTypeWithTemplate">Tip dokumenta sa predloškom</key>
+    <key alias="noMediaTypesEditPermissions">Uredi dozvole za ovu vrstu medija</key>
+    <key alias="documentTypeWithoutTemplate">Vrsta dokumenta bez predloška</key>
+    <key alias="documentTypeWithTemplate">Vrsta dokumenta sa predloškom</key>
     <key alias="documentTypeWithTemplateDescription">Definiranje podataka za stranicu sadržaja koja se može kreirati u stablu sadržaja i direktno je dostupana preko URL-a.
     </key>
-    <key alias="documentType">Tip dokumenta</key>
+    <key alias="documentType">Vrsta dokumenta</key>
     <key alias="documentTypeDescription">Definiranje podataka za komponentu sadržaja koju mogu kreirati urednici u
        stablu sadržaja i može biti izabrana na drugim stranicama, ali nema direktan URL.
     </key>
-    <key alias="elementType">Tip elementa</key>
+    <key alias="elementType">Vrsta elementa</key>
     <key alias="elementTypeDescription">Definiranje sheme za ponavljajući skup svojstava, na primjer, u 'Bloku
        Uređivaču svojstava Lista' ili 'Ugniježđeni sadržaj'.
     </key>
@@ -396,11 +402,11 @@
        više drugih vrsta dokumenata. Na primjer, skup 'Common Page Settings'.
     </key>
     <key alias="folder">Mapa</key>
-    <key alias="folderDescription">Koristi se za organiziranje tipova dokumenata, sastava i tipova elemenata kreiranih u ovome
+    <key alias="folderDescription">Koristi se za organiziranje vrste dokumenata, sastava i vrste elemenata kreiranih u ovome
        Stablo vrste dokumenta.
     </key>
     <key alias="newFolder">Nova mapa</key>
-    <key alias="newDataType">Novi tip podatka</key>
+    <key alias="newDataType">Nova vrsta podatka</key>
     <key alias="newJavascriptFile">Nova JavaScript datoteka</key>
     <key alias="newEmptyPartialView">Novi prazan djelomični prikaz</key>
     <key alias="newPartialViewMacro">Novi djelomični prikaz za makro</key>
@@ -472,6 +478,7 @@
     <key alias="editdictionary">Uredi stavku iz rječnika</key>
     <key alias="editlanguage">Uredi jezik</key>
     <key alias="editSelectedMedia">Uredite odabrane medije</key>
+    <key alias="editWebhook">Uredi webhook</key>
     <key alias="insertAnchor">Umetni lokalnu vezu</key>
     <key alias="insertCharacter">Umetni znak</key>
     <key alias="insertgraphicheadline">Umetni grafički naslov</key>
@@ -525,17 +532,17 @@
     <key alias="linkToMedia">Link do medija</key>
     <key alias="selectContentStartNode">Odaberi početni čvor sadržaja</key>
     <key alias="selectMedia">Odaberi medije</key>
-    <key alias="selectMediaType">Odaberi tip medija</key>
+    <key alias="selectMediaType">Odaberi vrstu medija</key>
     <key alias="selectIcon">Odaberi ikonu</key>
     <key alias="selectItem">Odaberi stavku</key>
     <key alias="selectLink">Odaberi vezu</key>
     <key alias="selectMacro">Odaberi makro</key>
     <key alias="selectContent">Odaberi sadržaj</key>
-    <key alias="selectContentType">Odaberi tip sadržaja</key>
+    <key alias="selectContentType">Odaberi vrstu sadržaja</key>
     <key alias="selectMediaStartNode">Odaberi početni čvor medija</key>
     <key alias="selectMember">Odaberi člana</key>
     <key alias="selectMemberGroup">Odaberi grupu članova</key>
-    <key alias="selectMemberType">Odaberi tip članova</key>
+    <key alias="selectMemberType">Odaberi vrstu članova</key>
     <key alias="selectNode">Odaberi čvor</key>
     <key alias="selectLanguages">Odaberi jezike</key>
     <key alias="selectSections">Odaberi sekcije</key>
@@ -639,7 +646,7 @@
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Kreirajte prilagođeni prikaz liste</key>
     <key alias="removeListView" version="7.2">Ukloni prilagođeni prikaz liste</key>
-    <key alias="aliasAlreadyExists">Tip sadržaja, tip medija ili tip člana s ovim aliasom već postoji</key>
+    <key alias="aliasAlreadyExists">Vrsta sadržaja, medija ili člana s ovim aliasom već postoji</key>
   </area>
   <area alias="renamecontainer">
     <key alias="renamed">Preimenovano</key>
@@ -648,7 +655,7 @@
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Dodajte vrijednost</key>
-    <key alias="dataBaseDatatype">Tip baze podataka</key>
+    <key alias="dataBaseDatatype">Vrsta baze podataka</key>
     <key alias="guid">Uređivač svojstva GUID</key>
     <key alias="renderControl">Uređivač svojstva</key>
     <key alias="rteButtons">Gumbi</key>
@@ -683,7 +690,7 @@
   </area>
   <area alias="errors">
     <key alias="receivedErrorFromServer">Primljena greška sa servera</key>
-    <key alias="dissallowedMediaType">Administrator je zabranio navedeni tip datoteke</key>
+    <key alias="dissallowedMediaType">Administrator je zabranio navedenu vrstu datoteke</key>
     <key alias="codemirroriewarning">NAPOMENA! Iako je CodeMirror omogućen konfiguracijom, on je onemogućen u
        Internet Explorer-u jer nije dovoljno stabilan.
     </key>
@@ -691,7 +698,7 @@
     <key alias="filePermissionsError">Postoji problem sa pristupom za čitanje/pisanje određenoj datoteci ili mapi</key>
     <key alias="macroErrorLoadingPartialView">Greška pri učitavanju skripte parcijalnog prikaza (datoteka: %0%)</key>
     <key alias="missingTitle">Unesite naslov</key>
-    <key alias="missingType">Molimo odaberite tip</key>
+    <key alias="missingType">Molimo odaberite vrstu</key>
     <key alias="pictureResizeBiggerThanOrg">Napravit ćete sliku veću od originalne veličine. Jeste li sigurni
        da želite nastaviti?
     </key>
@@ -827,8 +834,8 @@
     <key alias="status">Status</key>
     <key alias="submit">Potvrdi</key>
     <key alias="success">Uspjeh</key>
-    <key alias="type">Tip</key>
-    <key alias="typeName">Ime tipa</key>
+    <key alias="type">Vrsta</key>
+    <key alias="typeName">Ime vrste</key>
     <key alias="typeToSearch">Upišite za pretragu...</key>
     <key alias="under">ispod</key>
     <key alias="up">Gore</key>
@@ -839,7 +846,7 @@
     <key alias="user">Korisnik</key>
     <key alias="username">Korisničko ime</key>
     <key alias="value">Vrijednost</key>
-    <key alias="view">Pogled</key>
+    <key alias="view">Prikaz</key>
     <key alias="welcome">Dobrodošli...</key>
     <key alias="width">Širina</key>
     <key alias="yes">Da</key>
@@ -873,7 +880,7 @@
     <key alias="addTemplate">Dodaj predložak</key>
     <key alias="addChildNode">Dodajte podređeni čvor</key>
     <key alias="addChild">Dodaj dijete</key>
-    <key alias="editDataType">Uredite tip podataka</key>
+    <key alias="editDataType">Uredite vrstu podataka</key>
     <key alias="navigateSections">Krećite se po odjeljcima</key>
     <key alias="shortcut">Prečice</key>
     <key alias="showShortcuts">Prikaži prečice</key>
@@ -990,7 +997,7 @@
     <key alias="runwaySimpleSite">Želim početi s jednostavnom web-stranicom</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
-      "Runway" je jednostavna web stranica koja nudi neke osnovne tipove dokumenata i predloške. Instalacijski čarobnjak može postaviti Runway za vas automatski,
+      "Runway" je jednostavna web stranica koja nudi neke osnovne vrste dokumenata i predloške. Instalacijski čarobnjak može postaviti Runway za vas automatski,
         ali ga možete lako urediti, proširiti ili ukloniti. Nije potrebno i možete savršeno koristiti Umbraco i bez njega. Kako god,
         Runway nudi laku osnovu zasnovanu na najboljim praksama za početak brže nego ikad.
         Ako se odlučite za instalaciju Runway, opcionalo možete odabrati osnovne građevne blokove tzv. Runway Modules da poboljšate svoje Runway stranice.
@@ -1035,15 +1042,15 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="renewSession">Obnovite sada da sačuvate svoj rad</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Sretna super nedelja</key>
-    <key alias="greeting1">Sretan divan ponedeljak</key>
-    <key alias="greeting2">Sretan specifičan utorak</key>
-    <key alias="greeting3">Sretna divna srijeda</key>
-    <key alias="greeting4">Sretan gromoglasan četvrtak</key>
-    <key alias="greeting5">Sretan zanimljiv petak</key>
-    <key alias="greeting6">Sretna opuštena subota</key>
+    <key alias="greeting0">Dobrodošli</key>
+    <key alias="greeting1">Dobrodošli</key>
+    <key alias="greeting2">Dobrodošli</key>
+    <key alias="greeting3">Dobrodošli</key>
+    <key alias="greeting4">Dobrodošli</key>
+    <key alias="greeting5">Dobrodošli</key>
+    <key alias="greeting6">Dobrodošli</key>
     <key alias="instruction">Prijavite se u nastavku</key>
-    <key alias="signInWith">Prijav sa</key>
+    <key alias="signInWith">Prijava sa</key>
     <key alias="timeout">Isteklo je vrijeme sesije</key>
     <key alias="bottomText">
       <![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
@@ -1160,7 +1167,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="moveTo">Odaberite gdje dokument %0% treba premjestiti ispod</key>
     <key alias="nodeSelected">je odabrano kao korijen vašeg novog sadržaja, kliknite na 'Uredu' ispod.</key>
     <key alias="noNodeSelected">Još nije odabran čvor, molimo odaberite čvor na gornjoj listi prije nego kliknete na 'Uredu'</key>
-    <key alias="notAllowedByContentType">Trenutni čvor nije dozvoljen pod odabranim čvorom zbog njegovog tipa</key>
+    <key alias="notAllowedByContentType">Trenutni čvor nije dozvoljen pod odabranim čvorom zbog njegove vrste</key>
     <key alias="notAllowedByPath">Trenutni čvor se ne može premjestiti na jednu od njegovih podstranica niti roditelj i odredište mogu biti isti</key>
     <key alias="notAllowedAtRoot">Trenutni čvor ne može postojati u korijenu</key>
     <key alias="notValid">Radnja nije dozvoljena jer nemate dovoljna dopuštenja za 1 ili više djece
@@ -1393,10 +1400,47 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="noColors">Niste konfigurirali nijednu odobrenu boju</key>
   </area>
   <area alias="contentPicker">
-    <key alias="allowedItemTypes">Možete odabrati samo stavke tipa: %0%</key>
+    <key alias="allowedItemTypes">Možete odabrati samo stavke vrste: %0%</key>
     <key alias="pickedTrashedItem">Odabrali ste stavku sadržaja koja je trenutno obrisana ili je u košu za smeće</key>
     <key alias="pickedTrashedItems">Odabrali ste stavke sadržaja koje su trenutno obrisane ili su u košu za smeće</key>
+    <key alias="specifyPickerRootTitle">Odredite korijen</key>
+    <key alias="defineRootNode">Odaberite čvor korijena</key>
+    <key alias="defineXPathOrigin">Odredite korijen preko XPath</key>
+    <key alias="defineDynamicRoot">Odredite Dinamički Korijen</key>
+    <key alias="configurationStartNodeTitle">Početni čvor</key>
+    <key alias="configurationXPathTitle">XPath Upit</key>
   </area>
+  <area alias="dynamicRoot">
+    <key alias="configurationTitle">Dinamički korijenski upit</key>
+    <key alias="pickDynamicRootOriginTitle">Odabir podrijetla</key>
+    <key alias="pickDynamicRootOriginDesc">Definirajte podrijetlo za svoj dinamički korijenski upit</key>
+    <key alias="originRootTitle">Korijen</key>
+    <key alias="originRootDesc">Korijenski čvor ove sesije uređivanja</key>
+    <key alias="originParentTitle">Roditelj</key>
+    <key alias="originParentDesc">Čvor izvora u ovoj sesiji uređivanja</key>
+    <key alias="originCurrentTitle">Trenutni</key>
+    <key alias="originCurrentDesc">Čvor sadržaja koji je izvor za ovu sesiju uređivanja</key>
+    <key alias="originSiteTitle">Web stranica</key>
+    <key alias="originSiteDesc">Pronađi najbliži čvor s imenom računala (hostname)</key>
+    <key alias="originByKeyTitle">Specifični čvor</key>
+    <key alias="originByKeyDesc">Odaberite određeni čvor kao podrijetlo za ovaj upit</key>
+    <key alias="pickDynamicRootQueryStepTitle">Dodaj korak upitu</key>
+    <key alias="pickDynamicRootQueryStepDesc">Definirajte sljedeći korak svog dinamičkog korijenskog upita</key>
+    <key alias="queryStepNearestAncestorOrSelfTitle">Najbliži predak ili sam</key>
+    <key alias="queryStepNearestAncestorOrSelfDesc">Upitajte najbližeg pretka ili samog sebe koji odgovara jednom od konfiguriranih vrsta</key>
+    <key alias="queryStepFurthestAncestorOrSelfTitle">Najudaljeniji predak ili sam</key>
+    <key alias="queryStepFurthestAncestorOrSelfDesc">Upitajte najudaljenijeg pretka ili samog sebe koji odgovara jednom od konfiguriranih vrsta</key>
+    <key alias="queryStepNearestDescendantOrSelfTitle">Najbliži potomak ili sam</key>
+    <key alias="queryStepNearestDescendantOrSelfDesc">Upitajte najbližeg potomka ili samog sebe koji odgovara jednom od konfiguriranih vrsta</key>
+    <key alias="queryStepFurthestDescendantOrSelfTitle">Najudaljeniji potomak ili sam</key>
+    <key alias="queryStepFurthestDescendantOrSelfDesc">Upitajte najudaljenijeg potomka ili samog sebe koji odgovara jednom od konfiguriranih vrsta</key>
+    <key alias="queryStepCustomTitle">Prilagođeno</key>
+    <key alias="queryStepCustomDesc">Upitajte pomoću prilagođenog koraka upita</key>
+    <key alias="addQueryStep">Dodaj korak upitu</key>
+    <key alias="queryStepTypes">Koji odgovara vrstama: </key>
+    <key alias="noValidStartNodeTitle">Nema podudaranja sadržaja</key>
+    <key alias="noValidStartNodeDesc">Konfiguracija ove osobine ne odgovara nijednom sadržaju. Stvorite nedostajući sadržaj ili se obratite administratoru kako biste prilagodili postavke dinamičkog korijena za ovu osobinu.</key>
+</area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Izbrisana stavka</key>
     <key alias="pickedTrashedItem">Odabrali ste medijsku stavku koja je trenutno obrisana ili je u košu za smeće</key>
@@ -1440,11 +1484,11 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="documentRolledBack">Dokument je vraćen</key>
     <key alias="headline">Odaberite verziju koju želite usporediti sa trenutnom verzijom</key>
     <key alias="htmlHelp">Ovo prikazuje odabranu verziju kao HTML, ako želite vidjeti razliku između dvije
-       verzije u isto vrijeme, koristite pogled diff
+       verzije u isto vrijeme, koristite prikaz diff
     </key>
     <key alias="rollbackTo">Vratite se na</key>
     <key alias="selectVersion">Odaberite verziju</key>
-    <key alias="view">Pogled</key>
+    <key alias="view">Prikaz</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Uredite datoteku skripte</key>
@@ -1481,15 +1525,15 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
        gumb "Uvezi" (na sljedećem ekranu će se tražiti da potvrdite)
     </key>
     <key alias="newtabname">Naslov nove kartice</key>
-    <key alias="nodetype">Tip čvora</key>
-    <key alias="objecttype">Tip</key>
+    <key alias="nodetype">Vrsta čvora</key>
+    <key alias="objecttype">Vrsta</key>
     <key alias="stylesheet">Stilovi</key>
     <key alias="script">Skripte</key>
     <key alias="tab">Kartica</key>
     <key alias="tabname">Naslov kartice</key>
     <key alias="tabs">Kartice</key>
-    <key alias="contentTypeEnabled">Glavni tip sadržaja je omogućen</key>
-    <key alias="contentTypeUses">Ovaj tip sadržaja koristi</key>
+    <key alias="contentTypeEnabled">Glavna vrsta sadržaja je omogućena</key>
+    <key alias="contentTypeUses">Ova vrsta sadržaja koristi</key>
     <key alias="noPropertiesDefinedOnTab">Nema definiranih svojstava na ovoj kartici. Kliknite na vezu "dodaj novu nekretninu" na
        vrh za kreiranje novog svojstva.
     </key>
@@ -1516,18 +1560,18 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="folderUploadNotAllowed">Ova datoteka se učitava kao dio fasckile, ali kreiranje nove mape ovdje nije dozvoljeno</key>
     <key alias="folderCreationNotAllowed">Kreiranje nove mape ovdje nije dozvoljeno</key>
     <key alias="contentPublishedFailedByEvent">Objavljivanje je otkazao dodatak treće strane</key>
-    <key alias="contentTypeDublicatePropertyType">Tip svojstva već postoji</key>
-    <key alias="contentTypePropertyTypeCreated">Tip svojstva kreiran</key>
-    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Naziv: %0% <br /> Tip podatka: %1%]]></key>
-    <key alias="contentTypePropertyTypeDeleted">Tip svojstva obrisan</key>
-    <key alias="contentTypeSavedHeader">Tip dokumenta spremljen</key>
+    <key alias="contentTypeDublicatePropertyType">Vrsta svojstva već postoji</key>
+    <key alias="contentTypePropertyTypeCreated">Vrsta svojstva kreirana</key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Naziv: %0% <br /> Vrsta podatka: %1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted">Vrsta svojstva obrisana</key>
+    <key alias="contentTypeSavedHeader">Vrsta dokumenta spremljena</key>
     <key alias="contentTypeTabCreated">Kartica kreirana</key>
     <key alias="contentTypeTabDeleted">Kartica je obrisana</key>
     <key alias="contentTypeTabDeletedText">Kartica sa id-em: %0% je obrisana</key>
     <key alias="cssErrorHeader">Stilovi nisu spremljeni</key>
     <key alias="cssSavedHeader">Stilovi spremljeni</key>
     <key alias="cssSavedText">Stilovi spremljeni bez ikakvih grešaka</key>
-    <key alias="dataTypeSaved">Tip podatka spremljen</key>
+    <key alias="dataTypeSaved">Vrsta podatka spremljena</key>
     <key alias="dictionaryItemSaved">Stavka riječnika je spremljena</key>
     <key alias="editContentPublishedFailedByParent">Objavljivanje nije uspjelo jer nadređena stranica nije objavljena</key>
     <key alias="editContentPublishedHeader">Sadržaj objavljen</key>
@@ -1546,7 +1590,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="editTemplateSaved">Predložak spremljen</key>
     <key alias="editUserError">Greška pri spremanju korisnika (provjerite log zapis)</key>
     <key alias="editUserSaved">Korisnik spremljen</key>
-    <key alias="editUserTypeSaved">Tip korisnika spremljen</key>
+    <key alias="editUserTypeSaved">Vrsta korisnika spremljena</key>
     <key alias="editUserGroupSaved">Grupa korisnika spremljena</key>
     <key alias="editCulturesAndHostnamesSaved">Kulture i imena hostova su spremljeni</key>
     <key alias="editCulturesAndHostnamesError">Greška pri spremanju kultura i imena hostova</key>
@@ -1555,8 +1599,8 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="fileSavedHeader">Datoteke spremljene</key>
     <key alias="fileSavedText">Datoteka spremljena bez ikakvih grešaka</key>
     <key alias="languageSaved">Jezik spremljen</key>
-    <key alias="mediaTypeSavedHeader">Tip medija spremljen</key>
-    <key alias="memberTypeSavedHeader">Tip člana spremljen</key>
+    <key alias="mediaTypeSavedHeader">Vrsta medija spremljena</key>
+    <key alias="memberTypeSavedHeader">Vrsta člana spremljena</key>
     <key alias="memberGroupSavedHeader">Grupa članova spremljena</key>
     <key alias="memberGroupNameDuplicate">Druga grupa članova sa istim imenom već postoji</key>
     <key alias="templateErrorHeader">Predložak nije spremljen</key>
@@ -1583,8 +1627,8 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="deleteUserSuccess">Korisnik %0% je obrisan</key>
     <key alias="resendInviteHeader">Pozovi korisnika</key>
     <key alias="resendInviteSuccess">Pozivnica je ponovo poslana na %0%</key>
-    <key alias="documentTypeExportedSuccess">Tip dokumenta je izvezen u datoteku</key>
-    <key alias="documentTypeExportedError">Došlo je do greške prilikom izvoza tipa dokumenta</key>
+    <key alias="documentTypeExportedSuccess">Vrsta dokumenta je izvezena u datoteku</key>
+    <key alias="documentTypeExportedError">Došlo je do greške prilikom izvoza vrste dokumenta</key>
     <key alias="dictionaryItemExportedSuccess">Stavke iz riječnika su izvezene u datoteku</key>
     <key alias="dictionaryItemExportedError">Došlo je do greške prilikom izvoza stavki rječnika</key>
     <key alias="dictionaryItemImported">Sljedeće stavke iz rječnika su uvezene!</key>
@@ -1594,6 +1638,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="publishWithMissingDomain">Nijedna domena nije konfigurirana za %0%, molimo kontaktirajte administratora</key>
     <key alias="copySuccessMessage">Vaše sistemske informacije su uspješno kopirane u međuspremnik</key>
     <key alias="cannotCopyInformation">Nije moguće kopirati vaše sistemske informacije u međuspremnik</key>
+    <key alias="webhookSaved">Webhook spremljen</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Dodaj stil</key>
@@ -1667,7 +1712,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="itemsReturned">stavaka vraćeno, u</key>
     <key alias="iWant">Želim</key>
     <key alias="allContent">sav sadržaj</key>
-    <key alias="contentOfType">sadržaj tipa "%0%"</key>
+    <key alias="contentOfType">sadržaj vrste "%0%"</key>
     <key alias="from">sa</key>
     <key alias="websiteRoot">moje web stranice</key>
     <key alias="where">gdje</key>
@@ -1698,7 +1743,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
   <area alias="grid">
     <key alias="media">Slika</key>
     <key alias="macro">Makro</key>
-    <key alias="insertControl">Odaberite tip sadržaja</key>
+    <key alias="insertControl">Odaberite vrstu sadržaja</key>
     <key alias="chooseLayout">Odaberite izgled</key>
     <key alias="addRows">Dodaj redak</key>
     <key alias="addElement">Dodaj sadržaj</key>
@@ -1765,19 +1810,19 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="allowedTemplatesDescription">Odaberite koje predloške urednici mogu koristiti na sadržaju ove vrste
     </key>
     <key alias="allowAsRootHeading">Dozvoli kao korijen</key>
-    <key alias="allowAsRootDescription">Dozvolite urednicima da kreiraju sadržaj ovog tipa u korijenu stabla sadržaja.
+    <key alias="allowAsRootDescription">Dozvolite urednicima da kreiraju sadržaj ove vrste u korijenu stabla sadržaja.
     </key>
-    <key alias="childNodesHeading">Dozvoljeni tipovi podređenih čvorova</key>
-    <key alias="childNodesDescription">Dozvolite da se sadržaj navedenih tipova kreira ispod sadržaja ovog tipa.
+    <key alias="childNodesHeading">Dozvoljene vrste podređenih čvorova</key>
+    <key alias="childNodesDescription">Dozvolite da se sadržaj navedenih vrsta kreira ispod sadržaja ove vrste.
     </key>
     <key alias="chooseChildNode">Odaberite podređeni čvor</key>
     <key alias="compositionsDescription">Naslijediti kartice i svojstva iz postojeće vrste dokumenta. Nove kartice bit će
       dodane trenutnoj vrsti dokumenta ili spojene ako postoji kartica s identičnim imenom.
     </key>
-    <key alias="compositionInUse">Ovaj tip sadržaja se koristi u kompoziciji i stoga se ne može sam sastaviti.
+    <key alias="compositionInUse">Ova vrsta sadržaja se koristi u kompoziciji i stoga se ne može sam sastaviti.
     </key>
-    <key alias="noAvailableCompositions">Nema dostupnih tipova sadržaja za upotrebu kao kompozicija.</key>
-    <key alias="compositionRemoveWarning">Uklanjanje kompozicije će obrisati sve povezane podatke o svojstvu. Jednom kada spremite tip dokumenta, nema povratka.
+    <key alias="noAvailableCompositions">Nema dostupnih vrsta sadržaja za upotrebu kao kompozicija.</key>
+    <key alias="compositionRemoveWarning">Uklanjanje kompozicije će obrisati sve povezane podatke o svojstvu. Jednom kada spremite vrstu dokumenta, nema povratka.
     </key>
     <key alias="availableEditors">Napravi novi</key>
     <key alias="reuse">Koristite postojeće</key>
@@ -1789,16 +1834,16 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="folderToMove">Odaberite mapu za premještanje</key>
     <key alias="folderToCopy">Odaberite mapu za kopiranje</key>
     <key alias="structureBelow">do u strukturi stabla ispod</key>
-    <key alias="allDocumentTypes">Svi tipovi dokumenata</key>
+    <key alias="allDocumentTypes">Sve vrste dokumenata</key>
     <key alias="allDocuments">Svi dokumenti</key>
     <key alias="allMediaItems">Sve medijske stavke</key>
-    <key alias="usingThisDocument">korištenje ovog tipa dokumenta bit će trajno izbrisano, potvrdite da želite obrisati ove također.</key>
+    <key alias="usingThisDocument">korištenje ove vrste dokumenta bit će trajno izbrisano, potvrdite da želite obrisati ove također.</key>
     <key alias="usingThisMedia">korištenje ove vrste medija će biti trajno izbrisano, potvrdite da želite obrisati ove također.
     </key>
     <key alias="usingThisMember">korištenje ove vrste člana će biti trajno izbrisano, potvrdite da želite obrisati ove također</key>
     <key alias="andAllDocuments">i svi dokumenti koji koriste ovu vrstu</key>
     <key alias="andAllMediaItems">i sve medijske stavke koje koriste ovu vrstu</key>
-    <key alias="andAllMembers">i svi članovi koji koriste ovaj tip</key>
+    <key alias="andAllMembers">i svi članovi koji koriste ovu vrstu</key>
     <key alias="memberCanEdit">Član može uređivati</key>
     <key alias="memberCanEditDescription">Dozvolite da ovu vrijednost svojstva da uređuje član na svojoj stranici profila
     </key>
@@ -1812,7 +1857,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="tabHasNoSortOrder">kartica nema redoslijed sortiranja</key>
     <key alias="compositionUsageHeading">Gdje se koristi ovaj sastav?</key>
     <key alias="compositionUsageSpecification">Ovaj sastav se trenutno koristi u sastavu sljedećih
-      tipa sadržaja:
+      vrsta sadržaja:
     </key>
     <key alias="variantsHeading">Dozvoli varijacije</key>
     <key alias="cultureVariantHeading">Dozvolite varirati u zavisnosti od kulture</key>
@@ -1824,20 +1869,19 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="segmentVariantDescription">Dozvolite urednicima da kreiraju segmente ovog sadržaja.</key>
     <key alias="allowVaryByCulture">Dozvolite varijaciju po kulturi</key>
     <key alias="allowVaryBySegment">Dozvoli segmentaciju</key>
-    <key alias="elementType">Tip elementa</key>
-    <key alias="elementHeading">Je li tip elementa</key>
-    <key alias="elementDescription">Tip elementa je namijenjen za korištenje na primjer u ugniježđenom sadržaju, a ne u stablu.
+    <key alias="elementType">Vrsta elementa</key>
+    <key alias="elementHeading">Da li je vrste elementa</key>
+    <key alias="elementDescription">Vrsta elementa je namijenjena za korištenje na primjer u ugniježenom sadržaju, a ne u stablu.
     </key>
-    <key alias="elementCannotToggle">Tip dokumenta se ne može promijeniti u tip elementa nakon što je naviknut
+    <key alias="elementCannotToggle">Vrsta dokumenta se ne može promijeniti u vrstu elementa nakon što je naviknut
       kreirati jednu ili više stavki sadržaja.
     </key>
-    <key alias="elementDoesNotSupport">Ovo nije primjenjivo za tip elementa</key>
+    <key alias="elementDoesNotSupport">Ovo nije primjenjivo za vrstu elementa</key>
     <key alias="propertyHasChanges">Napravili ste promjene on ovom svojstvu. Jeste li sigurni da ih želite odbaciti?</key>
     <key alias="displaySettingsHeadline">Izgled</key>
     <key alias="displaySettingsLabelOnTop">Oznaka iznad (puna širina)</key>
     <key alias="removeChildNode">Uklanjate podređeni čvor</key>
-    <key alias="removeChildNodeWarning">Uklanjanje podređenog čvora ograničit će opcije urednika da kreiraju drugačiji sadržaj
-      tipovi ispod čvora.
+    <key alias="removeChildNodeWarning">Uklanjanje podređenog čvora ograničit će opcije urednika da kreiraju drugačiju vrstu sadržaj ispod čvora.
     </key>
     <key alias="usingEditor">korištenjem ovog uređivača bit će ažurirane nove postavke.</key>
     <key alias="historyCleanupHeading">Brisanje povijesti</key>
@@ -1847,6 +1891,24 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="historyCleanupPreventCleanup">Spriječi čišćenje</key>
     <key alias="historyCleanupEnableCleanup">Omogući čišćenje</key>
     <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>BILJEŠKA!</strong> Čišćenje povijesnih verzija sadržaja onemogućeno je globalno. Ove postavke neće stupiti na snagu prije nego što se omogući.]]></key>
+    <key alias="changeDataTypeHelpText">Promjena vrste podatka sa spremljenim vrijednostima je onemogućena. Da bi omogućili promjenu, možete promijeniti Umbraco:CMS:DataTypes:CanBeChanged postavku u appsettings.json.</key>
+  </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Kreiraj webhook</key>
+    <key alias="addWebhookHeader">Dodaj webhook zaglavlje</key>
+    <key alias="addDocumentType">Dodaj Vrstu Dokumenta</key>
+    <key alias="addMediaType">Dodaj Vrstu Medija</key>
+    <key alias="createHeader">Kreiraj zaglavlje</key>
+    <key alias="deliveries">Isporuke</key>
+    <key alias="noHeaders">Nijedno webhook zaglavlje nije dodano</key>
+    <key alias="noEventsFound">Nema pronađenih događaja.</key>
+    <key alias="enabled">Omogućeno</key>
+    <key alias="events">Događanja</key>
+    <key alias="event">Događaj</key>
+    <key alias="url">Url</key>
+    <key alias="types">Vrste</key>
+    <key alias="webhookKey">Webhook key</key>
+    <key alias="retryCount">Broj pokušaja</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Dodaj jezik</key>
@@ -1952,7 +2014,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="cacheBrowser">Pretraživač predmemorije</key>
     <key alias="contentRecycleBin">Koš za smeće</key>
     <key alias="createdPackages">Kreirani paketi</key>
-    <key alias="dataTypes">Tipovi podataka</key>
+    <key alias="dataTypes">Vrste podataka</key>
     <key alias="dictionary">Riječnik</key>
     <key alias="installedPackages">Instalirani paketi</key>
     <key alias="installSkin">Instaliraj skin</key>
@@ -1960,17 +2022,17 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="languages">Jezici</key>
     <key alias="localPackage">Instaliraj lokalni paket</key>
     <key alias="macros">Makroi</key>
-    <key alias="mediaTypes">Tipovi medija</key>
+    <key alias="mediaTypes">Vrste medija</key>
     <key alias="member">Članovi</key>
     <key alias="memberGroups">Grupe članova</key>
     <key alias="memberRoles">Uloge članova</key>
-    <key alias="memberTypes">Tipovi članova</key>
-    <key alias="documentTypes">Tipovi dokumenata</key>
-    <key alias="relationTypes">Tipovi relacija</key>
+    <key alias="memberTypes">Vrste članova</key>
+    <key alias="documentTypes">Vrste dokumenata</key>
+    <key alias="relationTypes">Vrste relacija</key>
     <key alias="packager">Paketi</key>
     <key alias="packages">Paketi</key>
-    <key alias="partialViews">Parcijalni pogledi</key>
-    <key alias="partialViewMacros">Parcijalni pregledi makro datoteka</key>
+    <key alias="partialViews">Parcijalni prikazi</key>
+    <key alias="partialViewMacros">Parcijalni prikazi makro datoteka</key>
     <key alias="repositories">Instaliraj iz repozitorija</key>
     <key alias="runway">Instaliraj Runway</key>
     <key alias="runwayModules">Runway moduli</key>
@@ -1983,6 +2045,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="settingsGroup">Postavke</key>
     <key alias="templatingGroup">Predložak</key>
     <key alias="thirdPartyGroup">Treća strana</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Postoji nova verzija</key>
@@ -2013,7 +2076,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     </key>
     <key alias="descriptionField">Polje kratkog opisa</key>
     <key alias="disabled">Onemogući korisnika</key>
-    <key alias="documentType">Tip dokumenta</key>
+    <key alias="documentType">Vrsta dokumenta</key>
     <key alias="editors">Urednik</key>
     <key alias="emailRequired">Obavezno - unesite email adresu za ovog korisnika</key>
     <key alias="excerptField">Polje izvoda</key>
@@ -2059,6 +2122,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Pretražite svu djecu</key>
     <key alias="languagesHelp">Ograničite jezike kojima korisnici imaju pristup za uređivanje</key>
+    <key alias="allowAccessToAllLanguages">Dozvoljen pristup svim jezicima</key>
     <key alias="sectionsHelp">Dodajte odjeljke da korisnicima omogućite pristup</key>
     <key alias="selectUserGroups">Odaberite grupe korisnika</key>
     <key alias="noStartNode">Nije odabran početni čvor</key>
@@ -2387,7 +2451,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="comment">Komentar</key>
     <key alias="name">Naziv</key>
     <key alias="noRelations">Nema relacija za ovu vrstu odnosa</key>
-    <key alias="tabRelationType">Tip relacije</key>
+    <key alias="tabRelationType">Vrsta relacije</key>
     <key alias="tabRelations">Relacije</key>
     <key alias="isDependency">Je zavisan</key>
     <key alias="dependency">Da</key>
@@ -2402,7 +2466,8 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="settingsPublishedStatus">Status stranice</key>
     <key alias="settingsModelsBuilder">Generator modela</key>
     <key alias="settingsHealthCheck">Provjera zdravlja</key>
-    <key alias="settingsProfiler">Profilisanje</key>
+    <key alias="settingsAnalytics">Podaci telemetrije</key>
+    <key alias="settingsProfiler">Profiliranje</key>
     <key alias="memberIntro">Početak rada</key>
     <key alias="formsInstall">Instaliraj Umbraco Forms</key>
   </area>
@@ -2430,10 +2495,10 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="currentLanguage">Trenutni jezik</key>
     <key alias="switchLanguage">Prebaci jezik na</key>
     <key alias="createNewFolder">Kreirajte novi folder</key>
-    <key alias="newPartialView">Parcijalni pogled</key>
+    <key alias="newPartialView">Parcijalni prikaz</key>
     <key alias="newPartialViewMacro">Makro za pracijalni prikaz</key>
     <key alias="newMember">Član</key>
-    <key alias="newDataType">Tip podatka</key>
+    <key alias="newDataType">Vrsta podatka</key>
     <key alias="redirectDashboardSearchLabel">Pretražite kontrolnu ploču za preusmjeravanje</key>
     <key alias="userGroupSearchLabel">Pretražite odjeljak korisničke grupe</key>
     <key alias="userSearchLabel">Pretražite odjeljak korisnika</key>
@@ -2461,11 +2526,11 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
   </area>
   <area alias="references">
     <key alias="tabName">Reference</key>
-    <key alias="DataTypeNoReferences">Ovaj tip podataka nema reference.</key>
+    <key alias="DataTypeNoReferences">Ova vrsta podataka nema reference.</key>
     <key alias="itemHasNoReferences">Ova stavka nema reference.</key>
-    <key alias="labelUsedByDocumentTypes">Koristi se u tipovima dokumenata</key>
-    <key alias="labelUsedByMediaTypes">Koristi se u tipovima medija</key>
-    <key alias="labelUsedByMemberTypes">Koristi se u tipovima članova</key>
+    <key alias="labelUsedByDocumentTypes">Koristi se u vrstama dokumenata</key>
+    <key alias="labelUsedByMediaTypes">Koristi se u vrstama medija</key>
+    <key alias="labelUsedByMemberTypes">Koristi se u vrstama članova</key>
     <key alias="usedByProperties">Koristi</key>
     <key alias="labelUsedItems">Stavke u upotrebi</key>
     <key alias="labelUsedDescendants">Potomci u upotrebi</key>
@@ -2610,15 +2675,15 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     </key>
     <key alias="learningBaseDescription">
       <![CDATA[
-        <p>Želite savladati Umbraco? Provedite nekoliko minuta učeći najbolje prakse gledajući jedan od ovih videozapisa o korištenju Umbraco-a <a href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener"> Umbraco Learning Base Youtube kanal</a>. Ovdje možete pronaći gomilu video materijala koji pokriva mnoge aspekte Umbraco-a.</p>
+        <p>Želite savladati Umbraco? Provedite nekoliko minuta učeći najbolje prakse gledajući jedan od ovih videozapisa o korištenju Umbraco-a <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener"> Umbraco Learning Base Youtube kanal</a>. Ovdje možete pronaći gomilu video materijala koji pokriva mnoge aspekte Umbraco-a.</p>
       ]]>
     </key>
     <key alias="getStarted">Za početak</key>
   </area>
   <area alias="settingsDashboard">
-    <key alias="start">Počni ovdje</key>
+    <key alias="start">Krenite ovdje</key>
     <key alias="startDescription">Ovaj odjeljak sadrži blokove za izgradnju vaše Umbraco stranice. Slijedite dolje
-      veze da saznate više o radu sa stavkama u odjeljku Postavke
+      navedene veze linkova kako biste saznali više o radu sa stavkama u odjeljku Postavke
     </key>
     <key alias="more">Saznajte više</key>
     <key alias="bulletPointOne">
@@ -2659,12 +2724,12 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     </key>
   </area>
   <area alias="blockEditor">
-    <key alias="headlineCreateBlock">Odaberite tip elementa</key>
-    <key alias="headlineAddSettingsElementType">Priložite postavke na tip elementa</key>
+    <key alias="headlineCreateBlock">Odaberite vrstu elementa</key>
+    <key alias="headlineAddSettingsElementType">Priložite postavke na vrstu elementa</key>
     <key alias="headlineAddCustomView">Odaberite prikaz</key>
     <key alias="headlineAddCustomStylesheet">Odaberite stil</key>
     <key alias="headlineAddThumbnail">Odaberite sličicu</key>
-    <key alias="labelcreateNewElementType">Kreirajte novi tip elementa</key>
+    <key alias="labelcreateNewElementType">Kreirajte novu vrstu elementa</key>
     <key alias="labelCustomStylesheet">Prilagođeni stil</key>
     <key alias="addCustomStylesheet">Dodaj stil</key>
     <key alias="headlineEditorAppearance">Izgled bloka</key>
@@ -2696,7 +2761,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
       više neće biti dostupan i bit će prikazan kao nepodržani sadržaj.
     </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguracija od '%0%']]></key>
-    <key alias="elementTypeDoesNotExist">Ne može se uređivati jer tip elementa ne postoji.</key>
+    <key alias="elementTypeDoesNotExist">Ne može se uređivati jer vrsta elementa ne postoji.</key>
     <key alias="thumbnail">Sličica</key>
     <key alias="addThumbnail">Dodaj sličicu</key>
     <key alias="tabCreateEmpty">Kreiraj prazno</key>
@@ -2711,7 +2776,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="confirmCancelBlockCreationHeadline">Odbaciti kreiranje?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Jeste li sigurni da želite otkazati kreiranje.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Greška!</key>
-    <key alias="elementTypeDoesNotExistDescription">Tip elementa ovog bloka više ne postoji</key>
+    <key alias="elementTypeDoesNotExistDescription">Vrsta elementa ovog bloka više ne postoji</key>
     <key alias="addBlock">Dodaj sadržaj</key>
     <key alias="addThis">Dodaj %0%</key>
     <key alias="propertyEditorNotSupported">Svojstvo '%0%' koristi uređivač '%1%' koji nije podržan u blokovima.</key>
@@ -2721,9 +2786,9 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="areaValidationEntriesShort"><![CDATA[<strong>%0%</strong> mora biti prisutan barem <strong>%2%</strong> puta.]]></key>
     <key alias="areaValidationEntriesExceed"><![CDATA[<strong>%0%</strong> mora biti maksimalno prisutan <strong>%3%</strong> puta.]]></key>
     <key alias="areaNumberOfBlocks">Broj blokova</key>
-    <key alias="areaDisallowAllBlocks">Dozvolite samo određene tipove blokova</key>
+    <key alias="areaDisallowAllBlocks">Dozvolite samo određene vrste blokova</key>
     <key alias="areaAllowedBlocks">Dozvoljene vrste blokova</key>
-    <key alias="areaAllowedBlocksHelp">Definirajte tipove blokova koji su dozvoljeni u ovom području i opcionalo koliko svakog tipa treba biti prisutan.</key>
+    <key alias="areaAllowedBlocksHelp">Definirajte vrste blokova koji su dozvoljeni u ovom području i opcionalo koliko svake vrste treba biti prisutno.</key>
     <key alias="confirmDeleteBlockAreaMessage">Jeste li sigurni da želite obrisati ovo područje?</key>
     <key alias="confirmDeleteBlockAreaNotice">Svi blokovi koji su trenutno kreirani unutar ovog područja bit će obrisani.</key>
     <key alias="layoutOptions">Opcije rasporeda</key>
@@ -2738,7 +2803,7 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="allowBlockInRootHelp">Učinite ovaj blok dostupnim u korijenu izgleda.</key>
     <key alias="allowBlockInAreas">Dozvolite u područjima</key>
     <key alias="allowBlockInAreasHelp">Učinite ovaj blok dostupnim prema zadanim postavkama unutar područja drugih blokova (osim ako za ova područja nisu postavljene eksplicitne dozvole).</key>
-    <key alias="areaAllowedBlocksEmpty">Prema zadanim postavkama, svi tipovi blokova su dozvoljeni u području. Koristite ovu opciju da dozvolite samo odabrane tipove.</key>
+    <key alias="areaAllowedBlocksEmpty">Prema zadanim postavkama, sve vrste blokova su dozvoljeni u području. Koristite ovu opciju da dozvolite samo odabrane vrste.</key>
     <key alias="areas">Područja</key>
     <key alias="areasLayoutColumns">Mrežne kolone za područja</key>
     <key alias="areasLayoutColumnsHelp">Definirajte koliko će stupaca biti dostupno za područja. Ako nije definiran, koristit će se broj kolona definiranih za cijeli izgled.</key>
@@ -2779,9 +2844,9 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Što su predlošci sadržaja?</key>
     <key alias="whatDescription">Predlošci sadržaja su unaprijed definirani sadržaj koji se može odabrati prilikom kreiranja novog
-      sadržaj čvora.
+      čvora sadržaja.
     </key>
-    <key alias="createHeadline">Kako da kreiram predložak sadržaja?</key>
+    <key alias="createHeadline">Kako kreirati predložak sadržaja?</key>
     <key alias="createDescription">
       <![CDATA[
             <p>Postoje dva načina za kreiranje predloška sadržaja:</p>
@@ -2824,5 +2889,34 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
   <area alias="treeSearch">
     <key alias="searchResult">stavka vraćena</key>
     <key alias="searchResults">stavke vraćene</key>
+  </area>
+  <area alias="analytics">
+    <key alias="consentForAnalytics">Suglasnost za prikupljanje telemetrijskih podataka</key>
+    <key alias="analyticsLevelSavedSuccess">Telemetrijska razina spremljena!</key>
+    <key alias="analyticsDescription">
+      <![CDATA[
+      Kako bismo unaprijedili Umbraco i dodali nove funkcionalnosti na temelju relevantnih informacija,
+          <br>želimo prikupljati podatke o sustavu i uporabi iz vaše instalacije.
+          <br>Zbirni podaci bit će redovito dijeljeni, kao i saznanja dobivena iz tih metrika.
+          <br>Nadamo se da ćete nam pomoći prikupiti neke vrijedne podatke.
+          <br>
+          <br>NEĆEMO prikupljati osobne podatke poput sadržaja, koda, informacija o korisnicima, a svi podaci bit će potpuno anonimni.
+       ]]>
+    </key>
+    <key alias="minimalLevelDescription">Poslat ćemo samo anonimni ID web-mjesta kako bismo znali da web-mjesto postoji.</key>
+    <key alias="basicLevelDescription">Poslat ćemo anonimni ID web-mjesta, verziju Umbraco-a i instalirane pakete.</key>
+    <key alias="detailedLevelDescription">
+      <![CDATA[
+          Poslat ćemo:
+          <ul>
+            <li>Anonimni ID web-mjesta, verziju Umbraco-a i instalirane pakete.</li>
+            <li>Broj: korijenskih čvorova, čvorova sadržaja, makroa, medija, vrsta dokumenata, predložaka, jezika, domena, korisničkih grupa, korisnika, članova, vanjskih pružatelja prijave u Backoffice-u i uređivača svojstava u upotrebi.</li>
+            <li>Informacije o sustavu: web poslužitelj, operativni sustav poslužitelja, okvir poslužitelja, jezik operativnog sustava poslužitelja i pružatelj baze podataka.</li>
+            <li>Postavke konfiguracije: način Modelsbuilder-a, postoji li prilagođena putanja Umbraco-a, ASP okolina, je li omogućen dostavni API, dopušta li javni pristup i je li u načinu rada za otklanjanje pogrešaka.</li>
+          </ul>
+          <em>Moguće je da ćemo u budućnosti promijeniti podatke koje šaljemo na Detaljnoj razini. Ako se to dogodi, bit će navedeno iznad.
+          <br>Odabirom "Detaljno" pristajete na prikupljanje trenutnih i budućih anonimiziranih informacija.</em>
+       ]]>
+    </key>
   </area>
 </language>

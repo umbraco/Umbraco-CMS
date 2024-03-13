@@ -12,7 +12,7 @@ public partial class UserServiceCrudTests
     public async Task Delete_Returns_Not_Found_If_Not_Found()
     {
         var userService = CreateUserService();
-        var result = await userService.DeleteAsync(Guid.NewGuid());
+        var result = await userService.DeleteAsync(Constants.Security.SuperUserKey, Guid.NewGuid());
         Assert.AreEqual(UserOperationStatus.UserNotFound, result);
     }
 
@@ -36,7 +36,7 @@ public partial class UserServiceCrudTests
         createdUser!.LastLoginDate = DateTime.Now;
         userService.Save(createdUser);
 
-        var result = await userService.DeleteAsync(createdUser.Key);
+        var result = await userService.DeleteAsync(Constants.Security.SuperUserKey, createdUser.Key);
         Assert.AreEqual(UserOperationStatus.CannotDelete, result);
 
         // Asset that it is in fact not deleted
@@ -61,7 +61,7 @@ public partial class UserServiceCrudTests
         var creationResult = await userService.CreateAsync(Constants.Security.SuperUserKey, userCreateModel, true);
         Assert.IsTrue(creationResult.Success);
 
-        var deletionResult = await userService.DeleteAsync(creationResult.Result.CreatedUser!.Key);
+        var deletionResult = await userService.DeleteAsync(Constants.Security.SuperUserKey, creationResult.Result.CreatedUser!.Key);
         Assert.AreEqual(UserOperationStatus.Success, deletionResult);
         // Make sure it's actually deleted
         var postDeletedUser = await userService.GetAsync(creationResult.Result.CreatedUser.Key);

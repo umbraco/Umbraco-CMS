@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware;
@@ -117,7 +117,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
     {
         if (_basicAuthService.IsRedirectToLoginPageEnabled())
         {
-            context.Response.Redirect($"{_backOfficePath}#/login/false?returnPath={WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery())}" , false);
+            context.Response.Redirect($"{_backOfficePath}/login/?status=false&returnPath={WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery())}", false);
         }
         else
         {

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
-    internal static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
+    private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
         UmbracoOptionsAttribute? umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
@@ -45,6 +45,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<SecuritySettings>, SecuritySettingsValidator>();
 
         // Register configuration sections.
         builder
@@ -88,7 +89,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
             .AddUmbracoOptions<DataTypesSettings>()
-            .AddUmbracoOptions<PackageManifestSettings>();
+            .AddUmbracoOptions<PackageManifestSettings>()
+            .AddUmbracoOptions<WebhookSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

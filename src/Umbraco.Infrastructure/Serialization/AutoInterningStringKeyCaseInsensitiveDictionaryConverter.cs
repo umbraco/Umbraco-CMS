@@ -1,54 +1,49 @@
-using System.Collections;
-using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
-/// <summary>
-///     When applied to a dictionary with a string key, will ensure the deserialized string keys are interned
-/// </summary>
-/// <typeparam name="TValue"></typeparam>
-/// <remarks>
-///     borrowed from https://stackoverflow.com/a/36116462/694494
-/// </remarks>
-public class AutoInterningStringKeyCaseInsensitiveDictionaryConverter<TValue> : CaseInsensitiveDictionaryConverter<TValue>
+public class AutoInterningStringKeyCaseInsensitiveDictionaryConverter<TValue> : JsonConverter<IDictionary<string, TValue>>
 {
-    public AutoInterningStringKeyCaseInsensitiveDictionaryConverter()
-    {
-    }
+    // This is a hacky workaround to creating a "read only converter", since System.Text.Json doesn't support it.
+    // Taken from https://github.com/dotnet/runtime/issues/46372#issuecomment-1660515178
+    private readonly JsonConverter<IDictionary<string, TValue>> _fallbackConverter = (JsonConverter<IDictionary<string, TValue>>)JsonSerializerOptions.Default.GetConverter(typeof(IDictionary<string, TValue>));
 
-    public AutoInterningStringKeyCaseInsensitiveDictionaryConverter(StringComparer comparer)
-        : base(comparer)
-    {
-    }
+    /// <inheritdoc />
+    public override bool CanConvert(Type typeToConvert) => typeof(IDictionary<string, TValue>).IsAssignableFrom(typeToConvert);
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    public override Dictionary<string, TValue>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonToken.StartObject)
+        if (reader.TokenType != JsonTokenType.StartObject)
         {
-            IDictionary dictionary = Create(objectType);
-            while (reader.Read())
+            return null;
+        }
+
+        var dictionary = new Dictionary<string, TValue>(StringComparer.OrdinalIgnoreCase);
+        while (reader.Read())
+        {
+            switch (reader.TokenType)
             {
-                switch (reader.TokenType)
-                {
-                    case JsonToken.PropertyName:
-                        var key = string.Intern(reader.Value!.ToString()!);
+                case JsonTokenType.PropertyName:
+                    var key = string.Intern(reader.GetString()!);
 
-                        if (!reader.Read())
-                        {
-                            throw new Exception("Unexpected end when reading object.");
-                        }
+                    if (reader.Read() is false)
+                    {
+                        throw new JsonException();
+                    }
 
-                        TValue? v = serializer.Deserialize<TValue>(reader);
-                        dictionary[key] = v;
-                        break;
-                    case JsonToken.Comment:
-                        break;
-                    case JsonToken.EndObject:
-                        return dictionary;
-                }
+                    TValue? value = JsonSerializer.Deserialize<TValue>(ref reader, options);
+                    dictionary[key] = value!;
+                    break;
+                case JsonTokenType.Comment:
+                    break;
+                case JsonTokenType.EndObject:
+                    return dictionary;
             }
         }
 
         return null;
     }
+
+    public override void Write(Utf8JsonWriter writer, IDictionary<string, TValue> value, JsonSerializerOptions options) => _fallbackConverter.Write(writer, value, options);
 }

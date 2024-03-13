@@ -13,12 +13,12 @@ public class DictionaryOverviewResponseModel
     public Guid Id { get; set; }
 
     /// <summary>
-    ///     Gets or sets the parent key.
+    ///     Gets or sets the parent.
     /// </summary>
-    public Guid? ParentId { get; set; }
+    public ReferenceByIdModel? Parent { get; set; }
 
     /// <summary>
     ///     Sets the translations.
     /// </summary>
-    public IEnumerable<string> TranslatedIsoCodes { get; set; } = Array.Empty<string>();
+    public IEnumerable<string> TranslatedIsoCodes { get; set; } = Enumerable.Empty<string>();
 }

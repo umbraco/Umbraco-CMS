@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -74,6 +75,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Deleting_Content_Type_With_Hierarchy_Of_Content_Items_Moves_Orphaned_Content_To_Recycle_Bin()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
@@ -105,7 +107,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
                 var contentItem =
                     ContentBuilder.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
                 ContentService.Save(contentItem);
-                ContentService.SaveAndPublish(contentItem);
+                ContentService.Publish(contentItem, new[] { "*" });
                 parentId = contentItem.Id;
 
                 ids.Add(contentItem.Id);
@@ -125,6 +127,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_1()
     {
         ContentNotificationHandler.MovedContentToRecycleBin = MovedContentToRecycleBin;
@@ -158,7 +161,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
                     var contentItem =
                         ContentBuilder.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
                     ContentService.Save(contentItem);
-                    ContentService.SaveAndPublish(contentItem);
+                    ContentService.Publish(contentItem, new[] { "*" });
                     parentId = contentItem.Id;
                 }
             }
@@ -175,6 +178,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_2()
     {
         ContentNotificationHandler.MovedContentToRecycleBin = MovedContentToRecycleBin;
@@ -199,17 +203,17 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
 
             var root = ContentBuilder.CreateSimpleContent(contentType1, "Root");
             ContentService.Save(root);
-            ContentService.SaveAndPublish(root);
+            ContentService.Publish(root, new[] { "*" });
 
             var level1 = ContentBuilder.CreateSimpleContent(contentType2, "L1", root.Id);
             ContentService.Save(level1);
-            ContentService.SaveAndPublish(level1);
+            ContentService.Publish(level1, new[] { "*" });
 
             for (var i = 0; i < 2; i++)
             {
                 var level3 = ContentBuilder.CreateSimpleContent(contentType3, "L2" + i, level1.Id);
                 ContentService.Save(level3);
-                ContentService.SaveAndPublish(level3);
+                ContentService.Publish(level3, new[] { "*" });
             }
 
             ContentTypeService.Delete(contentType1);
@@ -243,7 +247,8 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         FileService.SaveTemplate(contentType1.DefaultTemplate);
         ContentTypeService.Save(contentType1);
         IContent contentItem = ContentBuilder.CreateTextpageContent(contentType1, "Testing", -1);
-        ContentService.SaveAndPublish(contentItem);
+        ContentService.Save(contentItem);
+        ContentService.Publish(contentItem, new[] { "*" });
         var initProps = contentItem.Properties.Count;
 
         // remove a property
@@ -351,7 +356,8 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
 
         // Act
         var homeDoc = cs.Create("Home Page", -1, contentTypeAlias);
-        cs.SaveAndPublish(homeDoc);
+        cs.Save(homeDoc);
+        cs.Publish(homeDoc, new[] { "*" });
 
         // Assert
         Assert.That(ctBase.HasIdentity, Is.True);

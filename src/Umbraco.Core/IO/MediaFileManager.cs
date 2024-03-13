@@ -121,7 +121,6 @@ public sealed class MediaFileManager
     /// <param name="content"></param>
     /// <param name="mediaFilePath">The file path if a file was found</param>
     /// <param name="propertyTypeAlias"></param>
-    /// <param name="variationContextAccessor"></param>
     /// <param name="culture"></param>
     /// <param name="segment"></param>
     /// <returns></returns>

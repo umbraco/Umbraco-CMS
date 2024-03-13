@@ -16,4 +16,10 @@ public interface IUserPresentationFactory
     Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel);
 
     Task<CurrentUserResponseModel> CreateCurrentUserResponseModelAsync(IUser user);
+
+    Task<UserResendInviteModel> CreateResendInviteModelAsync(ResendInviteUserRequestModel requestModel);
+
+    Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync();
+
+    Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync();
 }

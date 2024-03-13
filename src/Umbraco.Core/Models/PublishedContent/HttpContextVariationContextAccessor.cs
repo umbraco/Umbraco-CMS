@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Cache;
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 
 /// <summary>
-///     Implements <see cref="IVariationContextAccessor" /> on top of <see cref="IHttpContextAccessor" />.
+///     Implements <see cref="IVariationContextAccessor" /> on top of <see cref="IRequestCache" />.
 /// </summary>
 public class HttpContextVariationContextAccessor : IVariationContextAccessor
 {

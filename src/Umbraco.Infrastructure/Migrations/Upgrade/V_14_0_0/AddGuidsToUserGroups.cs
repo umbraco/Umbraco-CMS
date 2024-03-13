@@ -45,10 +45,17 @@ public class AddGuidsToUserGroups : UnscopedMigrationBase
         var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
         AddColumnIfNotExists<UserGroupDto>(columns, NewColumnName);
 
+        var nodeDtoTrashedIndex = $"IX_umbracoUserGroup_userGroupKey";
+        CreateIndex<UserGroupDto>(nodeDtoTrashedIndex);
+
         // We want specific keys for the default user groups, so we need to fetch the user groups again to set their keys.
-        IEnumerable<Guid> updatedUserGroups = Database.Fetch<UserGroupDto>()
-            .Select(x => x.Key = ResolveAliasToGuid(x.Alias));
-        Database.Update(updatedUserGroups);
+        List<UserGroupDto>? userGroups = Database.Fetch<UserGroupDto>();
+
+        foreach (UserGroupDto userGroup in userGroups)
+        {
+            userGroup.Key = ResolveAliasToGuid(userGroup.Alias);
+            Database.Update(userGroup);
+        }
 
         scope.Complete();
     }

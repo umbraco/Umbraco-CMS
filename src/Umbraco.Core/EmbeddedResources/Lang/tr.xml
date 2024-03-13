@@ -156,6 +156,12 @@
     <key alias="morePublishingOptions">Daha fazla yayınlama seçeneği</key>
     <key alias="submitChanges">Gönder</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Medya silindi</key>
+    <key alias="move">Medya taşındı</key>
+    <key alias="copy">Medya kopyalandı</key>
+    <key alias="save">Medya kaydedildi</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Görüntüleniyor</key>
     <key alias="delete">İçerik silindi</key>
@@ -316,19 +322,19 @@
   </area>
   <area alias="create">
     <key alias="chooseNode">Yeni %0% 'i nerede oluşturmak istiyorsunuz</key>
-    <key alias="createUnder">Altında bir öğe oluşturun</key>
+    <key alias="createUnder">Şu dizin altında bir öğe oluşturun: </key>
     <key alias="createContentBlueprint">İçerik şablonu yapmak istediğiniz belge türünü seçin</key>
     <key alias="enterFolderName">Bir klasör adı girin</key>
     <key alias="updateData">Bir tür ve başlık seçin</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Burada içerik oluşturmak için izin verilen doküman türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmelisiniz.]]></key>
-    <key alias="noDocumentTypesAtRoot"><![CDATA[Burada içerik oluşturmak için uygun belge türü yok. Bunları <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde oluşturmanız gerekir.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[Burada içerik oluşturmak için uygun bir belge türü yok. Öncelikle belge türlerini <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde oluşturmanız gerekiyor.]]></key>
     <key alias="noDocumentTypesWithNoSettingsAccess">İçerik ağacında seçilen sayfa, altında herhangi bir sayfanın oluşturulmasına izin vermiyor.</key>
-    <key alias="noDocumentTypesEditPermissions">Bu belge türü için izinleri düzenleyin</key>
+    <key alias="noDocumentTypesEditPermissions">Şu belge türü için izinleri düzenleyin</key>
     <key alias="noDocumentTypesCreateNew">Yeni bir belge türü oluşturun</key>
     <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[Burada içerik oluşturmak için izin verilen belge türü yok. Bunları, <strong>İzinler</strong> altında <strong>Kök olarak izin ver</strong> seçeneğini değiştirerek, <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmeniz gerekir. ]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Burada medya oluşturmak için izin verilen medya türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Medya Türleri</strong> 'nde etkinleştirmelisiniz. .]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">Ağaçtaki seçili ortam, altında başka bir ortamın oluşturulmasına izin vermiyor.</key>
-    <key alias="noMediaTypesEditPermissions">Bu medya türü için izinleri düzenleyin</key>
+    <key alias="noMediaTypesEditPermissions">Şu medya türü için izinleri düzenleyin:</key>
     <key alias="documentTypeWithoutTemplate">Şablonsuz Belge Türü</key>
     <key alias="newFolder">Yeni klasör</key>
     <key alias="newDataType">Yeni veri türü</key>
@@ -354,11 +360,11 @@
     <key alias="stay">Kal</key>
     <key alias="discardChanges">Değişiklikleri sil</key>
     <key alias="unsavedChanges">Kaydedilmemiş değişiklikleriniz var</key>
-    <key alias="unsavedChangesWarning">Bu sayfadan ayrılmak istediğinizden emin misiniz? - kaydedilmemiş değişiklikleriniz var</key>
+    <key alias="unsavedChangesWarning">Bu sayfadan ayrılmak istediğinizden emin misiniz? - Kaydedilmemiş değişiklikleriniz var</key>
     <key alias="confirmListViewPublish">Yayınlama, seçili öğelerin sitede görünür olmasını sağlar.</key>
-    <key alias="confirmListViewUnpublish">Yayından kaldırıldığında, seçili öğeler ve bunların tüm alt öğeleri siteden kaldırılır.</key>
-    <key alias="confirmUnpublish">Yayından kaldırıldığında bu sayfa ve tüm soyundan gelenler siteden kaldırılır.</key>
-    <key alias="doctypeChangeWarning">Kaydedilmemiş değişiklikleriniz var. Belge Türünde değişiklik yapmak değişiklikleri geçersiz kılacaktır.</key>
+    <key alias="confirmListViewUnpublish">Yayından kaldırma, seçili öğeler ile birlikte bu öğelerin tüm alt öğelerini de siteden kaldırır.</key>
+    <key alias="confirmUnpublish">Yayından kaldırma, bu seçili öğe ile birlikte onun tüm alt öğelerini de siteden kaldırır.</key>
+    <key alias="doctypeChangeWarning">Kaydedilmemiş değişiklikleriniz var. Belge Türü'nde değişiklik yapmak bu kaydedilmemiş değişikliklerinizi geçersiz kılacaktır.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Bitti</key>
@@ -422,7 +428,7 @@
     <key alias="permissionsHelp">İzinlerini ayarlamak istediğiniz kullanıcı gruplarını seçin</key>
     <key alias="recycleBinDeleting">Geri dönüşüm kutusundaki öğeler artık siliniyor. Lütfen bu işlem yapılırken bu pencereyi kapatmayın</key>
     <key alias="recycleBinIsEmpty">Geri dönüşüm kutusu artık boş</key>
-    <key alias="recycleBinWarning">Öğeler geri dönüşüm kutusundan silindiğinde sonsuza kadar kaybolacaklar</key>
+    <key alias="recycleBinWarning">Öğeler geri dönüşüm kutusundan silindiğinde bir daha geri gelmeyecek şekilde ortadan kaybolacaklar</key>
     <key alias="regexSearchError"><![CDATA[<a target='_ blank' href='http: //regexlib.com'> regexlib.com </a> 'un web hizmeti şu anda bazı sorunlar yaşıyor ve biz üzerinde kontrol yok. Bu rahatsızlıktan dolayı çok üzgünüz.]]></key>
     <key alias="regexSearchHelp">Bir form alanına doğrulama eklemek için normal ifade arayın. Örnek: 'e-posta,'posta kodu','URL'</key>
     <key alias="removeMacro">Makroyu Kaldır</key>
@@ -602,15 +608,16 @@
     <key alias="propertyHasErrors">Bu özellik geçersiz</key>
   </area>
   <area alias="general">
+    <key alias="options">Seçenekler</key>
     <key alias="about">Hakkında</key>
     <key alias="action">İşlem</key>
     <key alias="actions">İşlemler</key>
     <key alias="add">Ekle</key>
-    <key alias="alias">Takma reklam</key>
+    <key alias="alias">Takma isim</key>
     <key alias="all">Tümü</key>
     <key alias="areyousure">Emin misiniz?</key>
     <key alias="back">Geri</key>
-    <key alias="backToOverview">Genel bakışa dön</key>
+    <key alias="backToOverview">Gözden geçirmeye geri dön</key>
     <key alias="border">Kenarlık</key>
     <key alias="cancel">İptal</key>
     <key alias="cellMargin">Hücre kenar boşluğu</key>
@@ -618,14 +625,16 @@
     <key alias="clear">Temizle</key>
     <key alias="close">Kapat</key>
     <key alias="closewindow">Pencereyi Kapat</key>
+    <key alias="closepane">Pencereyi Kapat</key>
     <key alias="comment">Yorum</key>
-    <key alias="confirm">Onayla</key>
+    <key alias="confirm">Doğrula</key>
     <key alias="constrain">Sınırla</key>
     <key alias="constrainProportions">Oranları sınırlayın</key>
     <key alias="content">İçerik</key>
     <key alias="continue">Devam et</key>
     <key alias="copy">Kopyala</key>
     <key alias="create">Oluştur</key>
+    <key alias="cropSection">Bölümü kırp</key>
     <key alias="database">Veritabanı</key>
     <key alias="date">Tarih</key>
     <key alias="default">Varsayılan</key>
@@ -635,7 +644,7 @@
     <key alias="design">Tasarım</key>
     <key alias="dictionary">Sözlük</key>
     <key alias="dimensions">Boyutlar</key>
-    <key alias="discard">Sil</key>
+    <key alias="discard">Gözden çıkar</key>
     <key alias="down">Aşağı</key>
     <key alias="download">İndir</key>
     <key alias="edit">Düzenle</key>
@@ -648,6 +657,7 @@
     <key alias="first">İlk</key>
     <key alias="focalPoint">Odak noktası</key>
     <key alias="general">Genel</key>
+    <key alias="generic">Genel</key>
     <key alias="groups">Gruplar</key>
     <key alias="group">Grup</key>
     <key alias="height">Yükseklik</key>
@@ -655,7 +665,7 @@
     <key alias="hide">Gizle</key>
     <key alias="history">Geçmiş</key>
     <key alias="icon">Simge</key>
-    <key alias="id">Kimlik</key>
+    <key alias="id">Belirleyici Numara</key>
     <key alias="import">İçe Aktar</key>
     <key alias="excludeFromSubFolders">Yalnızca bu klasörü ara</key>
     <key alias="info">Bilgi</key>
@@ -686,7 +696,6 @@
     <key alias="off">Kapalı</key>
     <key alias="ok">Tamam</key>
     <key alias="open">Aç</key>
-    <key alias="options">Seçenekler</key>
     <key alias="on">Açık</key>
     <key alias="or">veya</key>
     <key alias="orderBy">Sıralama ölçütü</key>
@@ -848,12 +857,12 @@
               Umbraco'yu çalıştırmaya ve paketleri kurmaya hazırsınız!]]>
     </key>
     <key alias="permissionsResolveFolderIssues">Klasör sorununu çözme</key>
-    <key alias="permissionsResolveFolderIssuesLink">ASP.NET ile ilgili sorunlar ve klasör oluşturma hakkında daha fazla bilgi için bu bağlantıyı izleyin</key>
+    <key alias="permissionsResolveFolderIssuesLink">ASP.NET ile ilgili sorunlar ve klasör oluşturma hakkında daha fazla bilgi için bu bağlantıyı takip edin</key>
     <key alias="permissionsSettingUpPermissions">Klasör izinlerini ayarlama</key>
     <key alias="permissionsText">
       <![CDATA[
       Resimler ve PDF'ler gibi dosyaları depolamak için Umbraco'nun belirli dizinlere yazma / değiştirme erişimine ihtiyacı vardır.
-      Ayrıca, web sitenizin performansını artırmak için geçici verileri (aka: önbellek) depolar.
+      Ayrıca, web sitenizin performansını artırmak için geçici verileri önbellekte tutar.
     ]]>
     </key>
     <key alias="runwayFromScratch">Sıfırdan başlamak istiyorum</key>
@@ -889,12 +898,12 @@
       ]]>
     </key>
     <key alias="runwayWhatIsRunway">Runway Nedir</key>
-    <key alias="step1">Adım 1/5 Lisansı kabul edin</key>
+    <key alias="step1">Adım 1/5 Lisansın kabulü</key>
     <key alias="step2">Adım 2/5: Veritabanı yapılandırması</key>
-    <key alias="step3">Adım 3/5: Dosya İzinlerini Doğrulama</key>
-    <key alias="step4">4. Adım: Umbraco güvenliğini kontrol edin</key>
-    <key alias="step5">Adım 5/5: Umbraco başlamanıza hazır</key>
-    <key alias="thankYou">Umbraco'yu seçtiğiniz için teşekkür ederiz</key>
+    <key alias="step3">Adım 3/5: Dosya izinlerini doğrulama</key>
+    <key alias="step4">Adım 4/5: Umbraco güvenliğinin kontrolü</key>
+    <key alias="step5">Adım 5/5: Umbraco, üzerinde çalışmaya başlamanız için hazır</key>
+    <key alias="thankYou">Umbraco'yu seçtiğiniz için teşekkürler</key>
     <key alias="theEndBrowseSite">
       <![CDATA[<h3> Yeni sitenize göz atın </h3>
 Runway'i kurdunuz, öyleyse neden yeni web sitenizin nasıl göründüğüne bakmıyorsunuz.]]>
@@ -927,31 +936,31 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="displayName">Kültür Adı</key>
   </area>
   <area alias="lockout">
-    <key alias="lockoutWillOccur">Boştaydınız ve çıkış otomatik olarak içinde gerçekleşecek</key>
+    <key alias="lockoutWillOccur">Herhangi bir işlem yapmadınız ve sistemden çıkış otomatik olarak şu belirtilen süre içinde gerçekleşecek</key>
     <key alias="renewSession">Çalışmanızı kaydetmek için şimdi yenileyin</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Mutlu Pazarlar</key>
-    <key alias="greeting1">Mutlu manik Pazartesi</key>
-    <key alias="greeting2">Mutlu salı günleri</key>
-    <key alias="greeting3">Harika Çarşamba Günleri</key>
-    <key alias="greeting4">Mutlu, gök gürültülü Perşembe</key>
-    <key alias="greeting5">Mutlu Cuma Günü</key>
-    <key alias="greeting6">Mutlu Yıllar</key>
+    <key alias="greeting0">Hoş geldiniz</key>
+    <key alias="greeting1">Hoş geldiniz</key>
+    <key alias="greeting2">Hoş geldiniz</key>
+    <key alias="greeting3">Hoş geldiniz</key>
+    <key alias="greeting4">Hoş geldiniz</key>
+    <key alias="greeting5">Hoş geldiniz</key>
+    <key alias="greeting6">Hoş geldiniz</key>
     <key alias="instruction">Aşağıda oturum açın</key>
     <key alias="signInWith">ile oturum açın</key>
     <key alias="timeout">Oturum zaman aşımına uğradı</key>
     <key alias="bottomText"><![CDATA[<p style="text-align: right;">&copy; 2015 - %0% <br /> <a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com </a> </p>]]></key>
     <key alias="forgottenPassword">Şifrenizi mi unuttunuz?</key>
-    <key alias="forgottenPasswordInstruction">Parolanızı sıfırlamak için bir bağlantıyla belirtilen adrese bir e-posta gönderilecektir</key>
-    <key alias="requestPasswordResetConfirmation">Kayıtlarımızla eşleşirse, şifre sıfırlama talimatlarını içeren bir e-posta, belirtilen adrese gönderilecektir</key>
+    <key alias="forgottenPasswordInstruction">Şifrenizi yenilemeniz için belirtilen adrese bir bağlantı bilgisi gönderilecektir</key>
+    <key alias="requestPasswordResetConfirmation">Eğer kayıtlarımızla eşleşirse, şifre yenileme talimatlarını içeren bir e-posta belirtilen adrese gönderilecektir</key>
     <key alias="showPassword">Şifreyi göster</key>
     <key alias="hidePassword">Şifreyi gizle</key>
     <key alias="returnToLogin">Giriş formuna dön</key>
     <key alias="setPasswordInstruction">Lütfen yeni bir şifre girin</key>
     <key alias="setPasswordConfirmation">Şifreniz güncellendi</key>
     <key alias="resetCodeExpired">Tıkladığınız bağlantı geçersiz veya süresi dolmuş</key>
-    <key alias="resetPasswordEmailCopySubject">Umbraco: Şifreyi Sıfırla</key>
+    <key alias="resetPasswordEmailCopySubject">Umbraco: Şifreyi Yenile</key>
     <key alias="resetPasswordEmailCopyFormat">
       <![CDATA[
         <html>
@@ -990,7 +999,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 												<tr>
 													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
 														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
-															Şifre sıfırlama istendi
+															Şifre yenileme istendi
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Umbraco arka ofisinde oturum açmak için kullanıcı adınız: <strong>%0%</strong>
@@ -1001,7 +1010,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
 																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
-																				Şifrenizi sıfırlamak için bu bağlantıyı tıklayın
+																				Şifrenizi yenilemek için bu bağlantıyı tıklayın
 																			</a>
 																		</td>
 																	</tr>
@@ -1035,38 +1044,46 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 		</html>
   ]]>
     </key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Güvenlik Kodu</key>
+    <key alias="mfaSecurityCodeMessage">Güvenlik kodunuz: %0%</key>
+    <key alias="2faTitle">Son adım</key>
+    <key alias="2faText">2-aşamalı kimlik doğrulamayı etkinleştirdiniz ve kimliğinizi doğrulamanız gerekmekte.</key>
+    <key alias="2faMultipleText">Lütfen bir tane 2-aşamalı kimlik doğrulama hizmet sağlayıcı seçin</key>
+    <key alias="2faCodeInput">Doğrulama kodu</key>
+    <key alias="2faCodeInputHelp">Lütfen doğrulama kodunu girin</key>
+    <key alias="2faInvalidCode">Geçersiz kod girildi</key>
   </area>
   <area alias="main">
-    <key alias="dashboard">Dashboard</key>
+    <key alias="dashboard">Gösterge Paneli</key>
     <key alias="sections">Bölümler</key>
     <key alias="tree">İçerik</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Yukarıdaki sayfayı seçin ...</key>
     <key alias="copyDone">%0%,%1% konumuna kopyalandı</key>
-    <key alias="copyTo">%0% belgesinin aşağıya kopyalanacağı yeri seçin</key>
+    <key alias="copyTo">%0% belgesinin kopyalanacağı yeri aşağıdan seçin</key>
     <key alias="moveDone">%0%,%1% konumuna taşındı</key>
-    <key alias="moveTo">%0% belgesinin aşağıya taşınacağı yeri seçin</key>
+    <key alias="moveTo">%0% belgesinin taşınacağı yeri aşağıdan seçin</key>
     <key alias="nodeSelected">, yeni içeriğinizin kökü olarak seçildi, aşağıdaki 'tamam'ı tıklayın.</key>
     <key alias="noNodeSelected">Henüz düğüm seçilmedi, lütfen 'tamam'ı tıklamadan önce yukarıdaki listeden bir düğüm seçin</key>
-    <key alias="notAllowedByContentType">Geçerli düğüme, türü nedeniyle seçilen düğüm altında izin verilmiyor</key>
+    <key alias="notAllowedByContentType">Geçerli düğüme, türü nedeniyle, seçilen düğüm altında izin verilmiyor</key>
     <key alias="notAllowedByPath">Geçerli düğüm, alt sayfalarından birine taşınamaz</key>
-    <key alias="notAllowedAtRoot">Geçerli düğüm kökte bulunamaz</key>
+    <key alias="notAllowedAtRoot">Geçerli düğüm kök düğüm seviyesinde bulunamaz</key>
     <key alias="notValid">1 veya daha fazla alt belge üzerinde yetersiz izniniz olduğundan işleme izin verilmiyor.</key>
-    <key alias="relateToOriginal">Kopyalanan öğeleri orijinalle ilişkilendir</key>
+    <key alias="relateToOriginal">Kopyalanan öğeleri asıl öğe ile ilişkilendir</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications"><![CDATA[<strong>%0%</strong>]]> için bildiriminizi seçin</key>
-    <key alias="notificationsSavedFor">için bildirim ayarları kaydedildi</key>
+    <key alias="notificationsSavedFor">Bildirim ayarları bu belirtilen öğe için kaydedildi</key>
     <key alias="mailBody">
       <![CDATA[
       Merhaba %0%
 
-      Bu, '%1%' görevinin size bildirilmesi için otomatik bir postadır.
-      '%2%' sayfasında gerçekleştirildi
-      '%3%' kullanıcısı tarafından
+      Bu, '%1%' görevinin '%2%' sayfasında '%3%' kullanıcısı tarafından
+      gerçekleştirildiğini bildiren
+      otomatik bir e-postadır.
 
-      Düzenlemek için http://%4%/#/content/content/edit/%5% adresine gidin.
+      Düzenleme yapmak için http://%4%/#/content/content/edit/%5% adresine gidiniz.
 
       %6%
 

@@ -1,9 +1,9 @@
-﻿using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Api.Management.Models.Entities;
+﻿using Umbraco.Cms.Api.Management.Models.Entities;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
@@ -35,14 +35,14 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
 
     protected void IgnoreUserStartNodesForDataType(Guid? dataTypeKey) => _dataTypeKey = dataTypeKey;
 
-    protected override IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
+    protected override IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)
         => UserHasRootAccess() || IgnoreUserStartNodes()
-            ? base.GetPagedRootEntities(pageNumber, pageSize, out totalItems)
+            ? base.GetPagedRootEntities(skip, take, out totalItems)
             : CalculateAccessMap(() => _userStartNodeEntitiesService.RootUserAccessEntities(ItemObjectType, UserStartNodeIds), out totalItems);
 
-    protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
+    protected override IEntitySlim[] GetPagedChildEntities(Guid parentKey, int skip, int take, out long totalItems)
     {
-        IEntitySlim[] children = base.GetPagedChildEntities(parentKey, pageNumber, pageSize, out totalItems);
+        IEntitySlim[] children = base.GetPagedChildEntities(parentKey, skip, take, out totalItems);
         return UserHasRootAccess() || IgnoreUserStartNodes()
             ? children
             : CalculateAccessMap(() => _userStartNodeEntitiesService.ChildUserAccessEntities(children, UserStartNodePaths), out totalItems);

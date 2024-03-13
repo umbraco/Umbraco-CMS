@@ -22,7 +22,7 @@ internal class SqlServerEFCoreDistributedLockingMechanism<T> : IDistributedLocki
     private readonly Lazy<IEFCoreScopeAccessor<T>> _scopeAccessor; // Hooray it's a circular dependency.
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="SqlServerDistributedLockingMechanism" /> class.
+    ///     Initializes a new instance of the <see cref="SqlServerEFCoreDistributedLockingMechanism{T}"/> class.
     /// </summary>
     public SqlServerEFCoreDistributedLockingMechanism(
         ILogger<SqlServerEFCoreDistributedLockingMechanism<T>> logger,

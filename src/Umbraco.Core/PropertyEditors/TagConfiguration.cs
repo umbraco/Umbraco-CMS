@@ -7,14 +7,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class TagConfiguration
 {
-    [ConfigurationField("group", "Tag group", "requiredfield", Description = "Define a tag group")]
+    [ConfigurationField("group")]
     public string Group { get; set; } = "default";
 
-    [ConfigurationField(
-        "storageType",
-        "Storage Type",
-        "views/propertyeditors/tags/tags.prevalues.html",
-        Description = "Select whether to store the tags in cache as JSON (default) or as CSV. The only benefits of storage as JSON is that you are able to have commas in a tag value")]
+    [ConfigurationField("storageType")]
     public TagsStorageType StorageType { get; set; } = TagsStorageType.Json;
 
     // not a field

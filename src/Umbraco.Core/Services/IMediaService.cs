@@ -90,9 +90,6 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="pageIndex">Page number</param>
     /// <param name="pageSize">Page size</param>
     /// <param name="totalRecords">Total records query would return without paging</param>
-    /// <param name="orderBy">Field to order by</param>
-    /// <param name="orderDirection">Direction to order by</param>
-    /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
     /// <param name="filter"></param>
     /// <param name="ordering"></param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
@@ -384,4 +381,6 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="filepath">The filesystem path to the media.</param>
     /// <returns>The size of the media.</returns>
     long GetMediaFileSize(string filepath);
+
+    Task<OperationResult> EmptyRecycleBinAsync(Guid userId);
 }

@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 ///     Provides a base class for recurring background tasks implemented as hosted services.
 /// </summary>
 /// <remarks>
-///     See: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-3.1&tabs=visual-studio#timed-background-tasks
+///     See: <see href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-3.1&amp;tabs=visual-studio#timed-background-tasks"/>.
 /// </remarks>
 public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
 {
@@ -107,7 +107,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     }
 
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken cancellationToken)
+    public virtual Task StartAsync(CancellationToken cancellationToken)
     {
         using (!ExecutionContext.IsFlowSuppressed() ? (IDisposable)ExecutionContext.SuppressFlow() : null)
         {
@@ -118,7 +118,7 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     }
 
     /// <inheritdoc />
-    public Task StopAsync(CancellationToken cancellationToken)
+    public virtual Task StopAsync(CancellationToken cancellationToken)
     {
         _period = Timeout.InfiniteTimeSpan;
         _timer?.Change(Timeout.Infinite, 0);

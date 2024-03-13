@@ -35,6 +35,7 @@ public class TextBuilder : Builder
     ///     Initializes a new instance of the <see cref="TextBuilder" /> class with a list of models to generate
     ///     and the result of code parsing.
     /// </summary>
+    /// <param name="config">The models builder configuration.</param>
     /// <param name="typeModels">The list of models to generate.</param>
     public TextBuilder(ModelsBuilderSettings config, IList<TypeModel> typeModels)
         : base(config, typeModels)

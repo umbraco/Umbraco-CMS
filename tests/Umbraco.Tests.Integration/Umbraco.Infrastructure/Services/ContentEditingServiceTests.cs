@@ -1,11 +1,14 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -23,14 +26,21 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
-    protected override void CustomTestSetup(IUmbracoBuilder builder) =>
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
         builder.AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>();
+        // FIXME: These test NEED the System.Text.Json serializer.
+        //        When the ContextualJsonSerializer is removed, this can be removed too.
+        builder.Services.AddSingleton<IJsonSerializer, SystemTextJsonSerializer>();
+    }
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+
+    private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
     private IContentType CreateInvariantContentType(params ITemplate[] templates)
     {
@@ -117,7 +127,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        return result.Result!;
+        return result.Result.Content!;
     }
 
     private async Task<IContent> CreateVariantContent()
@@ -157,7 +167,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
-        return result.Result!;
+        return result.Result.Content!;
     }
 
     private async Task<IContentType> CreateTextPageContentTypeAsync()
@@ -181,7 +191,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
             InvariantName = rootName
         };
 
-        var root = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        var root = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result.Content!;
 
         contentType.AllowedContentTypes = new List<ContentTypeSort>
         {
@@ -192,7 +202,7 @@ public partial class ContentEditingServiceTests : UmbracoIntegrationTestWithCont
         createModel.ParentKey = root.Key;
         createModel.InvariantName = childName;
 
-        var child = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+        var child = (await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result.Content!;
         Assert.AreEqual(root.Id, child.ParentId);
 
         return (root, child);

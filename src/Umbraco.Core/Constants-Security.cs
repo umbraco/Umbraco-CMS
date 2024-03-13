@@ -77,9 +77,6 @@ public static partial class Constants
         public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
         public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
         public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
-        // FIXME: remove this in favor of BackOfficeAuthenticationType when the old backoffice auth is no longer necessary
-        public const string NewBackOfficeAuthenticationType = "NewUmbracoBackOffice";
-
         public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
 
         public const string DefaultMemberTypeAlias = "Member";

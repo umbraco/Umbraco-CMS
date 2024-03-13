@@ -38,7 +38,7 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
     private string _description;
     private string _icon;
     private int? _id;
-    private bool? _isContainer;
+    private Guid? _listView;
     private Guid? _key;
     private int? _level;
     private string _name;
@@ -94,10 +94,10 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
         set => _id = value;
     }
 
-    bool? IWithIsContainerBuilder.IsContainer
+    Guid? IWithIsContainerBuilder.ListView
     {
-        get => _isContainer;
-        set => _isContainer = value;
+        get => _listView;
+        set => _listView = value;
     }
 
     Guid? IWithKeyBuilder.Key
@@ -200,7 +200,7 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
 
     protected bool GetTrashed() => _trashed ?? false;
 
-    protected bool GetIsContainer() => _isContainer ?? false;
+    protected Guid? GetListView() => _listView;
 
     protected void BuildPropertyGroups(ContentTypeCompositionBase contentType, IEnumerable<PropertyGroup> propertyGroups)
     {

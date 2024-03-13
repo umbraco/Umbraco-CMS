@@ -15,7 +15,7 @@ public class BlockEditorData<TValue, TLayout>
     public BlockEditorData(
         string propertyEditorAlias,
         IEnumerable<ContentAndSettingsReference> references,
-        BlockValue<TLayout> blockValue)
+        TValue blockValue)
     {
         if (string.IsNullOrWhiteSpace(propertyEditorAlias))
         {
@@ -45,7 +45,7 @@ public class BlockEditorData<TValue, TLayout>
     /// <summary>
     ///     Returns the reference to the original BlockValue
     /// </summary>
-    public BlockValue<TLayout> BlockValue { get; }
+    public TValue BlockValue { get; }
 
     public List<ContentAndSettingsReference> References { get; } = new();
 }

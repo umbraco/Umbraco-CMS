@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.Serialization;
-using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 
@@ -35,6 +34,11 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
         swaggerGenOptions.UseOneOfForPolymorphism();
         swaggerGenOptions.UseAllOfForInheritance();
 
+        // Ensure all types that implements the IOpenApiDiscriminator have a $type property in the OpenApi schema with the default value (The class name) that is expected by the server
+        swaggerGenOptions.SelectDiscriminatorNameUsing(type => typeof(IOpenApiDiscriminator).IsAssignableFrom(type) ? "$type" : null);
+        swaggerGenOptions.SelectDiscriminatorValueUsing(type => typeof(IOpenApiDiscriminator).IsAssignableFrom(type) ? type.Name : null);
+
+
         swaggerGenOptions.AddSecurityDefinition(
             ManagementApiConfiguration.ApiSecurityName,
             new OpenApiSecurityScheme
@@ -48,14 +52,15 @@ public class ConfigureUmbracoManagementApiSwaggerGenOptions : IConfigureOptions<
                      AuthorizationCode = new OpenApiOAuthFlow
                      {
                          AuthorizationUrl =
-                             new Uri(Paths.BackOfficeApiAuthorizationEndpoint, UriKind.Relative),
-                         TokenUrl = new Uri(Paths.BackOfficeApiTokenEndpoint, UriKind.Relative)
+                             new Uri(Common.Security.Paths.BackOfficeApi.AuthorizationEndpoint, UriKind.Relative),
+                         TokenUrl = new Uri(Common.Security.Paths.BackOfficeApi.TokenEndpoint, UriKind.Relative)
                      }
                  }
              });
 
         // Sets Security requirement on backoffice apis
         swaggerGenOptions.OperationFilter<BackOfficeSecurityRequirementsOperationFilter>();
+        swaggerGenOptions.OperationFilter<NotificationHeaderFilter>();
+        swaggerGenOptions.SchemaFilter<RequireNonNullablePropertiesSchemaFilter>();
     }
-
 }

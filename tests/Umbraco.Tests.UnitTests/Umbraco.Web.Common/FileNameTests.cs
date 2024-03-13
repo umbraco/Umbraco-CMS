@@ -1,25 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
-using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.BackOffice.Install;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common;
 
@@ -46,45 +36,9 @@ internal class FileNameTests
 
     [Test]
     [AutoMoqData]
-    public async Task InstallViewExists(
-        [Frozen] IHostingEnvironment hostingEnvironment,
-        InstallController sut)
+    public void BackOfficeDefaultExists(BackOfficeDefaultController sut)
     {
-        Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute(It.IsAny<string>())).Returns("http://localhost/");
-        var viewResult = await sut.Index() as ViewResult;
-        var fileName = GetViewName(viewResult, Path.DirectorySeparatorChar.ToString());
-
-        var views = GetUiFiles(new[] { "umbraco", "UmbracoInstall" });
-        Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
-    }
-
-    [Test]
-    [AutoMoqData]
-    public void PreviewViewExists(PreviewController sut)
-    {
-        var viewResult = sut.Index() as ViewResult;
-        var fileName = GetViewName(viewResult);
-
-        var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
-
-        Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
-    }
-
-    [Test]
-    [AutoMoqData]
-    public async Task BackOfficeDefaultExists(
-        [Frozen] IHostingEnvironment hostingEnvironment,
-        [Frozen] ITempDataDictionary tempDataDictionary,
-        [Frozen] IRuntimeState runtimeState,
-        BackOfficeController sut)
-    {
-        Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute("/")).Returns("http://localhost/");
-        Mock.Get(hostingEnvironment).SetupGet(x => x.ApplicationVirtualPath).Returns("/");
-        Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);
-
-        sut.TempData = tempDataDictionary;
-
-        var viewResult = await sut.Default() as ViewResult;
+        var viewResult = sut.DefaultView();
         var fileName = GetViewName(viewResult);
         var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 

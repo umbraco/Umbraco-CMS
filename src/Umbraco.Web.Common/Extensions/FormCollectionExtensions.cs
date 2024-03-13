@@ -9,7 +9,7 @@ public static class FormCollectionExtensions
 {
     /// <summary>
     ///     Converts a dictionary object to a query string representation such as:
-    ///     firstname=shannon&lastname=deminick
+    ///     firstname=shannon&amp;lastname=deminick
     /// </summary>
     /// <param name="items"></param>
     /// <param name="keysToIgnore">Any keys found in this collection will be removed from the output</param>

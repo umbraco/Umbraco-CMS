@@ -399,8 +399,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             }
         }
 
-        if (content.PublishedVersionId > 0 &&
-            contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
+        if (content.PublishedState is PublishedState.Published && content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
         {
             foreach (ContentVariation v in contentVariation)
             {
@@ -718,8 +717,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             " WHERE contentKey IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node +
             " WHERE id = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2GranularPermission + " WHERE uniqueId IN (SELECT uniqueId FROM umbracoNode WHERE id = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
             "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup +
             " SET startContentId = NULL WHERE startContentId = @id",
@@ -1420,7 +1418,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// <param name="entity"></param>
     /// <param name="permission"></param>
     /// <param name="groupIds"></param>
-    public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds) =>
+    public void AssignEntityPermission(IContent entity, string permission, IEnumerable<int> groupIds) =>
         PermissionRepository.AssignEntityPermission(entity, permission, groupIds);
 
     public EntityPermissionCollection GetPermissionsForEntity(int entityId) =>

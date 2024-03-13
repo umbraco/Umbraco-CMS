@@ -1,3 +1,4 @@
+using System.Reflection;
 using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Cms.Core.Configuration;

@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="NJsonSchema" Version="10.9.0" />
+    <PackageReference Include="CommandLineParser" VersionOverride="2.9.1" />
+    <PackageReference Include="NJsonSchema" VersionOverride="10.9.0" />
   </ItemGroup>
 
   <ItemGroup>

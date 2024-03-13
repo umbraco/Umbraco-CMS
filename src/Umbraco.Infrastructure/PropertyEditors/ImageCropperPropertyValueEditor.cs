@@ -4,6 +4,7 @@
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -24,7 +25,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
 {
-    private readonly IDataTypeService _dataTypeService;
+    private readonly IDataTypeConfigurationCache _dataTypeConfigurationCache;
     private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
@@ -42,20 +43,20 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IOptionsMonitor<ContentSettings> contentSettings,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
-        IDataTypeService dataTypeService,
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
-        IFileStreamSecurityValidator fileStreamSecurityValidator)
+        IFileStreamSecurityValidator fileStreamSecurityValidator,
+        IDataTypeConfigurationCache dataTypeConfigurationCache)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         _jsonSerializer = jsonSerializer;
         _contentSettings = contentSettings.CurrentValue;
-        _dataTypeService = dataTypeService;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        _dataTypeConfigurationCache = dataTypeConfigurationCache;
         contentSettings.OnChange(x => _contentSettings = x);
 
         Validators.Add(new TemporaryFileUploadValidator(() => _contentSettings, TryParseTemporaryFileKey, TryGetTemporaryFile));
@@ -83,10 +84,10 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
             value = new ImageCropperValue { Src = val.ToString() };
         }
 
-        IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-        if (dataType?.ConfigurationObject != null)
+        var configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(property.PropertyType.DataTypeKey);
+        if (configuration is not null)
         {
-            value?.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
+            value?.ApplyConfiguration(configuration);
         }
 
         return value;
@@ -152,7 +153,10 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         if (temporaryFileKey.HasValue)
         {
             file = TryGetTemporaryFile(temporaryFileKey.Value);
-            _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey.Value, _scopeProvider);
+            if (file is not null)
+            {
+                _temporaryFileService.EnlistDeleteIfScopeCompletes(temporaryFileKey.Value, _scopeProvider);
+            }
         }
 
         if (file == null) // not uploading a file
@@ -166,6 +170,11 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
                 return null; // clear
             }
 
+            if (editorImageCropperValue is not null && temporaryFileKey.HasValue)
+            {
+                // a plausible tempFile value was supplied, but could not be converted to an actual file => clear the src
+                editorImageCropperValue.Src = null;
+            }
             return _jsonSerializer.Serialize(editorImageCropperValue); // unchanged
         }
 
@@ -205,8 +214,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         }
 
         // more magic here ;-(
-        ImageCropperConfiguration? configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)
-            ?.ConfigurationAs<ImageCropperConfiguration>();
+        ImageCropperConfiguration? configuration = _dataTypeConfigurationCache.GetConfigurationAs<ImageCropperConfiguration>(propertyType.DataTypeKey);
         ImageCropperConfiguration.Crop[] crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
         return _jsonSerializer.Serialize(new { src = val, crops });

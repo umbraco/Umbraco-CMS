@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
@@ -58,6 +59,7 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
 
     [TestCase(true)]
     [TestCase(false)]
+    [LongRunning]
     public void TestScope(bool complete)
     {
         var umbracoContext = UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
@@ -69,7 +71,8 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
 
         using (var scope = ScopeProvider.CreateScope())
         {
-            ContentService.SaveAndPublish(item);
+            ContentService.Save(item);
+            ContentService.Publish(item, item.AvailableCultures.ToArray());
             scope.Complete();
         }
 
@@ -94,7 +97,8 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             item.Name = "changed";
-            ContentService.SaveAndPublish(item);
+            ContentService.Save(item);
+            ContentService.Publish(item, item.AvailableCultures.ToArray());
 
             if (complete)
             {

@@ -132,7 +132,12 @@ public enum PublishResultType : byte
     /// <summary>
     ///     The document could not be published because it has been modified by another user.
     /// </summary>
-    FailedPublishConcurrencyViolation = FailedPublish | 11,
+    FailedPublishConcurrencyViolation = FailedPublish | 13,
+
+    /// <summary>
+    ///     The document could not be published because it has unsaved changes (is dirty).
+    /// </summary>
+    FailedPublishUnsavedChanges = FailedPublish | 14,
 
     #endregion
 
