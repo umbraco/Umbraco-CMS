@@ -24,7 +24,8 @@ public class DenyLocalLoginHandler : MustSatisfyRequirementAuthorizationHandler<
 
         if (isDenied is false)
         {
-            // Now allow anonymous (RequireAuthenticatedUser() adds this requirement) - necessary for some of the endpoints (BackOfficeController.Login())
+            // AuthorizationPolicies.BackOfficeAccess policy adds this requirement by policy.RequireAuthenticatedUser()
+            // Since we want to "allow anonymous" for some endpoints (i.e. BackOfficeController.Login()), it is necessary to succeed this requirement
             IEnumerable<DenyAnonymousAuthorizationRequirement> denyAnonymousUserRequirements = context.PendingRequirements.OfType<DenyAnonymousAuthorizationRequirement>();
             foreach (DenyAnonymousAuthorizationRequirement denyAnonymousUserRequirement in denyAnonymousUserRequirements)
             {
