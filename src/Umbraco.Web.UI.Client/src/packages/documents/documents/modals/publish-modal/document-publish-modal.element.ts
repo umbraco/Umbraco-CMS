@@ -10,7 +10,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 import '../shared/document-variant-language-picker.element.js';
 
-@customElement('umb-document-variant-picker-modal')
+@customElement('umb-document-publish-modal')
 export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	UmbDocumentPublishModalData,
 	UmbDocumentPublishModalValue
