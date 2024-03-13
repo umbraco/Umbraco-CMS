@@ -99,6 +99,55 @@ namespace Umbraco.Cms.Core.Services
 
         #region Create
 
+        public PagedModel<IMember> FilterAsync(
+            Guid? memberTypeId = null,
+            string? memberGroupName = null,
+            string orderBy = "username",
+            Direction orderDirection = Direction.Ascending,
+            string? filter = null,
+            int skip = 0,
+            int take = 100)
+        {
+            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            scope.ReadLock(Constants.Locks.MemberTypes);
+            IMemberType? memberType = null;
+            if (memberTypeId is not null)
+            {
+                memberType = _memberTypeRepository.Get(memberTypeId.Value);
+            }
+
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+            scope.ReadLock(Constants.Locks.MemberTree);
+            IQuery<IMember>? query1 = memberType?.Alias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberType.Alias);
+            int.TryParse(filter, out int filterAsIntId);
+            Guid.TryParse(filter, out Guid filterAsGuid);
+
+            IEnumerable<IMember> members;
+            long totalRecords;
+            if (memberGroupName.IsNullOrWhiteSpace() is false)
+            {
+                members = _memberRepository.FindMembersInRole(memberGroupName, string.Empty);
+                if (filter is not null)
+                {
+                    members = members.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key == filterAsGuid).ToArray();
+                }
+
+                totalRecords = members.Count();
+                members = members.Skip(skip).Take(take);
+            }
+            else
+            {
+                IQuery<IMember>? query2 = filter == null ? null : Query<IMember>().Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key == filterAsGuid);
+                members = _memberRepository.GetPage(query1, pageNumber, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: true));
+            }
+
+            return new PagedModel<IMember>
+            {
+                Items = members,
+                Total = totalRecords,
+            };
+        }
+
         /// <summary>
         /// Creates an <see cref="IMember"/> object without persisting it
         /// </summary>

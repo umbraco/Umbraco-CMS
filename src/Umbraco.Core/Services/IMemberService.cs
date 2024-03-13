@@ -91,6 +91,15 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
         string? memberTypeAlias,
         string filter);
 
+    public PagedModel<IMember> FilterAsync(
+        Guid? memberTypeId = null,
+        string? memberGroupName = null,
+        string orderBy = "username",
+        Direction orderDirection = Direction.Ascending,
+        string? filter = null,
+        int skip = 0,
+        int take = 100);
+
     /// <summary>
     ///     Creates an <see cref="IMember" /> object without persisting it
     /// </summary>
