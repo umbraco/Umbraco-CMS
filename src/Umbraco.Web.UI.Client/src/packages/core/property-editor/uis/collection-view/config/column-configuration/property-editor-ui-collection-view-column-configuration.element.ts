@@ -1,11 +1,11 @@
-import type { UmbCollectionColumnConfiguration } from '../../../../../../core/collection/types.js';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, repeat, css, query } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbCollectionColumnConfiguration } from '../../../../../collection/types.js';
+import { html, customElement, property, repeat, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbInputContentTypePropertyElement } from '@umbraco-cms/backoffice/components';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-collection-view-column-configuration
@@ -21,57 +21,27 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	private _options: Array<Option> = [
-		{ value: 'sortOrder', name: this.localize.term('general_sort'), group: 'System Fields' },
-		{ value: 'updateDate', name: this.localize.term('content_updateDate'), group: 'System Fields' },
-		{ value: 'updater', name: this.localize.term('content_updatedBy'), group: 'System Fields' },
-		{ value: 'createDate', name: this.localize.term('content_createDate'), group: 'System Fields' },
-		{ value: 'owner', name: this.localize.term('content_createBy'), group: 'System Fields' },
-		{ value: 'published', name: this.localize.term('content_isPublished'), group: 'System Fields' },
-		{ value: 'contentTypeAlias', name: this.localize.term('content_documentType'), group: 'System Fields' },
-		{ value: 'email', name: this.localize.term('general_email'), group: 'System Fields' },
-		{ value: 'username', name: this.localize.term('general_username'), group: 'System Fields' },
-		/*
-		{ value: 'contentTreePicker', name: 'contentTreePicker', group: 'Custom Fields' },
-		{ value: 'ete', name: 'ete', group: 'Custom Fields' },
-		{ value: 'link', name: 'link', group: 'Custom Fields' },
-		{ value: 'listViewContent', name: 'listViewContent', group: 'Custom Fields' },
-		{ value: 'mediaTreepicker', name: 'mediaTreepicker', group: 'Custom Fields' },
-		{ value: 'memberTreepicker', name: 'memberTreepicker', group: 'Custom Fields' },
-		{ value: 'multinode', name: 'multinode', group: 'Custom Fields' },
-		{ value: 'richtext', name: 'richtext', group: 'Custom Fields' },
-		{ value: 'text', name: 'text', group: 'Custom Fields' },
-		{ value: 'umbracoBytes', name: 'umbracoBytes', group: 'Custom Fields' },
-		{ value: 'umbracoExtension', name: 'umbracoExtension', group: 'Custom Fields' },
-		{ value: 'umbracoFile', name: 'umbracoFile', group: 'Custom Fields' },
-		{ value: 'umbracoHeight', name: 'umbracoHeight', group: 'Custom Fields' },
-		{ value: 'umbracoMemberComments', name: 'umbracoMemberComments', group: 'Custom Fields' },
-		{ value: 'umbracoWidth', name: 'umbracoWidth', group: 'Custom Fields' },
-		{ value: 'uploadAFile', name: 'uploadAFile', group: 'Custom Fields' },
-		{ value: 'uploader', name: 'uploader', group: 'Custom Fields' },
-		*/
-	];
+	@state()
+	private _field?: UmbInputContentTypePropertyElement['selectedProperty'];
 
-	@query('uui-select')
-	private _selectEl!: UUISelectElement;
+	#onChange(e: CustomEvent) {
+		const element = e.target as UmbInputContentTypePropertyElement;
 
-	#onAdd() {
-		const selected = this._options.find((config) => config.value === this._selectEl.value);
-		if (!selected) return;
+		if (!element.selectedProperty) return;
 
-		const duplicate = this.value.find((config) => selected?.value === config.alias);
+		this._field = element.selectedProperty;
+
+		const duplicate = this.value.find((config) => this._field?.alias === config.alias);
 
 		if (duplicate) {
-			this._selectEl.error = true;
+			// TODO: Show error to user, can not add duplicate field/column. [LK]
 			return;
-		} else {
-			this._selectEl.error = false;
 		}
 
 		const config: UmbCollectionColumnConfiguration = {
-			alias: selected.value,
-			header: selected.name,
-			isSystem: selected?.group === 'System Fields' ? 1 : 0,
+			alias: this._field.alias,
+			header: this._field.label,
+			isSystem: this._field.isSystem ? 1 : 0,
 		};
 
 		this.value = [...this.value, config];
@@ -81,9 +51,11 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 
 	#onRemove(unique: string) {
 		const newValue: Array<UmbCollectionColumnConfiguration> = [];
+
 		this.value.forEach((config) => {
 			if (config.alias !== unique) newValue.push(config);
 		});
+
 		this.value = newValue;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
@@ -93,6 +65,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 			(config): UmbCollectionColumnConfiguration =>
 				config.alias === configuration.alias ? { ...config, header: e.target.value as string } : config,
 		);
+
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -101,49 +74,57 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 			(config): UmbCollectionColumnConfiguration =>
 				config.alias === configuration.alias ? { ...config, nameTemplate: e.target.value as string } : config,
 		);
+
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<div>
-				<uui-select .options=${this._options} label="Select"></uui-select>
-				<uui-button label=${this.localize.term('general_add')} look="secondary" @click=${this.#onAdd}></uui-button>
-			</div>
-			${this.#renderTable()}`;
+		return html`
+			${this.#renderTable()}
+
+			<umb-input-content-type-property
+				document-types
+				media-types
+				@change=${this.#onChange}></umb-input-content-type-property>
+		`;
 	}
 
 	#renderTable() {
-		if (this.value && !this.value.length) return;
-		return html`<uui-table>
-			<uui-table-row>
-				<uui-table-head-cell style="width:0"></uui-table-head-cell>
-				<uui-table-head-cell>Alias</uui-table-head-cell>
-				<uui-table-head-cell>Header</uui-table-head-cell>
-				<uui-table-head-cell>Template</uui-table-head-cell>
-				<uui-table-head-cell style="width:0"></uui-table-head-cell>
-			</uui-table-row>
-			${repeat(
-				this.value,
-				(configuration) => configuration.alias,
-				(configuration) =>
-					html`<uui-table-row>
-						<uui-table-cell><uui-icon name="icon-navigation"></uui-icon></uui-table-cell>
-						${configuration.isSystem === 1
-							? this.#renderSystemFieldRow(configuration)
-							: this.#renderCustomFieldRow(configuration)}
-						<uui-table-cell>
-							<uui-button label="delete" look="secondary" @click=${() => this.#onRemove(configuration.alias)}
-								>Remove</uui-button
-							>
-						</uui-table-cell>
-					</uui-table-row>`,
-			)}
-		</uui-table>`;
+		if (!this.value?.length) return;
+		return html`
+			<uui-table>
+				<uui-table-row>
+					<uui-table-head-cell style="width:0"></uui-table-head-cell>
+					<uui-table-head-cell>Alias</uui-table-head-cell>
+					<uui-table-head-cell>Header</uui-table-head-cell>
+					<uui-table-head-cell>Template</uui-table-head-cell>
+					<uui-table-head-cell style="width:0"></uui-table-head-cell>
+				</uui-table-row>
+				${repeat(
+					this.value,
+					(configuration) => configuration.alias,
+					(configuration) => html`
+						<uui-table-row>
+							<uui-table-cell><uui-icon name="icon-navigation"></uui-icon></uui-table-cell>
+							${configuration.isSystem === 1
+								? this.#renderSystemFieldRow(configuration)
+								: this.#renderCustomFieldRow(configuration)}
+							<uui-table-cell>
+								<uui-button
+									label=${this.localize.term('general_remove')}
+									look="secondary"
+									@click=${() => this.#onRemove(configuration.alias)}></uui-button>
+							</uui-table-cell>
+						</uui-table-row>
+					`,
+				)}
+			</uui-table>
+		`;
 	}
 
 	#renderSystemFieldRow(configuration: UmbCollectionColumnConfiguration) {
 		return html`
-			<uui-table-cell><strong>${configuration.alias}</strong><small>(system field)</small></uui-table-cell>
+			<uui-table-cell><strong>${configuration.alias}</strong> <small>(system field)</small></uui-table-cell>
 			<uui-table-cell>${configuration.header}</uui-table-cell>
 			<uui-table-cell></uui-table-cell>
 		`;
@@ -169,11 +150,13 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	}
 
 	static styles = [
-		UmbTextStyles,
 		css`
-			strong {
-				display: block;
+			:host {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-1);
 			}
+
 			uui-input {
 				width: 100%;
 			}
