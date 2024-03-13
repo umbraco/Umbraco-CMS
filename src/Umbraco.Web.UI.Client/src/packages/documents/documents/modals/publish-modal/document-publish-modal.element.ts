@@ -1,6 +1,6 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
 import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
-import { css, customElement, html, nothing, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
@@ -71,28 +71,18 @@ export class UmbDocumentPublishModalElement extends UmbModalBaseElement<
 	render() {
 		return html`<umb-body-layout headline=${this.localize.term('content_readyToPublish')}>
 			<p id="subtitle">
-				${this.localize.term(
-					this.data?.allowScheduledPublish ? 'content_languagesToSchedule' : 'content_variantsToPublish',
-				)}
+				<umb-localize key="content_variantsToPublish">Which variants would you like to publish?</umb-localize>
 			</p>
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
 				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
 
-			${when(
-				this.data?.allowScheduledPublish,
-				() => html`This is a scheduled publish`,
-				() => nothing,
-			)}
-
-			<p>${this.localize.term('content_variantsWillBeSaved')}</p>
+			<p><umb-localize key="content_variantsWillBeSaved">All new variants will be saved.</umb-localize></p>
 
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
-					label="${this.localize.term(
-						this.data?.allowScheduledPublish ? 'buttons_schedulePublish' : 'buttons_saveAndPublish',
-					)}"
+					label="${this.localize.term('buttons_saveAndPublish')}"
 					look="primary"
 					color="positive"
 					@click=${this.#submit}></uui-button>

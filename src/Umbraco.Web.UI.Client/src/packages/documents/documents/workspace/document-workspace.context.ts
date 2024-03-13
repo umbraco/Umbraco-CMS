@@ -461,12 +461,11 @@ export class UmbDocumentWorkspaceContext
 		return selectedVariants;
 	}
 
-	async #handleSaveAndPublish(allowScheduledPublish?: boolean) {
+	async #handleSaveAndPublish() {
 		const unique = this.getUnique();
 		if (!unique) throw new Error('Unique is missing');
 
 		let variantIds: Array<UmbVariantId> = [];
-		let schedule: ScheduleRequestModel | undefined = undefined;
 
 		const { options, selected } = await this.#determineVariantOptions();
 
@@ -483,7 +482,6 @@ export class UmbDocumentWorkspaceContext
 				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
 					data: {
 						options,
-						allowScheduledPublish: allowScheduledPublish ?? false,
 					},
 					value: { selection: selected },
 				})
@@ -493,11 +491,10 @@ export class UmbDocumentWorkspaceContext
 			if (!result?.selection.length || !unique) return;
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
-			schedule = result.schedule;
 		}
 
 		const variants = await this.#performSaveOrCreate(variantIds);
-		await this.publishingRepository.publish(unique, variants, schedule);
+		await this.publishingRepository.publish(unique, variants);
 		this.workspaceComplete(this.#currentData.getValue());
 	}
 
@@ -550,7 +547,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	saveAndSchedule() {
-		return this.#handleSaveAndPublish(true);
+		return this.#handleSaveAndPublish();
 	}
 
 	public async unpublish() {
