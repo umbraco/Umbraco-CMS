@@ -68,7 +68,7 @@ test.describe('User Group tests', () => {
     expect(userGroupData.fallbackPermissions).toContain('Umb.Document.Read');
   });
 
-  test('can delete a user group', async ({page, umbracoApi, umbracoUi}) => {
+  test('can delete a user group', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.userGroup.createSimpleUserGroup(userGroupName);
 
@@ -124,7 +124,7 @@ test.describe('User Group tests', () => {
     await umbracoUi.userGroup.doesUserGroupHaveSection(userGroupName, 'Media');
   });
 
-  test('can remove a section from a user group', async ({page, umbracoApi, umbracoUi}) => {
+  test('can remove a section from a user group', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.userGroup.createSimpleUserGroup(userGroupName);
 
@@ -141,7 +141,6 @@ test.describe('User Group tests', () => {
     const userGroupData = await umbracoApi.userGroup.getByName(userGroupName);
     expect(userGroupData.sections).toEqual([])
   });
-
 
   // TODO: Create test after the content builder is available
   test.skip('can add a content start node to a user group', async ({page, umbracoApi, umbracoUi}) => {
@@ -173,8 +172,7 @@ test.describe('User Group tests', () => {
     await page.pause()
   });
 
-
-  test('can enable all permissions for a user group', async ({page, umbracoApi, umbracoUi}) => {
+  test('can enable all permissions for a user group', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.userGroup.createEmptyUserGroup(userGroupName);
     const allPermissions = [
@@ -193,7 +191,7 @@ test.describe('User Group tests', () => {
       'Umb.Document.CultureAndHostnames',
       'Umb.Document.PublicAccess',
       'Umb.Document.Rollback'
-    ]
+    ];
 
     // Act
     await umbracoUi.userGroup.clickUserGroupsTabButton();
