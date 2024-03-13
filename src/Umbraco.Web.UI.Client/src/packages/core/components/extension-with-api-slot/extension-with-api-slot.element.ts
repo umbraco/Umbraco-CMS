@@ -161,6 +161,7 @@ export class UmbExtensionWithApiSlotElement extends UmbLitElement {
 				undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 				this.defaultElement,
 			);
+			this.#extensionsController.apiProperties = this.#apiProps;
 			this.#extensionsController.elementProperties = this.#elProps;
 		}
 	}

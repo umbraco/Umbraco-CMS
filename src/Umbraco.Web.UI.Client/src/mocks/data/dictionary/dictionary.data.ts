@@ -5,12 +5,10 @@ import type {
 	NamedEntityTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockDictionaryModelHack = DictionaryItemResponseModel &
+export type UmbMockDictionaryModel = DictionaryItemResponseModel &
 	NamedEntityTreeItemResponseModel &
 	DictionaryItemItemResponseModel &
 	DictionaryOverviewResponseModel;
-
-export interface UmbMockDictionaryModel extends Omit<UmbMockDictionaryModelHack, 'type'> {}
 
 export const data: Array<UmbMockDictionaryModel> = [
 	{
