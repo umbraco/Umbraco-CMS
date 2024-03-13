@@ -33,7 +33,11 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` <umb-workspace-editor headline="Log Viewer" .enforceNoFooter=${true}> </umb-workspace-editor> `;
+		return html`
+			<umb-workspace-editor
+				headline=${this.localize.term('treeHeaders_logViewer')}
+				.enforceNoFooter=${true}></umb-workspace-editor>
+		`;
 	}
 
 	static styles = [

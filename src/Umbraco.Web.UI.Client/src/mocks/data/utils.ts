@@ -7,7 +7,6 @@ import type {
 export const createEntityTreeItem = (item: any): NamedEntityTreeItemResponseModel => {
 	return {
 		name: item.name,
-		type: item.type,
 		hasChildren: item.hasChildren,
 		id: item.id,
 		parent: item.parent,
@@ -21,7 +20,7 @@ export const folderTreeItemMapper = (item: any): FolderTreeItemResponseModel => 
 	};
 };
 
-export const createFileSystemTreeItem = (item: any): Omit<FileSystemTreeItemPresentationModel, 'type'> => {
+export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentationModel => {
 	return {
 		path: item.path,
 		parent: item.parent ?? null,
