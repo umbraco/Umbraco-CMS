@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -17,6 +18,7 @@ public class VerifyResetPasswordTokenController : SecurityControllerBase
 
     public VerifyResetPasswordTokenController(IUserService userService) => _userService = userService;
 
+    [AllowAnonymous]
     [HttpPost("forgot-password/verify")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
