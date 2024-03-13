@@ -45,14 +45,11 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		this.#groupStructureHelper.setIsRoot(value);
 	}
 
-	private _ownerTabId?: string | null;
 	@property({ type: String })
-	public get ownerTabId(): string | null | undefined {
-		return this._ownerTabId;
+	public get containerId(): string | null | undefined {
+		return this.#groupStructureHelper.getParentId();
 	}
-	public set ownerTabId(value: string | null | undefined) {
-		if (value === this._ownerTabId) return;
-		this._ownerTabId = value;
+	public set containerId(value: string | null | undefined) {
 		this.#groupStructureHelper.setParentId(value);
 	}
 
@@ -71,8 +68,6 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 
 	constructor() {
 		super();
-
-		this.#groupStructureHelper.setParentType('Tab');
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#blockWorkspace = workspaceContext;
