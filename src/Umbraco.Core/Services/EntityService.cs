@@ -303,6 +303,20 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    public IEnumerable<IEntitySlim> GetChildren(Guid? key, UmbracoObjectTypes objectType)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        if (ResolveKey(key, objectType, out int parentId) is false)
+        {
+            return Enumerable.Empty<IEntitySlim>();
+        }
+
+        IEnumerable<IEntitySlim> children = GetChildren(parentId, objectType);
+
+        return children;
+    }
+
     /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetDescendants(int id)
     {
@@ -344,6 +358,38 @@ public class EntityService : RepositoryService, IEntityService
         Ordering? ordering = null)
         => GetPagedChildren(id, objectType, pageIndex, pageSize, false, filter, ordering, out totalRecords);
 
+    public IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? key,
+        UmbracoObjectTypes objectType,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        if (ResolveKey(key, objectType, out int parentId) is false)
+        {
+            totalRecords = 0;
+            return Enumerable.Empty<IEntitySlim>();
+        }
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        IEnumerable<IEntitySlim> children = GetPagedChildren(
+            parentId,
+            objectType,
+            pageNumber,
+            pageSize,
+            out totalRecords,
+            filter,
+            ordering);
+
+        scope.Complete();
+        return children;
+    }
+
     /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedTrashedChildren(
         int id,
@@ -354,6 +400,39 @@ public class EntityService : RepositoryService, IEntityService
         IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null)
         => GetPagedChildren(id, objectType, pageIndex, pageSize, true, filter, ordering, out totalRecords);
+
+    IEnumerable<IEntitySlim> GetPagedTrashedChildren(
+        Guid? key,
+        UmbracoObjectTypes objectType,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        if (ResolveKey(key, objectType, out int parentId) is false)
+        {
+            totalRecords = 0;
+            return Enumerable.Empty<IEntitySlim>();
+        }
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        IEnumerable<IEntitySlim> children = GetPagedChildren(
+            parentId,
+            objectType,
+            pageNumber,
+            pageSize,
+            true,
+            filter,
+            ordering,
+            out totalRecords);
+
+        scope.Complete();
+        return children;
+    }
 
     /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetPagedDescendants(
@@ -556,6 +635,35 @@ public class EntityService : RepositoryService, IEntityService
 
             return _entityRepository.CountByQuery(query, objectType.GetGuid(), filter);
         }
+    }
+
+    public int CountChildren(Guid? key, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        if (ResolveKey(key, objectType, out var parentId) is false)
+        {
+            return 0;
+        }
+
+        var count = CountChildren(parentId, objectType, filter);
+
+        scope.Complete();
+        return count;
+    }
+
+    private bool ResolveKey(Guid? key, UmbracoObjectTypes objectType, out int id)
+    {
+        // We have to explicitly check for "root key" since this value is null, and GetId does not accept null.
+        if (key == Constants.System.RootKey)
+        {
+            id = Constants.System.Root;
+            return true;
+        }
+
+        Attempt<int> parentIdAttempt = GetId(key!.Value, objectType);
+        id = parentIdAttempt.Result;
+        return parentIdAttempt.Success;
     }
 
     // gets the object type, throws if not supported
