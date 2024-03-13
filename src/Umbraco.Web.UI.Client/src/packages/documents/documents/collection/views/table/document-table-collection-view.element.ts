@@ -1,11 +1,11 @@
 import { getPropertyValueByAlias } from '../index.js';
 import type { UmbCollectionColumnConfiguration } from '../../../../../core/collection/types.js';
-import type { UmbDocumentCollectionFilterModel, UmbDocumentCollectionItemModel } from '../../types.js';
+import type { UmbDocumentCollectionItemModel } from '../../types.js';
+import type { UmbDocumentCollectionContext } from '../../document-collection.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -62,7 +62,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _skip: number = 0;
 
-	#collectionContext?: UmbDefaultCollectionContext<UmbDocumentCollectionItemModel, UmbDocumentCollectionFilterModel>;
+	#collectionContext?: UmbDocumentCollectionContext;
 
 	constructor() {
 		super();
