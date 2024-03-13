@@ -235,6 +235,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				margin-top: var(--uui-size-layout-1);
 			}
 
+			uui-box,
 			umb-content-type-design-editor-group {
 				margin-bottom: var(--uui-size-layout-1);
 			}
