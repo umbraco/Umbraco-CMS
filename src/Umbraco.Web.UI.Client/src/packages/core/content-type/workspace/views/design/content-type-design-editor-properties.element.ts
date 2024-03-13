@@ -1,6 +1,7 @@
-import './content-type-workspace-view-edit-property.element.js';
+import './content-type-design-editor-property.element.js';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
-import type { UmbContentTypeWorkspacePropertyElement } from './content-type-workspace-view-edit-property.element.js';
+import type { UmbContentTypeDesignEditorPropertyElement } from './content-type-design-editor-property.element.js';
+import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -20,7 +21,7 @@ import {
 	UMB_WORKSPACE_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
-const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeWorkspacePropertyElement> = {
+const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement> = {
 	getUniqueOfElement: (element) => {
 		return element.getAttribute('data-umb-property-id');
 	},
@@ -28,7 +29,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeWorkspa
 		return modelEntry.id;
 	},
 	identifier: 'content-type-property-sorter',
-	itemSelector: 'umb-content-type-workspace-view-edit-property',
+	itemSelector: 'umb-content-type-design-editor-property',
 	//disabledItemSelector: '[inherited]',
 	//TODO: Set the property list (sorter wrapper) to inherited, if its inherited
 	// This is because we don't want to move local properties into an inherited group container.
@@ -37,9 +38,9 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeWorkspa
 	containerSelector: '#property-list',
 };
 
-@customElement('umb-content-type-workspace-view-edit-properties')
-export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	#sorter = new UmbSorterController<UmbPropertyTypeModel, UmbContentTypeWorkspacePropertyElement>(this, {
+@customElement('umb-content-type-design-editor-properties')
+export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
+	#sorter = new UmbSorterController<UmbPropertyTypeModel, UmbContentTypeDesignEditorPropertyElement>(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
 			this._propertyStructure = model;
@@ -69,7 +70,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			}
 
 			// increase the prevSortOrder and use it for the moved item,
-			this._propertyStructureHelper.partialUpdateProperty(item.id, {
+			this.#propertyStructureHelper.partialUpdateProperty(item.id, {
 				sortOrder: ++prevSortOrder,
 			});
 
@@ -79,7 +80,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			// As long as there is an item with the index & the sortOrder is less or equal to the prevSortOrder, we will update the sortOrder:
 			while ((entry = model[i]) !== undefined && entry.sortOrder <= prevSortOrder) {
 				// Increase the prevSortOrder and use it for the item:
-				this._propertyStructureHelper.partialUpdateProperty(entry.id, {
+				this.#propertyStructureHelper.partialUpdateProperty(entry.id, {
 					sortOrder: ++prevSortOrder,
 				});
 
@@ -104,24 +105,24 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 
 	@property({ type: String, attribute: 'container-name', reflect: false })
 	public get containerName(): string | undefined {
-		return this._propertyStructureHelper.getContainerName();
+		return this.#propertyStructureHelper.getContainerName();
 	}
 	public set containerName(value: string | undefined) {
-		this._propertyStructureHelper.setContainerName(value);
+		this.#propertyStructureHelper.setContainerName(value);
 	}
 
 	@property({ type: String, attribute: 'container-type', reflect: false })
 	public get containerType(): UmbPropertyContainerTypes | undefined {
-		return this._propertyStructureHelper.getContainerType();
+		return this.#propertyStructureHelper.getContainerType();
 	}
 	public set containerType(value: UmbPropertyContainerTypes | undefined) {
-		this._propertyStructureHelper.setContainerType(value);
+		this.#propertyStructureHelper.setContainerType(value);
 	}
 
 	#addPropertyModal: UmbModalRouteRegistrationController;
 	#workspaceModal?: UmbModalRouteRegistrationController;
 
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
+	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbContentTypeModel>(this);
 
 	@state()
 	private _propertyStructure: Array<UmbPropertyTypeModel> = [];
@@ -143,8 +144,23 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 
 		this.#sorter.disable();
 
+		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
+			this.observe(
+				context.isSorting,
+				(isSorting) => {
+					this._sortModeActive = isSorting;
+					if (isSorting) {
+						this.#sorter.enable();
+					} else {
+						this.#sorter.disable();
+					}
+				},
+				'_observeIsSorting',
+			);
+		});
+
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
-			this._propertyStructureHelper.setStructureManager(workspaceContext.structure);
+			this.#propertyStructureHelper.setStructureManager(workspaceContext.structure);
 
 			const entityType = workspaceContext.getEntityType();
 
@@ -158,18 +174,6 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 					this._editContentTypePath = routeBuilder({});
 				});
 
-			this.observe(
-				workspaceContext.isSorting,
-				(isSorting) => {
-					this._sortModeActive = isSorting;
-					if (isSorting) {
-						this.#sorter.enable();
-					} else {
-						this.#sorter.disable();
-					}
-				},
-				'_observeIsSorting',
-			);
 			const docTypeObservable = workspaceContext.structure.ownerContentType;
 			this.observe(
 				docTypeObservable,
@@ -179,7 +183,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 				'observeOwnerContentType',
 			);
 		});
-		this.observe(this._propertyStructureHelper.propertyStructure, (propertyStructure) => {
+		this.observe(this.#propertyStructureHelper.propertyStructure, (propertyStructure) => {
 			this._propertyStructure = propertyStructure;
 			this.#sorter.setModel(this._propertyStructure);
 		});
@@ -191,7 +195,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			.onSetup(async (params) => {
 				if (!this._ownerContentType || !this._containerId) return false;
 
-				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
+				const propertyData = await this.#propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
 				if (params.sortOrder !== undefined) {
 					let sortOrderInt = parseInt(params.sortOrder, 10);
@@ -206,7 +210,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 			.onSubmit(async (value) => {
 				if (!this._ownerContentType) return false;
 				// TODO: The model requires a data-type to be set, we cheat currently. But this should be re-though when we implement validation(As we most likely will have to com up with partial models for the runtime model.) [NL]
-				this._propertyStructureHelper.insertProperty(value as UmbPropertyTypeModel);
+				this.#propertyStructureHelper.insertProperty(value as UmbPropertyTypeModel);
 				return true;
 			})
 			.observeRouteBuilder((routeBuilder) => {
@@ -223,16 +227,16 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 							(property) => property.id,
 							(property) => {
 								return html`
-									<umb-content-type-workspace-view-edit-property
+									<umb-content-type-design-editor-property
 										data-umb-property-id=${property.id}
 										owner-content-type-id=${ifDefined(this._ownerContentType!.unique)}
 										owner-content-type-name=${ifDefined(this._ownerContentType!.name)}
 										.editContentTypePath=${this._editContentTypePath}
 										?inherited=${property.container?.id !== this.containerId}
 										?sort-mode-active=${this._sortModeActive}
-										.propertyStructureHelper=${this._propertyStructureHelper}
+										.propertyStructureHelper=${this.#propertyStructureHelper}
 										.property=${property}>
-									</umb-content-type-workspace-view-edit-property>
+									</umb-content-type-design-editor-property>
 								`;
 							},
 						)}
@@ -258,7 +262,7 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 				width: 100%;
 			}
 
-			#property-list[sort-mode-active]:not(:has(umb-content-type-workspace-view-edit-property)) {
+			#property-list[sort-mode-active]:not(:has(umb-content-type-design-editor-property)) {
 				/* Some height so that the sorter can target the area if the group is empty*/
 				min-height: var(--uui-size-layout-1);
 			}
@@ -266,10 +270,10 @@ export class UmbContentTypeWorkspaceViewEditPropertiesElement extends UmbLitElem
 	];
 }
 
-export default UmbContentTypeWorkspaceViewEditPropertiesElement;
+export default UmbContentTypeDesignEditorPropertiesElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-content-type-workspace-view-edit-properties': UmbContentTypeWorkspaceViewEditPropertiesElement;
+		'umb-content-type-design-editor-properties': UmbContentTypeDesignEditorPropertiesElement;
 	}
 }

@@ -7,9 +7,9 @@ import type {
 	UmbPropertyTypeContainerModel,
 } from '@umbraco-cms/backoffice/content-type';
 
-import './content-type-workspace-view-edit-properties.element.js';
+import './content-type-design-editor-properties.element.js';
 
-@customElement('umb-content-type-workspace-view-edit-group')
+@customElement('umb-content-type-design-editor-group')
 export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	//private _ownerGroupId?: string | null;
 
@@ -130,10 +130,10 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			? html`
 					<uui-box>
 						${this.#renderContainerHeader()}
-						<umb-content-type-workspace-view-edit-properties
+						<umb-content-type-design-editor-properties
 							container-id=${this.group!.id}
 							container-type="Group"
-							container-name=${this.group?.name ?? ''}></umb-content-type-workspace-view-edit-properties>
+							container-name=${this.group?.name ?? ''}></umb-content-type-design-editor-properties>
 					</uui-box>
 				`
 			: '';
@@ -210,6 +210,6 @@ export default UmbContentTypeWorkspaceViewEditGroupElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-content-type-workspace-view-edit-group': UmbContentTypeWorkspaceViewEditGroupElement;
+		'umb-content-type-design-editor-group': UmbContentTypeWorkspaceViewEditGroupElement;
 	}
 }

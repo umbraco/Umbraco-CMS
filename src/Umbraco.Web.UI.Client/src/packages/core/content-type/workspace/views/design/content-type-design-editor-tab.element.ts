@@ -1,5 +1,6 @@
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '../../content-type-workspace.context-token.js';
-import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-workspace-view-edit-group.element.js';
+import type { UmbContentTypeWorkspaceViewEditGroupElement } from './content-type-design-editor-group.element.js';
+import { UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT } from './content-type-design-editor.context.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import {
@@ -8,8 +9,8 @@ import {
 	type UmbPropertyTypeContainerModel,
 } from '@umbraco-cms/backoffice/content-type';
 
-import './content-type-workspace-view-edit-properties.element.js';
-import './content-type-workspace-view-edit-group.element.js';
+import './content-type-design-editor-properties.element.js';
+import './content-type-design-editor-group.element.js';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditGroupElement> = {
@@ -20,8 +21,8 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerModel, UmbContentTy
 	containerSelector: '.container-list',
 };
 
-@customElement('umb-content-type-workspace-view-edit-tab')
-export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
+@customElement('umb-content-type-design-editor-tab')
+export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	#sorter = new UmbSorterController<UmbPropertyTypeContainerModel, UmbContentTypeWorkspaceViewEditGroupElement>(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
@@ -131,6 +132,8 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#groupStructureHelper.setStructureManager(context.structure);
+		});
+		this.consumeContext(UMB_CONTENT_TYPE_DESIGN_EDITOR_CONTEXT, (context) => {
 			this.observe(
 				context.isSorting,
 				(isSorting) => {
@@ -176,10 +179,10 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 			!this._noTabName
 				? html`
 						<uui-box>
-							<umb-content-type-workspace-view-edit-properties
+							<umb-content-type-design-editor-properties
 								container-id=${this.containerId!}
 								container-type="Tab"
-								container-name=${this.tabName ?? ''}></umb-content-type-workspace-view-edit-properties>
+								container-name=${this.tabName ?? ''}></umb-content-type-design-editor-properties>
 						</uui-box>
 					`
 				: ''
@@ -189,12 +192,12 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 						this._groups,
 						(group) => group.id,
 						(group) => html`
-							<umb-content-type-workspace-view-edit-group
+							<umb-content-type-design-editor-group
 								class="container-handle"
 								?sort-mode-active=${this._sortModeActive}
 								.group=${group}
 								.groupStructureHelper=${this.#groupStructureHelper}>
-							</umb-content-type-workspace-view-edit-group>
+							</umb-content-type-design-editor-group>
 						`,
 					)}
 				</div>
@@ -232,7 +235,7 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 				margin-top: var(--uui-size-layout-1);
 			}
 
-			umb-content-type-workspace-view-edit-group {
+			umb-content-type-design-editor-group {
 				margin-bottom: var(--uui-size-layout-1);
 			}
 
@@ -249,10 +252,10 @@ export class UmbContentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 	];
 }
 
-export default UmbContentTypeWorkspaceViewEditTabElement;
+export default UmbContentTypeDesignEditorTabElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-content-type-workspace-view-edit-tab': UmbContentTypeWorkspaceViewEditTabElement;
+		'umb-content-type-design-editor-tab': UmbContentTypeDesignEditorTabElement;
 	}
 }

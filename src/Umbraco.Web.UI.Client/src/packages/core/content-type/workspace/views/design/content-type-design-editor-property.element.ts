@@ -15,12 +15,12 @@ import {
 } from '@umbraco-cms/backoffice/content-type';
 
 /**
- *  @element umb-content-type-workspace-view-edit-property
+ *  @element umb-content-type-design-editor-property
  *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
  */
-@customElement('umb-content-type-workspace-view-edit-property')
-export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
+@customElement('umb-content-type-design-editor-property')
+export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 	//
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
@@ -489,6 +489,6 @@ export class UmbContentTypeWorkspacePropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-content-type-workspace-view-edit-property': UmbContentTypeWorkspacePropertyElement;
+		'umb-content-type-design-editor-property': UmbContentTypeDesignEditorPropertyElement;
 	}
 }

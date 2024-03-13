@@ -6,7 +6,11 @@ import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspa
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
+import type {
+	UmbContentTypeCompositionModel,
+	UmbContentTypeSortModel,
+	UmbContentTypeWorkspaceContext,
+} from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
@@ -16,8 +20,9 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbContentTypeWorkspaceContext<EntityType>
 {
+	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
 	//
 	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
@@ -33,6 +38,8 @@ export class UmbMediaTypeWorkspaceContext
 	readonly icon;
 
 	readonly allowedAtRoot;
+	readonly variesByCulture;
+	readonly variesBySegment;
 	readonly allowedContentTypes;
 	readonly compositions;
 	readonly collection;
@@ -52,6 +59,8 @@ export class UmbMediaTypeWorkspaceContext
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
 		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
 		this.allowedAtRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAtRoot);
+		this.variesByCulture = this.structure.ownerContentTypeObservablePart((data) => data?.variesByCulture);
+		this.variesBySegment = this.structure.ownerContentTypeObservablePart((data) => data?.variesBySegment);
 		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);

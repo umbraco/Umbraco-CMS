@@ -1,5 +1,6 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
+// TODO: Stop sending the initial selection as part of data [NL], it should just be in the value:
 export interface UmbCompositionPickerModalData {
 	selection: Array<string>;
 	unique: string;

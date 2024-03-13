@@ -15,15 +15,11 @@ export interface UmbContentTypeWorkspaceContext<ContentTypeType extends UmbConte
 	readonly allowedAtRoot: Observable<boolean | undefined>;
 	readonly variesByCulture: Observable<boolean | undefined>;
 	readonly variesBySegment: Observable<boolean | undefined>;
-	readonly isElement: Observable<boolean | undefined>;
+	//readonly isElement: Observable<boolean | undefined>;
 	readonly allowedContentTypes: Observable<UmbContentTypeSortModel[] | undefined>;
 	readonly compositions: Observable<UmbContentTypeCompositionModel[] | undefined>;
 
 	readonly structure: UmbContentTypePropertyStructureManager<ContentTypeType>;
-	readonly isSorting: Observable<boolean>;
-
-	getIsSorting(): boolean;
-	setIsSorting(isSorting: boolean): void;
 
 	setAlias(alias: string): void;
 

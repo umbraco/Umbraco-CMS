@@ -8,7 +8,7 @@ export const contentTypeDesignEditorManifest: UmbBackofficeManifestKind = {
 	manifest: {
 		type: 'workspaceView',
 		kind: 'contentTypeDesignEditor',
-		element: () => import('./content-type-workspace-view-edit.element.js'),
+		element: () => import('./content-type-design-editor.element.js'),
 		weight: 1000,
 		meta: {
 			label: 'Design',

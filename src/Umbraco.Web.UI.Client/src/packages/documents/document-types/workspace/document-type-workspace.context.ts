@@ -3,7 +3,7 @@ import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTypeDetailModel } from '../types.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	UmbContentTypeCompositionModel,
 	UmbContentTypeSortModel,
@@ -50,9 +50,6 @@ export class UmbDocumentTypeWorkspaceContext
 
 	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
-	#isSorting = new UmbBooleanState(false);
-	isSorting = this.#isSorting.asObservable();
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DocumentType');
 
@@ -79,15 +76,6 @@ export class UmbDocumentTypeWorkspaceContext
 	protected resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
-		this.#isSorting.setValue(false);
-	}
-
-	getIsSorting() {
-		return this.#isSorting.getValue();
-	}
-
-	setIsSorting(isSorting: boolean) {
-		this.#isSorting.setValue(isSorting);
 	}
 
 	getData() {
@@ -163,7 +151,6 @@ export class UmbDocumentTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.setIsSorting(false);
 		this.#persistedData.setValue(data);
 		return data;
 	}
@@ -174,7 +161,6 @@ export class UmbDocumentTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(false);
-		this.setIsSorting(false);
 		this.#persistedData.setValue(data);
 		return data;
 	}
@@ -219,7 +205,6 @@ export class UmbDocumentTypeWorkspaceContext
 	public destroy(): void {
 		this.#persistedData.destroy();
 		this.structure.destroy();
-		this.#isSorting.destroy();
 		this.repository.destroy();
 		super.destroy();
 	}
