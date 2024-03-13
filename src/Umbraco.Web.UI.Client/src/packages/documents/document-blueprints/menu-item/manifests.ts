@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../entity.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {
@@ -10,7 +11,7 @@ const menuItem: ManifestTypes = {
 		treeAlias: 'Umb.Tree.DocumentBlueprint',
 		label: 'Document Blueprints',
 		icon: 'icon-blueprint',
-		entityType: 'document-blueprint-root',
+		entityType: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
 		menus: ['Umb.Menu.Settings'],
 	},
 };
