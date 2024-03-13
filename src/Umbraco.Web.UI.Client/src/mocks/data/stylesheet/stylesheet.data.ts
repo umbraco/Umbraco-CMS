@@ -4,11 +4,9 @@ import type {
 	StylesheetResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockStylesheetModelHack = StylesheetResponseModel &
+export type UmbMockStylesheetModel = StylesheetResponseModel &
 	FileSystemTreeItemPresentationModel &
 	StylesheetItemResponseModel;
-
-export interface UmbMockStylesheetModel extends Omit<UmbMockStylesheetModelHack, 'type' | 'icon'> {}
 
 export const data: Array<UmbMockStylesheetModel> = [
 	{

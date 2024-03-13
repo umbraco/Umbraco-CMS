@@ -291,6 +291,7 @@ export type { PagedTagResponseModel } from './models/PagedTagResponseModel';
 export type { PagedTelemetryResponseModel } from './models/PagedTelemetryResponseModel';
 export type { PagedUserGroupResponseModel } from './models/PagedUserGroupResponseModel';
 export type { PagedUserResponseModel } from './models/PagedUserResponseModel';
+export type { PagedWebhookResponseModel } from './models/PagedWebhookResponseModel';
 export type { PartialViewFolderResponseModel } from './models/PartialViewFolderResponseModel';
 export type { PartialViewItemResponseModel } from './models/PartialViewItemResponseModel';
 export type { PartialViewResponseModel } from './models/PartialViewResponseModel';

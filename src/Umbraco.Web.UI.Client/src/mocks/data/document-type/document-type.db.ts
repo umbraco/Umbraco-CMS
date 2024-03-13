@@ -122,9 +122,7 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 	};
 };
 
-const documentTypeTreeItemMapper = (
-	item: UmbMockDocumentTypeModel,
-): Omit<DocumentTypeTreeItemResponseModel, 'type'> => {
+const documentTypeTreeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeTreeItemResponseModel => {
 	return {
 		name: item.name,
 		hasChildren: item.hasChildren,
