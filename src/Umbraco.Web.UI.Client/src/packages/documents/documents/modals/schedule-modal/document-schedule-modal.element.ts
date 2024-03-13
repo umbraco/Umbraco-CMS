@@ -125,12 +125,18 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 
 	#renderPublishDateInput(option: UmbDocumentVariantOptionModel) {
 		return html`<div class="publish-date">
-			<umb-input-date
-				@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
-				label=${this.localize.term('general_publishDate')}></umb-input-date>
-			<umb-input-date
-				@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
-				label=${this.localize.term('general_publishDate')}></umb-input-date>
+			<uui-form-layout-item>
+				<uui-label><umb-localize key="content_releaseDate">Publish at</umb-localize></uui-label>
+				<umb-input-date
+					@change=${(e: Event) => this.#onFromDateChange(e, option.unique)}
+					label=${this.localize.term('general_publishDate')}></umb-input-date>
+			</uui-form-layout-item>
+			<uui-form-layout-item>
+				<uui-label><umb-localize key="content_unpublishDate">Unpublish at</umb-localize></uui-label>
+				<umb-input-date
+					@change=${(e: Event) => this.#onToDateChange(e, option.unique)}
+					label=${this.localize.term('general_publishDate')}></umb-input-date>
+			</uui-form-layout-item>
 		</div>`;
 	}
 
@@ -175,7 +181,18 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				flex-direction: row;
 				justify-content: space-between;
 				gap: 1rem;
-				margin: 0.5rem 0;
+				border-top: 1px solid var(--uui-color-border);
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+
+			.publish-date > uui-form-layout-item {
+				flex: 1;
+				margin: 0;
+				padding: 0.5rem 0 1rem;
+			}
+
+			.publish-date > uui-form-layout-item:first-child {
+				border-right: 1px solid var(--uui-color-border);
 			}
 		`,
 	];
