@@ -14,7 +14,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 	#structure?: UmbContentTypePropertyStructureManager<T>;
 
-	private _parentType?: UmbPropertyContainerTypes;
+	private _parentType?: UmbPropertyContainerTypes = 'Tab';
 	private _childType?: UmbPropertyContainerTypes = 'Group';
 	private _isRoot = false;
 	/**

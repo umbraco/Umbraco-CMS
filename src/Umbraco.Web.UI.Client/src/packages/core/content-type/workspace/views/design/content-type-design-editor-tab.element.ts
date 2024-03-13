@@ -128,8 +128,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.#groupStructureHelper.setParentType('Tab');
-
 		this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, (context) => {
 			this.#groupStructureHelper.setStructureManager(context.structure);
 		});
