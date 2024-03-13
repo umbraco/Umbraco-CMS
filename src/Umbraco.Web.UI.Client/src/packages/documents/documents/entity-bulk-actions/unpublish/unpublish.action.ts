@@ -1,6 +1,5 @@
 import { UmbUnpublishDocumentEntityAction } from '../../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
-import { umbPickDocumentVariantModal } from '../../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';

@@ -1,11 +1,12 @@
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import { UmbPublishDocumentEntityAction } from '../../entity-actions/publish.action.js';
 import type { UmbDocumentVariantOptionModel } from '../../types.js';
-import { umbPickDocumentVariantModal } from '../../modals/index.js';
+import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../modals/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<object> {
 	async execute() {
@@ -30,12 +31,39 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 			segment: null,
 		}));
 
-		const selectedVariants = await umbPickDocumentVariantModal(this, { type: 'publish', options });
+		// Figure out the default selections
+		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
+		const selection: Array<string> = [];
+		const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		const appCulture = context.getAppCulture();
+		// If the app language is one of the options, select it by default:
+		if (appCulture && options.some((o) => o.unique === appCulture)) {
+			selection.push(new UmbVariantId(appCulture, null).toString());
+		}
+
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const result = await modalManagerContext
+			.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+				data: {
+					options,
+				},
+				value: { selection },
+			})
+			.onSubmit()
+			.catch(() => undefined);
+
+		if (!result?.selection.length) return;
+
+		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+
 		const repository = new UmbDocumentPublishingRepository(this._host);
 
-		if (selectedVariants.length) {
+		if (variantIds.length) {
 			for (const unique of this.selection) {
-				await repository.publish(unique, selectedVariants);
+				await repository.publish(
+					unique,
+					variantIds.map((variantId) => ({ variantId })),
+				);
 			}
 		}
 	}
