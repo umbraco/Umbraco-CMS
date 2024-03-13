@@ -192,7 +192,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 			}
 
 			.publish-date > uui-form-layout-item:first-child {
-				border-right: 1px solid var(--uui-color-border);
+				border-right: 1px dashed var(--uui-color-border);
 			}
 		`,
 	];
