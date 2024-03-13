@@ -187,7 +187,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				<div class="container-list" ?sort-mode-active=${this._sortModeActive}>
 					${repeat(
 						this._groups,
-						(group) => group.id,
+						(group) => group.id + '_' + group.name,
 						(group) => html`
 							<umb-content-type-design-editor-group
 								class="container-handle"
