@@ -1,19 +1,15 @@
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../modals/publish-modal/index.js';
 import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import type { UmbEntityActionArgs } from '@umbraco-cms/backoffice/entity-action';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export type UmbPublishDocumentEntityActionMeta = {
-	allowScheduledPublish: boolean;
-};
-
-export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<UmbPublishDocumentEntityActionMeta> {
-	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<UmbPublishDocumentEntityActionMeta>) {
+export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<unknown> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<unknown>) {
 		super(host, args);
 	}
 
@@ -44,15 +40,23 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<UmbPubli
 			unique: new UmbVariantId(language.unique, null).toString(),
 		}));
 
+		// Figure out the default selections
+		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
+		const selection: Array<string> = [];
+		const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		const appCulture = context.getAppCulture();
+		// If the app language is one of the options, select it by default:
+		if (appCulture && options.some((o) => o.unique === appCulture)) {
+			selection.push(new UmbVariantId(appCulture, null).toString());
+		}
+
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const result = await modalManagerContext
 			.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
 				data: {
 					options,
-					allowScheduledPublish: this.args.meta.allowScheduledPublish,
 				},
-				// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
-				value: { selection: [] },
+				value: { selection },
 			})
 			.onSubmit()
 			.catch(() => undefined);
