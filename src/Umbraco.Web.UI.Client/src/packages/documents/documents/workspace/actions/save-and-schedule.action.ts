@@ -4,6 +4,6 @@ import { UmbWorkspaceActionBase } from '@umbraco-cms/backoffice/workspace';
 export class UmbDocumentSaveAndScheduleWorkspaceAction extends UmbWorkspaceActionBase {
 	async execute() {
 		const workspaceContext = await this.getContext(UMB_DOCUMENT_WORKSPACE_CONTEXT);
-		return workspaceContext.saveAndSchedule();
+		return workspaceContext.schedule();
 	}
 }

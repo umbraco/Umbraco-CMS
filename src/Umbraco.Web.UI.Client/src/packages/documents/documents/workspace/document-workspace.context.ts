@@ -8,7 +8,7 @@ import type {
 	UmbDocumentVariantModel,
 	UmbDocumentVariantOptionModel,
 } from '../types.js';
-import { UMB_DOCUMENT_PUBLISH_MODAL } from '../modals/index.js';
+import { UMB_DOCUMENT_PUBLISH_MODAL, UMB_DOCUMENT_SCHEDULE_MODAL } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
@@ -546,8 +546,39 @@ export class UmbDocumentWorkspaceContext
 		return this.#handleSaveAndPublish();
 	}
 
-	saveAndSchedule() {
-		return this.#handleSaveAndPublish();
+	public async schedule() {
+		const { options, selected } = await this.#determineVariantOptions();
+
+		// If there are multiple variants, we will open the modal to let the user pick which variants to save.
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const result = await modalManagerContext
+			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
+				data: {
+					options,
+				},
+				value: { selection: selected },
+			})
+			.onSubmit()
+			.catch(() => undefined);
+
+		if (!result?.selection.length || !result?.schedule) return;
+
+		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		const schedule = result?.schedule;
+
+		if (!variantIds.length || !schedule) return;
+
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+		await this.publishingRepository.publish(unique, variantIds, schedule);
+
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+
+		this.#persistedData.setValue(data);
+		this.#currentData.setValue(data);
+
+		this.workspaceComplete(data);
 	}
 
 	public async unpublish() {
