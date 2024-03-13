@@ -78,8 +78,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 					setup: (component) => {
 						(component as UmbMemberWorkspaceViewContentTabElement).tabName = tabName;
 						// TODO: Consider if we can link these more simple, and not parse this on.
-						(component as UmbMemberWorkspaceViewContentTabElement).ownerTabId =
-							this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ? tab.id : undefined;
+						(component as UmbMemberWorkspaceViewContentTabElement).containerId = tab.id;
 					},
 				});
 			});
@@ -91,7 +90,7 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 				component: () => import('./member-workspace-view-content-tab.element.js'),
 				setup: (component) => {
 					(component as UmbMemberWorkspaceViewContentTabElement).noTabName = true;
-					(component as UmbMemberWorkspaceViewContentTabElement).ownerTabId = null;
+					(component as UmbMemberWorkspaceViewContentTabElement).containerId = null;
 				},
 			});
 		}

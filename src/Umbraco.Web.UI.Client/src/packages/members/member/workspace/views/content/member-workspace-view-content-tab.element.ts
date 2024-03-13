@@ -8,40 +8,33 @@ import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffic
 import './member-workspace-view-content-properties.element.js';
 @customElement('umb-member-workspace-view-content-tab')
 export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
-	private _tabName?: string | undefined;
-
 	@property({ type: String })
 	public get tabName(): string | undefined {
-		return this._groupStructureHelper.getName();
+		return this.#groupStructureHelper.getName();
 	}
 	public set tabName(value: string | undefined) {
-		if (value === this._tabName) return;
-		const oldValue = this._tabName;
-		this._tabName = value;
-		this._groupStructureHelper.setName(value);
-		this.requestUpdate('tabName', oldValue);
+		const oldName = this.#groupStructureHelper.getName();
+		this.#groupStructureHelper.setName(value);
+		this.requestUpdate('tabName', oldName);
 	}
 
 	@property({ type: Boolean })
 	public get noTabName(): boolean {
-		return this._groupStructureHelper.getIsRoot();
+		return this.#groupStructureHelper.getIsRoot();
 	}
 	public set noTabName(value: boolean) {
-		this._groupStructureHelper.setIsRoot(value);
+		this.#groupStructureHelper.setIsRoot(value);
 	}
 
-	private _ownerTabId?: string | null;
 	@property({ type: String })
-	public get ownerTabId(): string | null | undefined {
-		return this._ownerTabId;
+	public get containerId(): string | null | undefined {
+		return this.#groupStructureHelper.getParentId();
 	}
-	public set ownerTabId(value: string | null | undefined) {
-		if (value === this._ownerTabId) return;
-		this._ownerTabId = value;
-		this._groupStructureHelper.setParentId(value);
+	public set containerId(value: string | null | undefined) {
+		this.#groupStructureHelper.setParentId(value);
 	}
 
-	_groupStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
+	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
 
 	@state()
 	_groups: Array<PropertyTypeContainerModelBaseModel> = [];
@@ -52,15 +45,13 @@ export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this._groupStructureHelper.setParentType('Tab');
-
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this._groupStructureHelper.setStructureManager(workspaceContext.structure);
+			this.#groupStructureHelper.setStructureManager(workspaceContext.structure);
 		});
-		this.observe(this._groupStructureHelper.containers, (groups) => {
+		this.observe(this.#groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
 		});
-		this.observe(this._groupStructureHelper.hasProperties, (hasProperties) => {
+		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {
 			this._hasProperties = hasProperties;
 		});
 	}

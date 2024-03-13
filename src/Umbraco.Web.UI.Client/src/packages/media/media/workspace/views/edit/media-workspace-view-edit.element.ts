@@ -78,8 +78,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 					setup: (component) => {
 						(component as UmbMediaWorkspaceViewEditTabElement).tabName = tabName;
 						// TODO: Consider if we can link these more simple, and not parse this on.
-						(component as UmbMediaWorkspaceViewEditTabElement).ownerTabId =
-							this._tabsStructureHelper.isOwnerChildContainer(tab.id!) ? tab.id : undefined;
+						(component as UmbMediaWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
 			});
@@ -91,7 +90,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 				component: () => import('./media-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
 					(component as UmbMediaWorkspaceViewEditTabElement).noTabName = true;
-					(component as UmbMediaWorkspaceViewEditTabElement).ownerTabId = null;
+					(component as UmbMediaWorkspaceViewEditTabElement).containerId = null;
 				},
 			});
 		}
