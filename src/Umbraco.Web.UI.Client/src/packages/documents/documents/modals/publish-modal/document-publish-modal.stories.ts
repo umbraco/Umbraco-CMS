@@ -144,17 +144,3 @@ export default meta;
 type Story = StoryObj<UmbDocumentPublishModalElement>;
 
 export const Overview: Story = {};
-export const Schedule: Story = {
-	args: {
-		data: { ...modalData, allowScheduledPublish: true },
-	},
-	parameters: {
-		docs: {
-			source: {
-				code: `
-modalManager.open(this, UMB_DOCUMENT_PUBLISH_MODAL, { data: { options: [], allowScheduledPublish: true } });
-				`,
-			},
-		},
-	},
-};
