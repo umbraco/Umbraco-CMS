@@ -23,8 +23,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const tagGroup = 'testTagGroup';
     const expectedDataTypeValues = {
-      alias: "group",
-      value: tagGroup,
+      "alias": "group",
+      "value": tagGroup,
     };
 
     // Act

@@ -22,8 +22,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can show open button', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "showOpenButton",
-      value: true,
+      "alias": "showOpenButton",
+      "value": true,
     };
 
     // Act

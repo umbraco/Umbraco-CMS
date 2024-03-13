@@ -21,8 +21,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can select ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "ignoreUserStartNodes",
-      value: true,
+      "alias": "ignoreUserStartNodes",
+      "value": true,
     };
     await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -40,8 +40,8 @@ test.describe(`${dataTypeName} tests`, () => {
     const toolbarValues: string[] = ["undo", "redo", "cut", "copy"];
     const expectedDataTypeValues = [
       {
-        alias: "toolbar",
-        value: toolbarValues,
+        "alias": "toolbar",
+        "value": toolbarValues,
       },
     ];
 
@@ -67,8 +67,8 @@ test.describe(`${dataTypeName} tests`, () => {
     const stylesheetPath = await umbracoApi.stylesheet.create(stylesheetName, 'content');
 
     const expectedDataTypeValues = {
-      alias: "stylesheets",
-      value: [stylesheetPath],
+      "alias": "stylesheets",
+      "value": [stylesheetPath],
     };
 
     await umbracoUi.dataType.goToDataType(dataTypeName);
@@ -91,8 +91,8 @@ test.describe(`${dataTypeName} tests`, () => {
     const width = 100;
     const height = 10;
     const expectedDataTypeValues = {
-      alias: "dimensions",
-      value: [width, height],
+      "alias": "dimensions",
+      "value": [width, height],
     };
     await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -110,8 +110,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const maxImageSize = 0;
     const expectedDataTypeValues = {
-      alias: "maxImageSize",
-      value: maxImageSize,
+      "alias": "maxImageSize",
+      "value": maxImageSize,
     };
     await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -128,8 +128,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const overlaySizeValue = 'large';
     const expectedDataTypeValues = {
-      alias: "overlaySize",
-      value: overlaySizeValue,
+      "alias": "overlaySize",
+      "value": overlaySizeValue,
     };
     await umbracoUi.dataType.goToDataType(dataTypeName);
 
@@ -145,8 +145,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can enable hide label', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "hideLabel",
-      value: true,
+      "alias": "hideLabel",
+      "value": true,
     };
     await umbracoUi.dataType.goToDataType(dataTypeName);
 

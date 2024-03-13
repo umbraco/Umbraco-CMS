@@ -19,14 +19,13 @@ for (const uploadType of uploadTypes) {
       }
     });
 
-    //TODO: Remove skip when the frontend is ready
-    test.skip("can add accepted file extension", async ({ umbracoApi, umbracoUi }) => {
+    test('can add accepted file extension', async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const fileExtensionValue = 'zip';
       const expectedDataTypeValues = [
         {
-          alias: "fileExtensions",
-          value: [fileExtensionValue],
+          "alias": "fileExtensions",
+          "value": [fileExtensionValue],
         },
       ];
       // Remove all existing accepted file extensions
@@ -45,14 +44,13 @@ for (const uploadType of uploadTypes) {
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });
 
-    //TODO: Remove skip when the frontend is ready
-    test.skip("can remove accepted file extension", async ({ umbracoApi, umbracoUi }) => {
+    test('can remove accepted file extension', async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const removedFileExtensionValue = "bat";
       const removedFileExtensionsValues = [
         {
-          alias: "fileExtensions",
-          value: [removedFileExtensionValue],
+          "alias": "fileExtensions",
+          "value": [removedFileExtensionValue],
         },
       ];
       // Remove all existing accepted file extensions and add an file extension to remove

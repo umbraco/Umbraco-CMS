@@ -22,8 +22,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can update pick multiple items', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "multiple",
-      value: false,
+      "alias": "multiple",
+      "value": false,
     };
 
     // Act
@@ -40,8 +40,8 @@ test.describe(`${dataTypeName} tests`, () => {
     const lowValue = 0;
     const highValue = 1000;
     const expectedDataTypeValues = {
-      alias: "validationLimit",
-      value: {
+      "alias": "validationLimit",
+      "value": {
         "min": lowValue,
         "max": highValue
       }
@@ -59,8 +59,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can update enable focal point', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "enableLocalFocalPoint",
-      value: true,
+      "alias": "enableLocalFocalPoint",
+      "value": true,
     };
 
     // Act
@@ -105,8 +105,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "ignoreUserStartNodes",
-      value: true,
+      "alias": "ignoreUserStartNodes",
+      "value": true,
     };
 
     // Act

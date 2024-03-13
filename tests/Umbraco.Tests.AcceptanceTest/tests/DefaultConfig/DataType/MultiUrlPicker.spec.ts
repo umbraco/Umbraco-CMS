@@ -23,8 +23,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const minimumValue = 2;
     const expectedDataTypeValues = {
-      alias: "minNumber",
-      value: minimumValue,
+      "alias": "minNumber",
+      "value": minimumValue,
     };
 
     // Act
@@ -40,8 +40,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const maximumValue = 2;
     const expectedDataTypeValues = {
-      alias: "maxNumber",
-      value: maximumValue,
+      "alias": "maxNumber",
+      "value": maximumValue,
     };
 
     // Act
@@ -56,8 +56,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "ignoreUserStartNodes",
-      value: true,
+      "alias": "ignoreUserStartNodes",
+      "value": true,
     };
 
     // Act
@@ -73,8 +73,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const overlaySizeValue = 'large';
     const expectedDataTypeValues = {
-      alias: "overlaySize",
-      value: overlaySizeValue,
+      "alias": "overlaySize",
+      "value": overlaySizeValue,
     };
 
     // Act
@@ -89,8 +89,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can update hide anchor/query string input', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "hideAnchor",
-      value: true,
+      "alias": "hideAnchor",
+      "value": true,
     };
 
     // Act

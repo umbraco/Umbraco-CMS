@@ -44,8 +44,8 @@ test.describe(`${dataTypeName} tests`, () => {
     const optionName = 'Test option';
     const expectedDataTypeValues = [
       {
-        alias: "items",
-        value: [optionName],
+        "alias": "items",
+        "value": [optionName],
       },
     ];
     // Remove all existing options
@@ -69,8 +69,8 @@ test.describe(`${dataTypeName} tests`, () => {
     const removedOptionName = 'Removed Option';
     const removedOptionValues = [
       {
-        alias: "items",
-        value: [removedOptionName],
+        "alias": "items",
+        "value": [removedOptionName],
       },
     ];
     // Remove all existing options and add an option to remove

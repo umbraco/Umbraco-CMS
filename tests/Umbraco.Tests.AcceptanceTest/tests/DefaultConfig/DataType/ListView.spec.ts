@@ -20,12 +20,12 @@ for (const listViewType of listViewTypes) {
       }
     });
 
-    test(`can update Page Size`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update page size', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const pageSizeValue = 5;
       const expectedDataTypeValues = {
-        alias: "pageSize",
-        value: pageSizeValue,
+        "alias": "pageSize",
+        "value": pageSizeValue,
       };
 
       // Act
@@ -37,13 +37,13 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can update Order Direction`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update order direction', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const isAscending = listViewType == 'List View - Members' ? false : true;
       const orderDirectionValue = isAscending ? 'asc' : 'desc';
       const expectedDataTypeValues = {
-        alias: "orderDirection",
-        value: orderDirectionValue,
+        "alias": "orderDirection",
+        "value": orderDirectionValue,
       };
 
       // Act
@@ -56,13 +56,13 @@ for (const listViewType of listViewTypes) {
     });
 
     //TODO: Uncomment when the frontend works
-    test.skip(`can add Column Displayed`, async ({ umbracoApi, umbracoUi }) => {
+    test.skip('can add column displayed', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const columnName = 'Document Type';
       const expectedIncludePropertiesValues = {
-        alias: "contentTypeAlias",
-        header: "Document Type",
-        isSystem: 1,
+        "alias": "contentTypeAlias",
+        "header": "Document Type",
+        "isSystem": 1,
       };
 
       // Act
@@ -76,13 +76,13 @@ for (const listViewType of listViewTypes) {
     });
 
     //TODO: Uncomment when the frontend works
-    test.skip(`can remove Column Displayed`, async ({ umbracoApi, umbracoUi }) => {
+    test.skip('can remove column displayed', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const columnName = 'updateDate';
       const expectedIncludePropertiesValues = {
-        alias: "updateDate",
-        header: "Last edited",
-        isSystem: 1,
+        "alias": "updateDate",
+        "header": "Last edited",
+        "isSystem": 1,
       };
 
       // Act
@@ -95,12 +95,12 @@ for (const listViewType of listViewTypes) {
       expect(includePropertiesData.value).not.toContainEqual(expectedIncludePropertiesValues);
     });
 
-    test(`can update Order By`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update order by', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const orderByValue = 'Last edited';
       const expectedDataTypeValues = {
-        alias: "orderBy",
-        value: "updateDate",
+        "alias": "orderBy",
+        "value": "updateDate",
       };
 
       // Act
@@ -112,17 +112,17 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can update Bulk Action Permission`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update bulk action permission', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const bulkActionPermissionValue = 'Allow bulk copy (content only)';
       const expectedDataTypeValues = {
-        alias: "bulkActionPermissions",
-        value: {
-          allowBulkPublish: false,
-          allowBulkUnpublish: false,
-          allowBulkCopy: true,
-          allowBulkDelete: false,
-          allowBulkMove: false,
+        "alias": "bulkActionPermissions",
+        "value": {
+          "allowBulkPublish": false,
+          "allowBulkUnpublish": false,
+          "allowBulkCopy": true,
+          "allowBulkDelete": false,
+          "allowBulkMove": false,
         },
       };
 
@@ -135,7 +135,7 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can update Content App Icon`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update content app icon', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const iconValue = 'icon-activity';
       const expectedDataTypeValues = {
@@ -153,12 +153,12 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can update Content App Name`, async ({ umbracoApi, umbracoUi }) => {
+    test('can update content app name', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const contentAppName = 'Test Content App Name';
       const expectedDataTypeValues = {
-        alias: "tabName",
-        value: contentAppName,
+        "alias": "tabName",
+        "value": contentAppName,
       };
 
       // Act
@@ -170,11 +170,11 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can enable Show Content App First`, async ({umbracoApi, umbracoUi}) => {
+    test('can enable show content app first', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const expectedDataTypeValues = {
-        alias: "showContentFirst",
-        value: true,
+        "alias": "showContentFirst",
+        "value": true,
       };
 
       // Act
@@ -186,11 +186,11 @@ for (const listViewType of listViewTypes) {
       expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
     });
 
-    test(`can enable Edit in Infinite Editor`, async ({umbracoApi, umbracoUi}) => {
+    test('can enable edit in infinite editor', async ({umbracoApi, umbracoUi}) => {
       // Arrange
       const expectedDataTypeValues = {
-        alias: "useInfiniteEditor",
-        value: true,
+        "alias": "useInfiniteEditor",
+        "value": true,
       };
 
       // Act

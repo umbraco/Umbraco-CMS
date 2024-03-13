@@ -23,8 +23,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const maxCharsValue = 126;
     const expectedDataTypeValues = {
-      alias: "maxChars",
-      value: maxCharsValue,
+      "alias": "maxChars",
+      "value": maxCharsValue,
     };
 
     // Act
@@ -40,8 +40,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const numberOfRowsValue = 9;
     const expectedDataTypeValues = {
-      alias: "rows",
-      value: numberOfRowsValue,
+      "alias": "rows",
+      "value": numberOfRowsValue,
     };
 
     // Act
@@ -57,8 +57,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const minHeightValue = 150;
     const expectedDataTypeValues = {
-      alias: "minHeight",
-      value: minHeightValue,
+      "alias": "minHeight",
+      "value": minHeightValue,
     };
 
     // Act
@@ -74,8 +74,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const maxHeightValue = 300;
     const expectedDataTypeValues = {
-      alias: "maxHeight",
-      value: maxHeightValue,
+      "alias": "maxHeight",
+      "value": maxHeightValue,
     };
 
     // Act

@@ -19,12 +19,12 @@ test.describe(`${dataTypeName} tests`, () => {
     }   
   });
 
-  test('can update Maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
+  test('can update maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const maxCharsValue = 126;
     const expectedDataTypeValues = {
-      alias: "maxChars",
-      value: maxCharsValue,
+      "alias": "maxChars",
+      "value": maxCharsValue,
     };
 
     // Act

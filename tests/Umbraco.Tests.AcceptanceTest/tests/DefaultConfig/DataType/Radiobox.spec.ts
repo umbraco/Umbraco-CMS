@@ -18,14 +18,13 @@ test.describe(`${dataTypeName} tests`, () => {
     }
   });
 
-  //TODO: Remove skip when the frontend is ready
-  test.skip('can add option', async ({umbracoApi, umbracoUi}) => {
+  test('can add option', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const optionName = 'Test option';
     const expectedDataTypeValues = [
       {
-        alias: "items",
-        value: [optionName],
+        "alias": "items",
+        "value": [optionName],
       },
     ];
     // Remove all existing options
@@ -44,14 +43,13 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toEqual(expectedDataTypeValues);
   });
 
-  //TODO: Remove skip when the frontend is ready
-  test.skip('can remove option', async ({umbracoApi, umbracoUi}) => {
+  test('can remove option', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const removedOptionName = 'Removed Option';
     const removedOptionValues = [
       {
-        alias: "items",
-        value: [removedOptionName],
+        "alias": "items",
+        "value": [removedOptionName],
       },
     ];
     // Remove all existing options and add an option to remove

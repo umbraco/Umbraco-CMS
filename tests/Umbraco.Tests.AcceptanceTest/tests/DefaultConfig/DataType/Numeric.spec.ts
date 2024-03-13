@@ -23,8 +23,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const minimumValue = -5;
     const expectedDataTypeValues = {
-      alias: "min",
-      value: minimumValue,
+      "alias": "min",
+      "value": minimumValue,
     };
 
     // Act
@@ -40,8 +40,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const maximumValue = 1000000;
     const expectedDataTypeValues = {
-      alias: "max",
-      value: maximumValue,
+      "alias": "max",
+      "value": maximumValue,
     };
 
     // Act
@@ -57,8 +57,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const stepSizeValue = 5;
     const expectedDataTypeValues = {
-      alias: "step",
-      value: stepSizeValue,
+      "alias": "step",
+      "value": stepSizeValue,
     };
 
     // Act

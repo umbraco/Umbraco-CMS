@@ -22,8 +22,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can update initial state', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "default",
-      value: true,
+      "alias": "default",
+      "value": true,
     };
 
     // Act
@@ -38,8 +38,8 @@ test.describe(`${dataTypeName} tests`, () => {
   test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedDataTypeValues = {
-      alias: "showLabels",
-      value: true,
+      "alias": "showLabels",
+      "value": true,
     };
 
     // Act
@@ -55,8 +55,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const labelOnValue = 'Test Label On';
     const expectedDataTypeValues = {
-      alias: "labelOn",
-      value: labelOnValue,
+      "alias": "labelOn",
+      "value": labelOnValue,
     };
 
     // Act
@@ -72,8 +72,8 @@ test.describe(`${dataTypeName} tests`, () => {
     // Arrange
     const labelOffValue = 'Test Label Off';
     const expectedDataTypeValues = {
-      alias: "labelOff",
-      value: labelOffValue,
+      "alias": "labelOff",
+      "value": labelOffValue,
     };
 
     // Act
