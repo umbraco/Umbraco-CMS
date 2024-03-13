@@ -561,7 +561,6 @@ export class UmbDocumentWorkspaceContext
 	public async schedule() {
 		const { options, selected } = await this.#determineVariantOptions();
 
-		// If there are multiple variants, we will open the modal to let the user pick which variants to save.
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const result = await modalManagerContext
 			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
