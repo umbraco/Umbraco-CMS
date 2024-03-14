@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Web.Common.Formatters;
 
@@ -19,17 +20,18 @@ public class UmbracoJsonModelBinder : BodyModelBinder
     public UmbracoJsonModelBinder(
         ArrayPool<char> arrayPool,
         ObjectPoolProvider objectPoolProvider,
+        IOptions<MvcNewtonsoftJsonOptions> jsonOptions,
         IHttpRequestStreamReaderFactory readerFactory,
         ILoggerFactory loggerFactory)
-        : base(GetNewtonsoftJsonFormatter(loggerFactory, arrayPool, objectPoolProvider), readerFactory, loggerFactory)
+        : base(GetNewtonsoftJsonFormatter(loggerFactory, arrayPool, objectPoolProvider, jsonOptions.Value), readerFactory, loggerFactory)
     {
     }
 
-    private static IInputFormatter[] GetNewtonsoftJsonFormatter(ILoggerFactory logger, ArrayPool<char> arrayPool, ObjectPoolProvider objectPoolProvider)
+    private static IInputFormatter[] GetNewtonsoftJsonFormatter(ILoggerFactory logger, ArrayPool<char> arrayPool, ObjectPoolProvider objectPoolProvider, MvcNewtonsoftJsonOptions jsonOptions)
     {
-        var jsonOptions = new MvcNewtonsoftJsonOptions { AllowInputFormatterExceptionMessages = true };
+        jsonOptions.AllowInputFormatterExceptionMessages = true;
 
-        JsonSerializerSettings ss = jsonOptions.SerializerSettings; // Just use the defaults as base
+        JsonSerializerSettings ss = jsonOptions.SerializerSettings;
 
         // We need to ignore required attributes when serializing. E.g UserSave.ChangePassword. Otherwise the model is not model bound.
         ss.ContractResolver = new IgnoreRequiredAttributesResolver();
