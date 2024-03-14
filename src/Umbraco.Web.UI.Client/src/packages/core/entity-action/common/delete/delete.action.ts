@@ -33,7 +33,7 @@ export class UmbDeleteEntityAction extends UmbEntityActionBase<MetaEntityActionD
 			this,
 			this.args.meta.detailRepositoryAlias,
 		);
-		detailRepository.delete(this.args.unique);
+		await detailRepository.delete(this.args.unique);
 
 		const actionEventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 		const event = new UmbRequestReloadStructureForEntityEvent({
