@@ -84,7 +84,6 @@ export class UmbPickerInputContext<ItemType extends { name: string; unique: stri
 	}
 
 	async requestRemoveItem(unique: string) {
-		// TODO: ID won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
 		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
 		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
