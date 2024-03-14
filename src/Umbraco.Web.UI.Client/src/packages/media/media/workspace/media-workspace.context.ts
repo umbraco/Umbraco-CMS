@@ -125,13 +125,23 @@ export class UmbMediaWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
-		const { data } = await this.#getDataPromise;
-		if (!data) return undefined;
+		type GetDataType = Awaited<ReturnType<UmbMediaDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
-		this.setIsNew(false);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-		return data || undefined;
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.update(data);
+			this.#currentData.update(data);
+		}
+
+		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbMediaStoreObserver');
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/media');
+		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }, mediaTypeUnique: string) {

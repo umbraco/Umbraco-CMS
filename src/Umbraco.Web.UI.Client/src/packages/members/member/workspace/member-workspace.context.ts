@@ -128,6 +128,7 @@ export class UmbMemberWorkspaceContext
 
 	#onMemberStoreChange(member: EntityType | undefined) {
 		if (!member) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
 			history.pushState(null, '', 'section/member-management');
 		}
 	}
