@@ -212,6 +212,10 @@ export class UmbMediaWorkspaceContext
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
+	name(variantId: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x))?.name ?? '');
+	}
+
 	async propertyStructureById(propertyId: string) {
 		return this.structure.propertyStructureById(propertyId);
 	}
