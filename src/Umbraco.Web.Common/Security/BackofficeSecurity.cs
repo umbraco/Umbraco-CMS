@@ -36,10 +36,10 @@ public class BackOfficeSecurity : IBackOfficeSecurity
                     // Check again
                     if (_currentUser == null)
                     {
-                        Attempt<int> id = GetUserId();
+                        Attempt<Guid> id = GetUserKey();
                         if (id.Success)
                         {
-                            _currentUser = id.Success ? _userService.GetUserById(id.Result) : null;
+                            _currentUser = id.Success ? _userService.GetAsync(id.Result).GetAwaiter().GetResult() : null;
                         }
                     }
                 }
@@ -47,6 +47,14 @@ public class BackOfficeSecurity : IBackOfficeSecurity
 
             return _currentUser;
         }
+    }
+
+    private Attempt<Guid> GetUserKey()
+    {
+        ClaimsIdentity? identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
+
+        Guid? id = identity?.GetUserKey();
+        return id.HasValue is false ? Attempt.Fail<Guid>() : Attempt.Succeed(id.Value);
     }
 
     /// <inheritdoc />

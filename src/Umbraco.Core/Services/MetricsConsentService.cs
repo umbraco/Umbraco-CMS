@@ -71,7 +71,7 @@ public class MetricsConsentService : IMetricsConsentService
         IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
         if (currentUser is null)
         {
-            currentUser = _userService.GetUserById(Constants.Security.SuperUserId);
+            currentUser = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
         }
 
         _logger.LogInformation("Telemetry level set to {telemetryLevel} by {username}", telemetryLevel, currentUser?.Username);

@@ -59,7 +59,7 @@ public class CreateUserStep : StepBase, IInstallStep
 
     public async Task<Attempt<InstallationResult>> ExecuteAsync(InstallData model)
     {
-            IUser? admin = _userService.GetUserById(Constants.Security.SuperUserId);
+            IUser? admin = _userService.GetAsync(Constants.Security.SuperUserKey).GetAwaiter().GetResult();
             if (admin is null)
             {
                 return FailWithMessage("Could not find the super user");
