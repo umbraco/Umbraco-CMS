@@ -9,10 +9,9 @@ import type { DocumentTypeTreeItemResponseModel } from './DocumentTypeTreeItemRe
 import type { FolderTreeItemResponseModel } from './FolderTreeItemResponseModel';
 import type { MediaTypeTreeItemResponseModel } from './MediaTypeTreeItemResponseModel';
 import type { NamedEntityTreeItemResponseModel } from './NamedEntityTreeItemResponseModel';
-import type { RelationTypeTreeItemResponseModel } from './RelationTypeTreeItemResponseModel';
 
 export type PagedNamedEntityTreeItemResponseModel = {
     total: number;
-    items: Array<(NamedEntityTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTypeTreeItemResponseModel | RelationTypeTreeItemResponseModel)>;
+    items: Array<(NamedEntityTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTypeTreeItemResponseModel)>;
 };
 

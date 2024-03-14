@@ -5,7 +5,5 @@
 
 import type { NamedItemResponseModelBaseModel } from './NamedItemResponseModelBaseModel';
 
-export type RelationTypeItemResponseModel = (NamedItemResponseModelBaseModel & {
-    isDeletable: boolean;
-});
+export type RelationTypeItemResponseModel = NamedItemResponseModelBaseModel;
 

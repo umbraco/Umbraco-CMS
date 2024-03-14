@@ -3,6 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateTemplateRequestModel } from '../models/CreateTemplateRequestModel';
+import type { DataTypeTreeItemResponseModel } from '../models/DataTypeTreeItemResponseModel';
+import type { DocumentBlueprintTreeItemResponseModel } from '../models/DocumentBlueprintTreeItemResponseModel';
+import type { DocumentTypeTreeItemResponseModel } from '../models/DocumentTypeTreeItemResponseModel';
+import type { FolderTreeItemResponseModel } from '../models/FolderTreeItemResponseModel';
+import type { MediaTypeTreeItemResponseModel } from '../models/MediaTypeTreeItemResponseModel';
+import type { NamedEntityTreeItemResponseModel } from '../models/NamedEntityTreeItemResponseModel';
 import type { PagedNamedEntityTreeItemResponseModel } from '../models/PagedNamedEntityTreeItemResponseModel';
 import type { TemplateConfigurationResponseModel } from '../models/TemplateConfigurationResponseModel';
 import type { TemplateItemResponseModel } from '../models/TemplateItemResponseModel';
@@ -178,6 +184,27 @@ export class TemplateResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/template/query/settings',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTreeTemplateAncestors({
+        descendantId,
+    }: {
+        descendantId?: string,
+    }): CancelablePromise<Array<(NamedEntityTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTypeTreeItemResponseModel)>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/tree/template/ancestors',
+            query: {
+                'descendantId': descendantId,
+            },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },
