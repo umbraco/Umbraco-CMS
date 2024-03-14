@@ -24,19 +24,30 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<UmbDocume
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguageContext = instance;
 			this.#observeAppCulture();
+			this.#observeDefaultCulture();
 		});
 	}
 
 	#observeAppCulture() {
 		this.observe(this.#appLanguageContext!.appLanguageCulture, (value) => {
 			this._currentCulture = value;
-			this._variant = this.item?.variants.find((x) => x.culture === value);
+			this._variant = this.#getVariant(value);
 		});
 	}
 
+	#observeDefaultCulture() {
+		this.observe(this.#appLanguageContext!.appDefaultLanguage, (value) => {
+			this._defaultCulture = value?.unique;
+		});
+	}
+
+	#getVariant(culture: string | undefined) {
+		return this.item?.variants.find((x) => x.culture === culture);
+	}
+
 	#getLabel() {
-		// TODO: get the name from the default language if the current culture is not available
-		return this._variant?.name ?? 'Untitled';
+		const fallbackName = this.#getVariant(this._defaultCulture)?.name ?? this._item?.variants[0].name ?? 'Unknown';
+		return this._variant?.name ?? `(${fallbackName})`;
 	}
 
 	// TODO: implement correct status symbol
