@@ -1,27 +1,19 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyContainerTypes, UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-document-workspace-view-edit-properties')
 export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement {
-	@property({ type: String, attribute: 'container-name', reflect: false })
-	public get containerName(): string | undefined {
-		return this.#propertyStructureHelper.getContainerName();
+	@property({ type: String, attribute: 'container-id', reflect: false })
+	public get containerId(): string | null | undefined {
+		return this.#propertyStructureHelper.getContainerId();
 	}
-	public set containerName(value: string | undefined) {
-		this.#propertyStructureHelper.setContainerName(value);
-	}
-
-	@property({ type: String, attribute: 'container-type', reflect: false })
-	public get containerType(): UmbPropertyContainerTypes | undefined {
-		return this.#propertyStructureHelper.getContainerType();
-	}
-	public set containerType(value: UmbPropertyContainerTypes | undefined) {
-		this.#propertyStructureHelper.setContainerType(value);
+	public set containerId(value: string | null | undefined) {
+		this.#propertyStructureHelper.setContainerId(value);
 	}
 
 	#propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbDocumentTypeDetailModel>(this);

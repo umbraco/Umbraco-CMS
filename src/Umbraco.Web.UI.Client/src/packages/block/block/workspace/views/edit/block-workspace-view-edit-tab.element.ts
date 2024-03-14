@@ -47,11 +47,14 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 
 	@property({ type: String })
 	public get containerId(): string | null | undefined {
-		return this.#groupStructureHelper.getParentId();
+		return this._containerId;
 	}
 	public set containerId(value: string | null | undefined) {
+		this._containerId = value;
 		this.#groupStructureHelper.setParentId(value);
 	}
+	@state()
+	private _containerId?: string | null;
 
 	/**
 	 * If true, the group box will be hidden, if we are to only represents one group.
@@ -95,30 +98,27 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`
-			${this._hasProperties ? this.#renderPart(this._tabName) : ''}
-			${repeat(
-				this._groups,
-				(group) => group.name,
-				(group) => this.#renderPart(group.name, group.name),
-			)}
-		`;
-	}
-
-	#renderPart(groupName: string | null | undefined, boxName?: string | null | undefined) {
-		return this.hideSingleGroup && this._groups.length === 1
-			? html` <umb-block-workspace-view-edit-properties
-					.managerName=${this.#managerName}
-					class="properties"
-					container-type="Group"
-					container-name=${groupName || ''}></umb-block-workspace-view-edit-properties>`
-			: html` <uui-box .headline=${boxName || ''}
-					><umb-block-workspace-view-edit-properties
-						.managerName=${this.#managerName}
-						class="properties"
-						container-type="Group"
-						container-name=${groupName || ''}></umb-block-workspace-view-edit-properties
-				></uui-box>`;
+		return this._containerId
+			? html`
+					${this._hasProperties
+						? html` <umb-block-workspace-view-edit-properties
+								.managerName=${this.#managerName}
+								class="properties"
+								.containerId=${this._containerId}></umb-block-workspace-view-edit-properties>`
+						: ''}
+					${repeat(
+						this._groups,
+						(group) => group.name,
+						(group) =>
+							html` <uui-box .headline=${group.name || ''}
+								><umb-block-workspace-view-edit-properties
+									.managerName=${this.#managerName}
+									class="properties"
+									.containerId=${group.id}></umb-block-workspace-view-edit-properties
+							></uui-box>`,
+					)}
+				`
+			: '';
 	}
 
 	static styles = [

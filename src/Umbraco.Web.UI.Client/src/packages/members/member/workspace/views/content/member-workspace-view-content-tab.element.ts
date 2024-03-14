@@ -28,11 +28,14 @@ export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
 
 	@property({ type: String })
 	public get containerId(): string | null | undefined {
-		return this.#groupStructureHelper.getParentId();
+		return this._containerId;
 	}
 	public set containerId(value: string | null | undefined) {
+		this._containerId = value;
 		this.#groupStructureHelper.setParentId(value);
 	}
+	@state()
+	private _containerId?: string | null;
 
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
 
@@ -63,8 +66,7 @@ export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
 						<uui-box>
 							<umb-member-workspace-view-content-properties
 								class="properties"
-								container-type="Tab"
-								container-name=${this.tabName || ''}></umb-member-workspace-view-content-properties>
+								.containerId=${this._containerId}></umb-member-workspace-view-content-properties>
 						</uui-box>
 					`
 				: ''}
@@ -75,8 +77,7 @@ export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
 					html`<uui-box .headline=${group.name || ''}>
 						<umb-member-workspace-view-content-properties
 							class="properties"
-							container-type="Group"
-							container-name=${group.name || ''}></umb-member-workspace-view-content-properties>
+							.containerId=${group.id}></umb-member-workspace-view-content-properties>
 					</uui-box>`,
 			)}
 		`;
