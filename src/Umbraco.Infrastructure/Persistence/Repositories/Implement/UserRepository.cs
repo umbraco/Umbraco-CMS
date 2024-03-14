@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
 /// </summary>
-internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepository
+internal class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserRepository
 {
     private readonly IMapperCollection _mapperCollection;
     private readonly GlobalSettings _globalSettings;
@@ -108,32 +108,12 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
 
     #region Overrides of RepositoryBase<int,IUser>
 
-    protected override IUser? PerformGet(int id)
+    protected override IUser? PerformGet(Guid key)
     {
-        // This will never resolve to a user, yet this is asked
-        // for all of the time (especially in cases of members).
-        // Don't issue a SQL call for this, we know it will not exist.
-        if (_runtimeState.Level == RuntimeLevel.Upgrade)
-        {
-            // when upgrading people might come from version 7 where user 0 was the default,
-            // only in upgrade mode do we want to fetch the user of Id 0
-            if (id < -1)
-            {
-                return null;
-            }
-        }
-        else
-        {
-            if (id == default || id < -1)
-            {
-                return null;
-            }
-        }
-
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Select<UserDto>()
             .From<UserDto>()
-            .Where<UserDto>(x => x.Id == id);
+            .Where<UserDto>(x => x.Key == key);
 
         List<UserDto>? dtos = Database.Fetch<UserDto>(sql);
         if (dtos.Count == 0)
@@ -345,7 +325,8 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow))
             .Where<UserLoginDto>(x => x.SessionId == sessionId));
 
-    protected override IEnumerable<IUser> PerformGetAll(params int[]? ids)
+
+    protected override IEnumerable<IUser> PerformGetAll(params Guid[]? ids)
     {
         List<UserDto> dtos = ids?.Length == 0
             ? GetDtosWith(null, true)
@@ -1196,16 +1177,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return sql;
     }
 
-    public IEnumerable<IUser> GetNextUsers(int id, int count)
+    public IEnumerable<IUser> GetNextUsers(Guid key, int count)
     {
         Sql<ISqlContext> idsQuery = SqlContext.Sql()
-            .Select<UserDto>(x => x.Id)
+            .Select<UserDto>(x => x.Key)
             .From<UserDto>()
-            .Where<UserDto>(x => x.Id >= id)
-            .OrderBy<UserDto>(x => x.Id);
+            .Where<UserDto>(x => x.Key >= key)
+            .OrderBy<UserDto>(x => x.Key);
 
         // first page is index 1, not zero
-        var ids = Database.Page<int>(1, count, idsQuery).Items.ToArray();
+        Guid[] ids = Database.Page<Guid>(1, count, idsQuery).Items.ToArray();
 
         // now get the actual users and ensure they are ordered properly (same clause)
         return ids.Length == 0

@@ -322,7 +322,7 @@ public interface IUserService : IMembershipUserService
     /// </returns>
     IEnumerable<IUser> GetAllNotInGroup(int groupId);
 
-    IEnumerable<IUser> GetNextUsers(int id, int count);
+    IEnumerable<IUser> GetNextUsers(Guid key, int count);
 
     #region User groups
 
