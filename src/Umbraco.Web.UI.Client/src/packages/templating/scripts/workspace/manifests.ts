@@ -1,4 +1,5 @@
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
+import { manifests as breadcrumbManifests } from './breadcrumb/manifests.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceActions } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -36,4 +37,4 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceActions];
+export const manifests = [workspace, ...workspaceActions, ...breadcrumbManifests];

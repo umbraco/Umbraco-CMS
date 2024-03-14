@@ -53,11 +53,15 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	}
 };
 
-const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
+	const descendantPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.descendantUnique);
+	if (!descendantPath) throw new Error('Descendant path is not available');
+
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	ScriptResource.getTreeScriptAncestors({
-		descendantPath: args.descendantUnique,
+	return ScriptResource.getTreeScriptAncestors({
+		descendantPath,
 	});
+};
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemModel => {
 	const serializer = new UmbServerFilePathUniqueSerializer();
