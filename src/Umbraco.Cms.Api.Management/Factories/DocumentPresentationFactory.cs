@@ -70,11 +70,7 @@ internal sealed class DocumentPresentationFactory
 
         responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
 
-        IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
-        if (contentType is not null)
-        {
-            responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(contentType)!;
-        }
+        responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
