@@ -92,13 +92,13 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	@property({ type: String })
 	public get tabName(): string | undefined {
-		return this.#groupStructureHelper.getName();
+		return this.#groupStructureHelper.getParentName();
 	}
 	public set tabName(value: string | undefined) {
 		if (value === this._tabName) return;
 		const oldValue = this._tabName;
 		this._tabName = value;
-		this.#groupStructureHelper.setName(value);
+		this.#groupStructureHelper.setParentName(value);
 		this.requestUpdate('tabName', oldValue);
 	}
 

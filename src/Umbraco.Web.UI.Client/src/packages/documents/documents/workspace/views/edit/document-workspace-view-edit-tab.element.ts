@@ -10,11 +10,11 @@ import './document-workspace-view-edit-properties.element.js';
 export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 	@property({ type: String })
 	public get tabName(): string | undefined {
-		return this.#groupStructureHelper.getName();
+		return this.#groupStructureHelper.getParentName();
 	}
 	public set tabName(value: string | undefined) {
-		const oldName = this.#groupStructureHelper.getName();
-		this.#groupStructureHelper.setName(value);
+		const oldName = this.#groupStructureHelper.getParentName();
+		this.#groupStructureHelper.setParentName(value);
 		this.requestUpdate('tabName', oldName);
 	}
 

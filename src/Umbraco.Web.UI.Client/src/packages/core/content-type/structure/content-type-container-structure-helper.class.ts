@@ -28,6 +28,10 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	// Direct containers are the containers defining the total of this container(Multiple containers with the same name and type)
 	private _parentMatchingContainers: UmbPropertyTypeContainerModel[] = [];
 
+	// State containing the all containers defined in the data:
+	#containers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
+	readonly containers = this.#containers.asObservable();
+
 	// State containing the merged containers (only one pr. name):
 	#mergedContainers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
 	readonly mergedContainers = this.#mergedContainers.asObservable();
@@ -64,33 +68,6 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		return this.#structure;
 	}
 
-	public setParentType(value?: UmbPropertyContainerTypes) {
-		if (this._parentType === value) return;
-		this._parentType = value;
-		this.#observeParentAlikeContainers();
-	}
-	public getParentType() {
-		return this._parentType;
-	}
-
-	public setContainerChildType(value?: UmbPropertyContainerTypes) {
-		if (this._childType === value) return;
-		this._childType = value;
-		this.#observeParentAlikeContainers();
-	}
-	public getContainerChildType() {
-		return this._childType;
-	}
-
-	public setName(value?: string) {
-		if (this._parentName === value) return;
-		this._parentName = value;
-		this.#observeParentAlikeContainers();
-	}
-	public getName() {
-		return this._parentName;
-	}
-
 	public setIsRoot(value: boolean) {
 		if (this._isRoot === value) return;
 		this._isRoot = value;
@@ -108,6 +85,33 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	}
 	public getParentId() {
 		return this._parentId;
+	}
+
+	public setParentType(value?: UmbPropertyContainerTypes) {
+		if (this._parentType === value) return;
+		this._parentType = value;
+		this.#observeParentAlikeContainers();
+	}
+	public getParentType() {
+		return this._parentType;
+	}
+
+	public setParentName(value?: string) {
+		if (this._parentName === value) return;
+		this._parentName = value;
+		this.#observeParentAlikeContainers();
+	}
+	public getParentName() {
+		return this._parentName;
+	}
+
+	public setContainerChildType(value?: UmbPropertyContainerTypes) {
+		if (this._childType === value) return;
+		this._childType = value;
+		this.#observeParentAlikeContainers();
+	}
+	public getContainerChildType() {
+		return this._childType;
 	}
 
 	#observeParentAlikeContainers() {
