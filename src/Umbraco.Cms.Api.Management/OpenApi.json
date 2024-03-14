@@ -16637,6 +16637,27 @@
             }
           },
           {
+            "name": "memberGroupName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isApproved",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "isLockedOut",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "orderBy",
             "in": "query",
             "schema": {
@@ -31230,6 +31251,62 @@
       }
     },
     "/umbraco/management/api/v1/webhook": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhook",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedWebhookResponseModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedWebhookResponseModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedWebhookResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
       "post": {
         "tags": [
           "Webhook"
@@ -34061,12 +34138,27 @@
       },
       "DatatypeConfigurationResponseModel": {
         "required": [
-          "canBeChanged"
+          "canBeChanged",
+          "documentListViewId",
+          "mediaListViewId",
+          "memberListViewId"
         ],
         "type": "object",
         "properties": {
           "canBeChanged": {
             "$ref": "#/components/schemas/DataTypeChangeModeModel"
+          },
+          "documentListViewId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mediaListViewId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberListViewId": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -38081,6 +38173,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/UserResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedWebhookResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/WebhookResponseModel"
                 }
               ]
             }
