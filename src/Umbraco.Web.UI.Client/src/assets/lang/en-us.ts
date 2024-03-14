@@ -2172,6 +2172,10 @@ export default {
 			'This item or its descendants is being referenced. Unpublishing can lead to broken links on your website. Please take the appropriate actions.',
 		deleteDisabledWarning: 'This item or its descendants is being referenced. Therefore, deletion has been disabled.',
 		listViewDialogWarning: 'The following items you are trying to %0% are referenced by other content.',
+		labelMoreReferences: (count: number) => {
+			if (count === 1) return '...and one more item';
+			return `...and ${count} more items`;
+		},
 	},
 	logViewer: {
 		deleteSavedSearch: 'Delete Saved Search',
