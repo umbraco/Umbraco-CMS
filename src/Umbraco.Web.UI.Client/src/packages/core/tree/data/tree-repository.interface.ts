@@ -1,5 +1,9 @@
 import type { UmbTreeItemModelBase } from '../types.js';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from './types.js';
+import type {
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from './types.js';
 import type { UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/external/backend-api';
@@ -47,6 +51,15 @@ export interface UmbTreeRepository<
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
+
+	/**
+	 * Requests the ancestors of the given item.
+	 * @param {UmbTreeAncestorsOfRequestArgs} args
+	 * @memberof UmbTreeRepository
+	 */
+	requestTreeItemAncestors: (
+		args: UmbTreeAncestorsOfRequestArgs,
+	) => Promise<{ data?: TreeItemType[]; error?: ProblemDetails; asObservable?: () => Observable<TreeItemType[]> }>;
 
 	/**
 	 * Returns an observable of the root items of the tree.
