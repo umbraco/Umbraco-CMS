@@ -3,12 +3,13 @@ import { UmbDocumentPropertyDataContext } from '../property-dataset-context/docu
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentDetailRepository } from '../repository/index.js';
 import type {
+	UmbDocumentVariantPublishModel,
 	UmbDocumentDetailModel,
 	UmbDocumentValueModel,
 	UmbDocumentVariantModel,
 	UmbDocumentVariantOptionModel,
 } from '../types.js';
-import { umbPickDocumentVariantModal, type UmbDocumentVariantPickerModalType } from '../modals/index.js';
+import { UMB_DOCUMENT_PUBLISH_MODAL, UMB_DOCUMENT_SCHEDULE_MODAL } from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
@@ -33,7 +34,9 @@ import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/externa
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import { UMB_DOCUMENT_SAVE_MODAL } from '../modals/save-modal/document-save-modal.token.js';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -43,7 +46,6 @@ export class UmbDocumentWorkspaceContext
 		UmbPublishableWorkspaceContextInterface,
 		UmbWorkspaceCollectionContextInterface<UmbDocumentTypeDetailModel>
 {
-	//
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
@@ -372,7 +374,7 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async #runUserFlorFor(type: UmbDocumentVariantPickerModalType): Promise<UmbVariantId[]> {
+	async #determineVariantOptions() {
 		const activeVariants = this.splitView.getActiveVariants();
 
 		const activeVariantIds = activeVariants.map((activeVariant) => UmbVariantId.Create(activeVariant));
@@ -383,21 +385,10 @@ export class UmbDocumentWorkspaceContext
 
 		const options = await firstValueFrom(this.variantOptions);
 
-		// If there is only one variant, we don't need to open the modal.
-		if (options.length === 0) {
-			throw new Error('No variants are available');
-		} else if (options.length === 1) {
-			// If only one option we will skip ahead and save the document with the only variant available:
-			const firstVariant = UmbVariantId.Create(options[0]);
-			return this.#performSaveOrCreate([firstVariant]);
-		}
-
-		const selectedVariants = await umbPickDocumentVariantModal(this, { type, options, selected });
-
-		// If no variants are selected, we don't save anything.
-		if (!selectedVariants.length) return [];
-
-		return this.#performSaveOrCreate(selectedVariants);
+		return {
+			options,
+			selected: selected.map((x) => x.toString()).filter((v, i, a) => a.indexOf(v) === i),
+		};
 	}
 
 	#buildSaveData(selectedVariants: Array<UmbVariantId>): UmbDocumentDetailModel {
@@ -490,8 +481,85 @@ export class UmbDocumentWorkspaceContext
 		return selectedVariants;
 	}
 
-	async save() {
-		await this.#runUserFlorFor('save');
+	async #handleSaveAndPublish() {
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+
+		let variantIds: Array<UmbVariantId> = [];
+
+		const { options, selected } = await this.#determineVariantOptions();
+
+		// If there is only one variant, we don't need to open the modal.
+		if (options.length === 0) {
+			throw new Error('No variants are available');
+		} else if (options.length === 1) {
+			// If only one option we will skip ahead and save the document with the only variant available:
+			variantIds.push(UmbVariantId.Create(options[0]));
+		} else {
+			// If there are multiple variants, we will open the modal to let the user pick which variants to publish.
+			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+			const result = await modalManagerContext
+				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+					data: {
+						options,
+					},
+					value: { selection: selected },
+				})
+				.onSubmit()
+				.catch(() => undefined);
+
+			if (!result?.selection.length || !unique) return;
+
+			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		}
+
+		const variants = await this.#performSaveOrCreate(variantIds);
+
+		await this.publishingRepository.publish(
+			unique,
+			variants.map((variantId) => ({ variantId })),
+		);
+
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+
+		this.#persistedData.setValue(data);
+		this.#currentData.setValue(data);
+
+		this.workspaceComplete(data);
+	}
+
+	public async save() {
+		const { options, selected } = await this.#determineVariantOptions();
+
+		let variantIds: Array<UmbVariantId> = [];
+
+		// If there is only one variant, we don't need to open the modal.
+		if (options.length === 0) {
+			throw new Error('No variants are available');
+		} else if (options.length === 1) {
+			// If only one option we will skip ahead and save the document with the only variant available:
+			variantIds.push(UmbVariantId.Create(options[0]));
+		} else {
+			// If there are multiple variants, we will open the modal to let the user pick which variants to save.
+			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+			const result = await modalManagerContext
+				.open(this, UMB_DOCUMENT_SAVE_MODAL, {
+					data: {
+						options,
+					},
+					value: { selection: selected },
+				})
+				.onSubmit()
+				.catch(() => undefined);
+
+			if (!result?.selection.length) return;
+
+			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+		}
+
+		await this.#performSaveOrCreate(variantIds);
+
 		const data = this.getData();
 		if (!data) throw new Error('Data is missing');
 
@@ -502,16 +570,49 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async publish() {
-		const variantIds = await this.#runUserFlorFor('publish');
-		const unique = this.getUnique();
-		if (variantIds.length && unique) {
-			await this.publishingRepository.publish(unique, variantIds);
-			this.workspaceComplete(this.#currentData.getValue());
-		}
+		throw new Error('Method not implemented.');
 	}
 
-	public async saveAndPublish() {
-		await this.publish();
+	public async saveAndPublish(): Promise<void> {
+		return this.#handleSaveAndPublish();
+	}
+
+	public async schedule() {
+		const { options, selected } = await this.#determineVariantOptions();
+
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const result = await modalManagerContext
+			.open(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
+				data: {
+					options,
+				},
+				value: { selection: selected.map((unique) => ({ unique, schedule: {} })) },
+			})
+			.onSubmit()
+			.catch(() => undefined);
+
+		if (!result?.selection.length) return;
+
+		// Map to the correct format for the API (UmbDocumentVariantPublishModel)
+		const variants =
+			result?.selection.map<UmbDocumentVariantPublishModel>((x) => ({
+				variantId: UmbVariantId.FromString(x.unique),
+				schedule: x.schedule,
+			})) ?? [];
+
+		if (!variants.length) return;
+
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+		await this.publishingRepository.publish(unique, variants);
+
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+
+		this.#persistedData.setValue(data);
+		this.#currentData.setValue(data);
+
+		this.workspaceComplete(data);
 	}
 
 	public async unpublish() {
@@ -521,7 +622,7 @@ export class UmbDocumentWorkspaceContext
 		if (!entityType) throw new Error('Entity type is missing');
 
 		// TODO: remove meta
-		new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} }).execute();
+		new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} as never }).execute();
 	}
 
 	async delete() {
