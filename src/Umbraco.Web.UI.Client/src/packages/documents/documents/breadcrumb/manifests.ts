@@ -6,7 +6,7 @@ export const manifests: Array<ManifestWorkspaceFooterApp> = [
 		alias: 'Umb.WorkspaceFooterApp.Document.Breadcrumb',
 		name: 'Document Breadcrumb Workspace Footer App',
 		weight: 10,
-		element: () => import('./workspace-breadcrumb.element.js'),
+		element: () => import('./variant-workspace-breadcrumb.element.js'),
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
