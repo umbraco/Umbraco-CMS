@@ -63,11 +63,7 @@ internal sealed class MediaPresentationFactory
             IsTrashed = entity.Trashed
         };
 
-        IMediaType? mediaType = _mediaTypeService.Get(entity.ContentTypeAlias);
-        if (mediaType is not null)
-        {
-            responseModel.MediaType = _umbracoMapper.Map<MediaTypeReferenceResponseModel>(mediaType)!;
-        }
+        responseModel.MediaType = _umbracoMapper.Map<MediaTypeReferenceResponseModel>(entity)!;
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
