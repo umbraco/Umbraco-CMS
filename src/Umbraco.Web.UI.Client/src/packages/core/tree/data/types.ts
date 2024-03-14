@@ -8,3 +8,7 @@ export interface UmbTreeChildrenOfRequestArgs {
 	skip: number;
 	take: number;
 }
+
+export interface UmbTreeAncestorsOfRequestArgs {
+	descendantUnique: string;
+}

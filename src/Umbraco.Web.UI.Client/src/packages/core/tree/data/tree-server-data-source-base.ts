@@ -1,6 +1,10 @@
 import type { UmbTreeItemModelBase } from '../types.js';
 import type { UmbTreeDataSource } from './tree-data-source.interface.js';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from './types.js';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from './types.js';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -12,6 +16,7 @@ export interface UmbTreeServerDataSourceBaseArgs<
 > {
 	getRootItems: (args: UmbTreeRootItemsRequestArgs) => Promise<UmbPagedModel<ServerTreeItemType>>;
 	getChildrenOf: (args: UmbTreeChildrenOfRequestArgs) => Promise<UmbPagedModel<ServerTreeItemType>>;
+	getAncestorsOf: (args: UmbTreeAncestorsOfRequestArgs) => Promise<Array<ServerTreeItemType>>;
 	mapper: (item: ServerTreeItemType) => ClientTreeItemType;
 }
 
@@ -29,6 +34,7 @@ export abstract class UmbTreeServerDataSourceBase<
 	#host;
 	#getRootItems;
 	#getChildrenOf;
+	#getAncestorsOf;
 	#mapper;
 
 	/**
@@ -40,6 +46,7 @@ export abstract class UmbTreeServerDataSourceBase<
 		this.#host = host;
 		this.#getRootItems = args.getRootItems;
 		this.#getChildrenOf = args.getChildrenOf;
+		this.#getAncestorsOf = args.getAncestorsOf;
 		this.#mapper = args.mapper;
 	}
 
@@ -74,6 +81,25 @@ export abstract class UmbTreeServerDataSourceBase<
 		if (data) {
 			const items = data?.items.map((item: ServerTreeItemType) => this.#mapper(item));
 			return { data: { total: data.total, items } };
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Fetches the ancestors of a given item from the server
+	 * @param {UmbTreeAncestorsOfRequestArgs} args
+	 * @return {*}
+	 * @memberof UmbTreeServerDataSourceBase
+	 */
+	async getAncestorsOf(args: UmbTreeAncestorsOfRequestArgs) {
+		if (!args.descendantUnique) throw new Error('Parent unique is missing');
+
+		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getAncestorsOf(args));
+
+		if (data) {
+			const items = data?.map((item: ServerTreeItemType) => this.#mapper(item));
+			return { data: items };
 		}
 
 		return { error };
