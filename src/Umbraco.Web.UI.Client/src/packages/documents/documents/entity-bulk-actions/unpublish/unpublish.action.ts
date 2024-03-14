@@ -16,7 +16,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 			const action = new UmbUnpublishDocumentEntityAction(this._host, {
 				unique: this.selection[0],
 				entityType: UMB_DOCUMENT_ENTITY_TYPE,
-				meta: {},
+				meta: {} as never,
 			});
 			await action.execute();
 			return;

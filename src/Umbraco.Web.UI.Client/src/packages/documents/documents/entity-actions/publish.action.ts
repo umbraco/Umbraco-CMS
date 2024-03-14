@@ -8,8 +8,8 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
-export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<unknown> {
-	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<unknown>) {
+export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
 		super(host, args);
 	}
 

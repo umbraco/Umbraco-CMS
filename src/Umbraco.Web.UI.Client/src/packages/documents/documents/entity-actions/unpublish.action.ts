@@ -8,8 +8,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<object> {
-	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<object>) {
+export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
 		super(host, args);
 	}
 
