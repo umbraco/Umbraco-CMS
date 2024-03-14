@@ -5,8 +5,7 @@ import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbr
 import { type UmbEntityActionArgs, UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never> {
 	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
@@ -32,31 +31,6 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 			unique: new UmbVariantId(language.unique, null).toString(),
 		}));
 
-		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
-
-		// If the document has only one variant or one language is available, we can skip the modal and unpublish directly:
-		if (documentData.variants.length === 1 || options.length === 1) {
-			const localizationController = new UmbLocalizationController(this._host);
-			const confirm = await modalManagerContext
-				.open(this, UMB_CONFIRM_MODAL, {
-					data: {
-						headline: localizationController.term('actions_unpublish'),
-						content: localizationController.term('prompt_confirmUnpublish'),
-						color: 'danger',
-						confirmLabel: localizationController.term('actions_unpublish'),
-					},
-				})
-				.onSubmit()
-				.catch(() => false);
-
-			if (confirm !== false) {
-				const variantId = UmbVariantId.Create(documentData.variants[0]);
-				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-				await publishingRepository.unpublish(this.args.unique, [variantId]);
-			}
-			return;
-		}
-
 		// Figure out the default selections
 		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
 		const selection: Array<string> = [];
@@ -67,6 +41,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 			selection.push(new UmbVariantId(appCulture, null).toString());
 		}
 
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		const result = await modalManagerContext
 			.open(this, UMB_DOCUMENT_UNPUBLISH_MODAL, {
 				data: {
