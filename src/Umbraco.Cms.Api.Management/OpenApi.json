@@ -21578,17 +21578,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedRelationTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedRelationTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedRelationTypeTreeItemResponseModel"
                 }
               }
             }
@@ -23259,8 +23259,16 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
           }
-        }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/security/forgot-password/reset": {
@@ -23564,16 +23572,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
           }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
+        }
       }
     },
     "/umbraco/management/api/v1/server/configuration": {
@@ -31872,16 +31872,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
           }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
+        }
       }
     },
     "/umbraco/management/api/v1/user/set-user-groups": {
@@ -32075,6 +32067,62 @@
       }
     },
     "/umbraco/management/api/v1/webhook": {
+      "get": {
+        "tags": [
+          "Webhook"
+        ],
+        "operationId": "GetWebhook",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedWebhookResponseModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedWebhookResponseModel"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedWebhookResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
       "post": {
         "tags": [
           "Webhook"
@@ -34906,12 +34954,27 @@
       },
       "DatatypeConfigurationResponseModel": {
         "required": [
-          "canBeChanged"
+          "canBeChanged",
+          "documentListViewId",
+          "mediaListViewId",
+          "memberListViewId"
         ],
         "type": "object",
         "properties": {
           "canBeChanged": {
             "$ref": "#/components/schemas/DataTypeChangeModeModel"
+          },
+          "documentListViewId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mediaListViewId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberListViewId": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "additionalProperties": false
@@ -38567,6 +38630,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                 }
               ]
             }
@@ -38765,6 +38831,30 @@
         },
         "additionalProperties": false
       },
+      "PagedRelationTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedSavedLogSearchResponseModel": {
         "required": [
           "items",
@@ -38926,6 +39016,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/UserResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedWebhookResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/WebhookResponseModel"
                 }
               ]
             }
@@ -39564,18 +39678,26 @@
         "additionalProperties": false
       },
       "RelationTypeItemResponseModel": {
+        "required": [
+          "isDeletable"
+        ],
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
+        "properties": {
+          "isDeletable": {
+            "type": "boolean"
+          }
+        },
         "additionalProperties": false
       },
       "RelationTypeResponseModel": {
         "required": [
           "id",
-          "isSystemRelationType",
+          "isDeletable",
           "path"
         ],
         "type": "object",
@@ -39597,7 +39719,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "isSystemRelationType": {
+          "isDeletable": {
             "type": "boolean"
           },
           "parentObjectTypeName": {
@@ -39607,6 +39729,23 @@
           "childObjectTypeName": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RelationTypeTreeItemResponseModel": {
+        "required": [
+          "isDeletable"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+          }
+        ],
+        "properties": {
+          "isDeletable": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
