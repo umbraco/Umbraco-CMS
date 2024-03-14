@@ -87,7 +87,9 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 	});
 
 	#openDynamicRootOriginPicker() {
-		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, {});
+		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_ORIGIN_PICKER_MODAL, {
+			data: { items: this._originManifests },
+		});
 		this.#openModal?.onSubmit().then((data: UmbTreePickerDynamicRoot) => {
 			const existingData = { ...this.data };
 			existingData.originKey = undefined;
@@ -98,7 +100,9 @@ export class UmbInputDocumentRootPickerElement extends FormControlMixin(UmbLitEl
 	}
 
 	#openDynamicRootQueryStepPicker() {
-		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL, {});
+		this.#openModal = this.#modalContext?.open(this, UMB_DYNAMIC_ROOT_QUERY_STEP_PICKER_MODAL, {
+			data: { items: this._queryStepManifests },
+		});
 		this.#openModal?.onSubmit().then((step) => {
 			if (this.data) {
 				const querySteps = [...(this.data.querySteps ?? []), step];

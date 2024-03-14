@@ -31,6 +31,12 @@ const modals: Array<ManifestModal> = [
 		name: 'Embedded Media Modal',
 		js: () => import('./embedded-media/embedded-media-modal.element.js'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.ItemPicker',
+		name: 'Item Picker Modal',
+		element: () => import('./item-picker/item-picker-modal.element.js'),
+	},
 ];
 
 export const manifests = [...modals];

@@ -57,6 +57,10 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				margin-bottom: var(--uui-size-space-2);
+			}
+
 			uui-box {
 				--uui-box-default-padding: 0;
 			}

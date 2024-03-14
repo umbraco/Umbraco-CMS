@@ -28,7 +28,7 @@ export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
 	}
 }
 
-const treeItemMapper = (model: UmbMockMediaModel): Omit<MediaTreeItemResponseModel, 'type'> => {
+const treeItemMapper = (model: UmbMockMediaModel): MediaTreeItemResponseModel => {
 	const mediaType = umbMediaTypeMockDb.read(model.mediaType.id);
 	if (!mediaType) throw new Error(`Media type with id ${model.mediaType.id} not found`);
 

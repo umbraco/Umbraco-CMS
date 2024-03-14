@@ -4,9 +4,7 @@ import type {
 	DataTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockDataTypeModelHack = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
-
-export interface UmbMockDataTypeModel extends Omit<UmbMockDataTypeModelHack, 'type'> {}
+export type UmbMockDataTypeModel = DataTypeResponseModel & DataTypeTreeItemResponseModel & DataTypeItemResponseModel;
 
 export const data: Array<UmbMockDataTypeModel> = [
 	{

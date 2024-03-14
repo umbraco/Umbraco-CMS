@@ -4,9 +4,7 @@ import type {
 	ScriptResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
-type UmbMockScriptModelHack = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
-
-export interface UmbMockScriptModel extends Omit<UmbMockScriptModelHack, 'type' | 'icon'> {}
+export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
 
 export const data: Array<UmbMockScriptModel> = [
 	{

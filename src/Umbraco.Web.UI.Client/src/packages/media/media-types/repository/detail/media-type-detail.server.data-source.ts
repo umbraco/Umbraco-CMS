@@ -42,7 +42,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			name: '',
 			alias: '',
 			description: '',
-			icon: '',
+			icon: 'icon-picture',
 			allowedAtRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,

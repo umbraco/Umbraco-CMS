@@ -38,8 +38,6 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 	#onChange(propertyName: keyof UmbMemberDetailModel, value: UmbMemberDetailModel[keyof UmbMemberDetailModel]) {
 		if (!this._workspaceContext) return;
 
-		console.log('Setting', propertyName, value);
-
 		this._workspaceContext.set(propertyName, value);
 	}
 
