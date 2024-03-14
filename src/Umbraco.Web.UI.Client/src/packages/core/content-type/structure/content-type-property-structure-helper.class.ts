@@ -209,7 +209,6 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 			newProperty.sortOrder = sortOrder;
 		}
 
-		// TODO: Remove as any when server model has gotten sortOrder:
 		await this.#structure.insertProperty(null, newProperty);
 		return true;
 	}

@@ -276,16 +276,4 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 		return await this.#structure.updateContainer(null, containerId, partialUpdate);
 	}
-
-	// TODO: This is only used by legacy implementations:
-	// @deprecated
-	async _legacy_updateContainerName(containerId: string, containerParentId: string | null, name: string) {
-		await this.#init;
-		if (!this.#structure) return;
-
-		const newName =
-			this.#structure.makeContainerNameUniqueForOwnerContentType(name, this._childType, containerParentId) ?? name;
-
-		return await this.partialUpdateContainer(containerId, { name: newName });
-	}
 }
