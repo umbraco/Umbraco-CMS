@@ -84,7 +84,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 							<uui-button label="Change" .href=${this._createRoute}></uui-button>
 						</uui-action-bar>
 					</umb-ref-data-type>
-			  `
+				`
 			: html`
 					<uui-button
 						id="empty-state-button"
@@ -92,7 +92,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 						look="placeholder"
 						color="default"
 						.href=${this._createRoute}></uui-button>
-			  `;
+				`;
 	}
 
 	static styles = [

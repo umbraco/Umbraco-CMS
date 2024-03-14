@@ -1,13 +1,15 @@
-import { umbPickDocumentVariantModal } from '../modals/pick-document-variant-modal.controller.js';
 import { UmbDocumentDetailRepository, UmbDocumentPublishingRepository } from '../repository/index.js';
-import { UmbDocumentVariantState } from '../types.js';
-import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
+import type { UmbDocumentVariantOptionModel } from '../types.js';
+import { UMB_DOCUMENT_UNPUBLISH_MODAL } from '../modals/index.js';
+import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
 import { type UmbEntityActionArgs, UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
-export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<object> {
-	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<object>) {
+export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never> {
+	constructor(host: UmbControllerHost, args: UmbEntityActionArgs<never>) {
 		super(host, args);
 	}
 
@@ -22,7 +24,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<object
 
 		if (!documentData) throw new Error('The document was not found');
 
-		const allOptions = (languageData?.items ?? []).map((language) => ({
+		const options: Array<UmbDocumentVariantOptionModel> = (languageData?.items ?? []).map((language) => ({
 			culture: language.unique,
 			segment: null,
 			language: language,
@@ -30,21 +32,58 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<object
 			unique: new UmbVariantId(language.unique, null).toString(),
 		}));
 
-		// TODO: Maybe move this to modal [NL]
-		// Only display variants that are relevant to pick from, i.e. variants that are published or published with pending changes:
-		const options = allOptions.filter(
-			(option) =>
-				option.variant &&
-				(option.variant.state === UmbDocumentVariantState.PUBLISHED ||
-					option.variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES),
-		);
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 
+		// If the document has only one variant or one language is available, we can skip the modal and unpublish directly:
+		if (documentData.variants.length === 1 || options.length === 1) {
+			const localizationController = new UmbLocalizationController(this._host);
+			const confirm = await modalManagerContext
+				.open(this, UMB_CONFIRM_MODAL, {
+					data: {
+						headline: localizationController.term('actions_unpublish'),
+						content: localizationController.term('prompt_confirmUnpublish'),
+						color: 'danger',
+						confirmLabel: localizationController.term('actions_unpublish'),
+					},
+				})
+				.onSubmit()
+				.catch(() => false);
+
+			if (confirm !== false) {
+				const variantId = UmbVariantId.Create(documentData.variants[0]);
+				const publishingRepository = new UmbDocumentPublishingRepository(this._host);
+				await publishingRepository.unpublish(this.args.unique, [variantId]);
+			}
+			return;
+		}
+
+		// Figure out the default selections
 		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
-		const selectedVariants = await umbPickDocumentVariantModal(this, { type: 'unpublish', options });
+		const selection: Array<string> = [];
+		const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		const appCulture = context.getAppCulture();
+		// If the app language is one of the options, select it by default:
+		if (appCulture && options.some((o) => o.unique === appCulture)) {
+			selection.push(new UmbVariantId(appCulture, null).toString());
+		}
 
-		if (selectedVariants.length) {
+		const result = await modalManagerContext
+			.open(this, UMB_DOCUMENT_UNPUBLISH_MODAL, {
+				data: {
+					options,
+				},
+				value: { selection },
+			})
+			.onSubmit()
+			.catch(() => undefined);
+
+		if (!result?.selection.length) return;
+
+		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+
+		if (variantIds.length) {
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
-			await publishingRepository.unpublish(this.args.unique, selectedVariants);
+			await publishingRepository.unpublish(this.args.unique, variantIds);
 		}
 	}
 }

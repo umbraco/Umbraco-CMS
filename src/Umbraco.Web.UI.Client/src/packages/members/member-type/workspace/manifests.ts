@@ -20,10 +20,9 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'contentTypeDesignEditor',
 		alias: 'Umb.WorkspaceView.MemberType.Design',
 		name: 'Member Type Workspace Design View',
-		js: () => import('./views/design/member-type-workspace-view-edit.element.js'),
-		weight: 1000,
 		meta: {
 			label: 'Design',
 			pathname: 'design',

@@ -308,7 +308,7 @@ export default {
 		languagesToSendForApproval: 'What languages would you like to send for approval?',
 		languagesToSchedule: 'What languages would you like to schedule?',
 		languagesToUnpublish:
-			'Select the languages to unpublish. Unpublishing a mandatory language will\n      unpublish all languages.\n    ',
+			'Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.',
 		variantsWillBeSaved: 'All new variants will be saved.',
 		variantsToPublish: 'Which variants would you like to publish?',
 		variantsToSave: 'Choose which variants to be saved.',

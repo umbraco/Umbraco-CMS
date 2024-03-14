@@ -31,7 +31,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 		// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
 		source: ObservableType,
 		callback: ObserverCallback<SpecificT>,
-		controllerAlias?: UmbControllerAlias,
+		controllerAlias?: UmbControllerAlias | null,
 	): SpecificR;
 
 	/**
