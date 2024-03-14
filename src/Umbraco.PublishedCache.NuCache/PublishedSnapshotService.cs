@@ -256,14 +256,14 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
 
             using (IScope scope = _scopeProvider.CreateScope())
             {
-                scope.ReadLock(Constants.Locks.ContentTree);
+                scope.EagerReadLock(Constants.Locks.ContentTree);
                 _contentStore.UpdateDataTypesLocked(idsA, id => CreateContentType(PublishedItemType.Content, id));
                 scope.Complete();
             }
 
             using (IScope scope = _scopeProvider.CreateScope())
             {
-                scope.ReadLock(Constants.Locks.MediaTree);
+                scope.EagerReadLock(Constants.Locks.MediaTree);
                 _mediaStore.UpdateDataTypesLocked(idsA, id => CreateContentType(PublishedItemType.Media, id));
                 scope.Complete();
             }
@@ -286,7 +286,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
                     case DomainChangeTypes.RefreshAll:
                         using (IScope scope = _scopeProvider.CreateScope())
                         {
-                            scope.ReadLock(Constants.Locks.Domains);
+                            scope.EagerReadLock(Constants.Locks.Domains);
                             LoadDomainsLocked();
                             scope.Complete();
                         }
@@ -670,7 +670,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         using (_contentStore?.GetScopedWriteLock(_scopeProvider))
         using (IScope scope = _scopeProvider.CreateScope())
         {
-            scope.ReadLock(Constants.Locks.ContentTree);
+            scope.EagerReadLock(Constants.Locks.ContentTree);
             var ok = action();
             scope.Complete();
             return ok;
@@ -732,7 +732,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         using (_mediaStore?.GetScopedWriteLock(_scopeProvider))
         using (IScope scope = _scopeProvider.CreateScope())
         {
-            scope.ReadLock(Constants.Locks.MediaTree);
+            scope.EagerReadLock(Constants.Locks.MediaTree);
             var ok = action();
             scope.Complete();
             return ok;
@@ -828,7 +828,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         using (_domainStore?.GetScopedWriteLock(_scopeProvider))
         using (IScope scope = _scopeProvider.CreateScope())
         {
-            scope.ReadLock(Constants.Locks.Domains);
+            scope.EagerReadLock(Constants.Locks.Domains);
             LoadDomainsLocked();
             scope.Complete();
         }
@@ -873,7 +873,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             {
                 using (IScope scope = _scopeProvider.CreateScope())
                 {
-                    scope.ReadLock(Constants.Locks.ContentTree);
+                    scope.EagerReadLock(Constants.Locks.ContentTree);
                     LoadContentFromDatabaseLocked(false);
                     scope.Complete();
                 }
@@ -902,7 +902,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             ContentCacheRefresher.JsonPayload capture = payload;
             using (IScope scope = _scopeProvider.CreateScope())
             {
-                scope.ReadLock(Constants.Locks.ContentTree);
+                scope.EagerReadLock(Constants.Locks.ContentTree);
 
                 if (capture.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                 {
@@ -947,7 +947,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             {
                 using (IScope scope = _scopeProvider.CreateScope())
                 {
-                    scope.ReadLock(Constants.Locks.MediaTree);
+                    scope.EagerReadLock(Constants.Locks.MediaTree);
                     LoadMediaFromDatabaseLocked(false);
                     scope.Complete();
                 }
@@ -976,7 +976,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             MediaCacheRefresher.JsonPayload capture = payload;
             using (IScope scope = _scopeProvider.CreateScope())
             {
-                scope.ReadLock(Constants.Locks.MediaTree);
+                scope.EagerReadLock(Constants.Locks.MediaTree);
 
                 if (capture.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
                 {
@@ -1129,7 +1129,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         // and it can be wlocked by 1 thread only at a time
         using (IScope scope = _scopeProvider.CreateScope())
         {
-            scope.ReadLock(Constants.Locks.ContentTypes);
+            scope.EagerReadLock(Constants.Locks.ContentTypes);
 
             IPublishedContentType[] typesA = refreshedIds.IsCollectionEmpty()
                 ? Array.Empty<IPublishedContentType>()
@@ -1170,7 +1170,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         // and it can be wlocked by 1 thread only at a time
         using (IScope scope = _scopeProvider.CreateScope())
         {
-            scope.ReadLock(Constants.Locks.MediaTypes);
+            scope.EagerReadLock(Constants.Locks.MediaTypes);
 
             IPublishedContentType[] typesA = refreshedIds == null
                 ? Array.Empty<IPublishedContentType>()
