@@ -102,7 +102,6 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				this.#structure.containerById(this._containerId),
 				(container) => {
 					if (container) {
-						console.log('Container update', container.name);
 						this._containerName = container.name ?? '';
 						this._containerType = container.type;
 						if (container.parent) {
@@ -227,7 +226,6 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		// This only works cause we are dealing with a single level of containers in this Helper, if we had more levels we would need to be more clever about the parent as well. [NL]
 		merged = merged.filter((x, i, cons) => i === cons.findIndex((y) => y.name === x.name && y.type === x.type));
 		this.#mergedContainers.setValue(merged);
-		console.log('merge', containers, ' > ', merged);
 	};
 
 	/**
