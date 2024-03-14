@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Core.Services
 
         #region Create
 
-        public PagedModel<IMember> FilterAsync(
+        public async Task<PagedModel<IMember>> FilterAsync(
             MemberFilter memberFilter,
             string orderBy = "username",
             Direction orderDirection = Direction.Ascending,
@@ -108,63 +108,9 @@ namespace Umbraco.Cms.Core.Services
         {
             using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             scope.ReadLock(Constants.Locks.MemberTypes);
-            IMemberType? memberType = null;
-            if (memberFilter.MemberTypeId is not null)
-            {
-                memberType = _memberTypeRepository.Get(memberFilter.MemberTypeId.Value);
-            }
-
-            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
             scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember>? query1 = memberType?.Alias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberType.Alias);
-            int.TryParse(memberFilter.Filter, out int filterAsIntId);
-            Guid.TryParse(memberFilter.Filter, out Guid filterAsGuid);
 
-            IEnumerable<IMember> members;
-            long totalRecords;
-            if (memberFilter.MemberGroupName.IsNullOrWhiteSpace() is false)
-            {
-                members = _memberRepository.FindMembersInRole(memberFilter.MemberGroupName, string.Empty);
-                if (memberFilter.Filter is not null)
-                {
-                    members = members.Where(x =>
-                            (x.Name != null && x.Name.Contains(memberFilter.Filter)) ||
-                            x.Username.Contains(memberFilter.Filter) ||
-                            x.Email.Contains(memberFilter.Filter) ||
-                            x.Id == filterAsIntId ||
-                            x.Key == filterAsGuid ||
-                            (memberFilter.IsApproved is not null && x.IsApproved == memberFilter.IsApproved) ||
-                            (memberFilter.IsLockedOut is not null && x.IsLockedOut == memberFilter.IsLockedOut))
-                        .ToArray();
-                }
-
-                totalRecords = members.Count();
-                members = members.Skip(skip).Take(take);
-            }
-            else
-            {
-                IQuery<IMember> query2 = memberFilter.IsApproved is null ? Query<IMember>() : Query<IMember>().Where(x => x.IsApproved == memberFilter.IsApproved);
-                if (memberFilter.IsLockedOut is not null)
-                {
-                    query2 = query2.Where(x => x.IsLockedOut == memberFilter.IsLockedOut);
-                }
-
-                query2 = memberFilter.Filter == null
-                    ? query2
-                    : query2.Where(x =>
-                        (x.Name != null && x.Name.Contains(memberFilter.Filter)) ||
-                        x.Username.Contains(memberFilter.Filter) ||
-                        x.Email.Contains(memberFilter.Filter) ||
-                        x.Id == filterAsIntId ||
-                        x.Key == filterAsGuid);
-                members = _memberRepository.GetPage(query1, pageNumber, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: true));
-            }
-
-            return new PagedModel<IMember>
-            {
-                Items = members,
-                Total = totalRecords,
-            };
+            return await _memberRepository.GetPagedByFilterAsync(memberFilter, skip, take, Ordering.By(orderBy, orderDirection));
         }
 
         /// <summary>

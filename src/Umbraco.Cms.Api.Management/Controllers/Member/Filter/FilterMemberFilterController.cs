@@ -49,7 +49,7 @@ public class FilterMemberFilterController : MemberFilterControllerBase
             Filter = filter,
         };
 
-        PagedModel<IMember> members = _memberService.FilterAsync(memberFilter, orderBy, orderDirection, skip, take);
+        PagedModel<IMember> members = await _memberService.FilterAsync(memberFilter, orderBy, orderDirection, skip, take);
 
         var pageViewModel = new PagedViewModel<MemberResponseModel>
         {

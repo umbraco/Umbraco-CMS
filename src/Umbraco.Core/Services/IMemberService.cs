@@ -92,7 +92,7 @@ public interface IMemberService : IMembershipMemberService, IContentServiceBase<
         string? memberTypeAlias,
         string filter);
 
-    public PagedModel<IMember> FilterAsync(
+    public Task<PagedModel<IMember>> FilterAsync(
         MemberFilter memberFilter,
         string orderBy = "username",
         Direction orderDirection = Direction.Ascending,
