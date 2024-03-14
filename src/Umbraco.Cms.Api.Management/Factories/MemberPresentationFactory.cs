@@ -58,11 +58,7 @@ internal sealed class MemberPresentationFactory
             Id = entity.Key,
         };
 
-        IMemberType? memberType = _memberTypeService.Get(entity.ContentTypeAlias);
-        if (memberType is not null)
-        {
-            responseModel.MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(memberType)!;
-        }
+        responseModel.MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!;
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
