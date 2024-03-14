@@ -39,7 +39,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
 		this.observe(
-			this._tabsStructureHelper.containers,
+			this._tabsStructureHelper.mergedContainers,
 			(tabs) => {
 				this._tabs = tabs;
 				this._createRoutes();

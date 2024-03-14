@@ -145,7 +145,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				'_observeIsSorting',
 			);
 		});
-		this.observe(this.#groupStructureHelper.containers, (groups) => {
+		this.observe(this.#groupStructureHelper.mergedContainers, (groups) => {
 			this._groups = groups;
 			this.#sorter.setModel(this._groups);
 		});

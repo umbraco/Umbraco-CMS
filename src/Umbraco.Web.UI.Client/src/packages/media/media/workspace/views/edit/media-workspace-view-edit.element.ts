@@ -38,7 +38,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this._tabsStructureHelper.containers, (tabs) => {
+		this.observe(this._tabsStructureHelper.mergedContainers, (tabs) => {
 			this._tabs = tabs;
 			this._createRoutes();
 		});

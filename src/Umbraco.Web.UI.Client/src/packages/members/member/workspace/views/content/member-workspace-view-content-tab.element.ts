@@ -51,7 +51,7 @@ export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
 		this.consumeContext(UMB_MEMBER_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#groupStructureHelper.setStructureManager(workspaceContext.structure);
 		});
-		this.observe(this.#groupStructureHelper.containers, (groups) => {
+		this.observe(this.#groupStructureHelper.mergedContainers, (groups) => {
 			this._groups = groups;
 		});
 		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {

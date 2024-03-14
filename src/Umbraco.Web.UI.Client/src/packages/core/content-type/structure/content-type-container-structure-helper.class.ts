@@ -29,8 +29,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	private _parentMatchingContainers: UmbPropertyTypeContainerModel[] = [];
 
 	// State containing the merged containers (only one pr. name):
-	#containers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
-	readonly containers = this.#containers.asObservable();
+	#mergedContainers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
+	readonly mergedContainers = this.#mergedContainers.asObservable();
 
 	// Owner containers are containers owned by the owner Content Type (The specific one up for editing)
 	private _ownerContainers: UmbPropertyTypeContainerModel[] = [];
@@ -44,7 +44,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			this.#initResolver = resolve;
 		});
 
-		this.#containers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+		this.#mergedContainers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 	}
 
 	public setStructureManager(structure: UmbContentTypePropertyStructureManager<T>) {
@@ -115,18 +115,18 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 
 		if (this._isRoot) {
 			this.removeControllerByAlias('_observeOwnerContainers');
-			this.#containers.setValue([]);
+			this.#mergedContainers.setValue([]);
 			//this._observeChildProperties(); // We cannot have root properties currently, therefor we instead just set it to false:
 			this.#hasProperties.setValue(false);
 			this.#observeRootContainers();
 		} else if (this._parentName && this._parentType) {
-			this.#containers.setValue([]);
+			this.#mergedContainers.setValue([]);
 			this.observe(
 				// This only works because we just have two levels, meaning this is the upper level and we want it to merge, so its okay this does not take parent-parent (And further structure) into account: [NL]
 				this.#structure.containersByNameAndType(this._parentName, this._parentType),
 				(parentContainers) => {
 					this._ownerContainers = [];
-					this.#containers.setValue([]);
+					this.#mergedContainers.setValue([]);
 					// Stop observing a the previous _parentMatchingContainers...
 					this._parentMatchingContainers.forEach((container) => {
 						this.removeControllerByAlias('_observeParentHasProperties_' + container.id);
@@ -169,7 +169,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			this.#structure.ownerContainersOf(this._childType, this._parentId),
 			(containers) => {
 				this._ownerContainers = containers ?? [];
-				this.#containers.setValue(this.#filterNonOwnerContainers(this.#containers.getValue()));
+				this.#mergedContainers.setValue(this.#filterNonOwnerContainers(this.#mergedContainers.getValue()));
 			},
 			'_observeOwnerContainers',
 		);
@@ -179,7 +179,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				this.#structure!.containersOfParentId(parentCon.id, this._childType!),
 				(containers) => {
 					// First we will filter out non-owner containers:
-					const old = this.#containers.getValue();
+					const old = this.#mergedContainers.getValue();
 					// Then filter out the containers that are in the new list, either based on id or a match on name & type.
 					// Matching on name & type will result in the latest being the one we include, notice will only counts for non-owner containers.
 					const oldFiltered = old.filter(
@@ -189,7 +189,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 					const newFiltered = oldFiltered.concat(containers);
 
 					// Filter out non owners again:
-					this.#containers.setValue(this.#filterNonOwnerContainers(newFiltered));
+					this.#mergedContainers.setValue(this.#filterNonOwnerContainers(newFiltered));
 				},
 				'_observeGroupsOf_' + parentCon.id,
 			);
@@ -230,7 +230,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 					(x, i, cons) => i === cons.findIndex((y) => y.name === x.name && y.type === x.type),
 				);
 
-				this.#containers.setValue(this.#filterNonOwnerContainers(rootContainers));
+				this.#mergedContainers.setValue(this.#filterNonOwnerContainers(rootContainers));
 			},
 			'_observeRootContainers',
 		);

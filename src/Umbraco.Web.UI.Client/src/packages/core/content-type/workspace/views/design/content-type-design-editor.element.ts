@@ -122,7 +122,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this._tabsStructureHelper.containers, (tabs) => {
+		this.observe(this._tabsStructureHelper.mergedContainers, (tabs) => {
 			this._tabs = tabs;
 			this._tabs.forEach((tab) => {
 				this.#updateCachedTabElementId(tab.name ?? '', tab.id);

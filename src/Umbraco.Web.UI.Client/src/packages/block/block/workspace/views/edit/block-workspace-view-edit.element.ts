@@ -74,7 +74,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 			'observeGroups',
 		);
 		this.observe(
-			this.#tabsStructureHelper.containers,
+			this.#tabsStructureHelper.mergedContainers,
 			(tabs) => {
 				this._tabs = tabs;
 				this._createRoutes();

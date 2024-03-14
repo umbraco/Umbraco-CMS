@@ -82,7 +82,7 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 		if (!this.#blockWorkspace || !this.#managerName) return;
 		this.#groupStructureHelper.setStructureManager(this.#blockWorkspace[this.#managerName].structure);
 		this.observe(
-			this.#groupStructureHelper.containers,
+			this.#groupStructureHelper.mergedContainers,
 			(groups) => {
 				this._groups = groups;
 			},
