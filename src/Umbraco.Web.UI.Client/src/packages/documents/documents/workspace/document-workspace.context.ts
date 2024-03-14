@@ -36,6 +36,7 @@ import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import { UMB_DOCUMENT_SAVE_MODAL } from '../modals/save-modal/document-save-modal.token.js';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -518,7 +519,7 @@ export class UmbDocumentWorkspaceContext
 		this.workspaceComplete(data);
 	}
 
-	async save() {
+	public async save() {
 		const { options, selected } = await this.#determineVariantOptions();
 
 		let variantIds: Array<UmbVariantId> = [];
@@ -533,7 +534,7 @@ export class UmbDocumentWorkspaceContext
 			// If there are multiple variants, we will open the modal to let the user pick which variants to save.
 			const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 			const result = await modalManagerContext
-				.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+				.open(this, UMB_DOCUMENT_SAVE_MODAL, {
 					data: {
 						options,
 					},

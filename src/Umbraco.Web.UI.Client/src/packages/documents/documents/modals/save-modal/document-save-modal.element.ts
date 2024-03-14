@@ -1,8 +1,5 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
-import type {
-	UmbDocumentUnpublishModalData,
-	UmbDocumentUnpublishModalValue,
-} from './document-unpublish-modal.token.js';
+import type { UmbDocumentVariantOptionModel } from '../../types.js';
+import type { UmbDocumentSaveModalData, UmbDocumentSaveModalValue } from './document-save-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -10,10 +7,10 @@ import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 import '../shared/document-variant-language-picker.element.js';
 
-@customElement('umb-document-unpublish-modal')
-export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
-	UmbDocumentUnpublishModalData,
-	UmbDocumentUnpublishModalValue
+@customElement('umb-document-save-modal')
+export class UmbDocumentSaveModalElement extends UmbModalBaseElement<
+	UmbDocumentSaveModalData,
+	UmbDocumentSaveModalValue
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
 
@@ -29,14 +26,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelectable(true);
 
 		// Only display variants that are relevant to pick from, i.e. variants that are draft or published with pending changes:
-		this._options =
-			this.data?.options.filter(
-				(option) =>
-					option.variant &&
-					(!option.variant.state ||
-						option.variant.state === UmbDocumentVariantState.PUBLISHED ||
-						option.variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES),
-			) ?? [];
+		this._options = this.data?.options ?? [];
 
 		let selected = this.value?.selection ?? [];
 
@@ -56,29 +46,21 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	}
 
 	render() {
-		return html`<umb-body-layout headline=${this.localize.term('content_unpublish')}>
+		return html`<umb-body-layout headline=${this.localize.term('content_readyToSave')}>
 			<p id="subtitle">
-				<umb-localize key="content_languagesToUnpublish">
-					Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.
-				</umb-localize>
+				<umb-localize key="content_variantsToSave">Choose which variants to be saved.</umb-localize>
 			</p>
 
 			<umb-document-variant-language-picker
 				.selectionManager=${this.#selectionManager}
 				.variantLanguageOptions=${this._options}></umb-document-variant-language-picker>
 
-			<p>
-				<umb-localize key="prompt_confirmUnpublish">
-					Unpublishing will remove this page and all its descendants from the site.
-				</umb-localize>
-			</p>
-
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
-					label="${this.localize.term('actions_unpublish')}"
+					label="${this.localize.term('buttons_saveAndClose')}"
 					look="primary"
-					color="warning"
+					color="positive"
 					@click=${this.#submit}></uui-button>
 			</div>
 		</umb-body-layout> `;
@@ -96,10 +78,10 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	];
 }
 
-export default UmbDocumentUnpublishModalElement;
+export default UmbDocumentSaveModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-unpublish-modal': UmbDocumentUnpublishModalElement;
+		'umb-document-save-modal': UmbDocumentSaveModalElement;
 	}
 }

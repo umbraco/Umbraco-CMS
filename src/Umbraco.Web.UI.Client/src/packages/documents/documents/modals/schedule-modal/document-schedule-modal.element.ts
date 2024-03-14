@@ -53,13 +53,6 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		selected = selected.filter((s) => this._options.some((o) => o.unique === s.unique));
 
 		this.#selectionManager.setSelection(selected.map((s) => s.unique));
-
-		// Additionally select mandatory languages:
-		this._options.forEach((variant) => {
-			if (variant.language?.isMandatory) {
-				this.#selectionManager.select(variant.unique);
-			}
-		});
 	}
 
 	#submit() {
