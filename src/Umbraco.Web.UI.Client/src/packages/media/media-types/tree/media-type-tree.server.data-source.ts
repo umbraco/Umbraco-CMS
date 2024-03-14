@@ -3,7 +3,11 @@ import type { UmbMediaTypeTreeItemModel } from './types.js';
 import type { MediaTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { MediaTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
@@ -25,6 +29,7 @@ export class UmbMediaTypeTreeServerDataSource extends UmbTreeServerDataSourceBas
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
@@ -44,6 +49,12 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		});
 	}
 };
+
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	MediaTypeResource.getTreeMediaTypeAncestors({
+		descendantId: args.descendantUnique,
+	});
 
 const mapper = (item: MediaTypeTreeItemResponseModel): UmbMediaTypeTreeItemModel => {
 	return {

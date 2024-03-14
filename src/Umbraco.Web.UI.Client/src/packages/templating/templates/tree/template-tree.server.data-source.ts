@@ -1,6 +1,10 @@
 import { UMB_TEMPLATE_ENTITY_TYPE } from '../entity.js';
 import type { UmbTemplateTreeItemModel } from './types.js';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { TemplateResource } from '@umbraco-cms/backoffice/external/backend-api';
@@ -25,6 +29,7 @@ export class UmbTemplateTreeServerDataSource extends UmbTreeServerDataSourceBase
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
@@ -44,6 +49,12 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		});
 	}
 };
+
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	TemplateResource.getTreeTemplateAncestors({
+		descendantId: args.descendantUnique,
+	});
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbTemplateTreeItemModel => {
 	return {

@@ -2,7 +2,11 @@ import type { UmbRelationTypeTreeItemModel } from './types.js';
 import type { NamedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { RelationTypeResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
@@ -24,6 +28,7 @@ export class UmbRelationTypeTreeServerDataSource extends UmbTreeServerDataSource
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
@@ -39,6 +44,10 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	} else {
 		throw new Error('Not supported for the relation type tree');
 	}
+};
+
+const getAncestorsOf = () => {
+	throw new Error('Not supported for the member type tree');
 };
 
 const mapper = (item: NamedEntityTreeItemResponseModel): UmbRelationTypeTreeItemModel => {

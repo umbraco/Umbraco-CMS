@@ -4,7 +4,11 @@ import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/serve
 import type { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { StylesheetResource } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
@@ -26,6 +30,7 @@ export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBa
 		super(host, {
 			getRootItems,
 			getChildrenOf,
+			getAncestorsOf,
 			mapper,
 		});
 	}
@@ -47,6 +52,12 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 		});
 	}
 };
+
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+	// eslint-disable-next-line local-rules/no-direct-api-import
+	StylesheetResource.getTreeStylesheetAncestors({
+		descendantPath: args.descendantUnique,
+	});
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeItemModel => {
 	const serializer = new UmbServerFilePathUniqueSerializer();
