@@ -1,5 +1,9 @@
 import type { UmbTreeItemModelBase } from '../types.js';
-import type { UmbTreeChildrenOfRequestArgs, UmbTreeRootItemsRequestArgs } from './types.js';
+import type {
+	UmbTreeAncestorsOfRequestArgs,
+	UmbTreeChildrenOfRequestArgs,
+	UmbTreeRootItemsRequestArgs,
+} from './types.js';
 import type { UmbPagedModel, UmbDataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -33,4 +37,11 @@ export interface UmbTreeDataSource<TreeItemType extends UmbTreeItemModelBase> {
 	 * @memberof UmbTreeDataSource
 	 */
 	getChildrenOf(args: UmbTreeChildrenOfRequestArgs): Promise<UmbDataSourceResponse<UmbPagedModel<TreeItemType>>>;
+
+	/**
+	 * Gets the ancestors of the given item.
+	 * @return {*}  {Promise<UmbDataSourceResponse<Array<TreeItemType>>}
+	 * @memberof UmbTreeDataSource
+	 */
+	getAncestorsOf(args: UmbTreeAncestorsOfRequestArgs): Promise<UmbDataSourceResponse<Array<TreeItemType>>>;
 }
