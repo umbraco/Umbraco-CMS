@@ -1,14 +1,17 @@
-import type { UmbDocumentTreeItemModel } from '../tree/index.js';
+import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../tree/index.js';
 import { UmbDocumentTreeRepository } from '../tree/index.js';
+import type { UmbDocumentVariantModel } from '../types.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbVariantableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 @customElement('umb-variant-workspace-breadcrumb')
 export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
-	#workspaceContext?: any;
+	#workspaceContext?: UmbVariantableWorkspaceContextInterface<UmbVariantModel>;
 	#treeRepository = new UmbDocumentTreeRepository(this);
 
 	@state()
@@ -20,26 +23,41 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	@state()
 	_ancestors: UmbDocumentTreeItemModel[] = [];
 
+	@state()
+	_activeVariantId?: UmbVariantId;
+
 	constructor() {
 		super();
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			//this.observe(this.#workspaceContext.isNew, (value) => (this._isNew = value), 'breadcrumbWorkspaceIsNewObserver');
 			this.#requestAncestors();
-			this.#observeName();
+			this.#observeActiveVariant();
 		});
 	}
 
-	#observeName() {
+	#observeActiveVariant() {
 		this.observe(
-			this.#workspaceContext.splitView.activeVariantsInfo,
+			this.#workspaceContext?.splitView.activeVariantsInfo,
 			(value) => {
 				if (!value) return;
-				const variantId = UmbVariantId.Create(value[0]);
-				this._name = this.#workspaceContext.getName(variantId);
+				this._activeVariantId = UmbVariantId.Create(value[0]);
+				this.#observeActiveVariantName();
 			},
-			'breadcrumbWorkspaceActiveVariantNameObserver',
+
+			'breadcrumbWorkspaceActiveVariantObserver',
 		);
+	}
+
+	#observeActiveVariantName() {
+		this.observe(
+			this.#workspaceContext?.name(this._activeVariantId),
+			(value) => (this._name = value || 'Untitled'),
+			'breadcrumbWorkspaceNameObserver',
+		);
+	}
+
+	#getAncestorVariantName(variants: Array<UmbDocumentTreeItemVariantModel> = []) {
+		return variants.find((x) => this._activeVariantId.compare(x))?.name;
 	}
 
 	async #requestAncestors() {
@@ -58,7 +76,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 				${this._ancestors.map(
 					(item) =>
 						html`<uui-breadcrumb-item href="/section/content/workspace/document/edit/${item.unique}"
-							>${item.name}</uui-breadcrumb-item
+							>${this.#getAncestorVariantName(item.variants)}</uui-breadcrumb-item
 						>`,
 				)}
 				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
