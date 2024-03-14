@@ -211,14 +211,14 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
         if (memberFilter.MemberTypeId.HasValue)
         {
-            sql =  sql
+            sql = sql
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((memberNode, memberContent) => memberContent.NodeId == memberNode.NodeId)
                 .InnerJoin<NodeDto>("mtn").On<NodeDto, ContentDto>((memberTypeNode, memberContent) => memberContent.ContentTypeId == memberTypeNode.NodeId && memberTypeNode.UniqueId == memberFilter.MemberTypeId, "mtn");
         }
 
         if (memberFilter.MemberGroupName.IsNullOrWhiteSpace() is false)
         {
-            sql =  sql
+            sql = sql
                 .InnerJoin<Member2MemberGroupDto>().On<MemberDto, Member2MemberGroupDto>((m, memberToGroup) => m.NodeId == memberToGroup.Member)
                 .InnerJoin<NodeDto>("mgn").On<NodeDto, Member2MemberGroupDto>((memberGroupNode, memberToGroup) => memberToGroup.MemberGroup == memberGroupNode.NodeId && memberGroupNode.Text == memberFilter.MemberGroupName, "mgn");
         }
@@ -239,13 +239,14 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             {
                 (x) => x.Where<NodeDto>(memberNode => memberNode.Text != null && memberNode.Text.Contains(memberFilter.Filter)),
                 (x) => x.Where<MemberDto>(memberNode => memberNode.Email.Contains(memberFilter.Filter)),
-                (x) => x.Where<MemberDto>(memberNode => memberNode.LoginName.Contains(memberFilter.Filter))
+                (x) => x.Where<MemberDto>(memberNode => memberNode.LoginName.Contains(memberFilter.Filter)),
             };
 
             if (int.TryParse(memberFilter.Filter, out int filterAsIntId))
             {
                 whereClauses.Add((x) => x.Where<NodeDto>(memberNode => memberNode.NodeId == filterAsIntId));
             }
+
             if (Guid.TryParse(memberFilter.Filter, out Guid filterAsGuid))
             {
                 whereClauses.Add((x) => x.Where<NodeDto>(memberNode => memberNode.UniqueId == filterAsGuid));
@@ -270,15 +271,8 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
 
     private void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
     {
-        if (sql == null)
-        {
-            throw new ArgumentNullException(nameof(sql));
-        }
-
-        if (ordering == null)
-        {
-            throw new ArgumentNullException(nameof(ordering));
-        }
+        ArgumentNullException.ThrowIfNull(sql);
+        ArgumentNullException.ThrowIfNull(ordering);
 
         if (ordering.OrderBy.IsNullOrWhiteSpace())
         {
@@ -288,7 +282,9 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         var orderBy = ordering.OrderBy.ToLowerInvariant() switch
         {
             "username" => sql.GetAliasedField(SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName)),
-            _ => throw new NotSupportedException("Ordering not supported")
+            "name" => sql.GetAliasedField(SqlSyntax.GetFieldName<NodeDto>(x => x.Text)),
+            "email" => sql.GetAliasedField(SqlSyntax.GetFieldName<MemberDto>(x => x.Email)),
+            _ => throw new NotSupportedException("Ordering not supported"),
         };
 
         if (ordering.Direction == Direction.Ascending)
