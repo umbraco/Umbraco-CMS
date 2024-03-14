@@ -16,7 +16,6 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 		if (value === this._group) return;
 		this._group = value;
 		this._groupId = value?.id;
-		this._groupName = value?.name ?? '';
 		this.#checkInherited();
 	}
 	public get group(): UmbPropertyTypeContainerModel | undefined {
@@ -40,9 +39,6 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 
 	@state()
 	_groupId?: string;
-
-	@state()
-	_groupName?: string;
 
 	@state()
 	_hasOwnerContainer?: boolean;
@@ -99,7 +95,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._inherited !== undefined && this._groupId && this._groupName
+		return this._inherited !== undefined && this._groupId
 			? html`
 					<uui-box>
 						${this.#renderContainerHeader()}
