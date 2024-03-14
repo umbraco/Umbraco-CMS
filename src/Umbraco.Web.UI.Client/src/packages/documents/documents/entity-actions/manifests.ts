@@ -4,12 +4,9 @@ import { UMB_DOCUMENT_PICKER_MODAL } from '../modals/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as publicAccessManifests } from './public-access/manifests.js';
 import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
-const entityActions: Array<ManifestTypes> = [
-	...createManifests,
-	...publicAccessManifests,
-	...cultureAndHostnamesManifests,
+const entityActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
 		kind: 'default',
@@ -72,4 +69,9 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...entityActions];
+export const manifests = [
+	...createManifests,
+	...publicAccessManifests,
+	...cultureAndHostnamesManifests,
+	...entityActions,
+];

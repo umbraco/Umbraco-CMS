@@ -127,15 +127,26 @@ export class UmbMediaTypeWorkspaceContext
 		return data;
 	}
 
-	async load(entityId: string) {
+	async load(unique: string) {
 		this.resetState();
-		const { data } = await this.structure.loadType(entityId);
-		if (!data) return undefined;
+		const { data, asObservable } = await this.structure.loadType(unique);
 
-		this.setIsNew(false);
-		this.setIsSorting(false);
-		this.#persistedData.setValue(data);
-		return data;
+		if (data) {
+			this.setIsNew(false);
+			this.setIsSorting(false);
+			this.#persistedData.update(data);
+		}
+
+		if (asObservable) {
+			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbMediaTypeStoreObserver');
+		}
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/settings/workspace/media-type-root');
+		}
 	}
 
 	/**

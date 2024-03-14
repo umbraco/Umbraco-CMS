@@ -114,14 +114,23 @@ export class UmbMemberWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
-		const { data } = await this.#getDataPromise;
-		if (!data) return undefined;
+		type GetDataType = Awaited<ReturnType<UmbMemberDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
-		this.setIsNew(false);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.update(data);
+			this.#currentData.update(data);
+		}
 
-		return data || undefined;
+		this.observe(asObservable(), (member) => this.#onMemberStoreChange(member), 'umbMemberStoreObserver');
+	}
+
+	#onMemberStoreChange(member: EntityType | undefined) {
+		if (!member) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/member-management');
+		}
 	}
 
 	async create(memberTypeUnique: string) {
@@ -287,17 +296,25 @@ export class UmbMemberWorkspaceContext
 	}
 
 	async save() {
-		const data = this.getData();
-		if (!data) throw new Error('No data to save');
+		if (!this.#currentData.value) throw new Error('Data is missing');
+		if (!this.#currentData.value.unique) throw new Error('Unique is missing');
+
+		let newData = undefined;
 
 		if (this.getIsNew()) {
-			await this.repository.create(data);
+			const { data } = await this.repository.create(this.#currentData.value);
+			newData = data;
 		} else {
-			await this.repository.save(data);
+			const { data } = await this.repository.save(this.#currentData.value);
+			newData = data;
 		}
 
-		this.setIsNew(false);
-		this.workspaceComplete(data);
+		if (newData) {
+			this.#persistedData.setValue(newData);
+			this.#currentData.setValue(newData);
+			this.setIsNew(false);
+			this.workspaceComplete(newData);
+		}
 	}
 
 	async delete() {
