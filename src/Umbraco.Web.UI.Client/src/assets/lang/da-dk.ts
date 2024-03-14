@@ -308,7 +308,7 @@ export default {
 		languagesToSendForApproval: 'Hvilke sprog vil du gerne sende til godkendelse?',
 		languagesToSchedule: 'Hvilke sprog vil du gerne planlægge?',
 		languagesToUnpublish:
-			'Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil\n      afpublicere alle sprog.\n    ',
+			'Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil afpublicere alle sprog.',
 		resetFocalPoint: 'Nulstil fokuspunkt',
 		variantsWillBeSaved: 'Alle nye varianter vil blive gemt.',
 		publishRequiresVariants: 'De følgende varianter er krævet for at en udgivelse kan finde sted:',
