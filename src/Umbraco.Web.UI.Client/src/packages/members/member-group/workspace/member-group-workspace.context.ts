@@ -38,12 +38,24 @@ export class UmbMemberGroupWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
-		const { data } = await this.#getDataPromise;
-		if (!data) return undefined;
+		type GetDataType = Awaited<ReturnType<UmbMemberGroupDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
+		}
+
+		this.observe(
+			asObservable(),
+			(memberGroup) => this.#onMemberGroupStoreChange(memberGroup),
+			'umbMemberGroupStoreObserver',
+		);
+	}
+
+	#onMemberGroupStoreChange(memberGroup: UmbMemberGroupDetailModel | undefined) {
+		if (!memberGroup) {
+			history.pushState(null, '', 'section/member-management/view/member-groups');
 		}
 	}
 
