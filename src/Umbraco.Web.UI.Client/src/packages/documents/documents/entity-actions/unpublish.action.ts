@@ -45,6 +45,7 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<never>
 		const result = await modalManagerContext
 			.open(this, UMB_DOCUMENT_UNPUBLISH_MODAL, {
 				data: {
+					documentUnique: this.args.unique,
 					options,
 				},
 				value: { selection },

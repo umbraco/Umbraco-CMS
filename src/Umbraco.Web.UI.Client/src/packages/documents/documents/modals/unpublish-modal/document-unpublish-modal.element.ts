@@ -3,7 +3,7 @@ import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
 } from './document-unpublish-modal.token.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
@@ -73,6 +73,14 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				</umb-localize>
 			</p>
 
+			${this.data?.documentUnique
+				? html`
+						<umb-document-tracked-reference-table
+							id="trackedReferences"
+							unique=${this.data?.documentUnique}></umb-document-tracked-reference-table>
+					`
+				: nothing}
+
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
@@ -89,8 +97,12 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		css`
 			:host {
 				display: block;
-				width: 400px;
+				width: 600px;
 				max-width: 90vw;
+			}
+
+			#trackedReferences {
+				--uui-table-cell-padding: 0;
 			}
 		`,
 	];
