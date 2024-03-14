@@ -3096,6 +3096,9 @@
                       },
                       {
                         "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -3123,6 +3126,9 @@
                       },
                       {
                         "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -3150,6 +3156,9 @@
                       },
                       {
                         "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -26315,6 +26324,9 @@
                       },
                       {
                         "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -26342,6 +26354,9 @@
                       },
                       {
                         "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                       }
                     ]
                   }
@@ -26369,6 +26384,9 @@
                       },
                       {
                         "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                      },
+                      {
+                        "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                       }
                     ]
                   }
