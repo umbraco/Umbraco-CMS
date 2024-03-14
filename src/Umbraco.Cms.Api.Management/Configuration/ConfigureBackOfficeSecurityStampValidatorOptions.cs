@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Api.Management.Configuration;
@@ -13,16 +11,18 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 public class ConfigureBackOfficeSecurityStampValidatorOptions : IConfigureOptions<BackOfficeSecurityStampValidatorOptions>
 {
     private readonly SecuritySettings _securitySettings;
+    private readonly TimeProvider _timeProvider;
 
-    public ConfigureBackOfficeSecurityStampValidatorOptions()
-        : this(StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+    public ConfigureBackOfficeSecurityStampValidatorOptions(IOptions<SecuritySettings> securitySettings, TimeProvider timeProvider)
     {
+        _timeProvider = timeProvider;
+        _securitySettings = securitySettings.Value;
     }
-
-    public ConfigureBackOfficeSecurityStampValidatorOptions(IOptions<SecuritySettings> securitySettings)
-        => _securitySettings = securitySettings.Value;
 
     /// <inheritdoc />
     public void Configure(BackOfficeSecurityStampValidatorOptions options)
-        => ConfigureSecurityStampOptions.ConfigureOptions(options, _securitySettings);
+    {
+        options.TimeProvider = _timeProvider;
+        ConfigureSecurityStampOptions.ConfigureOptions(options, _securitySettings);
+    }
 }

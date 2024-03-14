@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Security;
@@ -13,8 +12,9 @@ public class BackOfficeSecurityStampValidator : SecurityStampValidator<BackOffic
 {
     public BackOfficeSecurityStampValidator(
         IOptions<BackOfficeSecurityStampValidatorOptions> options,
-        BackOfficeSignInManager signInManager, ISystemClock clock, ILoggerFactory logger)
-        : base(options, signInManager, clock, logger)
+        BackOfficeSignInManager signInManager,
+        ILoggerFactory logger)
+        : base(options, signInManager, logger)
     {
     }
 }
