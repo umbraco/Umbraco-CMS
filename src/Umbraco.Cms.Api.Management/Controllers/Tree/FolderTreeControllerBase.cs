@@ -69,6 +69,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             ? Array.Empty<IEntitySlim>()
             : EntityService.GetPagedChildren(
                     parentKey,
+                    new [] { FolderObjectType, ItemObjectType },
                     ItemObjectType,
                     skip,
                     take,
