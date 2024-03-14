@@ -1,6 +1,6 @@
 import { UmbDocumentPublishingRepository } from '../../repository/index.js';
 import { UmbPublishDocumentEntityAction } from '../../entity-actions/publish.action.js';
-import type { UmbDocumentVariantOptionModel } from '../../types.js';
+import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../modals/index.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
@@ -26,6 +26,15 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 
 		const options: UmbDocumentVariantOptionModel[] = (languageData?.items ?? []).map((language) => ({
 			language,
+			variant: {
+				name: language.name,
+				culture: language.unique,
+				state: null,
+				createDate: null,
+				publishDate: null,
+				updateDate: null,
+				segment: null,
+			},
 			unique: new UmbVariantId(language.unique, null).toString(),
 			culture: language.unique,
 			segment: null,

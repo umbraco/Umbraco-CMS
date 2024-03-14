@@ -1,5 +1,5 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
-import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
@@ -70,8 +70,9 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 			case UmbDocumentVariantState.DRAFT:
 				return html`<umb-localize key="content_unpublished">Draft</umb-localize>`;
 			case UmbDocumentVariantState.NOT_CREATED:
-			default:
 				return html`<umb-localize key="content_notCreated">Not created</umb-localize>`;
+			default:
+				return nothing;
 		}
 	}
 
