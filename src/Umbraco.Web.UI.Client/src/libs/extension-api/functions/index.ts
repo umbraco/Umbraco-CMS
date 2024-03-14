@@ -1,3 +1,4 @@
+export * from './create-extension-api-by-alias.function.js';
 export * from './create-extension-api.function.js';
 export * from './create-extension-element-with-api.function.js';
 export * from './create-extension-element.function.js';
