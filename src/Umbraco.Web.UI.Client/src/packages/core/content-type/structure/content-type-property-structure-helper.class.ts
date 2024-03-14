@@ -50,7 +50,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
-		this._observeContainers();
+		this.#observeContainers();
 	}
 
 	public getStructureManager() {
@@ -60,7 +60,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	public setContainerId(value?: string | null) {
 		if (this._containerId === value) return;
 		this._containerId = value;
-		this._observeContainers();
+		this.#observeContainers();
 	}
 	public getContainerId() {
 		return this._containerId;
@@ -72,11 +72,11 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 	private _parentType?: UmbPropertyContainerTypes;
 
 	#containers?: Array<UmbPropertyTypeContainerModel>;
-	private _observeContainers() {
+	#observeContainers() {
 		if (!this.#structure || !this._containerId) return;
 
 		if (this._containerId === null) {
-			this._observePropertyStructureOf(null);
+			this.#observePropertyStructureOf(null);
 			this.removeControllerByAlias('_observeContainers');
 		} else {
 			this.observe(
@@ -141,14 +141,14 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 					this.#propertyStructure.setValue(_propertyStructure);
 				}
 
-				groupContainers.forEach((group) => this._observePropertyStructureOf(group.id));
+				groupContainers.forEach((group) => this.#observePropertyStructureOf(group.id));
 				this.#containers = groupContainers;
 			},
 			'_observeContainers',
 		);
 	}
 
-	private _observePropertyStructureOf(groupId?: string | null) {
+	#observePropertyStructureOf(groupId?: string | null) {
 		if (!this.#structure || groupId === undefined) return;
 
 		this.observe(

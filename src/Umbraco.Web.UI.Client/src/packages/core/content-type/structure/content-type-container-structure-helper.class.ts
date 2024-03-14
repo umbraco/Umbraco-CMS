@@ -57,7 +57,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
-		this._observeParentAlikeContainers();
+		this.#observeParentAlikeContainers();
 	}
 
 	public getStructureManager() {
@@ -67,7 +67,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	public setParentType(value?: UmbPropertyContainerTypes) {
 		if (this._parentType === value) return;
 		this._parentType = value;
-		this._observeParentAlikeContainers();
+		this.#observeParentAlikeContainers();
 	}
 	public getParentType() {
 		return this._parentType;
@@ -76,7 +76,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	public setContainerChildType(value?: UmbPropertyContainerTypes) {
 		if (this._childType === value) return;
 		this._childType = value;
-		this._observeParentAlikeContainers();
+		this.#observeParentAlikeContainers();
 	}
 	public getContainerChildType() {
 		return this._childType;
@@ -85,7 +85,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	public setName(value?: string) {
 		if (this._parentName === value) return;
 		this._parentName = value;
-		this._observeParentAlikeContainers();
+		this.#observeParentAlikeContainers();
 	}
 	public getName() {
 		return this._parentName;
@@ -95,7 +95,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		if (this._isRoot === value) return;
 		this._isRoot = value;
 		this._parentId = null;
-		this._observeParentAlikeContainers();
+		this.#observeParentAlikeContainers();
 	}
 	public getIsRoot() {
 		return this._isRoot;
@@ -104,13 +104,13 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	public setParentId(value: string | null | undefined) {
 		if (this._parentId === value) return;
 		this._parentId = value;
-		this._observeParentAlikeContainers();
+		this.#observeParentAlikeContainers();
 	}
 	public getParentId() {
 		return this._parentId;
 	}
 
-	private _observeParentAlikeContainers() {
+	#observeParentAlikeContainers() {
 		if (!this.#structure) return;
 
 		if (this._isRoot) {
@@ -118,11 +118,11 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			this.#containers.setValue([]);
 			//this._observeChildProperties(); // We cannot have root properties currently, therefor we instead just set it to false:
 			this.#hasProperties.setValue(false);
-			this._observeRootContainers();
+			this.#observeRootContainers();
 		} else if (this._parentName && this._parentType) {
 			this.#containers.setValue([]);
 			this.observe(
-				// This only works because we just have two levels, meaning this is the upper level and we want it to merge, so it okay this does not take parent parent into account: [NL]
+				// This only works because we just have two levels, meaning this is the upper level and we want it to merge, so its okay this does not take parent-parent (And further structure) into account: [NL]
 				this.#structure.containersByNameAndType(this._parentName, this._parentType),
 				(parentContainers) => {
 					this._ownerContainers = [];
@@ -134,8 +134,8 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 					});
 					this._parentMatchingContainers = parentContainers ?? [];
 					if (this._parentMatchingContainers.length > 0) {
-						this._observeChildProperties();
-						this._observeChildContainers();
+						this.#observeChildProperties();
+						this.#observeChildContainers();
 					} else {
 						// Do some reset:
 						this.#hasProperties.setValue(false);
@@ -147,7 +147,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		}
 	}
 
-	private _observeChildProperties() {
+	#observeChildProperties() {
 		if (!this.#structure) return;
 
 		this._parentMatchingContainers.forEach((container) => {
@@ -161,7 +161,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		});
 	}
 
-	private _observeChildContainers() {
+	#observeChildContainers() {
 		if (!this.#structure || !this._parentName || !this._childType || !this._parentId) return;
 
 		// TODO: If a owner container is removed, Or suddenly matches name-wise with a inherited container, then we now miss the inherited container,maybe [NL]
@@ -214,7 +214,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 			: containers;
 	}
 
-	private _observeRootContainers() {
+	#observeRootContainers() {
 		if (!this.#structure || !this._isRoot || !this._childType || this._parentId === undefined) return;
 
 		this.observe(

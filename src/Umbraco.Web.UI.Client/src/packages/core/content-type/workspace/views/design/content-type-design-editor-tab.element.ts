@@ -193,7 +193,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 								class="container-handle"
 								?sort-mode-active=${this._sortModeActive}
 								.group=${group}
-								.groupStructureHelper=${this.#groupStructureHelper}>
+								.groupStructureHelper=${this.#groupStructureHelper as any}>
 							</umb-content-type-design-editor-group>
 						`,
 					)}
