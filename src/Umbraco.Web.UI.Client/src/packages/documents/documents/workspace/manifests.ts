@@ -1,9 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-//import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
-//import { UmbPublishDocumentEntityAction } from '../entity-actions/publish.action.js';
+import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-schedule.action.js';
+import { UmbDocumentUnpublishWorkspaceAction } from './actions/unpublish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
-//import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
-//import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -11,7 +9,6 @@ import type {
 	ManifestWorkspaceActionMenuItem,
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-schedule.action.js';
 
 export const UMB_DOCUMENT_WORKSPACE_ALIAS = 'Umb.Workspace.Document';
 
@@ -152,10 +149,10 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
 		name: 'Unpublish',
 		weight: 10,
-		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		api: UmbDocumentUnpublishWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Unpublish',
+			label: 'Unpublish...',
 			icon: 'icon-globe',
 		},
 	},
