@@ -666,10 +666,6 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
     private class GenericContentEntityDto : DocumentEntityDto
     {
         public string? MediaPath { get; set; }
-
-        public Guid ContentTypeKey { get; set; }
-
-        public Guid? ListView { get; set; }
     }
 
     /// <summary>
@@ -738,6 +734,10 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         public string? Thumbnail { get; set; }
         public bool IsContainer { get; set; }
 
+        public Guid ContentTypeKey { get; set; }
+
+        public Guid? ListView { get; set; }
+
         // ReSharper restore UnusedAutoPropertyAccessor.Local
         // ReSharper restore UnusedMember.Local
     }
@@ -794,12 +794,8 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         entity.ContentTypeAlias = dto.Alias;
         entity.ContentTypeIcon = dto.Icon;
         entity.ContentTypeThumbnail = dto.Thumbnail;
-
-        if (dto is GenericContentEntityDto contentDto)
-        {
-            entity.ContentTypeKey = contentDto.ContentTypeKey;
-            entity.ListViewKey = contentDto.ListView;
-        }
+        entity.ContentTypeKey = dto.ContentTypeKey;
+        entity.ListViewKey = dto.ListView;
     }
 
     private MediaEntitySlim BuildMediaEntity(BaseDto dto)
