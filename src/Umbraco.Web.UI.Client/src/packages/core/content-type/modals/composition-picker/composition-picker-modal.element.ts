@@ -1,4 +1,3 @@
-import { UmbDocumentTypeCompositionRepository } from '../../repository/index.js';
 import type {
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue,
@@ -6,9 +5,12 @@ import type {
 import { css, html, customElement, state, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type {
+	UmbDocumentTypeCompositionRepository,
 	UmbDocumentTypeCompositionCompatibleModel,
 	UmbDocumentTypeCompositionReferenceModel,
 } from '@umbraco-cms/backoffice/document-type';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 interface CompatibleCompositions {
 	path: string;
@@ -20,8 +22,10 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	UmbCompositionPickerModalData,
 	UmbCompositionPickerModalValue
 > {
-	#compositionRepository = new UmbDocumentTypeCompositionRepository(this);
+	// TODO: Loosen this from begin specific to Document Types, so we can have a general interface for composition repositories. [NL]
+	#compositionRepository?: UmbDocumentTypeCompositionRepository;
 	#unique?: string;
+	#init?: Promise<void>;
 
 	@state()
 	private _references: Array<UmbDocumentTypeCompositionReferenceModel> = [];
@@ -31,9 +35,17 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _selection: Array<string> = [];
-
 	connectedCallback() {
 		super.connectedCallback();
+
+		const alias = this.data?.compositionRepositoryAlias;
+		if (alias) {
+			this.#init = new UmbExtensionApiInitializer(this, umbExtensionsRegistry, alias, [this], (permitted, ctrl) => {
+				this.#compositionRepository = permitted ? (ctrl.api as UmbDocumentTypeCompositionRepository) : undefined;
+			}).asPromise();
+		} else {
+			throw new Error('No composition repository alias provided');
+		}
 
 		this._selection = this.data?.selection ?? [];
 		this.modalContext?.setValue({ selection: this._selection });
@@ -42,8 +54,9 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	}
 
 	async #requestReference() {
+		await this.#init;
 		this.#unique = this.data?.unique;
-		if (!this.#unique) return;
+		if (!this.#unique || !this.#compositionRepository) return;
 
 		const { data } = await this.#compositionRepository.getReferences(this.#unique);
 
@@ -55,7 +68,8 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 	}
 
 	async #requestAvailableCompositions() {
-		if (!this.#unique) return;
+		await this.#init;
+		if (!this.#unique || !this.#compositionRepository) return;
 
 		const isElement = this.data?.isElement;
 		const currentPropertyAliases = this.data?.currentPropertyAliases;
@@ -74,6 +88,16 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 			path,
 			compositions: data.filter((c) => '/' + c.folderPath.join('/') === path),
 		}));
+	}
+
+	#onSelectionAdd(unique: string) {
+		this._selection = [...this._selection, unique];
+		this.modalContext?.setValue({ selection: this._selection });
+	}
+
+	#onSelectionRemove(unique: string) {
+		this._selection = this._selection.filter((s) => s !== unique);
+		this.modalContext?.setValue({ selection: this._selection });
 	}
 
 	render() {
@@ -144,16 +168,6 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 				There are no Content Types available to use as a composition
 			</umb-localize>`;
 		}
-	}
-
-	#onSelectionAdd(unique: string) {
-		this._selection = [...this._selection, unique];
-		this.modalContext?.setValue({ selection: this._selection });
-	}
-
-	#onSelectionRemove(unique: string) {
-		this._selection = this._selection.filter((s) => s !== unique);
-		this.modalContext?.setValue({ selection: this._selection });
 	}
 
 	#renderCompositionsItems(compositionsList: Array<UmbDocumentTypeCompositionCompatibleModel>) {

@@ -1,8 +1,9 @@
+import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/composition/index.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceActions,
-	ManifestWorkspaceView,
+	ManifestWorkspaceViews,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DocumentType';
@@ -11,23 +12,23 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.DocumentType',
 	name: 'Document Type Workspace',
-	js: () => import('./document-type-workspace.element.js'),
+	element: () => import('./document-type-workspace.element.js'),
 	meta: {
 		entityType: 'document-type',
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceView> = [
+const workspaceViews: Array<ManifestWorkspaceViews> = [
 	{
 		type: 'workspaceView',
+		kind: 'contentTypeDesignEditor',
 		alias: 'Umb.WorkspaceView.DocumentType.Design',
 		name: 'Document Type Workspace Design View',
-		js: () => import('./views/design/document-type-workspace-view-edit.element.js'),
-		weight: 1000,
 		meta: {
 			label: 'Design',
 			pathname: 'design',
 			icon: 'icon-document-dashed-line',
+			compositionRepositoryAlias: UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
@@ -40,7 +41,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.Structure',
 		name: 'Document Type Workspace Structure View',
-		js: () => import('./views/structure/document-type-workspace-view-structure.element.js'),
+		element: () => import('./views/structure/document-type-workspace-view-structure.element.js'),
 		weight: 800,
 		meta: {
 			label: 'Structure',
@@ -58,7 +59,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.Settings',
 		name: 'Document Type Workspace Settings View',
-		js: () => import('./views/settings/document-type-workspace-view-settings.element.js'),
+		element: () => import('./views/settings/document-type-workspace-view-settings.element.js'),
 		weight: 600,
 		meta: {
 			label: 'Settings',
@@ -76,7 +77,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.Templates',
 		name: 'Document Type Workspace Templates View',
-		js: () => import('./views/templates/document-type-workspace-view-templates.element.js'),
+		element: () => import('./views/templates/document-type-workspace-view-templates.element.js'),
 		weight: 400,
 		meta: {
 			label: 'Templates',

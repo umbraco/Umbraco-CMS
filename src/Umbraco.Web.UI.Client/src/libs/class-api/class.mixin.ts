@@ -54,7 +54,7 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 			// This type dance checks if the Observable given could be undefined, if it potentially could be undefined it means that this potentially could return undefined and then call the callback with undefined. [NL]
 			source: ObservableType,
 			callback: ObserverCallback<SpecificT>,
-			controllerAlias?: UmbControllerAlias,
+			controllerAlias?: UmbControllerAlias | null,
 		): SpecificR {
 			// Fallback to use a hash of the provided method, but only if the alias is undefined.
 			controllerAlias ??= controllerAlias === undefined ? simpleHashCode(callback.toString()) : undefined;
