@@ -98,23 +98,21 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 										this.removeControllerByAlias('_observeContainers');
 										this._parentName = undefined;
 										this._parentType = undefined;
-										this.#propertyStructure.setValue([]);
-										throw new Error('Main parent container does not exist');
 									}
 								},
 								'_observeMainParentContainer',
 							);
 						} else {
+							this.removeControllerByAlias('_observeMainParentContainer');
 							this._parentName = null; //In this way we want to look for one without a parent. [NL]
 							this._parentType = undefined;
-							this.removeControllerByAlias('_observeMainParentContainer');
 							this.#observeSimilarContainers();
 						}
 					} else {
+						this.removeControllerByAlias('_observeContainers');
 						this._containerName = undefined;
 						this._containerType = undefined;
-						this.removeControllerByAlias('_observeContainers');
-						throw new Error('Main container does not exist');
+						this.#propertyStructure.setValue([]);
 					}
 				},
 				'_observeMainContainer',

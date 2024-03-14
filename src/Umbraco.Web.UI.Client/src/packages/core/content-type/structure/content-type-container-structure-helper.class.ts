@@ -117,25 +117,22 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 										this.removeControllerByAlias('_observeContainers');
 										this._parentName = undefined;
 										this._parentType = undefined;
-										// TODO: reset has Properties.
-										// If you get this error, I might think its because we don't clean up child-containers and child-properties at this point [NL]
-										throw new Error('Main parent container does not exist');
 									}
 								},
 								'_observeMainParentContainer',
 							);
 						} else {
+							this.removeControllerByAlias('_observeMainParentContainer');
 							this._parentName = null; //In this way we want to look for one without a parent. [NL]
 							this._parentType = undefined;
-							this.removeControllerByAlias('_observeMainParentContainer');
 							this.#observeSimilarContainers();
 						}
 					} else {
+						this.removeControllerByAlias('_observeContainers');
 						this._containerName = undefined;
 						this._containerType = undefined;
 						// TODO: reset has Properties.
-						this.removeControllerByAlias('_observeContainers');
-						throw new Error('Main container does not exist');
+						this.#hasProperties.setValue(false);
 					}
 				},
 				'_observeMainContainer',
