@@ -37,6 +37,10 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 
 	#onActionExecuted(event: UmbActionExecutedEvent) {
 		event.stopPropagation();
+
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._popover?.hidePopover();
 	}
 
@@ -50,8 +54,11 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	render() {
 		return this._unique && this._entityType
 			? html`
-					<uui-button id="action-button" popovertarget="workspace-entity-action-menu-popover" label="Actions">
-						Actions
+					<uui-button
+						id="action-button"
+						popovertarget="workspace-entity-action-menu-popover"
+						label=${this.localize.term('general_actions')}>
+						${this.localize.term('general_actions')}
 						<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 					</uui-button>
 					<uui-popover-container
