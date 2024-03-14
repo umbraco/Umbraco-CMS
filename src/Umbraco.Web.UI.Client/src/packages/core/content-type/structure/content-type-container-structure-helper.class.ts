@@ -85,109 +85,6 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		return this._childType;
 	}
 
-	/*
-	#observeParentAlikeContainers() {
-		if (!this.#structure) return;
-
-		if (this._isRoot) {
-			// CLean up:
-			this._parentMatchingContainers.forEach((container) => {
-				this.removeControllerByAlias('_observeParentHasProperties_' + container.id);
-				this.removeControllerByAlias('_observeGroupsOf_' + container.id);
-			});
-			this._parentMatchingContainers = [];
-			this.removeControllerByAlias('_observeOwnerContainers');
-			this.#containers.setValue([]);
-			this.#mergedContainers.setValue([]);
-			//this._observeChildProperties(); // We cannot have root properties currently, therefor we instead just set it to false:
-			this.#hasProperties.setValue(false);
-			this.#observeRootContainers();
-		} else if (this._parentName && this._parentType) {
-			this.#containers.setValue([]);
-			this.#mergedContainers.setValue([]);
-			this.observe(
-				// This only works because we just have two levels, meaning this is the upper level and we want it to merge, so its okay this does not take parent-parent (And further structure) into account: [NL]
-				this.#structure.containersByNameAndType(this._parentName, this._parentType),
-				(parentContainers) => {
-					this._ownerContainers = [];
-					this.#containers.setValue([]);
-					this.#mergedContainers.setValue([]);
-					// Stop observing a the previous _parentMatchingContainers...
-					this._parentMatchingContainers.forEach((container) => {
-						this.removeControllerByAlias('_observeParentHasProperties_' + container.id);
-						this.removeControllerByAlias('_observeGroupsOf_' + container.id);
-					});
-					this._parentMatchingContainers = parentContainers ?? [];
-					if (this._parentMatchingContainers.length > 0) {
-						this.#observeChildProperties();
-						this.#observeChildContainers();
-					} else {
-						// Do some reset:
-						this.#hasProperties.setValue(false);
-						this.removeControllerByAlias('_observeOwnerContainers');
-					}
-				},
-				'_observeParentContainers',
-			);
-		}
-	}
-
-	#observeChildProperties() {
-		if (!this.#structure) return;
-
-		this._parentMatchingContainers.forEach((container) => {
-			this.observe(
-				this.#structure!.hasPropertyStructuresOf(container.id!),
-				(hasProperties) => {
-					this.#hasProperties.setValue(hasProperties);
-				},
-				'_observeParentHasProperties_' + container.id,
-			);
-		});
-	}
-
-	#observeChildContainers() {
-		if (!this.#structure || !this._parentName || !this._childType || !this._parentId) return;
-
-		// TODO: If a owner container is removed, Or suddenly matches name-wise with a inherited container, then we now miss the inherited container,maybe [NL]
-		this.observe(
-			this.#structure.ownerContainersOf(this._childType, this._parentId),
-			(containers) => {
-				this._ownerContainers = containers ?? [];
-				this.#containers.append(this._ownerContainers);
-				//this.#mergedContainers.setValue(this.#filterNonOwnerContainers(this.#mergedContainers.getValue()));
-			},
-			'_observeOwnerContainers',
-		);
-
-		this._parentMatchingContainers.forEach((parentCon) => {
-			this.observe(
-				this.#structure!.containersOfParentId(parentCon.id, this._childType!),
-				(containers) => {
-					// Problem this will never remove a container? [NL]
-					this.#containers.append(containers);
-
-					// First we will filter out non-owner containers:
-					const old = this.#mergedContainers.getValue();
-					// Then filter out the containers that are in the new list, either based on id or a match on name & type.
-					// Matching on name & type will result in the latest being the one we include, notice will only counts for non-owner containers.
-					const oldFiltered = old.filter(
-						(x) => !containers.some((y) => y.id === x.id || (y.name === x.name && y.type === x.type)),
-					);
-
-					const newFiltered = oldFiltered.concat(containers);
-
-					// Filter out non owners again:
-					this.#mergedContainers.setValue(this.#filterNonOwnerContainers(newFiltered));
-
-				},
-				'_observeGroupsOf_' + parentCon.id,
-			);
-		});
-	}
-
-	*/
-
 	private _containerName?: string;
 	private _containerType?: UmbPropertyContainerTypes;
 	private _parentName?: string | null;
@@ -205,6 +102,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 				this.#structure.containerById(this._containerId),
 				(container) => {
 					if (container) {
+						console.log('Container update', container.name);
 						this._containerName = container.name ?? '';
 						this._containerType = container.type;
 						if (container.parent) {
@@ -221,6 +119,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 										this._parentName = undefined;
 										this._parentType = undefined;
 										// TODO: reset has Properties.
+										// If you get this error, I might think its because we don't clean up child-containers and child-properties at this point [NL]
 										throw new Error('Main parent container does not exist');
 									}
 								},
@@ -274,9 +173,6 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 						'_observeGroupsOf_' + container.id,
 					);
 				});
-
-				//this._ownerContainers = this.#structure!.getOwnerContainers(this._containerType!, this._containerId!) ?? [];
-				//this.#containers.setValue(groupContainers);
 			},
 			'_observeContainers',
 		);
@@ -288,20 +184,11 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.observe(
 			this.#structure.rootContainers(this._childType),
 			(rootContainers) => {
-				console.log('root containers', rootContainers);
 				// Here (When getting root containers) we get containers from all ContentTypes. It also means we need to do an extra filtering to ensure we only get one of each containers. [NL]
 
 				// For that we get the owner containers first (We do not need to observe as this observation will be triggered if one of the owner containers change) [NL]
 				this._ownerContainers = this.#structure!.getOwnerContainers(this._childType!, this._containerId!) ?? [];
 				this.#containers.setValue(rootContainers);
-				/*
-				// Then we filter out the duplicate containers based on type and name:
-				rootContainers = rootContainers.filter(
-					(x, i, cons) => i === cons.findIndex((y) => y.name === x.name && y.type === x.type),
-				);
-
-				this.#mergedContainers.setValue(this.#filterNonOwnerContainers(rootContainers));
-				*/
 			},
 			'_observeRootContainers',
 		);
@@ -349,6 +236,10 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	isOwnerChildContainer(containerId?: string) {
 		if (!this.#structure || !containerId) return;
 		return this._ownerContainers.some((x) => x.id === containerId);
+	}
+
+	containersByNameAndType(name: string, type: UmbPropertyContainerTypes) {
+		return this.#containers.asObservablePart((cons) => cons.filter((x) => x.name === name && x.type === type));
 	}
 
 	/** Manipulate methods: */

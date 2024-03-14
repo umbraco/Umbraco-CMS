@@ -154,9 +154,8 @@ export class UmbContentTypeDesignEditorPropertiesElement extends UmbLitElement {
 					this._editContentTypePath = routeBuilder({});
 				});
 
-			const docTypeObservable = workspaceContext.structure.ownerContentType;
 			this.observe(
-				docTypeObservable,
+				workspaceContext.structure.ownerContentType,
 				(contentType) => {
 					this._ownerContentType = contentType;
 				},

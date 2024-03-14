@@ -56,17 +56,12 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 			if (this.group.name) {
 				// We can first match with something if we have a name [NL]
 				this.observe(
-					// TODO: Missing something about parent name and type here as well, or maybe this one can use the groupStructureHelper for this case:
-					// TODO: When the groupStructureHelper holds the full list of containers, then we can use that to look up all child containers by name and type.[NL]
-					this.groupStructureHelper.getStructureManager()!.containersByNameAndType(this.group.name, 'Group'),
+					this.groupStructureHelper.containersByNameAndType(this.group.name, 'Group'),
 					(containers) => {
-						const amountOfContainers = containers.length;
-
 						const hasAOwnerContainer = containers.some((con) =>
 							this.groupStructureHelper!.isOwnerChildContainer(con.id),
 						);
-
-						const pureOwnerContainer = hasAOwnerContainer && amountOfContainers === 1;
+						const pureOwnerContainer = hasAOwnerContainer && containers.length === 1;
 
 						this._hasOwnerContainer = hasAOwnerContainer;
 						this._inherited = !pureOwnerContainer;
