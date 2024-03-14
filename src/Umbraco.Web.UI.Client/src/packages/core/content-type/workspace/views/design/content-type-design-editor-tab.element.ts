@@ -135,7 +135,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	render() {
 		return html`
-		<h1>${this.containerId}</h1>
 		${
 			this._sortModeActive
 				? html`<uui-button
@@ -159,7 +158,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 						this._groups,
 						(group) => group.id + '_' + group.name + '_' + (group.parent?.id ?? ''),
 						(group) => html`
-							<b>${group.id}</b>
 							<umb-content-type-design-editor-group
 								class="container-handle"
 								?sort-mode-active=${this._sortModeActive}

@@ -15,7 +15,10 @@ import {
 	type PropertyTypeContainerModelBaseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestWorkspaceViewContentTypeDesignEditorKind,
+	UmbWorkspaceViewElement,
+} from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -75,8 +78,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#workspaceContext?: (typeof UMB_CONTENT_TYPE_WORKSPACE_CONTEXT)['TYPE'];
 	#designContext = new UmbContentTypeDesignEditorContext(this);
 
+	set manifest(value: ManifestWorkspaceViewContentTypeDesignEditorKind) {
+		this._compositionRepositoryAlias = value.meta.compositionRepositoryAlias;
+	}
+
 	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
+	@state()
+	_compositionRepositoryAlias?: string;
 	//private _hasRootProperties = false;
 
 	@state()
@@ -306,7 +315,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	async #openCompositionModal() {
-		if (!this.#workspaceContext) return;
+		if (!this.#workspaceContext || !this._compositionRepositoryAlias) return;
 
 		const unique = this.#workspaceContext.getUnique();
 		if (!unique) {
@@ -319,6 +328,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		}
 
 		const compositionConfiguration = {
+			compositionRepositoryAlias: this._compositionRepositoryAlias,
 			unique: unique,
 			// Here we use the loaded content types to declare what we already inherit. That puts a pressure on cleaning up, but thats a good thing. [NL]
 			selection: contentTypes.map((contentType) => contentType.unique).filter((id) => id !== unique),
@@ -376,14 +386,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			: this.localize.term('general_reorder');
 
 		return html`<div class="tab-actions">
-			<uui-button
-				look="outline"
-				label=${this.localize.term('contentTypeEditor_compositions')}
-				compact
-				@click=${this.#openCompositionModal}>
-				<uui-icon name="icon-merge"></uui-icon>
-				${this.localize.term('contentTypeEditor_compositions')}
-			</uui-button>
+			${this._compositionRepositoryAlias
+				? html`<uui-button
+						look="outline"
+						label=${this.localize.term('contentTypeEditor_compositions')}
+						compact
+						@click=${this.#openCompositionModal}>
+						<uui-icon name="icon-merge"></uui-icon>
+						${this.localize.term('contentTypeEditor_compositions')}
+					</uui-button>`
+				: ''}
 			<uui-button look="outline" label=${sortButtonText} compact @click=${this.#toggleSortMode}>
 				<uui-icon name="icon-navigation"></uui-icon>
 				${sortButtonText}

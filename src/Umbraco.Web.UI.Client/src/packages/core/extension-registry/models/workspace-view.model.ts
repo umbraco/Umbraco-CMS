@@ -18,4 +18,9 @@ export interface MetaWorkspaceView extends MetaManifestWithView {}
 export interface ManifestWorkspaceViewContentTypeDesignEditorKind extends ManifestWorkspaceView {
 	type: 'workspaceView';
 	kind: 'contentTypeDesignEditor';
+	meta: MetaWorkspaceViewContentTypeDesignEditorKind;
+}
+
+export interface MetaWorkspaceViewContentTypeDesignEditorKind extends MetaWorkspaceView {
+	compositionRepositoryAlias?: string;
 }

@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS } from '../repository/composition/index.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -27,6 +28,7 @@ const workspaceViews: Array<ManifestWorkspaceViews> = [
 			label: 'Design',
 			pathname: 'design',
 			icon: 'icon-document-dashed-line',
+			compositionRepositoryAlias: UMB_DOCUMENT_TYPE_COMPOSITION_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
