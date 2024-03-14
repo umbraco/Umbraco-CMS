@@ -258,7 +258,6 @@ namespace Umbraco.Cms
                     List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions);
 
                     // Process as per-normal.
-
                     var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
 
                     // If they couldn't be all processed (i.e. we're shutting down) then exit.

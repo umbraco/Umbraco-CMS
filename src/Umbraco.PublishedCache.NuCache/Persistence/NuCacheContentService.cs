@@ -138,10 +138,12 @@ public class NuCacheContentService : RepositoryService, INuCacheContentService
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
             }
+
             if (mediaTypeIds is not null && mediaTypeIds.Any())
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
             }
+
             if (memberTypeIds is not null && memberTypeIds.Any())
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
