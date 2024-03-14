@@ -10,6 +10,7 @@ export interface UmbVariantableWorkspaceContextInterface<VariantType extends Umb
 	// Name:
 	getName(variantId?: UmbVariantId): string | undefined;
 	setName(name: string, variantId?: UmbVariantId): void;
+	name(variantId: UmbVariantId): Observable<string>;
 
 	// Variant:
 	variants: Observable<Array<UmbVariantModel>>;
