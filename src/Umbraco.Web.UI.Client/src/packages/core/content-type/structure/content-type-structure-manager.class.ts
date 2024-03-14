@@ -146,11 +146,11 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		if (!unique) return {};
 
 		// Lets initiate the content type:
-		const { data } = await this.#repository.requestByUnique(unique);
+		const { data, asObservable } = await this.#repository.requestByUnique(unique);
 		if (!data) return {};
 
 		await this._observeContentType(data);
-		return { data };
+		return { data, asObservable };
 	}
 
 	private async _observeContentType(data: T) {

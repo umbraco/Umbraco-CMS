@@ -178,14 +178,27 @@ export class UmbDataTypeWorkspaceContext
 
 	async load(unique: string) {
 		this.resetState();
-		const request = this.repository.requestByUnique(unique);
-		this.#getDataPromise = request;
-		const { data } = await request;
+		this.#getDataPromise = this.repository.requestByUnique(unique);
+		type GetDataType = Awaited<ReturnType<UmbDataTypeDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 		if (!data) return undefined;
 
-		this.setIsNew(false);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.setValue(data);
+			this.#currentData.setValue(data);
+		}
+
+		if (asObservable) {
+			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDataTypeStoreObserver');
+		}
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/settings/workspace/data-type-root');
+		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }) {

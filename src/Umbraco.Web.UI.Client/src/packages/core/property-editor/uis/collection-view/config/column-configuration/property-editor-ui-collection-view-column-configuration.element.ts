@@ -16,7 +16,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: Array })
-	value: Array<UmbCollectionColumnConfiguration> = [];
+	value?: Array<UmbCollectionColumnConfiguration> = [];
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
@@ -31,7 +31,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 
 		this._field = element.selectedProperty;
 
-		const duplicate = this.value.find((config) => this._field?.alias === config.alias);
+		const duplicate = this.value?.find((config) => this._field?.alias === config.alias);
 
 		if (duplicate) {
 			// TODO: Show error to user, can not add duplicate field/column. [LK]
@@ -44,7 +44,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 			isSystem: this._field.isSystem ? 1 : 0,
 		};
 
-		this.value = [...this.value, config];
+		this.value = [...(this.value ?? []), config];
 
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
@@ -52,7 +52,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	#onRemove(unique: string) {
 		const newValue: Array<UmbCollectionColumnConfiguration> = [];
 
-		this.value.forEach((config) => {
+		this.value?.forEach((config) => {
 			if (config.alias !== unique) newValue.push(config);
 		});
 
@@ -61,7 +61,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	}
 
 	#onHeaderChange(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
-		this.value = this.value.map(
+		this.value = this.value?.map(
 			(config): UmbCollectionColumnConfiguration =>
 				config.alias === configuration.alias ? { ...config, header: e.target.value as string } : config,
 		);
@@ -70,7 +70,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 	}
 
 	#onTemplateChange(e: UUIInputEvent, configuration: UmbCollectionColumnConfiguration) {
-		this.value = this.value.map(
+		this.value = this.value?.map(
 			(config): UmbCollectionColumnConfiguration =>
 				config.alias === configuration.alias ? { ...config, nameTemplate: e.target.value as string } : config,
 		);

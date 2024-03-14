@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/document';
 import { UMB_MEDIA_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/media';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT, UMB_WORKSPACE_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 import type { UmbMediaWorkspaceContext } from '@umbraco-cms/backoffice/media';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -35,28 +35,16 @@ export class UmbPropertyEditorUICollectionViewElement extends UmbLitElement impl
 	constructor() {
 		super();
 
-		// Gets the Data Type ID for the current property.
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
-			this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-				// TODO: [LK:2024-02-22] We need a solution that will allow the Collection property-editor
-				// to work in any workspace (that supports `unique` and `structure.getPropertyStructureByAlias`).
-				const entityType = workspaceContext.getEntityType();
-				const contentWorkspaceContext =
-					entityType === 'media'
-						? (workspaceContext as UmbMediaWorkspaceContext)
-						: (workspaceContext as UmbDocumentWorkspaceContext);
+		this.consumeContext(UMB_WORKSPACE_COLLECTION_CONTEXT, (workspaceContext) => {
+			this._collectionAlias = workspaceContext.getCollectionAlias();
 
-				this._collectionAlias = entityType === 'media' ? UMB_MEDIA_COLLECTION_ALIAS : UMB_DOCUMENT_COLLECTION_ALIAS;
-
-				this.observe(contentWorkspaceContext.unique, (unique) => {
-					if (this._config) {
-						this._config.unique = unique;
-					}
-				});
+			this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 				this.observe(propertyContext.alias, async (propertyAlias) => {
 					if (propertyAlias) {
-						const property = await contentWorkspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
+						// Gets the Data Type ID for the current property.
+						const property = await workspaceContext.structure.getPropertyStructureByAlias(propertyAlias);
 						if (property && this._config) {
+							this._config.unique = workspaceContext.getUnique();
 							this._config.dataTypeId = property.dataType.unique;
 							this.requestUpdate('_config');
 						}

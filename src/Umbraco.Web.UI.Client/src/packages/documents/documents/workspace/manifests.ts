@@ -1,5 +1,4 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-import { UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION } from '../conditions/document-workspace-has-collection.condition.js';
 //import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 //import { UmbPublishDocumentEntityAction } from '../entity-actions/publish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
@@ -40,7 +39,11 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		},
 		conditions: [
 			{
-				alias: UMB_DOCUMENT_WORKSPACE_HAS_COLLECTION_CONDITION,
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+			{
+				alias: 'Umb.Condition.WorkspaceHasCollection',
 			},
 		],
 	},

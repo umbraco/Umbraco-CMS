@@ -72,13 +72,25 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	async load(unique: string) {
-		const { data } = await this.structure.loadType(unique);
-		if (!data) return undefined;
 		this.resetState();
+		const { data, asObservable } = await this.structure.loadType(unique);
 
-		this.setIsNew(false);
-		this.setIsSorting(false);
-		return { data } || undefined;
+		if (data) {
+			this.setIsNew(false);
+			this.setIsSorting(false);
+			this.#persistedData.update(data);
+		}
+
+		if (asObservable) {
+			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbMemberTypeStoreObserver');
+		}
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/settings/workspace/member-type-root');
+		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }) {

@@ -14,11 +14,11 @@ import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.ac
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbEditableWorkspaceContextBase,
-	UmbWorkspaceSplitViewManager,
-	type UmbVariantableWorkspaceContextInterface,
-	type UmbPublishableWorkspaceContextInterface,
+import { UmbEditableWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbWorkspaceCollectionContextInterface,
+	UmbVariantableWorkspaceContextInterface,
+	UmbPublishableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -33,11 +33,15 @@ import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/externa
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>, UmbPublishableWorkspaceContextInterface
+	implements
+		UmbVariantableWorkspaceContextInterface<UmbDocumentVariantModel>,
+		UmbPublishableWorkspaceContextInterface,
+		UmbWorkspaceCollectionContextInterface<UmbDocumentTypeDetailModel>
 {
 	//
 	public readonly repository = new UmbDocumentDetailRepository(this);
@@ -64,6 +68,7 @@ export class UmbDocumentWorkspaceContext
 
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.documentType.unique);
 	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.documentType.collection);
+
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants ?? []);
 
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
@@ -136,13 +141,23 @@ export class UmbDocumentWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
-		const { data } = await this.#getDataPromise;
-		if (!data) return undefined;
+		type GetDataType = Awaited<ReturnType<UmbDocumentDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
-		this.setIsNew(false);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-		return data || undefined;
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.update(data);
+			this.#currentData.update(data);
+		}
+
+		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDocumentStoreObserver');
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/content');
+		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
@@ -161,6 +176,10 @@ export class UmbDocumentWorkspaceContext
 		this.#persistedData.setValue(undefined);
 		this.#currentData.setValue(data);
 		return data;
+	}
+
+	getCollectionAlias() {
+		return 'Umb.Collection.Document';
 	}
 
 	getData() {

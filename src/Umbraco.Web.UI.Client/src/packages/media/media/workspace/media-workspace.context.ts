@@ -5,11 +5,11 @@ import { UmbMediaDetailRepository } from '../repository/index.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionModel } from '../types.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import {
-	UmbEditableWorkspaceContextBase,
-	UmbWorkspaceSplitViewManager,
-	type UmbVariantableWorkspaceContextInterface,
+import type {
+	UmbWorkspaceCollectionContextInterface,
+	UmbVariantableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
 	jsonStringComparison,
@@ -23,11 +23,12 @@ import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@u
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbVariantableWorkspaceContextInterface
+	implements UmbVariantableWorkspaceContextInterface, UmbWorkspaceCollectionContextInterface<UmbMediaTypeDetailModel>
 {
 	//
 	public readonly repository = new UmbMediaDetailRepository(this);
@@ -51,7 +52,7 @@ export class UmbMediaWorkspaceContext
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.unique);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.mediaType.unique);
-	readonly contentTypeCollection = this.#currentData.asObservablePart((data) => data?.mediaType.collection);
+	readonly contentTypeHasCollection = this.#currentData.asObservablePart((data) => !!data?.mediaType.collection);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 
@@ -124,13 +125,23 @@ export class UmbMediaWorkspaceContext
 	async load(unique: string) {
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
-		const { data } = await this.#getDataPromise;
-		if (!data) return undefined;
+		type GetDataType = Awaited<ReturnType<UmbMediaDetailRepository['requestByUnique']>>;
+		const { data, asObservable } = (await this.#getDataPromise) as GetDataType;
 
-		this.setIsNew(false);
-		this.#persistedData.setValue(data);
-		this.#currentData.setValue(data);
-		return data || undefined;
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.update(data);
+			this.#currentData.update(data);
+		}
+
+		this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbMediaStoreObserver');
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/media');
+		}
 	}
 
 	async create(parent: { entityType: string; unique: string | null }, mediaTypeUnique: string) {
@@ -144,6 +155,10 @@ export class UmbMediaWorkspaceContext
 		this.#persistedData.setValue(data);
 		this.#currentData.setValue(data);
 		return data;
+	}
+
+	getCollectionAlias() {
+		return 'Umb.Collection.Media';
 	}
 
 	getData() {
