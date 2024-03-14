@@ -14,7 +14,6 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 	@property({ attribute: false })
 	public set group(value: UmbPropertyTypeContainerModel | undefined) {
 		if (value === this._group) return;
-		console.log('Groupå got new group', value);
 		this._group = value;
 		this._groupId = value?.id;
 		this._groupName = value?.name ?? '';

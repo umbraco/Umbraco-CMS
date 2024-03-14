@@ -147,7 +147,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		});
 		this.observe(this.#groupStructureHelper.containers, (groups) => {
 			this._groups = groups;
-			console.log('tab got groups', groups);
 			this.#sorter.setModel(this._groups);
 		});
 		this.observe(this.#groupStructureHelper.hasProperties, (hasProperties) => {
