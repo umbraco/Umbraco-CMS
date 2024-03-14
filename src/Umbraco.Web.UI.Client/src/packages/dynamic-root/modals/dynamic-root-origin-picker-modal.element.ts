@@ -1,12 +1,12 @@
 import { UmbDocumentPickerContext } from '../../documents/documents/components/input-document/input-document.context.js';
+import type { UmbDynamicRootOriginModalData } from './index.js';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { css, html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { ManifestDynamicRootOrigin } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbTreePickerDynamicRoot } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-dynamic-root-origin-picker-modal')
-export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseElement {
+export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseElement<UmbDynamicRootOriginModalData> {
 	@state()
 	private _origins: Array<ManifestDynamicRootOrigin> = [];
 
@@ -16,10 +16,14 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 		super();
 
 		this.#documentPickerContext.max = 1;
+	}
 
-		this.observe(umbExtensionsRegistry.byType('dynamicRootOrigin'), (origins: Array<ManifestDynamicRootOrigin>) => {
-			this._origins = origins;
-		});
+	connectedCallback() {
+		super.connectedCallback();
+
+		if (this.data) {
+			this._origins = this.data.items;
+		}
 	}
 
 	#choose(item: ManifestDynamicRootOrigin) {
