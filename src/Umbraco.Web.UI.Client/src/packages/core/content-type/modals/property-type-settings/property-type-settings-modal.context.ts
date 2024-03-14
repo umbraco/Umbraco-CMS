@@ -6,7 +6,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 export const UMB_PROPERTY_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.PropertyType';
 
 /**
- * This is a very simplified workspace context, just to serve one for the imitated property type workspace. (As its not a real workspace)
+ * This is a very simplified workspace context, just to serve one for the imitated property type workspace. (As its not a real workspace, but this does as well provide the ability for extension-conditions to match with this workspace, as entity type and alias is available.)  [NL]
  */
 export class UmbPropertyTypeWorkspaceContext
 	extends UmbContextBase<UmbPropertyTypeWorkspaceContext>

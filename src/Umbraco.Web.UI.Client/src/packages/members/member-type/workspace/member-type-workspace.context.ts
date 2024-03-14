@@ -6,7 +6,7 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -38,7 +38,7 @@ export class UmbMemberTypeWorkspaceContext
 	readonly allowedContentTypes;
 	readonly compositions;
 
-	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
+	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.MemberType');
@@ -68,7 +68,7 @@ export class UmbMemberTypeWorkspaceContext
 	protected resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
-		this.#isSorting.setValue(undefined);
+		this.#isSorting.setValue(false);
 	}
 
 	async load(unique: string) {

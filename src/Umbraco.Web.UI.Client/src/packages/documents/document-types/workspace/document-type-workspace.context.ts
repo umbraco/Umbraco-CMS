@@ -1,13 +1,16 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '../entity.js';
 import type { UmbDocumentTypeDetailModel } from '../types.js';
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbContentTypeCompositionModel, UmbContentTypeSortModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import type {
+	UmbContentTypeCompositionModel,
+	UmbContentTypeSortModel,
+	UmbContentTypeWorkspaceContext,
+} from '@umbraco-cms/backoffice/content-type';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
@@ -15,8 +18,9 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbContentTypeWorkspaceContext<EntityType>
 {
+	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
 	//
 	readonly repository = new UmbDocumentTypeDetailRepository(this);
 	// Data/Draft is located in structure manager
@@ -25,7 +29,7 @@ export class UmbDocumentTypeWorkspaceContext
 	#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
 
 	// General for content types:
-	readonly data;
+	//readonly data;
 	readonly name;
 	readonly alias;
 	readonly description;
@@ -44,16 +48,13 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly defaultTemplate;
 	readonly cleanup;
 
-	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
-
-	#isSorting = new UmbBooleanState(undefined);
-	isSorting = this.#isSorting.asObservable();
+	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.DocumentType');
 
 		// General for content types:
-		this.data = this.structure.ownerContentType;
+		//this.data = this.structure.ownerContentType;
 		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
@@ -75,15 +76,6 @@ export class UmbDocumentTypeWorkspaceContext
 	protected resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
-		this.#isSorting.setValue(undefined);
-	}
-
-	getIsSorting() {
-		return this.#isSorting.getValue();
-	}
-
-	setIsSorting(isSorting: boolean) {
-		this.#isSorting.setValue(isSorting);
 	}
 
 	getData() {
@@ -159,7 +151,6 @@ export class UmbDocumentTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.setIsSorting(false);
 		this.#persistedData.setValue(data);
 		return data;
 	}
@@ -170,7 +161,6 @@ export class UmbDocumentTypeWorkspaceContext
 
 		if (data) {
 			this.setIsNew(false);
-			this.setIsSorting(false);
 			this.#persistedData.update(data);
 		}
 
@@ -226,7 +216,6 @@ export class UmbDocumentTypeWorkspaceContext
 	public destroy(): void {
 		this.#persistedData.destroy();
 		this.structure.destroy();
-		this.#isSorting.destroy();
 		this.repository.destroy();
 		super.destroy();
 	}

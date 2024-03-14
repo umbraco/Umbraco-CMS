@@ -2,28 +2,41 @@ import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_PROPERTY_SETTINGS_MODAL,
-	UMB_WORKSPACE_MODAL,
-	UmbModalRouteRegistrationController,
-	umbConfirmModal,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyTypeModel, UmbPropertyTypeScaffoldModel } from '@umbraco-cms/backoffice/content-type';
+import {
+	UMB_PROPERTY_TYPE_SETTINGS_MODAL,
+	type UmbContentTypeModel,
+	type UmbContentTypePropertyStructureHelper,
+	type UmbPropertyTypeModel,
+	type UmbPropertyTypeScaffoldModel,
+} from '@umbraco-cms/backoffice/content-type';
 
 /**
- *  @element umb-member-type-workspace-view-edit-property
+ *  @element umb-content-type-design-editor-property
  *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
  */
-@customElement('umb-member-type-workspace-view-edit-property')
-export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
-	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
+@customElement('umb-content-type-design-editor-property')
+export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
+	//
+	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+
+	#settingsModal;
+
+	@property({ attribute: false })
+	public set propertyStructureHelper(value: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined) {
+		if (value === this._propertyStructureHelper) return;
+		this._propertyStructureHelper = value;
+		this.#checkInherited();
+	}
+	public get propertyStructureHelper(): UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined {
+		return this._propertyStructureHelper;
+	}
+	private _propertyStructureHelper?: UmbContentTypePropertyStructureHelper<UmbContentTypeModel> | undefined;
+
 	/**
 	 * Property, the data object for the property.
 	 * @type {UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined}
@@ -37,14 +50,16 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 	public set property(value: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined) {
 		const oldValue = this._property;
 		this._property = value;
-		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
+		this.#checkInherited();
+		this.#settingsModal.setUniquePathValue('propertyId', value?.id?.toString());
 		this.setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}
+	private _property?: UmbPropertyTypeModel | UmbPropertyTypeScaffoldModel | undefined;
 
 	/**
-	 * Inherited, Determines if the property is part of the main member type thats being edited.
-	 * If true, then the property is inherited from another member type, not a part of the main member type.
+	 * Inherited, Determines if the property is part of the main content type thats being edited.
+	 * If true, then the property is inherited from another content type, not a part of the main content type.
 	 * @type {boolean}
 	 * @attr
 	 * @default undefined
@@ -55,107 +70,101 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true, attribute: 'sort-mode-active' })
 	public sortModeActive = false;
 
-	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+	@property({ type: String, attribute: 'owner-content-type-id' })
+	public ownerContentTypeId?: string;
 
-	#modalRegistration;
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
+	@property({ type: String, attribute: 'owner-content-type-name' })
+	public ownerContentTypeName?: string;
+
+	@property({ type: String, attribute: 'edit-content-type-path' })
+	public editContentTypePath?: string;
 
 	@state()
 	protected _modalRoute?: string;
 
 	@state()
-	protected _editMemberTypePath?: string;
-
-	@property()
-	public get modalRoute() {
-		return this._modalRoute;
-	}
-
-	@property({ type: String, attribute: 'owner-member-type-id' })
-	public ownerMemberTypeId?: string;
-
-	@property({ type: String, attribute: 'owner-member-type-name' })
-	public ownerMemberTypeName?: string;
+	private _dataTypeName?: string;
 
 	@state()
-	private _dataTypeName?: string;
+	private _aliasLocked = true;
+
+	constructor() {
+		super();
+
+		// TODO: consider if this can be registered more globally/contextually. [NL]
+		this.#settingsModal = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_TYPE_SETTINGS_MODAL)
+			.addUniquePaths(['propertyId'])
+			.onSetup(() => {
+				const id = this.ownerContentTypeId;
+				if (id === undefined) return false;
+				const propertyData = this.property;
+				if (propertyData === undefined) return false;
+				return { data: { contentTypeId: id }, value: propertyData };
+			})
+			.onSubmit((result) => {
+				this._partialUpdate(result as UmbPropertyTypeModel);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._modalRoute = routeBuilder(null);
+			});
+	}
+
+	async #checkInherited() {
+		if (this._propertyStructureHelper && this._property) {
+			// We can first match with something if we have a name [NL]
+			this.observe(
+				await this._propertyStructureHelper!.isOwnerProperty(this._property.id),
+				(isOwned) => {
+					this.inherited = !isOwned;
+				},
+				'observeIsOwnerProperty',
+			);
+		}
+	}
+
+	_partialUpdate(partialObject: UmbPropertyTypeModel) {
+		if (!this._property || !this._propertyStructureHelper) return;
+		this._propertyStructureHelper.partialUpdateProperty(this._property.id, partialObject);
+	}
+
+	_singleValueUpdate<PropertyNameType extends keyof UmbPropertyTypeModel>(
+		propertyName: PropertyNameType,
+		value: UmbPropertyTypeModel[PropertyNameType],
+	) {
+		if (!this._property || !this._propertyStructureHelper) return;
+		const partialObject: Partial<UmbPropertyTypeModel> = {};
+		partialObject[propertyName] = value === null ? undefined : value;
+		this._propertyStructureHelper.partialUpdateProperty(this._property.id, partialObject);
+	}
+
+	#onToggleAliasLock() {
+		this._aliasLocked = !this._aliasLocked;
+	}
 
 	async setDataType(dataTypeId: string | undefined) {
 		if (!dataTypeId) return;
 		this.#dataTypeDetailRepository.requestByUnique(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
 	}
 
-	constructor() {
-		super();
-		this.#modalRegistration = new UmbModalRouteRegistrationController(this, UMB_PROPERTY_SETTINGS_MODAL)
-			.addUniquePaths(['propertyId'])
-			.onSetup(() => {
-				const memberTypeId = this.ownerMemberTypeId;
-				if (memberTypeId === undefined) return false;
-				const propertyData = this.property;
-				if (propertyData === undefined) return false;
-				return { data: { documentTypeId: memberTypeId }, value: propertyData };
-			})
-			.onSubmit((result) => {
-				if (!result.dataType) {
-					throw new Error('No dataType found on property');
-				}
-				this._partialUpdate(result as UmbPropertyTypeModel);
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._modalRoute = routeBuilder(null);
-			});
-
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('member-type')
-			.onSetup(() => {
-				return { data: { entityType: 'member-type', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				this._editMemberTypePath = routeBuilder({});
-			});
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
-			this._modalManagerContext = context;
-		});
-	}
-
-	_partialUpdate(partialObject: UmbPropertyTypeModel) {
-		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
-	}
-
-	_singleValueUpdate(propertyName: string, value: string | number | boolean | null | undefined) {
-		const partialObject = {} as any;
-		partialObject[propertyName] = value;
-
-		this.dispatchEvent(new CustomEvent('partial-property-update', { detail: partialObject }));
-	}
-
-	@state()
-	private _aliasLocked = true;
-
-	#onToggleAliasLock() {
-		this._aliasLocked = !this._aliasLocked;
-	}
-
 	async #requestRemove(e: Event) {
 		e.preventDefault();
 		e.stopImmediatePropagation();
-		if (!this.property || !this.property.id) return;
+		if (!this._property || !this._property.id) return;
 
+		// TODO: Do proper localization here: [NL]
 		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
-				this.property.name || this.property.id,
+				this._property.name ?? this._property.id,
 			]}>
-					Are you sure you want to delete the property <strong>${this.property.name || this.property.id}</strong>
+					Are you sure you want to delete the property <strong>${this._property.name ?? this._property.id}</strong>
 				</umb-localize>
 				</div>`,
 			confirmLabel: this.localize.term('actions_delete'),
 			color: 'danger',
 		});
 
-		this.dispatchEvent(new CustomEvent('property-delete'));
+		this._propertyStructureHelper?.removeProperty(this._property.id);
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -177,21 +186,38 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 			}
 		}
 	}
-	renderSortableProperty() {
+
+	render() {
+		// TODO: Only show alias on label if user has access to DocumentType within settings: [NL]
+		return this.inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
+	}
+
+	renderInheritedProperty() {
 		if (!this.property) return;
-		return html`
-			<div class="sortable">
-				<uui-icon name="${this.inherited ? 'icon-merge' : 'icon-navigation'}"></uui-icon>
-				${this.property.name} <span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
-			</div>
-			<uui-input
-				type="number"
-				?readonly=${this.inherited}
-				label="sort order"
-				@change=${(e: UUIInputEvent) =>
-					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) || 0 } as UmbPropertyTypeModel)}
-				.value=${this.property.sortOrder ?? 0}></uui-input>
-		`;
+
+		if (this.sortModeActive) {
+			return this.renderSortableProperty();
+		} else {
+			return html`
+				<div id="header">
+					<b>${this.property.name}</b>
+					<i>${this.property.alias}</i>
+					<p>${this.property.description}</p>
+				</div>
+				<div id="editor">
+					${this.renderPropertyTags()}
+					<uui-tag look="default" class="inherited">
+						<uui-icon name="icon-merge"></uui-icon>
+						<span
+							>${this.localize.term('contentTypeEditor_inheritedFrom')}
+							<a href=${this.editContentTypePath + 'edit/' + this.ownerContentTypeId}>
+								${this.ownerContentTypeName ?? '??'}
+							</a>
+						</span>
+					</uui-tag>
+				</div>
+			`;
+		}
 	}
 
 	renderEditableProperty() {
@@ -238,32 +264,21 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 		}
 	}
 
-	renderInheritedProperty() {
+	renderSortableProperty() {
 		if (!this.property) return;
-
-		if (this.sortModeActive) {
-			return this.renderSortableProperty();
-		} else {
-			return html`
-				<div id="header">
-					<b>${this.property.name}</b>
-					<i>${this.property.alias}</i>
-					<p>${this.property.description}</p>
-				</div>
-				<div id="editor">
-					${this.renderPropertyTags()}
-					<uui-tag look="default" class="inherited">
-						<uui-icon name="icon-merge"></uui-icon>
-						<span
-							>${this.localize.term('contentTypeEditor_inheritedFrom')}
-							<a href=${this._editMemberTypePath + 'edit/' + this.ownerMemberTypeId}>
-								${this.ownerMemberTypeName ?? '??'}
-							</a>
-						</span>
-					</uui-tag>
-				</div>
-			`;
-		}
+		return html`
+			<div class="sortable">
+				<uui-icon name="${this.inherited ? 'icon-merge' : 'icon-navigation'}"></uui-icon>
+				${this.property.name} <span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
+			</div>
+			<uui-input
+				type="number"
+				?readonly=${this.inherited}
+				label="sort order"
+				@change=${(e: UUIInputEvent) =>
+					this._partialUpdate({ sortOrder: parseInt(e.target.value as string) ?? 0 } as UmbPropertyTypeModel)}
+				.value=${this.property.sortOrder ?? 0}></uui-input>
+		`;
 	}
 
 	renderPropertyAlias() {
@@ -283,7 +298,7 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 					<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
 						<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
 					</div>
-			  </uui-input>`
+				</uui-input>`
 			: '';
 	}
 
@@ -294,25 +309,20 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
 								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
-						  </uui-tag>`
+							</uui-tag>`
 						: nothing}
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
-						  </uui-tag>`
+							</uui-tag>`
 						: nothing}
 					${this.property.validation.mandatory === true
 						? html`<uui-tag look="default">
 								<span>* ${this.localize.term('general_mandatory')}</span>
-						  </uui-tag>`
+							</uui-tag>`
 						: nothing}
-			  </div>`
+				</div>`
 			: nothing;
-	}
-
-	render() {
-		// TODO: Only show alias on label if user has access to MemberType within settings:
-		return this.inherited ? this.renderInheritedProperty() : this.renderEditableProperty();
 	}
 
 	static styles = [
@@ -481,6 +491,6 @@ export class UmbMemberTypeWorkspacePropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-member-type-workspace-view-edit-property': UmbMemberTypeWorkspacePropertyElement;
+		'umb-content-type-design-editor-property': UmbContentTypeDesignEditorPropertyElement;
 	}
 }
