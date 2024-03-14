@@ -21051,17 +21051,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedRelationTypeTreeItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedRelationTypeTreeItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedNamedEntityTreeItemResponseModel"
+                  "$ref": "#/components/schemas/PagedRelationTypeTreeItemResponseModel"
                 }
               }
             }
@@ -37722,6 +37722,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/MediaTypeTreeItemResponseModel"
+                },
+                {
+                  "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                 }
               ]
             }
@@ -37913,6 +37916,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/RelationResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PagedRelationTypeTreeItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/RelationTypeTreeItemResponseModel"
                 }
               ]
             }
@@ -38719,18 +38746,26 @@
         "additionalProperties": false
       },
       "RelationTypeItemResponseModel": {
+        "required": [
+          "isDeletable"
+        ],
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/NamedItemResponseModelBaseModel"
           }
         ],
+        "properties": {
+          "isDeletable": {
+            "type": "boolean"
+          }
+        },
         "additionalProperties": false
       },
       "RelationTypeResponseModel": {
         "required": [
           "id",
-          "isSystemRelationType",
+          "isDeletable",
           "path"
         ],
         "type": "object",
@@ -38752,7 +38787,7 @@
             "minLength": 1,
             "type": "string"
           },
-          "isSystemRelationType": {
+          "isDeletable": {
             "type": "boolean"
           },
           "parentObjectTypeName": {
@@ -38762,6 +38797,23 @@
           "childObjectTypeName": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RelationTypeTreeItemResponseModel": {
+        "required": [
+          "isDeletable"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NamedEntityTreeItemResponseModel"
+          }
+        ],
+        "properties": {
+          "isDeletable": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

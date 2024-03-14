@@ -183,6 +183,11 @@ public interface IEntityService
     /// <param name="objectType">The object type of the children.</param>
     IEnumerable<IEntitySlim> GetChildren(int id, UmbracoObjectTypes objectType);
 
+    IEnumerable<IEntitySlim> GetChildren(Guid? key, UmbracoObjectTypes objectType)
+    {
+        return Array.Empty<IEntitySlim>();
+    }
+
     /// <summary>
     ///     Gets the descendants of an entity.
     /// </summary>
@@ -195,6 +200,19 @@ public interface IEntityService
     /// <param name="id">The identifier of the entity.</param>
     /// <param name="objectType">The object type of the descendants.</param>
     IEnumerable<IEntitySlim> GetDescendants(int id, UmbracoObjectTypes objectType);
+
+    IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? key,
+        UmbracoObjectTypes objectType,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        totalRecords = 0;
+        return Array.Empty<IEntitySlim>();
+    }
 
     /// <summary>
     ///     Gets children of an entity.
@@ -216,6 +234,22 @@ public interface IEntityService
         UmbracoObjectTypes objectType,
         long pageIndex,
         int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+    {
+        totalRecords = 0;
+        return Array.Empty<IEntitySlim>();
+    }
+
+    /// <summary>
+    ///     Gets children of an entity.
+    /// </summary>
+    IEnumerable<IEntitySlim> GetPagedTrashedChildren(
+        Guid? key,
+        UmbracoObjectTypes objectType,
+        int skip,
+        int take,
         out long totalRecords,
         IQuery<IUmbracoEntity>? filter = null,
         Ordering? ordering = null)
@@ -319,4 +353,6 @@ public interface IEntityService
     ///     Counts the children of an entity
     /// </summary>
     int CountChildren(int id, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null);
+
+    public int CountChildren(Guid? key, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null) => 0;
 }
