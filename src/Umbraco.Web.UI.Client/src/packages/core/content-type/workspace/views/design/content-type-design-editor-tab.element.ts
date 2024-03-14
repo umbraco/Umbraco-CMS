@@ -72,7 +72,6 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 	});
 
 	private _containerId?: string | null;
-	//private _inherited?: boolean;
 
 	@property({ type: String })
 	public get containerId(): string | null | undefined {
@@ -82,36 +81,8 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 		const oldValue = this._containerId;
 		if (value === this._containerId) return;
 		this._containerId = value;
-		// TODO: Needs ways to check if the container is inherited or not, that works for root containers, maybe null === not inherited is okay:
-		//this._inherited = value === null ? false : !this.#groupStructureHelper.isOwnerChildContainer(value);
-		this.#groupStructureHelper.setParentId(value);
+		this.#groupStructureHelper.setContainerId(value);
 		this.requestUpdate('containerId', oldValue);
-	}
-
-	private _tabName?: string | undefined;
-
-	@property({ type: String })
-	public get tabName(): string | undefined {
-		return this.#groupStructureHelper.getParentName();
-	}
-	public set tabName(value: string | undefined) {
-		if (value === this._tabName) return;
-		const oldValue = this._tabName;
-		this._tabName = value;
-		this.#groupStructureHelper.setParentName(value);
-		this.requestUpdate('tabName', oldValue);
-	}
-
-	@state()
-	private _noTabName?: boolean;
-
-	@property({ type: Boolean })
-	public get noTabName(): boolean {
-		return this.#groupStructureHelper.getIsRoot();
-	}
-	public set noTabName(value: boolean) {
-		this._noTabName = value;
-		this.#groupStructureHelper.setIsRoot(value);
 	}
 
 	@state()
@@ -164,7 +135,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 
 	render() {
 		return html`
-		<b>${this.containerId} — ${this.tabName}</b>
+		<h1>${this.containerId}</h1>
 		${
 			this._sortModeActive
 				? html`<uui-button
@@ -174,7 +145,7 @@ export class UmbContentTypeDesignEditorTabElement extends UmbLitElement {
 				: ''
 		}
 		${
-			!this._noTabName
+			this._hasProperties
 				? html`
 						<uui-box>
 							<umb-content-type-design-editor-properties

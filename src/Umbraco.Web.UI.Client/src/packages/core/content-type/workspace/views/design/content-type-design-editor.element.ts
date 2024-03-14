@@ -120,8 +120,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 		//TODO: We need to differentiate between local and composition tabs (and hybrids)
 
-		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
+		this._tabsStructureHelper.setIsRoot(true);
 		this.observe(this._tabsStructureHelper.mergedContainers, (tabs) => {
 			this._tabs = tabs;
 			this._tabs.forEach((tab) => {
@@ -184,7 +184,6 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		// change key for map entry:
 		const found = this.#routeElementCache.get(tabName);
 		if (found) {
-			found.tabName = newTabName;
 			this.#routeElementCache.set(newTabName, found);
 			this.#routeElementCache.delete(tabName);
 		}
@@ -209,7 +208,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 					component: () => this.#getCacheOrImportTabElement(tabName),
 					setup: (component) => {
 						// Or just cache the current view here, and use it if the same is begin requested?. [NL]
-						(component as UmbContentTypeDesignEditorTabElement).tabName = tabName;
+						//(component as UmbContentTypeDesignEditorTabElement).tabName = tabName;
 						(component as UmbContentTypeDesignEditorTabElement).containerId = tab.id;
 					},
 				});
@@ -221,7 +220,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			component: () =>
 				document.createElement('umb-content-type-design-editor-tab') as UmbContentTypeDesignEditorTabElement,
 			setup: (component) => {
-				(component as UmbContentTypeDesignEditorTabElement).noTabName = true;
+				//(component as UmbContentTypeDesignEditorTabElement).noTabName = true;
 				(component as UmbContentTypeDesignEditorTabElement).containerId = null;
 			},
 		});

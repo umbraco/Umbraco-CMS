@@ -95,9 +95,6 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 					component: () => import('./block-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
 						(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
-						(component as UmbBlockWorkspaceViewEditTabElement).tabName = tabName;
-						// TODO: Consider if we can link these more simple, and not parse this on.
-						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
 						(component as UmbBlockWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
@@ -110,7 +107,6 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 				component: () => import('./block-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
 					(component as UmbBlockWorkspaceViewEditTabElement).managerName = this.#managerName;
-					(component as UmbBlockWorkspaceViewEditTabElement).noTabName = true;
 					(component as UmbBlockWorkspaceViewEditTabElement).containerId = null;
 				},
 			});

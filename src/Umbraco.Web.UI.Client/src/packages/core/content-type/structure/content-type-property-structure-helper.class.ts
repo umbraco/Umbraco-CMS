@@ -73,7 +73,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 
 	#containers?: Array<UmbPropertyTypeContainerModel>;
 	#observeContainers() {
-		if (!this.#structure || !this._containerId) return;
+		if (!this.#structure || this._containerId === undefined) return;
 
 		if (this._containerId === null) {
 			this.#observePropertyStructureOf(null);

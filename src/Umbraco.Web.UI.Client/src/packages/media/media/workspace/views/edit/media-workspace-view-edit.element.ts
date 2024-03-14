@@ -76,8 +76,6 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./media-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
-						(component as UmbMediaWorkspaceViewEditTabElement).tabName = tabName;
-						// TODO: Consider if we can link these more simple, and not parse this on.
 						(component as UmbMediaWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
@@ -89,7 +87,6 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 				path: '',
 				component: () => import('./media-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
-					(component as UmbMediaWorkspaceViewEditTabElement).noTabName = true;
 					(component as UmbMediaWorkspaceViewEditTabElement).containerId = null;
 				},
 			});

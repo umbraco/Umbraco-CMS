@@ -25,33 +25,12 @@ export class UmbBlockWorkspaceViewEditTabElement extends UmbLitElement {
 	#groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	@property({ type: String })
-	public get tabName(): string | undefined {
-		return this.#groupStructureHelper.getParentName();
-	}
-	public set tabName(value: string | undefined) {
-		if (value === this._tabName) return;
-		const oldValue = this._tabName;
-		this._tabName = value;
-		this.#groupStructureHelper.setParentName(value);
-		this.requestUpdate('tabName', oldValue);
-	}
-	private _tabName?: string | undefined;
-
-	@property({ type: Boolean })
-	public get noTabName(): boolean {
-		return this.#groupStructureHelper.getIsRoot();
-	}
-	public set noTabName(value: boolean) {
-		this.#groupStructureHelper.setIsRoot(value);
-	}
-
-	@property({ type: String })
 	public get containerId(): string | null | undefined {
 		return this._containerId;
 	}
 	public set containerId(value: string | null | undefined) {
 		this._containerId = value;
-		this.#groupStructureHelper.setParentId(value);
+		this.#groupStructureHelper.setContainerId(value);
 	}
 	@state()
 	private _containerId?: string | null;

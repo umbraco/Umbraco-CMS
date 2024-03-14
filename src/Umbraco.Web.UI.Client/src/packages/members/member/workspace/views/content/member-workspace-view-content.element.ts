@@ -76,8 +76,6 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./member-workspace-view-content-tab.element.js'),
 					setup: (component) => {
-						(component as UmbMemberWorkspaceViewContentTabElement).tabName = tabName;
-						// TODO: Consider if we can link these more simple, and not parse this on.
 						(component as UmbMemberWorkspaceViewContentTabElement).containerId = tab.id;
 					},
 				});
@@ -89,7 +87,6 @@ export class UmbMemberWorkspaceViewEditElement extends UmbLitElement implements 
 				path: '',
 				component: () => import('./member-workspace-view-content-tab.element.js'),
 				setup: (component) => {
-					(component as UmbMemberWorkspaceViewContentTabElement).noTabName = true;
 					(component as UmbMemberWorkspaceViewContentTabElement).containerId = null;
 				},
 			});

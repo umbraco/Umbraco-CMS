@@ -80,9 +80,6 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./document-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
-						(component as UmbDocumentWorkspaceViewEditTabElement).tabName = tabName;
-						// TODO: Consider if we can link these more simple, and not parse this on.
-						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
 						(component as UmbDocumentWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
@@ -94,7 +91,6 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 				path: '',
 				component: () => import('./document-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
-					(component as UmbDocumentWorkspaceViewEditTabElement).noTabName = true;
 					(component as UmbDocumentWorkspaceViewEditTabElement).containerId = null;
 				},
 			});

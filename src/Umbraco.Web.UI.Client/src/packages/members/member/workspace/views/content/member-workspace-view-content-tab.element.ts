@@ -9,30 +9,12 @@ import './member-workspace-view-content-properties.element.js';
 @customElement('umb-member-workspace-view-content-tab')
 export class UmbMemberWorkspaceViewContentTabElement extends UmbLitElement {
 	@property({ type: String })
-	public get tabName(): string | undefined {
-		return this.#groupStructureHelper.getParentName();
-	}
-	public set tabName(value: string | undefined) {
-		const oldName = this.#groupStructureHelper.getParentName();
-		this.#groupStructureHelper.setParentName(value);
-		this.requestUpdate('tabName', oldName);
-	}
-
-	@property({ type: Boolean })
-	public get noTabName(): boolean {
-		return this.#groupStructureHelper.getIsRoot();
-	}
-	public set noTabName(value: boolean) {
-		this.#groupStructureHelper.setIsRoot(value);
-	}
-
-	@property({ type: String })
 	public get containerId(): string | null | undefined {
 		return this._containerId;
 	}
 	public set containerId(value: string | null | undefined) {
 		this._containerId = value;
-		this.#groupStructureHelper.setParentId(value);
+		this.#groupStructureHelper.setContainerId(value);
 	}
 	@state()
 	private _containerId?: string | null;
