@@ -130,7 +130,9 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     Trashed = trashed,
                     Published = published,
                     QueryString = dto.QueryString,
-                    Udi = udi,
+                    Type = dto.Udi is null ? LinkDisplay.Types.External
+                    : dto.Udi.EntityType,
+                    Unique = dto.Udi?.Guid,
                     Url = url ?? string.Empty,
                 });
             }
@@ -169,8 +171,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     Name = link.Name,
                     QueryString = link.QueryString,
                     Target = link.Target,
-                    Udi = link.Udi,
-                    Url = link.Udi == null ? link.Url : null, // only save the URL for external links
+                    Udi = TypeIsUdiBased(link) ? new GuidUdi(link.Type!, link.Unique!.Value) : null,
+                    Url = TypeIsExternal(link) ? link.Url : null, // only save the URL for external links
                 }));
         }
         catch (Exception ex)
@@ -180,6 +182,14 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
         return base.FromEditor(editorValue, currentValue);
     }
+
+    private static bool TypeIsExternal(LinkDisplay link) =>
+        link.Type is not null && link.Type.Equals(LinkDisplay.Types.External, StringComparison.InvariantCultureIgnoreCase);
+
+    private static bool TypeIsUdiBased(LinkDisplay link) =>
+        link.Type is not null && link.Unique is not null &&
+        (link.Type.Equals(LinkDisplay.Types.Document, StringComparison.InvariantCultureIgnoreCase)
+         || link.Type.Equals(LinkDisplay.Types.Media, StringComparison.InvariantCultureIgnoreCase));
 
     [DataContract]
     public class LinkDto
