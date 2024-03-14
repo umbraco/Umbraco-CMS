@@ -1,20 +1,24 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 @customElement('umb-workspace-entity-action-menu')
 export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
-	_unique?: string;
+	private _unique?: string;
 
 	@state()
-	_entityType?: string;
+	private _entityType?: string;
 
 	@state()
-	_popoverOpen = false;
+	private _popoverOpen = false;
+
+	@query('#workspace-entity-action-menu-popover')
+	private _popover?: UUIPopoverContainerElement;
 
 	constructor() {
 		super();
@@ -33,6 +37,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 
 	#onActionExecuted(event: UmbActionExecutedEvent) {
 		event.stopPropagation();
+		this._popover?.hidePopover();
 	}
 
 	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -43,13 +48,9 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 	}
 
 	render() {
-		return html` ${this.#renderActionsMenu()} `;
-	}
-
-	#renderActionsMenu() {
 		return this._unique && this._entityType
 			? html`
-					<uui-button popovertarget="workspace-entity-action-menu-popover" label="Actions">
+					<uui-button id="action-button" popovertarget="workspace-entity-action-menu-popover" label="Actions">
 						Actions
 						<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 					</uui-button>
@@ -67,7 +68,7 @@ export class UmbWorkspaceEntityActionMenuElement extends UmbLitElement {
 							</uui-scroll-container>
 						</umb-popover-layout>
 					</uui-popover-container>
-			  `
+				`
 			: nothing;
 	}
 
