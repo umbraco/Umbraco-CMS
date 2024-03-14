@@ -4,7 +4,7 @@ import type {
 	UmbPropertyTypeContainerModel,
 	UmbPropertyTypeModel,
 } from '../types.js';
-import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
+import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -13,13 +13,13 @@ type UmbPropertyTypeId = UmbPropertyTypeModel['id'];
 
 /**
  * This class is a helper class for managing the structure of containers in a content type.
- * This requires a structure manager {@link UmbContentTypePropertyStructureManager} to manage the structure.
+ * This requires a structure manager {@link UmbContentTypeStructureManager} to manage the structure.
  */
 export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init;
 	#initResolver?: (value: unknown) => void;
 
-	#structure?: UmbContentTypePropertyStructureManager<T>;
+	#structure?: UmbContentTypeStructureManager<T>;
 
 	private _containerId?: string | null;
 
@@ -40,7 +40,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 		return this.#structure.contentTypes;
 	}
 
-	public setStructureManager(structure: UmbContentTypePropertyStructureManager<T>) {
+	public setStructureManager(structure: UmbContentTypeStructureManager<T>) {
 		if (this.#structure === structure) return;
 		if (this.#structure) {
 			throw new Error(

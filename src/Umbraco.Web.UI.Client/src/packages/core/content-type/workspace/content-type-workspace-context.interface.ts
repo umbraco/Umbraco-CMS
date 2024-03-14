@@ -1,5 +1,5 @@
 import type { UmbContentTypeCompositionModel, UmbContentTypeModel, UmbContentTypeSortModel } from '../types.js';
-import type { UmbContentTypePropertyStructureManager } from '../structure/index.js';
+import type { UmbContentTypeStructureManager } from '../structure/index.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 
@@ -19,7 +19,7 @@ export interface UmbContentTypeWorkspaceContext<ContentTypeType extends UmbConte
 	readonly allowedContentTypes: Observable<UmbContentTypeSortModel[] | undefined>;
 	readonly compositions: Observable<UmbContentTypeCompositionModel[] | undefined>;
 
-	readonly structure: UmbContentTypePropertyStructureManager<ContentTypeType>;
+	readonly structure: UmbContentTypeStructureManager<ContentTypeType>;
 
 	setAlias(alias: string): void;
 

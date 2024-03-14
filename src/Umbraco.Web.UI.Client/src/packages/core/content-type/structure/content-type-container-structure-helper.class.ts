@@ -1,12 +1,12 @@
 import type { UmbContentTypeModel, UmbPropertyContainerTypes, UmbPropertyTypeContainerModel } from '../types.js';
-import type { UmbContentTypePropertyStructureManager } from './content-type-structure-manager.class.js';
+import type { UmbContentTypeStructureManager } from './content-type-structure-manager.class.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * This class is a helper class for managing the structure of containers in a content type.
- * This requires a structure manager {@link UmbContentTypePropertyStructureManager} to manage the structure.
+ * This requires a structure manager {@link UmbContentTypeStructureManager} to manage the structure.
  */
 export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeModel> extends UmbControllerBase {
 	#init;
@@ -15,7 +15,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 	_containerId?: string | null;
 	_childType?: UmbPropertyContainerTypes = 'Group';
 
-	#structure?: UmbContentTypePropertyStructureManager<T>;
+	#structure?: UmbContentTypeStructureManager<T>;
 
 	// State containing the all containers defined in the data:
 	#containers = new UmbArrayState<UmbPropertyTypeContainerModel>([], (x) => x.id);
@@ -41,7 +41,7 @@ export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeMode
 		this.observe(this.containers, this.#performContainerMerge, null);
 	}
 
-	public setStructureManager(structure: UmbContentTypePropertyStructureManager<T>) {
+	public setStructureManager(structure: UmbContentTypeStructureManager<T>) {
 		if (this.#structure === structure) return;
 		if (this.#structure) {
 			throw new Error(
