@@ -1,3 +1,4 @@
+import type { UmbDocumentVariantPublishModel } from '../../types.js';
 import type {
 	CultureAndScheduleRequestModel,
 	PublishDocumentRequestModel,
@@ -33,15 +34,14 @@ export class UmbDocumentPublishingServerDataSource {
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async publish(unique: string, variantIds: Array<UmbVariantId>) {
+	async publish(unique: string, variants: Array<UmbDocumentVariantPublishModel>) {
 		if (!unique) throw new Error('Id is missing');
 
-		const publishSchedules: CultureAndScheduleRequestModel[] = variantIds.map<CultureAndScheduleRequestModel>(
+		const publishSchedules: CultureAndScheduleRequestModel[] = variants.map<CultureAndScheduleRequestModel>(
 			(variant) => {
 				return {
-					culture: variant.isCultureInvariant() ? null : variant.toCultureString(),
-					// TODO: NO, this does not belong as part of the UmbVariantID, we need another way to parse that around:
-					//schedule: variant.schedule,
+					culture: variant.variantId.isCultureInvariant() ? null : variant.variantId.toCultureString(),
+					schedule: variant.schedule,
 				};
 			},
 		);

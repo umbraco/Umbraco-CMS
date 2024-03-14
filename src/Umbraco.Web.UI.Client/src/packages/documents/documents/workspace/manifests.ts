@@ -1,9 +1,7 @@
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
-//import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
-//import { UmbPublishDocumentEntityAction } from '../entity-actions/publish.action.js';
+import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-schedule.action.js';
+import { UmbDocumentUnpublishWorkspaceAction } from './actions/unpublish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
-//import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
-//import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -141,22 +139,6 @@ const workspaceActions: Array<ManifestWorkspaceActions> = [
 			},
 		],
 	},
-	{
-		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.Document.SaveAndSchedule',
-		name: 'Save And Schedule Document Workspace Action',
-		weight: 100,
-		api: UmbSaveAndScheduleDocumentWorkspaceAction,
-		meta: {
-			label: 'Save And Schedule',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
 	*/
 ];
 
@@ -167,10 +149,10 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
 		name: 'Unpublish',
 		weight: 10,
-		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		api: UmbDocumentUnpublishWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Unpublish',
+			label: 'Unpublish...',
 			icon: 'icon-globe',
 		},
 	},
@@ -193,10 +175,10 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.SchedulePublishing',
 		name: 'Schedule publishing',
 		weight: 20,
-		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		api: UmbDocumentSaveAndScheduleWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Schedule publishing (TBD)',
+			label: 'Schedule...',
 			icon: 'icon-globe',
 		},
 	},
