@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Query;
+namespace Umbraco.Cms.Api.Management.Controllers.RelationType;
 
 [ApiVersion("1.0")]
 public class CreateRelationTypeController : RelationTypeControllerBase

@@ -13,6 +13,16 @@ If the answer is yes, please read on. Otherwise, make sure to head on over [to t
 
 ↖️ You can jump to any section by using the "table of contents" button ( ![Table of contents icon](img/tableofcontentsicon.svg) ) above.
 
+## Getting Started:
+To run umbraco, we first need to initialize the client git submodule:
+* Execute `git submodule init` and then `git submodule update` to get the files into Umbraco.Web.UI.Client project
+* If you are going to work on the Backoffice, you can either go to the Umbraco.Web.UI.Client folder and check out a new branch or set it up in your IDE, which will allow you to commit to each repository simultaneously:
+  * **Rider**: Preferences -> Version Control -> Directory Mappings -> Click the '+' sign
+* If you get a white page delete Umbraco.Cms.StaticAssets\wwwroot\umbraco folder and run `npm ci && npm run build:for:cms` inside Umbraco.Web.UI.Client folder to clear out any leftover files from older versions.
+
+### Latest version
+* If you want to get the latest changes from the client repository, run `git submodule update` again which will pull the latest main branch.
+
 
 ## Debugging source locally
 
