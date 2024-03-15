@@ -19,6 +19,10 @@ export class UmbSectionContext {
 		this.#manifestPathname.setValue(manifest?.meta?.pathname);
 		this.#manifestLabel.setValue(manifest ? manifest.meta?.label || manifest.name : undefined);
 	}
+
+	getPathname() {
+		return this.#manifestPathname.getValue();
+	}
 }
 
 export const UMB_SECTION_CONTEXT = new UmbContextToken<UmbSectionContext>('UmbSectionContext');
