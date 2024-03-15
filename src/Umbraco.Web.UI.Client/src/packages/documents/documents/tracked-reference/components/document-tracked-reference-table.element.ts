@@ -69,7 +69,7 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 						(item) =>
 							html`<uui-table-row>
 								<uui-table-cell style="text-align:center;">
-									<uui-icon style="vertical-align: middle;" name="icon-document"></uui-icon>
+									<umb-icon name=${item.contentTypeIcon ?? 'icon-document'}></umb-icon>
 								</uui-table-cell>
 								<uui-table-cell class="link-cell"> ${item.nodeName} </uui-table-cell>
 								<uui-table-cell>${item.contentTypeName}</uui-table-cell>
