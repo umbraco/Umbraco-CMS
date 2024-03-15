@@ -1,46 +1,52 @@
 import { umbLoginData } from '../data/login.data.js';
-import { rest } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 
 export const handlers = [
-	rest.post('backoffice/umbracoapi/authentication/postlogin', async (req, res, ctx) => {
-		const json = await req.json();
+	http.post<any, {username: string, password: string}>('backoffice/umbracoapi/authentication/postlogin', async ({ request }) => {
+		const json = await request.json();
 
 		const username = json.username;
 		const password = json.password;
 
 		const { status, data } = umbLoginData.login(username, password);
 
-		return res(ctx.delay(), ctx.status(status), ctx.json(data));
+		return HttpResponse.json(data, { status });
 	}),
 
-	rest.post('backoffice/umbracoapi/authentication/PostRequestPasswordReset', async (_req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200));
+	http.post('backoffice/umbracoapi/authentication/PostRequestPasswordReset', async () => {
+    await delay();
+    return new Response('', { status: 200 });
 	}),
 
-	rest.post('backoffice/umbracoapi/authentication/validatepasswordresetcode', async (req, res, ctx) => {
-		const json = await req.json();
+	http.post<any, {code: string}>('backoffice/umbracoapi/authentication/validatepasswordresetcode', async ({request}) => {
+		const json = await request.json();
 
 		const code = json.code;
 
 		const { status } = umbLoginData.validatePasswordResetCode(code);
 
-		return res(ctx.delay(), ctx.status(status));
+    await delay();
+
+    return new Response('', { status });
 	}),
 
-	rest.post('backoffice/umbracoapi/authentication/newpassword', async (_req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200));
+	http.post('backoffice/umbracoapi/authentication/newpassword', async () => {
+    await delay();
+    return new Response('', { status: 200 });
 	}),
 
-	rest.get('backoffice/umbracoapi/authentication/Get2faProviders', async (_req, res, ctx) => {
-		return res(ctx.delay(), ctx.status(200), ctx.json(['Google', 'Lastpass']));
+	http.get('backoffice/umbracoapi/authentication/Get2faProviders', async () => {
+    await delay();
+    return HttpResponse.json(['Google', 'Lastpass']);
 	}),
 
-	rest.post('backoffice/umbracoapi/authentication/PostVerify2faCode', async (req, res, ctx) => {
-		const body = await req.json();
+	http.post<any, {code: string}>('backoffice/umbracoapi/authentication/PostVerify2faCode', async ({request}) => {
+		const body = await request.json();
+    await delay();
 		if (body.code === 'fail') {
-			return res(ctx.delay(), ctx.status(400), ctx.json({ Message: 'Invalid code' }));
+      return HttpResponse.json({ Message: 'Invalid code' }, { status: 400 });
 		}
     const user = umbLoginData.users[0];
-		return res(ctx.delay(), ctx.status(200), ctx.json(user));
+    return HttpResponse.json(user);
 	}),
 ];

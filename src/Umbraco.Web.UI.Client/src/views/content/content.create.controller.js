@@ -22,6 +22,7 @@ function contentCreateController($scope,
     function initialize() {
         $scope.loading = true;
         $scope.allowedTypes = null;
+        $scope.runtimeModeProduction = Umbraco.Sys.ServerVariables.application.runtimeMode == 'Production';
 
         var getAllowedTypes = contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function (data) {
             $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
