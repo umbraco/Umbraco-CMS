@@ -150,14 +150,14 @@ export class UmbMemberTypeWorkspaceContext
 		}
 
 		if (asObservable) {
-			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDocumentTypeStoreObserver');
+			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbMemberTypeStoreObserver');
 		}
 	}
 
 	#onStoreChange(entity: EntityType | undefined) {
 		if (!entity) {
 			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/settings/workspace/document-type-root');
+			history.pushState(null, '', 'section/settings/workspace/member-type-root');
 		}
 	}
 
