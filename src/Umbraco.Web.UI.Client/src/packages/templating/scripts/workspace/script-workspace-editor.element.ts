@@ -15,9 +15,6 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	private _content?: string | null = '';
 
 	@state()
-	private _path?: string | null = '';
-
-	@state()
 	private _ready?: boolean = false;
 
 	@state()
@@ -37,10 +34,6 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 
 			this.observe(this.#scriptsWorkspaceContext.content, (content) => {
 				this._content = content;
-			});
-
-			this.observe(this.#scriptsWorkspaceContext.path, (path) => {
-				this._path = path;
 			});
 
 			this.observe(this.#scriptsWorkspaceContext.isCodeEditorReady, (isReady) => {
@@ -82,7 +75,6 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 					@input=${this.#onNameInput}
 					label="Script name"
 					?readonly=${this._isNew === false}></uui-input>
-				<small>/scripts${this._path}</small>
 			</div>
 			<uui-box>
 				<!-- the div below in the header is to make the box display nicely with code editor -->
@@ -91,7 +83,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 					? this.#renderCodeEditor()
 					: html`<div id="loader-container">
 							<uui-loader></uui-loader>
-					  </div>`}
+						</div>`}
 			</uui-box>
 		</umb-workspace-editor>`;
 	}

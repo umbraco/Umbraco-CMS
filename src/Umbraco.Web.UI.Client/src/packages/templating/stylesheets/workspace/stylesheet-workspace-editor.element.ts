@@ -11,9 +11,6 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	private _isNew?: boolean = false;
 
 	@state()
-	private _path?: string;
-
-	@state()
 	private _name?: string;
 
 	#workspaceContext?: UmbStylesheetWorkspaceContext;
@@ -23,8 +20,6 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbStylesheetWorkspaceContext;
-
-			this.observe(this.#workspaceContext.path, (path) => (this._path = path), '_observeStylesheetPath');
 
 			this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeStylesheetName');
 
@@ -52,7 +47,6 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 						@input="${this.#onNameChange}"
 						?readonly=${this._isNew === false}>
 					</uui-input>
-					<small>/css${this._path}</small>
 				</div>
 			</umb-workspace-editor>
 		`;
