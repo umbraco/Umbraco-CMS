@@ -1,24 +1,28 @@
 import { UmbMemberTypeDetailRepository } from '../repository/detail/index.js';
 import type { UmbMemberTypeDetailModel } from '../types.js';
+import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../index.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
+import {
+	type UmbContentTypeCompositionModel,
+	UmbContentTypeStructureManager,
+	type UmbContentTypeWorkspaceContext,
+} from '@umbraco-cms/backoffice/content-type';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 
 type EntityType = UmbMemberTypeDetailModel;
 export class UmbMemberTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbContentTypeWorkspaceContext<EntityType>
 {
-	#isSorting = new UmbBooleanState(undefined);
-	isSorting = this.#isSorting.asObservable();
+	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
 
 	public readonly repository = new UmbMemberTypeDetailRepository(this);
 	#parent?: { entityType: string; unique: string | null };
@@ -57,10 +61,6 @@ export class UmbMemberTypeWorkspaceContext
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 	}
 
-	setIsSorting(isSorting: boolean) {
-		this.#isSorting.setValue(isSorting);
-	}
-
 	set<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
 		this.structure.updateOwnerContentType({ [propertyName]: value });
 	}
@@ -68,7 +68,50 @@ export class UmbMemberTypeWorkspaceContext
 	protected resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
-		this.#isSorting.setValue(false);
+	}
+
+	getData() {
+		return this.structure.getOwnerContentType();
+	}
+
+	getUnique() {
+		return this.getData()?.unique;
+	}
+
+	getEntityType() {
+		return UMB_MEMBER_TYPE_ENTITY_TYPE;
+	}
+
+	setName(name: string) {
+		this.structure.updateOwnerContentType({ name });
+	}
+
+	setAlias(alias: string) {
+		this.structure.updateOwnerContentType({ alias });
+	}
+
+	setDescription(description: string) {
+		this.structure.updateOwnerContentType({ description });
+	}
+
+	// TODO: manage setting icon color alias?
+	setIcon(icon: string) {
+		this.structure.updateOwnerContentType({ icon });
+	}
+
+	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
+		this.structure.updateOwnerContentType({ compositions });
+	}
+
+	async create(parent: { entityType: string; unique: string | null }) {
+		this.resetState();
+		this.#parent = parent;
+		const { data } = await this.structure.createScaffold();
+		if (!data) return undefined;
+
+		this.setIsNew(true);
+		this.#persistedData.setValue(data);
+		return data;
 	}
 
 	async load(unique: string) {
@@ -77,7 +120,6 @@ export class UmbMemberTypeWorkspaceContext
 
 		if (data) {
 			this.setIsNew(false);
-			this.setIsSorting(false);
 			this.#persistedData.update(data);
 		}
 
@@ -91,18 +133,6 @@ export class UmbMemberTypeWorkspaceContext
 			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
 			history.pushState(null, '', 'section/settings/workspace/member-type-root');
 		}
-	}
-
-	async create(parent: { entityType: string; unique: string | null }) {
-		this.resetState();
-		this.#parent = parent;
-		const { data } = await this.structure.createScaffold();
-		if (!data) return undefined;
-
-		this.setIsNew(true);
-		this.setIsSorting(false);
-		this.#persistedData.setValue(data);
-		return data;
 	}
 
 	async save() {
@@ -137,30 +167,10 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	public destroy(): void {
+		this.#persistedData.destroy();
 		this.structure.destroy();
+		this.repository.destroy();
 		super.destroy();
-	}
-
-	getData() {
-		return this.structure.getOwnerContentType();
-	}
-
-	getUnique() {
-		return this.getData()?.unique || '';
-	}
-
-	getEntityType() {
-		return 'member-type';
-	}
-
-	setName(name: string) {
-		this.structure.updateOwnerContentType({ name });
-	}
-	setAlias(alias: string) {
-		this.structure.updateOwnerContentType({ alias });
-	}
-	setDescription(description: string) {
-		this.structure.updateOwnerContentType({ description });
 	}
 }
 
