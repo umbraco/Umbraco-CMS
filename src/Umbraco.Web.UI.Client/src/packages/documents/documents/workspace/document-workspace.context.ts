@@ -244,8 +244,8 @@ export class UmbDocumentWorkspaceContext
 		this.#updateVariantData(variantId ?? UmbVariantId.CreateInvariant(), { name });
 	}
 
-	name(variantId: UmbVariantId) {
-		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId.compare(x))?.name ?? '');
+	name(variantId?: UmbVariantId) {
+		return this.#currentData.asObservablePart((data) => data?.variants?.find((x) => variantId?.compare(x))?.name ?? '');
 	}
 
 	setTemplate(templateUnique: string) {
