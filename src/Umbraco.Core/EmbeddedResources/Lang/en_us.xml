@@ -467,7 +467,6 @@
 </html>]]>
     </key>
   </area>
-  </area>
   <area alias="contentType">
     <key alias="copyFailed">Failed to copy content type</key>
     <key alias="moveFailed">Failed to move content type</key>
