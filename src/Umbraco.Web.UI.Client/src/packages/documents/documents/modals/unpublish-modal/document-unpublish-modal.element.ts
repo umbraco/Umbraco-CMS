@@ -78,8 +78,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		if (this._hasTrackedReferences) {
 			const documentConfigurationContext = await this.getContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT);
 			this._hasUnpublishPermission =
-				(await documentConfigurationContext.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false ??
-				true;
+				(await documentConfigurationContext.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false;
 		}
 	}
 
