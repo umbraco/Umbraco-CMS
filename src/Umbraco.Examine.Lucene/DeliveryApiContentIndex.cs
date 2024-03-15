@@ -1,9 +1,9 @@
+using System.Globalization;
 using Examine;
 using Examine.Lucene;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
@@ -125,8 +125,14 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
 
     private (string? ContentId, string? Culture) ParseItemId(string id)
     {
+        if (int.TryParse(id, out _))
+        {
+            return (id, null);
+        }
+
         DeliveryApiIndexCompositeIdModel compositeIdModel = _deliveryApiCompositeIdHandler.Decompose(id);
-        return (compositeIdModel.Id.ToString() ?? id, compositeIdModel.Culture);
+
+        return (compositeIdModel.Id?.ToString(CultureInfo.InvariantCulture), compositeIdModel.Culture);
     }
 
     protected override void OnTransformingIndexValues(IndexingItemEventArgs e)

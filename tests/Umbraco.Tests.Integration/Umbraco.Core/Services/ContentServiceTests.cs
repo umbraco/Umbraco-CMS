@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -1250,7 +1251,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(content.HasIdentity);
 
         // content cannot publish values because they are invalid
-        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, ValueEditorCache);
+        var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, ValueEditorCache, Mock.Of<ICultureDictionary>());
         var isValid = propertyValidationService.IsPropertyDataValid(content, out var invalidProperties,
             CultureImpact.Invariant);
         Assert.IsFalse(isValid);
