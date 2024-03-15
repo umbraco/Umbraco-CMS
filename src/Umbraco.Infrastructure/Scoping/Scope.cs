@@ -571,13 +571,13 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         public void EagerReadLock(params int[] lockIds) => EagerReadLockInner(InstanceId, null, lockIds);
 
         /// <inheritdoc />
-        public void ReadLock(params int[] lockIds) => LazyReadLockInner(InstanceId, lockIds);
+        public void ReadLock(params int[] lockIds) => EagerReadLockInner(InstanceId, null, lockIds);
 
         public void EagerReadLock(TimeSpan timeout, int lockId) =>
             EagerReadLockInner(InstanceId, timeout, lockId);
 
         /// <inheritdoc />
-        public void ReadLock(TimeSpan timeout, int lockId) => LazyReadLockInner(InstanceId, timeout, lockId);
+        public void ReadLock(TimeSpan timeout, int lockId) => EagerReadLockInner(InstanceId, timeout, lockId);
 
         public void EagerWriteLock(params int[] lockIds) => EagerWriteLockInner(InstanceId, null, lockIds);
 
