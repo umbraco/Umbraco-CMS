@@ -153,7 +153,7 @@ public class SqliteDistributedLockingMechanism : IDistributedLockingMechanism
 
             try
             {
-                var i = command.ExecuteNonQuery();
+                var i = db.ExecuteNonQuery(command);
 
                 if (i == 0)
                 {
