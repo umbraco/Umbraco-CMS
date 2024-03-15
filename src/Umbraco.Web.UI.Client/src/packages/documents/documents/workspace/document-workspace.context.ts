@@ -625,6 +625,10 @@ export class UmbDocumentWorkspaceContext
 		new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} as never }).execute();
 	}
 
+	public async publishWithDescendants() {
+		throw new Error('Method not implemented.');
+	}
+
 	async delete() {
 		const id = this.getUnique();
 		if (id) {

@@ -2,6 +2,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-schedule.action.js';
 import { UmbDocumentUnpublishWorkspaceAction } from './actions/unpublish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
+import { UmbDocumentPublishWithDescendantsWorkspaceAction } from './actions/publish-with-descendants.action.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -162,10 +163,10 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		alias: 'Umb.Document.WorkspaceActionMenuItem.PublishWithDescendants',
 		name: 'Publish with descendants',
 		weight: 20,
-		api: UmbDocumentSaveAndPublishWorkspaceAction,
+		api: UmbDocumentPublishWithDescendantsWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
-			label: 'Publish with descendants (TBD)',
+			label: 'Publish with descendants...',
 			icon: 'icon-globe',
 		},
 	},
