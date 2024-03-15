@@ -1,5 +1,6 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
 import { UmbDocumentTrackedReferenceRepository } from '../../tracked-reference/index.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../global-contexts/index.js';
 import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
@@ -24,6 +25,9 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 
 	@state()
 	_hasTrackedReferences = false;
+
+	@state()
+	_hasUnpublishPermission = true;
 
 	firstUpdated() {
 		this.#configureSelectionManager();
@@ -69,11 +73,23 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		if (!data) return;
 
 		this._hasTrackedReferences = data.total > 0;
+
+		// If there are tracked references, we also want to check if we are allowed to unpublish the document:
+		if (this._hasTrackedReferences) {
+			const documentConfigurationContext = await this.getContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT);
+			this._hasUnpublishPermission =
+				(await documentConfigurationContext.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false ??
+				true;
+		}
 	}
 
 	#submit() {
-		this.value = { selection: this.#selectionManager.getSelection() };
-		this.modalContext?.submit();
+		if (this._hasUnpublishPermission) {
+			this.value = { selection: this.#selectionManager.getSelection() };
+			this.modalContext?.submit();
+			return;
+		}
+		this.modalContext?.reject();
 	}
 
 	#close() {
@@ -118,6 +134,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
 					label="${this.localize.term('actions_unpublish')}"
+					?disabled=${!this._hasUnpublishPermission}
 					look="primary"
 					color="warning"
 					@click=${this.#submit}></uui-button>
