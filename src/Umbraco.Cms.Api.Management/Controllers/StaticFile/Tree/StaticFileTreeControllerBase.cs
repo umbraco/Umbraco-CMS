@@ -17,8 +17,6 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
 
     protected override IFileSystem FileSystem { get; }
 
-    protected override string ItemType(string path) => "static-file";
-
     protected override string[] GetDirectories(string path) =>
         IsTreeRootPath(path)
             ? _allowedRootFolders
