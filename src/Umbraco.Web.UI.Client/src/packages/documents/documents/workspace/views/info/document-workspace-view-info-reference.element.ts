@@ -85,8 +85,8 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 							(item) => item.nodeId,
 							(item) =>
 								html`<uui-table-row>
-									<uui-table-cell>
-										<uui-icon style=" vertical-align: middle;" name="icon-document"></uui-icon>
+									<uui-table-cell style="text-align:center;">
+										<umb-icon name=${item.contentTypeIcon ?? 'icon-document'}></umb-icon>
 									</uui-table-cell>
 									<uui-table-cell class="link-cell">
 										<uui-button label="Edit" href=${`${this._editDocumentPath}edit/${item.nodeId}`}>
