@@ -364,7 +364,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <typeparam name="TDto">The type of the Dto.</typeparam>
         /// <param name="sql">The Sql statement.</param>
-        /// <param name="fields">Expressions speci fying the fields.</param>
+        /// <param name="fields">Expressions specifying the fields.</param>
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> AndBy<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object?>>[] fields)
         {
