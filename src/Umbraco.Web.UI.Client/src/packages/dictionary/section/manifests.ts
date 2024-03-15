@@ -2,7 +2,7 @@ import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DICTIONARY_MENU_ALIAS } from '../menu/manifests.js';
 import type { ManifestSection, ManifestSectionSidebarApp } from '@umbraco-cms/backoffice/extension-registry';
 
-export const UMB_DICTIONARY_SECTION_ALIAS = 'Umb.Section.Dictionary';
+export const UMB_DICTIONARY_SECTION_ALIAS = 'Umb.Section.Translation';
 
 const section: ManifestSection = {
 	type: 'section',
@@ -13,6 +13,12 @@ const section: ManifestSection = {
 		label: 'Dictionary',
 		pathname: 'dictionary',
 	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionUserPermission',
+			match: UMB_DICTIONARY_SECTION_ALIAS,
+		},
+	],
 };
 
 const menuSectionSidebarApp: ManifestSectionSidebarApp = {

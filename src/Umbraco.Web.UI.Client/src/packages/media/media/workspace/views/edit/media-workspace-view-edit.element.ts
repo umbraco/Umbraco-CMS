@@ -38,7 +38,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 
 		this._tabsStructureHelper.setIsRoot(true);
 		this._tabsStructureHelper.setContainerChildType('Tab');
-		this.observe(this._tabsStructureHelper.containers, (tabs) => {
+		this.observe(this._tabsStructureHelper.mergedContainers, (tabs) => {
 			this._tabs = tabs;
 			this._createRoutes();
 		});
@@ -76,13 +76,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 					path: `tab/${encodeFolderName(tabName).toString()}`,
 					component: () => import('./media-workspace-view-edit-tab.element.js'),
 					setup: (component) => {
-						(component as UmbMediaWorkspaceViewEditTabElement).tabName = tabName;
-						// TODO: Consider if we can link these more simple, and not parse this on.
-						(component as UmbMediaWorkspaceViewEditTabElement).ownerTabId = this._tabsStructureHelper.isOwnerContainer(
-							tab.id!,
-						)
-							? tab.id
-							: undefined;
+						(component as UmbMediaWorkspaceViewEditTabElement).containerId = tab.id;
 					},
 				});
 			});
@@ -93,8 +87,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 				path: '',
 				component: () => import('./media-workspace-view-edit-tab.element.js'),
 				setup: (component) => {
-					(component as UmbMediaWorkspaceViewEditTabElement).noTabName = true;
-					(component as UmbMediaWorkspaceViewEditTabElement).ownerTabId = null;
+					(component as UmbMediaWorkspaceViewEditTabElement).containerId = null;
 				},
 			});
 		}
@@ -124,7 +117,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 											href=${this._routerPath + '/'}
 											>Content</uui-tab
 										>
-								  `
+									`
 								: ''}
 							${repeat(
 								this._tabs,
@@ -136,7 +129,7 @@ export class UmbMediaWorkspaceViewEditElement extends UmbLitElement implements U
 									>`;
 								},
 							)}
-					  </uui-tab-group>`
+						</uui-tab-group>`
 					: ''}
 
 				<umb-router-slot
