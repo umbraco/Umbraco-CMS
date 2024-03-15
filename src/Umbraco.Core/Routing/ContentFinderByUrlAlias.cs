@@ -55,11 +55,12 @@ public class ContentFinderByUrlAlias : IContentFinder
         // no alias if "/"
         if (frequest.Uri.AbsolutePath != "/")
         {
+            string path = frequest.Domain != null ? DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded) : frequest.AbsolutePathDecoded;
             node = FindContentByAlias(
                 umbracoContext.Content,
                 frequest.Domain != null ? frequest.Domain.ContentId : 0,
                 frequest.Culture,
-                frequest.AbsolutePathDecoded);
+                path);
 
             if (node != null)
             {
