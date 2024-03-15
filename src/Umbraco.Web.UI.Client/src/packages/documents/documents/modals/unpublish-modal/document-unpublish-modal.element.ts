@@ -1,4 +1,5 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
+import { UmbDocumentTrackedReferenceRepository } from '../../tracked-reference/index.js';
 import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
@@ -16,12 +17,17 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	UmbDocumentUnpublishModalValue
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
+	#trackedReferencesRepository = new UmbDocumentTrackedReferenceRepository(this);
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
+	@state()
+	_hasTrackedReferences = false;
+
 	firstUpdated() {
 		this.#configureSelectionManager();
+		this.#getTrackedReferences();
 	}
 
 	async #configureSelectionManager() {
@@ -44,6 +50,25 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		selected = selected.filter((s) => this._options.some((o) => o.unique === s));
 
 		this.#selectionManager.setSelection(selected);
+	}
+
+	async #getTrackedReferences() {
+		if (!this.data?.documentUnique) return;
+
+		const { data, error } = await this.#trackedReferencesRepository.requestTrackedReference(
+			this.data?.documentUnique,
+			0,
+			1,
+		);
+
+		if (error) {
+			console.error(error);
+			return;
+		}
+
+		if (!data) return;
+
+		this._hasTrackedReferences = data.total > 0;
 	}
 
 	#submit() {
@@ -76,9 +101,17 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 			${this.data?.documentUnique
 				? html`
 						<umb-document-tracked-reference-table
-							id="trackedReferences"
+							id="tracked-references"
 							unique=${this.data?.documentUnique}></umb-document-tracked-reference-table>
 					`
+				: nothing}
+			${this._hasTrackedReferences
+				? html`<uui-box id="tracked-references-warning">
+						<umb-localize key="references_unpublishWarning">
+							This item or its descendants is being referenced. Unpublishing can lead to broken links on your website.
+							Please take the appropriate actions.
+						</umb-localize>
+					</uui-box>`
 				: nothing}
 
 			<div slot="actions">
@@ -101,8 +134,14 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				max-width: 90vw;
 			}
 
-			#trackedReferences {
+			#tracked-references {
 				--uui-table-cell-padding: 0;
+			}
+
+			#tracked-references-warning {
+				margin-top: 1rem;
+				background-color: var(--uui-color-danger);
+				color: var(--uui-color-danger-contrast);
 			}
 		`,
 	];
