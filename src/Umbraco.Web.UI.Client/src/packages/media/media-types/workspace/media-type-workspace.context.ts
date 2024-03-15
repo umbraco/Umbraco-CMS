@@ -5,7 +5,7 @@ import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffi
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	UmbContentTypeCompositionModel,
 	UmbContentTypeSortModel,
@@ -46,9 +46,6 @@ export class UmbMediaTypeWorkspaceContext
 
 	readonly structure = new UmbContentTypeStructureManager<EntityType>(this, this.repository);
 
-	#isSorting = new UmbBooleanState(undefined);
-	isSorting = this.#isSorting.asObservable();
-
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.MediaType');
 
@@ -66,17 +63,9 @@ export class UmbMediaTypeWorkspaceContext
 		this.collection = this.structure.ownerContentTypeObservablePart((data) => data?.collection);
 	}
 
-	protected resetState() {
-		this.#persistedData.setValue(undefined);
+	protected resetState(): void {
 		super.resetState();
-	}
-
-	getIsSorting() {
-		return this.#isSorting.getValue();
-	}
-
-	setIsSorting(isSorting: boolean) {
-		this.#isSorting.setValue(isSorting);
+		this.#persistedData.setValue(undefined);
 	}
 
 	getData() {
@@ -112,6 +101,18 @@ export class UmbMediaTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ allowedAtRoot });
 	}
 
+	setVariesByCulture(variesByCulture: boolean) {
+		this.structure.updateOwnerContentType({ variesByCulture });
+	}
+
+	setVariesBySegment(variesBySegment: boolean) {
+		this.structure.updateOwnerContentType({ variesBySegment });
+	}
+
+	setIsElement(isElement: boolean) {
+		this.structure.updateOwnerContentType({ isElement });
+	}
+
 	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
 		this.structure.updateOwnerContentType({ allowedContentTypes });
 	}
@@ -131,7 +132,6 @@ export class UmbMediaTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.setIsSorting(false);
 		this.#persistedData.setValue(data);
 		return data;
 	}
@@ -142,7 +142,6 @@ export class UmbMediaTypeWorkspaceContext
 
 		if (data) {
 			this.setIsNew(false);
-			this.setIsSorting(false);
 			this.#persistedData.update(data);
 		}
 
@@ -199,7 +198,6 @@ export class UmbMediaTypeWorkspaceContext
 	public destroy(): void {
 		this.#persistedData.destroy();
 		this.structure.destroy();
-		this.#isSorting.destroy();
 		this.repository.destroy();
 		super.destroy();
 	}
