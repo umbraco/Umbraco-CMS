@@ -204,7 +204,7 @@ public class SnapDictionary<TKey, TValue>
 
         if (Monitor.IsEntered(_wlocko) is false)
         {
-            throw new TimeoutException("Could not enter the monitor before timeout.");
+            throw new TimeoutException("Could not enter the monitor before timeout in SnapDictionary");
         }
 
         lock (_rlocko)

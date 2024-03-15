@@ -38,7 +38,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterReadLock(_readLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache");
+                throw new TimeoutException("Timeout exceeded to the memory cache when getting item");
             }
             result = MemoryCache.Get(key) as Lazy<object?>; // null if key not found
         }
@@ -203,7 +203,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache");
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing item");
             }
             if (MemoryCache[key] == null)
             {
@@ -234,7 +234,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache");
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing by type");
             }
             // ToArray required to remove
             foreach (var key in MemoryCache
@@ -272,7 +272,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache");
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing by generic type");
             }
             Type typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
@@ -312,7 +312,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache");
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing generic type with predicate");
             }
             Type typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
@@ -357,7 +357,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache");
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing with prefix");
             }
 
             // ToArray required to remove
@@ -387,7 +387,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
             {
-                throw new TimeoutException("Timeout exceeded to the memory cache");
+                throw new TimeoutException("Timeout exceeded to the memory cach when clearing by regex");
             }
 
             // ToArray required to remove

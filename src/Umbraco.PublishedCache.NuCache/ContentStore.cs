@@ -336,7 +336,7 @@ public class ContentStore
 
         if (Monitor.IsEntered(_wlocko) is false)
         {
-            throw new TimeoutException("Could not enter monitor before timeout");
+            throw new TimeoutException("Could not enter monitor before timeout in content store");
         }
 
         lock (_rlocko)
