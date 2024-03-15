@@ -149,7 +149,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		kind: 'default',
 		alias: 'Umb.Document.WorkspaceActionMenuItem.Unpublish',
 		name: 'Unpublish',
-		weight: 10,
+		weight: 0,
 		api: UmbDocumentUnpublishWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
@@ -162,7 +162,7 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 		kind: 'default',
 		alias: 'Umb.Document.WorkspaceActionMenuItem.PublishWithDescendants',
 		name: 'Publish with descendants',
-		weight: 20,
+		weight: 10,
 		api: UmbDocumentPublishWithDescendantsWorkspaceAction,
 		forWorkspaceActions: 'Umb.WorkspaceAction.Document.SaveAndPublish',
 		meta: {
