@@ -98,7 +98,14 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	}
 
 	async #requestAncestors() {
+		/* TODO: implement breadcrumb for new items
+		 We currently miss the parent item name for new items. We need to align with backend
+		 how to solve it */
+		const isNew = this.#workspaceContext?.getIsNew();
+		if (isNew === true) return;
+
 		const unique = this.#workspaceContext?.getUnique();
+
 		if (!unique) throw new Error('Unique is not available');
 		const { data } = await this.#treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
 
