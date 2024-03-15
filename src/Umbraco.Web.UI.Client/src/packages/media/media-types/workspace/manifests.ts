@@ -6,9 +6,11 @@ import type {
 
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
+export const UMB_MEDIA_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MediaType';
+
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: 'Umb.Workspace.MediaType',
+	alias: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
 	name: 'Media Type Workspace',
 	js: () => import('./media-type-workspace.element.js'),
 	meta: {
