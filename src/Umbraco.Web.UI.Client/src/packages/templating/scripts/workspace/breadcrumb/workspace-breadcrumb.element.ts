@@ -1,5 +1,5 @@
 import { UmbScriptTreeRepository } from '../../tree/index.js';
-import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -55,12 +55,16 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		this._workspaceBasePath = `section/${sectionContext?.getPathname()}/workspace/${this.#workspaceContext!.getEntityType()}/edit`;
 	}
 
+	#getHref(ancestor: UmbUniqueTreeItemModel) {
+		return ancestor.isFolder ? undefined : `${this._workspaceBasePath}/${ancestor.unique}`;
+	}
+
 	render() {
 		return html`
 			<uui-breadcrumbs>
 				${this._ancestors.map(
 					(ancestor) =>
-						html`<uui-breadcrumb-item href="${this._workspaceBasePath}/${ancestor.unique}"
+						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(ancestor))}"
 							>${ancestor.name}</uui-breadcrumb-item
 						>`,
 				)}
