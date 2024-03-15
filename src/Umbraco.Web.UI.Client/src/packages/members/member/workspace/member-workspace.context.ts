@@ -16,7 +16,7 @@ import {
 	appendToFrozenArray,
 	mergeObservables,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
 import { UmbLanguageCollectionRepository } from '@umbraco-cms/backoffice/language';
@@ -46,7 +46,7 @@ export class UmbMemberWorkspaceContext
 	readonly createDate = this.#currentData.asObservablePart((data) => data?.variants[0].createDate);
 	readonly updateDate = this.#currentData.asObservablePart((data) => data?.variants[0].updateDate);
 	readonly contentTypeUnique = this.#currentData.asObservablePart((data) => data?.memberType.unique);
-	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbMemberTypeDetailRepository(this));
+	readonly structure = new UmbContentTypeStructureManager(this, new UmbMemberTypeDetailRepository(this));
 
 	readonly varies = this.structure.ownerContentTypePart((x) =>
 		x ? x.variesByCulture || x.variesBySegment : undefined,

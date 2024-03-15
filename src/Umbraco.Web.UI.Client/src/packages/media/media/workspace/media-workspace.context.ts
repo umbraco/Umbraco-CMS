@@ -4,7 +4,7 @@ import { UMB_MEDIA_ENTITY_TYPE } from '../entity.js';
 import { UmbMediaDetailRepository } from '../repository/index.js';
 import type { UmbMediaDetailModel, UmbMediaVariantModel, UmbMediaVariantOptionModel } from '../types.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import type {
 	UmbWorkspaceCollectionContextInterface,
 	UmbVariantableWorkspaceContextInterface,
@@ -58,7 +58,7 @@ export class UmbMediaWorkspaceContext
 
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 
-	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbMediaTypeDetailRepository(this));
+	readonly structure = new UmbContentTypeStructureManager(this, new UmbMediaTypeDetailRepository(this));
 	readonly variesByCulture = this.structure.ownerContentTypePart((x) => x?.variesByCulture);
 	//#variesByCulture?: boolean;
 	readonly variesBySegment = this.structure.ownerContentTypePart((x) => x?.variesBySegment);
