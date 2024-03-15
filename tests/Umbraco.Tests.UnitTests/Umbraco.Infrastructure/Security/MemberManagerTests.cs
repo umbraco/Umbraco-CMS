@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Net;
@@ -55,7 +56,8 @@ public class MemberManagerTests
             new IdentityErrorDescriber(),
             Mock.Of<IPublishedSnapshotAccessor>(),
             Mock.Of<IExternalLoginWithKeyService>(),
-            Mock.Of<ITwoFactorLoginService>());
+            Mock.Of<ITwoFactorLoginService>(),
+            Mock.Of<IEventMessagesFactory>());
 
         _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
         var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };
