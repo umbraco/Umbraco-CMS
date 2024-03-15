@@ -97,6 +97,7 @@ const meta: Meta<UmbDocumentUnpublishModalElement> = {
 		layout: 'centered',
 		docs: {
 			source: {
+				language: 'ts',
 				code: `
 import { UMB_DOCUMENT_UNPUBLISH_MODAL, UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -163,3 +164,12 @@ export default meta;
 type Story = StoryObj<UmbDocumentUnpublishModalElement>;
 
 export const Overview: Story = {};
+
+export const WithTrackedReferences: Story = {
+	args: {
+		data: {
+			...modalData,
+			documentUnique: '1234',
+		},
+	},
+};
