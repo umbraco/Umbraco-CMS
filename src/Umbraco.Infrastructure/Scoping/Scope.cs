@@ -23,10 +23,9 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private readonly bool _autoComplete;
         private readonly CoreDebugSettings _coreDebugSettings;
 
-        private readonly object _dictionaryLocker;
         private readonly IEventAggregator _eventAggregator;
         private readonly IsolationLevel _isolationLevel;
-        private readonly object _lockQueueLocker = new();
+        private readonly object _locker = new();
         private readonly ILogger<Scope> _logger;
         private readonly MediaFileManager _mediaFileManager;
         private readonly RepositoryCacheMode _repositoryCacheMode;
@@ -87,7 +86,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _scopeFileSystem = scopeFileSystems;
             _autoComplete = autoComplete;
             Detachable = detachable;
-            _dictionaryLocker = new object();
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
@@ -562,7 +560,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 DisposeLastScope();
             }
 
-            lock (_lockQueueLocker)
+            lock (_locker)
             {
                 _queuedLocks?.Clear();
             }
@@ -573,24 +571,24 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         public void EagerReadLock(params int[] lockIds) => EagerReadLockInner(InstanceId, null, lockIds);
 
         /// <inheritdoc />
-        public void ReadLock(params int[] lockIds) => LazyReadLockInner(InstanceId, lockIds);
+        public void ReadLock(params int[] lockIds) => EagerReadLockInner(InstanceId, null, lockIds);
 
         public void EagerReadLock(TimeSpan timeout, int lockId) =>
             EagerReadLockInner(InstanceId, timeout, lockId);
 
         /// <inheritdoc />
-        public void ReadLock(TimeSpan timeout, int lockId) => LazyReadLockInner(InstanceId, timeout, lockId);
+        public void ReadLock(TimeSpan timeout, int lockId) => EagerReadLockInner(InstanceId, timeout, lockId);
 
         public void EagerWriteLock(params int[] lockIds) => EagerWriteLockInner(InstanceId, null, lockIds);
 
         /// <inheritdoc />
-        public void WriteLock(params int[] lockIds) => LazyWriteLockInner(InstanceId, lockIds);
+        public void WriteLock(params int[] lockIds) => EagerWriteLockInner(InstanceId, null, lockIds);
 
         public void EagerWriteLock(TimeSpan timeout, int lockId) =>
             EagerWriteLockInner(InstanceId, timeout, lockId);
 
         /// <inheritdoc />
-        public void WriteLock(TimeSpan timeout, int lockId) => LazyWriteLockInner(InstanceId, timeout, lockId);
+        public void WriteLock(TimeSpan timeout, int lockId) => EagerWriteLockInner(InstanceId, timeout, lockId);
 
         /// <summary>
         ///     Used for testing. Ensures and gets any queued read locks.
@@ -659,7 +657,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
             else
             {
-                lock (_lockQueueLocker)
+                lock (_locker)
                 {
                     if (_queuedLocks?.Count > 0)
                     {
@@ -970,7 +968,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
             else
             {
-                lock (_dictionaryLocker)
+                lock (_locker)
                 {
                     _readLocksDictionary?.Remove(instanceId);
                     _writeLocksDictionary?.Remove(instanceId);
@@ -1045,7 +1043,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
         private void LazyLockInner(DistributedLockType lockType, Guid instanceId, params int[] lockIds)
         {
-            lock (_lockQueueLocker)
+            lock (_locker)
             {
                 if (_queuedLocks == null)
                 {
@@ -1061,7 +1059,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
         private void LazyLockInner(DistributedLockType lockType, Guid instanceId, TimeSpan timeout, int lockId)
         {
-            lock (_lockQueueLocker)
+            lock (_locker)
             {
                 if (_queuedLocks == null)
                 {
@@ -1088,7 +1086,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
             else
             {
-                lock (_dictionaryLocker)
+                lock (_locker)
                 {
                     foreach (var lockId in lockIds)
                     {
@@ -1122,7 +1120,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
             else
             {
-                lock (_dictionaryLocker)
+                lock (_locker)
                 {
                     foreach (var lockId in lockIds)
                     {
