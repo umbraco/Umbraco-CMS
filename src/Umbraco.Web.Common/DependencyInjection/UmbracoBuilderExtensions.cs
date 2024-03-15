@@ -176,7 +176,6 @@ public static partial class UmbracoBuilderExtensions
     {
         // Add background jobs
         builder.Services.AddRecurringBackgroundJob<HealthCheckNotifierJob>();
-        builder.Services.AddRecurringBackgroundJob<KeepAliveJob>();
         builder.Services.AddRecurringBackgroundJob<LogScrubberJob>();
         builder.Services.AddRecurringBackgroundJob<ContentVersionCleanupJob>();
         builder.Services.AddRecurringBackgroundJob<ScheduledPublishingJob>();
