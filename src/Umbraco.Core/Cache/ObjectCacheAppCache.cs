@@ -9,6 +9,9 @@ namespace Umbraco.Cms.Core.Cache;
 /// </summary>
 public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 {
+    private static readonly TimeSpan _readLockTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan _writeLockTimeout = TimeSpan.FromSeconds(5);
+
     private readonly ReaderWriterLockSlim _locker = new(LockRecursionPolicy.SupportsRecursion);
     private bool _disposedValue;
 
@@ -33,7 +36,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         Lazy<object?>? result;
         try
         {
-            _locker.EnterReadLock();
+            if (_locker.TryEnterReadLock(_readLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when getting item");
+            }
             result = MemoryCache.Get(key) as Lazy<object?>; // null if key not found
         }
         finally
@@ -195,7 +201,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         try
         {
-            _locker.EnterWriteLock();
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing item");
+            }
             if (MemoryCache[key] == null)
             {
                 return;
@@ -223,8 +232,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         var isInterface = type.IsInterface;
         try
         {
-            _locker.EnterWriteLock();
-
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing by type");
+            }
             // ToArray required to remove
             foreach (var key in MemoryCache
                          .Where(x =>
@@ -259,7 +270,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         try
         {
-            _locker.EnterWriteLock();
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing by generic type");
+            }
             Type typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
 
@@ -296,7 +310,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         try
         {
-            _locker.EnterWriteLock();
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing generic type with predicate");
+            }
             Type typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
 
@@ -338,7 +355,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         try
         {
-            _locker.EnterWriteLock();
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing with prefix");
+            }
 
             // ToArray required to remove
             foreach (var key in MemoryCache
@@ -365,7 +385,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 
         try
         {
-            _locker.EnterWriteLock();
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cach when clearing by regex");
+            }
 
             // ToArray required to remove
             foreach (var key in MemoryCache
