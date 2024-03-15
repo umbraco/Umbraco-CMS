@@ -422,7 +422,7 @@ public class EntityService : RepositoryService, IEntityService
         Ordering? ordering = null)
         => GetPagedChildren(id, objectType, pageIndex, pageSize, true, filter, ordering, out totalRecords);
 
-    IEnumerable<IEntitySlim> GetPagedTrashedChildren(
+    public IEnumerable<IEntitySlim> GetPagedTrashedChildren(
         Guid? key,
         UmbracoObjectTypes objectType,
         int skip,
