@@ -64,8 +64,8 @@ public class BackOfficeClaimsPrincipalFactoryTests
             new BackOfficeClaimsPrincipalFactory(GetMockedUserManager().Object, null));
 
     [Test]
-    public void Ctor_When_Options_Value_Is_Null_Expect_ArgumentNullException()
-        => Assert.Throws<ArgumentNullException>(() => new BackOfficeClaimsPrincipalFactory(
+    public void Ctor_When_Options_Value_Is_Null_Expect_ArgumentException()
+        => Assert.Throws<ArgumentException>(() => new BackOfficeClaimsPrincipalFactory(
             GetMockedUserManager().Object,
             new OptionsWrapper<BackOfficeIdentityOptions>(null)));
 

@@ -45,7 +45,7 @@ internal sealed class DataTypeValidateAttribute : TypeFilterAttribute
             var dataType = (DataTypeSave?)context.ActionArguments["dataType"];
             if (dataType is not null)
             {
-                dataType.Name = dataType.Name?.CleanForXss('[', ']', '(', ')', ':');
+                dataType.Name = dataType.Name?.CleanForXss('[', ']', '(', ')', ':', '/', '\\');
                 dataType.Alias = dataType.Alias == null
                     ? dataType.Name!
                     : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');

@@ -1,5 +1,10 @@
 function dateTimePickerController($scope, angularHelper, dateHelper, validationMessageService) {
 
+  const vm = this;
+
+  vm.clearDatePicker = clearDatePicker;
+  vm.inputChanged = inputChanged;
+
   let flatPickr = null;
 
   function onInit() {
@@ -71,10 +76,19 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
     });
   }
 
+  function clearDatePicker(event) {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    $scope.clearDate();
+  }
+
   $scope.clearDate = function () {
     $scope.hasDatetimePickerValue = false;
     if ($scope.model) {
       $scope.model.datetimePickerValue = null;
+      $scope.model.datetimePickerInputValue = null;
       $scope.model.value = null;
     }
     if ($scope.datePickerForm && $scope.datePickerForm.datepicker) {
@@ -92,7 +106,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
     setDatePickerVal();
   };
 
-  $scope.inputChanged = function () {
+  function inputChanged() {
     if ($scope.model.datetimePickerValue === "" && $scope.hasDatetimePickerValue) {
       // $scope.hasDatetimePickerValue indicates that we had a value before the input was changed,
       // but now the input is empty.

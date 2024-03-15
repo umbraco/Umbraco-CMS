@@ -22,9 +22,14 @@ public interface IPropertyIndexValueFactory
     ///         more than one value for a given field.
     ///     </para>
     /// </remarks>
+    IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture,
+        string? segment, bool published, IEnumerable<string> availableCultures,
+        IDictionary<Guid, IContentType> contentTypeDictionary) => GetIndexValues(property, culture, segment, published);
+
+    [Obsolete("Use non-obsolete overload, scheduled for removal in v14")]
     IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
         => GetIndexValues(property, culture, segment, published);
 
-    [Obsolete("Use the overload with the availableCultures parameter instead, scheduled for removal in v14")]
+    [Obsolete("Use non-obsolete overload, scheduled for removal in v14")]
     IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published);
 }
