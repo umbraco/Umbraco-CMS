@@ -101,32 +101,8 @@ export class UmbMemberTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ icon });
 	}
 
-	setAllowedAtRoot(allowedAtRoot: boolean) {
-		this.structure.updateOwnerContentType({ allowedAtRoot });
-	}
-
-	setVariesByCulture(variesByCulture: boolean) {
-		this.structure.updateOwnerContentType({ variesByCulture });
-	}
-
-	setVariesBySegment(variesBySegment: boolean) {
-		this.structure.updateOwnerContentType({ variesBySegment });
-	}
-
-	setIsElement(isElement: boolean) {
-		this.structure.updateOwnerContentType({ isElement });
-	}
-
-	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
-		this.structure.updateOwnerContentType({ allowedContentTypes });
-	}
-
 	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
 		this.structure.updateOwnerContentType({ compositions });
-	}
-
-	setCollection(collection: UmbReferenceByUnique) {
-		this.structure.updateOwnerContentType({ collection });
 	}
 
 	async create(parent: { entityType: string; unique: string | null }) {
