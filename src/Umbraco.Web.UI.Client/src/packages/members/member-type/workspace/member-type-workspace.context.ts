@@ -1,24 +1,30 @@
 import { UmbMemberTypeDetailRepository } from '../repository/detail/index.js';
 import type { UmbMemberTypeDetailModel } from '../types.js';
+import { UMB_MEMBER_TYPE_ENTITY_TYPE } from '../index.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
+import {
+	type UmbContentTypeCompositionModel,
+	type UmbContentTypeSortModel,
+	UmbContentTypeStructureManager,
+	type UmbContentTypeWorkspaceContext,
+} from '@umbraco-cms/backoffice/content-type';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
-import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 type EntityType = UmbMemberTypeDetailModel;
 export class UmbMemberTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbContentTypeWorkspaceContext<EntityType>
 {
-	#isSorting = new UmbBooleanState(undefined);
-	isSorting = this.#isSorting.asObservable();
+	readonly IS_CONTENT_TYPE_WORKSPACE_CONTEXT = true;
 
 	public readonly repository = new UmbMemberTypeDetailRepository(this);
 	#parent?: { entityType: string; unique: string | null };
@@ -57,10 +63,6 @@ export class UmbMemberTypeWorkspaceContext
 		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
 	}
 
-	setIsSorting(isSorting: boolean) {
-		this.#isSorting.setValue(isSorting);
-	}
-
 	set<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
 		this.structure.updateOwnerContentType({ [propertyName]: value });
 	}
@@ -68,29 +70,63 @@ export class UmbMemberTypeWorkspaceContext
 	protected resetState(): void {
 		super.resetState();
 		this.#persistedData.setValue(undefined);
-		this.#isSorting.setValue(false);
 	}
 
-	async load(unique: string) {
-		this.resetState();
-		const { data, asObservable } = await this.structure.loadType(unique);
-
-		if (data) {
-			this.setIsNew(false);
-			this.setIsSorting(false);
-			this.#persistedData.update(data);
-		}
-
-		if (asObservable) {
-			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbMemberTypeStoreObserver');
-		}
+	getData() {
+		return this.structure.getOwnerContentType();
 	}
 
-	#onStoreChange(entity: EntityType | undefined) {
-		if (!entity) {
-			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
-			history.pushState(null, '', 'section/settings/workspace/member-type-root');
-		}
+	getUnique() {
+		return this.getData()?.unique;
+	}
+
+	getEntityType() {
+		return UMB_MEMBER_TYPE_ENTITY_TYPE;
+	}
+
+	setName(name: string) {
+		this.structure.updateOwnerContentType({ name });
+	}
+
+	setAlias(alias: string) {
+		this.structure.updateOwnerContentType({ alias });
+	}
+
+	setDescription(description: string) {
+		this.structure.updateOwnerContentType({ description });
+	}
+
+	// TODO: manage setting icon color alias?
+	setIcon(icon: string) {
+		this.structure.updateOwnerContentType({ icon });
+	}
+
+	setAllowedAtRoot(allowedAtRoot: boolean) {
+		this.structure.updateOwnerContentType({ allowedAtRoot });
+	}
+
+	setVariesByCulture(variesByCulture: boolean) {
+		this.structure.updateOwnerContentType({ variesByCulture });
+	}
+
+	setVariesBySegment(variesBySegment: boolean) {
+		this.structure.updateOwnerContentType({ variesBySegment });
+	}
+
+	setIsElement(isElement: boolean) {
+		this.structure.updateOwnerContentType({ isElement });
+	}
+
+	setAllowedContentTypes(allowedContentTypes: Array<UmbContentTypeSortModel>) {
+		this.structure.updateOwnerContentType({ allowedContentTypes });
+	}
+
+	setCompositions(compositions: Array<UmbContentTypeCompositionModel>) {
+		this.structure.updateOwnerContentType({ compositions });
+	}
+
+	setCollection(collection: UmbReferenceByUnique) {
+		this.structure.updateOwnerContentType({ collection });
 	}
 
 	async create(parent: { entityType: string; unique: string | null }) {
@@ -100,9 +136,29 @@ export class UmbMemberTypeWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.setIsSorting(false);
 		this.#persistedData.setValue(data);
 		return data;
+	}
+
+	async load(unique: string) {
+		this.resetState();
+		const { data, asObservable } = await this.structure.loadType(unique);
+
+		if (data) {
+			this.setIsNew(false);
+			this.#persistedData.update(data);
+		}
+
+		if (asObservable) {
+			this.observe(asObservable(), (entity) => this.#onStoreChange(entity), 'umbDocumentTypeStoreObserver');
+		}
+	}
+
+	#onStoreChange(entity: EntityType | undefined) {
+		if (!entity) {
+			//TODO: This solution is alright for now. But reconsider when we introduce signal-r
+			history.pushState(null, '', 'section/settings/workspace/document-type-root');
+		}
 	}
 
 	async save() {
@@ -139,28 +195,6 @@ export class UmbMemberTypeWorkspaceContext
 	public destroy(): void {
 		this.structure.destroy();
 		super.destroy();
-	}
-
-	getData() {
-		return this.structure.getOwnerContentType();
-	}
-
-	getUnique() {
-		return this.getData()?.unique || '';
-	}
-
-	getEntityType() {
-		return 'member-type';
-	}
-
-	setName(name: string) {
-		this.structure.updateOwnerContentType({ name });
-	}
-	setAlias(alias: string) {
-		this.structure.updateOwnerContentType({ alias });
-	}
-	setDescription(description: string) {
-		this.structure.updateOwnerContentType({ description });
 	}
 }
 
