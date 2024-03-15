@@ -1,4 +1,3 @@
-import { manifests as breadcrumbManifests } from './breadcrumb/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
@@ -13,7 +12,6 @@ import { manifests as userPermissionManifests } from './user-permissions/manifes
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 
 export const manifests = [
-	...breadcrumbManifests,
 	...collectionManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,

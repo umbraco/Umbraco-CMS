@@ -1,6 +1,6 @@
-import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../tree/index.js';
-import { UmbDocumentTreeRepository } from '../tree/index.js';
-import type { UmbDocumentVariantModel } from '../types.js';
+import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../../tree/index.js';
+import { UmbDocumentTreeRepository } from '../../tree/index.js';
+import type { UmbDocumentVariantModel } from '../../types.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
