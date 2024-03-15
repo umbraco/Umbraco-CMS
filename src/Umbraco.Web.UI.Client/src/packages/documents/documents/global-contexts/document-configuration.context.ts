@@ -12,7 +12,10 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * A context for fetching and caching the document configuration.
  */
 export class UmbDocumentConfigurationContext extends UmbControllerBase implements UmbApi {
-	static DocumentConfiguration: Promise<DocumentConfigurationResponseModel | null>;
+	/**
+	 * The cached document configuration.
+	 */
+	static #DocumentConfiguration: Promise<DocumentConfigurationResponseModel | null>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -24,8 +27,7 @@ export class UmbDocumentConfigurationContext extends UmbControllerBase implement
 	 * @returns A promise that resolves to the document configuration, or null if the configuration could not be fetched.
 	 */
 	getDocumentConfiguration(): Promise<DocumentConfigurationResponseModel | null> {
-		debugger;
-		return (UmbDocumentConfigurationContext.DocumentConfiguration ??= this.fetchDocumentConfiguration());
+		return (UmbDocumentConfigurationContext.#DocumentConfiguration ??= this.fetchDocumentConfiguration());
 	}
 
 	/**
@@ -39,6 +41,7 @@ export class UmbDocumentConfigurationContext extends UmbControllerBase implement
 	}
 }
 
+// Export as default to work as a global context:
 export default UmbDocumentConfigurationContext;
 
 export const UMB_DOCUMENT_CONFIGURATION_CONTEXT = new UmbContextToken<UmbDocumentConfigurationContext>(
