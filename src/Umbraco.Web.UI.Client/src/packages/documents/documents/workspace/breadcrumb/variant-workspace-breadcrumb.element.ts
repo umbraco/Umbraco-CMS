@@ -1,6 +1,5 @@
 import type { UmbDocumentTreeItemModel, UmbDocumentTreeItemVariantModel } from '../../tree/index.js';
 import { UmbDocumentTreeRepository } from '../../tree/index.js';
-import type { UmbDocumentVariantModel } from '../../types.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -8,11 +7,14 @@ import type { UmbVariantableWorkspaceContextInterface } from '@umbraco-cms/backo
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantModel } from '@umbraco-cms/backoffice/variant';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 
 @customElement('umb-variant-workspace-breadcrumb')
 export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	#workspaceContext?: UmbVariantableWorkspaceContextInterface<UmbVariantModel>;
 	#treeRepository = new UmbDocumentTreeRepository(this);
+	#appLanguageContext?: UmbAppLanguageContext;
 
 	@state()
 	_isNew = false;
@@ -24,23 +26,37 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	_ancestors: UmbDocumentTreeItemModel[] = [];
 
 	@state()
-	_activeVariantId?: UmbVariantId;
+	_workspaceActiveVariantId?: UmbVariantId;
+
+	@state()
+	_appDefaultCulture?: string;
 
 	constructor() {
 		super();
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
+			this.#appLanguageContext = instance;
+			this.#observeDefaultCulture();
+		});
+
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#requestAncestors();
-			this.#observeActiveVariant();
+			this.#observeWorkspaceActiveVariant();
 		});
 	}
 
-	#observeActiveVariant() {
+	#observeDefaultCulture() {
+		this.observe(this.#appLanguageContext!.appDefaultLanguage, (value) => {
+			this._appDefaultCulture = value?.unique;
+		});
+	}
+
+	#observeWorkspaceActiveVariant() {
 		this.observe(
 			this.#workspaceContext?.splitView.activeVariantsInfo,
 			(value) => {
 				if (!value) return;
-				this._activeVariantId = UmbVariantId.Create(value[0]);
+				this._workspaceActiveVariantId = UmbVariantId.Create(value[0]);
 				this.#observeActiveVariantName();
 			},
 
@@ -50,14 +66,20 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 
 	#observeActiveVariantName() {
 		this.observe(
-			this.#workspaceContext?.name(this._activeVariantId),
-			(value) => (this._name = value || 'Untitled'),
+			this.#workspaceContext?.name(this._workspaceActiveVariantId),
+			(value) => (this._name = value || ''),
 			'breadcrumbWorkspaceNameObserver',
 		);
 	}
 
-	#getAncestorVariantName(variants: Array<UmbDocumentTreeItemVariantModel> = []) {
-		return variants.find((x) => this._activeVariantId.compare(x))?.name;
+	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
+	#getAncestorVariantName(ancestor: UmbDocumentTreeItemModel) {
+		const fallbackName =
+			ancestor.variants.find((variant) => variant.culture === this._appDefaultCulture)?.name ??
+			ancestor.variants[0].name ??
+			'Unknown';
+		const name = ancestor.variants.find((variant) => this._workspaceActiveVariantId?.compare(variant))?.name;
+		return name ?? `(${fallbackName})`;
 	}
 
 	async #requestAncestors() {
@@ -74,9 +96,9 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 		return html`
 			<uui-breadcrumbs>
 				${this._ancestors.map(
-					(item) =>
-						html`<uui-breadcrumb-item href="/section/content/workspace/document/edit/${item.unique}"
-							>${this.#getAncestorVariantName(item.variants)}</uui-breadcrumb-item
+					(ancestor) =>
+						html`<uui-breadcrumb-item href="/section/content/workspace/document/edit/${ancestor.unique}"
+							>${this.#getAncestorVariantName(ancestor)}</uui-breadcrumb-item
 						>`,
 				)}
 				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
