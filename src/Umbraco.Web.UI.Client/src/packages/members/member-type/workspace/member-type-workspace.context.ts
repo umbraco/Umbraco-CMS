@@ -9,7 +9,6 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import {
 	type UmbContentTypeCompositionModel,
-	type UmbContentTypeSortModel,
 	UmbContentTypeStructureManager,
 	type UmbContentTypeWorkspaceContext,
 } from '@umbraco-cms/backoffice/content-type';
@@ -17,7 +16,6 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
-import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 type EntityType = UmbMemberTypeDetailModel;
 export class UmbMemberTypeWorkspaceContext
