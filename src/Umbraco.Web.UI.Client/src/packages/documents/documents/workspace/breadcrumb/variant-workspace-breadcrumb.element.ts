@@ -97,7 +97,9 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 			<uui-breadcrumbs>
 				${this._ancestors.map(
 					(ancestor) =>
-						html`<uui-breadcrumb-item href="/section/content/workspace/document/edit/${ancestor.unique}"
+						html`<uui-breadcrumb-item
+							href="/section/content/workspace/document/edit/${ancestor.unique}/${this._workspaceActiveVariantId
+								?.culture}"
 							>${this.#getAncestorVariantName(ancestor)}</uui-breadcrumb-item
 						>`,
 				)}
