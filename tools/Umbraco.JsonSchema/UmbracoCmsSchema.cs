@@ -39,8 +39,6 @@ internal class UmbracoCmsSchema
         public IndexCreatorSettings Examine { get; set; } = null!;
         public IndexingSettings Indexing { get; set; } = null!;
 
-        public KeepAliveSettings KeepAlive { get; set; } = null!;
-
         public LoggingSettings Logging { get; set; } = null!;
 
         public NuCacheSettings NuCache { get; set; } = null!;
