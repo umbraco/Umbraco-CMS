@@ -198,7 +198,6 @@ export class UmbMediaTypeWorkspaceContext
 	public destroy(): void {
 		this.#persistedData.destroy();
 		this.structure.destroy();
-		this.#isSorting.destroy();
 		this.repository.destroy();
 		super.destroy();
 	}

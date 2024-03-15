@@ -193,7 +193,9 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	public destroy(): void {
+		this.#persistedData.destroy();
 		this.structure.destroy();
+		this.repository.destroy();
 		super.destroy();
 	}
 }
