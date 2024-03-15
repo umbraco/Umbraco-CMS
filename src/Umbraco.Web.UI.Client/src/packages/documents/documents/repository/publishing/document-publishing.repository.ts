@@ -65,4 +65,27 @@ export class UmbDocumentPublishingRepository extends UmbRepositoryBase {
 
 		return { error };
 	}
+
+	/**
+	 * Publish variants of a document including its descendants
+	 * @memberof UmbDocumentPublishingRepository
+	 */
+	async publishWithDescendants(id: string, variantIds: Array<UmbVariantId>, includeUnpublishedDescendants: boolean) {
+		if (!id) throw new Error('id is missing');
+		if (!variantIds) throw new Error('variant IDs are missing');
+		await this.#init;
+
+		const { error } = await this.#publishingDataSource.publishWithDescendants(
+			id,
+			variantIds,
+			includeUnpublishedDescendants,
+		);
+
+		if (!error) {
+			const notification = { data: { message: `Document published with descendants` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
+	}
 }

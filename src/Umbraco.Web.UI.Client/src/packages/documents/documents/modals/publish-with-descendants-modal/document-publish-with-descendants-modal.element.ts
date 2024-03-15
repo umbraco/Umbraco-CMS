@@ -16,6 +16,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	UmbDocumentPublishWithDescendantsModalValue
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
+	#includeUnpublishedDescendants = false;
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
@@ -50,7 +51,10 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 	}
 
 	#submit() {
-		this.value = { ...this.value, selection: this.#selectionManager.getSelection() };
+		this.value = {
+			selection: this.#selectionManager.getSelection(),
+			includeUnpublishedDescendants: this.#includeUnpublishedDescendants,
+		};
 		this.modalContext?.submit();
 	}
 
@@ -85,8 +89,7 @@ export class UmbDocumentPublishWithDescendantsModalElement extends UmbModalBaseE
 					id="includeUnpublishedDescendants"
 					label=${this.localize.term('content_includeUnpublished')}
 					?checked=${this.value?.includeUnpublishedDescendants}
-					@change=${() =>
-						(this.value.includeUnpublishedDescendants = !this.value.includeUnpublishedDescendants)}></uui-toggle>
+					@change=${() => (this.#includeUnpublishedDescendants = !this.#includeUnpublishedDescendants)}></uui-toggle>
 			</uui-form-layout-item>
 
 			<div slot="actions">

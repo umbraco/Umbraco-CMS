@@ -9,7 +9,12 @@ import type {
 	UmbDocumentVariantModel,
 	UmbDocumentVariantOptionModel,
 } from '../types.js';
-import { UMB_DOCUMENT_PUBLISH_MODAL, UMB_DOCUMENT_SCHEDULE_MODAL } from '../modals/index.js';
+import {
+	UMB_DOCUMENT_PUBLISH_MODAL,
+	UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL,
+	UMB_DOCUMENT_SCHEDULE_MODAL,
+	UMB_DOCUMENT_SAVE_MODAL,
+} from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_WORKSPACE_ALIAS } from './manifests.js';
@@ -36,7 +41,6 @@ import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import { UMB_DOCUMENT_SAVE_MODAL } from '../modals/save-modal/document-save-modal.token.js';
 
 type EntityType = UmbDocumentDetailModel;
 export class UmbDocumentWorkspaceContext
@@ -626,7 +630,41 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public async publishWithDescendants() {
-		throw new Error('Method not implemented.');
+		const { options, selected } = await this.#determineVariantOptions();
+
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const result = await modalManagerContext
+			.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
+				data: {
+					options,
+				},
+				value: { selection: selected },
+			})
+			.onSubmit()
+			.catch(() => undefined);
+
+		if (!result?.selection.length) return;
+
+		// Map to variantIds
+		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+
+		if (!variantIds.length) return;
+
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+		await this.publishingRepository.publishWithDescendants(
+			unique,
+			variantIds,
+			result.includeUnpublishedDescendants ?? false,
+		);
+
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+
+		this.#persistedData.setValue(data);
+		this.#currentData.setValue(data);
+
+		this.workspaceComplete(data);
 	}
 
 	async delete() {
