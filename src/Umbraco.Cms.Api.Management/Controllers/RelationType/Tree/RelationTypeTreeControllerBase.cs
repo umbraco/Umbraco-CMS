@@ -31,7 +31,6 @@ public class RelationTypeTreeControllerBase : NamedEntityTreeControllerBase<Rela
         {
             Name = relationType.Name!,
             Id = relationType.Key,
-            Type = Constants.UdiEntityType.RelationType,
             HasChildren = false,
             IsDeletable = relationType.IsDeletableRelationType(),
             Parent = parentKey.HasValue

@@ -17105,6 +17105,27 @@
             }
           },
           {
+            "name": "memberGroupName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isApproved",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "isLockedOut",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
             "name": "orderBy",
             "in": "query",
             "schema": {
@@ -33152,14 +33173,10 @@
           "hasChildren",
           "id",
           "isTrashed",
-          "noAccess",
-          "type"
+          "noAccess"
         ],
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           },
@@ -40636,14 +40653,10 @@
       },
       "TreeItemPresentationModel": {
         "required": [
-          "hasChildren",
-          "type"
+          "hasChildren"
         ],
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string"
-          },
           "hasChildren": {
             "type": "boolean"
           }
