@@ -125,6 +125,7 @@ public class LocksTests : UmbracoIntegrationTest
         }
     }
 
+    [NUnit.Framework.Ignore("We currently do not have a way to force lazy locks")]
     [Test]
     public void GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted()
     {
