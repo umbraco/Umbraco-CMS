@@ -1,7 +1,6 @@
-import type { UmbApi } from '../models/api.interface.js';
-import { createExtensionApi } from './create-extension-api.function.js';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '../registry.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { createExtensionApi, type UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  *
