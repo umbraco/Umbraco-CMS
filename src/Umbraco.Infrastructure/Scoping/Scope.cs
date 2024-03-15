@@ -582,13 +582,13 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         public void EagerWriteLock(params int[] lockIds) => EagerWriteLockInner(InstanceId, null, lockIds);
 
         /// <inheritdoc />
-        public void WriteLock(params int[] lockIds) => LazyWriteLockInner(InstanceId, lockIds);
+        public void WriteLock(params int[] lockIds) => EagerWriteLockInner(InstanceId, null, lockIds);
 
         public void EagerWriteLock(TimeSpan timeout, int lockId) =>
             EagerWriteLockInner(InstanceId, timeout, lockId);
 
         /// <inheritdoc />
-        public void WriteLock(TimeSpan timeout, int lockId) => LazyWriteLockInner(InstanceId, timeout, lockId);
+        public void WriteLock(TimeSpan timeout, int lockId) => EagerWriteLockInner(InstanceId, timeout, lockId);
 
         /// <summary>
         ///     Used for testing. Ensures and gets any queued read locks.
