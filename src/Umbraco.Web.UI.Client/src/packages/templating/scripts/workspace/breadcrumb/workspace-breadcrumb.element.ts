@@ -1,10 +1,10 @@
-import type { UmbScriptTreeItemModel } from '../../tree/index.js';
 import { UmbScriptTreeRepository } from '../../tree/index.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-
+import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 @customElement('umb-workspace-breadcrumb')
 export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	#workspaceContext?: any;
@@ -17,21 +17,30 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	_name: string = '';
 
 	@state()
-	_ancestors: UmbScriptTreeItemModel[] = [];
+	_ancestors: UmbUniqueTreeItemModel[] = [];
+
+	@state()
+	_workspaceBasePath?: string;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(this.#workspaceContext.isNew, (value) => (this._isNew = value), 'breadcrumbWorkspaceIsNewObserver');
 			this.observe(this.#workspaceContext.name, (value) => (this._name = value), 'breadcrumbWorkspaceNameObserver');
-
 			this.#requestAncestors();
+			this.#constructWorkspaceBasePath();
 		});
 	}
 
 	async #requestAncestors() {
+		/* TODO: implement breadcrumb for new items
+		 We currently miss the parent item name for new items. We need to align with backend
+		 how to solve it */
+		const isNew = this.#workspaceContext?.getIsNew();
+		if (isNew === true) return;
+
 		const unique = this.#workspaceContext?.getUnique();
+
 		if (!unique) throw new Error('Unique is not available');
 		const { data } = await this.#treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
 
@@ -40,13 +49,19 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		}
 	}
 
+	async #constructWorkspaceBasePath() {
+		// TODO: temp solution to construct the base path.
+		const sectionContext = await this.getContext(UMB_SECTION_CONTEXT);
+		this._workspaceBasePath = `section/${sectionContext?.getPathname()}/workspace/${this.#workspaceContext!.getEntityType()}/edit`;
+	}
+
 	render() {
 		return html`
 			<uui-breadcrumbs>
 				${this._ancestors.map(
-					(item) =>
-						html`<uui-breadcrumb-item href="/section/settings/workspace/script/edit/${item.unique}"
-							>${item.name}</uui-breadcrumb-item
+					(ancestor) =>
+						html`<uui-breadcrumb-item href="${this._workspaceBasePath}/${ancestor.unique}"
+							>${ancestor.name}</uui-breadcrumb-item
 						>`,
 				)}
 				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
