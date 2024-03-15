@@ -39,7 +39,7 @@ public class LockingMechanism : ILockingMechanism
     public void ReadLock(Guid instanceId, params int[] lockIds) => ReadLock(instanceId, null, lockIds);
 
     /// <inheritdoc />
-    public void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerReadLockInner(instanceId, timeout, lockIds);
+    public void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerWriteLockInner(instanceId, timeout, lockIds);
 
     public void WriteLock(Guid instanceId, params int[] lockIds) => WriteLock(instanceId, null, lockIds);
 
