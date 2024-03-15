@@ -44,7 +44,7 @@ public class PropertyValidationServiceTests
 
         var propEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
 
-        validationService = new PropertyValidationService(propEditors, dataTypeService.Object, new ValueEditorCache(), Mock.Of<ICultureDictionary>());
+        validationService = new PropertyValidationService(propEditors, dataTypeService.Object, Mock.Of<ILocalizedTextService>(),new ValueEditorCache(), Mock.Of<ICultureDictionary>());
     }
 
     [Test]

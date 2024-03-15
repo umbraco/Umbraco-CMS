@@ -649,6 +649,7 @@ public class VariationTests
         return new PropertyValidationService(
             propertyEditorCollection,
             dataTypeService,
+            Mock.Of<ILocalizedTextService>(),
             new ValueEditorCache(),
             Mock.Of<ICultureDictionary>());
     }
