@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -648,6 +649,8 @@ public class VariationTests
         return new PropertyValidationService(
             propertyEditorCollection,
             dataTypeService,
-            new ValueEditorCache());
+            Mock.Of<ILocalizedTextService>(),
+            new ValueEditorCache(),
+            Mock.Of<ICultureDictionary>());
     }
 }

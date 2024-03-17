@@ -359,8 +359,27 @@ public class EntityService : RepositoryService, IEntityService
         => GetPagedChildren(id, objectType, pageIndex, pageSize, false, filter, ordering, out totalRecords);
 
     public IEnumerable<IEntitySlim> GetPagedChildren(
-        Guid? key,
-        UmbracoObjectTypes objectType,
+        Guid? parentKey,
+        UmbracoObjectTypes childObjectType,
+        int skip,
+        int take,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
+        => GetPagedChildren(
+            parentKey,
+            new[] { childObjectType },
+            childObjectType,
+            skip,
+            take,
+            out totalRecords,
+            filter,
+            ordering);
+
+    public IEnumerable<IEntitySlim> GetPagedChildren(
+        Guid? parentKey,
+        IEnumerable<UmbracoObjectTypes> parentObjectTypes,
+        UmbracoObjectTypes childObjectType,
         int skip,
         int take,
         out long totalRecords,
@@ -369,7 +388,9 @@ public class EntityService : RepositoryService, IEntityService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        if (ResolveKey(key, objectType, out int parentId) is false)
+        var parentId = 0;
+        var parentIdResolved = parentObjectTypes.Any(parentObjectType => ResolveKey(parentKey, parentObjectType, out parentId));
+        if (parentIdResolved is false)
         {
             totalRecords = 0;
             return Enumerable.Empty<IEntitySlim>();
@@ -379,7 +400,7 @@ public class EntityService : RepositoryService, IEntityService
 
         IEnumerable<IEntitySlim> children = GetPagedChildren(
             parentId,
-            objectType,
+            childObjectType,
             pageNumber,
             pageSize,
             out totalRecords,
@@ -401,7 +422,7 @@ public class EntityService : RepositoryService, IEntityService
         Ordering? ordering = null)
         => GetPagedChildren(id, objectType, pageIndex, pageSize, true, filter, ordering, out totalRecords);
 
-    IEnumerable<IEntitySlim> GetPagedTrashedChildren(
+    public IEnumerable<IEntitySlim> GetPagedTrashedChildren(
         Guid? key,
         UmbracoObjectTypes objectType,
         int skip,
