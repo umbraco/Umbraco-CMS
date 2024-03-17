@@ -30,9 +30,9 @@ public class StaticFileTreeControllerBase : FileSystemTreeControllerBase
             ? Array.Empty<string>()
             : base.GetFiles(path);
 
-    protected override FileSystemTreeItemPresentationModel[] GetAncestorDirectories(string path)
+    protected override FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
         => IsAllowedPath(path)
-            ? base.GetAncestorDirectories(path)
+            ? base.GetAncestorModels(path, includeSelf)
             : Array.Empty<FileSystemTreeItemPresentationModel>();
 
     private bool IsTreeRootPath(string path) => string.IsNullOrWhiteSpace(path);

@@ -30,7 +30,7 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
     protected async Task<IEnumerable<NamedEntityTreeItemResponseModel>> MapTreeItemViewModels(IEnumerable<IDictionaryItem> dictionaryItems)
         => await Task.WhenAll(dictionaryItems.Select(CreateEntityTreeItemViewModelAsync));
 
-    protected override async Task<ActionResult<IEnumerable<NamedEntityTreeItemResponseModel>>> GetAncestors(Guid descendantKey)
+    protected override async Task<ActionResult<IEnumerable<NamedEntityTreeItemResponseModel>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
     {
         IDictionaryItem? dictionaryItem = await DictionaryItemService.GetAsync(descendantKey);
         if (dictionaryItem is null)
@@ -40,6 +40,11 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
         }
 
         var ancestors = new List<IDictionaryItem>();
+        if (includeSelf)
+        {
+            ancestors.Add(dictionaryItem);
+        }
+
         while (dictionaryItem?.ParentId is not null)
         {
             dictionaryItem = await DictionaryItemService.GetAsync(dictionaryItem.ParentId.Value);

@@ -49,7 +49,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         return viewModel;
     }
 
-    protected override async Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey)
+    protected override async Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey, bool includeSelf = true)
     {
         IEntitySlim? entity = EntityService.Get(descendantKey, ItemObjectType)
                               ?? EntityService.Get(descendantKey, FolderObjectType);
@@ -66,6 +66,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             ? EntityService
                 .GetAll(ItemObjectType, ancestorIds)
                 .Union(containers)
+                .Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>())
                 .OrderBy(item => item.Level)
                 .ToArray()
             : Array.Empty<IEntitySlim>();

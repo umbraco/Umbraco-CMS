@@ -42,9 +42,9 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         return await Task.FromResult(Ok(result));
     }
 
-    protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey)
+    protected virtual async Task<ActionResult<IEnumerable<TItem>>> GetAncestors(Guid descendantKey, bool includeSelf = true)
     {
-        IEntitySlim[] ancestorEntities = await GetAncestorEntitiesAsync(descendantKey);
+        IEntitySlim[] ancestorEntities = await GetAncestorEntitiesAsync(descendantKey, includeSelf);
 
         TItem[] result = ancestorEntities
             .Select(ancestor =>
@@ -60,7 +60,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         return Ok(result);
     }
 
-    protected virtual async Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey)
+    protected virtual async Task<IEntitySlim[]> GetAncestorEntitiesAsync(Guid descendantKey, bool includeSelf)
     {
         IEntitySlim? entity = EntityService.Get(descendantKey, ItemObjectType);
         if (entity is null)
@@ -73,6 +73,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         IEntitySlim[] ancestors = ancestorIds.Any()
             ? EntityService
                 .GetAll(ItemObjectType, ancestorIds)
+                .Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>())
                 .OrderBy(item => item.Level)
                 .ToArray()
             : Array.Empty<IEntitySlim>();
