@@ -30,7 +30,7 @@ export class UmbAuthRepository {
       if (response.status === 402) {
         const responseData = await response.json();
         twoFactorView = responseData.twoFactorLoginView ?? '';
-        twoFactorProviders = responseData.twoFactorProviders ?? [];
+        twoFactorProviders = responseData.enabledTwoFactorProviderNames ?? [];
       }
 
       return {
