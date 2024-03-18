@@ -121,7 +121,6 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 							>${this.#getAncestorVariantName(ancestor)}</uui-breadcrumb-item
 						>`,
 				)}
-				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
 			</uui-breadcrumbs>
 		`;
 	}

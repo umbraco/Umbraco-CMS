@@ -54,7 +54,6 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 							>${ancestor.name}</uui-breadcrumb-item
 						>`,
 				)}
-				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
 			</uui-breadcrumbs>
 		`;
 	}
