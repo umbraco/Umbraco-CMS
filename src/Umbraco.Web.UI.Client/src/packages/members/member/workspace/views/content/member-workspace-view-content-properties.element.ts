@@ -11,7 +11,7 @@ export class UmbMemberWorkspaceViewContentPropertiesElement extends UmbLitElemen
 	public get containerId(): string | null | undefined {
 		return this._propertyStructureHelper.getContainerId();
 	}
-	public set containerName(value: string | null | undefined) {
+	public set containerId(value: string | null | undefined) {
 		this._propertyStructureHelper.setContainerId(value);
 	}
 

@@ -1,4 +1,5 @@
 export * from './publish-modal/index.js';
+export * from './publish-with-descendants-modal/index.js';
 export * from './save-modal/index.js';
 export * from './unpublish-modal/index.js';
 export * from './schedule-modal/index.js';

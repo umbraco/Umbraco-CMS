@@ -51,7 +51,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		const oldValue = this._property;
 		this._property = value;
 		this.#checkInherited();
-		this.#settingsModal.setUniquePathValue('propertyId', value?.id?.toString());
+		this.#settingsModal.setUniquePathValue('propertyId', value?.id);
 		this.setDataType(this._property?.dataType?.unique);
 		this.requestUpdate('property', oldValue);
 	}

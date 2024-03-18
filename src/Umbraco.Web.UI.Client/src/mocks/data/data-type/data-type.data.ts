@@ -365,7 +365,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		name: 'Multiple Text String',
 		id: 'dt-multipleTextString',
 		parent: null,
-		editorAlias: 'Umbraco.MultipleTextString',
+		editorAlias: 'Umbraco.MultipleTextstring',
 		editorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 		hasChildren: false,
 		isFolder: false,

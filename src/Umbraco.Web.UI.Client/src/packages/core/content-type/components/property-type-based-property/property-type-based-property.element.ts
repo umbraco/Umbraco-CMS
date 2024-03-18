@@ -44,6 +44,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 					// If there is no UI, we will look up the Property editor model to find the default UI alias:
 					if (!this._propertyEditorUiAlias && dataType?.editorAlias) {
 						//use 'dataType.editorAlias' to look up the extension in the registry:
+						// TODO: lets implement a way to observe once. [NL]
 						this.observe(
 							umbExtensionsRegistry.byTypeAndAlias('propertyEditorSchema', dataType.editorAlias),
 							(extension) => {
@@ -53,6 +54,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 							},
 							'_observePropertyEditorSchema',
 						);
+					} else {
+						this.removeControllerByAlias('_observePropertyEditorSchema');
 					}
 				},
 				'_observeDataType',

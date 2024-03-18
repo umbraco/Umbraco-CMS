@@ -30,21 +30,25 @@ export class UmbDocumentVariantLanguagePickerElement extends UmbLitElement {
 	_selection: Array<string> = [];
 
 	render() {
-		return repeat(
-			this.variantLanguageOptions,
-			(option) => option.unique,
-			(option) => html`
-				<uui-menu-item
-					selectable
-					label=${option.variant?.name ?? option.language.name}
-					@selected=${() => this.selectionManager.select(option.unique)}
-					@deselected=${() => this.selectionManager.deselect(option.unique)}
-					?selected=${this._selection.includes(option.unique)}>
-					<uui-icon slot="icon" name="icon-globe"></uui-icon>
-					${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
-				</uui-menu-item>
-			`,
-		);
+		return this.variantLanguageOptions.length
+			? repeat(
+					this.variantLanguageOptions,
+					(option) => option.unique,
+					(option) => html`
+						<uui-menu-item
+							selectable
+							label=${option.variant?.name ?? option.language.name}
+							@selected=${() => this.selectionManager.select(option.unique)}
+							@deselected=${() => this.selectionManager.deselect(option.unique)}
+							?selected=${this._selection.includes(option.unique)}>
+							<uui-icon slot="icon" name="icon-globe"></uui-icon>
+							${UmbDocumentVariantLanguagePickerElement.renderLabel(option)}
+						</uui-menu-item>
+					`,
+				)
+			: html`<uui-box>
+					<umb-localize key="content_noVariantsToProcess">There are no available variants</umb-localize>
+				</uui-box>`;
 	}
 
 	static renderLabel(option: UmbDocumentVariantOptionModel) {

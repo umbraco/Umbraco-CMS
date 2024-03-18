@@ -9,7 +9,12 @@ import type {
 	UmbDocumentVariantModel,
 	UmbDocumentVariantOptionModel,
 } from '../types.js';
-import { UMB_DOCUMENT_PUBLISH_MODAL, UMB_DOCUMENT_SCHEDULE_MODAL } from '../modals/index.js';
+import {
+	UMB_DOCUMENT_PUBLISH_MODAL,
+	UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL,
+	UMB_DOCUMENT_SCHEDULE_MODAL,
+	UMB_DOCUMENT_SAVE_MODAL,
+} from '../modals/index.js';
 import { UmbDocumentPublishingRepository } from '../repository/publishing/index.js';
 import { UmbUnpublishDocumentEntityAction } from '../entity-actions/unpublish.action.js';
 import { UMB_DOCUMENT_SAVE_MODAL } from '../modals/save-modal/document-save-modal.token.js';
@@ -627,6 +632,44 @@ export class UmbDocumentWorkspaceContext
 
 		// TODO: remove meta
 		new UmbUnpublishDocumentEntityAction(this, { unique, entityType, meta: {} as never }).execute();
+	}
+
+	public async publishWithDescendants() {
+		const { options, selected } = await this.#determineVariantOptions();
+
+		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		const result = await modalManagerContext
+			.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
+				data: {
+					options,
+				},
+				value: { selection: selected },
+			})
+			.onSubmit()
+			.catch(() => undefined);
+
+		if (!result?.selection.length) return;
+
+		// Map to variantIds
+		const variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
+
+		if (!variantIds.length) return;
+
+		const unique = this.getUnique();
+		if (!unique) throw new Error('Unique is missing');
+		await this.publishingRepository.publishWithDescendants(
+			unique,
+			variantIds,
+			result.includeUnpublishedDescendants ?? false,
+		);
+
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+
+		this.#persistedData.setValue(data);
+		this.#currentData.setValue(data);
+
+		this.workspaceComplete(data);
 	}
 
 	async delete() {

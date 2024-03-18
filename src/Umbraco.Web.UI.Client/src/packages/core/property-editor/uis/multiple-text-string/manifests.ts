@@ -7,9 +7,9 @@ export const manifest: ManifestPropertyEditorUi = {
 	element: () => import('./property-editor-ui-multiple-text-string.element.js'),
 	meta: {
 		label: 'Multiple Text String',
-		propertyEditorSchemaAlias: 'Umbraco.MultipleTextString',
+		propertyEditorSchemaAlias: 'Umbraco.MultipleTextstring',
 		icon: 'icon-ordered-list',
-		group: '',
+		group: 'lists',
 		supportsReadOnly: true,
 	},
 };
