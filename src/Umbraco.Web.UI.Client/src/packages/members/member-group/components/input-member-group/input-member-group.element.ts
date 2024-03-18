@@ -25,7 +25,7 @@ export class UmbInputMemberGroupElement extends FormControlMixin(UmbLitElement) 
 	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
 		onChange: ({ model }) => {
-			this.selectedIds = model;
+			this.selection = model;
 		},
 	});
 
@@ -75,10 +75,10 @@ export class UmbInputMemberGroupElement extends FormControlMixin(UmbLitElement) 
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selectedIds(): Array<string> {
+	public get selection(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
-	public set selectedIds(ids: Array<string>) {
+	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
@@ -92,7 +92,10 @@ export class UmbInputMemberGroupElement extends FormControlMixin(UmbLitElement) 
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = splitStringToArray(idsString);
+		this.selection = splitStringToArray(idsString);
+	}
+	public get value(): string {
+		return this.selection.join(',');
 	}
 
 	@property({ type: Object, attribute: false })
@@ -180,7 +183,7 @@ export class UmbInputMemberGroupElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selectedIds.length >= this.max) return;
+		if (this.max > 0 && this.selection.length >= this.max) return;
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"

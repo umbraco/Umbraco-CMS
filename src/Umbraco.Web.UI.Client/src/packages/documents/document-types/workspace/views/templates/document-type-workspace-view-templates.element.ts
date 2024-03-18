@@ -52,7 +52,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 		// save new allowed ids
 		const input = e.target as UmbInputTemplateElement;
 		const idsWithoutRoot =
-			input.selectedIds
+			input.selection
 				?.filter((id) => id !== null)
 				.map((id) => {
 					return { id };
@@ -68,7 +68,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				<div id="templates" slot="editor">
 					<umb-input-template
 						.defaultUnique=${this._defaultTemplateId ?? ''}
-						.selectedIds=${this._allowedTemplateIds}
+						.selection=${this._allowedTemplateIds}
 						@change=${this.#templateInputChange}></umb-input-template>
 				</div>
 			</umb-property-layout>

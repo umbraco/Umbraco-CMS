@@ -52,7 +52,7 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 	render() {
 		return html`<umb-input-checkbox-list
 			@change="${this.#onChange}"
-			.selectedIds="${this.#value}"
+			.selection="${this.#value}"
 			.list="${this._list}"></umb-input-checkbox-list>`;
 	}
 }

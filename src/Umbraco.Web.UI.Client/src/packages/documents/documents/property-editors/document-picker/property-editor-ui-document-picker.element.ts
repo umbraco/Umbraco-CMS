@@ -29,7 +29,7 @@ export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement impl
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
+		this.value = (event.target as UmbInputDocumentElement).selection.join(',');
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 

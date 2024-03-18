@@ -32,12 +32,12 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 
 	#onChange(event: CustomEvent) {
 		const target = event.target as UmbStylesheetInputElement;
-		this._value = target.selectedIds;
+		this._value = target.selection;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<umb-stylesheet-input @change=${this.#onChange} .selectedIds=${this._value}></umb-stylesheet-input>`;
+		return html`<umb-stylesheet-input @change=${this.#onChange} .selection=${this._value}></umb-stylesheet-input>`;
 	}
 }
 

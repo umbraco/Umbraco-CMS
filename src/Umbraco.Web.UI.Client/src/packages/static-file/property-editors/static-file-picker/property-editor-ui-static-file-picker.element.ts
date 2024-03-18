@@ -31,7 +31,7 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputStaticFileElement).selectedPaths;
+		this.value = (event.target as UmbInputStaticFileElement).selection;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -40,7 +40,7 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 		return html`
 			<umb-input-static-file
 				@change=${this._onChange}
-				.selectedIds=${this._value}
+				.selection=${this._value}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}></umb-input-static-file>
 		`;

@@ -28,7 +28,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 	public config?: UmbPropertyEditorConfigCollection;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputStaticFileElement).selectedPaths;
+		this.value = (event.target as UmbInputStaticFileElement).selection;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -37,7 +37,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 		return html`
 			<umb-input-static-file
 				@change=${this._onChange}
-				.selectedIds=${this._value}
+				.selection=${this._value}
 				.min=${0}
 				.max=${1}></umb-input-static-file>
 			<br />

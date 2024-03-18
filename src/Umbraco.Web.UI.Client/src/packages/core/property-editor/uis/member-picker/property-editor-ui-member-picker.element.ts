@@ -49,7 +49,7 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 	private _onChange(event: CustomEvent) {
 		//TODO: This is a hack, something changed so now we need to convert the array to a comma separated string to make it work with the server.
 		const toCommaSeparatedString = (event.target as UmbInputMemberElement).selection.join(',');
-		// this.value = (event.target as UmbInputMemberElement).selectedIds;
+		// this.value = (event.target as UmbInputMemberElement).selection;
 		this.value = toCommaSeparatedString;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
@@ -58,7 +58,7 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 		return html`
 			<umb-input-member
 				@change=${this._onChange}
-				.selectedIds=${this._items}
+				.selection=${this._items}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}
 				>Add</umb-input-member

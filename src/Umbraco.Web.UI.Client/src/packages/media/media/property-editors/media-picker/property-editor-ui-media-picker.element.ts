@@ -51,9 +51,9 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	#value: Array<UmbMediaPickerPropertyValue> = [];
 
 	#onChange(event: CustomEvent) {
-		const selectedIds = (event.target as UmbInputMediaElement).selection;
+		const selection = (event.target as UmbInputMediaElement).selection;
 
-		const result = selectedIds.map((mediaKey) => {
+		const result = selection.map((mediaKey) => {
 			return {
 				key: UmbId.new(),
 				mediaKey,
@@ -72,7 +72,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		return html`
 			<umb-input-media
 				@change=${this.#onChange}
-				.selectedIds=${this._items}
+				.selection=${this._items}
 				.min=${this._limitMin}
 				.max=${this._limitMax}>
 				<umb-localize key="general_add">Add</umb-localize>

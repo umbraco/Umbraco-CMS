@@ -176,7 +176,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 					.value=${this._package.contentNodeId ?? ''}
 					max="1"
 					@change="${(e: CustomEvent) =>
-						(this._package.contentNodeId = (e.target as UmbInputDocumentElement).selectedIds[0])}">
+						(this._package.contentNodeId = (e.target as UmbInputDocumentElement).selection[0])}">
 				</umb-input-document>
 				<uui-checkbox
 					label="Include child nodes"
@@ -192,7 +192,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		return html`
 			<div slot="editor">
 				<umb-input-media
-					.selectedIds=${this._package.mediaIds ?? []}
+					.selection=${this._package.mediaIds ?? []}
 					@change="${(e: CustomEvent) =>
 						(this._package.mediaIds = (e.target as UmbInputMediaElement).selection)}"></umb-input-media>
 				<uui-checkbox
