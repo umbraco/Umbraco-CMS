@@ -106,7 +106,6 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		}
 
 		const oldValue = this._routes;
-		console.log('Test', oldValue === routes);
 
 		// is there any differences in the amount ot the paths? [NL]
 		if (oldValue && oldValue.length === routes.length) {
