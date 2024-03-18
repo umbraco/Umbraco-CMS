@@ -3,10 +3,9 @@ import type { ManifestWorkspaceFooterApp } from '@umbraco-cms/backoffice/extensi
 export const manifests: Array<ManifestWorkspaceFooterApp> = [
 	{
 		type: 'workspaceFooterApp',
+		kind: 'variantBreadcrumb',
 		alias: 'Umb.WorkspaceFooterApp.Document.Breadcrumb',
 		name: 'Document Breadcrumb Workspace Footer App',
-		weight: 10,
-		element: () => import('./variant-workspace-breadcrumb.element.js'),
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',

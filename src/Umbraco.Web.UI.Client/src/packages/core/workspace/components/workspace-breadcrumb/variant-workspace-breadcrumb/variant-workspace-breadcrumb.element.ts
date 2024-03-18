@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_NAVIGATION_STRUCTURE_CONTEXT } from '../../navigation/structure/document-navigation-structure.context-token.js';
+import { UMB_DOCUMENT_NAVIGATION_STRUCTURE_CONTEXT } from '../../../../../documents/documents/navigation/structure/document-navigation-structure.context-token.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
