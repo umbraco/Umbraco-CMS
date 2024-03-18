@@ -24,18 +24,15 @@ export class UmbScriptNavigationStructureWorkspaceContext extends UmbContextBase
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.#requestAncestors();
+			this.#requestStructure();
 		});
 	}
 
-	async #requestAncestors() {
-		/* TODO: implement breadcrumb for new items
-		 We currently miss the parent item name for new items. We need to align with backend
-		 how to solve it */
+	async #requestStructure() {
 		const isNew = this.#workspaceContext?.getIsNew();
-		if (isNew === true) return;
+		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
 
-		const unique = (await this.observe(this.#workspaceContext?.unique, () => {})?.asPromise()) as string;
+		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
 
 		const { data } = await this.#treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
