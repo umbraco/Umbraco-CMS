@@ -1,12 +1,15 @@
-import './document-publish-modal.element.js';
+import './document-publish-with-descendants-modal.element.js';
 
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { UmbDocumentVariantState } from '../../types.js';
-import type { UmbDocumentPublishModalData, UmbDocumentPublishModalValue } from './document-publish-modal.token.js';
-import type { UmbDocumentPublishModalElement } from './document-publish-modal.element.js';
+import type {
+	UmbDocumentPublishWithDescendantsModalData,
+	UmbDocumentPublishWithDescendantsModalValue,
+} from './document-publish-with-descendants-modal.token.js';
+import type { UmbDocumentPublishWithDescendantsModalElement } from './document-publish-with-descendants-modal.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-const modalData: UmbDocumentPublishModalData = {
+const modalData: UmbDocumentPublishWithDescendantsModalData = {
 	options: [
 		{
 			unique: 'en-us',
@@ -77,14 +80,14 @@ const modalData: UmbDocumentPublishModalData = {
 	],
 };
 
-const modalValue: UmbDocumentPublishModalValue = {
+const modalValue: UmbDocumentPublishWithDescendantsModalValue = {
 	selection: ['en-us'],
 };
 
-const meta: Meta<UmbDocumentPublishModalElement> = {
-	title: 'Workspaces/Document/Modals/Publish',
-	component: 'umb-document-publish-modal',
-	id: 'umb-document-publish-modal',
+const meta: Meta<UmbDocumentPublishWithDescendantsModalElement> = {
+	title: 'Workspaces/Document/Modals/Publish With Descendants Modal',
+	component: 'umb-document-publish-with-descendants-modal',
+	id: 'umb-document-publish-with-descendants-modal',
 	args: {
 		data: modalData,
 		value: modalValue,
@@ -96,11 +99,11 @@ const meta: Meta<UmbDocumentPublishModalElement> = {
 			source: {
 				language: 'ts',
 				code: `
-import { UMB_DOCUMENT_PUBLISH_MODAL, UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
+import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
-	const result = modalManager.open(this, UMB_DOCUMENT_PUBLISH_MODAL, {
+	const result = modalManager.open(this, UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL, {
 		data: {
 			options: [
 				{
@@ -158,6 +161,16 @@ this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalManager) => {
 };
 
 export default meta;
-type Story = StoryObj<UmbDocumentPublishModalElement>;
+type Story = StoryObj<UmbDocumentPublishWithDescendantsModalElement>;
 
 export const Overview: Story = {};
+
+export const Invariant: Story = {
+	args: {
+		data: {
+			...modalData,
+			options: modalData.options.slice(0, 1),
+		},
+		value: modalValue,
+	},
+};
