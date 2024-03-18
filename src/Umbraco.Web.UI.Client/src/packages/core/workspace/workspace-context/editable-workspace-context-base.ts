@@ -5,6 +5,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 	extends UmbContextBase<UmbEditableWorkspaceContextBase<WorkspaceDataModelType>>
@@ -60,4 +61,5 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceDataModelType>
 	abstract getEntityType(): string;
 	abstract getData(): WorkspaceDataModelType | undefined;
 	abstract save(): Promise<void>;
+	abstract unique: Observable<string | undefined>;
 }
