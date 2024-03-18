@@ -20,8 +20,8 @@ describe('UmbInputStaticFileElement', () => {
 
 	describe('Public API', () => {
 		describe('properties', () => {
-			it('has a selectedPaths property', () => {
-				expect(element).to.have.property('selectedPaths').to.be.an.instanceOf(Array);
+			it('has a selection property', () => {
+				expect(element).to.have.property('selection').to.be.an.instanceOf(Array);
 			});
 
 			it('has a value property', () => {

@@ -26,7 +26,6 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 			this._valueString = undefined;
 		}
 	}
-
 	get value() {
 		return this._valueString;
 	}

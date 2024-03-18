@@ -14,11 +14,11 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	 * @default 0
 	 */
 	@property({ type: Number })
-	public get min(): number {
-		return this.#pickerContext.min;
-	}
 	public set min(value: number) {
 		this.#pickerContext.min = value;
+	}
+	public get min(): number {
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -37,11 +37,11 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public get max(): number {
-		return this.#pickerContext.max;
-	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -53,11 +53,11 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of files';
 
-	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
 	public set selection(paths: Array<string>) {
 		this.#pickerContext.setSelection(paths);
+	}
+	public get selection(): Array<string> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
@@ -65,6 +65,9 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	public set value(pathsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selection = splitStringToArray(pathsString);
+	}
+	public get value(): string {
+		return this.selection.join(',');
 	}
 
 	@state()
