@@ -53,7 +53,7 @@ export class UmbDocumentTrackedReferenceTableElement extends UmbLitElement {
 	}
 
 	#renderTable() {
-		if (!this._items) return nothing;
+		if (this._items?.length === 0) return nothing;
 		return html`
 			<uui-box headline=${this.localize.term('references_labelDependsOnThis')} style="--uui-box-default-padding:0">
 				<uui-table>
