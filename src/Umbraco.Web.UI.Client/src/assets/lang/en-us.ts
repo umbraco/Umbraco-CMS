@@ -255,6 +255,7 @@ export default {
 			'Publish <strong>%0%</strong> and all content items underneath and thereby making their content publicly available.',
 		publishDescendantsWithVariantsHelp:
 			'Publish variants and variants of same type underneath and thereby making their content publicly available.',
+		noVariantsToProcess: 'There are no available variants',
 		releaseDate: 'Publish at',
 		unpublishDate: 'Unpublish at',
 		removeDate: 'Clear Date',
