@@ -5,15 +5,14 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: 'src/index.ts',
-      formats: ['iife'],
-      name: 'umblogin',
+      formats: ['es'],
       fileName: 'login'
 		},
     rollupOptions: {
-      external: [/^@umbraco/],
+      external: [/^@umbraco-cms/],
       output: {
-        globals: {
-          '@umbraco-ui/uui': 'uui',
+        manualChunks: {
+          'uui': ['@umbraco-ui/uui']
         },
       }
     },

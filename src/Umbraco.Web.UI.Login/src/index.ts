@@ -1,3 +1,6 @@
+import '@umbraco-ui/uui';
+import '@umbraco-ui/uui-css/dist/uui-css.css';
+
 import './auth.element.js';
 
 import './components/back-to-login-button.element.js';
