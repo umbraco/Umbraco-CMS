@@ -4,7 +4,6 @@ import {
   ResetPasswordResponse,
   ValidatePasswordResetCodeResponse,
   NewPasswordResponse,
-  MfaProvidersResponse,
 } from '../types.js';
 import {UmbAuthRepository} from './auth.repository.js';
 
@@ -13,6 +12,7 @@ export class UmbAuthContext {
   disableLocalLogin = false;
   twoFactorView = '';
   isMfaEnabled = false;
+  mfaProviders: string[] = [];
 
   #authRepository = new UmbAuthRepository();
 
@@ -75,10 +75,6 @@ export class UmbAuthContext {
 
   async getInvitedUser(): Promise<any> {
     return this.#authRepository.getInvitedUser();
-  }
-
-  getMfaProviders(): Promise<MfaProvidersResponse> {
-    return this.#authRepository.getMfaProviders();
   }
 
   validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
