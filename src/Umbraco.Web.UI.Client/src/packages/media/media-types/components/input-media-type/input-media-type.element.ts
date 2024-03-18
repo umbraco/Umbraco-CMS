@@ -121,6 +121,7 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderAddButton() {
+		if (this.max === 1 && this.selection.length >= this.max) return;
 		return html`
 			<uui-button
 				id="add-button"
