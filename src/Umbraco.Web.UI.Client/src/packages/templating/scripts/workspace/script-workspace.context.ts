@@ -16,7 +16,9 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 	#parent?: { entityType: string; unique: string | null };
 
 	#data = new UmbObjectState<UmbScriptDetailModel | undefined>(undefined);
+
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
 	readonly path = this.#data.asObservablePart((data) => data?.path);
