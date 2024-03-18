@@ -133,7 +133,7 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
 					label="${this.localize.term('actions_unpublish')}"
-					?disabled=${!this._hasUnpublishPermission}
+					?disabled=${!this._hasUnpublishPermission || !this.#selectionManager.getSelection().length}
 					look="primary"
 					color="warning"
 					@click=${this.#submit}></uui-button>
