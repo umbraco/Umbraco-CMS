@@ -57,10 +57,6 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 							value=${ifDefined(this._language?.name)}
 							@input="${this.#handleInput}"></uui-input>`}
 			</div>
-			<div slot="footer-info" id="footer-into">
-				<a href="section/settings/workspace/language-root">Languages</a> /
-				${this._isNew ? 'Create' : this._language?.name}
-			</div>
 		</umb-workspace-editor>`;
 	}
 
