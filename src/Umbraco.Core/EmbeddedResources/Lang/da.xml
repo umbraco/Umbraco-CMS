@@ -445,7 +445,6 @@
 </html>]]>
     </key>
   </area>
-  </area>
   <area alias="contentType">
     <key alias="copyFailed">Kopiering af indholdstypen fejlede</key>
     <key alias="moveFailed">Flytning af indholdstypen fejlede</key>
