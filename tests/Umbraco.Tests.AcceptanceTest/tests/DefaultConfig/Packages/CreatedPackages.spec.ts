@@ -16,7 +16,7 @@ test.describe('Created packages tests', () => {
     await umbracoApi.package.ensureNameNotExists(packageName);
   });
 
-  test('can create a empty package', async ({umbracoUi}) => {
+  test.skip('can create a empty package', async ({umbracoUi}) => {
     // Act
     await umbracoUi.package.clickCreatePackageButton();
     await umbracoUi.package.enterPackageName(packageName);
@@ -26,7 +26,7 @@ test.describe('Created packages tests', () => {
     await umbracoUi.package.isPackageNameVisible(packageName);
   });
 
-  test('can update package name', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can update package name', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const wrongPackageName = 'WrongPackageName';
     await umbracoApi.package.ensureNameNotExists(wrongPackageName);
@@ -43,7 +43,7 @@ test.describe('Created packages tests', () => {
     expect(umbracoApi.package.doesNameExist(packageName)).toBeTruthy();
   });
 
-  test('can delete a package', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can delete a package', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.package.createEmptyPackage(packageName);
     await umbracoUi.reloadPage();

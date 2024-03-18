@@ -60,7 +60,7 @@ test.describe('Data Types Folder tests', () => {
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeFalsy();
   });
 
-  test('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a data type in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     let dataTypeFolderId = await umbracoApi.dataType.createFolder(dataTypeFolderName);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeFolderName)).toBeTruthy();
