@@ -210,7 +210,7 @@ export default class UmbLoginPageElement extends LitElement {
         display: inline-flex;
         line-height: 1;
         font-size: 14px;
-        font-family: var(--uui-font-family);
+        font-family: var(--uui-font-family),sans-serif;
         margin-left: auto;
         margin-bottom: var(--uui-size-space-3);
       }
