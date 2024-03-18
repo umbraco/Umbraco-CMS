@@ -18,6 +18,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
@@ -37,6 +39,7 @@ public class BackOfficeController : SecurityControllerBase
     private readonly IOptions<SecuritySettings> _securitySettings;
     private readonly ILogger<BackOfficeController> _logger;
     private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
+    private readonly IUserTwoFactorLoginService _userTwoFactorLoginService;
 
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
@@ -44,7 +47,8 @@ public class BackOfficeController : SecurityControllerBase
         IBackOfficeUserManager backOfficeUserManager,
         IOptions<SecuritySettings> securitySettings,
         ILogger<BackOfficeController> logger,
-        IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
+        IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
+        IUserTwoFactorLoginService userTwoFactorLoginService)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;
@@ -52,6 +56,7 @@ public class BackOfficeController : SecurityControllerBase
         _securitySettings = securitySettings;
         _logger = logger;
         _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
+        _userTwoFactorLoginService = userTwoFactorLoginService;
     }
 
     // FIXME: this is a temporary solution to get the new backoffice auth rolling.
@@ -86,11 +91,13 @@ public class BackOfficeController : SecurityControllerBase
         }
         if(result.RequiresTwoFactor)
         {
-            var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
-
+            string? twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
+            BackOfficeIdentityUser? attemptingUser = await _backOfficeUserManager.FindByNameAsync(model.Username);
+            IEnumerable<string> enabledProviders = (await _userTwoFactorLoginService.GetProviderNamesAsync(attemptingUser!.Key)).Result.Where(x=>x.IsEnabledOnUser).Select(x=>x.ProviderName);
             return StatusCode(StatusCodes.Status402PaymentRequired, new RequiresTwoFactorResponseModel()
             {
-                TwoFactorLoginView = twofactorView
+                TwoFactorLoginView = twofactorView,
+                EnabledTwoFactorProviderNames = enabledProviders
             });
         }
         return Ok();
