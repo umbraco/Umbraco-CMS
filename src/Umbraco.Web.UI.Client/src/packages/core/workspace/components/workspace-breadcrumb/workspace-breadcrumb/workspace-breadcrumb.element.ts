@@ -28,8 +28,8 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 			this.observe(this.#workspaceContext.name, (value) => (this._name = value), 'breadcrumbWorkspaceNameObserver');
 		});
 
-		this.consumeContext('UmbNavigationStructureWorkspaceContext', (instance) => {
-			this.observe(instance.structure, (value) => (this._structure = value), 'navigationStructureObserver');
+		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
+			this.observe(instance.structure, (value) => (this._structure = value), 'menuStructureObserver');
 		});
 
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {

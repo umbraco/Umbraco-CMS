@@ -1,26 +1,25 @@
-import { UmbScriptTreeRepository } from '../tree/index.js';
-import { UMB_SCRIPT_NAVIGATION_STRUCTURE_WORKSPACE_CONTEXT } from './script-navigation-structure.context-token.js';
+import type { UmbStructureItemModel } from './types.js';
+import type { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-interface UmbStructureItemModel {
-	unique: string | null;
-	entityType: string;
-	name: string;
+interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
+	treeRepositoryAlias: string;
 }
 
-export class UmbScriptNavigationStructureWorkspaceContext extends UmbContextBase<UmbScriptNavigationStructureWorkspaceContext> {
+export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContextBase<unknown> {
 	#workspaceContext?: any;
-	#treeRepository = new UmbScriptTreeRepository(this);
+	#args: UmbMenuTreeStructureWorkspaceContextBaseArgs;
 
 	#structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
-	constructor(host: UmbControllerHost) {
-		super(host, UMB_SCRIPT_NAVIGATION_STRUCTURE_WORKSPACE_CONTEXT);
+	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
+		super(host, 'UmbMenuStructureWorkspaceContext');
+		this.#args = args;
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -35,14 +34,15 @@ export class UmbScriptNavigationStructureWorkspaceContext extends UmbContextBase
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
 
-		const { data } = await this.#treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.#args.treeRepositoryAlias);
+		const { data } = await treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
 
 		if (data) {
-			const structureItems = data.map((ancestor) => {
+			const structureItems = data.map((structureItem) => {
 				return {
-					unique: ancestor.unique,
-					entityType: ancestor.entityType,
-					name: ancestor.name,
+					unique: structureItem.unique,
+					entityType: structureItem.entityType,
+					name: structureItem.name,
 				};
 			});
 
@@ -50,5 +50,3 @@ export class UmbScriptNavigationStructureWorkspaceContext extends UmbContextBase
 		}
 	}
 }
-
-export default UmbScriptNavigationStructureWorkspaceContext;

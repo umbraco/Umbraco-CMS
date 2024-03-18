@@ -17,9 +17,9 @@ export const manifests = [
 	},
 	{
 		type: 'workspaceContext',
-		name: 'Script Navigation Structure Workspace Context',
-		alias: 'Umb.Context.Script.NavigationStructure',
-		api: () => import('./script-navigation-structure.context.js'),
+		name: 'Script Menu Structure Workspace Context',
+		alias: 'Umb.Context.Script.Menu.Structure',
+		api: () => import('./script-menu-structure.context.js'),
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
