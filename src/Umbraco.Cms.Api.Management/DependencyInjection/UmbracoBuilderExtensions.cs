@@ -32,6 +32,7 @@ public static partial class UmbracoBuilderExtensions
                 .AddSearchManagement()
                 .AddTrees()
                 .AddAuditLogs()
+                .AddConfigurationFactories()
                 .AddDocuments()
                 .AddDocumentTypes()
                 .AddMedia()
