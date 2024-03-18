@@ -3,7 +3,7 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 	UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
 } from '../entity.js';
-import { manifests as folderManifests } from './folder/manifests.js';
+//import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
 import { UmbDocumentBlueprintTreeRepository } from './document-blueprint-tree.repository.js';
 import { UmbDocumentBlueprintTreeStore } from './document-blueprint-tree.store.js';
@@ -16,6 +16,7 @@ import type {
 
 export const UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS = 'Umb.Repository.DocumentBlueprint.Tree';
 export const UMB_DOCUMENT_BLUEPRINT_TREE_STORE_ALIAS = 'Umb.Store.DocumentBlueprint.Tree';
+export const UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS = 'Umb.Tree.DocumentBlueprint';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',
@@ -34,7 +35,7 @@ const treeStore: ManifestTreeStore = {
 const tree: ManifestTree = {
 	type: 'tree',
 	kind: 'default',
-	alias: 'Umb.Tree.DocumentBlueprint',
+	alias: UMB_DOCUMENT_BLUEPRINT_TREE_ALIAS,
 	name: 'Document Blueprints Tree',
 	meta: {
 		repositoryAlias: UMB_DOCUMENT_BLUEPRINT_TREE_REPOSITORY_ALIAS,
@@ -53,4 +54,5 @@ const treeItem: ManifestTreeItem = {
 	],
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests, ...reloadManifests];
+export const manifests = [treeRepository, treeStore, tree, treeItem, ...reloadManifests];
+//...folderManifests,

@@ -48,6 +48,7 @@ export class UmbDocumentBlueprintWorkspaceElement extends UmbLitElement {
 				},
 			},
 			{
+				/** TODO: Any way to setup the root without edit/null appearing? */
 				path: 'edit/null',
 				component: this.#rootElement,
 			},
@@ -55,6 +56,7 @@ export class UmbDocumentBlueprintWorkspaceElement extends UmbLitElement {
 				path: 'edit/:unique',
 				component: this.#editorElement,
 				setup: (_component, info) => {
+					console.log('edit unique');
 					const unique = info.match.params.unique;
 					this.#workspaceContext!.load(unique);
 				},

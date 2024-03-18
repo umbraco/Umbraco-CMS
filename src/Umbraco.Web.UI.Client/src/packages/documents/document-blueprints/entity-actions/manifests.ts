@@ -1,12 +1,8 @@
-/*import {
+import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../entity.js';
+import {
 	UMB_DOCUMENT_BLUEPRINT_DETAIL_REPOSITORY_ALIAS,
 	UMB_DOCUMENT_BLUEPRINT_ITEM_REPOSITORY_ALIAS,
-} from '../repository/index.js';*/
-import {
-	UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
-	UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
-	UMB_DOCUMENT_BLUEPRINT_ITEM_ENTITY_TYPE,
-} from '../entity.js';
+} from '../index.js';
 import { UmbCreateEntityAction } from './create/create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -34,19 +30,18 @@ const entityActions: Array<ManifestTypes> = [
 			icon: 'icon-add',
 			label: 'Create',
 		},
-	} /*
+	},
 	{
 		type: 'entityAction',
 		kind: 'delete',
 		alias: 'Umb.EntityAction.DocumentBlueprintItem.Delete',
 		name: 'Delete Document Blueprint Item Entity Action',
-		forEntityTypes: [UMB_DOCUMENT_BLUEPRINT_ITEM_ENTITY_TYPE],
+		forEntityTypes: [UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE],
 		meta: {
 			detailRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_DETAIL_REPOSITORY_ALIAS,
 			itemRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_ITEM_REPOSITORY_ALIAS,
 		},
 	},
-	*/,
 ];
 
 export const manifests = [...entityActions];
