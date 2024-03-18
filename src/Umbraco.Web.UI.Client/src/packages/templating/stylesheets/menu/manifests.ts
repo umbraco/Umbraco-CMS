@@ -15,9 +15,9 @@ export const manifests = [
 	},
 	{
 		type: 'workspaceContext',
-		name: 'Stylesheet Navigation Structure Workspace Context',
-		alias: 'Umb.Context.Stylesheet.NavigationStructure',
-		api: () => import('./stylesheet-navigation-structure.context.js'),
+		name: 'Stylesheet Menu Structure Workspace Context',
+		alias: 'Umb.Context.Stylesheet.Menu.Structure',
+		api: () => import('./stylesheet-menu-structure.context.js'),
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
