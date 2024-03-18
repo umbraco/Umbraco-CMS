@@ -14,6 +14,7 @@
     await startMockServiceWorker();
     await import('./src/index.ts');
   </script>
+  <link rel="stylesheet" href="/user-defined.css" />
 </head>
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
 <noscript>
@@ -31,8 +32,7 @@
   </style>
   <div id="noscript-container">
     <h1 class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
-      <img aria-hidden="true" alt="logo" src="/favicon.svg" style="width: 30px" />
-      <span>Umbraco</span>
+      <img aria-hidden="true" alt="logo" src="/logo_dark.svg" style="width: 100%" />
     </h1>
     <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
     <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener"
