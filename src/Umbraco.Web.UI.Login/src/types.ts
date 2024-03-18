@@ -22,7 +22,9 @@ export interface IUmbAuthContext {
 }
 
 export type LoginResponse = {
-	data?: string;
+	data?: {
+    username: string;
+  };
 	error?: string;
 	status: number;
 	twoFactorView?: string;

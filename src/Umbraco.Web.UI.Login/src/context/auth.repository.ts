@@ -8,7 +8,7 @@ import type {
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
 export class UmbAuthRepository {
-  readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
+  readonly #authURL = 'management/api/v1/security/back-office/login';
 
   public async login(data: LoginRequestModel): Promise<LoginResponse> {
     try {
@@ -17,32 +17,28 @@ export class UmbAuthRepository {
         body: JSON.stringify({
           username: data.username,
           password: data.password,
-          rememberMe: data.persist,
         }),
         headers: {
           'Content-Type': 'application/json',
         },
       });
+
       const response = await fetch(request);
 
-      let responseData: any = undefined;
-
-      // Additionally authenticate with the Management API
-      await this.#managementApiLogin(data.username, data.password);
-
-      try {
-        const text = await response.text();
-        if (text) {
-          responseData = JSON.parse(this.#removeAngularJSResponseData(text));
-        }
-      } catch {
+      if (!response.ok) {
+        return {
+          status: response.status,
+          error: await this.#getErrorText(response),
+        };
       }
 
       return {
         status: response.status,
         error: response.ok ? undefined : await this.#getErrorText(response),
-        data: responseData,
-        twoFactorView: responseData?.twoFactorView,
+        data: {
+          username: data.username,
+        },
+        //twoFactorView: responseData?.twoFactorView, // TODO: Figure out how to handle this
       };
     } catch (error) {
       return {
@@ -288,25 +284,5 @@ export class UmbAuthRepository {
     }
 
     return text;
-  }
-
-  async #managementApiLogin(username: string, password: string) {
-    try {
-      const authURLManagementApi = 'management/api/v1/security/back-office/login';
-      const requestManagementApi = new Request(authURLManagementApi, {
-        method: 'POST',
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      return await fetch(requestManagementApi);
-    } catch (error) {
-      console.error('Failed to authenticate with the Management API:', error);
-    }
   }
 }

@@ -32,12 +32,6 @@ export class UmbAuthContext implements IUmbAuthContext {
     const params = new URLSearchParams(window.location.search);
     let returnPath = params.get('ReturnUrl') ?? params.get('returnPath') ?? this.#returnPath;
 
-    // Paths from the old Backoffice are encoded twice and need to be decoded,
-    // but we don't want to decode the new paths coming from the Management API.
-    if (returnPath.indexOf('/security/back-office/authorize') === -1) {
-      returnPath = decodeURIComponent(returnPath);
-    }
-
     // If return path is empty, return an empty string.
     if (!returnPath) {
       return '';
