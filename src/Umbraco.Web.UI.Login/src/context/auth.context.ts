@@ -1,6 +1,5 @@
 import {
   LoginRequestModel,
-  IUmbAuthContext,
   LoginResponse,
   ResetPasswordResponse,
   ValidatePasswordResetCodeResponse,
@@ -9,9 +8,11 @@ import {
 } from '../types.js';
 import {UmbAuthRepository} from './auth.repository.js';
 
-export class UmbAuthContext implements IUmbAuthContext {
+export class UmbAuthContext {
   readonly supportsPersistLogin = false;
   disableLocalLogin = false;
+  twoFactorView = '';
+  isMfaEnabled = false;
 
   #authRepository = new UmbAuthRepository();
 
@@ -85,4 +86,4 @@ export class UmbAuthContext implements IUmbAuthContext {
   }
 }
 
-export const umbAuthContext = new UmbAuthContext() as IUmbAuthContext;
+export const umbAuthContext = new UmbAuthContext();

@@ -32,13 +32,24 @@ export class UmbAuthRepository {
         };
       }
 
+      // If the response code is 402, it means that the user has enabled 2-factor authentication
+      if (response.status === 402) {
+        const responseData = await response.json();
+        return {
+          status: response.status,
+          data: {
+            username: data.username,
+          },
+          twoFactorView: responseData.twoFactorView,
+        };
+      }
+
+      // If the response code is 200, it means that the user has successfully logged in
       return {
         status: response.status,
-        error: response.ok ? undefined : await this.#getErrorText(response),
         data: {
           username: data.username,
         },
-        //twoFactorView: responseData?.twoFactorView, // TODO: Figure out how to handle this
       };
     } catch (error) {
       return {
