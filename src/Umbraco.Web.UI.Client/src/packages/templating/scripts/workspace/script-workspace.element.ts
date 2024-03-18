@@ -4,6 +4,8 @@ import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
+import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-script-workspace')
 export class UmbScriptWorkspaceElement extends UmbLitElement {
@@ -36,6 +38,12 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 			},
 		},
 	];
+
+	constructor() {
+		super();
+		// TODO: We need to recreate when ID changed?
+		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this, this.#workspaceContext]);
+	}
 
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
