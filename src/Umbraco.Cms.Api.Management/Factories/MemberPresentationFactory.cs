@@ -9,24 +9,19 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class MemberPresentationFactory
-    : ContentPresentationFactoryBase<IMemberType, IMemberTypeService>, IMemberPresentationFactory
+internal sealed class MemberPresentationFactory : IMemberPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IMemberService _memberService;
-    private readonly IMemberTypeService _memberTypeService;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
 
     public MemberPresentationFactory(
         IUmbracoMapper umbracoMapper,
         IMemberService memberService,
-        IMemberTypeService memberTypeService,
         ITwoFactorLoginService twoFactorLoginService)
-        : base(memberTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
         _memberService = memberService;
-        _memberTypeService = memberTypeService;
         _twoFactorLoginService = twoFactorLoginService;
     }
 
@@ -58,11 +53,7 @@ internal sealed class MemberPresentationFactory
             Id = entity.Key,
         };
 
-        IMemberType? memberType = _memberTypeService.Get(entity.ContentTypeAlias);
-        if (memberType is not null)
-        {
-            responseModel.MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(memberType)!;
-        }
+        responseModel.MemberType = _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!;
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
@@ -80,5 +71,5 @@ internal sealed class MemberPresentationFactory
         };
 
     public MemberTypeReferenceResponseModel CreateMemberTypeReferenceResponseModel(IMemberEntitySlim entity)
-        => CreateContentTypeReferenceResponseModel<MemberTypeReferenceResponseModel>(entity);
+        => _umbracoMapper.Map<MemberTypeReferenceResponseModel>(entity)!;
 }

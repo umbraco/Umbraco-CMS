@@ -22,5 +22,6 @@ public interface IDocumentPresentationFactory
     IEnumerable<DocumentVariantItemResponseModel> CreateVariantsItemResponseModels(IDocumentEntitySlim entity);
 
     DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity);
+
     Attempt<CultureAndScheduleModel,ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel);
 }
