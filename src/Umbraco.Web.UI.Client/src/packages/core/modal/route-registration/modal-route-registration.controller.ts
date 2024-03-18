@@ -301,15 +301,10 @@ export class UmbModalRouteRegistrationController<UmbModalTokenData extends objec
 	}
 
 	public destroy(): void {
-		console.log('DESTROYY the controller?');
 		super.destroy();
 		this.#contextConsumer.destroy();
 		this.#modalRegistrationContext = undefined;
 		this.#uniquePaths = undefined as any;
 		this.#routeContext = undefined;
-	}
-
-	[Symbol.dispose]() {
-		console.log('DISPOOOOOSEEEE the controller?');
 	}
 }
