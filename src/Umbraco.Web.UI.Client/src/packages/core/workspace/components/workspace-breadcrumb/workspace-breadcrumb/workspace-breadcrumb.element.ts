@@ -22,36 +22,36 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	@state()
 	_workspaceBasePath?: string;
 
+	#sectionContext?: any;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.observe(this.#workspaceContext.name, (value) => (this._name = value), 'breadcrumbWorkspaceNameObserver');
-			this.#constructWorkspaceBasePath();
 		});
 
 		this.consumeContext('UmbNavigationStructureWorkspaceContext', (instance) => {
 			this.observe(instance.structure, (value) => (this._structure = value), 'navigationStructureObserver');
 		});
+
+		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
+			this.#sectionContext = instance;
+		});
 	}
 
-	async #constructWorkspaceBasePath() {
-		// TODO: temp solution to construct the base path.
-		const sectionContext = await this.getContext(UMB_SECTION_CONTEXT);
-		this._workspaceBasePath = `section/${sectionContext?.getPathname()}/workspace/${this.#workspaceContext!.getEntityType()}/edit`;
-	}
-
-	#getHref(ancestor: UmbUniqueTreeItemModel) {
-		return ancestor.isFolder ? undefined : `${this._workspaceBasePath}/${ancestor.unique}`;
+	#getHref(structureItem: UmbUniqueTreeItemModel) {
+		const workspaceBasePath = `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit`;
+		return structureItem.isFolder ? undefined : `${workspaceBasePath}/${structureItem.unique}`;
 	}
 
 	render() {
 		return html`
 			<uui-breadcrumbs>
 				${this._structure?.map(
-					(ancestor) =>
-						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(ancestor))}"
-							>${ancestor.name}</uui-breadcrumb-item
+					(structureItem) =>
+						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(structureItem))}"
+							>${structureItem.name}</uui-breadcrumb-item
 						>`,
 				)}
 			</uui-breadcrumbs>
