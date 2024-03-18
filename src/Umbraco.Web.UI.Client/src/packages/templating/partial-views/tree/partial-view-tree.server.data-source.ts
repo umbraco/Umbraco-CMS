@@ -53,11 +53,15 @@ const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	}
 };
 
-const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
+const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) => {
+	const descendantPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.descendantUnique);
+	if (!descendantPath) throw new Error('Descendant path is not available');
+
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	PartialViewResource.getTreePartialViewAncestors({
-		descendantPath: args.descendantUnique,
+	return PartialViewResource.getTreePartialViewAncestors({
+		descendantPath,
 	});
+};
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeItemModel => {
 	const serializer = new UmbServerFilePathUniqueSerializer();
