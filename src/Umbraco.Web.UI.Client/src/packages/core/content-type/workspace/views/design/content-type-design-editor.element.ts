@@ -62,6 +62,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 				this._tabsStructureHelper.partialUpdateContainer(item.id, { sortOrder: prevItemSortOrder + weight });
 
 				// Check for overlaps
+				// TODO: Make sure this take inheritance into considerations.
 				model.some((entry, index) => {
 					if (index <= newIndex) return;
 					if (entry.sortOrder === prevItemSortOrder + weight) {
