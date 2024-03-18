@@ -8,7 +8,8 @@ import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 
 @customElement('umb-workspace-breadcrumb')
 export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
-	#workspaceContext?: UmbSaveableWorkspaceContextInterface;
+	// TODO: figure out the correct context type
+	#workspaceContext?: any;
 
 	@state()
 	_isNew = false;
@@ -19,15 +20,12 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	@state()
 	_structure: any[] = [];
 
-	@state()
-	_workspaceBasePath?: string;
-
 	#sectionContext?: any;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance;
+			this.#workspaceContext = instance as any;
 			this.observe(this.#workspaceContext.name, (value) => (this._name = value), 'breadcrumbWorkspaceNameObserver');
 		});
 
