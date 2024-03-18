@@ -134,8 +134,8 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     /// <inheritdoc />
     public override async Task<bool> CheckPasswordAsync(TUser user, string? password)
     {
-        // we cannot proceed if the user passed in does not have an identity
-        if (user.HasIdentity == false)
+        // we cannot proceed if the user passed in does not have an identity, or if no password is provided.
+        if (user.HasIdentity == false || password is null)
         {
             return false;
         }
@@ -252,7 +252,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     public async Task<bool> ValidateCredentialsAsync(string username, string password)
     {
         TUser user = await FindByNameAsync(username);
-        
+
         if (user == null)
         {
             return false;
@@ -263,7 +263,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
             throw new NotSupportedException("The current user store does not implement " +
                                             typeof(IUserPasswordStore<>));
         }
-        
+
         var result = await VerifyPasswordAsync(userPasswordStore, user, password);
 
         return result == PasswordVerificationResult.Success || result == PasswordVerificationResult.SuccessRehashNeeded;
