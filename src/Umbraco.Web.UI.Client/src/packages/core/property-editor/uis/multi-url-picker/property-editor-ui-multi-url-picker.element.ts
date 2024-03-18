@@ -15,7 +15,6 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	@property({ type: Array })
 	value: UmbLinkPickerLink[] = [];
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._overlaySize = config?.getValueByAlias('overlaySize');
 		this._hideAnchor = config?.getValueByAlias('hideAnchor');

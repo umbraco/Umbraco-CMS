@@ -20,7 +20,6 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 	@state()
 	private _swatches: string[] = [];
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (config) {
 			this._opacity = config.getValueByAlias('showAlpha') ?? this.#defaultOpacity;

@@ -17,7 +17,6 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 		return this._value;
 	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const validationLimit = config?.find((x) => x.alias === 'validationLimit');
 

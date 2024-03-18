@@ -21,7 +21,6 @@ export class UmbPropertyEditorUIToggleElement extends UmbLitElement implements U
 	@state()
 	_showLabels?: boolean;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this.value ??= config?.getValueByAlias('default') ?? false;
 		this._labelOff = config?.getValueByAlias('labelOff');

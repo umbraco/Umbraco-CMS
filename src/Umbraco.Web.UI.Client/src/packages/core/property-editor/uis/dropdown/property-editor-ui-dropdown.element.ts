@@ -24,7 +24,6 @@ export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements
 	@state()
 	private _list: Array<Option> = [];
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		this._multiple = config?.getValueByAlias('multiple');

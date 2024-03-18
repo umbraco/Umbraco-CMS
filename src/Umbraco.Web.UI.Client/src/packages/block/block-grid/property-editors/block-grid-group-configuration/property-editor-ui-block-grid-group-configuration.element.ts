@@ -21,7 +21,6 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 		return this._value;
 	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {}
 
 	#addGroup() {

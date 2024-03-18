@@ -8,16 +8,16 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 	/**
 	 * List of items.
 	 */
-	@property()
+	@property({ attribute: false })
 	public list: Array<{ key: string; sortOrder: number; value: string }> = [];
 
 	#selected = '';
-	public get selected(): string {
-		return this.#selected;
-	}
 	public set selected(key: string) {
 		this.#selected = key;
 		super.value = key;
+	}
+	public get selected(): string {
+		return this.#selected;
 	}
 
 	@property()
@@ -25,6 +25,9 @@ export class UmbInputRadioButtonListElement extends FormControlMixin(UmbLitEleme
 		if (key !== this._value) {
 			this.selected = key;
 		}
+	}
+	public get value(): string {
+		return this.selected;
 	}
 
 	protected getFormElement() {

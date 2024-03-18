@@ -35,7 +35,6 @@ export class UmbPropertyEditorUIBlockGridAreasConfigElement
 	@state()
 	private _value: Array<UmbBlockGridTypeAreaType> = [];
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const defaultAreaGridColumns = config?.getValueByAlias('defaultAreaGridColumns');
 		if (typeof defaultAreaGridColumns === 'number' && defaultAreaGridColumns > 0) {

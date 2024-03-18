@@ -21,7 +21,6 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	@state()
 	private _swatches: UmbSwatchDetails[] = [];
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._showLabels = config?.getValueByAlias('useLabel') ?? this.#defaultShowLabels;
 		this._swatches = config?.getValueByAlias('items') ?? [];

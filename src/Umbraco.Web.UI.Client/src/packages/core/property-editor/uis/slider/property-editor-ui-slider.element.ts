@@ -35,7 +35,6 @@ export class UmbPropertyEditorUISliderElement extends UmbLitElement implements U
 	@state()
 	_max?: number;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._enableRange = config?.getValueByAlias('enableRange');
 		this._initVal1 = config?.getValueByAlias('initVal1');

@@ -222,7 +222,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			<umb-input-language
 				.value="${this._package.languages?.join(',') ?? ''}"
 				@change="${(e: CustomEvent) => {
-					this._package.languages = (e.target as UmbInputLanguageElement).selectedUniques;
+					this._package.languages = (e.target as UmbInputLanguageElement).selection;
 				}}"></umb-input-language>
 		</div>`;
 	}

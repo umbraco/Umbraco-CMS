@@ -27,7 +27,6 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	private _culture?: string | null;
 	//TODO: Use type from VariantID
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._group = config?.getValueByAlias('group');
 		this.value = config?.getValueByAlias('items') ?? [];

@@ -19,7 +19,6 @@ export class UmbPropertyEditorUICheckboxListElement extends UmbLitElement implem
 		return this.#value;
 	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		const listData: Record<number, { value: string; sortOrder: number }> | undefined = config.getValueByAlias('items');

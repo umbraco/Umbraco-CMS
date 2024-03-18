@@ -26,7 +26,6 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 		settingsData: [],
 	};
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 

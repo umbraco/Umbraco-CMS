@@ -26,7 +26,6 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 		return this.#value;
 	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const validationLimit = config?.getByAlias('validationLimit');
 		if (!validationLimit) return;

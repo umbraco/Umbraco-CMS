@@ -53,7 +53,6 @@ export class UmbPropertyEditorUIDatePickerElement extends UmbLitElement implemen
 
 	private _offsetTime?: boolean;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		const oldVal = this._inputType;

@@ -19,7 +19,6 @@ export class UmbPropertyEditorUIRadioButtonListElement extends UmbLitElement imp
 		return this.#value;
 	}
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		const listData: Record<number, { value: string; sortOrder: number }> | undefined = config.getValueByAlias('items');
