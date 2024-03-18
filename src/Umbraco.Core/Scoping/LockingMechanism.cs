@@ -35,7 +35,7 @@ public class LockingMechanism : ILockingMechanism
     }
 
     /// <inheritdoc />
-    public void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyReadLockInner(instanceId, timeout, lockIds);
+    public void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerReadLockInner(instanceId, timeout, lockIds);
 
     public void ReadLock(Guid instanceId, params int[] lockIds) => ReadLock(instanceId, null, lockIds);
 
