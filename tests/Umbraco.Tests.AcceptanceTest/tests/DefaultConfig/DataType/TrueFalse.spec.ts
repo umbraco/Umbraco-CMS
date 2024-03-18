@@ -1,7 +1,7 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Textarea';
+const dataTypeName = 'True/false';
 test.describe(`${dataTypeName} tests`, () => {
   let dataTypeDefaultData = null;
   let dataTypeData = null;
@@ -19,16 +19,31 @@ test.describe(`${dataTypeName} tests`, () => {
     }   
   });
 
-  test('can update Maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
+  test('can update initial state', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const maxCharsValue = 126;
     const expectedDataTypeValues = {
-      "alias": "maxChars",
-      "value": maxCharsValue,
+      "alias": "default",
+      "value": true,
     };
 
     // Act
-    await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue.toString());
+    await umbracoUi.dataType.clickInitialStateSlider();
+    await umbracoUi.dataType.clickSaveButton();
+
+    // Assert
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+  });
+  
+  test('can update show toggle labels', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const expectedDataTypeValues = {
+      "alias": "showLabels",
+      "value": true,
+    };
+
+    // Act
+    await umbracoUi.dataType.clickShowToggleLabelsSlider();
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -36,16 +51,16 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  test('can update Number of rows value', async ({umbracoApi, umbracoUi}) => {
+  test('can update label on', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const numberOfRowsValue = 9;
+    const labelOnValue = 'Test Label On';
     const expectedDataTypeValues = {
-      "alias": "rows",
-      "value": numberOfRowsValue,
+      "alias": "labelOn",
+      "value": labelOnValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterNumberOfRowsValue(numberOfRowsValue.toString());
+    await umbracoUi.dataType.enterLabelOnValue(labelOnValue);
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -53,33 +68,16 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  test('can update Min height (pixels) value', async ({umbracoApi, umbracoUi}) => {
+  test('can update label off', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const minHeightValue = 150;
+    const labelOffValue = 'Test Label Off';
     const expectedDataTypeValues = {
-      "alias": "minHeight",
-      "value": minHeightValue,
+      "alias": "labelOff",
+      "value": labelOffValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterMinHeightValue(minHeightValue.toString());
-    await umbracoUi.dataType.clickSaveButton();
-
-    // Assert
-    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
-  });
-
-  test('can update Max height (pixels) value', async ({umbracoApi, umbracoUi}) => {
-    // Arrange
-    const maxHeightValue = 300;
-    const expectedDataTypeValues = {
-      "alias": "maxHeight",
-      "value": maxHeightValue,
-    };
-
-    // Act
-    await umbracoUi.dataType.enterMaxHeightValue(maxHeightValue.toString());
+    await umbracoUi.dataType.enterLabelOffValue(labelOffValue);
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert

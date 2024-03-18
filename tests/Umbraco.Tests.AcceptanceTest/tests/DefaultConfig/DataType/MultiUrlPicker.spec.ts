@@ -1,7 +1,7 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-const dataTypeName = 'Textarea';
+const dataTypeName = 'Multi URL Picker';
 test.describe(`${dataTypeName} tests`, () => {
   let dataTypeDefaultData = null;
   let dataTypeData = null;
@@ -19,16 +19,16 @@ test.describe(`${dataTypeName} tests`, () => {
     }   
   });
 
-  test('can update Maximum allowed characters value', async ({umbracoApi, umbracoUi}) => {
+  test('can update minimum number of items value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const maxCharsValue = 126;
+    const minimumValue = 2;
     const expectedDataTypeValues = {
-      "alias": "maxChars",
-      "value": maxCharsValue,
+      "alias": "minNumber",
+      "value": minimumValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterMaximumAllowedCharactersValue(maxCharsValue.toString());
+    await umbracoUi.dataType.enterMinimumNumberOfItemsValue(minimumValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -36,16 +36,16 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  test('can update Number of rows value', async ({umbracoApi, umbracoUi}) => {
+  test('can update maximum number of items value', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const numberOfRowsValue = 9;
+    const maximumValue = 2;
     const expectedDataTypeValues = {
-      "alias": "rows",
-      "value": numberOfRowsValue,
+      "alias": "maxNumber",
+      "value": maximumValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterNumberOfRowsValue(numberOfRowsValue.toString());
+    await umbracoUi.dataType.enterMaximumNumberOfItemsValue(maximumValue.toString());
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -53,16 +53,15 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  test('can update Min height (pixels) value', async ({umbracoApi, umbracoUi}) => {
+  test('can update ignore user start nodes', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const minHeightValue = 150;
     const expectedDataTypeValues = {
-      "alias": "minHeight",
-      "value": minHeightValue,
+      "alias": "ignoreUserStartNodes",
+      "value": true,
     };
 
     // Act
-    await umbracoUi.dataType.enterMinHeightValue(minHeightValue.toString());
+    await umbracoUi.dataType.clickIgnoreUserStartNodesSlider();
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert
@@ -70,16 +69,32 @@ test.describe(`${dataTypeName} tests`, () => {
     expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
   });
 
-  test('can update Max height (pixels) value', async ({umbracoApi, umbracoUi}) => {
+  test('can update overlay size', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const maxHeightValue = 300;
+    const overlaySizeValue = 'large';
     const expectedDataTypeValues = {
-      "alias": "maxHeight",
-      "value": maxHeightValue,
+      "alias": "overlaySize",
+      "value": overlaySizeValue,
     };
 
     // Act
-    await umbracoUi.dataType.enterMaxHeightValue(maxHeightValue.toString());
+    await umbracoUi.dataType.chooseOverlaySizeByValue(overlaySizeValue);
+    await umbracoUi.dataType.clickSaveButton();
+
+    // Assert
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    expect(dataTypeData.values).toContainEqual(expectedDataTypeValues);
+  });
+
+  test('can update hide anchor/query string input', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
+    const expectedDataTypeValues = {
+      "alias": "hideAnchor",
+      "value": true,
+    };
+
+    // Act
+    await umbracoUi.dataType.clickHideAnchorQueryStringInputSlider();
     await umbracoUi.dataType.clickSaveButton();
 
     // Assert

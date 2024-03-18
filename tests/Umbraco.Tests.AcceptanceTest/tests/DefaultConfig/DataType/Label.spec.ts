@@ -20,12 +20,12 @@ for (const labelType of labelTypes) {
       }
     });
 
-    test(`can change value type`, async ({ umbracoApi, umbracoUi }) => {
+    test('can change value type', async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const expectedDataTypeValues = [
         {
-          alias: "umbracoDataValueType",
-          value: "TEXT",
+          "alias": "umbracoDataValueType",
+          "value": "TEXT",
         },
       ];
 
