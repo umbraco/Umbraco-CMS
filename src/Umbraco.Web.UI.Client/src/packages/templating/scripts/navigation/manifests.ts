@@ -1,4 +1,5 @@
 import { UMB_SCRIPT_TREE_ALIAS } from '../tree/index.js';
+import { manifests as structureManifests } from './structure/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SCRIPT_MENU_ITEM_ALIAS = 'Umb.MenuItem.Script';
@@ -16,4 +17,4 @@ const menuItem: ManifestTypes = {
 	},
 };
 
-export const manifests = [menuItem];
+export const manifests = [menuItem, ...structureManifests];

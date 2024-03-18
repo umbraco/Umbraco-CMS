@@ -19,6 +19,7 @@ export class UmbRelationTypeWorkspaceContext
 
 	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
+	readonly unique = this.#data.asObservablePart((data) => data?.id);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly id = this.#data.asObservablePart((data) => data?.id);
 

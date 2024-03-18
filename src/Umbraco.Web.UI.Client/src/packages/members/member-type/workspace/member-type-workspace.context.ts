@@ -30,6 +30,7 @@ export class UmbMemberTypeWorkspaceContext
 
 	// General for content types:
 	readonly data;
+	readonly unique;
 	readonly name;
 	readonly alias;
 	readonly description;
@@ -49,6 +50,8 @@ export class UmbMemberTypeWorkspaceContext
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;
+
+		this.unique = this.structure.ownerContentTypeObservablePart((data) => data?.unique);
 		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
 		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
 		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);

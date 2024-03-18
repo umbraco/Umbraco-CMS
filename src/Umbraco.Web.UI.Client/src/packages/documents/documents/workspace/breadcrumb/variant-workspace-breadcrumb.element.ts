@@ -30,7 +30,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	_name: string = '';
 
 	@state()
-	_ancestors: UmbTreeItemWithVariantsModel[] = [];
+	_structure: any[] = [];
 
 	@state()
 	_workspaceActiveVariantId?: UmbVariantId;
@@ -63,8 +63,8 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	}
 
 	#observeAncestors() {
-		this.observe(this.#structureContext.ancestors, (value) => {
-			this._ancestors = value;
+		this.observe(this.#structureContext.structure, (value) => {
+			this._structure = value;
 		});
 	}
 
@@ -114,7 +114,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-breadcrumbs>
-				${this._ancestors.map(
+				${this._structure.map(
 					(ancestor) =>
 						html`<uui-breadcrumb-item
 							href="${this._workspaceBasePath}/${ancestor.unique}/${this._workspaceActiveVariantId?.culture}"
