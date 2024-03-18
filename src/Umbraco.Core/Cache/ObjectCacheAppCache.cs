@@ -88,8 +88,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         object[] entries;
         try
         {
-            _locker.EnterReadLock();
-
+            if (_locker.TryEnterReadLock(_readLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when getting item");
+            }
             entries = _keys.Where(predicate)
                 .Select(key => MemoryCache.Get(key))
                 .WhereNotNull()
@@ -125,11 +127,15 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null)
             {
                 result = SafeLazy.GetSafeLazy(factory);
-                MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
 
                 try
                 {
-                    _locker.EnterWriteLock();
+                    if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+                    {
+                        throw new TimeoutException("Timeout exceeded to the memory cache when using factory to insert");
+                    }
+
+                    MemoryCacheEntryOptions options = GetOptionsLocked(timeout, isSliding);
 
                     // NOTE: This does an add or update
                     MemoryCache.Set(key, result, options);
@@ -174,11 +180,28 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             return; // do not store null values (backward compat)
         }
 
-        MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
+        try
+        {
+            try
+            {
+                if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+                {
+                    throw new TimeoutException("Cannot insert value into cache, due to timeout for lock.");
+                }
+                MemoryCacheEntryOptions options = GetOptionsLocked(timeout, isSliding);
 
-        // NOTE: This does an add or update
-        MemoryCache.Set(key, result, options);
-        _keys.Add(key);
+                // NOTE: This does an add or update
+                MemoryCache.Set(key, result, options);
+                _keys.Add(key);
+            }
+            finally
+            {
+                if (_locker.IsReadLockHeld)
+                {
+                    _locker.ExitReadLock();
+                }
+            }
+
     }
 
     /// <inheritdoc />
@@ -333,7 +356,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
     }
 
-    private MemoryCacheEntryOptions GetOptions(TimeSpan? timeout = null, bool isSliding = false)
+    /// <remarks>
+    /// Requires to be called inside a write lock
+    /// </remarks>
+    private MemoryCacheEntryOptions GetOptionsLocked(TimeSpan? timeout = null, bool isSliding = false)
     {
         var options = new MemoryCacheEntryOptions();
 
