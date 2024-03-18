@@ -1,20 +1,42 @@
 import { UMB_SCRIPT_TREE_ALIAS } from '../tree/index.js';
-import { manifests as structureManifests } from './structure/manifests.js';
-import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SCRIPT_MENU_ITEM_ALIAS = 'Umb.MenuItem.Script';
 
-const menuItem: ManifestTypes = {
-	type: 'menuItem',
-	kind: 'tree',
-	alias: UMB_SCRIPT_MENU_ITEM_ALIAS,
-	name: 'Scripts Menu Item',
-	weight: 10,
-	meta: {
-		label: 'Scripts',
-		treeAlias: UMB_SCRIPT_TREE_ALIAS,
-		menus: ['Umb.Menu.Templating'],
+export const manifests = [
+	{
+		type: 'menuItem',
+		kind: 'tree',
+		alias: UMB_SCRIPT_MENU_ITEM_ALIAS,
+		name: 'Scripts Menu Item',
+		weight: 10,
+		meta: {
+			label: 'Scripts',
+			treeAlias: UMB_SCRIPT_TREE_ALIAS,
+			menus: ['Umb.Menu.Templating'],
+		},
 	},
-};
-
-export const manifests = [menuItem, ...structureManifests];
+	{
+		type: 'workspaceContext',
+		name: 'Script Navigation Structure Workspace Context',
+		alias: 'Umb.Context.Script.NavigationStructure',
+		api: () => import('./script-navigation-structure.context.js'),
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Script',
+			},
+		],
+	},
+	{
+		type: 'workspaceFooterApp',
+		kind: 'breadcrumb',
+		alias: 'Umb.WorkspaceFooterApp.Script.Breadcrumb',
+		name: 'Script Breadcrumb Workspace Footer App',
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Script',
+			},
+		],
+	},
+];

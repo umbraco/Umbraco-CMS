@@ -1,4 +1,4 @@
-import { UmbScriptTreeRepository } from '../../tree/index.js';
+import { UmbScriptTreeRepository } from '../tree/index.js';
 import { UMB_SCRIPT_NAVIGATION_STRUCTURE_WORKSPACE_CONTEXT } from './script-navigation-structure.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
