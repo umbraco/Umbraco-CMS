@@ -12,6 +12,8 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -34,19 +36,22 @@ public class BackOfficeController : SecurityControllerBase
     private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly IOptions<SecuritySettings> _securitySettings;
     private readonly ILogger<BackOfficeController> _logger;
+    private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
 
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeSignInManager backOfficeSignInManager,
         IBackOfficeUserManager backOfficeUserManager,
         IOptions<SecuritySettings> securitySettings,
-        ILogger<BackOfficeController> logger)
+        ILogger<BackOfficeController> logger,
+        IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;
         _backOfficeUserManager = backOfficeUserManager;
         _securitySettings = securitySettings;
         _logger = logger;
+        _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
     }
 
     // FIXME: this is a temporary solution to get the new backoffice auth rolling.
@@ -81,10 +86,12 @@ public class BackOfficeController : SecurityControllerBase
         }
         if(result.RequiresTwoFactor)
         {
-            return StatusCode(StatusCodes.Status402PaymentRequired, new ProblemDetailsBuilder()
-                .WithTitle("2FA Required")
-                .WithDetail("The user is protected by 2FA. Please continue the login process and verify a 2FA code.")
-                .Build());
+            var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(model.Username);
+
+            return StatusCode(StatusCodes.Status402PaymentRequired, new RequiresTwoFactorResponseModel()
+            {
+                TwoFactorLoginView = twofactorView
+            });
         }
         return Ok();
     }
