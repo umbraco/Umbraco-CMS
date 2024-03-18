@@ -1,7 +1,6 @@
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';

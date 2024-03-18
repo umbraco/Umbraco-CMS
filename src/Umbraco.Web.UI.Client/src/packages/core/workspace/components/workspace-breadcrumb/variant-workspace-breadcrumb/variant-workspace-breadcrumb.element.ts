@@ -1,5 +1,5 @@
 import { UMB_DOCUMENT_NAVIGATION_STRUCTURE_CONTEXT } from '../../../../../documents/documents/navigation/structure/document-navigation-structure.context-token.js';
-import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbVariantableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
@@ -38,8 +38,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	@state()
 	_appDefaultCulture?: string;
 
-	@state()
-	_workspaceBasePath?: string;
+	#sectionContext?: any;
 
 	constructor() {
 		super();
@@ -52,13 +51,16 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observeWorkspaceActiveVariant();
-			this.#constructWorkspaceBasePath();
 		});
 
 		this.consumeContext(UMB_DOCUMENT_NAVIGATION_STRUCTURE_CONTEXT, (instance) => {
 			if (!instance) return;
 			this.#structureContext = instance;
 			this.#observeAncestors();
+		});
+
+		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
+			this.#sectionContext = instance;
 		});
 	}
 
@@ -96,29 +98,29 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	}
 
 	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
-	#getAncestorVariantName(ancestor: UmbTreeItemWithVariantsModel) {
+	#getItemVariantName(structureItem: UmbTreeItemWithVariantsModel) {
 		const fallbackName =
-			ancestor.variants.find((variant) => variant.culture === this._appDefaultCulture)?.name ??
-			ancestor.variants[0].name ??
+			structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture)?.name ??
+			structureItem.variants[0].name ??
 			'Unknown';
-		const name = ancestor.variants.find((variant) => this._workspaceActiveVariantId?.compare(variant))?.name;
+		const name = structureItem.variants.find((variant) => this._workspaceActiveVariantId?.compare(variant))?.name;
 		return name ?? `(${fallbackName})`;
 	}
 
-	async #constructWorkspaceBasePath() {
-		// TODO: temp solution to construct the base path.
-		const sectionContext = await this.getContext(UMB_SECTION_CONTEXT);
-		this._workspaceBasePath = `section/${sectionContext?.getPathname()}/workspace/${this.#workspaceContext!.getEntityType()}/edit`;
+	#getHref(structureItem: any) {
+		const workspaceBasePath = `section/${this.#sectionContext?.getPathname()}/workspace/${structureItem.entityType}/edit`;
+		return structureItem.isFolder
+			? undefined
+			: `${workspaceBasePath}/${structureItem.unique}/${this._workspaceActiveVariantId?.culture}`;
 	}
 
 	render() {
 		return html`
 			<uui-breadcrumbs>
 				${this._structure.map(
-					(ancestor) =>
-						html`<uui-breadcrumb-item
-							href="${this._workspaceBasePath}/${ancestor.unique}/${this._workspaceActiveVariantId?.culture}"
-							>${this.#getAncestorVariantName(ancestor)}</uui-breadcrumb-item
+					(structureItem) =>
+						html`<uui-breadcrumb-item href="${ifDefined(this.#getHref(structureItem))}"
+							>${this.#getItemVariantName(structureItem)}</uui-breadcrumb-item
 						>`,
 				)}
 			</uui-breadcrumbs>
