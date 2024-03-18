@@ -2,7 +2,6 @@ import { firstValueFrom, ReplaySubject } from 'rxjs';
 
 class UmbLocalizationContext {
     #init = false;
-    readonly #apiBasePath = 'localizedtext';
     #innerDictionary = new ReplaySubject<Map<string, string>>(1);
 
     async #initLocalizedResources(): Promise<void> {
@@ -12,7 +11,7 @@ class UmbLocalizationContext {
 
         this.#init = true;
 
-        const response = await fetch(this.#apiBasePath);
+        /*const response = await fetch(this.#apiBasePath);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch localized resources: ${response.status} ${response.statusText}`);
@@ -28,7 +27,8 @@ class UmbLocalizationContext {
             }
         }
 
-        this.#innerDictionary.next(innerDictionary);
+        this.#innerDictionary.next(innerDictionary);*/
+        this.#innerDictionary.next(new Map<string, string>());
     }
 
     /**
