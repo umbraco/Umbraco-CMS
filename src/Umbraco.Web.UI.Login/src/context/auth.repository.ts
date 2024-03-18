@@ -1,7 +1,6 @@
 import type {
   LoginRequestModel,
   LoginResponse,
-  MfaProvidersResponse,
   ResetPasswordResponse,
   ValidatePasswordResetCodeResponse,
 } from '../types.js';
@@ -25,31 +24,23 @@ export class UmbAuthRepository {
 
       const response = await fetch(request);
 
-      if (!response.ok) {
-        return {
-          status: response.status,
-          error: await this.#getErrorText(response),
-        };
-      }
-
       // If the response code is 402, it means that the user has enabled 2-factor authentication
+      let twoFactorView = '';
+      let twoFactorProviders: Array<string> = [];
       if (response.status === 402) {
         const responseData = await response.json();
-        return {
-          status: response.status,
-          data: {
-            username: data.username,
-          },
-          twoFactorView: responseData.twoFactorView,
-        };
+        twoFactorView = responseData.twoFactorLoginView ?? '';
+        twoFactorProviders = responseData.twoFactorProviders ?? [];
       }
 
-      // If the response code is 200, it means that the user has successfully logged in
       return {
         status: response.status,
         data: {
           username: data.username,
         },
+        error: await this.#getErrorText(response),
+        twoFactorView,
+        twoFactorProviders,
       };
     } catch (error) {
       return {
@@ -187,34 +178,6 @@ export class UmbAuthRepository {
     return {
       status: response.status,
       error: this.#getErrorText(response),
-    };
-  }
-
-  public async getMfaProviders(): Promise<MfaProvidersResponse> {
-    const request = new Request('backoffice/umbracoapi/authentication/Get2faProviders', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const response = await fetch(request);
-
-    // Check if response contains AngularJS response data
-    if (response.ok) {
-      let text = await response.text();
-      text = this.#removeAngularJSResponseData(text);
-      const providers = JSON.parse(text);
-
-      return {
-        status: response.status,
-        providers,
-      };
-    }
-
-    return {
-      status: response.status,
-      error: await this.#getErrorText(response),
-      providers: [],
     };
   }
 

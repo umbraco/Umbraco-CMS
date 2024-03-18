@@ -11,6 +11,7 @@ export type LoginResponse = {
 	error?: string;
 	status: number;
 	twoFactorView?: string;
+  twoFactorProviders?: string[];
 };
 
 export type ResetPasswordResponse = {
@@ -26,10 +27,4 @@ export type ValidatePasswordResetCodeResponse = {
 export type NewPasswordResponse = {
 	error?: string;
 	status: number;
-};
-
-export type MfaProvidersResponse = {
-	error?: string;
-	status: number;
-	providers: string[];
 };

@@ -70,6 +70,9 @@ export default class UmbLoginPageElement extends LitElement {
       if (response.twoFactorView) {
         umbAuthContext.twoFactorView = response.twoFactorView;
       }
+      if (response.twoFactorProviders) {
+        umbAuthContext.mfaProviders = response.twoFactorProviders;
+      }
 
       this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'mfa'}}));
       return;

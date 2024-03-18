@@ -17,43 +17,27 @@ export default class UmbMfaPageElement extends LitElement {
   protected providers: Array<{ name: string; value: string; selected: boolean }> = [];
 
   @state()
-  private loading = true;
-
-  @state()
   private buttonState?: UUIButtonState;
 
   @state()
   private error: string | null = null;
 
-  connectedCallback() {
-    super.connectedCallback();
+  constructor() {
+    super();
     this.#loadProviders();
   }
 
-  async #loadProviders() {
-    try {
-      const response = await umbAuthContext.getMfaProviders();
-      this.providers = response.providers.map((provider) => ({name: provider, value: provider, selected: false}));
+  #loadProviders() {
+    this.providers = umbAuthContext.mfaProviders.map((provider) => ({name: provider, value: provider, selected: false}));
 
-      if (this.providers.length) {
-        this.providers[0].selected = true;
-      }
-
-      if (response.error) {
-        this.error = response.error;
-      }
-    } catch (e) {
-      if (e instanceof Error) {
-        this.error = e.message ?? 'Unknown error';
-      } else {
-        this.error = 'Unknown error';
-      }
-      this.providers = [];
+    if (this.providers.length) {
+      this.providers[0].selected = true;
+    } else {
+      this.error = 'Error: No providers available';
     }
-    this.loading = false;
   }
 
-  private async handleSubmit(e: SubmitEvent) {
+  async #handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
     this.error = null;
@@ -76,6 +60,12 @@ export default class UmbMfaPageElement extends LitElement {
 
     // If no provider given, use the first one (there probably is only one anyway)
     if (!provider) {
+      // If there are no providers, we can't continue
+      if (!this.providers.length) {
+        this.error = 'No providers available';
+        return;
+      }
+
       provider = this.providers[0].value;
     }
 
@@ -125,7 +115,7 @@ export default class UmbMfaPageElement extends LitElement {
   protected renderDefaultView() {
     return html`
       <uui-form>
-        <form id="LoginForm" @submit=${this.handleSubmit}>
+        <form id="LoginForm" @submit=${this.#handleSubmit}>
           <header id="header">
             <h1>
               <umb-localize key="login_2faTitle">One last step</umb-localize>
@@ -215,10 +205,7 @@ export default class UmbMfaPageElement extends LitElement {
   }
 
   protected render() {
-    return this.loading
-      ? html`
-        <uui-loader-bar></uui-loader-bar>`
-      : umbAuthContext.twoFactorView
+    return umbAuthContext.twoFactorView
         ? until(this.renderCustomView(), html`
           <uui-loader-bar></uui-loader-bar>`)
         : this.renderDefaultView();
