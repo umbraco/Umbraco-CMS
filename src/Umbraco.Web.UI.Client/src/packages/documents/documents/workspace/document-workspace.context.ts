@@ -54,7 +54,8 @@ export class UmbDocumentWorkspaceContext
 	public readonly repository = new UmbDocumentDetailRepository(this);
 	public readonly publishingRepository = new UmbDocumentPublishingRepository(this);
 
-	#parent?: { entityType: string; unique: string | null };
+	#parent = new UmbObjectState<{ entityType: string; unique: string | null } | undefined>(undefined);
+	readonly parentUnique = this.#parent.asObservablePart((parent) => (parent ? parent.unique : undefined));
 
 	/**
 	 * The document is the current state/draft version of the document.
@@ -169,7 +170,7 @@ export class UmbDocumentWorkspaceContext
 
 	async create(parent: { entityType: string; unique: string | null }, documentTypeUnique: string) {
 		this.resetState();
-		this.#parent = parent;
+		this.#parent.setValue(parent);
 		this.#getDataPromise = this.repository.createScaffold({
 			documentType: {
 				unique: documentTypeUnique,
@@ -454,9 +455,10 @@ export class UmbDocumentWorkspaceContext
 		const saveData = this.#buildSaveData(selectedVariants);
 
 		if (this.getIsNew()) {
-			if (!this.#parent) throw new Error('Parent is not set');
+			const parent = this.#parent.getValue();
+			if (!parent) throw new Error('Parent is not set');
 
-			const { data: create, error } = await this.repository.create(saveData, this.#parent.unique);
+			const { data: create, error } = await this.repository.create(saveData, parent.unique);
 			if (!create || error) {
 				console.error('Error creating document', error);
 				throw new Error('Error creating document');
@@ -467,8 +469,8 @@ export class UmbDocumentWorkspaceContext
 			// TODO: this might not be the right place to alert the tree, but it works for now
 			const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
 			const event = new UmbReloadTreeItemChildrenRequestEntityActionEvent({
-				entityType: this.#parent.entityType,
-				unique: this.#parent.unique,
+				entityType: parent.entityType,
+				unique: parent.unique,
 			});
 			eventContext.dispatchEvent(event);
 		} else {
