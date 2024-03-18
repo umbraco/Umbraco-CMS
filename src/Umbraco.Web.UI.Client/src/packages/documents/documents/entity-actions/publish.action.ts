@@ -24,16 +24,28 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 
 		if (!documentData) throw new Error('The document was not found');
 
-		const options: Array<UmbDocumentVariantOptionModel> = (languageData?.items ?? []).map((language) => ({
-			culture: language.unique,
-			segment: null,
-			language: language,
-			variant: documentData.variants.find((variant) => variant.culture === language.unique),
-			unique: new UmbVariantId(language.unique, null).toString(),
-		}));
+		const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
+		const appCulture = context.getAppCulture();
 
-		// If the document has only one variant or one language, we can skip the modal and publish directly:
-		if (documentData.variants.length === 1 || options.length === 1) {
+		const options: Array<UmbDocumentVariantOptionModel> = documentData.variants.map<UmbDocumentVariantOptionModel>(
+			(variant) => ({
+				culture: variant.culture,
+				segment: variant.segment,
+				language: languageData?.items.find((language) => language.unique === variant.culture) ?? {
+					name: appCulture!,
+					entityType: 'language',
+					fallbackIsoCode: null,
+					isDefault: true,
+					isMandatory: false,
+					unique: appCulture!,
+				},
+				variant,
+				unique: new UmbVariantId(variant.culture, variant.segment).toString(),
+			}),
+		);
+
+		// If the document has only one variant, we can skip the modal and publish directly:
+		if (options.length === 1) {
 			const variantId = UmbVariantId.Create(documentData.variants[0]);
 			const publishingRepository = new UmbDocumentPublishingRepository(this._host);
 			await publishingRepository.publish(this.args.unique, [{ variantId }]);
@@ -43,11 +55,12 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<never> {
 		// Figure out the default selections
 		// TODO: Missing features to pre-select the variant that fits with the variant-id of the tree/collection? (Again only relevant if the action is executed from a Tree or Collection) [NL]
 		const selection: Array<string> = [];
-		const context = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
-		const appCulture = context.getAppCulture();
 		// If the app language is one of the options, select it by default:
 		if (appCulture && options.some((o) => o.unique === appCulture)) {
 			selection.push(new UmbVariantId(appCulture, null).toString());
+		} else {
+			// If not, select the first option by default:
+			selection.push(options[0].unique);
 		}
 
 		const modalManagerContext = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);

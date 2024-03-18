@@ -3,7 +3,7 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
 	name: 'Multiple Text String',
-	alias: 'Umbraco.MultipleTextString',
+	alias: 'Umbraco.MultipleTextstring',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 		settings: {
