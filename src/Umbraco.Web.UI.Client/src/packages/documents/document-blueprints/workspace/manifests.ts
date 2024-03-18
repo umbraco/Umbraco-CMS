@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE, UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceActions } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -10,7 +10,7 @@ const workspace: ManifestWorkspace = {
 	name: 'Document Blueprint Root Workspace',
 	js: () => import('./document-blueprint-workspace.element.js'),
 	meta: {
-		entityType: UMB_DOCUMENT_BLUEPRINT_ROOT_ENTITY_TYPE,
+		entityType: UMB_DOCUMENT_BLUEPRINT_ENTITY_TYPE,
 	},
 };
 

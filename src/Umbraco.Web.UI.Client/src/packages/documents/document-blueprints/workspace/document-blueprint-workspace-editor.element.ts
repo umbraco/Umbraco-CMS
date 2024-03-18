@@ -20,6 +20,7 @@ export class UmbDocumentBlueprintWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
+		console.log('editor');
 
 		this.consumeContext(UMB_DOCUMENT_BLUEPRINT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;

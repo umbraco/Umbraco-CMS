@@ -28,7 +28,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
 				segment: null,
-				name: 'The Simplest Document',
+				name: 'The Simplest Document Blueprint',
 				createDate: '2023-02-06T15:32:05.350038',
 				updateDate: '2023-02-06T15:32:24.957009',
 			},

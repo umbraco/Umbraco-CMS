@@ -130,7 +130,6 @@ export class UmbDocumentBlueprintWorkspaceContext
 	}
 
 	async load(unique: string) {
-		console.log('load');
 		this.resetState();
 		this.#getDataPromise = this.repository.requestByUnique(unique);
 		const { data } = await this.#getDataPromise;
