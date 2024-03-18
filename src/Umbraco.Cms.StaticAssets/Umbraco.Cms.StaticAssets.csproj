@@ -25,9 +25,9 @@
     <CallTarget Targets="BuildBellissima" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellissimaPath)')" />
 
     <Message Text="Skip BuildLogin target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip BuildLogin target because '$(LoginPath)' already exists" Importance="high" Condition="Exists('$(LoginPath)') and Exists('$(BasePath)/auth')" />
-    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and (!Exists('$(LoginPath)') or !Exists('$(BasePath)/auth'))" />
-    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and (!Exists('$(LoginPath)') or !Exists('$(BasePath)/auth'))" />
+    <Message Text="Skip BuildLogin target because '$(LoginPath)' already exists" Importance="high" Condition="Exists('$(LoginPath)')" />
+    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
+    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
   </Target>
 
   <Target Name="BuildBellissima">
@@ -35,7 +35,7 @@
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:for:cms" />
   </Target>
 
-  <Target Name="BuildLogin" DependsOnTargets="BuildBellissima">
+  <Target Name="BuildLogin">
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" />
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" />
   </Target>
