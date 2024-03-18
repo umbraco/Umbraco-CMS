@@ -1,11 +1,6 @@
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
-import { manifests as breadcrumbManifests } from './breadcrumb/manifests.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ManifestWorkspace,
-	ManifestWorkspaceActions,
-	ManifestWorkspaceFooterApp,
-} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace, ManifestWorkspaceActions } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SCRIPT_WORKSPACE_ALIAS = 'Umb.Workspace.Script';
 export const UMB_SAVE_SCRIPT_WORKSPACE_ACTION_ALIAS = 'Umb.WorkspaceAction.Script.Save';
