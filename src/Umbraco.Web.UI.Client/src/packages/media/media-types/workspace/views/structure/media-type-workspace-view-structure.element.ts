@@ -85,7 +85,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 							@change="${(e: CustomEvent) => {
 								const sortedContentTypesList: Array<UmbContentTypeSortModel> = (
 									e.target as UmbInputMediaTypeElement
-								).selectedIds.map((id, index) => ({
+								).selection.map((id, index) => ({
 									contentType: { unique: id },
 									sortOrder: index,
 								}));

@@ -75,14 +75,14 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 				break;
 			case 'media': {
 				const input = event.target as UmbInputMediaElement;
-				this.#selectedIds = input.selectedIds;
-				this.value = input.selectedIds.join(',');
+				this.#selectedIds = input.selection;
+				this.value = input.selection.join(',');
 				break;
 			}
 			case 'member': {
 				const input = event.target as UmbInputMemberElement;
-				this.#selectedIds = input.selectedIds;
-				this.value = input.selectedIds.join(',');
+				this.#selectedIds = input.selection;
+				this.value = input.selection.join(',');
 				break;
 			}
 			default:

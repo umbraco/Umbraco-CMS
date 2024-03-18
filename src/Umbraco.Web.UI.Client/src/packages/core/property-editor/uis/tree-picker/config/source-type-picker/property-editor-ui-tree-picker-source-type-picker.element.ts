@@ -76,10 +76,10 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 				this.#setValue((<UmbInputDocumentTypeElement>event.target).selectedIds);
 				break;
 			case 'media':
-				this.#setValue((<UmbInputMediaTypeElement>event.target).selectedIds);
+				this.#setValue((<UmbInputMediaTypeElement>event.target).selection);
 				break;
 			case 'member':
-				this.#setValue((<UmbInputMemberTypeElement>event.target).selectedIds);
+				this.#setValue((<UmbInputMemberTypeElement>event.target).selection);
 				break;
 			default:
 				break;

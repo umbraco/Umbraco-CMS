@@ -51,7 +51,7 @@ export class UmbPropertyEditorUIMediaPickerElement extends UmbLitElement impleme
 	#value: Array<UmbMediaPickerPropertyValue> = [];
 
 	#onChange(event: CustomEvent) {
-		const selectedIds = (event.target as UmbInputMediaElement).selectedIds;
+		const selectedIds = (event.target as UmbInputMediaElement).selection;
 
 		const result = selectedIds.map((mediaKey) => {
 			return {

@@ -14,16 +14,16 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	private _value: Array<string> = [];
 	@property({ type: Array })
-	public get value(): Array<string> {
-		if (!this._value) return [];
-		return this._value.map((unique) => this.#serverFilePathUniqueSerializer.toServerPath(unique)) as string[];
-	}
 	public set value(value: Array<string>) {
 		if (!value) return;
 		this._value = value.map((unique) => this.#serverFilePathUniqueSerializer.toUnique(unique));
 	}
+	public get value(): Array<string> {
+		if (!this._value) return [];
+		return this._value.map((unique) => this.#serverFilePathUniqueSerializer.toServerPath(unique)) as string[];
+	}
+	private _value: Array<string> = [];
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;

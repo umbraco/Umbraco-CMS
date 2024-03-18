@@ -51,9 +51,6 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	};
 
 	@property({ attribute: false })
-	public get value(): UmbBlockListValueModel {
-		return this._value;
-	}
 	public set value(value: UmbBlockListValueModel | undefined) {
 		const buildUpValue: Partial<UmbBlockListValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
@@ -64,6 +61,9 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.#managerContext.setLayouts(this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] ?? []);
 		this.#managerContext.setContents(buildUpValue.contentData);
 		this.#managerContext.setSettings(buildUpValue.settingsData);
+	}
+	public get value(): UmbBlockListValueModel {
+		return this._value;
 	}
 
 	@state()

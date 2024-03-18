@@ -36,7 +36,7 @@ export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {
 
 	#onMediaStartNodeChange(event: UmbChangeEvent) {
 		const target = event.target as UmbInputMediaElement;
-		this.#userWorkspaceContext?.updateProperty('mediaStartNodeUniques', target.selectedIds);
+		this.#userWorkspaceContext?.updateProperty('mediaStartNodeUniques', target.selection);
 	}
 
 	render() {

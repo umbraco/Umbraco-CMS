@@ -136,11 +136,11 @@ export class UmbPublicAccessModalElement extends UmbModalBaseElement<
 	}
 
 	#onChangeGroup(e: CustomEvent) {
-		this._selectedIds = (e.target as UmbInputMemberTypeElement).selectedIds;
+		this._selectedIds = (e.target as UmbInputMemberTypeElement).selection;
 	}
 
 	#onChangeMember(e: CustomEvent) {
-		this._selectedIds = (e.target as UmbInputMemberElement).selectedIds;
+		this._selectedIds = (e.target as UmbInputMemberElement).selection;
 	}
 
 	// Renders

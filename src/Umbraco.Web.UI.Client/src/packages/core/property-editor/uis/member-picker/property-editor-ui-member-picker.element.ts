@@ -13,11 +13,11 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 	// private _value: Array<string> = [];
 
 	// @property({ type: Array })
-	// public get value(): Array<string> {
-	// 	return this._value;
-	// }
 	// public set value(value: Array<string>) {
 	// 	this._value = Array.isArray(value) ? value : value ? [value] : [];
+	// }
+	// public get value(): Array<string> {
+	// 	return this._value;
 	// }
 
 	@property({ type: String })
@@ -48,7 +48,7 @@ export class UmbPropertyEditorUIMemberPickerElement extends UmbLitElement implem
 
 	private _onChange(event: CustomEvent) {
 		//TODO: This is a hack, something changed so now we need to convert the array to a comma separated string to make it work with the server.
-		const toCommaSeparatedString = (event.target as UmbInputMemberElement).selectedIds.join(',');
+		const toCommaSeparatedString = (event.target as UmbInputMemberElement).selection.join(',');
 		// this.value = (event.target as UmbInputMemberElement).selectedIds;
 		this.value = toCommaSeparatedString;
 		this.dispatchEvent(new CustomEvent('property-value-change'));

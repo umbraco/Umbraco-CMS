@@ -125,7 +125,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			${this._package?.id
 				? html`<uui-button @click="${this.#download}" color="" look="secondary" label="Download package">
 						Download
-				  </uui-button>`
+					</uui-button>`
 				: nothing}
 			<uui-button
 				@click="${this._package.id ? this.#update : this.#save}"
@@ -194,7 +194,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 				<umb-input-media
 					.selectedIds=${this._package.mediaIds ?? []}
 					@change="${(e: CustomEvent) =>
-						(this._package.mediaIds = (e.target as UmbInputMediaElement).selectedIds)}"></umb-input-media>
+						(this._package.mediaIds = (e.target as UmbInputMediaElement).selection)}"></umb-input-media>
 				<uui-checkbox
 					label="Include child nodes"
 					.checked="${this._package.mediaLoadChildNodes ?? false}"

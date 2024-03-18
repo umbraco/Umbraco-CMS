@@ -13,11 +13,11 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	private _value: Array<string> = [];
 
 	@property({ type: Array })
-	public get value(): Array<string> {
-		return this._value;
-	}
 	public set value(value: Array<string>) {
 		this._value = value || [];
+	}
+	public get value(): Array<string> {
+		return this._value;
 	}
 
 	@state()

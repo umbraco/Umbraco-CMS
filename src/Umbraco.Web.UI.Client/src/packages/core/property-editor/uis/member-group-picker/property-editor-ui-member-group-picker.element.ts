@@ -13,11 +13,11 @@ export class UmbPropertyEditorUIMemberGroupPickerElement extends UmbLitElement i
 	// private _value: Array<string> = [];
 
 	// @property({ type: Array })
-	// public get value(): Array<string> {
-	// 	return this._value;
-	// }
 	// public set value(value: Array<string>) {
 	// 	this._value = Array.isArray(value) ? value : value ? [value] : [];
+	// }
+	// public get value(): Array<string> {
+	// 	return this._value;
 	// }
 
 	@property({ type: String })

@@ -45,7 +45,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#onMediaStartNodeChange(event: CustomEvent) {
 		event.stopPropagation();
 		const target = event.target as UmbInputMediaElement;
-		this.#workspaceContext?.updateProperty('mediaStartNode', { unique: target.selectedIds[0] });
+		this.#workspaceContext?.updateProperty('mediaStartNode', { unique: target.selection[0] });
 	}
 
 	#onNameChange(event: UUIInputEvent) {

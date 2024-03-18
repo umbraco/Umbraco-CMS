@@ -47,14 +47,14 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 	 * ```
 	 */
 	@property({ attribute: false })
-	public get value(): Array<UmbPropertyValueData> {
-		return this.context.getValues();
-	}
 	public set value(value: Array<UmbPropertyValueData>) {
 		this.#allowChangeEvent = false;
 		this.context.setValues(value);
 		// Above might not trigger a observer callback (if no change), so set the allow change event to true:
 		this.#allowChangeEvent = true;
+	}
+	public get value(): Array<UmbPropertyValueData> {
+		return this.context.getValues();
 	}
 
 	/**
@@ -71,14 +71,14 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 	 * `
 	 */
 	@property({ attribute: false })
-	public get name(): string | undefined {
-		return this.context.getName();
-	}
 	public set name(value: string | undefined) {
 		this.#allowChangeEvent = false;
 		this.context.setName(value);
 		// Above might not trigger a observer callback (if no change), so set the allow change event to true:
 		this.#allowChangeEvent = true;
+	}
+	public get name(): string | undefined {
+		return this.context.getName();
 	}
 
 	constructor() {
