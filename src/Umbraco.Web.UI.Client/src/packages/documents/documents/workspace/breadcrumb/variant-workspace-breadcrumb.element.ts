@@ -1,4 +1,4 @@
-import { UmbDocumentTreeRepository } from '../../tree/index.js';
+import { UMB_DOCUMENT_NAVIGATION_STRUCTURE_CONTEXT } from '../../navigation/structure/document-navigation-structure.context-token.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -23,11 +23,8 @@ interface UmbTreeItemWithVariantsModel {
 @customElement('umb-variant-workspace-breadcrumb')
 export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	#workspaceContext?: UmbVariantableWorkspaceContextInterface<UmbVariantModel>;
-	#treeRepository = new UmbDocumentTreeRepository(this);
 	#appLanguageContext?: UmbAppLanguageContext;
-
-	@state()
-	_isNew = false;
+	#structureContext?: any;
 
 	@state()
 	_name: string = '';
@@ -54,9 +51,20 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.#requestAncestors();
 			this.#observeWorkspaceActiveVariant();
 			this.#constructWorkspaceBasePath();
+		});
+
+		this.consumeContext(UMB_DOCUMENT_NAVIGATION_STRUCTURE_CONTEXT, (instance) => {
+			if (!instance) return;
+			this.#structureContext = instance;
+			this.#observeAncestors();
+		});
+	}
+
+	#observeAncestors() {
+		this.observe(this.#structureContext.ancestors, (value) => {
+			this._ancestors = value;
 		});
 	}
 
@@ -95,23 +103,6 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 			'Unknown';
 		const name = ancestor.variants.find((variant) => this._workspaceActiveVariantId?.compare(variant))?.name;
 		return name ?? `(${fallbackName})`;
-	}
-
-	async #requestAncestors() {
-		/* TODO: implement breadcrumb for new items
-		 We currently miss the parent item name for new items. We need to align with backend
-		 how to solve it */
-		const isNew = this.#workspaceContext?.getIsNew();
-		if (isNew === true) return;
-
-		const unique = this.#workspaceContext?.getUnique();
-
-		if (!unique) throw new Error('Unique is not available');
-		const { data } = await this.#treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
-
-		if (data) {
-			this._ancestors = data;
-		}
 	}
 
 	async #constructWorkspaceBasePath() {

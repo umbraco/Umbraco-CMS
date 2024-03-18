@@ -11,7 +11,7 @@ export * from './entity-actions/index.js';
 export * from './modals/index.js';
 
 export * from './tree/index.js';
-export { UMB_CONTENT_MENU_ALIAS } from './menu.manifests.js';
+export { UMB_CONTENT_MENU_ALIAS } from './navigation/manifests.js';
 export { UMB_DOCUMENT_COLLECTION_ALIAS } from './collection/index.js';
 
 export type * from './types.js';
