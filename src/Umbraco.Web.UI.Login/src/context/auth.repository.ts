@@ -182,7 +182,7 @@ export class UmbAuthRepository {
   }
 
   public async validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
-    const request = new Request('backoffice/umbracoapi/authentication/PostVerify2faCode', {
+    const request = new Request('management/api/v1/security/back-office/verify-2fa', {
       method: 'POST',
       body: JSON.stringify({
         code,
@@ -195,21 +195,17 @@ export class UmbAuthRepository {
 
     const response = await fetch(request);
 
-    let text = await response.text();
-    text = this.#removeAngularJSResponseData(text);
+    if (!response.ok) {
+      const data = await response.json();
 
-    const data = JSON.parse(text);
-
-    if (response.ok) {
       return {
-        data,
         status: response.status,
+        error: data.title ?? 'An unknown error occurred.',
       };
     }
 
     return {
       status: response.status,
-      error: data.Message ?? 'An unknown error occurred.',
     };
   }
 
