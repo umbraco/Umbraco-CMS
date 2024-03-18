@@ -72,6 +72,7 @@ const meta: Meta<UmbDocumentScheduleModalElement> = {
 		layout: 'centered',
 		docs: {
 			source: {
+				language: 'ts',
 				code: `
 import { UMB_DOCUMENT_SCHEDULE_MODAL, UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';

@@ -1,9 +1,11 @@
 import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
+import { UmbDocumentTrackedReferenceRepository } from '../../tracked-reference/index.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../global-contexts/index.js';
 import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,
 } from './document-unpublish-modal.token.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
@@ -16,12 +18,20 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 	UmbDocumentUnpublishModalValue
 > {
 	#selectionManager = new UmbSelectionManager<string>(this);
+	#trackedReferencesRepository = new UmbDocumentTrackedReferenceRepository(this);
 
 	@state()
 	_options: Array<UmbDocumentVariantOptionModel> = [];
 
+	@state()
+	_hasTrackedReferences = false;
+
+	@state()
+	_hasUnpublishPermission = true;
+
 	firstUpdated() {
 		this.#configureSelectionManager();
+		this.#getTrackedReferences();
 	}
 
 	async #configureSelectionManager() {
@@ -46,9 +56,39 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		this.#selectionManager.setSelection(selected);
 	}
 
+	async #getTrackedReferences() {
+		if (!this.data?.documentUnique) return;
+
+		const { data, error } = await this.#trackedReferencesRepository.requestTrackedReference(
+			this.data?.documentUnique,
+			0,
+			1,
+		);
+
+		if (error) {
+			console.error(error);
+			return;
+		}
+
+		if (!data) return;
+
+		this._hasTrackedReferences = data.total > 0;
+
+		// If there are tracked references, we also want to check if we are allowed to unpublish the document:
+		if (this._hasTrackedReferences) {
+			const documentConfigurationContext = await this.getContext(UMB_DOCUMENT_CONFIGURATION_CONTEXT);
+			this._hasUnpublishPermission =
+				(await documentConfigurationContext.getDocumentConfiguration())?.disableUnpublishWhenReferenced === false;
+		}
+	}
+
 	#submit() {
-		this.value = { selection: this.#selectionManager.getSelection() };
-		this.modalContext?.submit();
+		if (this._hasUnpublishPermission) {
+			this.value = { selection: this.#selectionManager.getSelection() };
+			this.modalContext?.submit();
+			return;
+		}
+		this.modalContext?.reject();
 	}
 
 	#close() {
@@ -73,10 +113,27 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 				</umb-localize>
 			</p>
 
+			${this.data?.documentUnique
+				? html`
+						<umb-document-tracked-reference-table
+							id="tracked-references"
+							unique=${this.data?.documentUnique}></umb-document-tracked-reference-table>
+					`
+				: nothing}
+			${this._hasTrackedReferences
+				? html`<uui-box id="tracked-references-warning">
+						<umb-localize key="references_unpublishWarning">
+							This item or its descendants is being referenced. Unpublishing can lead to broken links on your website.
+							Please take the appropriate actions.
+						</umb-localize>
+					</uui-box>`
+				: nothing}
+
 			<div slot="actions">
 				<uui-button label=${this.localize.term('general_close')} @click=${this.#close}></uui-button>
 				<uui-button
 					label="${this.localize.term('actions_unpublish')}"
+					?disabled=${!this._hasUnpublishPermission || !this.#selectionManager.getSelection().length}
 					look="primary"
 					color="warning"
 					@click=${this.#submit}></uui-button>
@@ -89,8 +146,18 @@ export class UmbDocumentUnpublishModalElement extends UmbModalBaseElement<
 		css`
 			:host {
 				display: block;
-				width: 400px;
+				width: 600px;
 				max-width: 90vw;
+			}
+
+			#tracked-references {
+				--uui-table-cell-padding: 0;
+			}
+
+			#tracked-references-warning {
+				margin-top: 1rem;
+				background-color: var(--uui-color-danger);
+				color: var(--uui-color-danger-contrast);
 			}
 		`,
 	];
