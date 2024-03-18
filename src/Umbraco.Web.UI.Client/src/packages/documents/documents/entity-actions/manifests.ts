@@ -116,7 +116,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		forEntityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		api: () => import('./permissions.action.js'),
 		meta: {
-			icon: 'icon-rss',
+			icon: 'icon-megaphone',
 			label: 'Notifications...',
 		},
 	},
