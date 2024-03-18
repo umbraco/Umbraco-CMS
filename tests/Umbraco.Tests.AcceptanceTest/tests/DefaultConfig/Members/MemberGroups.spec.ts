@@ -22,6 +22,9 @@ test.describe('Member Group tests', () => {
     await umbracoUi.memberGroup.clickSaveButton();
 
     // Assert
+    await umbracoUi.memberGroup.isSuccessNotificationVisible();
+    await umbracoUi.memberGroup.clickLeftArrowButton();
+    await umbracoUi.memberGroup.isMemberGroupNameVisible(memberGroupName);
     expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeTruthy();
   });
 
@@ -38,6 +41,9 @@ test.describe('Member Group tests', () => {
     await umbracoUi.memberGroup.clickConfirmToDeleteButton();
 
     // Assert
+    await umbracoUi.memberGroup.isSuccessNotificationVisible();
+    await umbracoUi.memberGroup.clickLeftArrowButton();
+    await umbracoUi.memberGroup.isMemberGroupNameVisible(memberGroupName, false);
     expect(await umbracoApi.memberGroup.doesNameExist(memberGroupName)).toBeFalsy();
   });
 });
