@@ -11,4 +11,16 @@ export const manifests = [
 			},
 		],
 	},
+	{
+		type: 'workspaceFooterApp',
+		kind: 'breadcrumb',
+		alias: 'Umb.WorkspaceFooterApp.Script.Breadcrumb',
+		name: 'Script Breadcrumb Workspace Footer App',
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Script',
+			},
+		],
+	},
 ];
