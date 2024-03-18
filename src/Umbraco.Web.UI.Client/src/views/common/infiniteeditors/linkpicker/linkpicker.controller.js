@@ -195,7 +195,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
             $scope.model.target.id = media.id;
             $scope.model.target.udi = media.udi;
             $scope.model.target.isMedia = true;
-            $scope.model.target[$scope.model.useNodeName ? 'nodeName' : 'name'] = args.node.name;
+            $scope.model.target[$scope.model.useNodeName ? 'nodeName' : 'name'] = media.name;
             $scope.model.target.url = media.image;
 
             editorService.close();
