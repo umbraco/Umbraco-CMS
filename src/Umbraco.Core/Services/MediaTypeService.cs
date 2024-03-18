@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Locking;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -60,10 +61,9 @@ public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMe
     }
 
 
-    // beware! order is important to avoid deadlocks
-    protected override int[] ReadLockIds { get; } = { Constants.Locks.MediaTypes };
+    protected override int[] ReadLockIds => MediaTypeLocks.ReadLockIds;
 
-    protected override int[] WriteLockIds { get; } = { Constants.Locks.MediaTree, Constants.Locks.MediaTypes };
+    protected override int[] WriteLockIds => MediaTypeLocks.WriteLockIds;
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.MediaType;
 
