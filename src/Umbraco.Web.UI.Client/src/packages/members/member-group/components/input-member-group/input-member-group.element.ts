@@ -112,6 +112,7 @@ export class UmbInputMemberGroupElement extends FormControlMixin(UmbLitElement) 
 	constructor() {
 		super();
 
+		// TODO: This would have to be more specific if used in a property editor context... [NL]
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('member-group')
 			.onSetup(() => {
@@ -183,7 +184,7 @@ export class UmbInputMemberGroupElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selection.length >= this.max) return;
+		if (this.max === 1 && this.selection.length >= this.max) return;
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"
