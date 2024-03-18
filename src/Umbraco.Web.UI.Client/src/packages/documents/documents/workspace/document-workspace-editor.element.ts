@@ -56,7 +56,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.#workspaceContext?.splitView.setActiveVariant(index, culture, segment);
 	}
 
-	async #generateRoutes() {
+	#generateRoutes() {
 		if (!this.#variants || !this.#appCulture) return;
 
 		// Generate split view routes for all available routes
@@ -106,11 +106,12 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		}
 
 		const oldValue = this._routes;
+		console.log('Test', oldValue === routes);
 
 		// is there any differences in the amount ot the paths? [NL]
 		if (oldValue && oldValue.length === routes.length) {
 			// is there any differences in the paths? [NL]
-			const hasDifferences = !jsonStringComparison(oldValue, routes);
+			const hasDifferences = oldValue.some((route, index) => route.path !== routes[index].path);
 			if (!hasDifferences) return;
 		}
 		this._routes = routes;
