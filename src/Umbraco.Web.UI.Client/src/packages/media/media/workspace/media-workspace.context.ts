@@ -12,9 +12,7 @@ import type {
 import { UmbEditableWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
-	jsonStringComparison,
 	mergeObservables,
-	partialUpdateFrozenArray,
 	UmbArrayState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
