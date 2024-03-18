@@ -35,10 +35,9 @@ export class UmbRouteContext extends UmbControllerBase {
 		this.#modalRegistrations.push(registration);
 		this.#createNewUrlBuilder(registration);
 		this.#generateModalRoutes();
-		return registration;
 	}
 
-	public unregisterModal(registrationToken: ReturnType<typeof this.registerModal>) {
+	public unregisterModal(registrationToken: UmbModalRouteRegistration) {
 		const index = this.#modalRegistrations.indexOf(registrationToken);
 		if (index === -1) return;
 		this.#modalRegistrations.splice(index, 1);
