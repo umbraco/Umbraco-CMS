@@ -18,6 +18,8 @@ export class UmbLanguageWorkspaceContext
 	#data = new UmbObjectState<UmbLanguageDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
+
 	// TODO: this is a temp solution to bubble validation errors to the UI
 	#validationErrors = new UmbObjectState<any | undefined>(undefined);
 	readonly validationErrors = this.#validationErrors.asObservable();

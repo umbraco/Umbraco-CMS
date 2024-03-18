@@ -22,7 +22,7 @@ export class UmbDictionaryWorkspaceContext
 
 	#data = new UmbObjectState<UmbDictionaryDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
-
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly dictionary = this.#data.asObservablePart((data) => data);
 

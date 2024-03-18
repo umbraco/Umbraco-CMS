@@ -17,6 +17,7 @@ export class UmbUserGroupWorkspaceContext
 	#data = new UmbObjectState<UmbUserGroupDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 	readonly name = this.#data.asObservablePart((data) => data?.name || '');
 	readonly icon = this.#data.asObservablePart((data) => data?.icon || null);
 	readonly sections = this.#data.asObservablePart((data) => data?.sections || []);
