@@ -14,11 +14,11 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 	 * @default 0
 	 */
 	@property({ type: Number })
-	public get min(): number {
-		return this.#pickerContext.min;
-	}
 	public set min(value: number) {
 		this.#pickerContext.min = value;
+	}
+	public get min(): number {
+		return this.#pickerContext.min;
 	}
 
 	/**
@@ -37,11 +37,11 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 	 * @default Infinity
 	 */
 	@property({ type: Number })
-	public get max(): number {
-		return this.#pickerContext.max;
-	}
 	public set max(value: number) {
 		this.#pickerContext.max = value;
+	}
+	public get max(): number {
+		return this.#pickerContext.max;
 	}
 
 	/**
@@ -53,11 +53,11 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public get selection(): Array<string> {
-		return this.#pickerContext.getSelection();
-	}
 	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
+	}
+	public get selection(): Array<string> {
+		return this.#pickerContext.getSelection();
 	}
 
 	@property()
