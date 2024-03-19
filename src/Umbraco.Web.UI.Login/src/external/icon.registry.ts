@@ -1,6 +1,8 @@
 import { UUIIconRegistry, UUIIconRegistryElement, UUIIconRegistryEssential } from '@umbraco-ui/uui';
-import { Observable, ReplaySubject } from 'rxjs';
 import { customElement } from 'lit/decorators.js';
+
+// @ts-ignore
+import icons from '../../../Umbraco.Web.UI.Client/src/packages/core/icon-registry/icons/icons.json';
 
 /**
  * This is a custom icon registry that will load icons from the Umbraco assets folder.
@@ -8,49 +10,20 @@ import { customElement } from 'lit/decorators.js';
  */
 class UmbIconRegistry extends UUIIconRegistry {
 	protected acceptIcon(iconName: string): boolean {
-    // If the icon name is a variable, we will not provide it.
-    if (iconName.startsWith('{{') && iconName.endsWith('}}')) {
+    const iconManifest = icons.find((i) => i.name === iconName);
+    if (!iconManifest)
       return false;
-    }
-
-		// Inform that we will be providing this.
-		const icon = this.provideIcon(iconName);
-
-		this.#getIcons().subscribe((icons) => {
-			if (icons[iconName]) {
-				icon.svg = icons[iconName].replace('<svg', `<svg fill="currentColor"`);
-			} else {
-				// If we can't load the icon, we will not provide it.
-				console.warn(`Icon ${iconName} not found`);
-			}
-		});
-
-		return true;
+    const icon = this.provideIcon(iconName);
+    const iconPath = iconManifest.path;
+    import(/* @vite-ignore */ iconPath)
+      .then((iconModule) => {
+        icon.svg = iconModule.default;
+      })
+      .catch((err) => {
+        console.error(`Failed to load icon ${iconName} on path ${iconPath}`, err.message);
+      });
+    return true;
 	}
-
-  #iconsLoaded = false;
-  #icons = new ReplaySubject<Record<string, string>>(1);
-  #getIcons(): Observable<Record<string, string>> {
-    if (!this.#iconsLoaded) {
-      this.#iconsLoaded = true;
-      /*fetch('backoffice/umbracoapi/icon/geticons')
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Could not fetch icons');
-          }
-
-          return response.json();
-        })
-        .then((icons) => {
-          this.#icons.next(icons);
-          this.#icons.complete();
-        });*/
-      this.#icons.next({});
-      this.#icons.complete();
-    }
-
-    return this.#icons.asObservable();
-  }
 }
 
 @customElement('umb-backoffice-icon-registry')
