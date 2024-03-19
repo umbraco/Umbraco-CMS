@@ -12,13 +12,13 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'min',
 					label: 'Minimum',
 					description: 'Enter the minimum amount of number to be entered',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 				},
 				{
 					alias: 'max',
 					label: 'Maximum',
 					description: 'Enter the minimum amount of number to be entered',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 				},
 				{
 					alias: 'step',
