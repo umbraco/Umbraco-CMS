@@ -30,7 +30,9 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 
 		// TODO: set up context token
 		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
-			this.observe(instance.structure, (value) => (this._structure = value), 'menuStructureObserver');
+			// TODO: get the correct interface from the context token
+			const context = instance as any;
+			this.observe(context.structure, (value) => (this._structure = value), 'menuStructureObserver');
 		});
 
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
