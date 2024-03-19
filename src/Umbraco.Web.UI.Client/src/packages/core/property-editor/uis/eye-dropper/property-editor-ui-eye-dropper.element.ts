@@ -1,8 +1,9 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-eye-dropper
@@ -27,17 +28,17 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 		}
 	}
 
-	private _onChange(event: UUIColorPickerChangeEvent) {
+	#onChange(event: UUIColorPickerChangeEvent) {
 		this.value = event.target.value;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	// TODO: This should use the given value:
 	render() {
 		return html`<umb-input-eye-dropper
-			@change="${this._onChange}"
+			.opacity=${this._opacity}
 			.swatches=${this._swatches}
-			.opacity="${this._opacity}"></umb-input-eye-dropper>`;
+			.value=${this.value}
+			@change=${this.#onChange}></umb-input-eye-dropper>`;
 	}
 }
 
