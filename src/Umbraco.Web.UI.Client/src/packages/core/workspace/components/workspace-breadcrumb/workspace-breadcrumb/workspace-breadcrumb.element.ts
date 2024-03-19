@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import type { UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-breadcrumb')
 export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
@@ -17,9 +18,9 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	_name: string = '';
 
 	@state()
-	_structure: any[] = [];
+	_structure: UmbStructureItemModel[] = [];
 
-	#sectionContext?: any;
+	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
 	constructor() {
 		super();
