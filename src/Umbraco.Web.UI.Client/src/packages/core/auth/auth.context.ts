@@ -3,10 +3,10 @@ import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import type { UmbOpenApiConfiguration } from './models/openApiConfiguration.js';
 import { OpenAPI } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbAuthContext extends UmbControllerBase {
+export class UmbAuthContext extends UmbContextBase<UmbAuthContext> {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	readonly isAuthorized = this.#isAuthorized.asObservable();
 
@@ -16,13 +16,12 @@ export class UmbAuthContext extends UmbControllerBase {
 	#authFlow;
 
 	constructor(host: UmbControllerHost, serverUrl: string, backofficePath: string, isBypassed: boolean) {
-		super(host);
+		super(host, UMB_AUTH_CONTEXT);
 		this.#isBypassed = isBypassed;
 		this.#serverUrl = serverUrl;
 		this.#backofficePath = backofficePath;
 
 		this.#authFlow = new UmbAuthFlow(serverUrl, this.#getRedirectUrl());
-		this.provideContext(UMB_AUTH_CONTEXT, this);
 	}
 
 	/**
