@@ -32,6 +32,14 @@ export type NewPasswordResponse = {
 	status: number;
 };
 
+export type ValidateInviteCodeResponse = {
+  error?: string;
+  status: number;
+  data?: {
+    passwordConfiguration: PasswordConfigurationModel;
+  }
+};
+
 export type PasswordConfigurationModel = {
   minimumPasswordLength: number;
   requireNonLetterOrDigit: boolean;

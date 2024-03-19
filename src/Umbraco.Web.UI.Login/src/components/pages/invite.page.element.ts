@@ -8,6 +8,9 @@ import { umbLocalizationContext } from '../../external/localization/localization
 
 @customElement('umb-invite-page')
 export default class UmbInvitePageElement extends LitElement {
+  #token = '';
+  #userId = '';
+
   @state()
   state: UUIButtonState = undefined;
 
@@ -15,20 +18,37 @@ export default class UmbInvitePageElement extends LitElement {
   error = '';
 
   @state()
-  invitedUser?: any;
+  loading = true;
 
-  protected async firstUpdated(_changedProperties: any) {
-    super.firstUpdated(_changedProperties);
+  constructor() {
+    super();
+    this.#init();
+  }
 
-    const response = await umbAuthContext.getInvitedUser();
+  async #init() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('inviteCode');
+    const userId = urlParams.get('userId');
 
-    if (!response.user?.id) {
-      // The login page should already have redirected the user to an error page. They should never get here.
-      this.error = 'No invited user found';
+    if (!token || !userId) {
+      this.error = 'The invite has expired or is invalid';
+      this.loading = false;
       return;
     }
 
-    this.invitedUser = response.user;
+    this.#token = token;
+    this.#userId = userId;
+
+    const response = await umbAuthContext.validateInviteCode(this.#token, this.#userId);
+
+    if (response.error) {
+      this.error = response.error;
+      this.loading = false;
+      return;
+    }
+
+    umbAuthContext.passwordConfiguration = response.data?.passwordConfiguration;
+    this.loading = false;
   }
 
   async #onSubmit(event: CustomEvent) {
@@ -38,7 +58,7 @@ export default class UmbInvitePageElement extends LitElement {
     if (!password) return;
 
     this.state = 'waiting';
-    const response = await umbAuthContext.newInvitedUserPassword(password);
+    const response = await umbAuthContext.newInvitedUserPassword(password, this.#token, this.#userId);
 
     if (response.error) {
       this.error = response.error;
@@ -51,26 +71,23 @@ export default class UmbInvitePageElement extends LitElement {
   }
 
   render() {
-    return this.invitedUser
-      ? html`
-        <umb-new-password-layout
-          @submit=${this.#onSubmit}
-          .userId=${this.invitedUser.id}
-          .userName=${this.invitedUser.name}
-          .state=${this.state}
-          .error=${this.error}></umb-new-password-layout>`
-      : this.error
+    return this.loading ? html`<uui-loader-bar></uui-loader-bar>` : (
+      this.error
         ? html`
           <umb-error-layout
-            .header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
-            .message=${this.error}></umb-error-layout>`
-        : html`
-          <umb-error-layout
             header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
-            message=${until(
+            message=${this.error ?? until(
               umbLocalizationContext.localize('errors_defaultError', undefined, 'An unknown failure has occured')
             )}>
-          </umb-error-layout>`;
+          </umb-error-layout>`
+      : html`
+        <umb-new-password-layout
+          @submit=${this.#onSubmit}
+          is-invite
+          .userId=${this.#userId}
+          .state=${this.state}
+          .error=${this.error}></umb-new-password-layout>`
+    );
   }
 }
 

@@ -4,7 +4,7 @@ import type {
   ResetPasswordResponse,
   ValidatePasswordResetCodeResponse,
   NewPasswordResponse,
-  PasswordConfigurationModel
+  PasswordConfigurationModel, ValidateInviteCodeResponse
 } from "../types.js";
 import {UmbAuthRepository} from './auth.repository.js';
 
@@ -66,12 +66,12 @@ export class UmbAuthContext {
     return this.#authRepository.newPassword(password, resetCode, userId);
   }
 
-  async newInvitedUserPassword(password: string): Promise<NewPasswordResponse> {
-    return this.#authRepository.newInvitedUserPassword(password);
+  async newInvitedUserPassword(password: string, token: string, userId: string): Promise<NewPasswordResponse> {
+    return this.#authRepository.newInvitedUserPassword(password, token, userId);
   }
 
-  async getInvitedUser(): Promise<any> {
-    return this.#authRepository.getInvitedUser();
+  async validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
+    return this.#authRepository.validateInviteCode(token, userId);
   }
 
   validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
