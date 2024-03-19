@@ -7,7 +7,8 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 export class UmbLanguageNavigationStructureWorkspaceContext extends UmbContextBase<UmbLanguageNavigationStructureWorkspaceContext> {
-	#workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
+	// TODO: figure out the correct type where we have "data" available
+	#workspaceContext?: any;
 
 	#structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
@@ -27,6 +28,8 @@ export class UmbLanguageNavigationStructureWorkspaceContext extends UmbContextBa
 		if (!data) throw new Error('Data is not available');
 
 		const items = [
+			// TODO: figure out if we can get the root from somewhere
+			// so we don't have to hardcode it
 			{
 				unique: null,
 				entityType: 'language-root',
