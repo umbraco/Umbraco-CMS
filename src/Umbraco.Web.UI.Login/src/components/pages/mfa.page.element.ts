@@ -175,7 +175,7 @@ export default class UmbMfaPageElement extends LitElement {
             button-style="success"
             look="primary"
             color="default"
-            label=${until(umbLocalizationContext.localize('general_validate'), 'Validate')}
+            label=${until(umbLocalizationContext.localize('general_validate', undefined, 'Validate'), 'Validate')}
             type="submit"></uui-button>
         </form>
       </uui-form>
