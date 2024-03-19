@@ -43,7 +43,7 @@ public partial class PartialViewSnippetCollectionBuilder : LazyCollectionBuilder
 
         // Strip the @inherits if it's there
         Regex headerMatch = HeaderRegex();
-         var newContent = headerMatch.Replace(content, string.Empty)
+        var newContent = headerMatch.Replace(content, string.Empty)
             .Replace("Model.Content.", "Model.")
             .Replace("(Model.Content)", "(Model)")
             .Replace("Model?.Content.", "Model.")
