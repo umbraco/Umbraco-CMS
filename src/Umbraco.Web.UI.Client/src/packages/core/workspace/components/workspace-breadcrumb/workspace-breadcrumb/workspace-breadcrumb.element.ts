@@ -2,9 +2,8 @@ import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/e
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-import type { UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
+import type { UmbMenuStructureWorkspaceContext, UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-workspace-breadcrumb')
 export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
@@ -26,13 +25,15 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as any;
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.observe(this.#workspaceContext.name, (value) => (this._name = value), 'breadcrumbWorkspaceNameObserver');
 		});
 
 		// TODO: set up context token
 		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
 			// TODO: get the correct interface from the context token
-			const context = instance as any;
+			const context = instance as UmbMenuStructureWorkspaceContext;
 			this.observe(context.structure, (value) => (this._structure = value), 'menuStructureObserver');
 		});
 
