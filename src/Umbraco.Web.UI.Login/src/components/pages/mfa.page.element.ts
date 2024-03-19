@@ -154,14 +154,12 @@ export default class UmbMfaPageElement extends LitElement {
               autocomplete="one-time-code"
               placeholder=${until(
                 umbLocalizationContext.localize('login_2faCodeInputHelp'),
-                undefined,
                 'Please enter the verification code'
               )}
               aria-required="true"
               required
               required-message=${until(
                 umbLocalizationContext.localize('login_2faCodeInputHelp'),
-                undefined,
                 'Please enter the verification code'
               )}
               style="width:100%;">
