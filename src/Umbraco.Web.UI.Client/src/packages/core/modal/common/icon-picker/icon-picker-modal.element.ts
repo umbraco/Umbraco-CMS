@@ -1,4 +1,4 @@
-import icons from '../../../icon-registry/icons/icons.json' with { type: 'json' };
+import icons from '../../../icon-registry/icons/icons.json' assert { type: 'json' };
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
