@@ -5,6 +5,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbRouterSlotInitEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
+import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * @element umb-relation-type-workspace
@@ -45,6 +47,12 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 			},
 		},
 	];
+
+	constructor() {
+		super();
+		// TODO: We need to recreate when ID changed?
+		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this, this.#workspaceContext]);
+	}
 
 	render() {
 		return html`<umb-router-slot
