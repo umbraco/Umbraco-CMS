@@ -55,6 +55,7 @@ public class ForgotPasswordUriProvider : IForgotPasswordUriProvider
         uriBuilder.Path = BackOfficeLoginController.LoginPath;
         uriBuilder.Query = QueryString.Create(new KeyValuePair<string, string?>[]
         {
+            new ("flow", "reset-password"),
             new ("userId", user.Key.ToString()),
             new ("resetCode", tokenAttempt.Result.ToUrlBase64()),
         }).ToUriComponent();
