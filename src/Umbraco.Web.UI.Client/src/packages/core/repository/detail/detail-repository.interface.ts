@@ -3,9 +3,10 @@ import type {
 	UmbRepositoryResponse,
 	UmbRepositoryResponseWithAsObservable,
 } from '../types.js';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
-export interface UmbDetailRepository<DetailModelType> {
+export interface UmbDetailRepository<DetailModelType> extends UmbApi {
 	createScaffold(preset?: Partial<DetailModelType>): Promise<UmbRepositoryResponse<DetailModelType>>;
 	requestByUnique(unique: string): Promise<UmbRepositoryResponseWithAsObservable<DetailModelType>>;
 	byUnique(unique: string): Promise<Observable<DetailModelType | undefined>>;

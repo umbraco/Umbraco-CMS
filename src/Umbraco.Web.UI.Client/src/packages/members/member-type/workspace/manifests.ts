@@ -9,7 +9,7 @@ export const UMB_MEMBER_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.MemberType';
 
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: 'Umb.Workspace.MemberType',
+	alias: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
 	name: 'Member Type Workspace',
 	js: () => import('./member-type-workspace.element.js'),
 	meta: {
@@ -20,10 +20,9 @@ const workspace: ManifestWorkspace = {
 const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
+		kind: 'contentTypeDesignEditor',
 		alias: 'Umb.WorkspaceView.MemberType.Design',
 		name: 'Member Type Workspace Design View',
-		js: () => import('./views/design/member-type-workspace-view-edit.element.js'),
-		weight: 1000,
 		meta: {
 			label: 'Design',
 			pathname: 'design',
