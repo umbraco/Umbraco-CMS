@@ -15,25 +15,25 @@ export const manifests = [
 	},
 	{
 		type: 'workspaceContext',
-		name: 'Data Type Menu Structure Workspace Context',
-		alias: 'Umb.Context.DataType.Menu.Structure',
+		name: 'Member Type Menu Structure Workspace Context',
+		alias: 'Umb.Context.MemberType.Menu.Structure',
 		api: () => import('./member-type-menu-structure.context.js'),
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: 'Umb.Workspace.DataType',
+				match: 'Umb.Workspace.MemberType',
 			},
 		],
 	},
 	{
 		type: 'workspaceFooterApp',
 		kind: 'breadcrumb',
-		alias: 'Umb.WorkspaceFooterApp.DataType.Breadcrumb',
-		name: 'Data Type Breadcrumb Workspace Footer App',
+		alias: 'Umb.WorkspaceFooterApp.MemberType.Breadcrumb',
+		name: 'Member Type Breadcrumb Workspace Footer App',
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: 'Umb.Workspace.DataType',
+				match: 'Umb.Workspace.MemberType',
 			},
 		],
 	},
