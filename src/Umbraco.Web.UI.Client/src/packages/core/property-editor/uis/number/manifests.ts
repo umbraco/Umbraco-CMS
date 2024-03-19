@@ -46,6 +46,10 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 						alias: 'allowDecimals',
 						value: true,
 					},
+					{
+						alias: 'step',
+						value: '0.01',
+					},
 				],
 			},
 		},
