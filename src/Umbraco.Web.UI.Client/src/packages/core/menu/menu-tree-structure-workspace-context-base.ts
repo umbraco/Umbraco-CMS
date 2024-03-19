@@ -1,5 +1,5 @@
 import type { UmbStructureItemModel } from './types.js';
-import type { UmbTreeRepository, UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeRepository, UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -34,29 +34,45 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	}
 
 	async #requestStructure() {
+		let structureItems: Array<UmbStructureItemModel> = [];
+
+		const treeRepository = await createExtensionApiByAlias<
+			UmbTreeRepository<UmbUniqueTreeItemModel, UmbUniqueTreeRootModel>
+		>(this, this.#args.treeRepositoryAlias);
+
+		const { data: root } = await treeRepository.requestTreeRoot();
+
+		if (root) {
+			structureItems = [
+				{
+					unique: root.unique,
+					entityType: root.entityType,
+					name: root.name,
+					isFolder: root.isFolder,
+				},
+			];
+		}
+
 		const isNew = this.#workspaceContext?.getIsNew();
 		const uniqueObservable = isNew ? this.#workspaceContext?.parentUnique : this.#workspaceContext?.unique;
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbUniqueTreeItemModel>>(
-			this,
-			this.#args.treeRepositoryAlias,
-		);
 		const { data } = await treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
 
 		if (data) {
-			const structureItems = data.map((structureItem) => {
+			const ancestorItems = data.map((treeItem) => {
 				return {
-					unique: structureItem.unique,
-					entityType: structureItem.entityType,
-					name: structureItem.name,
-					isFolder: structureItem.isFolder,
+					unique: treeItem.unique,
+					entityType: treeItem.entityType,
+					name: treeItem.name,
+					isFolder: treeItem.isFolder,
 				};
 			});
-
-			this.#structure.setValue(structureItems);
+			structureItems.push(...ancestorItems);
 		}
+
+		this.#structure.setValue(structureItems);
 	}
 }
