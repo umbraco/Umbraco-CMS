@@ -33,7 +33,7 @@ class UmbIconRegistry extends UUIIconRegistry {
   #getIcons(): Observable<Record<string, string>> {
     if (!this.#iconsLoaded) {
       this.#iconsLoaded = true;
-      fetch('backoffice/umbracoapi/icon/geticons')
+      /*fetch('backoffice/umbracoapi/icon/geticons')
         .then((response) => {
           if (!response.ok) {
             throw new Error('Could not fetch icons');
@@ -44,7 +44,9 @@ class UmbIconRegistry extends UUIIconRegistry {
         .then((icons) => {
           this.#icons.next(icons);
           this.#icons.complete();
-        });
+        });*/
+      this.#icons.next({});
+      this.#icons.complete();
     }
 
     return this.#icons.asObservable();

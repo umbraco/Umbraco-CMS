@@ -24,13 +24,21 @@ class UmbLoginData {
 
 		if (valid)
 			return {
-				data: null,
+				data: {
+          passwordConfiguration: {
+            minimumLength: 8,
+            requireDigit: true,
+            requireLowercase: true,
+            requireUppercase: true,
+            requireNonAlphanumeric: true,
+          }
+        },
 				status: 200,
 			};
 		else
 			return {
-				data: null,
-				status: 404,
+				error: 'Invalid code',
+				status: 400,
 			};
 	}
 
@@ -51,6 +59,7 @@ class UmbLoginData {
 			password: 'html',
 			twoFactor: true,
 			twoFactorView: '/src/mocks/customViews/my-custom-view.html',
+      enabledTwoFactorProviderNames: ['sms', 'email']
 		},
 		{
 			id: '3',
@@ -59,6 +68,7 @@ class UmbLoginData {
 			password: 'js',
 			twoFactor: true,
 			twoFactorView: '/src/mocks/customViews/my-custom-view.js',
+      enabledTwoFactorProviderNames: ['sms', 'email']
 		},
 		{
 			id: '4',
