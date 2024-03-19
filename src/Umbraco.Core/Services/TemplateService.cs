@@ -242,10 +242,10 @@ public class TemplateService : RepositoryService, ITemplateService
                 return Attempt.FailWithStatus(TemplateOperationStatus.MasterTemplateNotFound, template);
             }
 
-            // detect immediate circular references
-            if (masterTemplateAlias.IsNullOrWhiteSpace() == false
-            && masterTemplate?.MasterTemplateAlias is not null
-            && masterTemplate.MasterTemplateAlias.Equals(template.Alias))
+            // detect circular references
+            if (masterTemplateAlias is not null
+                && masterTemplate is not null
+                && await HasCircularReference(masterTemplateAlias, template, masterTemplate))
             {
                 return Attempt.FailWithStatus(TemplateOperationStatus.CircularMasterTemplateReference, template);
             }
@@ -421,4 +421,41 @@ public class TemplateService : RepositoryService, ITemplateService
 
     private static bool IsValidAlias(string alias)
         => alias.IsNullOrWhiteSpace() == false && alias.Length <= 255;
+
+    private async Task<bool> HasCircularReference(string parsedMasterTemplateAlias, ITemplate template, ITemplate masterTemplate)
+    {
+        if (parsedMasterTemplateAlias.IsNullOrWhiteSpace() == false
+            && masterTemplate.MasterTemplateAlias is not null
+            && masterTemplate.MasterTemplateAlias.Equals(template.Alias))
+        {
+            return true;
+        }
+
+        var processedTemplates = new List<ITemplate> { template, masterTemplate };
+        return await HasCircularReference(processedTemplates, masterTemplate.MasterTemplateAlias);
+    }
+
+    private async Task<bool> HasCircularReference(List<ITemplate> referencedTemplates, string? masterTemplateAlias)
+    {
+        if (masterTemplateAlias is null)
+        {
+            return false;
+        }
+
+        if (referencedTemplates.Any(template => template.Alias.Equals(masterTemplateAlias)))
+        {
+            return true;
+        }
+
+        ITemplate? masterTemplate = await GetAsync(masterTemplateAlias);
+        if (masterTemplate == null)
+        {
+            // this should not happen unless somebody manipulated the data by hand as this function is only called between persisted items
+            return false;
+        }
+
+        referencedTemplates.Add(masterTemplate);
+
+        return await HasCircularReference(referencedTemplates, masterTemplate.MasterTemplateAlias);
+    }
 }
