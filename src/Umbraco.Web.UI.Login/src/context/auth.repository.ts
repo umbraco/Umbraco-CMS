@@ -7,11 +7,9 @@ import type {
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
 export class UmbAuthRepository {
-  readonly #authURL = 'management/api/v1/security/back-office/login';
-
   public async login(data: LoginRequestModel): Promise<LoginResponse> {
     try {
-      const request = new Request(this.#authURL, {
+      const request = new Request('management/api/v1/security/back-office/login', {
         method: 'POST',
         body: JSON.stringify({
           username: data.username,
