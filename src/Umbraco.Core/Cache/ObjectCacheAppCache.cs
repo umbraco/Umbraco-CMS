@@ -128,14 +128,14 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             {
                 result = SafeLazy.GetSafeLazy(factory);
 
+                MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
+
                 try
                 {
                     if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
                     {
                         throw new TimeoutException("Timeout exceeded to the memory cache when using factory to insert");
                     }
-
-                    MemoryCacheEntryOptions options = GetOptionsLocked(timeout, isSliding);
 
                     // NOTE: This does an add or update
                     MemoryCache.Set(key, result, options);
@@ -179,29 +179,26 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             return; // do not store null values (backward compat)
         }
+        MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
 
         try
         {
-            try
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
             {
-                if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
-                {
-                    throw new TimeoutException("Cannot insert value into cache, due to timeout for lock.");
-                }
-                MemoryCacheEntryOptions options = GetOptionsLocked(timeout, isSliding);
-
-                // NOTE: This does an add or update
-                MemoryCache.Set(key, result, options);
-                _keys.Add(key);
-            }
-            finally
-            {
-                if (_locker.IsReadLockHeld)
-                {
-                    _locker.ExitReadLock();
-                }
+                throw new TimeoutException("Cannot insert value into cache, due to timeout for lock.");
             }
 
+            // NOTE: This does an add or update
+            MemoryCache.Set(key, result, options);
+            _keys.Add(key);
+        }
+        finally
+        {
+            if (_locker.IsReadLockHeld)
+            {
+                _locker.ExitReadLock();
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -359,7 +356,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     /// <remarks>
     /// Requires to be called inside a write lock
     /// </remarks>
-    private MemoryCacheEntryOptions GetOptionsLocked(TimeSpan? timeout = null, bool isSliding = false)
+    private MemoryCacheEntryOptions GetOptions(TimeSpan? timeout = null, bool isSliding = false)
     {
         var options = new MemoryCacheEntryOptions();
 
@@ -374,6 +371,23 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
 
         // Ensure key is removed from set when evicted from cache
-        return options.RegisterPostEvictionCallback((key, _, _, _) => _keys.Remove((string)key));
+        return options.RegisterPostEvictionCallback((key, _, _, _) =>
+        {
+            try
+            {
+                if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+                {
+                    throw new TimeoutException("Timeout exceeded to the memory cache when using factory to insert");
+                }
+                _keys.Remove((string)key);
+            }
+            finally
+            {
+                if (_locker.IsWriteLockHeld)
+                {
+                    _locker.ExitWriteLock();
+                }
+            }
+        });
     }
 }
