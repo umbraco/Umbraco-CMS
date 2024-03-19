@@ -27,10 +27,6 @@ export class UmbLocalizeElement extends LitElement {
     return this.#key;
   }
 
-  get hasFallbackValue() {
-    return !!this.textContent;
-  }
-
 	@state()
 	value = '';
 
