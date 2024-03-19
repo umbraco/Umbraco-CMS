@@ -49,7 +49,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 			rows="${ifDefined(this._rows)}"
 			@input=${this.onInput}
 			style="${styleMap(this._css)}"
-			autoheight="${this._rows ? false : true}"></uui-textarea>`;
+			auto-height=${this._rows ? false : true}></uui-textarea>`;
 	}
 
 	static styles = [
