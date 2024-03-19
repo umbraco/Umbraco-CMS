@@ -25,7 +25,11 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.#requestStructure();
+
+			this.#workspaceContext.observe(this.#workspaceContext.unique, (value) => {
+				if (!value) return;
+				this.#requestStructure();
+			});
 		});
 	}
 
