@@ -18,6 +18,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	public readonly structure = this.#structure.asObservable();
 
 	constructor(host: UmbControllerHost, args: UmbMenuTreeStructureWorkspaceContextBaseArgs) {
+		// TODO: set up context token
 		super(host, 'UmbMenuStructureWorkspaceContext');
 		this.#args = args;
 

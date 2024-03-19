@@ -8,16 +8,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
-
-// This is interface kept internal on purpose until we know if there are other use cases for this
-interface UmbTreeItemWithVariantsModel {
-	unique: string;
-	variants: Array<{
-		name: string;
-		culture: string | null;
-		segment: string | null;
-	}>;
-}
+import { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 @customElement('umb-variant-workspace-breadcrumb')
 export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
@@ -52,6 +43,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 			this.#observeWorkspaceActiveVariant();
 		});
 
+		// TODO: set up context token
 		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
 			if (!instance) return;
 			this.#structureContext = instance;
@@ -65,7 +57,8 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 
 	#observeAncestors() {
 		this.observe(this.#structureContext.structure, (value) => {
-			this._structure = value;
+			// TODO: get the type from the context
+			this._structure = value as Array<UmbVariantStructureItemModel>;
 		});
 	}
 
@@ -97,7 +90,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	}
 
 	// TODO: we should move the fallback name logic to a helper class. It will be used in multiple places
-	#getItemVariantName(structureItem: UmbTreeItemWithVariantsModel) {
+	#getItemVariantName(structureItem: UmbVariantStructureItemModel) {
 		const fallbackName =
 			structureItem.variants.find((variant) => variant.culture === this._appDefaultCulture)?.name ??
 			structureItem.variants[0].name ??

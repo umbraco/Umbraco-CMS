@@ -13,6 +13,7 @@ export class UmbLanguageNavigationStructureWorkspaceContext extends UmbContextBa
 	public readonly structure = this.#structure.asObservable();
 
 	constructor(host: UmbControllerHost) {
+		// TODO: set up context token
 		super(host, 'UmbMenuStructureWorkspaceContext');
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
