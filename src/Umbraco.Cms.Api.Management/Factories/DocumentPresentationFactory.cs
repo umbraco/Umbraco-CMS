@@ -1,6 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.Content;
 using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
@@ -16,8 +15,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class DocumentPresentationFactory
-    : ContentPresentationFactoryBase<IContentType, IContentTypeService>, IDocumentPresentationFactory
+internal sealed class DocumentPresentationFactory : IDocumentPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IDocumentUrlFactory _documentUrlFactory;
@@ -33,7 +31,6 @@ internal sealed class DocumentPresentationFactory
         IContentTypeService contentTypeService,
         IPublicAccessService publicAccessService,
         TimeProvider timeProvider)
-        : base(contentTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
         _documentUrlFactory = documentUrlFactory;
@@ -70,11 +67,7 @@ internal sealed class DocumentPresentationFactory
 
         responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
 
-        IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
-        if (contentType is not null)
-        {
-            responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(contentType)!;
-        }
+        responseModel.DocumentType = _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
         responseModel.Variants = CreateVariantsItemResponseModels(entity);
 
@@ -118,7 +111,7 @@ internal sealed class DocumentPresentationFactory
     }
 
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
-        => CreateContentTypeReferenceResponseModel<DocumentTypeReferenceResponseModel>(entity);
+        => _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(entity)!;
 
     public Attempt<CultureAndScheduleModel, ContentPublishingOperationStatus> CreateCultureAndScheduleModel(PublishDocumentRequestModel requestModel)
     {

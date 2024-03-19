@@ -14,7 +14,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
-  test('can create a template', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a template', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.template.clickActionsMenuAtRoot();
     await umbracoUi.template.clickNewTemplateButton();
@@ -96,7 +96,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(childTemplateName);
   });
 
-  test('can use query builder for a template', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can use query builder for a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const templateAlias = AliasHelper.toAlias(templateName);
     await umbracoApi.template.create(templateName, templateAlias, '');

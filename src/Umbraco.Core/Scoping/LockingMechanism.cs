@@ -13,8 +13,7 @@ public class LockingMechanism : ILockingMechanism
 {
     private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
     private readonly ILogger<LockingMechanism> _logger;
-    private readonly object _lockQueueLocker = new();
-    private readonly object _dictionaryLocker = new();
+    private readonly object _locker = new();
     private StackQueue<(DistributedLockType lockType, TimeSpan timeout, Guid instanceId, int lockId)>? _queuedLocks;
     private HashSet<int>? _readLocks;
     private Dictionary<Guid, Dictionary<int, int>>? _readLocksDictionary;
@@ -35,12 +34,12 @@ public class LockingMechanism : ILockingMechanism
     }
 
     /// <inheritdoc />
-    public void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyReadLockInner(instanceId, timeout, lockIds);
+    public void ReadLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerReadLockInner(instanceId, timeout, lockIds);
 
     public void ReadLock(Guid instanceId, params int[] lockIds) => ReadLock(instanceId, null, lockIds);
 
     /// <inheritdoc />
-    public void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => LazyWriteLockInner(instanceId, timeout, lockIds);
+    public void WriteLock(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds) => EagerWriteLockInner(instanceId, timeout, lockIds);
 
     public void WriteLock(Guid instanceId, params int[] lockIds) => WriteLock(instanceId, null, lockIds);
 
@@ -64,7 +63,7 @@ public class LockingMechanism : ILockingMechanism
     /// <param name="lockIds">Array of lock object identifiers.</param>
     private void EagerWriteLockInner(Guid instanceId, TimeSpan? timeout, params int[] lockIds)
     {
-        lock (_dictionaryLocker)
+        lock (_locker)
         {
             foreach (var lockId in lockIds)
             {
@@ -106,7 +105,7 @@ public class LockingMechanism : ILockingMechanism
     /// <param name="lockIds">Array of lock object identifiers.</param>
     private void EagerReadLockInner(Guid instanceId, TimeSpan? timeout, params int[] lockIds)
     {
-        lock (_dictionaryLocker)
+        lock (_locker)
         {
             foreach (var lockId in lockIds)
             {
@@ -219,7 +218,7 @@ public class LockingMechanism : ILockingMechanism
 
     private void LazyLockInner(DistributedLockType lockType, Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
     {
-        lock (_lockQueueLocker)
+        lock (_locker)
         {
             if (_queuedLocks == null)
             {
@@ -239,7 +238,7 @@ public class LockingMechanism : ILockingMechanism
     /// <param name="instanceId">Instance ID of the scope to clear.</param>
     public void ClearLocks(Guid instanceId)
     {
-        lock (_dictionaryLocker)
+        lock (_locker)
         {
             _readLocksDictionary?.Remove(instanceId);
             _writeLocksDictionary?.Remove(instanceId);
@@ -294,7 +293,7 @@ public class LockingMechanism : ILockingMechanism
     /// </summary>
     public void EnsureLocks(Guid scopeInstanceId)
     {
-        lock (_lockQueueLocker)
+        lock (_locker)
         {
             if (!(_queuedLocks?.Count > 0))
             {

@@ -382,12 +382,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Authorizers
             Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
             Services.AddSingleton<IContentPermissionAuthorizer, ContentPermissionAuthorizer>();
+            Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
             Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
             Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
             Services.AddSingleton<IUserGroupPermissionAuthorizer, UserGroupPermissionAuthorizer>();
             Services.AddSingleton<IUserPermissionAuthorizer, UserPermissionAuthorizer>();
-            Services.AddSingleton<IDictionaryPermissionAuthorizer, DictionaryPermissionAuthorizer>();
-
         }
     }
 }

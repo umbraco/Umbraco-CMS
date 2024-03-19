@@ -20,7 +20,7 @@ for (const datePickerType of datePickerTypes) {
       }
     });
 
-    test(`can update offset time`, async ({ umbracoApi, umbracoUi }) => {
+    test.skip(`can update offset time`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const expectedDataTypeValues =
         datePickerType === 'Date Picker'

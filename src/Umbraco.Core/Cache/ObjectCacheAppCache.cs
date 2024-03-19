@@ -16,6 +16,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     private readonly IOptions<MemoryCacheOptions> _options;
     private readonly IHostEnvironment? _hostEnvironment;
     private readonly ISet<string> _keys = new HashSet<string>();
+    private static readonly TimeSpan _readLockTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan _writeLockTimeout = TimeSpan.FromSeconds(5);
+
     private readonly ReaderWriterLockSlim _locker = new(LockRecursionPolicy.SupportsRecursion);
     private bool _disposedValue;
 
@@ -54,8 +57,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         Lazy<object?>? result;
         try
         {
-            _locker.EnterReadLock();
-
+            if (_locker.TryEnterReadLock(_readLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when getting item");
+            }
             result = MemoryCache.Get(key) as Lazy<object?>; // null if key not found
         }
         finally
@@ -83,8 +88,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         object[] entries;
         try
         {
-            _locker.EnterReadLock();
-
+            if (_locker.TryEnterReadLock(_readLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when getting item");
+            }
             entries = _keys.Where(predicate)
                 .Select(key => MemoryCache.Get(key))
                 .WhereNotNull()
@@ -120,11 +127,15 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null)
             {
                 result = SafeLazy.GetSafeLazy(factory);
+
                 MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
 
                 try
                 {
-                    _locker.EnterWriteLock();
+                    if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+                    {
+                        throw new TimeoutException("Timeout exceeded to the memory cache when using factory to insert");
+                    }
 
                     // NOTE: This does an add or update
                     MemoryCache.Set(key, result, options);
@@ -168,12 +179,26 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         {
             return; // do not store null values (backward compat)
         }
-
         MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
 
-        // NOTE: This does an add or update
-        MemoryCache.Set(key, result, options);
-        _keys.Add(key);
+        try
+        {
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Cannot insert value into cache, due to timeout for lock.");
+            }
+
+            // NOTE: This does an add or update
+            MemoryCache.Set(key, result, options);
+            _keys.Add(key);
+        }
+        finally
+        {
+            if (_locker.IsWriteLockHeld)
+            {
+                _locker.ExitWriteLock();
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -201,7 +226,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         try
         {
-            _locker.EnterWriteLock();
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache when clearing item");
+            }
 
             MemoryCache.Remove(key);
             _keys.Remove(key);
@@ -286,7 +314,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         try
         {
-            _locker.EnterWriteLock();
+            if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+            {
+                throw new TimeoutException("Timeout exceeded to the memory cache.");
+            }
 
             // ToArray required to remove
             foreach (var key in _keys.Where(predicate).ToArray())
@@ -337,6 +368,23 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
 
         // Ensure key is removed from set when evicted from cache
-        return options.RegisterPostEvictionCallback((key, _, _, _) => _keys.Remove((string)key));
+        return options.RegisterPostEvictionCallback((key, _, _, _) =>
+        {
+            try
+            {
+                if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
+                {
+                    throw new TimeoutException("Timeout exceeded to the memory cache when using factory to insert");
+                }
+                _keys.Remove((string)key);
+            }
+            finally
+            {
+                if (_locker.IsWriteLockHeld)
+                {
+                    _locker.ExitWriteLock();
+                }
+            }
+        });
     }
 }

@@ -11,6 +11,7 @@ public enum UserOperationStatus
     UserNameIsNotEmail,
     EmailCannotBeChanged,
     NoUserGroup,
+    AdminUserGroupMustNotBeEmpty,
     DuplicateUserName,
     InvalidEmail,
     DuplicateEmail,

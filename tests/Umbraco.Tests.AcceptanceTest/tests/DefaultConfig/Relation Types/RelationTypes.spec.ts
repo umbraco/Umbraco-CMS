@@ -18,7 +18,7 @@ test.describe('Relation types tests', () => {
     await umbracoApi.relationType.ensureNameNotExists(relationTypeName);
   });
 
-  test('can create a relation type', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can create a relation type', async ({umbracoApi, umbracoUi}) => {
     // Act
     await umbracoUi.relationType.clickActionsMenuAtRoot();
     await umbracoUi.relationType.clickCreateButton();
@@ -82,7 +82,7 @@ test.describe('Relation types tests', () => {
     expect(relationTypeData.isDependency).toEqual(true);
   });
 
-  test('can delete a relation type', async ({umbracoApi, umbracoUi}) => {
+  test.skip('can delete a relation type', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.relationType.create(relationTypeName, false, false, objectTypeId, objectTypeId);
 

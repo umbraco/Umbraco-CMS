@@ -16,9 +16,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
 
     public DocumentMapDefinition(PropertyEditorCollection propertyEditorCollection, CommonMapper commonMapper)
         : base(propertyEditorCollection)
-    {
-        _commonMapper = commonMapper;
-    }
+        => _commonMapper = commonMapper;
 
     public void DefineMaps(IUmbracoMapper mapper)
     {
@@ -50,8 +48,8 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
         target.Id = source.Key;
         target.DocumentType = context.Map<DocumentTypeCollectionReferenceResponseModel>(source.ContentType)!;
         target.SortOrder = source.SortOrder;
-        target.Creator = _commonMapper.GetOwner(source, context)?.Name;
-        target.Updater = _commonMapper.GetCreator(source, context)?.Name;
+        target.Creator = _commonMapper.GetOwnerName(source, context);
+        target.Updater = _commonMapper.GetCreatorName(source, context);
 
         // If there's a set of property aliases specified in the collection configuration, we will check if the current property's
         // value should be mapped. If it isn't one of the ones specified in 'includeProperties', we will just return the result

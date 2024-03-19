@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.DependencyInjection;
+using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.Handlers;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.Security;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
@@ -31,6 +32,7 @@ public static class BackOfficeAuthBuilderExtensions
         builder.AddNotificationAsyncHandler<UserDeletedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserGroupDeletingNotification, RevokeUserAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<UserGroupDeletedNotification, RevokeUserAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<UserLoginSuccessNotification, RevokeUserAuthenticationTokensNotificationHandler>();
 
         return builder;
     }
@@ -52,11 +54,7 @@ public static class BackOfficeAuthBuilderExtensions
         builder.Services
             .AddAuthentication()
             // Add our custom schemes which are cookie handlers
-            .AddCookie(Constants.Security.BackOfficeAuthenticationType, options =>
-            {
-                options.LoginPath = "/umbraco/login";
-                options.Cookie.Name = Constants.Security.BackOfficeAuthenticationType;
-            })
+            .AddCookie(Constants.Security.BackOfficeAuthenticationType)
             .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
             {
                 o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
@@ -75,6 +73,10 @@ public static class BackOfficeAuthBuilderExtensions
                 o.Cookie.Name = Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType;
                 o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
+
+        builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
+        builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
+        builder.Services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
 
         return builder;
     }
