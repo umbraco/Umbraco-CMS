@@ -42,11 +42,11 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		const { data } = await treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
 
 		if (data) {
-			const structureItems = data.map((structureItem) => {
+			const structureItems = data.map((treeItem) => {
 				return {
-					unique: structureItem.unique,
-					entityType: structureItem.entityType,
-					variants: structureItem.variants.map((variant: any) => {
+					unique: treeItem.unique,
+					entityType: treeItem.entityType,
+					variants: treeItem.variants.map((variant: any) => {
 						return {
 							name: variant.name,
 							culture: variant.culture,
