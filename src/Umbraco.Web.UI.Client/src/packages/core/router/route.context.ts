@@ -3,14 +3,14 @@ import { createRoutePathBuilder } from './generate-route-path-builder.function.j
 import type { IRoutingInfo, IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
 
 type UmbRoutePlusModalKey = UmbRoute & { __modalKey: string };
 
-export class UmbRouteContext extends UmbControllerBase {
+export class UmbRouteContext extends UmbContextBase<UmbRouteContext> {
 	#mainRouter: IRouterSlot;
 	#modalRouter: IRouterSlot;
 	#modalRegistrations: UmbModalRouteRegistration[] = [];
@@ -21,10 +21,9 @@ export class UmbRouteContext extends UmbControllerBase {
 	#activeModalPath?: string;
 
 	constructor(host: UmbControllerHost, mainRouter: IRouterSlot, modalRouter: IRouterSlot) {
-		super(host);
+		super(host, UMB_ROUTE_CONTEXT);
 		this.#mainRouter = mainRouter;
 		this.#modalRouter = modalRouter;
-		this.provideContext(UMB_ROUTE_CONTEXT, this);
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 			this.#modalContext = context;
 			this.#generateModalRoutes();
@@ -35,10 +34,9 @@ export class UmbRouteContext extends UmbControllerBase {
 		this.#modalRegistrations.push(registration);
 		this.#createNewUrlBuilder(registration);
 		this.#generateModalRoutes();
-		return registration;
 	}
 
-	public unregisterModal(registrationToken: ReturnType<typeof this.registerModal>) {
+	public unregisterModal(registrationToken: UmbModalRouteRegistration) {
 		const index = this.#modalRegistrations.indexOf(registrationToken);
 		if (index === -1) return;
 		this.#modalRegistrations.splice(index, 1);
@@ -126,7 +124,7 @@ export class UmbRouteContext extends UmbControllerBase {
 		if (this.#activeModalPath) {
 			// If if there is a modal using the old path.
 			const activeModal = this.#modalRegistrations.find((registration) => {
-				return '/' + registration.generateModalPath() === this.#activeModalPath;
+				return registration.generateModalPath() === this.#activeModalPath;
 			});
 			if (activeModal) {
 				this.#modalContext?.close(activeModal.key);

@@ -26,7 +26,6 @@ export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements 
 	@state()
 	private _placeholder?: string;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._type = config?.getValueByAlias<UuiInputTypeType>('inputType') ?? this.#defaultType;
 		this._inputMode = config?.getValueByAlias('inputMode');

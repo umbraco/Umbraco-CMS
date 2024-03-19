@@ -1,7 +1,7 @@
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UUISliderEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-slider')
 export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
@@ -15,10 +15,10 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 	step = 1;
 
 	@property({ type: Number })
-	initVal1 = 0;
+	valueLow = 0;
 
 	@property({ type: Number })
-	initVal2 = 0;
+	valueHigh = 0;
 
 	@property({ type: Boolean, attribute: 'enable-range' })
 	enableRange = false;
@@ -34,8 +34,7 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		if (this.enableRange) return this.#renderRangeSlider();
-		else return this.#renderSlider();
+		return this.enableRange ? this.#renderRangeSlider() : this.#renderSlider();
 	}
 
 	#renderSlider() {
@@ -43,7 +42,7 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 			.min="${this.min}"
 			.max="${this.max}"
 			.step="${this.step}"
-			.value="${this.initVal1.toString()}"
+			.value="${this.valueLow.toString()}"
 			@change="${this.#onChange}"></uui-slider>`;
 	}
 	#renderRangeSlider() {
@@ -51,8 +50,7 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 			.min="${this.min}"
 			.max="${this.max}"
 			.step="${this.step}"
-			.valueLow="${this.initVal1}"
-			.valueHigh="${this.initVal2}"
+			.value="${this.valueLow},${this.valueHigh}"
 			@change="${this.#onChange}"></uui-range-slider>`;
 	}
 }

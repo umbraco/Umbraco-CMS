@@ -126,11 +126,11 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	//  How do we handle this?
 	/*
 	@property()
-	public get value() {
-		throw new Error(`${this} does not support to get the value directly. Use items instead.`);
-	}
 	public set value(value: FormDataEntryValue | FormData) {
 		throw new Error(`${this} does not support to set the value directly. Use items instead.`);
+	}
+	public get value() {
+		throw new Error(`${this} does not support to get the value directly. Use items instead.`);
 	}
 	*/
 

@@ -108,7 +108,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 	#handleFallbackChange(event: UmbChangeEvent) {
 		if (event instanceof UmbChangeEvent) {
 			const target = event.target as UmbInputLanguageElement;
-			const selectedLanguageUnique = target.selectedUniques?.[0];
+			const selectedLanguageUnique = target.selection?.[0];
 			this.#languageWorkspaceContext?.setFallbackCulture(selectedLanguageUnique);
 		}
 	}
@@ -149,7 +149,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 						${this._language?.isDefault && this._language?.isDefault !== this._isDefaultLanguage
 							? html`<div id="default-language-warning">
 									Switching default language may result in default content missing.
-							  </div>`
+								</div>`
 							: nothing}
 
 						<hr />

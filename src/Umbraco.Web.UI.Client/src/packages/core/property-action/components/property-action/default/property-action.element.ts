@@ -21,7 +21,6 @@ export class UmbPropertyActionElement<
 	@property({ attribute: false })
 	public manifest?: ManifestPropertyActionDefaultKind<MetaType>;
 
-	@property({ attribute: false })
 	public set api(api: ApiType | undefined) {
 		this.#api = api;
 

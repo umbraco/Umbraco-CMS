@@ -13,21 +13,9 @@ type Story = StoryObj<UmbInputRadioButtonListElement>;
 export const Overview: Story = {
 	args: {
 		list: [
-			{
-				key: '1',
-				sortOrder: 0,
-				value: 'One',
-			},
-			{
-				key: '2',
-				sortOrder: 1,
-				value: 'Two',
-			},
-			{
-				key: '3',
-				sortOrder: 2,
-				value: 'Three',
-			},
+			{ label: 'One', value: '1' },
+			{ label: 'Two', value: '2' },
+			{ label: 'Three', value: '3' },
 		],
 	},
 };
@@ -35,45 +23,20 @@ export const Overview: Story = {
 export const WithSelectedValue: Story = {
 	args: {
 		list: [
-			{
-				key: '1',
-				sortOrder: 0,
-				value: 'One',
-			},
-			{
-				key: '2',
-				sortOrder: 1,
-				value: 'Two',
-			},
-			{
-				key: '3',
-				sortOrder: 2,
-				value: 'Three',
-			},
+			{ label: 'One', value: '1' },
+			{ label: 'Two', value: '2' },
+			{ label: 'Three', value: '3' },
 		],
-		selected: '2',
-		value: 'Two',
+		value: '2',
 	},
 };
 
 export const SortOrder: Story = {
 	args: {
 		list: [
-			{
-				key: '1',
-				sortOrder: 4,
-				value: 'One',
-			},
-			{
-				key: '2',
-				sortOrder: 1,
-				value: 'Two',
-			},
-			{
-				key: '3',
-				sortOrder: 2,
-				value: 'Three',
-			},
+			{ label: 'One', value: '1' },
+			{ label: 'Two', value: '2' },
+			{ label: 'Three', value: '3' },
 		],
 	},
 };

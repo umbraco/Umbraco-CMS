@@ -1,9 +1,10 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
+import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-color-picker
@@ -12,8 +13,8 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#defaultShowLabels = false;
 
-	@property()
-	value = '';
+	@property({ type: Object })
+	value?: UmbSwatchDetails;
 
 	@state()
 	private _showLabels = this.#defaultShowLabels;
@@ -21,23 +22,23 @@ export class UmbPropertyEditorUIColorPickerElement extends UmbLitElement impleme
 	@state()
 	private _swatches: UmbSwatchDetails[] = [];
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._showLabels = config?.getValueByAlias('useLabel') ?? this.#defaultShowLabels;
 		this._swatches = config?.getValueByAlias('items') ?? [];
 	}
 
 	private _onChange(event: UUIColorSwatchesEvent) {
-		this.value = event.target.value;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		const value = event.target.value;
+		this.value = this._swatches.find((swatch) => swatch.value === value);
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
 		return html`<umb-input-color
-			@change="${this._onChange}"
-			.value=${this.value ?? ''}
-			.swatches="${this._swatches}"
-			.showLabels="${this._showLabels}"></umb-input-color>`;
+			?showLabels=${this._showLabels}
+			.swatches=${this._swatches}
+			.value=${this.value?.value ?? ''}
+			@change=${this._onChange}></umb-input-color>`;
 	}
 }
 

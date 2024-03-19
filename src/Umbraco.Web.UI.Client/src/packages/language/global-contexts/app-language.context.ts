@@ -2,11 +2,13 @@ import { UmbLanguageCollectionRepository } from '../collection/index.js';
 import type { UmbLanguageDetailModel } from '../types.js';
 import { UmbArrayState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbAppLanguageContext extends UmbControllerBase implements UmbApi {
+// TODO: Make a store for the App Languages.
+// TODO: Implement default language end-point, in progress at backend team, so we can avoid getting all languages.
+export class UmbAppLanguageContext extends UmbContextBase<UmbAppLanguageContext> implements UmbApi {
 	#languageCollectionRepository: UmbLanguageCollectionRepository;
 	#languages = new UmbArrayState<UmbLanguageDetailModel>([], (x) => x.unique);
 
@@ -24,8 +26,7 @@ export class UmbAppLanguageContext extends UmbControllerBase implements UmbApi {
 	}
 
 	constructor(host: UmbControllerHost) {
-		super(host);
-		this.provideContext(UMB_APP_LANGUAGE_CONTEXT, this);
+		super(host, UMB_APP_LANGUAGE_CONTEXT);
 		this.#languageCollectionRepository = new UmbLanguageCollectionRepository(this);
 		this.#observeLanguages();
 	}

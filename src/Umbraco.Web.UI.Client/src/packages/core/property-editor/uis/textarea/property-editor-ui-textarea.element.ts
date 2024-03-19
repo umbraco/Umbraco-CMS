@@ -24,7 +24,6 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 	@state()
 	private _css?: any;
 
-	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = config?.getValueByAlias('maxChars');
 		this._rows = config?.getValueByAlias('rows');
@@ -50,7 +49,7 @@ export class UmbPropertyEditorUITextareaElement extends UmbLitElement implements
 			rows="${ifDefined(this._rows)}"
 			@input=${this.onInput}
 			style="${styleMap(this._css)}"
-			autoheight="${this._rows ? false : true}"></uui-textarea>`;
+			auto-height=${this._rows ? false : true}></uui-textarea>`;
 	}
 
 	static styles = [

@@ -1,15 +1,29 @@
 import type { UmbModalToken } from '../token/index.js';
-import { UmbModalRouteRegistration } from './modal-route-registration.js';
-import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
-import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbModalConfig, UmbModalContext, UmbModalManagerContext, UmbModalRouteRegistration } from '../index.js';
+import { type Params, type IRouterSlot, UMB_ROUTE_CONTEXT, encodeFolderName } from '@umbraco-cms/backoffice/router';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
-export class UmbModalRouteRegistrationController<D extends object = object, R = any>
-	extends UmbModalRouteRegistration<D, R>
-	implements UmbController
+export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
+
+export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = UmbModalTokenValue extends undefined
+	? {
+			modal?: UmbModalConfig;
+			data: UmbModalTokenData;
+			value?: UmbModalTokenValue;
+		}
+	: {
+			modal?: UmbModalConfig;
+			data: UmbModalTokenData;
+			value: UmbModalTokenValue;
+		};
+export class UmbModalRouteRegistrationController<UmbModalTokenData extends object = object, UmbModalTokenValue = any>
+	extends UmbControllerBase
+	implements UmbModalRouteRegistration<UmbModalTokenData, UmbModalTokenValue>
 {
 	//
-	#host;
 	#init;
 	#contextConsumer;
 
@@ -17,14 +31,24 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	#uniquePaths: Map<string, string | undefined> = new Map();
 
 	#routeContext?: typeof UMB_ROUTE_CONTEXT.TYPE;
-	#modalRegistration?: UmbModalRouteRegistration;
+	#modalRegistrationContext?: typeof UMB_ROUTE_CONTEXT.TYPE;
 
-	public get controllerAlias() {
-		return this.alias.toString();
-	}
-	protected getControllerHost() {
-		return this.#host;
-	}
+	#key: string;
+	#path?: string;
+	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string;
+
+	#onSetupCallback?: (
+		routingInfo: Params,
+	) =>
+		| Promise<UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> | false>
+		| UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue>
+		| false;
+	#onSubmitCallback?: (data: UmbModalTokenValue) => void;
+	#onRejectCallback?: () => void;
+
+	#modalContext: UmbModalContext<UmbModalTokenData, UmbModalTokenValue> | undefined;
+	#routeBuilder?: UmbModalRouteBuilder;
+	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
 	/**
 	 * Creates an instance of UmbModalRouteRegistrationController.
@@ -32,11 +56,13 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	 * @param {UmbModalToken} alias - The alias of the modal, this is used to identify the modal.
 	 * @memberof UmbModalRouteRegistrationController
 	 */
-	constructor(host: UmbControllerHost, alias: UmbModalToken<D, R> | string) {
-		super(alias, null);
-		this.#host = host;
+	constructor(host: UmbControllerHost, alias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string) {
+		super(host, alias.toString());
+		this.#key = UmbId.new();
+		this.#modalAlias = alias;
+		//this.#path = path;
 
-		this.#contextConsumer = new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT, (_routeContext) => {
+		this.#contextConsumer = new UmbContextConsumerController(this, UMB_ROUTE_CONTEXT, (_routeContext) => {
 			this.#routeContext = _routeContext;
 			this.#registerModal();
 		});
@@ -118,6 +144,9 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		this.#uniquePaths.set(identifier, value);
 		this.#registerModal();
 	}
+	getUniquePathValue(identifier: string): string | undefined {
+		return this.#uniquePaths.get(identifier);
+	}
 
 	async #registerModal() {
 		await this.#init;
@@ -128,7 +157,6 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		// Check if there is any undefined values of unique map:
 		if (pathParts.some((value) => value === undefined)) {
 			this.#unregisterModal();
-			return;
 		}
 
 		if (this.#additionalPath) {
@@ -138,44 +166,147 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 
 		const newPath = pathParts.join('/') ?? '';
 
-		//if no changes then break out:
-		if (this.path === newPath) {
+		// if no changes then break out:
+		// We test for both path and context changes [NL]
+		if (this.path === newPath && this.#modalRegistrationContext === this.#routeContext) {
 			return;
 		}
 
+		// Clean up if it already exists:
 		this.#unregisterModal();
 
 		// Make this the path of the modal registration:
 		this._setPath(newPath);
 
-		this.#modalRegistration = this.#routeContext.registerModal(this);
+		this.#routeContext.registerModal(this);
+		// Store which context we used and use this as 'if registered', so we can know if it changed.
+		this.#modalRegistrationContext = this.#routeContext;
 	}
 
 	async #unregisterModal() {
 		if (!this.#routeContext) return;
-		if (this.#modalRegistration) {
-			this.#routeContext.unregisterModal(this.#modalRegistration);
-			this.#modalRegistration = undefined;
+		if (this.#modalRegistrationContext) {
+			this.#modalRegistrationContext.unregisterModal(this);
+			this.#modalRegistrationContext = undefined;
 		}
 	}
 
 	hostConnected() {
-		if (!this.#modalRegistration) {
+		super.hostConnected();
+		if (!this.#modalRegistrationContext) {
 			this.#registerModal();
 		}
 	}
 	hostDisconnected(): void {
-		if (this.#modalRegistration) {
-			this.#routeContext?.unregisterModal(this.#modalRegistration);
-			this.#modalRegistration = undefined;
+		super.hostDisconnected();
+		if (this.#modalRegistrationContext) {
+			this.#modalRegistrationContext.unregisterModal(this);
+			this.#modalRegistrationContext = undefined;
 		}
 	}
 
+	public get key() {
+		return this.#key;
+	}
+
+	public get alias() {
+		return this.#modalAlias;
+	}
+
+	public generateModalPath() {
+		return `modal/${encodeFolderName(this.alias.toString())}${this.path && this.path !== '' ? `/${this.path}` : ''}`;
+	}
+
+	public get path() {
+		return this.#path;
+	}
+
+	protected _setPath(path: string | undefined) {
+		this.#path = path;
+	}
+
+	/**
+	 * Returns true if the modal is currently active.
+	 */
+	public get active() {
+		return !!this.#modalContext;
+	}
+
+	public open(params: { [key: string]: string | number }, prepend?: string) {
+		if (this.active) return;
+
+		window.history.pushState({}, '', this.#routeBuilder?.(params) + (prepend ? `${prepend}` : ''));
+	}
+
+	/**
+	 * Returns the modal handler if the modal is currently active. Otherwise its undefined.
+	 */
+	public get modalContext() {
+		return this.#modalContext;
+	}
+
+	public observeRouteBuilder(callback: (urlBuilder: UmbModalRouteBuilder) => void) {
+		this.#urlBuilderCallback = callback;
+		return this;
+	}
+	public _internal_setRouteBuilder(urlBuilder: UmbModalRouteBuilder) {
+		this.#routeBuilder = urlBuilder;
+		this.#urlBuilderCallback?.(urlBuilder);
+	}
+
+	public onSetup(
+		callback: (
+			routingInfo: Params,
+		) =>
+			| Promise<UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> | false>
+			| UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue>
+			| false,
+	) {
+		this.#onSetupCallback = callback;
+		return this;
+	}
+	public onSubmit(callback: (value: UmbModalTokenValue) => void) {
+		this.#onSubmitCallback = callback;
+		return this;
+	}
+	public onReject(callback: () => void) {
+		this.#onRejectCallback = callback;
+		return this;
+	}
+
+	#onSubmit = (data: UmbModalTokenValue) => {
+		this.#onSubmitCallback?.(data);
+		this.#modalContext = undefined;
+	};
+	#onReject = () => {
+		this.#onRejectCallback?.();
+		this.#modalContext = undefined;
+	};
+
+	async routeSetup(router: IRouterSlot, modalManagerContext: UmbModalManagerContext, params: Params) {
+		// If already open, don't do anything:
+		if (this.active) return;
+
+		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(params) : undefined;
+		if (modalData !== false) {
+			const args = {
+				modal: {},
+				...modalData,
+				router,
+			};
+			args.modal.key = this.#key;
+
+			this.#modalContext = modalManagerContext.open(this, this.#modalAlias, args);
+			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);
+			return this.#modalContext;
+		}
+		return;
+	}
+
 	public destroy(): void {
-		this.#host?.removeController(this);
-		this.#host = undefined as any;
+		super.destroy();
 		this.#contextConsumer.destroy();
-		this.#modalRegistration = undefined;
+		this.#modalRegistrationContext = undefined;
 		this.#uniquePaths = undefined as any;
 		this.#routeContext = undefined;
 	}

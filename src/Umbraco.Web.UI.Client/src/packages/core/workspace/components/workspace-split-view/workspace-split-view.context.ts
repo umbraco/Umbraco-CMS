@@ -2,11 +2,11 @@ import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../workspace-context/index.js'
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 
-export class UmbWorkspaceSplitViewContext extends UmbControllerBase {
+export class UmbWorkspaceSplitViewContext extends UmbContextBase<UmbWorkspaceSplitViewContext> {
 	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
 	public getWorkspaceContext() {
 		return this.#workspaceContext;
@@ -21,7 +21,7 @@ export class UmbWorkspaceSplitViewContext extends UmbControllerBase {
 	//variantId = this.#variantId.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host);
+		super(host, UMB_WORKSPACE_SPLIT_VIEW_CONTEXT);
 
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
@@ -31,8 +31,6 @@ export class UmbWorkspaceSplitViewContext extends UmbControllerBase {
 		this.observe(this.index, () => {
 			this._observeVariant();
 		});
-
-		this.provideContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, this);
 	}
 
 	private _observeVariant() {

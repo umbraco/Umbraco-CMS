@@ -53,17 +53,20 @@ export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of items';
 
-	public set selectedIds(ids: Array<string>) {
+	public set selection(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
 	}
-	public get selectedIds(): Array<string> {
+	public get selection(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
 
 	@property()
 	public set value(idsString: string) {
-		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = splitStringToArray(idsString);
+		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection. [NL]
+		this.selection = splitStringToArray(idsString);
+	}
+	public get value(): string {
+		return this.selection.join(',');
 	}
 
 	@state()
@@ -118,7 +121,7 @@ export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selectedIds.length >= this.max) return;
+		if (this.max === 1 && this.selection.length >= this.max) return;
 		return html`
 			<uui-button
 				id="add-button"
