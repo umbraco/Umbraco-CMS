@@ -19,7 +19,7 @@ There are two ways to use this:
 1. Checkout the `v14/dev` branch of [Umbraco-CMS](https://github.com/umbraco/Umbraco-cms/tree/v14/dev)
 2. Run `git submodule update --init` to initialize and pull down the backoffice repository
    1. If you are using a Git GUI client, you might need to do this manually
-3. Go to src/Umbraco.Web.UI.New or switch default startup project to "Umbraco.Web.UI.New"
+3. Go to src/Umbraco.Web.UI or switch default startup project to "Umbraco.Web.UI"
 4. Start the backend server: `dotnet run` or run the project from your IDE
 5. Access https://localhost:44339/umbraco and complete the installation of Umbraco
 6. You should see the log in screen after installation
@@ -28,7 +28,7 @@ There are two ways to use this:
 ### Running with Vite
 
 1. Perform steps 1 to 5 from before
-2. Open this file in an editor: `src/Umbraco.Web.UI.New/appsettings.Development.json`
+2. Open this file in an editor: `src/Umbraco.Web.UI/appsettings.Development.json`
 3. Add this to the Umbraco.CMS section to override the backoffice host:
 
 ```json
