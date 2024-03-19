@@ -70,7 +70,6 @@ class UmbLocalizationContext {
         }
 
         const valueEntry = dictionary.get(alias);
-        console.log('value for key', alias, 'is', valueEntry, 'with tokens', tokens, 'and fallback', fallbackValue);
 
         if (typeof valueEntry !== 'undefined') {
             return this.tokenReplace(valueEntry, tokens);
