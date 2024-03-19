@@ -1,4 +1,5 @@
-import icons from './icons/icons.json' with { type: 'json' };
+// @ts-ignore
+import icons from './icons/icons.json' assert { type: 'json' };
 import { UUIIconRegistry } from '@umbraco-cms/backoffice/external/uui';
 
 interface UmbIconDescriptor {
