@@ -44,8 +44,8 @@ public class InviteUriProvider : IInviteUriProvider
         uriBuilder.Path = BackOfficeLoginController.LoginPath;
         uriBuilder.Query = QueryString.Create(new KeyValuePair<string, string?>[]
         {
-            new ("flow", "reset-password"),
-            new ("invite-user", invitee.Key.ToString()),
+            new ("flow", "invite-user"),
+            new ("userId", invitee.Key.ToString()),
             new ("inviteCode", tokenAttempt.Result.ToUrlBase64()),
         }).ToUriComponent();
 
