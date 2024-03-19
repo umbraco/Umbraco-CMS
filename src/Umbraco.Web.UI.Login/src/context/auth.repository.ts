@@ -237,6 +237,7 @@ export class UmbAuthRepository {
       }
 
       const data = await response.json();
+      console.error('Error encountered with last request', response, data);
       return data.title ?? fallbackText ?? 'An unknown error occurred.';
     } catch {
       return fallbackText ?? 'An unknown error occurred.';
