@@ -11,7 +11,7 @@ export class UmbInputEyeDropperElement extends FormControlMixin(UmbLitElement) {
 
 	#onChange(e: UUIColorPickerChangeEvent) {
 		e.stopPropagation();
-		super.value = e.target.value;
+		this.value = e.target.value;
 		this.dispatchEvent(new CustomEvent('change'));
 	}
 
