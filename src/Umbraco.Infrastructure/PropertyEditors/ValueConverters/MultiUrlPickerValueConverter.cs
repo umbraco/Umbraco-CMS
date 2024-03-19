@@ -107,6 +107,8 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
             {
                 LinkType type = LinkType.External;
                 var url = dto.Url;
+                var name = dto.Name;
+                IPublishedContent? content = null;
 
                 if (dto.Udi is not null)
                 {
@@ -114,7 +116,7 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                         ? LinkType.Media
                         : LinkType.Content;
 
-                    IPublishedContent? content = type == LinkType.Media
+                    content = type == LinkType.Media
                         ? publishedSnapshot.Media?.GetById(preview, dto.Udi.Guid)
                         : publishedSnapshot.Content?.GetById(preview, dto.Udi.Guid);
 
@@ -123,16 +125,22 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase, IDeliver
                         continue;
                     }
 
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        name = content.Name;
+                    }
+
                     url = content.Url(_publishedUrlProvider);
                 }
 
                 links.Add(
                     new Link
                     {
-                        Name = dto.Name,
+                        Name = name,
                         Target = dto.Target,
                         Type = type,
                         Udi = dto.Udi,
+                        Content = content,
                         Url = url + dto.QueryString,
                     });
             }

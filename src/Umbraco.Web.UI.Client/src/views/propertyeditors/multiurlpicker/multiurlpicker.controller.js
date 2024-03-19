@@ -110,6 +110,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
 
         var target = link ? {
             name: link.name,
+            nodeName: link.nodeName,
             anchor: link.queryString,
             udi: link.udi,
             url: link.url,
@@ -122,6 +123,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
             ignoreUserStartNodes : ($scope.model.config && $scope.model.config.ignoreUserStartNodes) ? $scope.model.config.ignoreUserStartNodes : "0",
             hideAnchor: $scope.model.config && $scope.model.config.hideAnchor ? true : false,
             size: $scope.model.config.overlaySize,
+            useNodeName: true,
             submit: model => {
                 if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed
@@ -130,13 +132,15 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
                     }
                     if (link) {
                         link.udi = model.target.udi;
-                        link.name = model.target.name || model.target.url || model.target.anchor;
+                        link.name = model.target.name;
+                        link.nodeName = model.target.nodeName;
                         link.queryString = model.target.anchor;
                         link.target = model.target.target;
                         link.url = model.target.url;
                     } else {
                         link = {
-                            name: model.target.name || model.target.url || model.target.anchor,
+                            name: model.target.name,
+                            nodeName: model.target.nodeName,
                             queryString: model.target.anchor,
                             target: model.target.target,
                             udi: model.target.udi,
