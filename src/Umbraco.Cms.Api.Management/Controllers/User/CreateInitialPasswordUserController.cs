@@ -19,6 +19,7 @@ public class CreateInitialPasswordUserController : UserControllerBase
 
     public CreateInitialPasswordUserController(IUserService userService) => _userService = userService;
 
+    [AllowAnonymous]
     [HttpPost("invite/create-password")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
