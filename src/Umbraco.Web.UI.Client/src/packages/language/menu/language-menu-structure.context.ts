@@ -34,11 +34,13 @@ export class UmbLanguageNavigationStructureWorkspaceContext extends UmbContextBa
 				unique: null,
 				entityType: 'language-root',
 				name: 'Languages',
+				isFolder: false,
 			},
 			{
 				unique: data.unique,
 				entityType: data.entityType,
 				name: data.name,
+				isFolder: false,
 			},
 		];
 

@@ -5,6 +5,7 @@ export interface UmbStructureItemModelBase {
 
 export interface UmbStructureItemModel extends UmbStructureItemModelBase {
 	name: string;
+	isFolder: boolean;
 }
 
 export interface UmbVariantStructureItemModel extends UmbStructureItemModelBase {

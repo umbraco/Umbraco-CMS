@@ -47,6 +47,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 					unique: structureItem.unique,
 					entityType: structureItem.entityType,
 					name: structureItem.name,
+					isFolder: structureItem.isFolder,
 				};
 			});
 

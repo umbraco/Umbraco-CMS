@@ -11,7 +11,8 @@ interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 }
 
 export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends UmbContextBase<unknown> {
-	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
+	// TODO: add correct interface
+	#workspaceContext?: any;
 	#args: UmbMenuVariantTreeStructureWorkspaceContextBaseArgs;
 
 	#structure = new UmbArrayState<UmbVariantStructureItemModel>([], (x) => x.unique);
