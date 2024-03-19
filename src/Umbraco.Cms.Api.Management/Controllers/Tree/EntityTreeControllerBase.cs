@@ -70,15 +70,13 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         }
 
         var ancestorIds = entity.AncestorIds();
-        IEntitySlim[] ancestors = ancestorIds.Any()
-            ? EntityService
-                .GetAll(ItemObjectType, ancestorIds)
-                .Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>())
-                .OrderBy(item => item.Level)
-                .ToArray()
-            : Array.Empty<IEntitySlim>();
 
-        return ancestors;
+        IEnumerable<IEntitySlim> ancestors = ancestorIds.Any()
+            ? EntityService.GetAll(ItemObjectType, ancestorIds)
+            : Array.Empty<IEntitySlim>();
+        ancestors = ancestors.Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>());
+
+        return ancestors.OrderBy(item => item.Level).ToArray();
     }
 
     protected virtual IEntitySlim[] GetPagedRootEntities(int skip, int take, out long totalItems)

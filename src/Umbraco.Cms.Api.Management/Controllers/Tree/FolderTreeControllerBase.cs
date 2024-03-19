@@ -62,16 +62,14 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
         var ancestorIds = entity.AncestorIds();
         // annoyingly we can't use EntityService.GetAll() with container object types, so we have to get them one by one
         IEntitySlim[] containers = ancestorIds.Select(id => EntityService.Get(id, FolderObjectType)).WhereNotNull().ToArray();
-        IEntitySlim[] ancestors = ancestorIds.Any()
+        IEnumerable<IEntitySlim> ancestors = ancestorIds.Any()
             ? EntityService
                 .GetAll(ItemObjectType, ancestorIds)
                 .Union(containers)
-                .Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>())
-                .OrderBy(item => item.Level)
-                .ToArray()
             : Array.Empty<IEntitySlim>();
+        ancestors = ancestors.Union(includeSelf ? new[] { entity } : Array.Empty<IEntitySlim>());
 
-        return ancestors;
+        return ancestors.OrderBy(item => item.Level).ToArray();
     }
 
     private IEntitySlim[] GetEntities(Guid? parentKey, int skip, int take, out long totalItems)
