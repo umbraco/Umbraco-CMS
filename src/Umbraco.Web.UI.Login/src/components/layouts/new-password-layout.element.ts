@@ -24,10 +24,10 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
   error: string = '';
 
   @property()
-  userId: any;
+  userId: string = '';
 
-  @property()
-  userName?: string;
+  @property({ type: Boolean, attribute: 'is-invite' })
+  isInvite = false;
 
   constructor() {
     super();
@@ -124,9 +124,9 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
   }
 
   renderHeader() {
-    if (this.userName) {
+    if (this.isInvite) {
       return html`
-        <h1>Hi, ${this.userName}</h1>
+        <h1>Hi!</h1>
         <span>
           <umb-localize key="user_userinviteWelcomeMessage">
             Welcome to Umbraco! Just need to get your password setup and then you're good to go
