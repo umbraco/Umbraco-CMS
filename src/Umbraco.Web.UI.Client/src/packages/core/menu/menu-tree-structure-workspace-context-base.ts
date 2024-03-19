@@ -1,5 +1,5 @@
 import type { UmbStructureItemModel } from './types.js';
-import type { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeRepository, UmbUniqueTreeItemModel } from '@umbraco-cms/backoffice/tree';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -35,7 +35,10 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
 		if (!unique) throw new Error('Unique is not available');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.#args.treeRepositoryAlias);
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbUniqueTreeItemModel>>(
+			this,
+			this.#args.treeRepositoryAlias,
+		);
 		const { data } = await treeRepository.requestTreeItemAncestors({ descendantUnique: unique });
 
 		if (data) {
