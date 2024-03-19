@@ -5,6 +5,8 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
+import '../../components/tags-input/tags-input.element.js';
+
 /**
  * @element umb-property-editor-ui-tags
  */
@@ -24,16 +26,20 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 	private _group?: string;
 
 	@state()
+	private _storageType?: string;
+
+	@state()
 	private _culture?: string | null;
 	//TODO: Use type from VariantID
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._group = config?.getValueByAlias('group');
-		this.value = config?.getValueByAlias('items') ?? [];
+		this._storageType = config?.getValueByAlias('storageType');
 	}
 
 	constructor() {
 		super();
+
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.variantId, (id) => {
 				if (id && id.culture !== undefined) {
@@ -43,7 +49,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 		});
 	}
 
-	private _onChange(event: CustomEvent) {
+	#onChange(event: CustomEvent) {
 		this.value = ((event.target as UmbTagsInputElement).value as string).split(',');
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
@@ -53,7 +59,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 			group="${ifDefined(this._group)}"
 			.culture=${this._culture}
 			.items=${this.value}
-			@change=${this._onChange}></umb-tags-input>`;
+			@change=${this.#onChange}></umb-tags-input>`;
 	}
 }
 

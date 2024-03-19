@@ -1,55 +1,41 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
  * @element umb-property-editor-ui-dropdown
  */
 @customElement('umb-property-editor-ui-dropdown')
 export class UmbPropertyEditorUIDropdownElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	#value = '';
-	@property({ type: String })
-	public set value(value: string | undefined) {
-		this.#value = value?.trim() || '';
-	}
-	public get value(): string {
-		return this.#value;
-	}
+	#selection: Array<string> = [];
 
-	@state()
-	_multiple?: boolean;
+	@property({ type: Array })
+	public set value(value: Array<string> | string | undefined) {
+		this.#selection = Array.isArray(value) ? value : value ? [value] : [];
+	}
+	public get value(): Array<string> | undefined {
+		return this.#selection;
+	}
 
 	@state()
 	private _list: Array<Option> = [];
 
+	@state()
+	private _multiple?: boolean;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (!config) return;
+		const listData: string[] | undefined = config?.getValueByAlias('items');
+		this._list = listData?.map((x) => ({ value: x, name: x, selected: this.#selection.includes(x) })) ?? [];
 		this._multiple = config?.getValueByAlias('multiple');
-
-		const listData: Record<number, { value: string; sortOrder: number }> | undefined = config.getValueByAlias('items');
-		if (!listData) return;
-
-		// formatting the items in the dictionary into an array
-		const sortedItems = [];
-		const values = Object.values<{ value: string; sortOrder: number }>(listData);
-		const keys = Object.keys(listData);
-		for (let i = 0; i < values.length; i++) {
-			sortedItems.push({ key: keys[i], sortOrder: values[i].sortOrder, value: values[i].value });
-		}
-
-		// ensure the items are sorted by the provided sort order
-		sortedItems.sort((a, b) => {
-			return a.sortOrder > b.sortOrder ? 1 : b.sortOrder > a.sortOrder ? -1 : 0;
-		});
-
-		this._list = sortedItems.map((x) => ({ value: x.value, name: x.value, selected: x.value === this.value }));
 	}
 
 	#onChange(event: UUISelectEvent) {
-		this.value = event.target.value as string;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		const value = event.target.value as string;
+		this.value = value ? [value] : [];
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {

@@ -1,4 +1,3 @@
-import { manifest as storageType } from './config/storage-type/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
@@ -14,6 +13,4 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-const config: Array<ManifestPropertyEditorUi> = [storageType];
-
-export const manifests = [manifest, ...config];
+export const manifests = [manifest];
