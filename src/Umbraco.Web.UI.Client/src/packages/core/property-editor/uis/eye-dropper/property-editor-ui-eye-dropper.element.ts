@@ -22,9 +22,30 @@ export class UmbPropertyEditorUIEyeDropperElement extends UmbLitElement implemen
 	private _swatches: string[] = [];
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		if (config) {
-			this._opacity = config.getValueByAlias('showAlpha') ?? this.#defaultOpacity;
-			this._swatches = config.getValueByAlias('palette') ?? [];
+		this._opacity = config?.getValueByAlias('showAlpha') ?? this.#defaultOpacity;
+
+		const showPalette = config?.getValueByAlias('showPalette') ?? false;
+
+		if (showPalette) {
+			// TODO: This is a temporary solution until we have a proper way to get the palette from the config. [LK]
+			this._swatches = [
+				'#d0021b',
+				'#f5a623',
+				'#f8e71c',
+				'#8b572a',
+				'#7ed321',
+				'#417505',
+				'#bd10e0',
+				'#9013fe',
+				'#4a90e2',
+				'#50e3c2',
+				'#b8e986',
+				'#000',
+				'#444',
+				'#888',
+				'#ccc',
+				'#fff',
+			];
 		}
 	}
 
