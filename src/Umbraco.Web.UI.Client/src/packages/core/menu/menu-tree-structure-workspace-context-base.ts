@@ -24,7 +24,8 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.#workspaceContext.observe(this.#workspaceContext.unique, (value) => {
 				if (!value) return;
 				this.#requestStructure();
