@@ -194,9 +194,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
         finally
         {
-            if (_locker.IsReadLockHeld)
+            if (_locker.IsWriteLockHeld)
             {
-                _locker.ExitReadLock();
+                _locker.ExitWriteLock();
             }
         }
     }
