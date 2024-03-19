@@ -1,33 +1,28 @@
 ﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Relation;
 
 public class RelationResponseModel
 {
     /// <summary>
-    ///     Gets or sets the Parent Id of the Relation (Source).
+    ///     Gets or sets the Type of relation
     /// </summary>
-    [ReadOnly(true)]
-    public Guid ParentId { get; set; }
+    public ReferenceByIdModel RelationType { get; set; }
 
     /// <summary>
-    ///     Gets or sets the Parent Name of the relation (Source).
+    ///     Gets or sets the Parent of the Relation (Source).
     /// </summary>
     [ReadOnly(true)]
-    public string? ParentName { get; set; }
+    [Required]
+    public RelationReferenceModel Parent { get; set; }
 
     /// <summary>
-    ///     Gets or sets the Child Id of the Relation (Destination).
+    ///     Gets or sets the Child of the Relation (Destination).
     /// </summary>
     [ReadOnly(true)]
-    public Guid ChildId { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the Child Name of the relation (Destination).
-    /// </summary>
-    [ReadOnly(true)]
-    public string? ChildName { get; set; }
+    [Required]
+    public RelationReferenceModel Child { get; set; }
 
     /// <summary>
     ///     Gets or sets the date when the Relation was created.
@@ -40,4 +35,11 @@ public class RelationResponseModel
     /// </summary>
     [ReadOnly(true)]
     public string? Comment { get; set; }
+
+    public RelationResponseModel(ReferenceByIdModel relationType, RelationReferenceModel parent, RelationReferenceModel child)
+    {
+        RelationType = relationType;
+        Parent = parent;
+        Child = child;
+    }
 }
