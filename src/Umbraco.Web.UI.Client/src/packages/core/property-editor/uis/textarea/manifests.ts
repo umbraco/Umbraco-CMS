@@ -15,7 +15,7 @@ export const manifest: ManifestPropertyEditorUi = {
 				{
 					alias: 'rows',
 					label: 'Number of rows',
-					description: 'If empty the textarea is set to autoheight',
+					description: 'If empty or zero, the textarea is set to auto-height',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Number',
 				},
 				{
