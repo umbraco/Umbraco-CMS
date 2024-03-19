@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -46,6 +47,28 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
         {
             ReservedFieldNames = GetMemberReservedFieldNames(),
         };
+
+    public MediaConfigurationResponseModel CreateMediaConfigurationResponseModel()
+    {
+        var responseModel = new MediaConfigurationResponseModel
+        {
+            DisableDeleteWhenReferenced = _contentSettings.DisableDeleteWhenReferenced,
+            DisableUnpublishWhenReferenced = _contentSettings.DisableUnpublishWhenReferenced,
+            SanitizeTinyMce = _globalSettings.SanitizeTinyMce,
+            ReservedFieldNames = GetMediaReservedFieldNames(),
+        };
+        return responseModel;
+    }
+
+    private ISet<string> GetMediaReservedFieldNames()
+    {
+        var reservedProperties = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name).ToHashSet();
+        var reservedMethods = typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name).ToHashSet();
+        reservedProperties.UnionWith(reservedMethods);
+        reservedProperties.UnionWith(_memberPropertySettings.ReservedFieldNames);
+
+        return reservedProperties;
+    }
 
     private ISet<string> GetMemberReservedFieldNames()
     {
