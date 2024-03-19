@@ -26,9 +26,21 @@ export const manifests = [
 	},
 	{
 		type: 'workspaceContext',
-		name: 'Document Structure Context',
-		alias: 'Umb.Context.Document.Structure',
+		name: 'Document Menu Structure Workspace Context',
+		alias: 'Umb.Context.Document.Menu.Structure',
 		api: () => import('./document-menu-structure.context.js'),
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: 'Umb.Workspace.Document',
+			},
+		],
+	},
+	{
+		type: 'workspaceFooterApp',
+		kind: 'variantBreadcrumb',
+		alias: 'Umb.WorkspaceFooterApp.Document.Breadcrumb',
+		name: 'Document Breadcrumb Workspace Footer App',
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',

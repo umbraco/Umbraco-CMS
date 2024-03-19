@@ -2,7 +2,6 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentSaveAndScheduleWorkspaceAction } from './actions/save-and-schedule.action.js';
 import { UmbDocumentUnpublishWorkspaceAction } from './actions/unpublish.action.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
-import { manifests as breadcrumbManifests } from './breadcrumb/manifests.js';
 import { UmbDocumentPublishWithDescendantsWorkspaceAction } from './actions/publish-with-descendants.action.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
@@ -186,10 +185,4 @@ const workspaceActionMenuItems: Array<ManifestWorkspaceActionMenuItem> = [
 	},
 ];
 
-export const manifests = [
-	workspace,
-	...workspaceViews,
-	...workspaceActions,
-	...workspaceActionMenuItems,
-	...breadcrumbManifests,
-];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...workspaceActionMenuItems];

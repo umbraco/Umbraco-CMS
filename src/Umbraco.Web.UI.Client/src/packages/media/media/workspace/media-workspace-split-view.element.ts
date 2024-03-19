@@ -49,9 +49,7 @@ export class UmbMediaWorkspaceSplitViewElement extends UmbLitElement {
 						)}
 					</div>
 
-					<umb-workspace-footer alias="Umb.Workspace.Media">
-						<div id="breadcrumbs">Breadcrumbs</div>
-					</umb-workspace-footer>`
+					<umb-workspace-footer alias="Umb.Workspace.Media"></umb-workspace-footer>`
 			: nothing;
 	}
 
