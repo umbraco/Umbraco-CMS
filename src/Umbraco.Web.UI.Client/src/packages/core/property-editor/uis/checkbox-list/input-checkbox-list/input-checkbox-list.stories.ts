@@ -14,13 +14,13 @@ export const Overview: Story = {
 	args: {
 		list: [
 			{
-				key: 'isAwesome',
-				value: 'Umbraco is awesome?',
+				label: 'Umbraco is awesome?',
+				value: 'isAwesome',
 				checked: true,
 			},
 			{
-				key: 'attendingCodeGarden',
-				value: 'Attending CodeGarden?',
+				label: 'Attending CodeGarden?',
+				value: 'attendingCodeGarden',
 				checked: false,
 			},
 		],
