@@ -1,5 +1,5 @@
 import { manifests as repositoryManifests } from './repository/manifests.js';
-import { manifests as navigationManifests } from './navigation/manifests.js';
+import { manifests as menuManifests } from './menu/manifests.js';
 import { manifests as entityActions } from './entity-actions/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as appLanguageSelect } from './app-language-select/manifests.js';
@@ -10,7 +10,7 @@ import { manifests as globalContextManifests } from './global-contexts/manifests
 export const manifests = [
 	...repositoryManifests,
 	...entityActions,
-	...navigationManifests,
+	...menuManifests,
 	...workspaceManifests,
 	...appLanguageSelect,
 	...modalManifests,

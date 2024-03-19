@@ -1,39 +1,28 @@
-import { UMB_LANGUAGE_NAVIGATION_STRUCTURE_WORKSPACE_CONTEXT } from './language-navigation-structure.context-token.js';
+import type { UmbLanguageDetailModel } from '../types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-
-interface UmbStructureItemModel {
-	unique: string | null;
-	entityType: string;
-	name: string;
-}
+import type { UmbStructureItemModel } from '@umbraco-cms/backoffice/menu';
 
 export class UmbLanguageNavigationStructureWorkspaceContext extends UmbContextBase<UmbLanguageNavigationStructureWorkspaceContext> {
-	#workspaceContext?: any;
+	#workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	#structure = new UmbArrayState<UmbStructureItemModel>([], (x) => x.unique);
 	public readonly structure = this.#structure.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_LANGUAGE_NAVIGATION_STRUCTURE_WORKSPACE_CONTEXT);
+		super(host, 'UmbMenuStructureWorkspaceContext');
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.#requestAncestors();
+			this.#requestStructure();
 		});
 	}
 
-	async #requestAncestors() {
-		/* TODO: implement breadcrumb for new items
-		 We currently miss the parent item name for new items. We need to align with backend
-		 how to solve it */
-		const isNew = this.#workspaceContext?.getIsNew();
-		if (isNew === true) return;
-
-		const data = await this.observe(this.#workspaceContext?.data, () => {})?.asPromise();
+	async #requestStructure() {
+		const data = (await this.observe(this.#workspaceContext?.data, () => {})?.asPromise()) as UmbLanguageDetailModel;
 		if (!data) throw new Error('Data is not available');
 
 		const items = [
