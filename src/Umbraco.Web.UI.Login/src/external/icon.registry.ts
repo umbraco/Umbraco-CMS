@@ -14,7 +14,7 @@ class UmbIconRegistry extends UUIIconRegistry {
     if (!iconManifest)
       return false;
     const icon = this.provideIcon(iconName);
-    const iconPath = iconManifest.path;
+    const iconPath = `/umbraco/backoffice/packages/core/icon-registry/${iconManifest.path}`;
     import(/* @vite-ignore */ iconPath)
       .then((iconModule) => {
         icon.svg = iconModule.default;
