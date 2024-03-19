@@ -22896,8 +22896,8 @@
           }
         },
         "responses": {
-          "204": {
-            "description": "No Content",
+          "200": {
+            "description": "Success",
             "headers": {
               "Umb-Notifications": {
                 "description": "The list of notifications produced during the request.",
@@ -22907,6 +22907,35 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VerifyResetPasswordResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VerifyResetPasswordResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VerifyResetPasswordResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -30981,6 +31010,35 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VerifyInviteUserResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VerifyInviteUserResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/VerifyInviteUserResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -41213,6 +41271,38 @@
           "token": {
             "minLength": 1,
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyInviteUserResponseModel": {
+        "required": [
+          "passwordConfiguration"
+        ],
+        "type": "object",
+        "properties": {
+          "passwordConfiguration": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyResetPasswordResponseModel": {
+        "required": [
+          "passwordConfiguration"
+        ],
+        "type": "object",
+        "properties": {
+          "passwordConfiguration": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
