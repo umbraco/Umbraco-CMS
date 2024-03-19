@@ -38,7 +38,7 @@ export class UmbDictionaryMockDB extends UmbEntityMockDbBase<UmbMockDictionaryMo
 	}
 }
 
-const treeItemMapper = (model: UmbMockDictionaryModel): Omit<NamedEntityTreeItemResponseModel, 'type'> => {
+const treeItemMapper = (model: UmbMockDictionaryModel): NamedEntityTreeItemResponseModel => {
 	return {
 		name: model.name,
 		id: model.id,

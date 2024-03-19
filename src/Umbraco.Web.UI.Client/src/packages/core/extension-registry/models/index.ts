@@ -44,7 +44,10 @@ import type { ManifestWorkspaceAction, ManifestWorkspaceActionDefaultKind } from
 import type { ManifestWorkspaceActionMenuItem } from './workspace-action-menu-item.model.js';
 import type { ManifestWorkspaceContext } from './workspace-context.model.js';
 import type { ManifestWorkspaceFooterApp } from './workspace-footer-app.model.js';
-import type { ManifestWorkspaceView } from './workspace-view.model.js';
+import type {
+	ManifestWorkspaceView,
+	ManifestWorkspaceViewContentTypeDesignEditorKind,
+} from './workspace-view.model.js';
 import type { ManifestEntityUserPermission } from './entity-user-permission.model.js';
 import type { ManifestGranularUserPermission } from './user-granular-permission.model.js';
 import type { ManifestCollectionAction } from './collection-action.model.js';
@@ -107,9 +110,11 @@ export type ManifestEntityActions =
 	| ManifestEntityActionDeleteFolderKind
 	| ManifestEntityActionTrashKind;
 
+export type ManifestPropertyActions = ManifestPropertyAction | ManifestPropertyActionDefaultKind;
+
 export type ManifestWorkspaceActions = ManifestWorkspaceAction | ManifestWorkspaceActionDefaultKind;
 
-export type ManifestPropertyActions = ManifestPropertyAction | ManifestPropertyActionDefaultKind;
+export type ManifestWorkspaceViews = ManifestWorkspaceView | ManifestWorkspaceViewContentTypeDesignEditorKind;
 
 export type ManifestTypes =
 	| ManifestBundle<ManifestTypes>
@@ -157,7 +162,7 @@ export type ManifestTypes =
 	| ManifestWorkspaceActionMenuItem
 	| ManifestWorkspaceContext
 	| ManifestWorkspaceFooterApp
-	| ManifestWorkspaceView
+	| ManifestWorkspaceViews
 	| ManifestEntityUserPermission
 	| ManifestGranularUserPermission
 	| ManifestBase;

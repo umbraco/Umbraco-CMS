@@ -11,6 +11,12 @@ const section: ManifestSection = {
 		label: 'Packages',
 		pathname: 'packages',
 	},
+	conditions: [
+		{
+			alias: 'Umb.Condition.SectionUserPermission',
+			match: sectionAlias,
+		},
+	],
 };
 
 const sectionsViews: Array<ManifestSectionView> = [

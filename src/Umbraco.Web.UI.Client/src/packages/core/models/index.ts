@@ -23,3 +23,8 @@ export interface NumberRangeValueType {
 export interface UmbReferenceByUnique {
 	unique: string;
 }
+
+export interface UmbReferenceByUniqueAndType {
+	type: string;
+	unique: string;
+}

@@ -26,7 +26,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	@state()
 	private _currentAlias = 'text';
 
-	#changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
+	#changeIcon(e: { target: HTMLInputElement; type: string; key: unknown }) {
 		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
 			this.modalContext?.updateValue({ icon: e.target.id });
 		}
@@ -34,7 +34,9 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	#filterIcons(e: { target: HTMLInputElement }) {
 		if (e.target.value) {
-			this._iconListFiltered = this._iconList.filter((icon) => icon.name.includes(e.target.value));
+			this._iconListFiltered = this._iconList.filter((icon) =>
+				icon.name.toLowerCase().includes(e.target.value.toLowerCase()),
+			);
 		} else {
 			this._iconListFiltered = this._iconList;
 		}
