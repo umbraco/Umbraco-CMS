@@ -5,6 +5,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -615,6 +616,7 @@ public class VariationTests
             propertyEditorCollection,
             dataTypeService,
             localizedTextService,
-            new ValueEditorCache());
+            new ValueEditorCache(),
+            Mock.Of<ICultureDictionary>());
     }
 }

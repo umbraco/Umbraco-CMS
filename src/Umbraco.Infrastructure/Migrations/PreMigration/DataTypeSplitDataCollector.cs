@@ -92,7 +92,8 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
 
         var fromCodeEditorsData = _dataEditors
             .Where(de =>
-                de.GetType().Assembly.GetName().FullName
+                de.Type == EditorType.PropertyValue
+                && de.GetType().Assembly.GetName().FullName
                     .StartsWith("umbraco.core", StringComparison.InvariantCultureIgnoreCase) is false
                 && de.GetType().Assembly.GetName().FullName
                     .StartsWith("umbraco.infrastructure", StringComparison.InvariantCultureIgnoreCase) is false)
