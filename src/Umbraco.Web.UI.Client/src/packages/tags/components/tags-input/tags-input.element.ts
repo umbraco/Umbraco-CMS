@@ -185,22 +185,22 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 			<div id="wrapper">
 				${this.#enteredTags()}
 				<span id="main-tag-wrapper">
-				<uui-tag id="input-width-tracker" aria-hidden="true" style="visibility:hidden;opacity:0;position:absolute;">
-					${this._currentInput}
-				</uui-tag>
-				<uui-tag look="outline" id="main-tag" @click="${this.focus}" slot="trigger">
-					<input
-						id="tag-input"
-						aria-label="tag input"
-						placeholder="Enter tag"
-						.value="${this._currentInput ?? undefined}"
-						@keydown="${this.#onKeydown}"
-						@input="${this.#onInput}"
-						@blur="${this.#onBlur}" />
-					<uui-icon id="icon-add" name="icon-add"></uui-icon>
-					${this.#renderTagOptions()}
-				</uui-tag>
-				<span>
+					<uui-tag id="input-width-tracker" aria-hidden="true" style="visibility:hidden;opacity:0;position:absolute;">
+						${this._currentInput}
+					</uui-tag>
+					<uui-tag look="outline" id="main-tag" @click="${this.focus}" slot="trigger">
+						<input
+							id="tag-input"
+							aria-label="tag input"
+							placeholder="Enter tag"
+							.value="${this._currentInput ?? undefined}"
+							@keydown="${this.#onKeydown}"
+							@input="${this.#onInput}"
+							@blur="${this.#onBlur}" />
+						<uui-icon id="icon-add" name="icon-add"></uui-icon>
+						${this.#renderTagOptions()}
+					</uui-tag>
+				</span>
 			</div>
 		`;
 	}
@@ -230,10 +230,10 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 								class="options"
 								id="tag-${tag.id}"
 								type="radio"
-								name="${tag.group}"
+								name="${tag.group ?? ''}"
 								@click="${() => this.#optionClick(index)}"
 								@keydown="${(e: KeyboardEvent) => this.#optionKeydown(e, index)}"
-								value="${tag.text}" />
+								value="${tag.text ?? ''}" />
 							<label for="tag-${tag.id}"> ${tag.text} </label>`;
 					},
 				)}
