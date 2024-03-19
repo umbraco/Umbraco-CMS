@@ -57,6 +57,8 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 	#observeName() {
 		this.observe(
 			this.#workspaceContext?.name,
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			(value) => (this._name = value || ''),
 			'breadcrumbWorkspaceNameObserver',
 		);
