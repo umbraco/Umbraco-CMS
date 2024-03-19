@@ -12,10 +12,6 @@ import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu'
 
 @customElement('umb-variant-workspace-breadcrumb')
 export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
-	#workspaceContext?: UmbVariantableWorkspaceContextInterface<UmbVariantModel>;
-	#appLanguageContext?: UmbAppLanguageContext;
-	#structureContext?: any;
-
 	@state()
 	_name: string = '';
 
@@ -29,6 +25,9 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 	_appDefaultCulture?: string;
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
+	#workspaceContext?: UmbVariantableWorkspaceContextInterface<UmbVariantModel>;
+	#appLanguageContext?: UmbAppLanguageContext;
+	#structureContext?: any;
 
 	constructor() {
 		super();
@@ -38,27 +37,33 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 			this.#observeDefaultCulture();
 		});
 
+		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
+			this.#sectionContext = instance;
+		});
+
 		this.consumeContext(UMB_VARIANT_WORKSPACE_CONTEXT, (instance) => {
+			if (!instance) return;
 			this.#workspaceContext = instance;
 			this.#observeWorkspaceActiveVariant();
+			this.#observeStructure();
 		});
 
 		// TODO: set up context token
 		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
 			if (!instance) return;
 			this.#structureContext = instance;
-			this.#observeAncestors();
-		});
-
-		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
-			this.#sectionContext = instance;
+			this.#observeStructure();
 		});
 	}
 
-	#observeAncestors() {
+	#observeStructure() {
+		if (!this.#structureContext || !this.#workspaceContext) return;
+		const isNew = this.#workspaceContext.getIsNew();
+
 		this.observe(this.#structureContext.structure, (value) => {
 			// TODO: get the type from the context
-			this._structure = value as Array<UmbVariantStructureItemModel>;
+			const structure = value as Array<UmbVariantStructureItemModel>;
+			this._structure = isNew ? structure : structure.slice(0, -1);
 		});
 	}
 
@@ -115,6 +120,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 							>${this.#getItemVariantName(structureItem)}</uui-breadcrumb-item
 						>`,
 				)}
+				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
 			</uui-breadcrumbs>
 		`;
 	}

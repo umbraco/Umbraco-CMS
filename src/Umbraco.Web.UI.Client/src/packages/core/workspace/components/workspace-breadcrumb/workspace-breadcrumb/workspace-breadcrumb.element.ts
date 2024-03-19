@@ -7,26 +7,19 @@ import type { UmbMenuStructureWorkspaceContext, UmbStructureItemModel } from '@u
 
 @customElement('umb-workspace-breadcrumb')
 export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
-	// TODO: figure out the correct context type
-	#workspaceContext?: any;
-
 	@state()
-	_isNew = false;
+	_name: string = '';
 
 	@state()
 	_structure: UmbStructureItemModel[] = [];
 
+	// TODO: figure out the correct context type
+	#workspaceContext?: any;
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
-	#currentUnique?: string;
+	#structureContext?: UmbMenuStructureWorkspaceContext;
 
 	constructor() {
 		super();
-		// TODO: set up context token
-		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
-			// TODO: get the correct interface from the context token
-			const context = instance as UmbMenuStructureWorkspaceContext;
-			this.observe(context.structure, (value) => (this._structure = value), 'menuStructureObserver');
-		});
 
 		this.consumeContext(UMB_SECTION_CONTEXT, (instance) => {
 			this.#sectionContext = instance;
@@ -34,21 +27,37 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as any;
-			this.#currentUnique = this.#workspaceContext.getUnique();
-			this.#syncCurrentName();
+			this.#observeStructure();
+			this.#observeName();
+		});
+
+		// TODO: set up context token
+		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
+			// TODO: get the correct interface from the context token
+			this.#structureContext = instance as UmbMenuStructureWorkspaceContext;
+			this.#observeStructure();
 		});
 	}
 
-	#syncCurrentName() {
+	#observeStructure() {
+		if (!this.#structureContext || !this.#workspaceContext) return;
+		const isNew = this.#workspaceContext.getIsNew();
+
 		this.observe(
-			this.#workspaceContext.name,
+			this.#structureContext.structure,
 			(value) => {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				this._structure = this._structure.map((structureItem) =>
-					structureItem.unique === this.#currentUnique ? { ...structureItem, name: value } : structureItem,
-				);
+				// TODO: get the type from the context
+				const structure = value as Array<UmbStructureItemModel>;
+				this._structure = isNew ? structure : structure.slice(0, -1);
 			},
+			'menuStructureObserver',
+		);
+	}
+
+	#observeName() {
+		this.observe(
+			this.#workspaceContext?.name,
+			(value) => (this._name = value || ''),
 			'breadcrumbWorkspaceNameObserver',
 		);
 	}
@@ -67,6 +76,7 @@ export class UmbWorkspaceBreadcrumbElement extends UmbLitElement {
 							>${structureItem.name}</uui-breadcrumb-item
 						>`,
 				)}
+				<uui-breadcrumb-item>${this._name}</uui-breadcrumb-item>
 			</uui-breadcrumbs>
 		`;
 	}
