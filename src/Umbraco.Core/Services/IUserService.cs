@@ -61,7 +61,7 @@ public interface IUserService : IMembershipUserService
 
     Task<Attempt<UserOperationStatus>> VerifyInviteAsync(Guid userKey, string token);
 
-    Task<Attempt<PasswordChangedModel, UserOperationStatus>> CreateInitialPasswordAsync(Guid performingUserKey, Guid userKey, string token, string password);
+    Task<Attempt<PasswordChangedModel, UserOperationStatus>> CreateInitialPasswordAsync(Guid userKey, string token, string password);
 
     Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model);
 
