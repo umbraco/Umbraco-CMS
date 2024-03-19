@@ -12,9 +12,9 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 
 	#selection: Array<string> = [];
 	@property({ type: Array })
-	public set selection(keys: Array<string>) {
-		this.#selection = keys;
-		super.value = keys.join(',');
+	public set selection(values: Array<string>) {
+		this.#selection = values;
+		super.value = values.join(',');
 	}
 	public get selection(): Array<string> {
 		return this.#selection;
@@ -32,16 +32,16 @@ export class UmbInputCheckboxListElement extends FormControlMixin(UmbLitElement)
 	#onChange(e: UUIBooleanInputEvent) {
 		e.stopPropagation();
 		if (e.target.checked) this.selection = [...this.selection, e.target.value];
-		else this.#removeFromSelection(this.selection.findIndex((key) => e.target.value === key));
+		else this.#removeFromSelection(this.selection.findIndex((value) => e.target.value === value));
 
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#removeFromSelection(index: number) {
 		if (index == -1) return;
-		const keys = [...this.selection];
-		keys.splice(index, 1);
-		this.selection = keys;
+		const values = [...this.selection];
+		values.splice(index, 1);
+		this.selection = values;
 	}
 
 	render() {
