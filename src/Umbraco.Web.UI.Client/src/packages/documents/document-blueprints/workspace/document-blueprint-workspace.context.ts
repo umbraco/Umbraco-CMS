@@ -8,10 +8,9 @@ import type {
 	UmbDocumentBlueprintVariantModel,
 	UmbDocumentBlueprintVariantOptionModel,
 } from '../types.js';
-//import { umbPickDocumentVariantModal, type UmbDocumentBlueprintVariantPickerModalType } from '../modals/index.js';
+/* import { umbPickDocumentVariantModal, type UmbDocumentBlueprintVariantPickerModalType } from '../modals/index.js';*/
 import { UMB_DOCUMENT_BLUEPRINT_ROOT_WORKSPACE_ALIAS } from './manifests.js';
 import { UMB_INVARIANT_CULTURE, UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
@@ -26,10 +25,11 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from '@umbraco-cms/backoffice/language';
-import { type Observable, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/event';
+import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 type EntityType = UmbDocumentBlueprintDetailModel;
 export class UmbDocumentBlueprintWorkspaceContext

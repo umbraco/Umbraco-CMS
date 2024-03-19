@@ -3,6 +3,7 @@ import {
 	UMB_DOCUMENT_BLUEPRINT_DETAIL_REPOSITORY_ALIAS,
 	UMB_DOCUMENT_BLUEPRINT_ITEM_REPOSITORY_ALIAS,
 } from '../index.js';
+import { manifests as createManifests } from './create/manifests.js';
 import { UmbCreateEntityAction } from './create/create.action.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -44,4 +45,4 @@ const entityActions: Array<ManifestTypes> = [
 	},
 ];
 
-export const manifests = [...entityActions];
+export const manifests = [...entityActions, ...createManifests];
