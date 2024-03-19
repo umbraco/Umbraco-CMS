@@ -8,9 +8,6 @@ public class RelationTypeResponseModel : RelationTypeBaseModel
 
     public string? Alias { get; set; }
 
-    [Required]
-    public string Path { get; set; } = string.Empty;
-
     public bool IsDeletable { get; set; }
 
     /// <summary>

@@ -27,7 +27,6 @@ public class RelationTypeViewModelsMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Alias = source.Alias;
         target.ParentObjectType = source.ParentObjectType;
-        target.Path = "-1," + source.Id;
 
         target.IsDeletable = source.IsDeletableRelationType();
 
