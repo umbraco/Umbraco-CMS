@@ -1,4 +1,3 @@
-import { UMB_DOCUMENT_NAVIGATION_STRUCTURE_CONTEXT } from '../../../../../documents/documents/navigation/structure/document-navigation-structure.context-token.js';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -53,7 +52,7 @@ export class UmbVariantWorkspaceBreadcrumbElement extends UmbLitElement {
 			this.#observeWorkspaceActiveVariant();
 		});
 
-		this.consumeContext(UMB_DOCUMENT_NAVIGATION_STRUCTURE_CONTEXT, (instance) => {
+		this.consumeContext('UmbMenuStructureWorkspaceContext', (instance) => {
 			if (!instance) return;
 			this.#structureContext = instance;
 			this.#observeAncestors();
