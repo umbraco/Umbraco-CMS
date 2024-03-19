@@ -353,9 +353,6 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
     }
 
-    /// <remarks>
-    /// Requires to be called inside a write lock
-    /// </remarks>
     private MemoryCacheEntryOptions GetOptions(TimeSpan? timeout = null, bool isSliding = false)
     {
         var options = new MemoryCacheEntryOptions();
