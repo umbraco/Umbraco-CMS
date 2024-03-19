@@ -39,7 +39,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     /// </summary>
     /// <param name="options">The options.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    public ObjectCacheAppCache(IOptions<MemoryCacheOptions> options, ILoggerFactory loggerFactory)
+    internal ObjectCacheAppCache(IOptions<MemoryCacheOptions> options, ILoggerFactory loggerFactory)
         => MemoryCache = new MemoryCache(options, loggerFactory);
 
     /// <inheritdoc />
