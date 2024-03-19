@@ -424,6 +424,7 @@ public class TemplateService : RepositoryService, ITemplateService
 
     private async Task<bool> HasCircularReference(string parsedMasterTemplateAlias, ITemplate template, ITemplate masterTemplate)
     {
+        // quick check without extra DB calls as we already have both templates
         if (parsedMasterTemplateAlias.IsNullOrWhiteSpace() == false
             && masterTemplate.MasterTemplateAlias is not null
             && masterTemplate.MasterTemplateAlias.Equals(template.Alias))
@@ -432,10 +433,10 @@ public class TemplateService : RepositoryService, ITemplateService
         }
 
         var processedTemplates = new List<ITemplate> { template, masterTemplate };
-        return await HasCircularReference(processedTemplates, masterTemplate.MasterTemplateAlias);
+        return await HasRecursiveCircularReference(processedTemplates, masterTemplate.MasterTemplateAlias);
     }
 
-    private async Task<bool> HasCircularReference(List<ITemplate> referencedTemplates, string? masterTemplateAlias)
+    private async Task<bool> HasRecursiveCircularReference(List<ITemplate> referencedTemplates, string? masterTemplateAlias)
     {
         if (masterTemplateAlias is null)
         {
@@ -456,6 +457,6 @@ public class TemplateService : RepositoryService, ITemplateService
 
         referencedTemplates.Add(masterTemplate);
 
-        return await HasCircularReference(referencedTemplates, masterTemplate.MasterTemplateAlias);
+        return await HasRecursiveCircularReference(referencedTemplates, masterTemplate.MasterTemplateAlias);
     }
 }
