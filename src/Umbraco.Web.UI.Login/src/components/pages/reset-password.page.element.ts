@@ -39,9 +39,9 @@ export default class UmbResetPasswordPageElement extends LitElement {
               <umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
             </h1>
             <span>
-							<umb-localize key="login_forgottenPasswordInstruction"
-              >An email will be sent to the address specified with a link to reset your password</umb-localize
-              >
+							<umb-localize key="login_forgottenPasswordInstruction">
+                An email will be sent to the address specified with a link to reset your password
+              </umb-localize>
 						</span>
           </header>
 

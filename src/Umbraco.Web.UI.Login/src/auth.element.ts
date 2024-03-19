@@ -34,10 +34,11 @@ const createInput = (opts: {
   return input;
 };
 
-const createLabel = (opts: { forId: string; localizeAlias: string }) => {
+const createLabel = (opts: { forId: string; localizeAlias: string; localizeFallback: string; }) => {
   const label = document.createElement('uui-label');
   const umbLocalize = document.createElement('umb-localize') as UmbLocalizeElement;
   umbLocalize.key = opts.localizeAlias;
+  umbLocalize.innerHTML = opts.localizeFallback;
   label.for = opts.forId;
   label.appendChild(umbLocalize);
 
@@ -184,8 +185,9 @@ export default class UmbAuthElement extends LitElement {
     this._usernameLabel = createLabel({
       forId: 'username-input',
       localizeAlias: this.usernameIsEmail ? 'general_email' : 'general_username',
+      localizeFallback: this.usernameIsEmail ? 'Email' : 'Username',
     });
-    this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'general_password'});
+    this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'general_password', localizeFallback: 'Password'});
 
     this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
     this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);

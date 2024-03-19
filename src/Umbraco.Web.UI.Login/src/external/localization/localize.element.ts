@@ -14,32 +14,40 @@ import { umbLocalizationContext } from './localization-context.js';
  */
 @customElement('umb-localize')
 export class UmbLocalizeElement extends LitElement {
+  #key = '';
+
 	@property({ type: String })
-	key!: string;
+	set key (value: string) {
+    this.#key = value;
+    this.#text().then((val) => {
+      this.value = val;
+    });
+  }
+  get key() {
+    return this.#key;
+  }
 
 	@state()
 	value = '';
 
-	connectedCallback() {
-		super.connectedCallback();
-		this.#load();
+  async #text(): Promise<string> {
+    const localizedValue = await this.localize(this.key);
+
+    // If the value is the same as the key, it means the key was not found.
+    if (localizedValue === '#fallback#') {
+      return this.textContent ?? this.key;
+    }
+
+    return localizedValue;
+  }
+
+	async localize(key: string): Promise<string> {
+		return umbLocalizationContext.localize(key, undefined, '#fallback#');
 	}
 
-	async #load() {
-		try {
-			this.value = await this.localize(this.key);
-		} catch (error: any) {
-			console.error('Failed to localize key:', this.key, error);
-		}
-	}
-
-	async localize(key: string, fallback?: string): Promise<string> {
-		return umbLocalizationContext.localize(key, undefined, fallback);
-	}
-
-	render() {
-		return this.value ? html`${unsafeHTML(this.value)}` : html`<slot></slot>`;
-	}
+  render() {
+    return html`${unsafeHTML(this.value)}`
+  }
 }
 
 declare global {

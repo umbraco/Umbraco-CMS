@@ -1,34 +1,30 @@
 import { firstValueFrom, ReplaySubject } from 'rxjs';
 
 class UmbLocalizationContext {
-    #init = false;
     #innerDictionary = new ReplaySubject<Map<string, string>>(1);
 
+    constructor() {
+      this.#initLocalizedResources();
+    }
+
     async #initLocalizedResources(): Promise<void> {
-        if (this.#init) {
-            return;
-        }
+      const innerDictionary = new Map<string, string>();
+      /*const response = await fetch(this.#apiBasePath);
 
-        this.#init = true;
+      if (!response.ok) {
+          throw new Error(`Failed to fetch localized resources: ${response.status} ${response.statusText}`);
+      }
 
-        /*const response = await fetch(this.#apiBasePath);
+      // Resources are returned as a dictionary of dictionaries and we need to flatten it to a single dictionary.
+      // The keys need to be prefixed with the dictionary name and an underscore.
+      const resources = await response.json();
+      for (const [dictionaryName, dictionary] of Object.entries(resources)) {
+          for (const [key, value] of Object.entries(dictionary as Record<string, string>)) {
+              innerDictionary.set(`${dictionaryName}_${key}`, value);
+          }
+      }*/
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch localized resources: ${response.status} ${response.statusText}`);
-        }
-
-        // Resources are returned as a dictionary of dictionaries and we need to flatten it to a single dictionary.
-        // The keys need to be prefixed with the dictionary name and an underscore.
-        const resources = await response.json();
-        const innerDictionary = new Map<string, string>();
-        for (const [dictionaryName, dictionary] of Object.entries(resources)) {
-            for (const [key, value] of Object.entries(dictionary as Record<string, string>)) {
-                innerDictionary.set(`${dictionaryName}_${key}`, value);
-            }
-        }
-
-        this.#innerDictionary.next(innerDictionary);*/
-        this.#innerDictionary.next(new Map<string, string>());
+      this.#innerDictionary.next(innerDictionary);
     }
 
     /**
@@ -41,18 +37,6 @@ class UmbLocalizationContext {
      */
     async localize(key: string, tokens?: any[], fallback?: string): Promise<string> {
         return this._lookup(key, tokens, fallback);
-    }
-
-    /**
-     * Localize many keys.
-     * If a key is not found, the key is returned.
-     * @param keys
-     * @see localize
-     */
-    async localizeMany(keys: string[]): Promise<string[]> {
-        this.#initLocalizedResources();
-        const innerDictionary = await firstValueFrom(this.#innerDictionary);
-        return keys.map((key) => innerDictionary.get(key) ?? key ?? '');
     }
 
     /**
@@ -71,7 +55,6 @@ class UmbLocalizationContext {
     }
 
     private async _lookup(alias: string, tokens?: any[], fallbackValue?: string) {
-        this.#initLocalizedResources();
         const dictionary = await firstValueFrom(this.#innerDictionary);
 
         //strip the key identifier if its there
@@ -87,16 +70,13 @@ class UmbLocalizationContext {
         }
 
         const valueEntry = dictionary.get(alias);
+        console.log('value for key', alias, 'is', valueEntry, 'with tokens', tokens, 'and fallback', fallbackValue);
 
-        if (valueEntry) {
+        if (typeof valueEntry !== 'undefined') {
             return this.tokenReplace(valueEntry, tokens);
         }
 
-        if (fallbackValue) {
-            return fallbackValue;
-        }
-
-        return `[${alias}]`;
+        return fallbackValue ?? `[${alias}]`;
     }
 }
 
